@@ -18,10 +18,8 @@
 
 package com.quartercode.disconnected.launch;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -150,13 +148,15 @@ public class Launcher {
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            while ( (line = reader.readLine()) != null) {
-                LOGGER.info(line);
-            }
+            StreamGobbler outputGobbler = new StreamGobbler("> ", process.getInputStream(), System.out);
+            outputGobbler.start();
+            StreamGobbler errorGobbler = new StreamGobbler("> ", process.getErrorStream(), System.err);
+            errorGobbler.start();
 
             process.waitFor();
+
+            outputGobbler.interrupt();
+            errorGobbler.interrupt();
         }
         catch (URISyntaxException e) {
             LOGGER.log(Level.SEVERE, "Can't find jar file", e);
