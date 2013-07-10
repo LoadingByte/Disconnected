@@ -34,6 +34,7 @@ public class Main {
      */
     public static void main(String[] args) {
 
+        LOGGER.info("Version " + Disconnected.getVersion());
     }
 
     private Main() {

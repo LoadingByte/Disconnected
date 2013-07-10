@@ -28,6 +28,16 @@ public class Disconnected {
     private static final File RESOURCES = new File("resources");
 
     /**
+     * Returns the current implemented version.
+     * 
+     * @return The current implemented version.
+     */
+    public static String getVersion() {
+
+        return Disconnected.class.getPackage().getImplementationVersion();
+    }
+
+    /**
      * Returns the resources directory.
      * 
      * @return The resources directory.
