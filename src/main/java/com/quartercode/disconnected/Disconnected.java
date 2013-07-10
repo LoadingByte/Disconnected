@@ -27,6 +27,11 @@ public class Disconnected {
 
     private static final File RESOURCES = new File("resources");
 
+    /**
+     * Returns the resources directory.
+     * 
+     * @return The resources directory.
+     */
     public static File getResources() {
 
         return RESOURCES;

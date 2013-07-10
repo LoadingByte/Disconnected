@@ -138,12 +138,20 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/target/resources</outputDirectory>
+							<outputDirectory>${project.build.directory}</outputDirectory>
 							<resources>
 								<resource>
 									<filtering>false</filtering>
 									<directory>src/main/resources</directory>
-									<targetPath>.</targetPath>
+									<targetPath>resources</targetPath>
+									<includes>
+										<include>**/*</include>
+									</includes>
+								</resource>
+								<resource>
+									<filtering>false</filtering>
+									<directory>src/main/config</directory>
+									<targetPath>config</targetPath>
 									<includes>
 										<include>**/*</include>
 									</includes>

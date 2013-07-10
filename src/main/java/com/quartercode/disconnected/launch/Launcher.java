@@ -26,6 +26,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import com.quartercode.disconnected.Main;
 
 /**
@@ -33,6 +35,8 @@ import com.quartercode.disconnected.Main;
  * This allows to set vm arguments internally, e.g. for a natives path.
  */
 public class Launcher {
+
+    private static final Logger LOGGER = Logger.getLogger(Launcher.class.getName());
 
     /**
      * The main method which creates and calls a new launcher.
@@ -43,7 +47,7 @@ public class Launcher {
     public static void main(String[] args) {
 
         String mainClass = Main.class.getName();
-        List<String> vmArguments = Arrays.asList("-Djava.library.path=lib/natives");
+        List<String> vmArguments = Arrays.asList("-Djava.util.logging.config.file=config/logging.properties", "-Djava.library.path=lib/natives");
 
         Launcher launcher = new Launcher(mainClass, vmArguments);
         launcher.launch();
@@ -126,8 +130,8 @@ public class Launcher {
      */
     public void launch() {
 
-        System.out.println("Launching main class " + mainClass + " ...");
-        System.out.println("VM Arguments: " + vmArguments);
+        LOGGER.info("Launching main class " + mainClass + " ...");
+        LOGGER.info("VM Arguments: " + vmArguments);
 
         try {
             File file = new File(Launcher.class.getProtectionDomain().getCodeSource().getLocation().toURI());
@@ -149,25 +153,22 @@ public class Launcher {
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ( (line = reader.readLine()) != null) {
-                System.out.println(line);
+                LOGGER.info(line);
             }
 
             process.waitFor();
         }
         catch (URISyntaxException e) {
-            System.err.println("Can't find jar file");
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Can't find jar file", e);
         }
         catch (IOException e) {
-            System.err.println("Can't build process/read process output");
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Can't build process/read process output", e);
         }
         catch (InterruptedException e) {
-            System.err.println("Interrupted while waiting for ");
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Interrupted while waiting for launched process", e);
         }
 
-        System.out.println("Launcher terminated");
+        LOGGER.info("Launcher terminated");
     }
 
 }

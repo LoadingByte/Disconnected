@@ -18,10 +18,14 @@
 
 package com.quartercode.disconnected;
 
+import java.util.logging.Logger;
+
 /**
  * The main class which initalizes the whole game.
  */
 public class Main {
+
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     /**
      * The main method which initalizes the whole game.
@@ -30,6 +34,7 @@ public class Main {
      */
     public static void main(String[] args) {
 
+        LOGGER.info("Hi");
     }
 
     private Main() {
