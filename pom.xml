@@ -1,276 +1,276 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.quartercode</groupId>
-	<artifactId>disconnected</artifactId>
-	<version>0.0.1-snapshot</version>
-	<packaging>jar</packaging>
+    <groupId>com.quartercode</groupId>
+    <artifactId>disconnected</artifactId>
+    <version>0.0.1-snapshot</version>
+    <packaging>jar</packaging>
 
-	<name>Disconnected</name>
-	<url>http://maven.apache.org</url>
-	<description>Disconnected is a large sandox-type hacking game which simulates the entire world for giving realistic reactions of the society.</description>
-	<inceptionYear>2013</inceptionYear>
+    <name>Disconnected</name>
+    <url>http://maven.apache.org</url>
+    <description>Disconnected is a large sandox-type hacking game which simulates the entire world for giving realistic reactions of the society.</description>
+    <inceptionYear>2013</inceptionYear>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<finalName>${project.artifactId}-${project.version}</finalName>
-		<main.class>com.quartercode.disconnected.launch.Launcher</main.class>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+        <main.class>com.quartercode.disconnected.launch.Launcher</main.class>
+    </properties>
 
-	<organization>
-		<name>QuarterCode</name>
-		<url>http://www.quartercode.com</url>
-	</organization>
+    <organization>
+        <name>QuarterCode</name>
+        <url>http://www.quartercode.com</url>
+    </organization>
 
-	<licenses>
-		<license>
-			<name>GNU General Public License Version 3</name>
-			<url>http://opensource.org/licenses/GPL-3.0</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
+    <licenses>
+        <license>
+            <name>GNU General Public License Version 3</name>
+            <url>http://opensource.org/licenses/GPL-3.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
-	<scm>
-		<url>https://github.com/QuarterCode/Disconnected/tree/master/</url>
-		<connection>scm:git:git://github.com/QuarterCode/Disconnected.git</connection>
-		<developerConnection>scm:git:git@github.com:QuarterCode/Disconnected.git</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
+    <scm>
+        <url>https://github.com/QuarterCode/Disconnected/tree/master/</url>
+        <connection>scm:git:git://github.com/QuarterCode/Disconnected.git</connection>
+        <developerConnection>scm:git:git@github.com:QuarterCode/Disconnected.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 
-	<dependencies>
-		<!-- Utility -->
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.6</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.4</version>
-		</dependency>
+    <dependencies>
+        <!-- Utility -->
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
 
-		<!-- OpenGL -->
-		<dependency>
-			<groupId>org.lwjgl.lwjgl</groupId>
-			<artifactId>lwjgl</artifactId>
-			<version>2.9.0</version>
-		</dependency>
-		<dependency>
-			<groupId>de.matthiasmann.twl</groupId>
-			<artifactId>twl</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>de.matthiasmann.twl</groupId>
-			<artifactId>twleffects</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<!-- Required by TWL -->
-			<groupId>xpp3</groupId>
-			<artifactId>xpp3</artifactId>
-			<version>1.1.4c</version>
-		</dependency>
+        <!-- OpenGL -->
+        <dependency>
+            <groupId>org.lwjgl.lwjgl</groupId>
+            <artifactId>lwjgl</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+        <dependency>
+            <groupId>de.matthiasmann.twl</groupId>
+            <artifactId>twl</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>de.matthiasmann.twl</groupId>
+            <artifactId>twleffects</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <!-- Required by TWL -->
+            <groupId>xpp3</groupId>
+            <artifactId>xpp3</artifactId>
+            <version>1.1.4c</version>
+        </dependency>
 
-		<!-- Test -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        <!-- Test -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-	<build>
-		<defaultGoal>clean install</defaultGoal>
+    <build>
+        <defaultGoal>clean install</defaultGoal>
 
-		<plugins>
-			<!-- License header -->
-			<plugin>
-				<groupId>com.mycila.maven-license-plugin</groupId>
-				<artifactId>maven-license-plugin</artifactId>
-				<version>1.10.b1</version>
-				<executions>
-					<execution>
-						<id>license-header</id>
-						<phase>clean</phase>
-						<configuration>
-							<properties>
-								<name>${project.name}</name>
-								<organization>${project.organization.name}</organization>
-								<url>${project.organization.url}</url>
-								<inceptionYear>${project.inceptionYear}</inceptionYear>
-							</properties>
-							<quiet>true</quiet>
-							<encoding>UTF-8</encoding>
-							<strictCheck>true</strictCheck>
-							<header>HEADER.txt</header>
-							<mapping>
-								<java>SLASHSTAR_STYLE</java>
-							</mapping>
-							<keywords>
-								<keyword>${project.name}</keyword>
-								<keyword>license</keyword>
-							</keywords>
-							<includes>
-								<include>src/main/java/**</include>
-								<include>src/test/java/**</include>
-							</includes>
-						</configuration>
-						<goals>
-							<goal>format</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+        <plugins>
+            <!-- License header -->
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <version>1.10.b1</version>
+                <executions>
+                    <execution>
+                        <id>license-header</id>
+                        <phase>clean</phase>
+                        <configuration>
+                            <properties>
+                                <name>${project.name}</name>
+                                <organization>${project.organization.name}</organization>
+                                <url>${project.organization.url}</url>
+                                <inceptionYear>${project.inceptionYear}</inceptionYear>
+                            </properties>
+                            <quiet>true</quiet>
+                            <encoding>UTF-8</encoding>
+                            <strictCheck>true</strictCheck>
+                            <header>HEADER.txt</header>
+                            <mapping>
+                                <java>SLASHSTAR_STYLE</java>
+                            </mapping>
+                            <keywords>
+                                <keyword>${project.name}</keyword>
+                                <keyword>license</keyword>
+                            </keywords>
+                            <includes>
+                                <include>src/main/java/**</include>
+                                <include>src/test/java/**</include>
+                            </includes>
+                        </configuration>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<!-- Copy resources (only runtime) -->
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.6</version>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}</outputDirectory>
-							<resources>
-								<resource>
-									<filtering>false</filtering>
-									<directory>src/main/resources</directory>
-									<targetPath>resources</targetPath>
-									<includes>
-										<include>**/*</include>
-									</includes>
-								</resource>
-								<resource>
-									<filtering>false</filtering>
-									<directory>src/main/config</directory>
-									<targetPath>config</targetPath>
-									<includes>
-										<include>**/*</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <!-- Copy resources (only runtime) -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <filtering>false</filtering>
+                                    <directory>src/main/resources</directory>
+                                    <targetPath>resources</targetPath>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <filtering>false</filtering>
+                                    <directory>src/main/config</directory>
+                                    <targetPath>config</targetPath>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<!-- Unpack natives -->
-			<plugin>
-				<groupId>com.googlecode.mavennatives</groupId>
-				<artifactId>maven-nativedependencies-plugin</artifactId>
-				<version>0.0.7</version>
-				<executions>
-					<execution>
-						<id>unpack-natives</id>
-						<phase>generate-resources</phase>
-						<configuration>
-							<nativesTargetDir>${project.build.directory}/natives</nativesTargetDir>
-						</configuration>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <!-- Unpack natives -->
+            <plugin>
+                <groupId>com.googlecode.mavennatives</groupId>
+                <artifactId>maven-nativedependencies-plugin</artifactId>
+                <version>0.0.7</version>
+                <executions>
+                    <execution>
+                        <id>unpack-natives</id>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <nativesTargetDir>${project.build.directory}/natives</nativesTargetDir>
+                        </configuration>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<!-- Compile project classes -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
+            <!-- Compile project classes -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
 
-			<!-- Test -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.15</version>
-				<configuration>
-					<forkMode>once</forkMode>
-					<argLine>-Djava.library.path=${project.build.directory}/natives</argLine>
-				</configuration>
-			</plugin>
+            <!-- Test -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.15</version>
+                <configuration>
+                    <forkMode>once</forkMode>
+                    <argLine>-Djava.library.path=${project.build.directory}/natives</argLine>
+                </configuration>
+            </plugin>
 
-			<!-- Build JAR (only project classes) -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<finalName>${finalName}</finalName>
-					<archive>
-						<manifest>
-							<mainClass>${main.class}</mainClass>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
+            <!-- Build JAR (only project classes) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <finalName>${finalName}</finalName>
+                    <archive>
+                        <manifest>
+                            <mainClass>${main.class}</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
 
-			<!-- Generate launch shortcuts -->
-			<plugin>
-				<groupId>org.bluestemsoftware.open.maven.plugin</groupId>
-				<artifactId>launch4j-plugin</artifactId>
-				<version>1.5.0.0</version>
-				<executions>
-					<execution>
-						<id>generate-launch-shortcut-win</id>
-						<phase>package</phase>
-						<goals>
-							<goal>launch4j</goal>
-						</goals>
-						<configuration>
-							<dontWrapJar>true</dontWrapJar>
-							<headerType>gui</headerType>
-							<jar>${finalName}.jar</jar>
-							<outfile>${project.build.directory}/${project.artifactId}.exe</outfile>
-							<icon>src/main/resources/icons/shortcut.ico</icon>
-							<classPath>
-								<mainClass>${main.class}</mainClass>
-							</classPath>
-							<jre>
-								<minVersion>1.6.0</minVersion>
-							</jre>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <!-- Generate launch shortcuts -->
+            <plugin>
+                <groupId>org.bluestemsoftware.open.maven.plugin</groupId>
+                <artifactId>launch4j-plugin</artifactId>
+                <version>1.5.0.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-launch-shortcut-win</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <dontWrapJar>true</dontWrapJar>
+                            <headerType>gui</headerType>
+                            <jar>${finalName}.jar</jar>
+                            <outfile>${project.build.directory}/${project.artifactId}.exe</outfile>
+                            <icon>src/main/resources/icons/shortcut.ico</icon>
+                            <classPath>
+                                <mainClass>${main.class}</mainClass>
+                            </classPath>
+                            <jre>
+                                <minVersion>1.6.0</minVersion>
+                            </jre>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<!-- Assemble packages -->
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<outputDirectory>${project.build.directory}</outputDirectory>
-				</configuration>
-				<executions>
-					<execution>
-						<id>assemble-packages</id>
-						<phase>package</phase>
-						<configuration>
-							<descriptors>
-								<descriptor>src/main/assembly/bin.xml</descriptor>
-							</descriptors>
-						</configuration>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+            <!-- Assemble packages -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>assemble-packages</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/bin.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
