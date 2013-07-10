@@ -19,6 +19,7 @@
 package com.quartercode.disconnected;
 
 import java.util.logging.Logger;
+import com.quartercode.disconnected.util.LogExceptionHandler;
 
 /**
  * The main class which initalizes the whole game.
@@ -33,6 +34,8 @@ public class Main {
      * @param args The command line arguments.
      */
     public static void main(String[] args) {
+
+        Thread.setDefaultUncaughtExceptionHandler(new LogExceptionHandler());
 
         LOGGER.info("Version " + Disconnected.getVersion());
     }

@@ -63,7 +63,7 @@ public class StreamGobblerTest {
         StreamGobbler gobbler = new StreamGobbler(prefix, inputStream, new PrintStream(outputStream));
         gobbler.start();
         gobbler.join();
-        Assert.assertEquals(outputStream.toString(), (prefix == null ? "" : prefix) + input + System.getProperty("line.separator"));
+        Assert.assertEquals("Input equals output", outputStream.toString(), (prefix == null ? "" : prefix) + input + System.getProperty("line.separator"));
     }
 
 }
