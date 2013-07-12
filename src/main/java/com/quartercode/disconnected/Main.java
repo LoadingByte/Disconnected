@@ -18,6 +18,8 @@
 
 package com.quartercode.disconnected;
 
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import com.quartercode.disconnected.util.LogExceptionHandler;
 
@@ -34,6 +36,14 @@ public class Main {
      * @param args The command line arguments.
      */
     public static void main(String[] args) {
+
+        try {
+            LogManager.getLogManager().readConfiguration(Main.class.getResourceAsStream("/config/logging.properties"));
+        }
+        catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Can't load logging configuration", e);
+            return;
+        }
 
         Thread.setDefaultUncaughtExceptionHandler(new LogExceptionHandler());
 

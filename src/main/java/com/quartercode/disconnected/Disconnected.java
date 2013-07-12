@@ -18,14 +18,10 @@
 
 package com.quartercode.disconnected;
 
-import java.io.File;
-
 /**
  * A static storage class which stores important game values;
  */
 public class Disconnected {
-
-    private static final File RESOURCES = new File("resources");
 
     /**
      * Returns the current implemented version.
@@ -35,16 +31,6 @@ public class Disconnected {
     public static String getVersion() {
 
         return Disconnected.class.getPackage().getImplementationVersion();
-    }
-
-    /**
-     * Returns the resources directory.
-     * 
-     * @return The resources directory.
-     */
-    public static File getResources() {
-
-        return RESOURCES;
     }
 
     private Disconnected() {

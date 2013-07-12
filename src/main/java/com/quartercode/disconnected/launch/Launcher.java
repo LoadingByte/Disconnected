@@ -45,7 +45,7 @@ public class Launcher {
     public static void main(String[] args) {
 
         String mainClass = Main.class.getName();
-        List<String> vmArguments = Arrays.asList("-Djava.util.logging.config.file=config/logging.properties", "-Djava.library.path=lib/natives");
+        List<String> vmArguments = Arrays.asList("-Djava.library.path=lib/natives");
 
         Launcher launcher = new Launcher(mainClass, vmArguments);
         launcher.launch();
@@ -129,7 +129,6 @@ public class Launcher {
     public void launch() {
 
         LOGGER.info("Launching main class " + mainClass + " ...");
-        LOGGER.info("VM Arguments: " + vmArguments);
 
         try {
             File file = new File(Launcher.class.getProtectionDomain().getCodeSource().getLocation().toURI());
@@ -137,9 +136,13 @@ public class Launcher {
             List<String> arguments = new ArrayList<String>();
             arguments.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
 
-            for (String vmArgument : vmArguments) {
-                arguments.add(vmArgument);
+            if (vmArguments != null) {
+                LOGGER.info("VM Arguments: " + vmArguments);
+                for (String vmArgument : vmArguments) {
+                    arguments.add(vmArgument);
+                }
             }
+
             arguments.add("-cp");
             arguments.add(file.getAbsolutePath());
             arguments.add(mainClass);

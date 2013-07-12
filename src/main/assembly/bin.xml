@@ -2,6 +2,7 @@
 <assembly>
     <id>bin</id>
     <formats>
+        <format>dir</format>
         <format>tar.gz</format>
         <format>zip</format>
     </formats>
@@ -14,7 +15,7 @@
     </files>
 
     <fileSets>
-        <!-- General -->
+        <!-- Information -->
         <fileSet>
             <directory>${project.basedir}</directory>
             <outputDirectory>.</outputDirectory>
@@ -23,22 +24,14 @@
                 <include>LICENSE.*</include>
             </includes>
         </fileSet>
+
+        <!-- Shortcuts -->
         <fileSet>
             <directory>${project.build.directory}</directory>
             <outputDirectory>.</outputDirectory>
             <includes>
                 <include>*.exe</include>
             </includes>
-        </fileSet>
-
-        <!-- Resources -->
-        <fileSet>
-            <directory>src/main/config</directory>
-            <outputDirectory>config</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>src/main/resources</directory>
-            <outputDirectory>resources</outputDirectory>
         </fileSet>
 
         <!-- Natives -->

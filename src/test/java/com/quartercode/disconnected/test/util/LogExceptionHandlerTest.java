@@ -92,7 +92,7 @@ public class LogExceptionHandlerTest {
         thread.start();
         thread.join();
 
-        Assert.assertEquals("Logged uncaught throwable", catched.get(), log);
+        Assert.assertTrue("Logged uncaught throwable", catched.get() == log);
     }
 
 }
