@@ -96,6 +96,9 @@
                     <execution>
                         <id>license-header</id>
                         <phase>clean</phase>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
                         <configuration>
                             <properties>
                                 <name>${project.name}</name>
@@ -119,9 +122,6 @@
                                 <include>src/test/java/**</include>
                             </includes>
                         </configuration>
-                        <goals>
-                            <goal>format</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -195,6 +195,9 @@
                     <execution>
                         <id>generate-launch-shortcut-win</id>
                         <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
                         <configuration>
                             <dontWrapJar>true</dontWrapJar>
                             <headerType>gui</headerType>
@@ -208,9 +211,6 @@
                                 <minVersion>1.6.0</minVersion>
                             </jre>
                         </configuration>
-                        <goals>
-                            <goal>launch4j</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -226,14 +226,14 @@
                     <execution>
                         <id>assemble-packages</id>
                         <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
                         <configuration>
                             <descriptors>
                                 <descriptor>src/main/assembly/bin.xml</descriptor>
                             </descriptors>
                         </configuration>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
