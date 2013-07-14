@@ -96,7 +96,7 @@ public class Launcher {
     /**
      * Sets the main class which get called on launch.
      * 
-     * @param The main class which get called on launch.
+     * @param mainClass The main class which get called on launch.
      */
     public void setMainClass(String mainClass) {
 
@@ -116,7 +116,7 @@ public class Launcher {
     /**
      * Sets the vm arguments which gets set on launch.
      * 
-     * @param The vm arguments which gets set on launch.
+     * @param vmArguments The vm arguments which gets set on launch.
      */
     public void setVmArguments(List<String> vmArguments) {
 
