@@ -18,10 +18,14 @@
 
 package com.quartercode.disconnected;
 
+import com.quartercode.disconnected.sim.run.Simulator;
+
 /**
  * A static storage class which stores important game values;
  */
 public class Disconnected {
+
+    private static Simulator simulator;
 
     /**
      * Returns the current implemented version.
@@ -31,6 +35,26 @@ public class Disconnected {
     public static String getVersion() {
 
         return Disconnected.class.getPackage().getImplementationVersion();
+    }
+
+    /**
+     * Returns the active simulator.
+     * 
+     * @return The active simulator.
+     */
+    public static Simulator getSimulator() {
+
+        return simulator;
+    }
+
+    /**
+     * Sets the active simulator to a new simulator.
+     * 
+     * @param simulator The new active simulator.
+     */
+    public static void setSimulator(Simulator simulator) {
+
+        Disconnected.simulator = simulator;
     }
 
     private Disconnected() {
