@@ -21,7 +21,7 @@ package com.quartercode.disconnected;
 import com.quartercode.disconnected.sim.run.Simulator;
 
 /**
- * A static storage class which stores important game values;
+ * A static storage class which stores important game values.
  */
 public class Disconnected {
 
