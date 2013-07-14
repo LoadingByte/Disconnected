@@ -68,6 +68,7 @@ public class LogExceptionHandlerTest {
         thread.setUncaughtExceptionHandler(new LogExceptionHandler());
 
         final AtomicBoolean catched = new AtomicBoolean();
+        LogExceptionHandler.getLogger().setUseParentHandlers(false);
         LogExceptionHandler.getLogger().addHandler(new Handler() {
 
             @Override
