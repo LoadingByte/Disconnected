@@ -29,15 +29,14 @@ import java.util.List;
 public class Program extends ComputerPart {
 
     /**
-     * Creates a new program and sets the name, the version and the vulnerabilities.
+     * Creates a new program and sets the name and the vulnerabilities.
      * 
      * @param name The name the program has.
-     * @param version The version of the program (hasn't to be a number).
      * @param vulnerabilities The vulnerabilities the program has.
      */
-    protected Program(String name, String version, List<Vulnerability> vulnerabilities) {
+    protected Program(String name, List<Vulnerability> vulnerabilities) {
 
-        super(name, version, vulnerabilities);
+        super(name, vulnerabilities);
     }
 
 }

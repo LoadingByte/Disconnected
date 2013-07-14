@@ -34,16 +34,15 @@ public class Mainboard extends ComputerPart {
     private List<MainboradSlot> slots;
 
     /**
-     * Creates a new mainboard and sets the name, the version, the vulnerabilities and a list of all avaiable mainboard slots.
+     * Creates a new mainboard and sets the name, the vulnerabilities and a list of all avaiable mainboard slots.
      * 
      * @param name The name the part has.
-     * @param version The version of the part (hasn't to be a number).
      * @param vulnerabilities The vulnerabilities the part has.
      * @param slots A list of all avaiable mainboard slots.
      */
-    public Mainboard(String name, String version, List<Vulnerability> vulnerabilities, List<MainboradSlot> slots) {
+    public Mainboard(String name, List<Vulnerability> vulnerabilities, List<MainboradSlot> slots) {
 
-        super(name, version, vulnerabilities);
+        super(name, vulnerabilities);
 
         this.slots = slots;
     }

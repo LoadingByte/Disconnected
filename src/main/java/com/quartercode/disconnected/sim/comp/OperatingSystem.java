@@ -29,15 +29,14 @@ import java.util.List;
 public class OperatingSystem extends ComputerPart {
 
     /**
-     * Creates a new operating system and sets the name, the version and the vulnerabilities.
+     * Creates a new operating system and sets the name and the vulnerabilities.
      * 
      * @param name The name the operating system has.
-     * @param version The version of the operating system (hasn't to be a number).
      * @param vulnerabilities The vulnerabilities the operating system has.
      */
-    public OperatingSystem(String name, String version, List<Vulnerability> vulnerabilities) {
+    public OperatingSystem(String name, List<Vulnerability> vulnerabilities) {
 
-        super(name, version, vulnerabilities);
+        super(name, vulnerabilities);
     }
 
 }

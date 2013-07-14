@@ -32,17 +32,16 @@ public class RAM extends Hardware {
     private long frequency;
 
     /**
-     * Creates a new ram module and sets the name, the version, the vulnerabilities, the size and the access frequency.
+     * Creates a new ram module and sets the name, the vulnerabilities, the size and the access frequency.
      * 
      * @param name The name the cpu has.
-     * @param version The version of the cpu (hasn't to be a number).
      * @param vulnerabilities The vulnerabilities the cpu has.
      * @param size The size of the ram module, given in bytes.
      * @param frequency The access frequency of the ram module, given in hertz.
      */
-    public RAM(String name, String version, List<Vulnerability> vulnerabilities, long size, long frequency) {
+    public RAM(String name, List<Vulnerability> vulnerabilities, long size, long frequency) {
 
-        super(name, version, vulnerabilities);
+        super(name, vulnerabilities);
 
         this.size = size;
         this.frequency = frequency;

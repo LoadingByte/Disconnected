@@ -35,15 +35,14 @@ import com.quartercode.disconnected.sim.comp.hardware.RAM;
 public class Hardware extends ComputerPart {
 
     /**
-     * Creates a new hardware part and sets the name, the version and the vulnerabilities.
+     * Creates a new hardware part and sets the name and the vulnerabilities.
      * 
      * @param name The name the part has.
-     * @param version The version of the part (hasn't to be a number).
      * @param vulnerabilities The vulnerabilities the part has.
      */
-    protected Hardware(String name, String version, List<Vulnerability> vulnerabilities) {
+    protected Hardware(String name, List<Vulnerability> vulnerabilities) {
 
-        super(name, version, vulnerabilities);
+        super(name, vulnerabilities);
     }
 
 }

@@ -37,20 +37,17 @@ import java.util.List;
 public class ComputerPart {
 
     private String              name;
-    private String              version;
     private List<Vulnerability> vulnerabilities;
 
     /**
-     * Creates a new computer part and sets the name, the version and the vulnerabilities.
+     * Creates a new computer part and sets the name and the vulnerabilities.
      * 
      * @param name The name the part has.
-     * @param version The version of the part (hasn't to be a number).
      * @param vulnerabilities The vulnerabilities the part has.
      */
-    protected ComputerPart(String name, String version, List<Vulnerability> vulnerabilities) {
+    protected ComputerPart(String name, List<Vulnerability> vulnerabilities) {
 
         this.name = name;
-        this.version = version;
         this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
     }
 
@@ -62,16 +59,6 @@ public class ComputerPart {
     public String getName() {
 
         return name;
-    }
-
-    /**
-     * Returns the version of the part (hasn't to be a number).
-     * 
-     * @return The version of the part (hasn't to be a number).
-     */
-    public String getVersion() {
-
-        return version;
     }
 
     /**

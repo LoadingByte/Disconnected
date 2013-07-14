@@ -32,17 +32,16 @@ public class CPU extends Hardware {
     private long frequency;
 
     /**
-     * Creates a new cpu and sets the name, the version, the vulnerabilities, the count of possible threads and the frequency.
+     * Creates a new cpu and sets the name, the vulnerabilities, the count of possible threads and the frequency.
      * 
      * @param name The name the cpu has.
-     * @param version The version of the cpu (hasn't to be a number).
      * @param vulnerabilities The vulnerabilities the cpu has.
      * @param threads The count of possible threads running at the same time.
      * @param frequency The frequency of the cpu, given in hertz.
      */
-    public CPU(String name, String version, List<Vulnerability> vulnerabilities, int threads, long frequency) {
+    public CPU(String name, List<Vulnerability> vulnerabilities, int threads, long frequency) {
 
-        super(name, version, vulnerabilities);
+        super(name, vulnerabilities);
 
         this.threads = threads;
         this.frequency = frequency;
