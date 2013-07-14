@@ -27,10 +27,6 @@ public class LocationTest {
 
     private Location location;
 
-    public LocationTest() {
-
-    }
-
     @Before
     public void setUp() throws Exception {
 

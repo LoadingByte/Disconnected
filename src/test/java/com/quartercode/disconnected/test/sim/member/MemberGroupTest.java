@@ -28,10 +28,6 @@ public class MemberGroupTest {
 
     private MemberGroup group;
 
-    public MemberGroupTest() {
-
-    }
-
     @Before
     public void setUp() {
 

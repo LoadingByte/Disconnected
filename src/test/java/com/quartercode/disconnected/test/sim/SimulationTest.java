@@ -28,10 +28,6 @@ public class SimulationTest {
 
     private Simulation simulation;
 
-    public SimulationTest() {
-
-    }
-
     @Before
     public void setUp() {
 
