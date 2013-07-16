@@ -30,7 +30,7 @@ public class MemberTest {
     private MemberGroup group;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
         member = new Member("member");
         group = new MemberGroup();

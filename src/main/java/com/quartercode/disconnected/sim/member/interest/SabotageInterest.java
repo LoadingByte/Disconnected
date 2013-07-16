@@ -25,7 +25,7 @@ import com.quartercode.disconnected.sim.member.MemberGroup;
  * This is a simple sabotage interest which has a computer as target.
  * 
  * @see Interest
- * @see ComputerTarget
+ * @see Target
  */
 public class SabotageInterest extends Interest implements Target {
 

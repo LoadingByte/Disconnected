@@ -28,7 +28,7 @@ public class LocationTest {
     private Location location;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
         location = new Location(0.1F, 0.2F);
     }

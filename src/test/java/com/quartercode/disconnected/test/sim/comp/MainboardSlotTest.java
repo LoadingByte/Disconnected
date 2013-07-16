@@ -31,7 +31,7 @@ public class MainboardSlotTest {
     private CPU           content;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
         mainboradSlot = new MainboradSlot(CPU.class);
         content = new CPU(null, null, 0, 0);

@@ -85,7 +85,7 @@ public class LogExceptionHandlerTest {
             }
 
             @Override
-            public void close() throws SecurityException {
+            public void close() {
 
             }
         });

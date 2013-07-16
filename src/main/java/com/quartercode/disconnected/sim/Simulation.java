@@ -82,7 +82,7 @@ public class Simulation {
      * Returns the member of this simulation which controls the given computer.
      * Returns null if the given computer isn't controlled by any member.
      * 
-     * @param member The computer which is controlled by the member to return.
+     * @param computer The computer which is controlled by the member to return.
      * @return The member of this simulation which controls the given computer.
      */
     public Member getMember(Computer computer) {
