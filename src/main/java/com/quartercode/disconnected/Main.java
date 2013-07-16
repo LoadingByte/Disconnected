@@ -18,10 +18,14 @@
 
 package com.quartercode.disconnected;
 
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import com.quartercode.disconnected.resstore.Resstore;
+import com.quartercode.disconnected.resstore.ResstoreLoader;
 import com.quartercode.disconnected.util.LogExceptionHandler;
+import com.quartercode.disconnected.util.ResourceLister;
 
 /**
  * The main class which initalizes the whole game.
@@ -48,6 +52,22 @@ public class Main {
         Thread.setDefaultUncaughtExceptionHandler(new LogExceptionHandler());
 
         LOGGER.info("Version " + Disconnected.getVersion());
+
+        try {
+            for (String name : ResourceLister.getResources("/data/parts", false)) {
+                try {
+                    Resstore.addComputerPart(ResstoreLoader.loadComputerPart(Main.class.getResourceAsStream(name)));
+                }
+                catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Can't load computer part under \"" + name + "\"", e);
+                    return;
+                }
+            }
+        }
+        catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Can't read resource list for computer parts", e);
+            return;
+        }
     }
 
     private Main() {
