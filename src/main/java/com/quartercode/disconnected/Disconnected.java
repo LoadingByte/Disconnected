@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected;
 
+import com.quartercode.disconnected.profile.ProfileManager;
 import com.quartercode.disconnected.resstore.ResoureStore;
 import com.quartercode.disconnected.sim.run.Simulator;
 
@@ -26,9 +27,10 @@ import com.quartercode.disconnected.sim.run.Simulator;
  */
 public class Disconnected {
 
-    private static ResoureStore resoureStore;
+    private static ResoureStore   resoureStore;
+    private static ProfileManager profileManager;
 
-    private static Simulator    simulator;
+    private static Simulator      simulator;
 
     /**
      * Returns the current implemented version.
@@ -58,6 +60,26 @@ public class Disconnected {
     public static void setResoureStore(ResoureStore resoureStore) {
 
         Disconnected.resoureStore = resoureStore;
+    }
+
+    /**
+     * Returns the active profile manager for storing loaded profiles (which are actually simulations).
+     * 
+     * @return The active profile manager.
+     */
+    public static ProfileManager getProfileManager() {
+
+        return profileManager;
+    }
+
+    /**
+     * Sets the active profile manager to a new profile manager.
+     * 
+     * @param profileManager The new active profile manager.
+     */
+    public static void setProfileManager(ProfileManager profileManager) {
+
+        Disconnected.profileManager = profileManager;
     }
 
     /**

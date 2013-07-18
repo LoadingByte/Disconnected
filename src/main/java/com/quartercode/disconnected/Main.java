@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import com.quartercode.disconnected.profile.ProfileManager;
 import com.quartercode.disconnected.resstore.ResoureStore;
 import com.quartercode.disconnected.resstore.ResoureStoreLoader;
 import com.quartercode.disconnected.util.LogExceptionHandler;
@@ -73,6 +74,9 @@ public class Main {
             LOGGER.log(Level.SEVERE, "Can't read resource list for computer parts", e);
             return;
         }
+
+        // Initalize profile manager and load stored profiles (TODO: Add code for loading).
+        Disconnected.setProfileManager(new ProfileManager());
     }
 
     private Main() {

@@ -20,9 +20,13 @@ package com.quartercode.disconnected.sim.member;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.member.interest.Interest;
 
@@ -34,12 +38,24 @@ import com.quartercode.disconnected.sim.member.interest.Interest;
  * @see Interest
  * @see Reputation
  */
+@XmlAccessorType (XmlAccessType.FIELD)
 public class Member {
 
-    private String                       name;
-    private List<Interest>               interests   = new CopyOnWriteArrayList<Interest>();
-    private Map<MemberGroup, Reputation> reputations = new ConcurrentHashMap<MemberGroup, Reputation>();
-    private Computer                     computer;
+    @XmlAttribute
+    @XmlID
+    private String         name;
+    @XmlElement (name = "interest")
+    private List<Interest> interests = new CopyOnWriteArrayList<Interest>();
+    @XmlIDREF
+    private Computer       computer;
+
+    /**
+     * Creates a new empty member.
+     * This is only recommended for direct field access (e.g. for serialization).
+     */
+    public Member() {
+
+    }
 
     /**
      * Creates a new member and sets the name.
@@ -59,21 +75,6 @@ public class Member {
     public String getName() {
 
         return name;
-    }
-
-    /**
-     * Returns the reputation of this member from the perspective of the given member group.
-     * If no reputation is set, an empty one will be created.
-     * 
-     * @param group The member group which has the returned reputation of this member.
-     * @return The reputation of this member from the perspective of the given member group.
-     */
-    public Reputation getReputation(MemberGroup group) {
-
-        if (!reputations.containsKey(group)) {
-            reputations.put(group, new Reputation());
-        }
-        return reputations.get(group);
     }
 
     /**

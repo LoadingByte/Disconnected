@@ -22,6 +22,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
@@ -37,10 +42,18 @@ import com.quartercode.disconnected.sim.run.Simulator;
  * @see Computer
  * @see Simulator
  */
+@XmlRootElement (namespace = "http://quartercode.com/")
+@XmlAccessorType (XmlAccessType.FIELD)
 public class Simulation {
 
+    @XmlElementWrapper (name = "members")
+    @XmlElement (name = "member")
     private List<Member>      members   = new CopyOnWriteArrayList<Member>();
+    @XmlElementWrapper (name = "groups")
+    @XmlElement (name = "group")
     private List<MemberGroup> groups    = new CopyOnWriteArrayList<MemberGroup>();
+    @XmlElementWrapper (name = "computers")
+    @XmlElement (name = "computer")
     private List<Computer>    computers = new CopyOnWriteArrayList<Computer>();
 
     /**

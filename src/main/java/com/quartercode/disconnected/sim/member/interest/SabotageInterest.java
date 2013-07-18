@@ -18,8 +18,13 @@
 
 package com.quartercode.disconnected.sim.member.interest;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlIDREF;
+import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
+import com.quartercode.disconnected.sim.run.action.Action;
 
 /**
  * This is a simple sabotage interest which has a computer as target.
@@ -27,9 +32,19 @@ import com.quartercode.disconnected.sim.member.MemberGroup;
  * @see Interest
  * @see Target
  */
+@XmlAccessorType (XmlAccessType.FIELD)
 public class SabotageInterest extends Interest implements Target {
 
+    @XmlIDREF
     private Member target;
+
+    /**
+     * Creates a new empty sabotage interest object.
+     * This is only recommended for direct field access (e.g. for serialization).
+     */
+    public SabotageInterest() {
+
+    }
 
     /**
      * Creates a new sabotage interest and sets the priority and the computer target.
@@ -45,7 +60,13 @@ public class SabotageInterest extends Interest implements Target {
     }
 
     @Override
-    public int getReputationChange(Member member, MemberGroup group) {
+    public Member getTarget() {
+
+        return target;
+    }
+
+    @Override
+    public int getReputationChange(Simulation simulation, Member member, MemberGroup group) {
 
         int change = getPriority() * 3;
 
@@ -61,9 +82,10 @@ public class SabotageInterest extends Interest implements Target {
     }
 
     @Override
-    public Member getTarget() {
+    public Action getAction(Simulation simulation, Member member) {
 
-        return target;
+        // TODO: Implement calculation
+        return null;
     }
 
 }

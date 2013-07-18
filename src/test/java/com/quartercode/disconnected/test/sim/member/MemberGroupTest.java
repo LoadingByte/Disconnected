@@ -34,6 +34,7 @@ public class MemberGroupTest {
         group = new MemberGroup();
         group.addMember(new Member("member1"));
         group.addMember(new Member("member2"));
+        group.getReputation(group.getMembers().get(0)).setValue(10);
         group.addInterest(new EmptyInterest(1));
         group.addInterest(new EmptyInterest(1));
     }
@@ -62,6 +63,12 @@ public class MemberGroupTest {
 
         group.removeMember(group.getMembers().get(0));
         Assert.assertEquals("Member count", 1, group.getMembers().size());
+    }
+
+    @Test
+    public void testGetReputation() {
+
+        Assert.assertEquals(10, group.getReputation(group.getMembers().get(0)).getValue());
     }
 
     @Test

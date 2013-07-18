@@ -21,6 +21,11 @@ package com.quartercode.disconnected.sim.comp;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlID;
 
 /**
  * This class stores information about a computer, like the mainboard, other hardware, programs etc.
@@ -33,23 +38,48 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @see OperatingSystem
  * @see Program
  */
+@XmlAccessorType (XmlAccessType.FIELD)
 public class Computer {
 
-    private Location              location         = new Location();
+    @XmlAttribute
+    @XmlID
+    private String                id;
 
+    private Location              location;
     private Mainboard             mainboard;
+    @XmlElement (name = "hardware")
     private List<Hardware>        hardware         = new CopyOnWriteArrayList<Hardware>();
+    @XmlElement (name = "operatingSystem")
     private List<OperatingSystem> operatingSystems = new CopyOnWriteArrayList<OperatingSystem>();
+    @XmlElement (name = "program")
     private List<Program>         programs         = new CopyOnWriteArrayList<Program>();
 
     /**
-     * Creates a new computer and sets the location.
-     * 
-     * @param location The location for the computer.
+     * Creates a new empty computer.
+     * This is only recommended for direct field access (e.g. for serialization).
      */
-    public Computer(Location location) {
+    public Computer() {
 
-        this.location = location;
+    }
+
+    /**
+     * Creates a new computer and sets the final id.
+     * 
+     * @param id The final id for the computer.
+     */
+    public Computer(String id) {
+
+        this.id = id;
+    }
+
+    /**
+     * Returns the final id the computer has.
+     * 
+     * @return The final id the computer has.
+     */
+    public String getId() {
+
+        return id;
     }
 
     /**
@@ -60,6 +90,16 @@ public class Computer {
     public Location getLocation() {
 
         return location;
+    }
+
+    /**
+     * Sets the location of the computer to a new one.
+     * 
+     * @param location The new location of the computer.
+     */
+    public void setLocation(Location location) {
+
+        this.location = location;
     }
 
     /**
@@ -126,16 +166,6 @@ public class Computer {
     }
 
     /**
-     * Adds an operating system to the computer.
-     * 
-     * @param operatingSystem The operating system to add to the computer.
-     */
-    public void addOperatingSystem(OperatingSystem operatingSystem) {
-
-        operatingSystems.add(operatingSystem);
-    }
-
-    /**
      * Removes an operating system from the computer.
      * 
      * @param operatingSystem The operating system to remove from the computer.
@@ -150,7 +180,7 @@ public class Computer {
      * 
      * @return All programs which are installed on the computer.
      */
-    public List<Program> getProgram() {
+    public List<Program> getPrograms() {
 
         return Collections.unmodifiableList(programs);
     }

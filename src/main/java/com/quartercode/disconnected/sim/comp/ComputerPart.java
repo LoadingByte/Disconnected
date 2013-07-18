@@ -21,6 +21,9 @@ package com.quartercode.disconnected.sim.comp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import org.apache.commons.lang.Validate;
+import com.quartercode.disconnected.Disconnected;
 
 /**
  * This class stores information about a spefific computer part, like a mainboard or an operating system.
@@ -47,6 +50,8 @@ public class ComputerPart {
      */
     protected ComputerPart(String name, List<Vulnerability> vulnerabilities) {
 
+        Validate.notNull(name, "Name can't be null");
+
         this.name = name;
         this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
     }
@@ -69,6 +74,33 @@ public class ComputerPart {
     public List<Vulnerability> getVulnerabilities() {
 
         return Collections.unmodifiableList(vulnerabilities);
+    }
+
+    /**
+     * This computer part name adapter is for storing a computer part in a profile xml file using his name.
+     * While unmarshalling, the adapter loads the resource store resource for the given name.
+     */
+    public static class ComputerPartAdapter extends XmlAdapter<String, ComputerPart> {
+
+        /**
+         * Creates a new computer part adapter.
+         */
+        public ComputerPartAdapter() {
+
+        }
+
+        @Override
+        public ComputerPart unmarshal(String v) throws Exception {
+
+            return Disconnected.getResoureStore().getComputerPart(v);
+        }
+
+        @Override
+        public String marshal(ComputerPart v) throws Exception {
+
+            return v.getName();
+        }
+
     }
 
 }

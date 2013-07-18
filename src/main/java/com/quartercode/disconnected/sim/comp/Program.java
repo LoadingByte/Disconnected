@@ -19,6 +19,8 @@
 package com.quartercode.disconnected.sim.comp;
 
 import java.util.List;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import com.quartercode.disconnected.sim.comp.ComputerPart.ComputerPartAdapter;
 
 /**
  * This class stores information about a program.
@@ -26,6 +28,7 @@ import java.util.List;
  * 
  * @see ComputerPart
  */
+@XmlJavaTypeAdapter (value = ComputerPartAdapter.class)
 public class Program extends ComputerPart {
 
     /**

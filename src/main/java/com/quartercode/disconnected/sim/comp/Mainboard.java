@@ -18,8 +18,11 @@
 
 package com.quartercode.disconnected.sim.comp;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import com.quartercode.disconnected.sim.comp.ComputerPart.ComputerPartAdapter;
 
 /**
  * This class stores information about a mainboard.
@@ -29,6 +32,7 @@ import java.util.List;
  * @see ComputerPart
  * @see Hardware
  */
+@XmlJavaTypeAdapter (value = ComputerPartAdapter.class)
 public class Mainboard extends ComputerPart {
 
     private List<MainboradSlot> slots;
@@ -45,6 +49,26 @@ public class Mainboard extends ComputerPart {
         super(name, vulnerabilities);
 
         this.slots = slots;
+    }
+
+    /**
+     * Creates a new mainboard and sets the name, the vulnerabilities and a all avaiable mainboard slots using a given string list.
+     * The give slot string list gets splitted at commas, the trimmed parts should represent classes.
+     * 
+     * @param name The name the part has.
+     * @param vulnerabilities The vulnerabilities the part has.
+     * @param slots A list of all avaiable mainboard slots.
+     * @throws ClassNotFoundException One of the given slot classes can't be found.
+     */
+    @SuppressWarnings ("unchecked")
+    public Mainboard(String name, List<Vulnerability> vulnerabilities, String slots) throws ClassNotFoundException {
+
+        super(name, vulnerabilities);
+
+        this.slots = new ArrayList<MainboradSlot>();
+        for (String slot : slots.split(",")) {
+            this.slots.add(new MainboradSlot((Class<? extends Hardware>) Class.forName(slot.trim())));
+        }
     }
 
     /**

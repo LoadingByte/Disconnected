@@ -22,33 +22,23 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.sim.member.Member;
-import com.quartercode.disconnected.sim.member.MemberGroup;
 
 public class MemberTest {
 
-    private Member      member;
-    private MemberGroup group;
+    private Member member;
 
     @Before
     public void setUp() {
 
         member = new Member("member");
-        group = new MemberGroup();
-        member.getReputation(group).setValue(10);
         member.addInterest(new EmptyInterest(1));
-        member.addInterest(new EmptyInterest(1));
+        member.addInterest(new EmptyInterest(2));
     }
 
     @Test
     public void testGetName() {
 
         Assert.assertEquals("member", member.getName());
-    }
-
-    @Test
-    public void testGetReputation() {
-
-        Assert.assertEquals(10, member.getReputation(group).getValue());
     }
 
     @Test
@@ -60,7 +50,7 @@ public class MemberTest {
     @Test
     public void testAddInterest() {
 
-        member.addInterest(new EmptyInterest(1));
+        member.addInterest(new EmptyInterest(3));
         Assert.assertEquals("Interest count", 3, member.getInterests().size());
     }
 

@@ -21,6 +21,10 @@ package com.quartercode.disconnected.sim.member;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.member.interest.Interest;
 
 /**
@@ -32,10 +36,16 @@ import com.quartercode.disconnected.sim.member.interest.Interest;
  * @see Reputation
  * @see Interest
  */
+@XmlAccessorType (XmlAccessType.FIELD)
 public class MemberGroup {
 
-    private List<Member>   members   = new CopyOnWriteArrayList<Member>();
-    private List<Interest> interests = new CopyOnWriteArrayList<Interest>();
+    @XmlElement (name = "member")
+    @XmlIDREF
+    private List<Member>     members     = new CopyOnWriteArrayList<Member>();
+    @XmlElement (name = "reputation")
+    private List<Reputation> reputations = new CopyOnWriteArrayList<Reputation>();
+    @XmlElement (name = "interest")
+    private List<Interest>   interests   = new CopyOnWriteArrayList<Interest>();
 
     /**
      * Creates a new empty member group
@@ -90,6 +100,26 @@ public class MemberGroup {
     public void removeMember(Member member) {
 
         members.remove(member);
+    }
+
+    /**
+     * Returns the reputation the given member has from the perspective of this.
+     * If no reputation is set, an empty one will be created.
+     * 
+     * @param member The member whose reputation should be returned.
+     * @return The reputation the given member has from the perspective of this.
+     */
+    public Reputation getReputation(Member member) {
+
+        for (Reputation reputation : reputations) {
+            if (reputation.getMember().equals(member)) {
+                return reputation;
+            }
+        }
+
+        Reputation reputation = new Reputation(member);
+        reputations.add(reputation);
+        return reputation;
     }
 
     /**

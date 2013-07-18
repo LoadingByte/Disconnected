@@ -18,7 +18,12 @@
 
 package com.quartercode.disconnected.sim.member.interest;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import org.apache.commons.lang.Validate;
+import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.run.action.Action;
@@ -31,9 +36,20 @@ import com.quartercode.disconnected.sim.run.action.Action;
  * @see MemberGroup
  * @see Action
  */
+@XmlAccessorType (XmlAccessType.FIELD)
+@XmlSeeAlso (SabotageInterest.class)
 public abstract class Interest {
 
+    @XmlAttribute
     private int priority;
+
+    /**
+     * Creates a new empty interest object.
+     * This is only recommended for direct field access (e.g. for serialization).
+     */
+    public Interest() {
+
+    }
 
     /**
      * Creates a new interest and sets the priority.
@@ -61,10 +77,21 @@ public abstract class Interest {
     /**
      * Returns the reputation change of a group to a member if the member executes the interest.
      * 
+     * @param simulation The simulation which contains the given member.
      * @param member The member which reputation changes.
      * @param group The group which holds the change perspective.
      * @return The reputation change of a group to a member if the member executes the interest.
      */
-    public abstract int getReputationChange(Member member, MemberGroup group);
+    public abstract int getReputationChange(Simulation simulation, Member member, MemberGroup group);
+
+    /**
+     * Calculates the best avaiable action the given member would use for ecexuting the interest.
+     * The calculated action may not be the perfect one, this method should also implement some human roughness.
+     * 
+     * @param simulation The simulation which contains the given member.
+     * @param member The member which should execute the calculated action later.
+     * @return The best avaiable action the given member would use for ecexuting the interest.
+     */
+    public abstract Action getAction(Simulation simulation, Member member);
 
 }

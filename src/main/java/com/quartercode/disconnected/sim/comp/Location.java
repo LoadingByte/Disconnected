@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.sim.comp;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import org.apache.commons.lang.Validate;
 
 /**
@@ -52,6 +53,7 @@ public class Location {
      * 
      * @return The relative x coordinate.
      */
+    @XmlAttribute
     public float getX() {
 
         return x;
@@ -73,6 +75,7 @@ public class Location {
      * 
      * @return The relative y coordinate.
      */
+    @XmlAttribute
     public float getY() {
 
         return y;

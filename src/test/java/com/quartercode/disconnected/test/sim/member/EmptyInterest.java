@@ -18,9 +18,11 @@
 
 package com.quartercode.disconnected.test.sim.member;
 
+import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.interest.Interest;
+import com.quartercode.disconnected.sim.run.action.Action;
 
 public class EmptyInterest extends Interest {
 
@@ -30,9 +32,15 @@ public class EmptyInterest extends Interest {
     }
 
     @Override
-    public int getReputationChange(Member member, MemberGroup group) {
+    public int getReputationChange(Simulation simulation, Member member, MemberGroup group) {
 
         return 0;
+    }
+
+    @Override
+    public Action getAction(Simulation simulation, Member member) {
+
+        return null;
     }
 
 }

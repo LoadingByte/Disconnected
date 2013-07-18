@@ -19,6 +19,8 @@
 package com.quartercode.disconnected.sim.comp;
 
 import java.util.List;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import com.quartercode.disconnected.sim.comp.ComputerPart.ComputerPartAdapter;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 
@@ -32,6 +34,7 @@ import com.quartercode.disconnected.sim.comp.hardware.RAM;
  * @see CPU
  * @see RAM
  */
+@XmlJavaTypeAdapter (value = ComputerPartAdapter.class)
 public class Hardware extends ComputerPart {
 
     /**
