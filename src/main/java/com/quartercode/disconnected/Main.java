@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-import com.quartercode.disconnected.resstore.Resstore;
-import com.quartercode.disconnected.resstore.ResstoreLoader;
+import com.quartercode.disconnected.resstore.ResoureStore;
+import com.quartercode.disconnected.resstore.ResoureStoreLoader;
 import com.quartercode.disconnected.util.LogExceptionHandler;
 import com.quartercode.disconnected.util.ResourceLister;
 
@@ -41,6 +41,7 @@ public class Main {
      */
     public static void main(String[] args) {
 
+        // Logging configuration
         try {
             LogManager.getLogManager().readConfiguration(Main.class.getResourceAsStream("/config/logging.properties"));
         }
@@ -49,14 +50,18 @@ public class Main {
             return;
         }
 
+        // Default exception handler if the vm throws an exception to the entry point of thread (e.g. main() or run())
         Thread.setDefaultUncaughtExceptionHandler(new LogExceptionHandler());
 
+        // Print information about the software
         LOGGER.info("Version " + Disconnected.getVersion());
 
+        // Initalize resource store and load stored resources
+        Disconnected.setResoureStore(new ResoureStore());
         try {
             for (String name : ResourceLister.getResources("/data/parts", false)) {
                 try {
-                    Resstore.addComputerPart(ResstoreLoader.loadComputerPart(Main.class.getResourceAsStream(name)));
+                    Disconnected.getResoureStore().addComputerPart(ResoureStoreLoader.loadComputerPart(Main.class.getResourceAsStream(name)));
                 }
                 catch (Exception e) {
                     LOGGER.log(Level.SEVERE, "Can't load computer part under \"" + name + "\"", e);

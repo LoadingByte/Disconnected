@@ -26,9 +26,9 @@ import javax.xml.bind.annotation.XmlType;
 import com.quartercode.disconnected.sim.comp.ComputerPart;
 
 /**
- * This class represents a loaded resource store computer part which is used by the resstore loader to load computer parts.
+ * This class represents a loaded resource store computer part which is used by the resource store loader to load computer parts.
  * 
- * @see ResstoreLoader
+ * @see ResoureStoreLoader
  */
 @XmlRootElement (namespace = "http://quartercode.com")
 @XmlType (propOrder = { "type", "name", "attributes" })

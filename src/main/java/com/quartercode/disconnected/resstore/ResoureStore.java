@@ -24,21 +24,28 @@ import java.util.List;
 import com.quartercode.disconnected.sim.comp.ComputerPart;
 
 /**
- * This static class stores different resource store resources which can be loaded using the resstore loader.
+ * This static class stores different resource store resources which can be loaded using the resource store loader.
  * 
- * @see ResstoreLoader
+ * @see ResoureStoreLoader
  * @see ComputerPart
  */
-public class Resstore {
+public class ResoureStore {
 
-    private static List<ComputerPart> computerParts = new ArrayList<ComputerPart>();
+    private List<ComputerPart> computerParts = new ArrayList<ComputerPart>();
+
+    /**
+     * Creates a new empty resource store with no loaded resources.
+     */
+    public ResoureStore() {
+
+    }
 
     /**
      * Returns a list of all stored computer parts.
      * 
      * @return A list of all stored computer parts.
      */
-    public static List<ComputerPart> getComputerParts() {
+    public List<ComputerPart> getComputerParts() {
 
         return Collections.unmodifiableList(computerParts);
     }
@@ -49,11 +56,11 @@ public class Resstore {
      * @param type Check if a computer part is assignable from this type.
      * @return A list of all stored computer parts which are assignable from the given type.
      */
-    public static List<ComputerPart> getComputerParts(Class<? extends ComputerPart> type) {
+    public List<ComputerPart> getComputerParts(Class<? extends ComputerPart> type) {
 
         List<ComputerPart> computerParts = new ArrayList<ComputerPart>();
 
-        for (ComputerPart computerPart : Resstore.computerParts) {
+        for (ComputerPart computerPart : this.computerParts) {
             if (type.isAssignableFrom(computerPart.getClass())) {
                 computerParts.add(computerPart);
             }
@@ -63,17 +70,30 @@ public class Resstore {
     }
 
     /**
-     * Stores a computer part into the resstore.
+     * Returns a list of all stored computer parts which have the given name.
+     * 
+     * @param name Check if a computer part has the given name.
+     * @return A list of all stored computer parts which have the given name.
+     */
+    public ComputerPart getComputerPart(String name) {
+
+        for (ComputerPart computerPart : computerParts) {
+            if (computerPart.getName().equals(name)) {
+                return computerPart;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Stores a computer part into the resource store.
      * 
      * @param computerPart The computer part to store.
      */
-    public static void addComputerPart(ComputerPart computerPart) {
+    public void addComputerPart(ComputerPart computerPart) {
 
         computerParts.add(computerPart);
-    }
-
-    private Resstore() {
-
     }
 
 }

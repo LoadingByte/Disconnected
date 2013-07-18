@@ -29,7 +29,7 @@ import com.quartercode.disconnected.sim.comp.Vulnerability;
 /**
  * This utility class is for loading stored resources, like computer parts, and converting them to real simulation object.
  */
-public class ResstoreLoader {
+public class ResoureStoreLoader {
 
     /**
      * Reads a simulation computer part from an input stream using a stored computer part.
@@ -43,7 +43,26 @@ public class ResstoreLoader {
 
         StoredComputerPart storedComputerPart = JAXB.unmarshal(inputStream, StoredComputerPart.class);
 
-        Constructor<?> constructor = storedComputerPart.getType().getConstructors()[0];
+        Constructor<?> constructor = null;
+        for (Constructor<?> testConstructor : storedComputerPart.getType().getConstructors()) {
+            if (constructor != null) {
+                break;
+            }
+
+            for (int arg = 2; arg < testConstructor.getParameterTypes().length; arg++) {
+                if (!isAllowedAttributeType(testConstructor.getParameterTypes()[arg])) {
+                    constructor = null;
+                    break;
+                } else {
+                    constructor = testConstructor;
+                }
+            }
+        }
+
+        if (constructor == null) {
+            throw new RuntimeException("Can't find allowed type attribute constructor in \"" + storedComputerPart.getType().getName() + "\"");
+        }
+
         List<Object> initargs = new ArrayList<Object>();
         initargs.add(storedComputerPart.getName());
         initargs.add(new ArrayList<Vulnerability>());
@@ -51,7 +70,7 @@ public class ResstoreLoader {
         for (int counter = 0; counter < storedComputerPart.getAttributes().size(); counter++) {
             String value = storedComputerPart.getAttributes().get(counter).getValue();
             Class<?> type = constructor.getParameterTypes()[counter + 2];
-            if (type.isPrimitive()) {
+            if (isAllowedAttributeType(type)) {
                 if (type == byte.class) {
                     initargs.add(Byte.parseByte(value));
                 } else if (type == short.class) {
@@ -68,16 +87,23 @@ public class ResstoreLoader {
                     initargs.add(Boolean.parseBoolean(value));
                 } else if (type == char.class) {
                     initargs.add(value.charAt(0));
+                } else if (type == String.class) {
+                    initargs.add(value);
                 }
             } else {
-                throw new RuntimeException("Can't create computer part with non-primitive attributes");
+                throw new RuntimeException("Can't create computer part with non-primitive or non-string attributes");
             }
         }
 
         return (ComputerPart) constructor.newInstance(initargs.toArray(new Object[initargs.size()]));
     }
 
-    private ResstoreLoader() {
+    private static boolean isAllowedAttributeType(Class<?> c) {
+
+        return c.isPrimitive() || c == String.class;
+    }
+
+    private ResoureStoreLoader() {
 
     }
 

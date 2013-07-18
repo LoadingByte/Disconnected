@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected;
 
+import com.quartercode.disconnected.resstore.ResoureStore;
 import com.quartercode.disconnected.sim.run.Simulator;
 
 /**
@@ -25,7 +26,9 @@ import com.quartercode.disconnected.sim.run.Simulator;
  */
 public class Disconnected {
 
-    private static Simulator simulator;
+    private static ResoureStore resoureStore;
+
+    private static Simulator    simulator;
 
     /**
      * Returns the current implemented version.
@@ -35,6 +38,26 @@ public class Disconnected {
     public static String getVersion() {
 
         return Disconnected.class.getPackage().getImplementationVersion();
+    }
+
+    /**
+     * Returns the active resource store for storing loaded resource store resources.
+     * 
+     * @return The active resource store.
+     */
+    public static ResoureStore getResoureStore() {
+
+        return resoureStore;
+    }
+
+    /**
+     * Sets the active resource store for storing loaded resource store resources to a new one.
+     * 
+     * @param resoureStore The new active resource store.
+     */
+    public static void setResoureStore(ResoureStore resoureStore) {
+
+        Disconnected.resoureStore = resoureStore;
     }
 
     /**
