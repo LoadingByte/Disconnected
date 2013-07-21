@@ -70,10 +70,10 @@ public class ResoureStore {
     }
 
     /**
-     * Returns a list of all stored computer parts which have the given name.
+     * Returns the stored computer parts which has the given name.
      * 
      * @param name Check if a computer part has the given name.
-     * @return A list of all stored computer parts which have the given name.
+     * @return The stored computer parts which has the given name.
      */
     public ComputerPart getComputerPart(String name) {
 

@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
 
 /**
- * This class represents a simple key value pair, named as attribute.
+ * This class represents a simple key and value pair called attribute.
  */
 public class Attribute {
 

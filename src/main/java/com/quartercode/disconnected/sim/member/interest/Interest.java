@@ -87,10 +87,11 @@ public abstract class Interest {
     /**
      * Calculates the best avaiable action the given member would use for ecexuting the interest.
      * The calculated action may not be the perfect one, this method should also implement some human roughness.
+     * This may also return null if no good action can be found, e.g. if every possibility is to risky.
      * 
      * @param simulation The simulation which contains the given member.
      * @param member The member which should execute the calculated action later.
-     * @return The best avaiable action the given member would use for ecexuting the interest.
+     * @return The best avaiable action the given member would use for executing the interest. This may be null.
      */
     public abstract Action getAction(Simulation simulation, Member member);
 
