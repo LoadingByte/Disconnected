@@ -28,8 +28,10 @@ import com.quartercode.disconnected.sim.comp.Vulnerability;
  */
 public class CPU extends Hardware {
 
-    private int  threads;
-    private long frequency;
+    private static final long serialVersionUID = -6953965174736837113L;
+
+    private int               threads;
+    private long              frequency;
 
     /**
      * Creates a new cpu and sets the name, the vulnerabilities, the count of possible threads and the frequency.

@@ -166,6 +166,16 @@ public class Computer {
     }
 
     /**
+     * Adds an operating system to the computer.
+     * 
+     * @param operatingSystem The operating system to add to the computer.
+     */
+    public void addOperatingSystem(OperatingSystem operatingSystem) {
+
+        operatingSystems.add(operatingSystem);
+    }
+
+    /**
      * Removes an operating system from the computer.
      * 
      * @param operatingSystem The operating system to remove from the computer.

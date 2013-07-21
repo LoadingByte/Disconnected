@@ -37,6 +37,8 @@ import com.quartercode.disconnected.sim.comp.hardware.RAM;
 @XmlJavaTypeAdapter (value = ComputerPartAdapter.class)
 public class Hardware extends ComputerPart {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Creates a new hardware part and sets the name and the vulnerabilities.
      * 

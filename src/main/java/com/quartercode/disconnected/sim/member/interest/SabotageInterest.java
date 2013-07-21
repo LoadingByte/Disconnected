@@ -18,13 +18,19 @@
 
 package com.quartercode.disconnected.sim.member.interest;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.Simulation;
+import com.quartercode.disconnected.sim.comp.OperatingSystem;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.run.action.Action;
+import com.quartercode.disconnected.sim.run.action.AttackAction;
+import com.quartercode.disconnected.sim.run.attack.Exploit;
+import com.quartercode.disconnected.sim.run.attack.Payload;
 
 /**
  * This is a simple sabotage interest which has a computer as target.
@@ -84,7 +90,25 @@ public class SabotageInterest extends Interest implements Target {
     @Override
     public Action getAction(Simulation simulation, Member member) {
 
-        // TODO: Implement calculation
+        // TODO: Implement real calculation (instead of dev placeholder for simple tests)
+
+        // Only look for vulnerabilities on the OS; no other ones added yet
+        for (OperatingSystem operatingSystem : member.getComputer().getOperatingSystems()) {
+            if (operatingSystem.getVulnerabilities().size() > 0) {
+                // Take the first avaiable vulnerability and fastly develop a new exploit which let the user gain the highest possible right level
+                Exploit exploit = new Exploit(operatingSystem.getVulnerabilities().get(0), operatingSystem.getRightLevels().get(operatingSystem.getRightLevels().size() - 1));
+
+                // Also develop a brand new payload which immediatly destroys the target computer
+                List<String> scripts = new ArrayList<String>();
+                scripts.add("simulation.getGroup(member).removeMember(member)");
+                scripts.add("simulation.removeMember(member)");
+                scripts.add("simulation.removeComputer(member.getComputer())");
+                Payload payload = new Payload(operatingSystem, scripts);
+
+                return new AttackAction(target, exploit, payload);
+            }
+        }
+
         return null;
     }
 

@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.sim.comp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +35,8 @@ import com.quartercode.disconnected.sim.comp.ComputerPart.ComputerPartAdapter;
  */
 @XmlJavaTypeAdapter (value = ComputerPartAdapter.class)
 public class Mainboard extends ComputerPart {
+
+    private static final long   serialVersionUID = 1L;
 
     private List<MainboradSlot> slots;
 
@@ -53,7 +56,7 @@ public class Mainboard extends ComputerPart {
 
     /**
      * Creates a new mainboard and sets the name, the vulnerabilities and a all avaiable mainboard slots using a given string list.
-     * The give slot string list gets splitted at commas, the trimmed parts should represent classes.
+     * The given slot string list gets splitted at commas, the trimmed parts should represent classes.
      * 
      * @param name The name the part has.
      * @param vulnerabilities The vulnerabilities the part has.
@@ -90,7 +93,9 @@ public class Mainboard extends ComputerPart {
      * @see Mainboard
      * @see Hardware
      */
-    public static class MainboradSlot {
+    public static class MainboradSlot implements Serializable {
+
+        private static final long         serialVersionUID = 1L;
 
         private Class<? extends Hardware> type;
         private Hardware                  content;

@@ -29,14 +29,16 @@ import com.quartercode.disconnected.sim.comp.ComputerPart;
  * This class represents a loaded resource store computer part which is used by the resource store loader to load computer parts.
  * 
  * @see ResoureStoreLoader
+ * @see ComputerPart
  */
 @XmlRootElement (namespace = "http://quartercode.com")
-@XmlType (propOrder = { "type", "name", "attributes" })
+@XmlType (propOrder = { "type", "name", "attributes", "vulnerabilities" })
 public class StoredComputerPart {
 
     private Class<? extends ComputerPart> type;
     private String                        name;
     private List<Attribute>               attributes;
+    private List<StoredVulnerability>     vulnerabilities;
 
     /**
      * Creates a new empty stored computer part.
@@ -109,6 +111,28 @@ public class StoredComputerPart {
     public void setAttributes(List<Attribute> attributes) {
 
         this.attributes = attributes;
+    }
+
+    /**
+     * Returns all vulnerabilities of the stored computer part.
+     * 
+     * @return All vulnerabilities of the stored computer part.
+     */
+    @XmlElementWrapper (name = "vulnerabilities")
+    @XmlElement (name = "vulnerability")
+    public List<StoredVulnerability> getVulnerabilities() {
+
+        return vulnerabilities;
+    }
+
+    /**
+     * Sets the vulnerability list of the stored computer part to a new one.
+     * 
+     * @param vulnerabilities The new vulnerability list of the stored computer part.
+     */
+    public void setVulnerabilities(List<StoredVulnerability> vulnerabilities) {
+
+        this.vulnerabilities = vulnerabilities;
     }
 
 }

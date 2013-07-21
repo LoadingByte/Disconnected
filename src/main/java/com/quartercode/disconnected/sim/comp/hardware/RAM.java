@@ -28,8 +28,10 @@ import com.quartercode.disconnected.sim.comp.Vulnerability;
  */
 public class RAM extends Hardware {
 
-    private long size;
-    private long frequency;
+    private static final long serialVersionUID = 7876933474996321380L;
+
+    private long              size;
+    private long              frequency;
 
     /**
      * Creates a new ram module and sets the name, the vulnerabilities, the size and the access frequency.

@@ -63,9 +63,12 @@ public class ResoureStoreLoader {
             throw new RuntimeException("Can't find allowed type attribute constructor in \"" + storedComputerPart.getType().getName() + "\"");
         }
 
+        // This list will be filled with vulnerabilities after the creation of the part
+        List<Vulnerability> vulnerabilities = new ArrayList<Vulnerability>();
+
         List<Object> initargs = new ArrayList<Object>();
         initargs.add(storedComputerPart.getName());
-        initargs.add(new ArrayList<Vulnerability>());
+        initargs.add(vulnerabilities);
 
         for (int counter = 0; counter < storedComputerPart.getAttributes().size(); counter++) {
             String value = storedComputerPart.getAttributes().get(counter).getValue();
@@ -95,7 +98,13 @@ public class ResoureStoreLoader {
             }
         }
 
-        return (ComputerPart) constructor.newInstance(initargs.toArray(new Object[initargs.size()]));
+        ComputerPart computerPart = (ComputerPart) constructor.newInstance(initargs.toArray(new Object[initargs.size()]));
+        if (storedComputerPart.getVulnerabilities() != null) {
+            for (StoredVulnerability vulnerability : storedComputerPart.getVulnerabilities()) {
+                vulnerabilities.add(new Vulnerability(vulnerability.getName(), null, vulnerability.getScripts()));
+            }
+        }
+        return computerPart;
     }
 
     private static boolean isAllowedAttributeType(Class<?> c) {

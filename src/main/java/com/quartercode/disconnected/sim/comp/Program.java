@@ -24,22 +24,52 @@ import com.quartercode.disconnected.sim.comp.ComputerPart.ComputerPartAdapter;
 
 /**
  * This class stores information about a program.
- * This also contains a list of all vulnerabilities this program has.
+ * This also contains a list of all vulnerabilities this program has, the operating system the program is written for and the required right level.
  * 
  * @see ComputerPart
  */
 @XmlJavaTypeAdapter (value = ComputerPartAdapter.class)
 public class Program extends ComputerPart {
 
+    private static final long serialVersionUID = 1L;
+
+    private String            operatingSystem;
+    private String            rightLevel;
+
     /**
-     * Creates a new program and sets the name and the vulnerabilities.
+     * Creates a new program and sets the name, the vulnerabilities, the operating system the program is written for and the required right level.
      * 
      * @param name The name the program has.
      * @param vulnerabilities The vulnerabilities the program has.
+     * @param operatingSystem The operating system the program is written for.
+     * @param rightLevel The required right level a user need for executing the program.
      */
-    protected Program(String name, List<Vulnerability> vulnerabilities) {
+    protected Program(String name, List<Vulnerability> vulnerabilities, String operatingSystem, String rightLevel) {
 
         super(name, vulnerabilities);
+
+        this.operatingSystem = operatingSystem;
+        this.rightLevel = rightLevel;
+    }
+
+    /**
+     * Returns the operating system the program is written for.
+     * 
+     * @return The operating system the program is written for.
+     */
+    public String getOperatingSystem() {
+
+        return operatingSystem;
+    }
+
+    /**
+     * Returns the required right level a user need for executing the program.
+     * 
+     * @return The required right level a user need for executing the program.
+     */
+    public String getRightLevel() {
+
+        return rightLevel;
     }
 
 }

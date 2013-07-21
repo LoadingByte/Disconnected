@@ -18,12 +18,14 @@
 
 package com.quartercode.disconnected.sim.comp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.Disconnected;
+import com.quartercode.disconnected.util.CloneUtil;
 
 /**
  * This class stores information about a spefific computer part, like a mainboard or an operating system.
@@ -37,7 +39,9 @@ import com.quartercode.disconnected.Disconnected;
  * @see OperatingSystem
  * @see Program
  */
-public class ComputerPart {
+public class ComputerPart implements Serializable {
+
+    private static final long   serialVersionUID = 1L;
 
     private String              name;
     private List<Vulnerability> vulnerabilities;
@@ -74,6 +78,58 @@ public class ComputerPart {
     public List<Vulnerability> getVulnerabilities() {
 
         return Collections.unmodifiableList(vulnerabilities);
+    }
+
+    @Override
+    public ComputerPart clone() {
+
+        return (ComputerPart) CloneUtil.clone(this);
+    }
+
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + (vulnerabilities == null ? 0 : vulnerabilities.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        ComputerPart other = (ComputerPart) obj;
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        if (vulnerabilities == null) {
+            if (other.vulnerabilities != null) {
+                return false;
+            }
+        } else if (!vulnerabilities.equals(other.vulnerabilities)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [name=" + name + ", vulnerabilities=" + vulnerabilities + "]";
     }
 
     /**

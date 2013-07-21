@@ -18,7 +18,18 @@
 
 package com.quartercode.disconnected.sim.run;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.quartercode.disconnected.sim.Simulation;
+import com.quartercode.disconnected.sim.comp.Computer;
+import com.quartercode.disconnected.sim.member.Member;
+import com.quartercode.disconnected.sim.member.MemberGroup;
+import com.quartercode.disconnected.sim.member.interest.Interest;
+import com.quartercode.disconnected.sim.member.interest.SabotageInterest;
+import com.quartercode.disconnected.sim.member.interest.Target;
+import com.quartercode.disconnected.sim.run.action.Action;
+import com.quartercode.disconnected.util.RandomPool;
+import com.quartercode.disconnected.util.SimulationGenerator;
 
 /**
  * This class implements the root simulation update method for executing the simulation.
@@ -96,6 +107,102 @@ public class Simulator {
      */
     public void update() {
 
+        final RandomPool random = new RandomPool(100);
+
+        // Generate new members and computers
+        int newComputers = random.nextInt(8) - 5;
+        if (newComputers > 0) {
+            List<Computer> computers = SimulationGenerator.generateComputers(simulation, newComputers, simulation.getComputers());
+            for (Computer computer : computers) {
+                simulation.addComputer(computer);
+            }
+            for (Member member : SimulationGenerator.generateMembers(simulation, computers, simulation.getGroups())) {
+                simulation.addMember(member);
+
+                for (MemberGroup group : simulation.getGroups()) {
+                    if (group.getMembers().contains(member)) {
+                        group.getReputation(member).addValue(random.nextInt(10));
+                    } else {
+                        group.getReputation(member).addValue(-random.nextInt(15));
+                    }
+                }
+            }
+        }
+
+        // Generate global group interests for enemy sabotage (based on reputation)
+        for (MemberGroup group : simulation.getGroups()) {
+            for (Member member : simulation.getMembers()) {
+                Interest existingInterest = null;
+                for (Interest interest : group.getInterests()) {
+                    if (interest instanceof Target && ((Target) interest).getTarget().equals(member)) {
+                        existingInterest = interest;
+                        break;
+                    }
+                }
+
+                if (existingInterest == null && group.getReputation(member).getValue() <= -10) {
+                    float probability = -group.getReputation(member).getValue() / 100F;
+                    if (probability > 1) {
+                        probability = 1;
+                    }
+
+                    if (random.nextFloat() <= probability) {
+                        int priority = -group.getReputation(member).getValue() / 20;
+                        if (priority < 1) {
+                            priority = 10;
+                        } else if (priority > 10) {
+                            probability = 10;
+                        }
+                        group.addInterest(new SabotageInterest(priority, member));
+                    }
+                } else if (existingInterest != null && group.getReputation(member).getValue() > -10) {
+                    group.removeInterest(existingInterest);
+                }
+            }
+        }
+
+        // Execute global group interests
+        for (Member member : simulation.getMembers()) {
+            final MemberGroup group = simulation.getGroup(member);
+            if (group != null) {
+                for (final Interest interest : new ArrayList<Interest>(group.getInterests())) {
+                    // Probability calculation still in simulator, getAction() doesn't do it yet
+                    int currentReputaion = group.getReputation(member).getValue();
+                    float probability = interest.getPriority() * 5F * (interest.getReputationChange(simulation, member, group) * 20F) / ( (currentReputaion == 0 ? 1 : currentReputaion) * 100);
+                    if (probability > 1) {
+                        probability = 1;
+                    }
+                    probability /= 50;
+
+                    if (random.nextFloat() <= probability) {
+                        new Action() {
+
+                            @Override
+                            public void execute(Simulation simulation, final Member member) {
+
+                                // Reputation also still in simulator
+                                group.getReputation(member).addValue(2);
+
+                                // Calculate the success before attacking; that's technology! (also: not yet implemented in subroutines)
+                                if (random.nextInt(50) == 0) {
+                                    Member target = ((Target) interest).getTarget();
+                                    group.getReputation(member).addValue(20);
+                                    simulation.getGroup(target).getReputation(member).removeValue(20);
+
+                                    // Remove the existing interest
+                                    group.removeInterest(interest);
+
+                                    // Finally: The main hack
+                                    Action action = interest.getAction(simulation, member);
+                                    action.execute(simulation, member);
+                                }
+                            }
+                        }.execute(simulation, member);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
 }
