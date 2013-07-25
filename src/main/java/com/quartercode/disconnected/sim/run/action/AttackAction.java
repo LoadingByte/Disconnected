@@ -20,10 +20,12 @@ package com.quartercode.disconnected.sim.run.action;
 
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.member.Member;
+import com.quartercode.disconnected.sim.member.interest.ReputationChangeProvider;
 import com.quartercode.disconnected.sim.run.attack.Attack;
 import com.quartercode.disconnected.sim.run.attack.Exploit;
 import com.quartercode.disconnected.sim.run.attack.Payload;
 import com.quartercode.disconnected.sim.run.util.ScriptExecutor;
+import com.quartercode.disconnected.util.ProbabilityUtil;
 
 /**
  * This is a simple attack action which executes an attack to a given target using an exploit and payload.
@@ -33,69 +35,49 @@ import com.quartercode.disconnected.sim.run.util.ScriptExecutor;
  * @see Exploit
  * @see Payload
  */
-public class AttackAction implements Action {
+public class AttackAction extends Action {
 
-    private Member  target;
-    private Exploit exploit;
-    private Payload payload;
+    private Attack attack;
 
     /**
-     * Creates a new attack action and sets the vulnerability to exploit and the payload.
+     * Creates a new attack action and sets the reputation changer and the attack to use.
      * 
-     * @param target The target to attack using the given exploit and payload.
-     * @param exploit The exploit to use for exploiting a vulnerability.
-     * @param payload The payload to execute after exploiting the given vulnerability.
+     * @param reputationChangeProvider The reputation change provider which provides reputation deltas.
+     * @param attack The attack to use for executing the action.
      */
-    public AttackAction(Member target, Exploit exploit, Payload payload) {
+    public AttackAction(ReputationChangeProvider reputationChangeProvider, Attack attack) {
 
-        this.target = target;
-        this.exploit = exploit;
-        this.payload = payload;
+        super(reputationChangeProvider);
+
+        this.attack = attack;
     }
 
     /**
-     * Returns the target to attack using the given exploit and payload.
+     * Returns the attack to use for executing the action.
      * 
-     * @return the target to attack using the given exploit and payload.
+     * @return The attack to use for executing the action.
      */
-    public Member getTarget() {
+    public Attack getAttack() {
 
-        return target;
-    }
-
-    /**
-     * Returns the exploit to use for exploiting a vulnerability.
-     * 
-     * @return The exploit to use for exploiting a vulnerability.
-     */
-    public Exploit getExploit() {
-
-        return exploit;
-    }
-
-    /**
-     * Returns the payload to execute after exploiting the given vulnerability.
-     * 
-     * @return The payload to execute after exploiting the given vulnerability.
-     */
-    public Payload getPayload() {
-
-        return payload;
+        return attack;
     }
 
     @Override
-    public void execute(Simulation simulation, Member member) {
+    public boolean execute(Simulation simulation, Member member) {
 
-        Attack attack = new Attack(member, target, exploit, payload);
+        // Execute the exploit
+        simulation.getGroup(member).getReputation(member).addValue(getReputationChangeProvider().getReputationChange(simulation, member, simulation.getGroup(member)));
+        ScriptExecutor.execute(attack.getExploit().getVulnerability().getScripts(), simulation, attack.getTarget(), member);
 
-        for (String script : attack.getExploit().getVulnerability().getScripts()) {
-            ScriptExecutor.execute(script, simulation, attack.getTarget(), attack.getAttacker());
-        }
+        // Calculate the success (of course, this is not final)
+        if (ProbabilityUtil.gen(0.2F)) {
+            // Execute the payload
+            simulation.getGroup(attack.getTarget()).getReputation(member).addValue(getReputationChangeProvider().getReputationChange(simulation, member, simulation.getGroup(attack.getTarget())));
+            ScriptExecutor.execute(attack.getPayload().getScripts(), simulation, attack.getTarget(), member);
 
-        if (attack.getPayload() != null) {
-            for (String script : attack.getPayload().getScripts()) {
-                ScriptExecutor.execute(script, simulation, attack.getTarget(), attack.getAttacker());
-            }
+            return true;
+        } else {
+            return false;
         }
     }
 

@@ -16,31 +16,25 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.test.sim.member;
+package com.quartercode.disconnected.sim.member.interest;
 
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
-import com.quartercode.disconnected.sim.member.interest.Interest;
-import com.quartercode.disconnected.sim.run.action.Action;
 
-public class EmptyInterest extends Interest {
+/**
+ * This interface defines a class which is able to provide possible reputation changes.
+ */
+public interface ReputationChangeProvider {
 
-    public EmptyInterest(float priority) {
-
-        super(priority);
-    }
-
-    @Override
-    public int getReputationChange(Simulation simulation, Member member, MemberGroup group) {
-
-        return 0;
-    }
-
-    @Override
-    public Action getAction(Simulation simulation, Member member) {
-
-        return null;
-    }
+    /**
+     * Returns the reputation change of a group to a member if the member executes the interest.
+     * 
+     * @param simulation The simulation which contains the given member.
+     * @param member The member which reputation changes.
+     * @param group The group which holds the change perspective.
+     * @return The reputation change of a group to a member if the member executes the interest.
+     */
+    public abstract int getReputationChange(Simulation simulation, Member member, MemberGroup group);
 
 }

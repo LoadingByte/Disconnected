@@ -37,15 +37,14 @@ import com.quartercode.disconnected.sim.run.action.Action;
  * @see Action
  */
 @XmlAccessorType (XmlAccessType.FIELD)
-@XmlSeeAlso (SabotageInterest.class)
-public abstract class Interest {
+@XmlSeeAlso (DestroyInterest.class)
+public abstract class Interest implements ReputationChangeProvider {
 
     @XmlAttribute
-    private int priority;
+    private float priority;
 
     /**
-     * Creates a new empty interest object.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * Creates a new empty interest.
      */
     public Interest() {
 
@@ -54,35 +53,35 @@ public abstract class Interest {
     /**
      * Creates a new interest and sets the priority.
      * 
-     * @param priority The priority this interest has for the group or member (must be between 1 and 10, both inclusive).
+     * @param priority The priority this interest has for the group or member (must be between 0 and 1, both inclusive).
      */
-    public Interest(int priority) {
+    public Interest(float priority) {
 
-        Validate.isTrue(priority >= 1 && priority <= 10, "Priority must be in range 1 <= x <= 10");
-
-        this.priority = priority;
+        setPriority(priority);
     }
 
     /**
      * Returns the priority the interest has for the group or member.
-     * The priority value is located between 1 and 10, both inclusive.
+     * The priority value is located between 0 and 1, both inclusive.
      * 
      * @return The priority the interest has for the group or member.
      */
-    public int getPriority() {
+    public float getPriority() {
 
         return priority;
     }
 
     /**
-     * Returns the reputation change of a group to a member if the member executes the interest.
+     * Sets the priority the interest has for the group or member to a new one.
+     * The priority value must be located between 0 and 1, both inclusive.
      * 
-     * @param simulation The simulation which contains the given member.
-     * @param member The member which reputation changes.
-     * @param group The group which holds the change perspective.
-     * @return The reputation change of a group to a member if the member executes the interest.
+     * @param priority The new priority the interest has.
      */
-    public abstract int getReputationChange(Simulation simulation, Member member, MemberGroup group);
+    public void setPriority(float priority) {
+
+        Validate.isTrue(priority >= 0 && priority <= 1, "Priority must be in range 0 <= priority <= 1");
+        this.priority = priority;
+    }
 
     /**
      * Calculates the best avaiable action the given member would use for ecexuting the interest.

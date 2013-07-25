@@ -39,8 +39,6 @@ import com.quartercode.disconnected.sim.member.MemberGroup;
  */
 public class SimulationGenerator {
 
-    private static RandomPool random = new RandomPool(100);
-
     /**
      * Generates a new simulation.
      * 
@@ -67,9 +65,9 @@ public class SimulationGenerator {
         for (MemberGroup group : simulation.getGroups()) {
             for (Member member : simulation.getMembers()) {
                 if (group.getMembers().contains(member)) {
-                    group.getReputation(member).addValue(random.nextInt(10));
+                    group.getReputation(member).addValue(RandomPool.PUBLIC.nextInt(10));
                 } else {
-                    group.getReputation(member).addValue(-random.nextInt(15));
+                    group.getReputation(member).subtractValue(RandomPool.PUBLIC.nextInt(12));
                 }
             }
         }
@@ -78,7 +76,7 @@ public class SimulationGenerator {
     }
 
     /**
-     * Generates the given amount of computers randomly.
+     * Generates the given amount of computers RandomPool.PUBLICly.
      * 
      * @param simulation The simulation to use for generating metadata (like ids).
      * @param amount The amount of computers the generator should generate.
@@ -90,7 +88,7 @@ public class SimulationGenerator {
     }
 
     /**
-     * Generates the given amount of computers randomly ignoring the locations of the given computers.
+     * Generates the given amount of computers RandomPool.PUBLICly ignoring the locations of the given computers.
      * 
      * @param simulation The simulation to use for generating metadata (like ids).
      * @param amount The amount of computers the generator should generate.
@@ -123,24 +121,24 @@ public class SimulationGenerator {
             computers.add(computer);
 
             List<ComputerPart> mainboards = Disconnected.getResoureStore().getComputerParts(Mainboard.class);
-            computer.setMainboard((Mainboard) mainboards.get(random.nextInt(mainboards.size())).clone());
+            computer.setMainboard((Mainboard) mainboards.get(RandomPool.PUBLIC.nextInt(mainboards.size())).clone());
 
             for (MainboradSlot slot : computer.getMainboard().getSlots()) {
                 List<ComputerPart> possibleHardware = Disconnected.getResoureStore().getComputerParts(slot.getType());
-                Hardware hardware = (Hardware) possibleHardware.get(random.nextInt(possibleHardware.size())).clone();
+                Hardware hardware = (Hardware) possibleHardware.get(RandomPool.PUBLIC.nextInt(possibleHardware.size())).clone();
                 computer.addHardware(hardware);
                 slot.setContent(hardware);
             }
 
             List<ComputerPart> operatingSystems = Disconnected.getResoureStore().getComputerParts(OperatingSystem.class);
-            computer.addOperatingSystem((OperatingSystem) operatingSystems.get(random.nextInt(operatingSystems.size())).clone());
+            computer.addOperatingSystem((OperatingSystem) operatingSystems.get(RandomPool.PUBLIC.nextInt(operatingSystems.size())).clone());
         }
 
         return computers;
     }
 
     /**
-     * Generates the given amount of member groups randomly.
+     * Generates the given amount of member groups RandomPool.PUBLICly.
      * 
      * @param simulation The simulation to use for generating metadata (like ids).
      * @param amount The amount of member groups the generator should generate.
@@ -158,7 +156,7 @@ public class SimulationGenerator {
     }
 
     /**
-     * Generates the given amount of members randomly.
+     * Generates the given amount of members RandomPool.PUBLICly.
      * 
      * @param simulation The simulation to use for generating metadata (like ids).
      * @param amount The amount of members the generator should generate.
@@ -184,9 +182,9 @@ public class SimulationGenerator {
     }
 
     /**
-     * Generates a list of members randomly using the given computers and groups.
+     * Generates a list of members RandomPool.PUBLICly using the given computers and groups.
      * The generated amount of members is euqally to the amount of given computers.
-     * Also, every generated member gets randomly sorted into one of the given member groups.
+     * Also, every generated member gets RandomPool.PUBLICly sorted into one of the given member groups.
      * 
      * @param simulation The simulation to use for generating metadata (like ids).
      * @param computers The computers to use for generating the members.
@@ -198,7 +196,7 @@ public class SimulationGenerator {
         List<Member> members = generateMembers(simulation, computers.size());
 
         for (int counter = 0; counter < members.size(); counter++) {
-            groups.get(random.nextInt(groups.size())).addMember(members.get(counter));
+            groups.get(RandomPool.PUBLIC.nextInt(groups.size())).addMember(members.get(counter));
             members.get(counter).setComputer(computers.get(counter));
         }
 

@@ -55,9 +55,9 @@ public class ReputationTest {
     }
 
     @Test
-    public void testRemoveValue() {
+    public void testSubtractValue() {
 
-        reputation.removeValue(60);
+        reputation.subtractValue(60);
         Assert.assertEquals("Reputation value", -50, reputation.getValue());
     }
 

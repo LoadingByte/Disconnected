@@ -24,10 +24,11 @@ import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
+import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
 import com.quartercode.disconnected.sim.member.interest.Interest;
-import com.quartercode.disconnected.sim.member.interest.SabotageInterest;
 import com.quartercode.disconnected.sim.member.interest.Target;
 import com.quartercode.disconnected.sim.run.action.Action;
+import com.quartercode.disconnected.util.ProbabilityUtil;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.SimulationGenerator;
 
@@ -107,10 +108,8 @@ public class Simulator {
      */
     public void update() {
 
-        final RandomPool random = new RandomPool(100);
-
         // Generate new members and computers
-        int newComputers = random.nextInt(8) - 5;
+        int newComputers = RandomPool.PUBLIC.nextInt(ProbabilityUtil.gen(0.008F) ? 50 : 8) - 5;
         if (newComputers > 0) {
             List<Computer> computers = SimulationGenerator.generateComputers(simulation, newComputers, simulation.getComputers());
             for (Computer computer : computers) {
@@ -118,87 +117,107 @@ public class Simulator {
             }
             for (Member member : SimulationGenerator.generateMembers(simulation, computers, simulation.getGroups())) {
                 simulation.addMember(member);
+            }
+        }
 
-                for (MemberGroup group : simulation.getGroups()) {
-                    if (group.getMembers().contains(member)) {
-                        group.getReputation(member).addValue(random.nextInt(10));
-                    } else {
-                        group.getReputation(member).addValue(-random.nextInt(15));
-                    }
+        // Clean interests
+        for (MemberGroup group : simulation.getGroups()) {
+            for (Interest interest : new ArrayList<Interest>(group.getInterests())) {
+                if (interest instanceof Target && !simulation.getMembers().contains( ((Target) interest).getTarget())) {
+                    group.removeInterest(interest);
+                }
+            }
+        }
+        for (Member member : simulation.getMembers()) {
+            for (Interest interest : new ArrayList<Interest>(member.getInterests())) {
+                if (interest instanceof Target && !simulation.getMembers().contains( ((Target) interest).getTarget())) {
+                    member.removeInterest(interest);
                 }
             }
         }
 
-        // Generate global group interests for enemy sabotage (based on reputation)
+        // Generate global group interests against members with bas reputation
         for (MemberGroup group : simulation.getGroups()) {
-            for (Member member : simulation.getMembers()) {
-                Interest existingInterest = null;
+            targetLoop:
+            for (Member target : simulation.getMembers()) {
                 for (Interest interest : group.getInterests()) {
-                    if (interest instanceof Target && ((Target) interest).getTarget().equals(member)) {
-                        existingInterest = interest;
-                        break;
+                    if (interest instanceof Target && ((Target) interest).getTarget().equals(target)) {
+                        continue targetLoop;
                     }
                 }
 
-                if (existingInterest == null && group.getReputation(member).getValue() <= -10) {
-                    float probability = -group.getReputation(member).getValue() / 100F;
-                    if (probability > 1) {
-                        probability = 1;
-                    }
-
-                    if (random.nextFloat() <= probability) {
-                        int priority = -group.getReputation(member).getValue() / 20;
-                        if (priority < 1) {
-                            priority = 10;
-                        } else if (priority > 10) {
-                            probability = 10;
+                if (group.getReputation(target).getValue() <= /*-50*/-10) {
+                    if (ProbabilityUtil.genPseudo(-group.getReputation(target).getValue() / 20F)) {
+                        float priority = -group.getReputation(target).getValue() / /* 200F */400F;
+                        if (priority > 1) {
+                            priority = 1;
                         }
-                        group.addInterest(new SabotageInterest(priority, member));
+                        group.addInterest(new DestroyInterest(priority, target));
                     }
-                } else if (existingInterest != null && group.getReputation(member).getValue() > -10) {
-                    group.removeInterest(existingInterest);
                 }
             }
         }
 
         // Execute global group interests
-        for (Member member : simulation.getMembers()) {
-            final MemberGroup group = simulation.getGroup(member);
-            if (group != null) {
-                for (final Interest interest : new ArrayList<Interest>(group.getInterests())) {
-                    // Probability calculation still in simulator, getAction() doesn't do it yet
-                    int currentReputaion = group.getReputation(member).getValue();
-                    float probability = interest.getPriority() * 5F * (interest.getReputationChange(simulation, member, group) * 20F) / ( (currentReputaion == 0 ? 1 : currentReputaion) * 100);
-                    if (probability > 1) {
-                        probability = 1;
+        for (MemberGroup group : simulation.getGroups()) {
+            for (Interest interest : new ArrayList<Interest>(group.getInterests())) {
+                for (Member member : simulation.getMembers()) {
+                    Action action = interest.getAction(simulation, member);
+                    if (action != null) {
+                        if (action.execute(simulation, member)) {
+                            group.removeInterest(interest);
+                        }
+
+                        break;
                     }
-                    probability /= 50;
+                }
+            }
+        }
 
-                    if (random.nextFloat() <= probability) {
-                        new Action() {
-
-                            @Override
-                            public void execute(Simulation simulation, final Member member) {
-
-                                // Reputation also still in simulator
-                                group.getReputation(member).addValue(2);
-
-                                // Calculate the success before attacking; that's technology! (also: not yet implemented in subroutines)
-                                if (random.nextInt(50) == 0) {
-                                    Member target = ((Target) interest).getTarget();
-                                    group.getReputation(member).addValue(20);
-                                    simulation.getGroup(target).getReputation(member).removeValue(20);
-
-                                    // Remove the existing interest
-                                    group.removeInterest(interest);
-
-                                    // Finally: The main hack
-                                    Action action = interest.getAction(simulation, member);
-                                    action.execute(simulation, member);
+        // Generate member interests against members of other groups
+        memberLoop:
+        for (Member member : simulation.getMembers()) {
+            if (ProbabilityUtil.genPseudo(RandomPool.PUBLIC.nextFloat() / 100F)) {
+                if (member.getInterests().size() < 5) {
+                    MemberGroup group = simulation.getGroup(member);
+                    targetLoop:
+                    for (Member target : simulation.getMembers()) {
+                        if (!simulation.getGroup(target).equals(group)) {
+                            for (Interest interest : member.getInterests()) {
+                                if (interest instanceof Target && ((Target) interest).getTarget().equals(target)) {
+                                    continue targetLoop;
                                 }
                             }
-                        }.execute(simulation, member);
-                        break;
+
+                            if (ProbabilityUtil.genPseudo(RandomPool.PUBLIC.nextFloat() + -group.getReputation(target).getValue() / 100F)) {
+                                float priority = RandomPool.PUBLIC.nextFloat() + -group.getReputation(target).getValue() / /* 200F */40F;
+                                if (priority > 1) {
+                                    priority = 1;
+                                }
+                                member.addInterest(new DestroyInterest(priority, target));
+                                continue memberLoop;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Execute member interests
+        for (Member member : simulation.getMembers()) {
+            if (simulation.getMembers().contains(member)) {
+                for (Interest interest : new ArrayList<Interest>(member.getInterests())) {
+                    if (interest instanceof Target && !simulation.getMembers().contains( ((Target) interest).getTarget())) {
+                        continue;
+                    } else {
+                        Action action = interest.getAction(simulation, member);
+                        if (action != null) {
+                            if (action.execute(simulation, member)) {
+                                member.removeInterest(interest);
+                            }
+
+                            break;
+                        }
                     }
                 }
             }

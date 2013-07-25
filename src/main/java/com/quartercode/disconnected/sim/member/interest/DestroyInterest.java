@@ -24,41 +24,45 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.comp.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.ComputerPart;
+import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.run.action.Action;
 import com.quartercode.disconnected.sim.run.action.AttackAction;
+import com.quartercode.disconnected.sim.run.attack.Attack;
 import com.quartercode.disconnected.sim.run.attack.Exploit;
 import com.quartercode.disconnected.sim.run.attack.Payload;
+import com.quartercode.disconnected.util.ProbabilityUtil;
 
 /**
- * This is a simple sabotage interest which has a computer as target.
+ * This is a simple destroy interest which has a computer as target.
+ * The executor of the resulting action should destroy the target.
  * 
  * @see Interest
  * @see Target
  */
 @XmlAccessorType (XmlAccessType.FIELD)
-public class SabotageInterest extends Interest implements Target {
+public class DestroyInterest extends Interest implements Target {
 
     @XmlIDREF
     private Member target;
 
     /**
-     * Creates a new empty sabotage interest object.
+     * Creates a new empty destroy interest object.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    public SabotageInterest() {
+    public DestroyInterest() {
 
     }
 
     /**
-     * Creates a new sabotage interest and sets the priority and the computer target.
+     * Creates a new destroy interest and sets the priority and the computer target.
      * 
      * @param priority The priority of the interest.
      * @param target The member target the interest has.
      */
-    public SabotageInterest(int priority, Member target) {
+    public DestroyInterest(float priority, Member target) {
 
         super(priority);
 
@@ -74,7 +78,7 @@ public class SabotageInterest extends Interest implements Target {
     @Override
     public int getReputationChange(Simulation simulation, Member member, MemberGroup group) {
 
-        int change = getPriority() * 3;
+        int change = (int) (getPriority() * 30);
 
         if (group.getMembers().contains(member)) {
             if (!group.getInterests().contains(this)) {
@@ -90,22 +94,31 @@ public class SabotageInterest extends Interest implements Target {
     @Override
     public Action getAction(Simulation simulation, Member member) {
 
-        // TODO: Implement real calculation (instead of dev placeholder for simple tests)
+        // Calculate probability for executing the action
+        int currentReputation = simulation.getGroup(member).getReputation(member).getValue();
+        float probability = getPriority() * (getReputationChange(simulation, member, simulation.getGroup(member)) * 20F) / ( (currentReputation == 0 ? 1 : currentReputation) * 100);
 
-        // Only look for vulnerabilities on the OS; no other ones added yet
-        for (OperatingSystem operatingSystem : member.getComputer().getOperatingSystems()) {
-            if (operatingSystem.getVulnerabilities().size() > 0) {
-                // Take the first avaiable vulnerability and fastly develop a new exploit which let the user gain the highest possible right level
-                Exploit exploit = new Exploit(operatingSystem.getVulnerabilities().get(0), operatingSystem.getRightLevels().get(operatingSystem.getRightLevels().size() - 1));
+        if (ProbabilityUtil.genPseudo(probability)) {
+            // Collect all vulnerabilities
+            List<Vulnerability> vulnerabilities = new ArrayList<Vulnerability>();
+            for (ComputerPart part : member.getComputer().getParts()) {
+                vulnerabilities.addAll(part.getVulnerabilities());
+            }
+
+            // Take the first avaiable vulnerability and quickly develop a new exploit
+            if (vulnerabilities.size() > 0) {
+                Exploit exploit = new Exploit(vulnerabilities.get(0));
 
                 // Also develop a brand new payload which immediatly destroys the target computer
                 List<String> scripts = new ArrayList<String>();
-                scripts.add("simulation.getGroup(member).removeMember(member)");
                 scripts.add("simulation.removeMember(member)");
+                scripts.add("simulation.getGroup(member).removeMember(member)");
                 scripts.add("simulation.removeComputer(member.getComputer())");
-                Payload payload = new Payload(operatingSystem, scripts);
 
-                return new AttackAction(target, exploit, payload);
+                // Use the first avaiable operating system as execution environment
+                Payload payload = new Payload(member.getComputer().getOperatingSystems().get(0), scripts);
+
+                return new AttackAction(this, new Attack(target, exploit, payload));
             }
         }
 

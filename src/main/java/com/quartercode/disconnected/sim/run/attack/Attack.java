@@ -18,11 +18,12 @@
 
 package com.quartercode.disconnected.sim.run.attack;
 
+import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.sim.member.Member;
 
 /**
  * This class represents an attack to a vulnerable system component.
- * An attack always contains an attacker, a target, and exploit and a payload.
+ * An attack always contains a target, and exploit and a payload. The attacker is not stored in an attack.
  * The payload gets executed after the attacker exploited the vulnerability.
  * 
  * @see Member
@@ -31,35 +32,26 @@ import com.quartercode.disconnected.sim.member.Member;
  */
 public class Attack {
 
-    private Member  attacker;
     private Member  target;
     private Exploit exploit;
     private Payload payload;
 
     /**
-     * Creates a new attack and sets the attacker, the target, the exploit and the payload.
+     * Creates a new attack and sets the target, the exploit and the payload.
      * 
-     * @param attacker The attacker who attacks the target using the given exploit and payload.
      * @param target The target who gets attacked by the attacker.
      * @param exploit The exploit which exploits the vulnerability.
      * @param payload The payload which gets executed after exploiting the vulnerability.
      */
-    public Attack(Member attacker, Member target, Exploit exploit, Payload payload) {
+    public Attack(Member target, Exploit exploit, Payload payload) {
 
-        this.attacker = attacker;
+        Validate.notNull(target, "Can't create an attack without a target member");
+        Validate.notNull(exploit, "Can't create an attack without an exploit");
+        Validate.notNull(payload, "Can't create an attack without a payload");
+
         this.target = target;
         this.exploit = exploit;
         this.payload = payload;
-    }
-
-    /**
-     * Returns the attacker who attacks the target using the given exploit and payload.
-     * 
-     * @return The attacker who attacks the target using the given exploit and payload.
-     */
-    public Member getAttacker() {
-
-        return attacker;
     }
 
     /**

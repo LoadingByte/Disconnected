@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.sim.run.util;
 
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.script.ScriptEngine;
@@ -38,8 +39,8 @@ public class ScriptExecutor {
      * Executes the given script on the given member in the given simulation.
      * This may change some parameters of his computer, his reputation or even transmit data to the causer of the script execution.
      * 
-     * @param simulation The simulation to execute the script in.
      * @param script The script to execute on the given member.
+     * @param simulation The simulation to execute the script in.
      * @param member The member to execute the given script on.
      * @param causer The member who caused the execution of the given script.
      */
@@ -58,6 +59,22 @@ public class ScriptExecutor {
         }
         catch (ScriptException e) {
             LOGGER.log(Level.SEVERE, "Can't execute the following script on member \"" + member.getName() + "\", caused by member \"" + causer.getName() + "\":\n" + script, e);
+        }
+    }
+
+    /**
+     * Executes the given scripts on the given member in the given simulation.
+     * This may change some parameters of his computer, his reputation or even transmit data to the causer of the script executions.
+     * 
+     * @param scripts The scripts to execute on the given member.
+     * @param simulation The simulation to execute the script in.
+     * @param member The member to execute the given script on.
+     * @param causer The member who caused the execution of the given script.
+     */
+    public static void execute(Collection<String> scripts, Simulation simulation, Member member, Member causer) {
+
+        for (String script : scripts) {
+            execute(script, simulation, member, causer);
         }
     }
 

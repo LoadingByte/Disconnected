@@ -110,11 +110,11 @@ public class Reputation {
     }
 
     /**
-     * Removes a delta from the reputation value.
+     * Subtracts a delta from the reputation value.
      * 
-     * @param delta The delta to remove from the reputation value.
+     * @param delta The delta to subtract from the reputation value.
      */
-    public void removeValue(int delta) {
+    public void subtractValue(int delta) {
 
         value -= delta;
     }

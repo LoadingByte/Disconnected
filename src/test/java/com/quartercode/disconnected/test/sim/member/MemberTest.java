@@ -31,8 +31,8 @@ public class MemberTest {
     public void setUp() {
 
         member = new Member("member");
-        member.addInterest(new EmptyInterest(1));
-        member.addInterest(new EmptyInterest(2));
+        member.addInterest(new EmptyInterest(0.1F));
+        member.addInterest(new EmptyInterest(0.2F));
     }
 
     @Test
@@ -50,7 +50,7 @@ public class MemberTest {
     @Test
     public void testAddInterest() {
 
-        member.addInterest(new EmptyInterest(3));
+        member.addInterest(new EmptyInterest(0.3F));
         Assert.assertEquals("Interest count", 3, member.getInterests().size());
     }
 
