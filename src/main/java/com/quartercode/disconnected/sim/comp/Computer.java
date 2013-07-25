@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.sim.comp;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -213,6 +214,24 @@ public class Computer {
     public void removeProgram(Program program) {
 
         programs.remove(program);
+    }
+
+    /**
+     * Returns all computer parts this computer currently contains.
+     * This collects the objects from every sublist and creates a new list out of them.
+     * 
+     * @return All computer parts this computer currently contains.
+     */
+    public List<ComputerPart> getParts() {
+
+        List<ComputerPart> parts = new ArrayList<ComputerPart>();
+
+        parts.add(mainboard);
+        parts.addAll(hardware);
+        parts.addAll(operatingSystems);
+        parts.addAll(programs);
+
+        return parts;
     }
 
 }
