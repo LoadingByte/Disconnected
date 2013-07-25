@@ -34,8 +34,13 @@ import java.util.Random;
  */
 public class RandomPool {
 
-    private List<Random> randoms = new ArrayList<Random>();
-    private int          currentIndex;
+    /**
+     * This is a public random pool you can quickly access if you need random numbers and don't want to create a new pool.
+     */
+    public static final RandomPool PUBLIC  = new RandomPool(1000);
+
+    private List<Random>           randoms = new ArrayList<Random>();
+    private int                    currentIndex;
 
     /**
      * Creates a new empty random pool.
