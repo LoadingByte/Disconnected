@@ -39,7 +39,7 @@ public class RandomPool {
      */
     public static final RandomPool PUBLIC  = new RandomPool(1000);
 
-    private List<Random>           randoms = new ArrayList<Random>();
+    private final List<Random>     randoms = new ArrayList<Random>();
     private int                    currentIndex;
 
     /**

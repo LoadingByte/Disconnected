@@ -30,8 +30,8 @@ public class CPU extends Hardware {
 
     private static final long serialVersionUID = -6953965174736837113L;
 
-    private int               threads;
-    private long              frequency;
+    private final int         threads;
+    private final long        frequency;
 
     /**
      * Creates a new cpu and sets the name, the vulnerabilities, the count of possible threads and the frequency.

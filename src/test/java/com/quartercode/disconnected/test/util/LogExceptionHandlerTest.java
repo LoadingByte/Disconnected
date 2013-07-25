@@ -43,8 +43,8 @@ public class LogExceptionHandlerTest {
         return data;
     }
 
-    private RuntimeException exception;
-    private boolean          log;
+    private final RuntimeException exception;
+    private final boolean          log;
 
     public LogExceptionHandlerTest(RuntimeException exception, boolean log) {
 

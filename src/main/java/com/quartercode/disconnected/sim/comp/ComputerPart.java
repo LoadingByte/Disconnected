@@ -41,10 +41,10 @@ import com.quartercode.disconnected.util.CloneUtil;
  */
 public class ComputerPart implements Serializable {
 
-    private static final long   serialVersionUID = 1L;
+    private static final long         serialVersionUID = 1L;
 
-    private String              name;
-    private List<Vulnerability> vulnerabilities;
+    private final String              name;
+    private final List<Vulnerability> vulnerabilities;
 
     /**
      * Creates a new computer part and sets the name and the vulnerabilities.

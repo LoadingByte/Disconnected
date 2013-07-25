@@ -32,7 +32,7 @@ import com.quartercode.disconnected.sim.member.interest.ReputationChangeProvider
  */
 public abstract class Action {
 
-    private ReputationChangeProvider reputationChangeProvider;
+    private final ReputationChangeProvider reputationChangeProvider;
 
     /**
      * Creates a new abstract action and sets the reputation change provider.

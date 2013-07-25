@@ -41,8 +41,8 @@ import com.quartercode.disconnected.util.SimulationGenerator;
  */
 public class Simulator {
 
-    private Simulation simulation;
-    private TickThread tickThread;
+    private final Simulation simulation;
+    private TickThread       tickThread;
 
     /**
      * Creates a new simulator and sets the simulation which should be simulated.

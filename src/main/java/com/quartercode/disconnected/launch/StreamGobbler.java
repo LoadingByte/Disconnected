@@ -33,9 +33,9 @@ public class StreamGobbler extends Thread {
 
     private static final Logger LOGGER = Logger.getLogger(StreamGobbler.class.getName());
 
-    private String              prefix;
-    private InputStream         inputStream;
-    private PrintStream         outputStream;
+    private final String        prefix;
+    private final InputStream   inputStream;
+    private final PrintStream   outputStream;
 
     /**
      * Creates a new stream gobbler and setsthe prefix and the input and output streams.

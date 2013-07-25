@@ -36,9 +36,9 @@ import com.quartercode.disconnected.sim.comp.ComputerPart.ComputerPartAdapter;
 @XmlJavaTypeAdapter (value = ComputerPartAdapter.class)
 public class Mainboard extends ComputerPart {
 
-    private static final long   serialVersionUID = 1L;
+    private static final long         serialVersionUID = 1L;
 
-    private List<MainboradSlot> slots;
+    private final List<MainboradSlot> slots;
 
     /**
      * Creates a new mainboard and sets the name, the vulnerabilities and a list of all avaiable mainboard slots.
@@ -95,10 +95,10 @@ public class Mainboard extends ComputerPart {
      */
     public static class MainboradSlot implements Serializable {
 
-        private static final long         serialVersionUID = 1L;
+        private static final long               serialVersionUID = 1L;
 
-        private Class<? extends Hardware> type;
-        private Hardware                  content;
+        private final Class<? extends Hardware> type;
+        private Hardware                        content;
 
         /**
          * Creates a new mainboard slot and sets the hardware type the slot can accept.

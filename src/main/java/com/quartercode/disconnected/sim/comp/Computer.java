@@ -44,16 +44,16 @@ public class Computer {
 
     @XmlAttribute
     @XmlID
-    private String                id;
+    private String                      id;
 
-    private Location              location;
-    private Mainboard             mainboard;
+    private Location                    location;
+    private Mainboard                   mainboard;
     @XmlElement (name = "hardware")
-    private List<Hardware>        hardware         = new CopyOnWriteArrayList<Hardware>();
+    private final List<Hardware>        hardware         = new CopyOnWriteArrayList<Hardware>();
     @XmlElement (name = "operatingSystem")
-    private List<OperatingSystem> operatingSystems = new CopyOnWriteArrayList<OperatingSystem>();
+    private final List<OperatingSystem> operatingSystems = new CopyOnWriteArrayList<OperatingSystem>();
     @XmlElement (name = "program")
-    private List<Program>         programs         = new CopyOnWriteArrayList<Program>();
+    private final List<Program>         programs         = new CopyOnWriteArrayList<Program>();
 
     /**
      * Creates a new empty computer.

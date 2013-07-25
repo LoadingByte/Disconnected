@@ -31,7 +31,7 @@ import com.quartercode.disconnected.sim.comp.ComputerPart;
  */
 public class ResoureStore {
 
-    private List<ComputerPart> computerParts = new ArrayList<ComputerPart>();
+    private final List<ComputerPart> computerParts = new ArrayList<ComputerPart>();
 
     /**
      * Creates a new empty resource store with no loaded resources.

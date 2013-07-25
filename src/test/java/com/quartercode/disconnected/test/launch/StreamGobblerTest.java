@@ -45,8 +45,8 @@ public class StreamGobblerTest {
         return data;
     }
 
-    private String input;
-    private String prefix;
+    private final String input;
+    private final String prefix;
 
     public StreamGobblerTest(String input, String prefix) {
 

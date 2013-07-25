@@ -30,8 +30,8 @@ import com.quartercode.disconnected.sim.comp.OperatingSystem;
  */
 public class Payload {
 
-    private OperatingSystem operatingSystem;
-    private List<String>    scripts;
+    private final OperatingSystem operatingSystem;
+    private final List<String>    scripts;
 
     /**
      * Creates a new payload and sets the operating system the payload is written for and some scripts which define what happens while execution.

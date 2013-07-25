@@ -30,8 +30,8 @@ import com.quartercode.disconnected.sim.comp.OperatingSystem.RightLevel;
  */
 public class Session {
 
-    private Computer   computer;
-    private RightLevel rightLevel;
+    private final Computer   computer;
+    private final RightLevel rightLevel;
 
     /**
      * Creates a new open sesson and sets the attacked computer and the inital right level.

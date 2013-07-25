@@ -31,7 +31,7 @@ public class TickThread extends Thread {
 
     private static final Logger LOGGER = Logger.getLogger(TickThread.class.getName());
 
-    private Simulator           simulator;
+    private final Simulator     simulator;
 
     private int                 delay  = 1000;
 

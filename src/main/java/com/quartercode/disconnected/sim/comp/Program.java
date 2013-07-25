@@ -33,8 +33,8 @@ public class Program extends ComputerPart {
 
     private static final long serialVersionUID = 1L;
 
-    private String            operatingSystem;
-    private String            rightLevel;
+    private final String      operatingSystem;
+    private final String      rightLevel;
 
     /**
      * Creates a new program and sets the name, the vulnerabilities, the operating system the program is written for and the required right level.

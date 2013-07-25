@@ -48,13 +48,13 @@ public class Simulation {
 
     @XmlElementWrapper (name = "members")
     @XmlElement (name = "member")
-    private List<Member>      members   = new CopyOnWriteArrayList<Member>();
+    private final List<Member>      members   = new CopyOnWriteArrayList<Member>();
     @XmlElementWrapper (name = "groups")
     @XmlElement (name = "group")
-    private List<MemberGroup> groups    = new CopyOnWriteArrayList<MemberGroup>();
+    private final List<MemberGroup> groups    = new CopyOnWriteArrayList<MemberGroup>();
     @XmlElementWrapper (name = "computers")
     @XmlElement (name = "computer")
-    private List<Computer>    computers = new CopyOnWriteArrayList<Computer>();
+    private final List<Computer>    computers = new CopyOnWriteArrayList<Computer>();
 
     /**
      * Creates a new empty simulation.

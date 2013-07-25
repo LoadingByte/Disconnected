@@ -34,9 +34,9 @@ import com.quartercode.disconnected.sim.comp.ComputerPart.ComputerPartAdapter;
 @XmlJavaTypeAdapter (value = ComputerPartAdapter.class)
 public class OperatingSystem extends ComputerPart {
 
-    private static final long serialVersionUID = 1L;
+    private static final long      serialVersionUID = 1L;
 
-    private List<RightLevel>  rightLevels;
+    private final List<RightLevel> rightLevels;
 
     /**
      * Creates a new operating system and sets the name, the vulnerabilities and the avaiable right levels.
@@ -92,7 +92,7 @@ public class OperatingSystem extends ComputerPart {
 
         private static final long serialVersionUID = 1L;
 
-        private String            name;
+        private final String      name;
 
         /**
          * Creates a new right level and sets the name.

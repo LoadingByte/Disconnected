@@ -31,7 +31,7 @@ import com.quartercode.disconnected.sim.Simulation;
  */
 public class ProfileManager {
 
-    private List<Simulation> profiles = new ArrayList<Simulation>();
+    private final List<Simulation> profiles = new ArrayList<Simulation>();
 
     /**
      * Creates a new profile manager.

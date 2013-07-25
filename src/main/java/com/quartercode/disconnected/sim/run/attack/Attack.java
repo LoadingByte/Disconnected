@@ -32,9 +32,9 @@ import com.quartercode.disconnected.sim.member.Member;
  */
 public class Attack {
 
-    private Member  target;
-    private Exploit exploit;
-    private Payload payload;
+    private final Member  target;
+    private final Exploit exploit;
+    private final Payload payload;
 
     /**
      * Creates a new attack and sets the target, the exploit and the payload.

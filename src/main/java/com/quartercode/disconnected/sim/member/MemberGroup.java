@@ -41,11 +41,11 @@ public class MemberGroup {
 
     @XmlElement (name = "member")
     @XmlIDREF
-    private List<Member>     members     = new CopyOnWriteArrayList<Member>();
+    private final List<Member>     members     = new CopyOnWriteArrayList<Member>();
     @XmlElement (name = "reputation")
-    private List<Reputation> reputations = new CopyOnWriteArrayList<Reputation>();
+    private final List<Reputation> reputations = new CopyOnWriteArrayList<Reputation>();
     @XmlElement (name = "interest")
-    private List<Interest>   interests   = new CopyOnWriteArrayList<Interest>();
+    private final List<Interest>   interests   = new CopyOnWriteArrayList<Interest>();
 
     /**
      * Creates a new empty member group

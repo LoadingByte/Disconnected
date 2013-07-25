@@ -43,11 +43,11 @@ public class Member {
 
     @XmlAttribute
     @XmlID
-    private String         name;
+    private String               name;
     @XmlElement (name = "interest")
-    private List<Interest> interests = new CopyOnWriteArrayList<Interest>();
+    private final List<Interest> interests = new CopyOnWriteArrayList<Interest>();
     @XmlIDREF
-    private Computer       computer;
+    private Computer             computer;
 
     /**
      * Creates a new empty member.

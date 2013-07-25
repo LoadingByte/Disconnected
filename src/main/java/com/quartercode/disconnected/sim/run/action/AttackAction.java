@@ -37,7 +37,7 @@ import com.quartercode.disconnected.util.ProbabilityUtil;
  */
 public class AttackAction extends Action {
 
-    private Attack attack;
+    private final Attack attack;
 
     /**
      * Creates a new attack action and sets the reputation changer and the attack to use.
