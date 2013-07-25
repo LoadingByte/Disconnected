@@ -55,7 +55,7 @@ public class LocationGenerator {
      */
     public static List<Location> generateLocations(int amount, List<Location> ignore) {
 
-        Validate.isTrue(amount > 0, "Generation count must be > 0");
+        Validate.isTrue(amount > 0, "Generation amount must be > 0");
 
         if (map == null) {
             try {

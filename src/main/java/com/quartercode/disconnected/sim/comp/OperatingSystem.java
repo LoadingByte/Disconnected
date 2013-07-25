@@ -81,7 +81,7 @@ public class OperatingSystem extends ComputerPart {
     }
 
     /**
-     * This class represents a final right level a user can have on an operating system.
+     * This class represents a right level a user can have on an operating system.
      * The right level defines what a user can or cannot do. If a user has a right level, he can use every other right level below his one.
      * Every operating system has its own right levels, and programs define the right level you need for executing it.
      * 
