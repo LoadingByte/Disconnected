@@ -18,6 +18,9 @@
 
 package com.quartercode.disconnected.sim.run;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.Validate;
@@ -29,32 +32,59 @@ import org.apache.commons.lang.Validate;
  */
 public class TickThread extends Thread {
 
-    private static final Logger LOGGER = Logger.getLogger(TickThread.class.getName());
+    private static final Logger    LOGGER      = Logger.getLogger(TickThread.class.getName());
 
-    private final Simulator     simulator;
-
-    private int                 delay  = 1000;
+    private final List<TickAction> tickActions = new ArrayList<TickAction>();
+    private int                    delay       = 1000;
 
     /**
-     * Creates a new tick thread and sets the simulator.
-     * 
-     * @param simulator The simulator which will get called.
+     * Creates a new empty tick thread.
      */
-    public TickThread(Simulator simulator) {
+    public TickThread() {
 
-        super("simulation-tick");
-
-        this.simulator = simulator;
+        super("tick");
     }
 
     /**
-     * Returns the simulator which will get called.
+     * Creates a new tick thread and sets a list of tick actions which get called on every tick.
      * 
-     * @return The simulator which will get called.
+     * @param tickActions A list of tick actions which get called on every tick.
      */
-    public Simulator getSimulator() {
+    public TickThread(TickAction... tickActions) {
 
-        return simulator;
+        this();
+
+        this.tickActions.addAll(Arrays.asList(tickActions));
+    }
+
+    /**
+     * Returns a list of tick actions which get called on every tick.
+     * 
+     * @return A list of tick actions which get called on every tick.
+     */
+    public List<TickAction> getTickActions() {
+
+        return tickActions;
+    }
+
+    /**
+     * Adds a tick action which gets called on every tick.
+     * 
+     * @param tickAction A tick action which gets called on every tick.
+     */
+    public void addTickAction(TickAction tickAction) {
+
+        tickActions.add(tickAction);
+    }
+
+    /**
+     * Removes a tick action from the tick thread.
+     * 
+     * @param tickAction The tick action to remove from the tick thread.
+     */
+    public void removeTickAction(TickAction tickAction) {
+
+        tickActions.remove(tickAction);
     }
 
     /**
@@ -75,7 +105,6 @@ public class TickThread extends Thread {
     public void setDelay(int delay) {
 
         Validate.isTrue(delay > 0, "Delay must be > 0");
-
         this.delay = delay;
     }
 
@@ -83,18 +112,22 @@ public class TickThread extends Thread {
     public void run() {
 
         while (!isInterrupted()) {
-            try {
-                simulator.update();
-            }
-            catch (Throwable t) {
-                LOGGER.log(Level.SEVERE, "An exception occurred while executing simulator update", t);
-            }
+            synchronized (this) {
+                for (TickAction tickAction : new ArrayList<TickAction>(tickActions)) {
+                    try {
+                        tickAction.update();
+                    }
+                    catch (Throwable t) {
+                        LOGGER.log(Level.SEVERE, "An exception occurred while executing tick action update (tick action " + tickAction.getClass().getName() + ")", t);
+                    }
+                }
 
-            try {
-                Thread.sleep(delay);
-            }
-            catch (InterruptedException e) {
-                LOGGER.log(Level.SEVERE, "Tick thread has been interrupted", e);
+                try {
+                    Thread.sleep(delay);
+                }
+                catch (InterruptedException e) {
+                    LOGGER.log(Level.SEVERE, "Tick thread has been interrupted", e);
+                }
             }
         }
     }

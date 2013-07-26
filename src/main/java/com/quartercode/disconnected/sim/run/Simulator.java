@@ -39,10 +39,11 @@ import com.quartercode.disconnected.util.SimulationGenerator;
  * @see Simulation
  * @see TickThread
  */
-public class Simulator {
+public class Simulator implements TickAction {
 
     private final Simulation simulation;
     private TickThread       tickThread;
+    private final TickTimer  tickTimer = new TickTimer();
 
     /**
      * Creates a new simulator and sets the simulation which should be simulated.
@@ -83,7 +84,7 @@ public class Simulator {
     public void setRunning(boolean running) {
 
         if (running && !isRunning()) {
-            tickThread = new TickThread(this);
+            tickThread = new TickThread(tickTimer, this);
             tickThread.start();
         } else if (!running && isRunning()) {
             tickThread.interrupt();
@@ -103,9 +104,21 @@ public class Simulator {
     }
 
     /**
-     * This method executes the basic tick update which is called in the same intervals.
+     * Returns the final tick timer which schedules delayed and peridoic tasks.
+     * The tick timer is always the same object and wont change if you change the running state.
+     * 
+     * @return The final tick timer which schedules delayed and peridoic tasks.
+     */
+    public TickTimer getTickTimer() {
+
+        return tickTimer;
+    }
+
+    /**
+     * Executes the basic tick update which is called in the same intervals.
      * This calls some subroutines which actually simulate a tick.
      */
+    @Override
     public void update() {
 
         // Generate new members and computers
