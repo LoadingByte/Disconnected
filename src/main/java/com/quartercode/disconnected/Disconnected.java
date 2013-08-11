@@ -33,13 +33,33 @@ public class Disconnected {
     private static Simulator      simulator;
 
     /**
-     * Returns the current implemented version.
+     * Returns the title of the product.
      * 
-     * @return The current implemented version.
+     * @return The title of the product.
+     */
+    public static String getTitle() {
+
+        return Disconnected.class.getPackage().getImplementationTitle();
+    }
+
+    /**
+     * Returns the current implemented version of the product.
+     * 
+     * @return The current implemented version of the product.
      */
     public static String getVersion() {
 
         return Disconnected.class.getPackage().getImplementationVersion();
+    }
+
+    /**
+     * Returns the vendor who created the product.
+     * 
+     * @return The vendor who created the product.
+     */
+    public static String getVendor() {
+
+        return Disconnected.class.getPackage().getImplementationVendor();
     }
 
     /**
