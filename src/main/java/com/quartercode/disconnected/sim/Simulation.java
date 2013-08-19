@@ -226,4 +226,42 @@ public class Simulation {
         return interests;
     }
 
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (computers == null ? 0 : computers.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Simulation other = (Simulation) obj;
+        if (computers == null) {
+            if (other.computers != null) {
+                return false;
+            }
+        } else if (!computers.equals(other.computers)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [members=" + members + ", groups=" + groups + ", computers=" + computers + "]";
+    }
+
 }

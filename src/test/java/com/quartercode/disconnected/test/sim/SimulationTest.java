@@ -22,7 +22,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.member.Member;
+import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
 
 public class SimulationTest {
 
@@ -31,35 +31,13 @@ public class SimulationTest {
     @Before
     public void setUp() {
 
-        simulation = new Simulation();
-        simulation.addMember(new Member("member1"));
-        simulation.addMember(new Member("member2"));
+        simulation = SimulationGenerator.generateSimulation(10, 2);
     }
 
     @Test
-    public void testGetMembers() {
+    public void testEquals() {
 
-        Assert.assertEquals("Member count", 2, simulation.getMembers().size());
-    }
-
-    @Test
-    public void testGetMember() {
-
-        Assert.assertEquals("Member exists", simulation.getMembers().get(1), simulation.getMember("member2"));
-    }
-
-    @Test
-    public void testAddMember() {
-
-        simulation.addMember(new Member("member3"));
-        Assert.assertEquals("Member count", 3, simulation.getMembers().size());
-    }
-
-    @Test
-    public void testRemoveMember() {
-
-        simulation.removeMember(simulation.getMembers().get(0));
-        Assert.assertEquals("Member count", 1, simulation.getMembers().size());
+        Assert.assertEquals("Simulation equals itself", simulation, simulation);
     }
 
 }

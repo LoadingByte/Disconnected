@@ -18,12 +18,9 @@
 
 package com.quartercode.disconnected.sim.comp;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import com.quartercode.disconnected.sim.comp.ComputerPart.ComputerPartAdapter;
+import com.quartercode.disconnected.Disconnected;
+import com.quartercode.disconnected.sim.run.TickTimer.TimerTask;
 
 /**
  * This class stores information about an operating system.
@@ -31,89 +28,163 @@ import com.quartercode.disconnected.sim.comp.ComputerPart.ComputerPartAdapter;
  * 
  * @see ComputerPart
  */
-@XmlJavaTypeAdapter (value = ComputerPartAdapter.class)
 public class OperatingSystem extends ComputerPart {
 
-    private static final long      serialVersionUID = 1L;
-
-    private final List<RightLevel> rightLevels;
-
     /**
-     * Creates a new operating system and sets the name, the vulnerabilities and the avaiable right levels.
-     * 
-     * @param name The name the operating system has.
-     * @param vulnerabilities The vulnerabilities the operating system has.
-     * @param rightLevels A list of all right levels which a user can have on this system.
-     */
-    public OperatingSystem(String name, List<Vulnerability> vulnerabilities, List<RightLevel> rightLevels) {
-
-        super(name, vulnerabilities);
-
-        this.rightLevels = rightLevels;
-    }
-
-    /**
-     * Creates a new operating system and sets the name, the vulnerabilities and the avaiableright levels using a given string list.
-     * The given right level string list gets splitted at commas, the trimmed parts should represent names.
-     * 
-     * @param name The name the operating system has.
-     * @param vulnerabilities The vulnerabilities the operating system has.
-     * @param rightLevels A list of all right levels which a user can have on this system.
-     */
-    public OperatingSystem(String name, List<Vulnerability> vulnerabilities, String rightLevels) {
-
-        super(name, vulnerabilities);
-
-        this.rightLevels = new ArrayList<RightLevel>();
-        for (String rightLevel : rightLevels.split(",")) {
-            this.rightLevels.add(new RightLevel(rightLevel.trim()));
-        }
-    }
-
-    /**
-     * Returns all right levels the operating system offers. The right level defines what a user can or cannot do.
-     * 
-     * @return All right levels the operating system offers.
-     */
-    public List<RightLevel> getRightLevels() {
-
-        return Collections.unmodifiableList(rightLevels);
-    }
-
-    /**
-     * This class represents a right level a user can have on an operating system.
+     * This enum represents the right levels a user can has on an operating system.
      * The right level defines what a user can or cannot do. If a user has a right level, he can use every other right level below his one.
-     * Every operating system has its own right levels, and programs define the right level you need for executing it.
      * 
      * @see OperatingSystem
      * @see Program
      */
-    public static class RightLevel implements Serializable {
+    public static enum RightLevel {
 
-        private static final long serialVersionUID = 1L;
+        GUEST, USER, ADMIN, SYSTEM;
+    }
 
-        private final String      name;
+    /**
+     * The state of an operating system defines if the system is turned on/off, is switching states etc.
+     * 
+     * @see OperatingSystem
+     */
+    public static enum State {
 
-        /**
-         * Creates a new right level and sets the name.
-         * 
-         * @param name The name for the right level.
-         */
-        public RightLevel(String name) {
+        OFF, SWITCHING_OFF, ON, SWITCHING_ON;
+    }
 
-            this.name = name;
+    private static final long serialVersionUID = 1L;
+
+    private int               switchOnTime;
+    private int               switchOffTime;
+
+    private State             state;
+
+    /**
+     * Creates a new empty operating system.
+     * This is only recommended for direct field access (e.g. for serialization).
+     */
+    public OperatingSystem() {
+
+    }
+
+    /**
+     * Creates a new operating system and sets the computer, the name, the version, the vulnerabilities and the times the os needs for switching on/off.
+     * 
+     * @param name The name the operating system has.
+     * @param version The current version the operating system has.
+     * @param vulnerabilities The vulnerabilities the operating system has.
+     * @param switchOnTime The amount of ticks the system needs to switch on (boot up).
+     * @param switchOffTime The amount of ticks the system needs to switch off (shutdown).
+     */
+    public OperatingSystem(Computer computer, String name, Version version, List<Vulnerability> vulnerabilities, int switchOnTime, int switchOffTime) {
+
+        super(computer, name, version, vulnerabilities);
+
+        this.switchOnTime = switchOnTime;
+        this.switchOffTime = switchOffTime;
+    }
+
+    /**
+     * Returns the amount of ticks the system needs to switch on (boot up).
+     * 
+     * @return The amount of ticks the system needs to switch on (boot up).
+     */
+    public int getSwitchOnTime() {
+
+        return switchOnTime;
+    }
+
+    /**
+     * Returns the amount of ticks the system needs to switch off (shutdown).
+     * 
+     * @return The amount of ticks the system needs to switch off (shutdown).
+     */
+    public int getSwitchOffTime() {
+
+        return switchOffTime;
+    }
+
+    /**
+     * Returns the current state of the operation system.
+     * 
+     * @return The current state of the operation system.
+     */
+    public State getState() {
+
+        return state;
+    }
+
+    /**
+     * Switches the state of the system.
+     * This may take a while (for example, this method will boot the system or shut it down).
+     * 
+     * @param state The state to switch the system to.
+     */
+    public void switchState(final State state) {
+
+        if (state == State.ON && this.state == State.OFF) {
+            this.state = State.SWITCHING_ON;
+            Disconnected.getSimulator().getTickTimer().schedule(new TimerTask(switchOnTime) {
+
+                @Override
+                public void run() {
+
+                    OperatingSystem.this.state = State.ON;
+                }
+            });
+        } else if (state == State.OFF && this.state == State.ON) {
+            this.state = State.SWITCHING_OFF;
+            Disconnected.getSimulator().getTickTimer().schedule(new TimerTask(switchOffTime) {
+
+                @Override
+                public void run() {
+
+                    OperatingSystem.this.state = State.OFF;
+                }
+            });
         }
+    }
 
-        /**
-         * Returns the name of the right level. The name is used by programs for defining who can execute the software.
-         * 
-         * @return The name of the right level.
-         */
-        public String getName() {
+    @Override
+    public int hashCode() {
 
-            return name;
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + (state == null ? 0 : state.hashCode());
+        result = prime * result + switchOffTime;
+        result = prime * result + switchOnTime;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
         }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        OperatingSystem other = (OperatingSystem) obj;
+        if (state != other.state) {
+            return false;
+        }
+        if (switchOffTime != other.switchOffTime) {
+            return false;
+        }
+        if (switchOnTime != other.switchOnTime) {
+            return false;
+        }
+        return true;
+    }
 
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [switchOnTime=" + switchOnTime + ", switchOffTime=" + switchOffTime + ", state=" + state + ", getName()=" + getName() + ", getVersion()=" + getVersion() + ", getVulnerabilities()=" + getVulnerabilities() + "]";
     }
 
 }

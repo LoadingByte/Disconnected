@@ -22,9 +22,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlIDREF;
 import org.apache.commons.lang.Validate;
-import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.util.CloneUtil;
 
 /**
@@ -32,6 +36,7 @@ import com.quartercode.disconnected.util.CloneUtil;
  * This also contains a list of all vulnerabilities this part has.
  * 
  * @see Computer
+ * @see Version
  * @see Vulnerability
  * 
  * @see Mainboard
@@ -39,25 +44,54 @@ import com.quartercode.disconnected.util.CloneUtil;
  * @see OperatingSystem
  * @see Program
  */
+@XmlAccessorType (XmlAccessType.FIELD)
 public class ComputerPart implements Serializable {
 
-    private static final long         serialVersionUID = 1L;
+    private static final long   serialVersionUID = 1L;
 
-    private final String              name;
-    private final List<Vulnerability> vulnerabilities;
+    @XmlIDREF
+    @XmlAttribute
+    private Computer            computer;
+
+    private String              name;
+    private Version             version;
+    @XmlElement (name = "vulnerability")
+    private List<Vulnerability> vulnerabilities  = new ArrayList<Vulnerability>();
 
     /**
-     * Creates a new computer part and sets the name and the vulnerabilities.
+     * Creates a new empty computer part.
+     * This is only recommended for direct field access (e.g. for serialization).
+     */
+    public ComputerPart() {
+
+    }
+
+    /**
+     * Creates a new computer part and sets the computer, the name, the version and the vulnerabilities.
      * 
+     * @param computer The computer this part is built in.
      * @param name The name the part has.
+     * @param version The current version the part has.
      * @param vulnerabilities The vulnerabilities the part has.
      */
-    protected ComputerPart(String name, List<Vulnerability> vulnerabilities) {
+    protected ComputerPart(Computer computer, String name, Version version, List<Vulnerability> vulnerabilities) {
 
         Validate.notNull(name, "Name can't be null");
 
+        this.computer = computer;
         this.name = name;
+        this.version = version;
         this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
+    }
+
+    /**
+     * Returns the computer this part is built in.
+     * 
+     * @return The computer this part is built in.
+     */
+    public Computer getComputer() {
+
+        return computer;
     }
 
     /**
@@ -71,6 +105,16 @@ public class ComputerPart implements Serializable {
     }
 
     /**
+     * Returns the current version the part has.
+     * 
+     * @return The current version the part has.
+     */
+    public Version getVersion() {
+
+        return version;
+    }
+
+    /**
      * Returns the vulnerabilities the part has.
      * 
      * @return The vulnerabilities the part has.
@@ -78,6 +122,13 @@ public class ComputerPart implements Serializable {
     public List<Vulnerability> getVulnerabilities() {
 
         return Collections.unmodifiableList(vulnerabilities);
+    }
+
+    @XmlID
+    @XmlAttribute
+    public String getId() {
+
+        return computer.getId() + "." + computer.getParts().indexOf(this);
     }
 
     @Override
@@ -92,6 +143,7 @@ public class ComputerPart implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + (version == null ? 0 : version.hashCode());
         result = prime * result + (vulnerabilities == null ? 0 : vulnerabilities.hashCode());
         return result;
     }
@@ -116,6 +168,13 @@ public class ComputerPart implements Serializable {
         } else if (!name.equals(other.name)) {
             return false;
         }
+        if (version == null) {
+            if (other.version != null) {
+                return false;
+            }
+        } else if (!version.equals(other.version)) {
+            return false;
+        }
         if (vulnerabilities == null) {
             if (other.vulnerabilities != null) {
                 return false;
@@ -129,34 +188,7 @@ public class ComputerPart implements Serializable {
     @Override
     public String toString() {
 
-        return getClass().getName() + " [name=" + name + ", vulnerabilities=" + vulnerabilities + "]";
-    }
-
-    /**
-     * This computer part name adapter is for storing a computer part in a profile xml file using his name.
-     * While unmarshalling, the adapter loads the resource store resource for the given name.
-     */
-    public static class ComputerPartAdapter extends XmlAdapter<String, ComputerPart> {
-
-        /**
-         * Creates a new computer part adapter.
-         */
-        public ComputerPartAdapter() {
-
-        }
-
-        @Override
-        public ComputerPart unmarshal(String v) throws Exception {
-
-            return Disconnected.getResoureStore().getComputerPart(v);
-        }
-
-        @Override
-        public String marshal(ComputerPart v) throws Exception {
-
-            return v.getName();
-        }
-
+        return getClass().getName() + " [name=" + name + ", version=" + version + ", vulnerabilities=" + vulnerabilities + "]";
     }
 
 }

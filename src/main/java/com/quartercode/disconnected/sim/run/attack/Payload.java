@@ -65,4 +65,50 @@ public class Payload {
         return scripts;
     }
 
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (operatingSystem == null ? 0 : operatingSystem.hashCode());
+        result = prime * result + (scripts == null ? 0 : scripts.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Payload other = (Payload) obj;
+        if (operatingSystem == null) {
+            if (other.operatingSystem != null) {
+                return false;
+            }
+        } else if (!operatingSystem.equals(other.operatingSystem)) {
+            return false;
+        }
+        if (scripts == null) {
+            if (other.scripts != null) {
+                return false;
+            }
+        } else if (!scripts.equals(other.scripts)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [operatingSystem=" + operatingSystem + ", scripts=" + scripts + "]";
+    }
+
 }

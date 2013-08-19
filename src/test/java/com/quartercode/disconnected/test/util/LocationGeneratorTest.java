@@ -21,7 +21,7 @@ package com.quartercode.disconnected.test.util;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
-import com.quartercode.disconnected.sim.comp.Location;
+import com.quartercode.disconnected.sim.Location;
 import com.quartercode.disconnected.util.LocationGenerator;
 
 public class LocationGeneratorTest {

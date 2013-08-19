@@ -40,10 +40,10 @@ import com.quartercode.disconnected.util.ProbabilityUtil;
  * The executor of the resulting action should destroy the target.
  * 
  * @see Interest
- * @see Target
+ * @see HasTarget
  */
 @XmlAccessorType (XmlAccessType.FIELD)
-public class DestroyInterest extends Interest implements Target {
+public class DestroyInterest extends Interest implements HasTarget {
 
     @XmlIDREF
     private Member target;
@@ -116,13 +116,51 @@ public class DestroyInterest extends Interest implements Target {
                 scripts.add("simulation.removeComputer(member.getComputer())");
 
                 // Use the first avaiable operating system as execution environment
-                Payload payload = new Payload(member.getComputer().getOperatingSystems().get(0), scripts);
+                Payload payload = new Payload(member.getComputer().getOperatingSystem(), scripts);
 
                 return new AttackAction(this, new Attack(target, exploit, payload));
             }
         }
 
         return null;
+    }
+
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + (target == null ? 0 : target.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        DestroyInterest other = (DestroyInterest) obj;
+        if (target == null) {
+            if (other.target != null) {
+                return false;
+            }
+        } else if (!target.equals(other.target)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [target=" + target + ", getPriority()=" + getPriority() + "]";
     }
 
 }

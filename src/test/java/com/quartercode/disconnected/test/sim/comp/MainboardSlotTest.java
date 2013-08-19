@@ -22,6 +22,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.sim.comp.Mainboard.MainboradSlot;
+import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 
@@ -34,7 +35,7 @@ public class MainboardSlotTest {
     public void setUp() {
 
         mainboradSlot = new MainboradSlot(CPU.class);
-        content = new CPU("cpu", null, 0, 0);
+        content = new CPU(null, "cpu", new Version(1, 0, 0), null, 0, 0);
         mainboradSlot.setContent(content);
     }
 
@@ -47,13 +48,13 @@ public class MainboardSlotTest {
     @Test
     public void testAccept() {
 
-        Assert.assertTrue("Accept CPU", mainboradSlot.accept(new CPU("cpu", null, 0, 0)));
+        Assert.assertTrue("Accept CPU", mainboradSlot.accept(new CPU(null, "cpu", new Version(1, 0, 0), null, 0, 0)));
     }
 
     @Test
     public void testNotAccept() {
 
-        Assert.assertFalse("Accept RAM (invalid)", mainboradSlot.accept(new RAM("ram", null, 0, 0)));
+        Assert.assertFalse("Accept RAM (invalid)", mainboradSlot.accept(new RAM(null, "ram", new Version(1, 0, 0), null, 0, 0)));
     }
 
     @Test
@@ -65,7 +66,7 @@ public class MainboardSlotTest {
     @Test
     public void testSetContent() {
 
-        CPU newContent = new CPU("cpu", null, 0, 0);
+        CPU newContent = new CPU(null, "cpu", new Version(1, 0, 0), null, 0, 0);
         mainboradSlot.setContent(newContent);
         Assert.assertEquals("Content equals", newContent, mainboradSlot.getContent());
     }

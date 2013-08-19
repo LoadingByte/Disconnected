@@ -19,31 +19,45 @@
 package com.quartercode.disconnected.sim.comp.hardware;
 
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.Hardware;
+import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 
 /**
- * This class represents a cpu module of a computer.
+ * This class represents a cpu of a computer.
  * A cpu has a count of possible threads running at the same time and a frequency (given in hertz).
  */
+@XmlAccessorType (XmlAccessType.FIELD)
 public class CPU extends Hardware {
 
-    private static final long serialVersionUID = -6953965174736837113L;
+    private static final long serialVersionUID = 1L;
 
-    private final int         threads;
-    private final long        frequency;
+    private int               threads;
+    private long              frequency;
 
     /**
-     * Creates a new cpu and sets the name, the vulnerabilities, the count of possible threads and the frequency.
+     * Creates a new empty cpu.
+     * This is only recommended for direct field access (e.g. for serialization).
+     */
+    public CPU() {
+
+    }
+
+    /**
+     * Creates a new cpu and sets the computer, the name, the version, the vulnerabilities, the count of possible threads and the frequency.
      * 
      * @param name The name the cpu has.
+     * @param version The current version the cpu has.
      * @param vulnerabilities The vulnerabilities the cpu has.
      * @param threads The count of possible threads running at the same time.
      * @param frequency The frequency of the cpu, given in hertz.
      */
-    public CPU(String name, List<Vulnerability> vulnerabilities, int threads, long frequency) {
+    public CPU(Computer computer, String name, Version version, List<Vulnerability> vulnerabilities, int threads, long frequency) {
 
-        super(name, vulnerabilities);
+        super(computer, name, version, vulnerabilities);
 
         this.threads = threads;
         this.frequency = frequency;
@@ -67,6 +81,44 @@ public class CPU extends Hardware {
     public long getFrequency() {
 
         return frequency;
+    }
+
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + (int) (frequency ^ frequency >>> 32);
+        result = prime * result + threads;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        CPU other = (CPU) obj;
+        if (frequency != other.frequency) {
+            return false;
+        }
+        if (threads != other.threads) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [threads=" + threads + ", frequency=" + frequency + ", getName()=" + getName() + ", getVersion()=" + getVersion() + ", getVulnerabilities()=" + getVulnerabilities() + "]";
     }
 
 }

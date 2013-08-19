@@ -79,6 +79,44 @@ public class TickTimer implements TickAction {
         }
     }
 
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (tasks == null ? 0 : tasks.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        TickTimer other = (TickTimer) obj;
+        if (tasks == null) {
+            if (other.tasks != null) {
+                return false;
+            }
+        } else if (!tasks.equals(other.tasks)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [tasks=" + tasks + "]";
+    }
+
     /**
      * This class represents a timer task which elapses a given amount of ticks and then call the integrated runnable.
      */
@@ -154,6 +192,49 @@ public class TickTimer implements TickAction {
 
             elapsed++;
         }
+
+        @Override
+        public int hashCode() {
+
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + delay;
+            result = prime * result + elapsed;
+            result = prime * result + period;
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            TimerTask other = (TimerTask) obj;
+            if (delay != other.delay) {
+                return false;
+            }
+            if (elapsed != other.elapsed) {
+                return false;
+            }
+            if (period != other.period) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public String toString() {
+
+            return getClass().getName() + " [delay=" + delay + ", period=" + period + ", elapsed=" + elapsed + "]";
+        }
+
     }
 
 }

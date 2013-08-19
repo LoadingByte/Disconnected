@@ -84,4 +84,58 @@ public class Attack {
         return payload;
     }
 
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (exploit == null ? 0 : exploit.hashCode());
+        result = prime * result + (payload == null ? 0 : payload.hashCode());
+        result = prime * result + (target == null ? 0 : target.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Attack other = (Attack) obj;
+        if (exploit == null) {
+            if (other.exploit != null) {
+                return false;
+            }
+        } else if (!exploit.equals(other.exploit)) {
+            return false;
+        }
+        if (payload == null) {
+            if (other.payload != null) {
+                return false;
+            }
+        } else if (!payload.equals(other.payload)) {
+            return false;
+        }
+        if (target == null) {
+            if (other.target != null) {
+                return false;
+            }
+        } else if (!target.equals(other.target)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [target=" + target + ", exploit=" + exploit + ", payload=" + payload + "]";
+    }
+
 }

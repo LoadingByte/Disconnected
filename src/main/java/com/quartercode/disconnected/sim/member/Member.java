@@ -127,4 +127,58 @@ public class Member {
         this.computer = computer;
     }
 
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (computer == null ? 0 : computer.hashCode());
+        result = prime * result + (interests == null ? 0 : interests.hashCode());
+        result = prime * result + (name == null ? 0 : name.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Member other = (Member) obj;
+        if (computer == null) {
+            if (other.computer != null) {
+                return false;
+            }
+        } else if (!computer.equals(other.computer)) {
+            return false;
+        }
+        if (interests == null) {
+            if (other.interests != null) {
+                return false;
+            }
+        } else if (!interests.equals(other.interests)) {
+            return false;
+        }
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [name=" + name + ", interests=" + interests + ", computer=" + computer + "]";
+    }
+
 }

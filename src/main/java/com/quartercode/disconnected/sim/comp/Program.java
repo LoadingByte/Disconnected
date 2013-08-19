@@ -19,8 +19,6 @@
 package com.quartercode.disconnected.sim.comp;
 
 import java.util.List;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import com.quartercode.disconnected.sim.comp.ComputerPart.ComputerPartAdapter;
 
 /**
  * This class stores information about a program.
@@ -28,38 +26,33 @@ import com.quartercode.disconnected.sim.comp.ComputerPart.ComputerPartAdapter;
  * 
  * @see ComputerPart
  */
-@XmlJavaTypeAdapter (value = ComputerPartAdapter.class)
 public class Program extends ComputerPart {
 
     private static final long serialVersionUID = 1L;
 
-    private final String      operatingSystem;
-    private final String      rightLevel;
+    private String            rightLevel;
 
     /**
-     * Creates a new program and sets the name, the vulnerabilities, the operating system the program is written for and the required right level.
-     * 
-     * @param name The name the program has.
-     * @param vulnerabilities The vulnerabilities the program has.
-     * @param operatingSystem The operating system the program is written for.
-     * @param rightLevel The required right level a user need for executing the program.
+     * Creates a new empty program.
+     * This is only recommended for direct field access (e.g. for serialization).
      */
-    protected Program(String name, List<Vulnerability> vulnerabilities, String operatingSystem, String rightLevel) {
+    public Program() {
 
-        super(name, vulnerabilities);
-
-        this.operatingSystem = operatingSystem;
-        this.rightLevel = rightLevel;
     }
 
     /**
-     * Returns the operating system the program is written for.
+     * Creates a new program and sets the computer, the name, the version, the vulnerabilities and the required right level.
      * 
-     * @return The operating system the program is written for.
+     * @param name The name the program has.
+     * @param version The current version the program has.
+     * @param vulnerabilities The vulnerabilities the program has.
+     * @param rightLevel The required right level a user need for executing the program.
      */
-    public String getOperatingSystem() {
+    protected Program(Computer computer, String name, Version version, List<Vulnerability> vulnerabilities, String rightLevel) {
 
-        return operatingSystem;
+        super(computer, name, version, vulnerabilities);
+
+        this.rightLevel = rightLevel;
     }
 
     /**
@@ -70,6 +63,44 @@ public class Program extends ComputerPart {
     public String getRightLevel() {
 
         return rightLevel;
+    }
+
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + (rightLevel == null ? 0 : rightLevel.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Program other = (Program) obj;
+        if (rightLevel == null) {
+            if (other.rightLevel != null) {
+                return false;
+            }
+        } else if (!rightLevel.equals(other.rightLevel)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [rightLevel=" + rightLevel + ", getName()=" + getName() + ", getVersion()=" + getVersion() + ", getVulnerabilities()=" + getVulnerabilities() + "]";
     }
 
 }

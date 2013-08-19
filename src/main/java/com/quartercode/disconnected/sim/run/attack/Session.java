@@ -65,4 +65,46 @@ public class Session {
         return rightLevel;
     }
 
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (computer == null ? 0 : computer.hashCode());
+        result = prime * result + (rightLevel == null ? 0 : rightLevel.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Session other = (Session) obj;
+        if (computer == null) {
+            if (other.computer != null) {
+                return false;
+            }
+        } else if (!computer.equals(other.computer)) {
+            return false;
+        }
+        if (rightLevel != other.rightLevel) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [computer=" + computer + ", rightLevel=" + rightLevel + "]";
+    }
+
 }

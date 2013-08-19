@@ -19,11 +19,13 @@
 package com.quartercode.disconnected.sim.comp;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import com.quartercode.disconnected.sim.comp.ComputerPart.ComputerPartAdapter;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlIDREF;
 
 /**
  * This class stores information about a mainboard.
@@ -33,45 +35,35 @@ import com.quartercode.disconnected.sim.comp.ComputerPart.ComputerPartAdapter;
  * @see ComputerPart
  * @see Hardware
  */
-@XmlJavaTypeAdapter (value = ComputerPartAdapter.class)
 public class Mainboard extends ComputerPart {
 
-    private static final long         serialVersionUID = 1L;
+    private static final long   serialVersionUID = 1L;
 
-    private final List<MainboradSlot> slots;
+    @XmlElement (name = "slot")
+    private List<MainboradSlot> slots;
 
     /**
-     * Creates a new mainboard and sets the name, the vulnerabilities and a list of all avaiable mainboard slots.
-     * 
-     * @param name The name the part has.
-     * @param vulnerabilities The vulnerabilities the part has.
-     * @param slots A list of all avaiable mainboard slots.
+     * Creates a new empty mainboard.
+     * This is only recommended for direct field access (e.g. for serialization).
      */
-    public Mainboard(String name, List<Vulnerability> vulnerabilities, List<MainboradSlot> slots) {
+    public Mainboard() {
 
-        super(name, vulnerabilities);
-
-        this.slots = slots;
     }
 
     /**
-     * Creates a new mainboard and sets the name, the vulnerabilities and a all avaiable mainboard slots using a given string list.
-     * The given slot string list gets splitted at commas, the trimmed parts should represent classes.
+     * Creates a new mainboard and sets the computer, the name, the version, the vulnerabilities and a list of all avaiable mainboard slots.
      * 
-     * @param name The name the part has.
-     * @param vulnerabilities The vulnerabilities the part has.
+     * @param computer The computer this part is built in.
+     * @param name The name the mainboard has.
+     * @param version The current version the mainboard has.
+     * @param vulnerabilities The vulnerabilities the mainboard has.
      * @param slots A list of all avaiable mainboard slots.
-     * @throws ClassNotFoundException One of the given slot classes can't be found.
      */
-    @SuppressWarnings ("unchecked")
-    public Mainboard(String name, List<Vulnerability> vulnerabilities, String slots) throws ClassNotFoundException {
+    public Mainboard(Computer computer, String name, Version version, List<Vulnerability> vulnerabilities, List<MainboradSlot> slots) {
 
-        super(name, vulnerabilities);
+        super(computer, name, version, vulnerabilities);
 
-        this.slots = new ArrayList<MainboradSlot>();
-        for (String slot : slots.split(",")) {
-            this.slots.add(new MainboradSlot((Class<? extends Hardware>) Class.forName(slot.trim())));
-        }
+        this.slots = slots;
     }
 
     /**
@@ -85,6 +77,44 @@ public class Mainboard extends ComputerPart {
         return Collections.unmodifiableList(slots);
     }
 
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + (slots == null ? 0 : slots.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Mainboard other = (Mainboard) obj;
+        if (slots == null) {
+            if (other.slots != null) {
+                return false;
+            }
+        } else if (!slots.equals(other.slots)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [slots=" + slots + ", getName()=" + getName() + ", getVersion()=" + getVersion() + ", getVulnerabilities()=" + getVulnerabilities() + "]";
+    }
+
     /**
      * This class represents a mainboard slot which can have a hardware part as content.
      * The hardware type a slot can accept is defined using generics and the type class.
@@ -93,12 +123,24 @@ public class Mainboard extends ComputerPart {
      * @see Mainboard
      * @see Hardware
      */
+    @XmlAccessorType (XmlAccessType.FIELD)
     public static class MainboradSlot implements Serializable {
 
-        private static final long               serialVersionUID = 1L;
+        private static final long         serialVersionUID = 1L;
 
-        private final Class<? extends Hardware> type;
-        private Hardware                        content;
+        @XmlAttribute
+        private Class<? extends Hardware> type;
+        @XmlIDREF
+        @XmlAttribute
+        private Hardware                  content;
+
+        /**
+         * Creates a new empty mainboard slot.
+         * This is only recommended for direct field access (e.g. for serialization).
+         */
+        public MainboradSlot() {
+
+        }
 
         /**
          * Creates a new mainboard slot and sets the hardware type the slot can accept.
@@ -149,6 +191,52 @@ public class Mainboard extends ComputerPart {
         public void setContent(Hardware content) {
 
             this.content = content;
+        }
+
+        @Override
+        public int hashCode() {
+
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + (content == null ? 0 : content.hashCode());
+            result = prime * result + (type == null ? 0 : type.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            MainboradSlot other = (MainboradSlot) obj;
+            if (content == null) {
+                if (other.content != null) {
+                    return false;
+                }
+            } else if (!content.equals(other.content)) {
+                return false;
+            }
+            if (type == null) {
+                if (other.type != null) {
+                    return false;
+                }
+            } else if (!type.equals(other.type)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public String toString() {
+
+            return getClass().getName() + " [type=" + type + ", content=" + content + "]";
         }
 
     }

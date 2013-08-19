@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.comp;
+package com.quartercode.disconnected.sim;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import org.apache.commons.lang.Validate;

@@ -18,15 +18,11 @@
 
 package com.quartercode.disconnected;
 
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import com.quartercode.disconnected.profile.ProfileManager;
-import com.quartercode.disconnected.resstore.ResoureStore;
-import com.quartercode.disconnected.resstore.ResoureStoreLoader;
 import com.quartercode.disconnected.util.LogExceptionHandler;
-import com.quartercode.disconnected.util.ResourceLister;
 
 /**
  * The main class which initalizes the whole game.
@@ -56,24 +52,6 @@ public class Main {
 
         // Print information about the software
         LOGGER.info("Version " + Disconnected.getVersion());
-
-        // Initalize resource store and load stored resources
-        Disconnected.setResoureStore(new ResoureStore());
-        try {
-            for (String name : ResourceLister.getResources("/data/parts", false)) {
-                try {
-                    Disconnected.getResoureStore().addComputerPart(ResoureStoreLoader.loadComputerPart(Main.class.getResourceAsStream(name)));
-                }
-                catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Can't load computer part under \"" + name + "\"", e);
-                    return;
-                }
-            }
-        }
-        catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can't read resource list for computer parts", e);
-            return;
-        }
 
         // Initalize profile manager and load stored profiles (TODO: Add code for loading).
         Disconnected.setProfileManager(new ProfileManager());

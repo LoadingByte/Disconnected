@@ -16,21 +16,25 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.util;
+package com.quartercode.disconnected.sim.run.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import com.quartercode.disconnected.Disconnected;
+import com.quartercode.disconnected.sim.Location;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.Computer;
-import com.quartercode.disconnected.sim.comp.ComputerPart;
 import com.quartercode.disconnected.sim.comp.Hardware;
-import com.quartercode.disconnected.sim.comp.Location;
 import com.quartercode.disconnected.sim.comp.Mainboard;
 import com.quartercode.disconnected.sim.comp.Mainboard.MainboradSlot;
 import com.quartercode.disconnected.sim.comp.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.Version;
+import com.quartercode.disconnected.sim.comp.hardware.CPU;
+import com.quartercode.disconnected.sim.comp.hardware.RAM;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
+import com.quartercode.disconnected.util.LocationGenerator;
+import com.quartercode.disconnected.util.RandomPool;
 
 /**
  * This utility class generates a simulation.
@@ -76,7 +80,7 @@ public class SimulationGenerator {
     }
 
     /**
-     * Generates the given amount of computers RandomPool.PUBLICly.
+     * Generates the given amount of computers randomly.
      * 
      * @param simulation The simulation to use for generating metadata (like ids).
      * @param amount The amount of computers the generator should generate.
@@ -88,7 +92,7 @@ public class SimulationGenerator {
     }
 
     /**
-     * Generates the given amount of computers RandomPool.PUBLICly ignoring the locations of the given computers.
+     * Generates the given amount of computers randomly ignoring the locations of the given computers.
      * 
      * @param simulation The simulation to use for generating metadata (like ids).
      * @param amount The amount of computers the generator should generate.
@@ -120,25 +124,35 @@ public class SimulationGenerator {
             computer.setLocation(location);
             computers.add(computer);
 
-            List<ComputerPart> mainboards = Disconnected.getResoureStore().getComputerParts(Mainboard.class);
-            computer.setMainboard((Mainboard) mainboards.get(RandomPool.PUBLIC.nextInt(mainboards.size())).clone());
+            computer.setMainboard(new Mainboard(computer, "MB XYZ 2000 Pro", new Version(1, 2, 5), null, Arrays.asList(new MainboradSlot(CPU.class), new MainboradSlot(RAM.class))));
+
+            List<Hardware> hardware = new ArrayList<Hardware>();
+            hardware.add(new CPU(computer, "Intel Core i7-4950HQ", new Version(1, 0, 0), null, 8, 2400000000L));
+            hardware.add(new RAM(computer, "EpicRAM 4194304", new Version(1, 0, 5), null, 4194304, 1600000000L));
 
             for (MainboradSlot slot : computer.getMainboard().getSlots()) {
-                List<ComputerPart> possibleHardware = Disconnected.getResoureStore().getComputerParts(slot.getType());
-                Hardware hardware = (Hardware) possibleHardware.get(RandomPool.PUBLIC.nextInt(possibleHardware.size())).clone();
-                computer.addHardware(hardware);
-                slot.setContent(hardware);
+                Hardware useHardware = null;
+                for (Hardware testHardware : hardware) {
+                    if (slot.accept(testHardware)) {
+                        useHardware = testHardware;
+                        break;
+                    }
+                }
+
+                if (useHardware != null) {
+                    computer.addHardware(useHardware);
+                    slot.setContent(useHardware);
+                }
             }
 
-            List<ComputerPart> operatingSystems = Disconnected.getResoureStore().getComputerParts(OperatingSystem.class);
-            computer.addOperatingSystem((OperatingSystem) operatingSystems.get(RandomPool.PUBLIC.nextInt(operatingSystems.size())).clone());
+            computer.setOperatingSystem(new OperatingSystem(computer, "Frames", new Version(3, 7, 65), null, 200, 100));
         }
 
         return computers;
     }
 
     /**
-     * Generates the given amount of member groups RandomPool.PUBLICly.
+     * Generates the given amount of member groups randomly.
      * 
      * @param simulation The simulation to use for generating metadata (like ids).
      * @param amount The amount of member groups the generator should generate.
@@ -156,7 +170,7 @@ public class SimulationGenerator {
     }
 
     /**
-     * Generates the given amount of members RandomPool.PUBLICly.
+     * Generates the given amount of members randomly.
      * 
      * @param simulation The simulation to use for generating metadata (like ids).
      * @param amount The amount of members the generator should generate.
@@ -182,9 +196,9 @@ public class SimulationGenerator {
     }
 
     /**
-     * Generates a list of members RandomPool.PUBLICly using the given computers and groups.
+     * Generates a list of members randomly using the given computers and groups.
      * The generated amount of members is euqally to the amount of given computers.
-     * Also, every generated member gets RandomPool.PUBLICly sorted into one of the given member groups.
+     * Also, every generated member gets randomly sorted into one of the given member groups.
      * 
      * @param simulation The simulation to use for generating metadata (like ids).
      * @param computers The computers to use for generating the members.

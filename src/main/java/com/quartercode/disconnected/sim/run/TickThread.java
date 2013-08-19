@@ -35,7 +35,7 @@ public class TickThread extends Thread {
     private static final Logger    LOGGER      = Logger.getLogger(TickThread.class.getName());
 
     private final List<TickAction> tickActions = new ArrayList<TickAction>();
-    private int                    delay       = 1000;
+    private int                    delay       = 50;
 
     /**
      * Creates a new empty tick thread.
@@ -130,6 +130,48 @@ public class TickThread extends Thread {
                 }
             }
         }
+    }
+
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + delay;
+        result = prime * result + (tickActions == null ? 0 : tickActions.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        TickThread other = (TickThread) obj;
+        if (delay != other.delay) {
+            return false;
+        }
+        if (tickActions == null) {
+            if (other.tickActions != null) {
+                return false;
+            }
+        } else if (!tickActions.equals(other.tickActions)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [tickActions=" + tickActions + ", delay=" + delay + "]";
     }
 
 }

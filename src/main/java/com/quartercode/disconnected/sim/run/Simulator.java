@@ -25,12 +25,12 @@ import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
+import com.quartercode.disconnected.sim.member.interest.HasTarget;
 import com.quartercode.disconnected.sim.member.interest.Interest;
-import com.quartercode.disconnected.sim.member.interest.Target;
 import com.quartercode.disconnected.sim.run.action.Action;
+import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
 import com.quartercode.disconnected.util.ProbabilityUtil;
 import com.quartercode.disconnected.util.RandomPool;
-import com.quartercode.disconnected.util.SimulationGenerator;
 
 /**
  * This class implements the root simulation update method for executing the simulation.
@@ -136,14 +136,14 @@ public class Simulator implements TickAction {
         // Clean interests
         for (MemberGroup group : simulation.getGroups()) {
             for (Interest interest : new ArrayList<Interest>(group.getInterests())) {
-                if (interest instanceof Target && !simulation.getMembers().contains( ((Target) interest).getTarget())) {
+                if (interest instanceof HasTarget && !simulation.getMembers().contains( ((HasTarget) interest).getTarget())) {
                     group.removeInterest(interest);
                 }
             }
         }
         for (Member member : simulation.getMembers()) {
             for (Interest interest : new ArrayList<Interest>(member.getInterests())) {
-                if (interest instanceof Target && !simulation.getMembers().contains( ((Target) interest).getTarget())) {
+                if (interest instanceof HasTarget && !simulation.getMembers().contains( ((HasTarget) interest).getTarget())) {
                     member.removeInterest(interest);
                 }
             }
@@ -154,7 +154,7 @@ public class Simulator implements TickAction {
             targetLoop:
             for (Member target : simulation.getMembers()) {
                 for (Interest interest : group.getInterests()) {
-                    if (interest instanceof Target && ((Target) interest).getTarget().equals(target)) {
+                    if (interest instanceof HasTarget && ((HasTarget) interest).getTarget().equals(target)) {
                         continue targetLoop;
                     }
                 }
@@ -197,7 +197,7 @@ public class Simulator implements TickAction {
                     for (Member target : simulation.getMembers()) {
                         if (!simulation.getGroup(target).equals(group)) {
                             for (Interest interest : member.getInterests()) {
-                                if (interest instanceof Target && ((Target) interest).getTarget().equals(target)) {
+                                if (interest instanceof HasTarget && ((HasTarget) interest).getTarget().equals(target)) {
                                     continue targetLoop;
                                 }
                             }
@@ -220,7 +220,7 @@ public class Simulator implements TickAction {
         for (Member member : simulation.getMembers()) {
             if (simulation.getMembers().contains(member)) {
                 for (Interest interest : new ArrayList<Interest>(member.getInterests())) {
-                    if (interest instanceof Target && !simulation.getMembers().contains( ((Target) interest).getTarget())) {
+                    if (interest instanceof HasTarget && !simulation.getMembers().contains( ((HasTarget) interest).getTarget())) {
                         continue;
                     } else {
                         Action action = interest.getAction(simulation, member);
@@ -235,6 +235,60 @@ public class Simulator implements TickAction {
                 }
             }
         }
+    }
+
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (simulation == null ? 0 : simulation.hashCode());
+        result = prime * result + (tickThread == null ? 0 : tickThread.hashCode());
+        result = prime * result + (tickTimer == null ? 0 : tickTimer.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Simulator other = (Simulator) obj;
+        if (simulation == null) {
+            if (other.simulation != null) {
+                return false;
+            }
+        } else if (!simulation.equals(other.simulation)) {
+            return false;
+        }
+        if (tickThread == null) {
+            if (other.tickThread != null) {
+                return false;
+            }
+        } else if (!tickThread.equals(other.tickThread)) {
+            return false;
+        }
+        if (tickTimer == null) {
+            if (other.tickTimer != null) {
+                return false;
+            }
+        } else if (!tickTimer.equals(other.tickTimer)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [simulation=" + simulation + ", tickThread=" + tickThread + ", tickTimer=" + tickTimer + "]";
     }
 
 }

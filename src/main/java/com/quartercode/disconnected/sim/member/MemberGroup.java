@@ -153,4 +153,58 @@ public class MemberGroup {
         interests.remove(interest);
     }
 
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (interests == null ? 0 : interests.hashCode());
+        result = prime * result + (members == null ? 0 : members.hashCode());
+        result = prime * result + (reputations == null ? 0 : reputations.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MemberGroup other = (MemberGroup) obj;
+        if (interests == null) {
+            if (other.interests != null) {
+                return false;
+            }
+        } else if (!interests.equals(other.interests)) {
+            return false;
+        }
+        if (members == null) {
+            if (other.members != null) {
+                return false;
+            }
+        } else if (!members.equals(other.members)) {
+            return false;
+        }
+        if (reputations == null) {
+            if (other.reputations != null) {
+                return false;
+            }
+        } else if (!reputations.equals(other.reputations)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [members=" + members + ", reputations=" + reputations + ", interests=" + interests + "]";
+    }
+
 }

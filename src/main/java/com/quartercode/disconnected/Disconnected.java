@@ -19,7 +19,6 @@
 package com.quartercode.disconnected;
 
 import com.quartercode.disconnected.profile.ProfileManager;
-import com.quartercode.disconnected.resstore.ResoureStore;
 import com.quartercode.disconnected.sim.run.Simulator;
 
 /**
@@ -27,7 +26,6 @@ import com.quartercode.disconnected.sim.run.Simulator;
  */
 public class Disconnected {
 
-    private static ResoureStore   resoureStore;
     private static ProfileManager profileManager;
 
     private static Simulator      simulator;
@@ -60,26 +58,6 @@ public class Disconnected {
     public static String getVendor() {
 
         return Disconnected.class.getPackage().getImplementationVendor();
-    }
-
-    /**
-     * Returns the active resource store for storing loaded resource store resources.
-     * 
-     * @return The active resource store.
-     */
-    public static ResoureStore getResoureStore() {
-
-        return resoureStore;
-    }
-
-    /**
-     * Sets the active resource store for storing loaded resource store resources to a new one.
-     * 
-     * @param resoureStore The new active resource store.
-     */
-    public static void setResoureStore(ResoureStore resoureStore) {
-
-        Disconnected.resoureStore = resoureStore;
     }
 
     /**

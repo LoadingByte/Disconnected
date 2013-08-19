@@ -26,7 +26,7 @@ import com.quartercode.disconnected.sim.member.Member;
  * 
  * @see Interest
  */
-public interface Target {
+public interface HasTarget {
 
     /**
      * Returns the member the interest has as target.

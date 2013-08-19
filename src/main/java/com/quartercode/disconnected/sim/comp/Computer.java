@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
+import com.quartercode.disconnected.sim.Location;
 
 /**
  * This class stores information about a computer, like the mainboard, other hardware, programs etc.
@@ -44,16 +45,15 @@ public class Computer {
 
     @XmlAttribute
     @XmlID
-    private String                      id;
+    private String               id;
 
-    private Location                    location;
-    private Mainboard                   mainboard;
+    private Location             location;
+    private Mainboard            mainboard;
     @XmlElement (name = "hardware")
-    private final List<Hardware>        hardware         = new CopyOnWriteArrayList<Hardware>();
-    @XmlElement (name = "operatingSystem")
-    private final List<OperatingSystem> operatingSystems = new CopyOnWriteArrayList<OperatingSystem>();
+    private final List<Hardware> hardware = new CopyOnWriteArrayList<Hardware>();
+    private OperatingSystem      operatingSystem;
     @XmlElement (name = "program")
-    private final List<Program>         programs         = new CopyOnWriteArrayList<Program>();
+    private final List<Program>  programs = new CopyOnWriteArrayList<Program>();
 
     /**
      * Creates a new empty computer.
@@ -157,33 +157,24 @@ public class Computer {
     }
 
     /**
-     * Returns all opertating systems which are installed on the computer.
+     * Returns the opertating system which is installed on the computer.
      * 
-     * @return All opertating systems which are installed on the computer.
+     * @return The opertating system which is installed on the computer.
      */
-    public List<OperatingSystem> getOperatingSystems() {
 
-        return Collections.unmodifiableList(operatingSystems);
+    public OperatingSystem getOperatingSystem() {
+
+        return operatingSystem;
     }
 
     /**
-     * Adds an operating system to the computer.
+     * Sets the opertating system which is installed on the computer to a new one.
      * 
-     * @param operatingSystem The operating system to add to the computer.
+     * @param operatingSystem The new opertating system which is installed on the computer.
      */
-    public void addOperatingSystem(OperatingSystem operatingSystem) {
+    public void setOperatingSystem(OperatingSystem operatingSystem) {
 
-        operatingSystems.add(operatingSystem);
-    }
-
-    /**
-     * Removes an operating system from the computer.
-     * 
-     * @param operatingSystem The operating system to remove from the computer.
-     */
-    public void removeOperatingSystem(OperatingSystem operatingSystem) {
-
-        operatingSystems.remove(operatingSystem);
+        this.operatingSystem = operatingSystem;
     }
 
     /**
@@ -228,10 +219,48 @@ public class Computer {
 
         parts.add(mainboard);
         parts.addAll(hardware);
-        parts.addAll(operatingSystems);
+        parts.add(operatingSystem);
         parts.addAll(programs);
 
         return parts;
+    }
+
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (hardware == null ? 0 : hardware.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Computer other = (Computer) obj;
+        if (hardware == null) {
+            if (other.hardware != null) {
+                return false;
+            }
+        } else if (!hardware.equals(other.hardware)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [id=" + id + ", location=" + location + ", mainboard=" + mainboard + ", hardware=" + hardware + ", operatingSystem=" + operatingSystem + ", programs=" + programs + "]";
     }
 
 }

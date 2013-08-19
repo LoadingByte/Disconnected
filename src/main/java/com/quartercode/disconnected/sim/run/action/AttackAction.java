@@ -81,4 +81,42 @@ public class AttackAction extends Action {
         }
     }
 
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (attack == null ? 0 : attack.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        AttackAction other = (AttackAction) obj;
+        if (attack == null) {
+            if (other.attack != null) {
+                return false;
+            }
+        } else if (!attack.equals(other.attack)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [attack=" + attack + "]";
+    }
+
 }

@@ -19,8 +19,7 @@
 package com.quartercode.disconnected.sim.comp;
 
 import java.util.List;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import com.quartercode.disconnected.sim.comp.ComputerPart.ComputerPartAdapter;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 
@@ -33,21 +32,32 @@ import com.quartercode.disconnected.sim.comp.hardware.RAM;
  * 
  * @see CPU
  * @see RAM
+ * @see HardDrive
  */
-@XmlJavaTypeAdapter (value = ComputerPartAdapter.class)
+@XmlSeeAlso ({ CPU.class, RAM.class })
 public class Hardware extends ComputerPart {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Creates a new hardware part and sets the name and the vulnerabilities.
-     * 
-     * @param name The name the part has.
-     * @param vulnerabilities The vulnerabilities the part has.
+     * Creates a new empty hardware part.
+     * This is only recommended for direct field access (e.g. for serialization).
      */
-    protected Hardware(String name, List<Vulnerability> vulnerabilities) {
+    public Hardware() {
 
-        super(name, vulnerabilities);
+    }
+
+    /**
+     * Creates a new hardware part and sets the computer, the name, the version and the vulnerabilities.
+     * 
+     * @param computer The computer this part is built in.
+     * @param name The name the hardware part has.
+     * @param version The current version hardware the part has.
+     * @param vulnerabilities The vulnerabilities the hardware part has.
+     */
+    public Hardware(Computer computer, String name, Version version, List<Vulnerability> vulnerabilities) {
+
+        super(computer, name, version, vulnerabilities);
     }
 
 }

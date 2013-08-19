@@ -19,31 +19,45 @@
 package com.quartercode.disconnected.sim.comp.hardware;
 
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.Hardware;
+import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 
 /**
  * This class represents a ram module of a computer.
  * A ram module has a size (given in bytes) and an access frequency (given in hertz).
  */
+@XmlAccessorType (XmlAccessType.FIELD)
 public class RAM extends Hardware {
 
-    private static final long serialVersionUID = 7876933474996321380L;
+    private static final long serialVersionUID = 1L;
 
-    private final long        size;
-    private final long        frequency;
+    private long              size;
+    private long              frequency;
 
     /**
-     * Creates a new ram module and sets the name, the vulnerabilities, the size and the access frequency.
+     * Creates a new empty ram module.
+     * This is only recommended for direct field access (e.g. for serialization).
+     */
+    public RAM() {
+
+    }
+
+    /**
+     * Creates a new ram module and sets the computer, the name, the version, the vulnerabilities, the size and the access frequency.
      * 
-     * @param name The name the cpu has.
-     * @param vulnerabilities The vulnerabilities the cpu has.
+     * @param name The name the ram module has.
+     * @param version The current version the ram module has.
+     * @param vulnerabilities The vulnerabilities the ram module has.
      * @param size The size of the ram module, given in bytes.
      * @param frequency The access frequency of the ram module, given in hertz.
      */
-    public RAM(String name, List<Vulnerability> vulnerabilities, long size, long frequency) {
+    public RAM(Computer computer, String name, Version version, List<Vulnerability> vulnerabilities, long size, long frequency) {
 
-        super(name, vulnerabilities);
+        super(computer, name, version, vulnerabilities);
 
         this.size = size;
         this.frequency = frequency;
@@ -67,6 +81,44 @@ public class RAM extends Hardware {
     public long getFrequency() {
 
         return frequency;
+    }
+
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + (int) (frequency ^ frequency >>> 32);
+        result = prime * result + (int) (size ^ size >>> 32);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        RAM other = (RAM) obj;
+        if (frequency != other.frequency) {
+            return false;
+        }
+        if (size != other.size) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [size=" + size + ", frequency=" + frequency + ", getName()=" + getName() + ", getVersion()=" + getVersion() + ", getVulnerabilities()=" + getVulnerabilities() + "]";
     }
 
 }
