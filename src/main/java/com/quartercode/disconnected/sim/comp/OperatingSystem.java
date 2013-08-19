@@ -20,6 +20,9 @@ package com.quartercode.disconnected.sim.comp;
 
 import java.util.List;
 import com.quartercode.disconnected.Disconnected;
+import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
+import com.quartercode.disconnected.sim.comp.hardware.HardDrive.File;
+import com.quartercode.disconnected.sim.comp.hardware.HardDrive.File.FileType;
 import com.quartercode.disconnected.sim.run.TickTimer.TimerTask;
 
 /**
@@ -142,6 +145,80 @@ public class OperatingSystem extends ComputerPart {
                     OperatingSystem.this.state = State.OFF;
                 }
             });
+        }
+    }
+
+    /**
+     * Returns the connected hard drive which uses the given letter.
+     * If there is no drive with the given letter, this will return null.
+     * 
+     * @param letter The letter the selected hard drive needs to use.
+     * @return The connected hard drive which uses the given letter.
+     */
+    public HardDrive getHardDrive(char letter) {
+
+        for (Hardware hardware : getComputer().getHardware()) {
+            if (hardware instanceof HardDrive && ((HardDrive) hardware).getLetter() == letter) {
+                return (HardDrive) hardware;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the connected hard drive on which the file under the given path is stored.
+     * A path is a collection of files seperated by a seperator.
+     * This requires a global os path.
+     * If there is no drive the file is stored on, this will return null.
+     * 
+     * @param path The file represented by this path is stored on the selected hard drive.
+     * @return The connected hard drive on which the file under the given path is stored.
+     */
+    public HardDrive getHardDrive(String path) {
+
+        if (path.contains(":")) {
+            return getHardDrive(path.split(":")[0].charAt(0));
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the file which is stored on the computer this os is running on under the given path.
+     * A path is a collection of files seperated by a seperator.
+     * This will look up the file using a global os path.
+     * 
+     * @param path The path to look in for the file.
+     * @return The file which is stored on the computer this os is running on under the given path.
+     */
+    public File getFile(String path) {
+
+        HardDrive hardDrive = getHardDrive(path);
+        if (hardDrive != null) {
+            return hardDrive.getFile(path.split(":")[1]);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Creates a new file using the given path and type on this computer and returns it.
+     * If the file already exists, the existing file will be returned.
+     * A path is a collection of files seperated by a seperator.
+     * This will get the file location using a global os path.
+     * 
+     * @param path The path the new file will be located under.
+     * @param type The file type the new file should has.
+     * @return The new file (or the existing one, if the file already exists).
+     */
+    public File addFile(String path, FileType type) {
+
+        HardDrive hardDrive = getHardDrive(path);
+        if (hardDrive != null) {
+            return hardDrive.addFile(path.split(":")[1], type);
+        } else {
+            return null;
         }
     }
 

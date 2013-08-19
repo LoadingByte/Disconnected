@@ -30,6 +30,7 @@ import com.quartercode.disconnected.sim.comp.Mainboard.MainboradSlot;
 import com.quartercode.disconnected.sim.comp.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
+import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
@@ -124,11 +125,12 @@ public class SimulationGenerator {
             computer.setLocation(location);
             computers.add(computer);
 
-            computer.setMainboard(new Mainboard(computer, "MB XYZ 2000 Pro", new Version(1, 2, 5), null, Arrays.asList(new MainboradSlot(CPU.class), new MainboradSlot(RAM.class))));
+            computer.setMainboard(new Mainboard(computer, "MB XYZ 2000 Pro", new Version(1, 2, 5), null, Arrays.asList(new MainboradSlot(CPU.class), new MainboradSlot(RAM.class), new MainboradSlot(HardDrive.class))));
 
             List<Hardware> hardware = new ArrayList<Hardware>();
             hardware.add(new CPU(computer, "Intel Core i7-4950HQ", new Version(1, 0, 0), null, 8, 2400000000L));
             hardware.add(new RAM(computer, "EpicRAM 4194304", new Version(1, 0, 5), null, 4194304, 1600000000L));
+            hardware.add(new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, 1099511627776L));
 
             for (MainboradSlot slot : computer.getMainboard().getSlots()) {
                 Hardware useHardware = null;

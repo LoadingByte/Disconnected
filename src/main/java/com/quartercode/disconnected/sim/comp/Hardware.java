@@ -21,6 +21,7 @@ package com.quartercode.disconnected.sim.comp;
 import java.util.List;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
+import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 
 /**
@@ -34,7 +35,7 @@ import com.quartercode.disconnected.sim.comp.hardware.RAM;
  * @see RAM
  * @see HardDrive
  */
-@XmlSeeAlso ({ CPU.class, RAM.class })
+@XmlSeeAlso ({ CPU.class, RAM.class, HardDrive.class })
 public class Hardware extends ComputerPart {
 
     private static final long serialVersionUID = 1L;
