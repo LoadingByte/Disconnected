@@ -18,11 +18,9 @@
 
 package com.quartercode.disconnected.sim.comp;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.apache.commons.lang.Validate;
 
 /**
  * This class represents the version of a computer part.
@@ -30,15 +28,11 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * 
  * @see ComputerPart
  */
-@XmlAccessorType (XmlAccessType.FIELD)
 @XmlJavaTypeAdapter (Version.VersionAdapter.class)
 public class Version {
 
-    @XmlAttribute
     private int major;
-    @XmlAttribute
     private int minor;
-    @XmlAttribute
     private int patchLevel;
 
     /**
@@ -62,9 +56,17 @@ public class Version {
         this.patchLevel = patchLevel;
     }
 
+    /**
+     * Creates a new version object and sets the values by parsing a version string.
+     * This is using the format MAJOR.MINOR.PATCHLEVEL (e.g. 1.2.5).
+     * 
+     * @param version The version string to parse the values from.
+     */
     public Version(String version) {
 
         String[] versionParts = version.split("\\.");
+        Validate.isTrue(versionParts.length == 3, "The version string must be splitted in 3 parts by dots (e.g. 1.2.5): ", version);
+
         major = Integer.parseInt(versionParts[0]);
         minor = Integer.parseInt(versionParts[1]);
         patchLevel = Integer.parseInt(versionParts[2]);
