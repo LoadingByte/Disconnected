@@ -37,6 +37,9 @@ import com.quartercode.disconnected.sim.comp.hardware.HardDrive.File.FileType;
  * This class represents a hard drive of a computer.
  * A hard drive only has it's size stored (given in bytes).
  * The hard drive has a letter (e.g. "C") and stores files which can be accessed like regular files.
+ * 
+ * @see Hardware
+ * @see File
  */
 @XmlAccessorType (XmlAccessType.FIELD)
 public class HardDrive extends Hardware {
@@ -59,6 +62,7 @@ public class HardDrive extends Hardware {
     /**
      * Creates a new hard drive and sets the computer, the name, the version, the vulnerabilities and the size.
      * 
+     * @param computer The computer this part is built in.
      * @param name The name the hard drive has.
      * @param version The current version the hard drive has.
      * @param vulnerabilities The vulnerabilities the hard drive has.
@@ -226,6 +230,8 @@ public class HardDrive extends Hardware {
     /**
      * This class represents a file on a hard drive.
      * Every file knows his path and has a content string. Every directory has a list of child files.
+     * 
+     * @see HardDrive
      */
     @XmlAccessorType (XmlAccessType.FIELD)
     public static class File implements Serializable {
@@ -246,12 +252,13 @@ public class HardDrive extends Hardware {
         private static final long serialVersionUID = 1L;
 
         @XmlIDREF
+        @XmlAttribute
         private HardDrive         host;
         @XmlAttribute
         private String            name;
         @XmlAttribute
         private FileType          type;
-        private String            content          = "";
+        private String            content;
         @XmlElement (name = "child")
         private final List<File>  childs           = new ArrayList<HardDrive.File>();
 
@@ -372,7 +379,7 @@ public class HardDrive extends Hardware {
          */
         public String getContent() {
 
-            return type == FileType.FILE ? content : null;
+            return type == FileType.FILE ? content == null ? "" : content : null;
         }
 
         /**
