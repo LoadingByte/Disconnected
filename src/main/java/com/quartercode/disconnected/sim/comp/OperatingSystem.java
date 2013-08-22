@@ -73,6 +73,7 @@ public class OperatingSystem extends ComputerPart {
     /**
      * Creates a new operating system and sets the computer, the name, the version, the vulnerabilities and the times the os needs for switching on/off.
      * 
+     * @param computer The computer this part is built in.
      * @param name The name the operating system has.
      * @param version The current version the operating system has.
      * @param vulnerabilities The vulnerabilities the operating system has.

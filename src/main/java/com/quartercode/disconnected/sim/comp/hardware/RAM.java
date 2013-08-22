@@ -29,6 +29,8 @@ import com.quartercode.disconnected.sim.comp.Vulnerability;
 /**
  * This class represents a ram module of a computer.
  * A ram module has a size (given in bytes) and an access frequency (given in hertz).
+ * 
+ * @see Hardware
  */
 @XmlAccessorType (XmlAccessType.FIELD)
 public class RAM extends Hardware {
@@ -49,6 +51,7 @@ public class RAM extends Hardware {
     /**
      * Creates a new ram module and sets the computer, the name, the version, the vulnerabilities, the size and the access frequency.
      * 
+     * @param computer The computer this part is built in.
      * @param name The name the ram module has.
      * @param version The current version the ram module has.
      * @param vulnerabilities The vulnerabilities the ram module has.

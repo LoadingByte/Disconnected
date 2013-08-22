@@ -29,6 +29,8 @@ import com.quartercode.disconnected.sim.comp.Vulnerability;
 /**
  * This class represents a cpu of a computer.
  * A cpu has a count of possible threads running at the same time and a frequency (given in hertz).
+ * 
+ * @see Hardware
  */
 @XmlAccessorType (XmlAccessType.FIELD)
 public class CPU extends Hardware {
@@ -49,6 +51,7 @@ public class CPU extends Hardware {
     /**
      * Creates a new cpu and sets the computer, the name, the version, the vulnerabilities, the count of possible threads and the frequency.
      * 
+     * @param computer The computer this part is built in.
      * @param name The name the cpu has.
      * @param version The current version the cpu has.
      * @param vulnerabilities The vulnerabilities the cpu has.
