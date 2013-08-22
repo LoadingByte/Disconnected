@@ -66,7 +66,7 @@ public class Location {
      */
     public void setX(float x) {
 
-        Validate.isTrue(x >= 0 && x <= 1, "X must be in range 0 <= x <= 1");
+        Validate.isTrue(x >= 0 && x <= 1, "X must be in range 0 <= x <= 1: ", x);
         this.x = Math.round(x * 100) / 100F;
     }
 
@@ -88,7 +88,7 @@ public class Location {
      */
     public void setY(float y) {
 
-        Validate.isTrue(y >= 0 && y <= 1, "Y must be in range 0 <= x <= 1");
+        Validate.isTrue(y >= 0 && y <= 1, "Y must be in range 0 <= x <= 1: ", y);
         this.y = Math.round(y * 100) / 100F;
     }
 

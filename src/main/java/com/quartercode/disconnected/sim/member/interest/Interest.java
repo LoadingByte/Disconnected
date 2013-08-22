@@ -79,7 +79,7 @@ public abstract class Interest implements ReputationChangeProvider {
      */
     public void setPriority(float priority) {
 
-        Validate.isTrue(priority >= 0 && priority <= 1, "Priority must be in range 0 <= priority <= 1");
+        Validate.isTrue(priority >= 0 && priority <= 1, "Priority must be in range 0 <= priority <= 1: " + priority);
         this.priority = priority;
     }
 

@@ -104,7 +104,7 @@ public class TickThread extends Thread {
      */
     public void setDelay(int delay) {
 
-        Validate.isTrue(delay > 0, "Delay must be > 0");
+        Validate.isTrue(delay > 0, "Delay must be > 0: ", delay);
         this.delay = delay;
     }
 
