@@ -18,8 +18,6 @@
 
 package com.quartercode.disconnected.test.profile;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -45,24 +43,13 @@ public class ProfileSerializerTest {
     @Test
     public void testSerializeEquals() throws IOException {
 
-        store(simulation, new File("test1.xml"));
-
         StringWriter serialized = new StringWriter();
         WriterOutputStream outputStream = new WriterOutputStream(serialized);
         ProfileSerializer.serialize(outputStream, simulation);
         outputStream.close();
 
         Simulation copy = ProfileSerializer.deserialize(new ReaderInputStream(new StringReader(serialized.toString())));
-        store(copy, new File("test2.xml"));
         Assert.assertEquals("Simulation equals serialized-deserialized copy", simulation, copy);
-    }
-
-    private void store(Simulation simulation, File file) throws IOException {
-
-        file.createNewFile();
-        FileOutputStream outputStream = new FileOutputStream(file);
-        ProfileSerializer.serialize(outputStream, simulation);
-        outputStream.close();
     }
 
 }
