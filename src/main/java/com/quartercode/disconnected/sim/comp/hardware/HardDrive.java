@@ -181,6 +181,37 @@ public class HardDrive extends Hardware {
         return current;
     }
 
+    /**
+     * Returns the total amount of bytes which are occupied by files.
+     * 
+     * @return The total amount of bytes which are occupied by files.
+     */
+    public long getFilled() {
+
+        return getFilled(rootFile);
+    }
+
+    private long getFilled(File file) {
+
+        long filled = file.getSize();
+        if (file.getChildFiles() != null) {
+            for (File childFile : file.getChildFiles()) {
+                filled += getFilled(childFile);
+            }
+        }
+        return filled;
+    }
+
+    /**
+     * Returns the total amount of bytes which are not occupied by any files.
+     * 
+     * @return The total amount of bytes which are not occupied by any files.
+     */
+    public long getFree() {
+
+        return size - getFilled();
+    }
+
     @Override
     public int hashCode() {
 
@@ -270,12 +301,7 @@ public class HardDrive extends Hardware {
 
         }
 
-        /**
-         * Creates a new root file.
-         * 
-         * @param host The host which will host the root file.
-         */
-        public File(HardDrive host) {
+        private File(HardDrive host) {
 
             this.host = host;
             name = "root";
@@ -384,14 +410,34 @@ public class HardDrive extends Hardware {
 
         /**
          * Changes the content to new one (if this file is a content one).
+         * This throws an OutOfSpaceException if there isn't enough space on the host drive for the new content.
          * 
          * @param content The new content to write into the file.
+         * @throws OutOfSpaceException If there isn't enough space on the host drive for the new content.
          */
         public void setContent(String content) {
 
             if (type == FileType.FILE) {
+                String oldContent = this.content;
                 this.content = content == null ? "" : content;
+
+                if (host.getFilled() > host.getFree()) {
+                    long size = getSize();
+                    this.content = oldContent;
+                    throw new OutOfSpaceException(host, size);
+                }
             }
+        }
+
+        /**
+         * Returns the size this file has in bytes (if this file is a content one).
+         * Directories don't have a size.
+         * 
+         * @return The size this file has in bytes (if this file is a content one).
+         */
+        public long getSize() {
+
+            return type == FileType.FILE ? (content == null ? "" : content).length() : 0;
         }
 
         /**
@@ -428,7 +474,11 @@ public class HardDrive extends Hardware {
         private void addChildFile(File file) {
 
             if (!childs.contains(file)) {
-                childs.add(file);
+                if (file.getSize() > host.getFree()) {
+                    throw new OutOfSpaceException(host, file.getSize());
+                } else {
+                    childs.add(file);
+                }
             }
         }
 
@@ -451,8 +501,10 @@ public class HardDrive extends Hardware {
         /**
          * Moves the file to a new location under the given path.
          * After the movement, the file can be used like before.
+         * This throws an OutOfSpaceException if there isn't enough space on the new host drive for the file.
          * 
          * @param path The new location for the file.
+         * @throws OutOfSpaceException If there isn't enough space on the new host drive for the file.
          */
         public void move(String path) {
 
@@ -542,6 +594,51 @@ public class HardDrive extends Hardware {
         public String toString() {
 
             return getClass().getName() + " [name=" + name + ", type=" + type + ", content=" + content + ", childs=" + childs + "]";
+        }
+
+    }
+
+    /**
+     * This runtime exception occures if there is not enough space on a hard drive for handling some new bytes (e.g. from a file).
+     */
+    public static class OutOfSpaceException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+
+        private final HardDrive   host;
+        private final long        size;
+
+        /**
+         * Creates a new out of space exception and sets the host which should have handled the new bytes and the amount of new bytes.
+         * 
+         * @param host The hard drive host which should have handled the new bytes,
+         * @param size The amount of new bytes.
+         */
+        public OutOfSpaceException(HardDrive host, long size) {
+
+            super("Out of space on " + host.getLetter() + ": " + host.getFilled() + "b/" + host.getSize() + "b filled, can't handle " + size + "b");
+            this.host = host;
+            this.size = size;
+        }
+
+        /**
+         * Returns the hard drive host which should have handled the new bytes,
+         * 
+         * @return The hard drive host which should have handled the new bytes,
+         */
+        public HardDrive getHost() {
+
+            return host;
+        }
+
+        /**
+         * Returns the amount of new bytes.
+         * 
+         * @return The amount of new bytes.
+         */
+        public long getSize() {
+
+            return size;
         }
 
     }

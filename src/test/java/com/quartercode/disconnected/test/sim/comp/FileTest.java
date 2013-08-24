@@ -27,6 +27,7 @@ import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive.File;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive.File.FileType;
+import com.quartercode.disconnected.util.ByteUnit;
 
 public class FileTest {
 
@@ -43,7 +44,7 @@ public class FileTest {
         operatingSystem = new OperatingSystem(computer, "OperatingSystem", new Version(1, 0, 0), null, 0, 0);
         computer.setOperatingSystem(operatingSystem);
 
-        hardDrive = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, 1099511627776L);
+        hardDrive = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
         hardDrive.setLetter('C');
         computer.addHardware(hardDrive);
 
@@ -71,6 +72,14 @@ public class FileTest {
     }
 
     @Test
+    public void testCalcSpace() {
+
+        Assert.assertEquals("Filled bytes", 12, hardDrive.getFilled());
+        Assert.assertEquals("Free bytes", hardDrive.getSize() - 12, hardDrive.getFree());
+        Assert.assertEquals("Filled + free = size", hardDrive.getSize(), hardDrive.getFilled() + hardDrive.getFree());
+    }
+
+    @Test
     public void testGetLocalPath() {
 
         Assert.assertEquals("Local path", "/test1/test2/test.txt", testFile.getLocalPath());
@@ -95,7 +104,7 @@ public class FileTest {
     @Test
     public void testMoveGlobal() {
 
-        HardDrive hardDriveD = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, 1099511627776L);
+        HardDrive hardDriveD = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
         hardDriveD.setLetter('D');
         computer.addHardware(hardDriveD);
 
