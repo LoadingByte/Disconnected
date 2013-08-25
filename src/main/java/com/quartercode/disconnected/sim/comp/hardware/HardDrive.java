@@ -22,16 +22,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.annotation.XmlTransient;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.Hardware;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive.File.FileType;
+import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSlot;
 
 /**
  * This class represents a hard drive of a computer.
@@ -42,6 +44,7 @@ import com.quartercode.disconnected.sim.comp.hardware.HardDrive.File.FileType;
  * @see File
  */
 @XmlAccessorType (XmlAccessType.FIELD)
+@NeedsMainboardSlot
 public class HardDrive extends Hardware {
 
     private static final long serialVersionUID = 1L;
@@ -282,8 +285,7 @@ public class HardDrive extends Hardware {
 
         private static final long serialVersionUID = 1L;
 
-        @XmlIDREF
-        @XmlAttribute
+        @XmlTransient
         private HardDrive         host;
         @XmlAttribute
         private String            name;
@@ -538,6 +540,15 @@ public class HardDrive extends Hardware {
             getParent().removeChildFile(this);
         }
 
+        public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
+
+            if (parent instanceof HardDrive) {
+                host = (HardDrive) parent;
+            } else {
+                host = ((File) parent).getHost();
+            }
+        }
+
         @Override
         public int hashCode() {
 
@@ -593,7 +604,11 @@ public class HardDrive extends Hardware {
         @Override
         public String toString() {
 
-            return getClass().getName() + " [name=" + name + ", type=" + type + ", content=" + content + ", childs=" + childs + "]";
+            List<String> childNames = new ArrayList<String>();
+            for (File child : childs) {
+                childNames.add(child.getName());
+            }
+            return getClass().getName() + " [name=" + name + ", type=" + type + ", content=" + content + ", childs=" + childNames + "]";
         }
 
     }

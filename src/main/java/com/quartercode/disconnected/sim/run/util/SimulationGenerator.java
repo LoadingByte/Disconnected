@@ -19,21 +19,23 @@
 package com.quartercode.disconnected.sim.run.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import com.quartercode.disconnected.sim.Location;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.Hardware;
-import com.quartercode.disconnected.sim.comp.Mainboard;
-import com.quartercode.disconnected.sim.comp.Mainboard.MainboradSlot;
 import com.quartercode.disconnected.sim.comp.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
+import com.quartercode.disconnected.sim.comp.hardware.HardDrive.File.FileType;
+import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
+import com.quartercode.disconnected.sim.comp.hardware.Mainboard.MainboradSlot;
+import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSlot;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
+import com.quartercode.disconnected.util.ByteUnit;
 import com.quartercode.disconnected.util.LocationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
 
@@ -125,17 +127,21 @@ public class SimulationGenerator {
             computer.setLocation(location);
             computers.add(computer);
 
-            computer.setMainboard(new Mainboard(computer, "MB XYZ 2000 Pro", new Version(1, 2, 5), null, Arrays.asList(new MainboradSlot(CPU.class), new MainboradSlot(RAM.class), new MainboradSlot(HardDrive.class))));
+            List<MainboradSlot> mainboradSlots = new ArrayList<MainboradSlot>();
+            mainboradSlots.add(new MainboradSlot(CPU.class));
+            mainboradSlots.add(new MainboradSlot(RAM.class));
+            mainboradSlots.add(new MainboradSlot(HardDrive.class));
+            computer.addHardware(new Mainboard(computer, "MB XYZ 2000 Pro", new Version(1, 2, 5), null, mainboradSlots));
 
             List<Hardware> hardware = new ArrayList<Hardware>();
             hardware.add(new CPU(computer, "Intel Core i7-4950HQ", new Version(1, 0, 0), null, 8, 2400000000L));
-            hardware.add(new RAM(computer, "EpicRAM 4194304", new Version(1, 0, 5), null, 4194304, 1600000000L));
-            hardware.add(new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, 1099511627776L));
+            hardware.add(new RAM(computer, "EpicRAM 4194304", new Version(1, 0, 5), null, ByteUnit.BYTE.convert(4, ByteUnit.MEGABYTE), 1600000000L));
+            hardware.add(new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE)));
 
-            for (MainboradSlot slot : computer.getMainboard().getSlots()) {
+            for (MainboradSlot slot : computer.getHardware(Mainboard.class).get(0).getSlots()) {
                 Hardware useHardware = null;
                 for (Hardware testHardware : hardware) {
-                    if (slot.accept(testHardware)) {
+                    if (testHardware.getClass().isAnnotationPresent(NeedsMainboardSlot.class) && slot.accept(testHardware)) {
                         useHardware = testHardware;
                         break;
                     }

@@ -175,10 +175,20 @@ public class Member {
         return true;
     }
 
+    /**
+     * Returns an informational string about the member containing the name, the version and the amount of vulnerabilities.
+     * 
+     * @return An informational string about the part containing the name, the version and the amount of vulnerabilities.
+     */
+    public String toInfoString() {
+
+        return name + ", " + interests.size() + "interests, computer" + computer.getId();
+    }
+
     @Override
     public String toString() {
 
-        return getClass().getName() + " [name=" + name + ", interests=" + interests + ", computer=" + computer + "]";
+        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }

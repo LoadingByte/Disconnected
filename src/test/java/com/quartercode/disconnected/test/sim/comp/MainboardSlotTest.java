@@ -21,9 +21,9 @@ package com.quartercode.disconnected.test.sim.comp;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.sim.comp.Mainboard.MainboradSlot;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
+import com.quartercode.disconnected.sim.comp.hardware.Mainboard.MainboradSlot;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 
 public class MainboardSlotTest {

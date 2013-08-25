@@ -135,7 +135,7 @@ public class Attack {
     @Override
     public String toString() {
 
-        return getClass().getName() + " [target=" + target + ", exploit=" + exploit + ", payload=" + payload + "]";
+        return getClass().getName() + " [target=" + target.toInfoString() + ", exploit=" + exploit + ", payload=" + payload + "]";
     }
 
 }

@@ -25,6 +25,7 @@ import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.Hardware;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
+import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSlot;
 
 /**
  * This class represents a ram module of a computer.
@@ -33,6 +34,7 @@ import com.quartercode.disconnected.sim.comp.Vulnerability;
  * @see Hardware
  */
 @XmlAccessorType (XmlAccessType.FIELD)
+@NeedsMainboardSlot
 public class RAM extends Hardware {
 
     private static final long serialVersionUID = 1L;

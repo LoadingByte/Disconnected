@@ -204,7 +204,7 @@ public class MemberGroup {
     @Override
     public String toString() {
 
-        return getClass().getName() + " [members=" + members + ", reputations=" + reputations + ", interests=" + interests + "]";
+        return getClass().getName() + " [members=" + members.size() + ", interests=" + interests.size() + "]";
     }
 
 }

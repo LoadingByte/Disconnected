@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import com.quartercode.disconnected.sim.Location;
+import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
 
 /**
  * This class stores information about a computer, like the mainboard, other hardware, programs etc.
@@ -48,7 +49,6 @@ public class Computer {
     private String               id;
 
     private Location             location;
-    private Mainboard            mainboard;
     @XmlElement (name = "hardware")
     private final List<Hardware> hardware = new CopyOnWriteArrayList<Hardware>();
     private OperatingSystem      operatingSystem;
@@ -74,9 +74,9 @@ public class Computer {
     }
 
     /**
-     * Returns the final id the computer has.
+     * Returns the unique id the computer has.
      * 
-     * @return The final id the computer has.
+     * @return The unique id the computer has.
      */
     public String getId() {
 
@@ -104,30 +104,9 @@ public class Computer {
     }
 
     /**
-     * Returns the mainboard of the computer which every other hardware part needs.
-     * 
-     * @return The mainboard of the computer.
-     */
-    public Mainboard getMainboard() {
-
-        return mainboard;
-    }
-
-    /**
-     * Sets the mainboard of the computer which every other hardware part needs to a new one.
-     * 
-     * @param mainboard The new mainboard of the computer.
-     */
-    public void setMainboard(Mainboard mainboard) {
-
-        this.mainboard = mainboard;
-    }
-
-    /**
      * Returns the hardware the computer contains.
-     * The mainboard is not classified as hardware and stored seperately.
      * 
-     * @return The hardware the computer contains, except for the mainboards.
+     * @return The hardware the computer contains.
      */
     public List<Hardware> getHardware() {
 
@@ -135,8 +114,27 @@ public class Computer {
     }
 
     /**
+     * Returns the hardware parts in the computer which have the given type as a superclass.
+     * 
+     * @param <T>
+     * 
+     * @param type The type to use for the selection.
+     * @return The hardware parts in the computer which have the given type as a superclass.
+     */
+    @SuppressWarnings ("unchecked")
+    public <T extends Hardware> List<T> getHardware(Class<T> type) {
+
+        List<T> hardware = new ArrayList<T>();
+        for (Hardware hardwarePart : this.hardware) {
+            if (type.isAssignableFrom(hardwarePart.getClass())) {
+                hardware.add((T) hardwarePart);
+            }
+        }
+        return hardware;
+    }
+
+    /**
      * Adds a hardware part to the computer.
-     * The mainboard is not classified as hardware and stored seperately.
      * 
      * @param hardware The hardware part to add to the computer.
      */
@@ -147,7 +145,6 @@ public class Computer {
 
     /**
      * Removes a hardware part from the computer.
-     * The mainboard is not classified as hardware and stored seperately.
      * 
      * @param hardware The hardware part to from from the computer.
      */
@@ -188,6 +185,24 @@ public class Computer {
     }
 
     /**
+     * Returns the programs on the computer which have the given type as a superclass.
+     * 
+     * @param type The type to use for the selection.
+     * @return The programs on the computer which have the given type as a superclass.
+     */
+    @SuppressWarnings ("unchecked")
+    public <T extends Program> List<T> getPrograms(Class<T> type) {
+
+        List<T> programs = new ArrayList<T>();
+        for (Program program : this.programs) {
+            if (type.isAssignableFrom(program.getClass())) {
+                programs.add((T) program);
+            }
+        }
+        return programs;
+    }
+
+    /**
      * Adds a program to the computer.
      * 
      * @param program The program to add to the computer.
@@ -217,7 +232,6 @@ public class Computer {
 
         List<ComputerPart> parts = new ArrayList<ComputerPart>();
 
-        parts.add(mainboard);
         parts.addAll(hardware);
         parts.add(operatingSystem);
         parts.addAll(programs);
@@ -260,7 +274,15 @@ public class Computer {
     @Override
     public String toString() {
 
-        return getClass().getName() + " [id=" + id + ", location=" + location + ", mainboard=" + mainboard + ", hardware=" + hardware + ", operatingSystem=" + operatingSystem + ", programs=" + programs + "]";
+        List<String> hardwareInfo = new ArrayList<String>();
+        for (Hardware hardwarePart : hardware) {
+            hardwareInfo.add(hardwarePart.toInfoString());
+        }
+        List<String> programInfo = new ArrayList<String>();
+        for (Program program : programs) {
+            programInfo.add(program.toInfoString());
+        }
+        return getClass().getName() + " [id=" + id + ", location=" + location + ", hardware=" + hardwareInfo + ", operatingSystem=" + operatingSystem.toInfoString() + ", programs=" + programInfo + "]";
     }
 
 }

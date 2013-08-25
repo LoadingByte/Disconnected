@@ -160,7 +160,7 @@ public class DestroyInterest extends Interest implements HasTarget {
     @Override
     public String toString() {
 
-        return getClass().getName() + " [target=" + target + ", getPriority()=" + getPriority() + "]";
+        return getClass().getName() + " [target=" + target.toInfoString() + ", getPriority()=" + getPriority() + "]";
     }
 
 }

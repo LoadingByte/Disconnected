@@ -16,9 +16,13 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.comp;
+package com.quartercode.disconnected.sim.comp.hardware;
 
 import java.io.Serializable;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -26,16 +30,20 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlIDREF;
+import com.quartercode.disconnected.sim.comp.Computer;
+import com.quartercode.disconnected.sim.comp.ComputerPart;
+import com.quartercode.disconnected.sim.comp.Hardware;
+import com.quartercode.disconnected.sim.comp.Version;
+import com.quartercode.disconnected.sim.comp.Vulnerability;
 
 /**
  * This class stores information about a mainboard.
  * This also contains a list of all vulnerabilities this mainboard has.
- * The mainboard is not classified as a hardware part.
  * 
  * @see ComputerPart
  * @see Hardware
  */
-public class Mainboard extends ComputerPart {
+public class Mainboard extends Hardware {
 
     private static final long   serialVersionUID = 1L;
 
@@ -112,7 +120,7 @@ public class Mainboard extends ComputerPart {
     @Override
     public String toString() {
 
-        return getClass().getName() + " [slots=" + slots + ", getName()=" + getName() + ", getVersion()=" + getVersion() + ", getVulnerabilities()=" + getVulnerabilities() + "]";
+        return getClass().getName() + " [slots=" + slots + ", toInfoString()=" + toInfoString() + "]";
     }
 
     /**
@@ -236,8 +244,17 @@ public class Mainboard extends ComputerPart {
         @Override
         public String toString() {
 
-            return getClass().getName() + " [type=" + type + ", content=" + content + "]";
+            return getClass().getName() + " [type=" + type + ", content=" + content.toInfoString() + "]";
         }
+
+    }
+
+    /**
+     * This annotation marks hardware types which are compatible with a mainboard and need a slot to function.
+     */
+    @Target (ElementType.TYPE)
+    @Retention (RetentionPolicy.RUNTIME)
+    public static @interface NeedsMainboardSlot {
 
     }
 

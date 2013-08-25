@@ -101,7 +101,7 @@ public class Program extends ComputerPart {
     @Override
     public String toString() {
 
-        return getClass().getName() + " [rightLevel=" + rightLevel + ", getName()=" + getName() + ", getVersion()=" + getVersion() + ", getVulnerabilities()=" + getVulnerabilities() + "]";
+        return getClass().getName() + " [rightLevel=" + rightLevel + ", toInfoString()=" + toInfoString() + "]";
     }
 
 }

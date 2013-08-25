@@ -22,20 +22,21 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
+import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 
 /**
- * This class stores information about a part of hardware, like a cpu or a ram module.
+ * This class stores information about a part of hardware, like a mainboard, a cpu or a ram module.
  * This also contains a list of all vulnerabilities this hardware part has.
- * The mainboard is not classified as a hardware part.
  * 
  * @see ComputerPart
  * 
+ * @see Mainboard
  * @see CPU
  * @see RAM
  * @see HardDrive
  */
-@XmlSeeAlso ({ CPU.class, RAM.class, HardDrive.class })
+@XmlSeeAlso ({ Mainboard.class, CPU.class, RAM.class, HardDrive.class })
 public class Hardware extends ComputerPart {
 
     private static final long serialVersionUID = 1L;

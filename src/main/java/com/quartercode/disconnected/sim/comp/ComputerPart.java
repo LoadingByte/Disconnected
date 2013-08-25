@@ -22,24 +22,24 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.util.CloneUtil;
 
 /**
- * This class stores information about a spefific computer part, like a mainboard or an operating system.
+ * This class stores information about a spefific computer part, like a hardware part or an operating system.
  * This also contains a list of all vulnerabilities this part has.
  * 
  * @see Computer
  * @see Version
  * @see Vulnerability
  * 
- * @see Mainboard
  * @see Hardware
  * @see OperatingSystem
  * @see Program
@@ -49,8 +49,7 @@ public class ComputerPart implements Serializable {
 
     private static final long   serialVersionUID = 1L;
 
-    @XmlIDREF
-    @XmlAttribute
+    @XmlTransient
     private Computer            computer;
 
     private String              name;
@@ -124,11 +123,21 @@ public class ComputerPart implements Serializable {
         return Collections.unmodifiableList(vulnerabilities);
     }
 
+    /**
+     * Generates an unique id which is used to reference to this computer part.
+     * 
+     * @return An unique id which is used to reference to this computer part.
+     */
     @XmlID
     @XmlAttribute
     public String getId() {
 
         return computer.getId() + "." + computer.getParts().indexOf(this);
+    }
+
+    public void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
+
+        computer = (Computer) parent;
     }
 
     @Override
@@ -185,10 +194,20 @@ public class ComputerPart implements Serializable {
         return true;
     }
 
+    /**
+     * Returns an informational string about the part containing the name, the version and the amount of vulnerabilities.
+     * 
+     * @return An informational string about the part containing the name, the version and the amount of vulnerabilities.
+     */
+    public String toInfoString() {
+
+        return name + " " + version + ", " + vulnerabilities.size() + " vulns";
+    }
+
     @Override
     public String toString() {
 
-        return getClass().getName() + " [name=" + name + ", version=" + version + ", vulnerabilities=" + vulnerabilities + "]";
+        return getClass().getName() + "[" + toInfoString() + "]";
     }
 
 }

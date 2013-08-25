@@ -158,7 +158,7 @@ public class Reputation {
     @Override
     public String toString() {
 
-        return getClass().getName() + " [member=" + member + ", value=" + value + "]";
+        return getClass().getName() + " [member=" + member.toInfoString() + ", value=" + value + "]";
     }
 
 }

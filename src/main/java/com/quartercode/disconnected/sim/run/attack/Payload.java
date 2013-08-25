@@ -108,7 +108,7 @@ public class Payload {
     @Override
     public String toString() {
 
-        return getClass().getName() + " [operatingSystem=" + operatingSystem + ", scripts=" + scripts + "]";
+        return getClass().getName() + " [operatingSystem=" + operatingSystem.toInfoString() + ", scripts=" + scripts + "]";
     }
 
 }

@@ -262,7 +262,7 @@ public class OperatingSystem extends ComputerPart {
     @Override
     public String toString() {
 
-        return getClass().getName() + " [switchOnTime=" + switchOnTime + ", switchOffTime=" + switchOffTime + ", state=" + state + ", getName()=" + getName() + ", getVersion()=" + getVersion() + ", getVulnerabilities()=" + getVulnerabilities() + "]";
+        return getClass().getName() + " [switchOnTime=" + switchOnTime + ", switchOffTime=" + switchOffTime + ", state=" + state + ", toInfoString()=" + toInfoString() + "]";
     }
 
 }

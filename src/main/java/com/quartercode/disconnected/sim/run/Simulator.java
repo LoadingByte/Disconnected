@@ -159,9 +159,9 @@ public class Simulator implements TickAction {
                     }
                 }
 
-                if (group.getReputation(target).getValue() <= /*-50*/-10) {
+                if (group.getReputation(target).getValue() <= -10) {
                     if (ProbabilityUtil.genPseudo(-group.getReputation(target).getValue() / 20F)) {
-                        float priority = -group.getReputation(target).getValue() / /* 200F */400F;
+                        float priority = -group.getReputation(target).getValue() / 400F;
                         if (priority > 1) {
                             priority = 1;
                         }
