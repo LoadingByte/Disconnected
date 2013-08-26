@@ -31,16 +31,14 @@ import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.interest.Interest;
-import com.quartercode.disconnected.sim.run.Simulator;
 
 /**
  * This clas represents a simulation which stores information about the members, member groups and computers.
- * To actually run the simulation, you need to run a simulator.
+ * To actually run the simulation, you need to run a tick simulator.
  * 
  * @see Member
  * @see MemberGroup
  * @see Computer
- * @see Simulator
  */
 @XmlRootElement (namespace = "http://quartercode.com/")
 @XmlAccessorType (XmlAccessType.FIELD)

@@ -25,7 +25,6 @@ import com.quartercode.disconnected.sim.member.interest.ReputationChangeProvider
 
 /**
  * This abstract class defines an action which a member of a simulation can execute.
- * The actual execution is implemented by a simulator class.
  * 
  * @see Interest
  * @see Member

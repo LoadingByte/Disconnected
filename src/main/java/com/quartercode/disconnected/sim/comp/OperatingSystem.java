@@ -23,6 +23,7 @@ import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive.File;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive.File.FileType;
+import com.quartercode.disconnected.sim.run.TickTimer;
 import com.quartercode.disconnected.sim.run.TickTimer.TimerTask;
 
 /**
@@ -128,7 +129,7 @@ public class OperatingSystem extends ComputerPart {
 
         if (state == State.ON && this.state == State.OFF) {
             this.state = State.SWITCHING_ON;
-            Disconnected.getSimulator().getTickTimer().schedule(new TimerTask(switchOnTime) {
+            Disconnected.getTicker().getAction(TickTimer.class).schedule(new TimerTask(switchOnTime) {
 
                 @Override
                 public void run() {
@@ -138,7 +139,7 @@ public class OperatingSystem extends ComputerPart {
             });
         } else if (state == State.OFF && this.state == State.ON) {
             this.state = State.SWITCHING_OFF;
-            Disconnected.getSimulator().getTickTimer().schedule(new TimerTask(switchOffTime) {
+            Disconnected.getTicker().getAction(TickTimer.class).schedule(new TimerTask(switchOffTime) {
 
                 @Override
                 public void run() {

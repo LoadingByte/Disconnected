@@ -18,10 +18,16 @@
 
 package com.quartercode.disconnected;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import com.quartercode.disconnected.profile.ProfileManager;
+import com.quartercode.disconnected.sim.run.TickAction;
+import com.quartercode.disconnected.sim.run.TickSimulator;
+import com.quartercode.disconnected.sim.run.TickTimer;
+import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.util.LogExceptionHandler;
 
 /**
@@ -55,6 +61,12 @@ public class Main {
 
         // Initalize profile manager and load stored profiles (TODO: Add code for loading).
         Disconnected.setProfileManager(new ProfileManager());
+
+        // Initalize ticker
+        List<TickAction> tickActions = new ArrayList<TickAction>();
+        tickActions.add(new TickTimer());
+        tickActions.add(new TickSimulator());
+        Disconnected.setTicker(new Ticker(tickActions.toArray(new TickAction[tickActions.size()])));
     }
 
     private Main() {

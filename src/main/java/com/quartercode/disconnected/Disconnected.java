@@ -19,7 +19,9 @@
 package com.quartercode.disconnected;
 
 import com.quartercode.disconnected.profile.ProfileManager;
-import com.quartercode.disconnected.sim.run.Simulator;
+import com.quartercode.disconnected.sim.Simulation;
+import com.quartercode.disconnected.sim.run.TickSimulator;
+import com.quartercode.disconnected.sim.run.Ticker;
 
 /**
  * A static storage class which stores important game values.
@@ -27,8 +29,9 @@ import com.quartercode.disconnected.sim.run.Simulator;
 public class Disconnected {
 
     private static ProfileManager profileManager;
+    private static Ticker         ticker;
 
-    private static Simulator      simulator;
+    private static Simulation     simulation;
 
     /**
      * Returns the title of the product.
@@ -81,23 +84,48 @@ public class Disconnected {
     }
 
     /**
-     * Returns the active simulator.
+     * Returns the current active ticker which controls the tick thread.
      * 
-     * @return The active simulator.
+     * @return The current active ticker which controls the tick thread.
      */
-    public static Simulator getSimulator() {
+    public static Ticker getTicker() {
 
-        return simulator;
+        return ticker;
     }
 
     /**
-     * Sets the active simulator to a new simulator.
+     * Sets the current active ticker which controls the tick thread to a new one.
      * 
-     * @param simulator The new active simulator.
+     * @param ticker The new ticker which will control the tick thread.
      */
-    public static void setSimulator(Simulator simulator) {
+    public static void setTicker(Ticker ticker) {
 
-        Disconnected.simulator = simulator;
+        Disconnected.ticker = ticker;
+    }
+
+    /**
+     * Returns the current active simulation.
+     * 
+     * @return The current active simulation.
+     */
+    public static Simulation getSimulation() {
+
+        return simulation;
+    }
+
+    /**
+     * Sets the current active simulation to a new one.
+     * The action will take place in the next tick.
+     * 
+     * @param simulation The new simulation.
+     */
+    public static void setSimulation(Simulation simulation) {
+
+        Disconnected.simulation = simulation;
+
+        if (ticker != null) {
+            ticker.getAction(TickSimulator.class).setSimulation(simulation);
+        }
     }
 
     private Disconnected() {
