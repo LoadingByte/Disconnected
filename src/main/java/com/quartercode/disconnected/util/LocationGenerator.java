@@ -52,6 +52,7 @@ public class LocationGenerator {
      * 
      * @param amount The amount of locations to generate.
      * @return The generated locations.
+     * @throws RuntimeException The map image can't be read.
      */
     public static List<Location> generateLocations(int amount, List<Location> ignore) {
 

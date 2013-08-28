@@ -46,23 +46,23 @@ public class RAM extends Hardware {
      * Creates a new empty ram module.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    public RAM() {
+    protected RAM() {
 
     }
 
     /**
-     * Creates a new ram module and sets the computer, the name, the version, the vulnerabilities, the size and the access frequency.
+     * Creates a new ram module and sets the host computer, the name, the version, the vulnerabilities, the size and the access frequency.
      * 
-     * @param computer The computer this part is built in.
+     * @param host The host computer this part is built in.
      * @param name The name the ram module has.
      * @param version The current version the ram module has.
      * @param vulnerabilities The vulnerabilities the ram module has.
      * @param size The size of the ram module, given in bytes.
      * @param frequency The access frequency of the ram module, given in hertz.
      */
-    public RAM(Computer computer, String name, Version version, List<Vulnerability> vulnerabilities, long size, long frequency) {
+    public RAM(Computer host, String name, Version version, List<Vulnerability> vulnerabilities, long size, long frequency) {
 
-        super(computer, name, version, vulnerabilities);
+        super(host, name, version, vulnerabilities);
 
         this.size = size;
         this.frequency = frequency;

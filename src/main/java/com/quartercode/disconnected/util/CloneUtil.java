@@ -35,6 +35,7 @@ public class CloneUtil {
      * 
      * @param object The input object to clone.
      * @return The created clone of the input object.
+     * @throws RuntimeException Any exception happened while the serialization or deserialization.
      */
     public static Object clone(Object object) {
 

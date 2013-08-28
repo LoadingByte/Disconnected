@@ -18,11 +18,11 @@
 
 package com.quartercode.disconnected.sim.comp;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.quartercode.disconnected.Disconnected;
-import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
-import com.quartercode.disconnected.sim.comp.hardware.HardDrive.File;
-import com.quartercode.disconnected.sim.comp.hardware.HardDrive.File.FileType;
+import com.quartercode.disconnected.sim.comp.Media.File;
+import com.quartercode.disconnected.sim.comp.Media.File.FileType;
 import com.quartercode.disconnected.sim.run.TickTimer;
 import com.quartercode.disconnected.sim.run.TickTimer.TimerTask;
 
@@ -67,23 +67,23 @@ public class OperatingSystem extends ComputerPart {
      * Creates a new empty operating system.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    public OperatingSystem() {
+    protected OperatingSystem() {
 
     }
 
     /**
-     * Creates a new operating system and sets the computer, the name, the version, the vulnerabilities and the times the os needs for switching on/off.
+     * Creates a new operating system and sets the host computer, the name, the version, the vulnerabilities and the times the os needs for switching on/off.
      * 
-     * @param computer The computer this part is built in.
+     * @param host The host computer this part is built in.
      * @param name The name the operating system has.
      * @param version The current version the operating system has.
      * @param vulnerabilities The vulnerabilities the operating system has.
      * @param switchOnTime The amount of ticks the system needs to switch on (boot up).
      * @param switchOffTime The amount of ticks the system needs to switch off (shutdown).
      */
-    public OperatingSystem(Computer computer, String name, Version version, List<Vulnerability> vulnerabilities, int switchOnTime, int switchOffTime) {
+    public OperatingSystem(Computer host, String name, Version version, List<Vulnerability> vulnerabilities, int switchOnTime, int switchOffTime) {
 
-        super(computer, name, version, vulnerabilities);
+        super(host, name, version, vulnerabilities);
 
         this.switchOnTime = switchOnTime;
         this.switchOffTime = switchOffTime;
@@ -151,17 +151,29 @@ public class OperatingSystem extends ComputerPart {
     }
 
     /**
-     * Returns the connected hard drive which uses the given letter.
-     * If there is no drive with the given letter, this will return null.
+     * Returns a list containing all media which are connected to this computer.
      * 
-     * @param letter The letter the selected hard drive needs to use.
-     * @return The connected hard drive which uses the given letter.
+     * @return A list containing all media which are connected to this computer.
      */
-    public HardDrive getHardDrive(char letter) {
+    public List<MediaProvider> getMedia() {
 
-        for (Hardware hardware : getComputer().getHardware()) {
-            if (hardware instanceof HardDrive && ((HardDrive) hardware).getLetter() == letter) {
-                return (HardDrive) hardware;
+        List<MediaProvider> media = new ArrayList<MediaProvider>();
+        media.addAll(getHost().getHardware(MediaProvider.class));
+        return media;
+    }
+
+    /**
+     * Returns the connected media which uses the given letter.
+     * If there is no media with the given letter, this will return null.
+     * 
+     * @param letter The letter the returned media needs to use.
+     * @return The connected media which uses the given letter.
+     */
+    public MediaProvider getMedia(char letter) {
+
+        for (MediaProvider media : getMedia()) {
+            if (media.getLetter() == letter) {
+                return media;
             }
         }
 
@@ -169,36 +181,36 @@ public class OperatingSystem extends ComputerPart {
     }
 
     /**
-     * Returns the connected hard drive on which the file under the given path is stored.
+     * Returns the connected media on which the file under the given path is stored.
      * A path is a collection of files seperated by a seperator.
      * This requires a global os path.
-     * If there is no drive the file is stored on, this will return null.
+     * If there is no media the file is stored on, this will return null.
      * 
-     * @param path The file represented by this path is stored on the selected hard drive.
-     * @return The connected hard drive on which the file under the given path is stored.
+     * @param path The file represented by this path is stored on the returned media.
+     * @return The connected media on which the file under the given path is stored.
      */
-    public HardDrive getHardDrive(String path) {
+    public MediaProvider getMedia(String path) {
 
         if (path.contains(":")) {
-            return getHardDrive(path.split(":")[0].charAt(0));
+            return getMedia(path.split(":")[0].charAt(0));
+        } else {
+            return null;
         }
-
-        return null;
     }
 
     /**
-     * Returns the file which is stored on the computer this os is running on under the given path.
+     * Returns the file which is stored on a media of the computer this os is running on under the given path.
      * A path is a collection of files seperated by a seperator.
      * This will look up the file using a global os path.
      * 
      * @param path The path to look in for the file.
-     * @return The file which is stored on the computer this os is running on under the given path.
+     * @return The file which is stored on a media of the computer this os is running on under the given path.
      */
     public File getFile(String path) {
 
-        HardDrive hardDrive = getHardDrive(path);
-        if (hardDrive != null) {
-            return hardDrive.getFile(path.split(":")[1]);
+        MediaProvider media = getMedia(path);
+        if (media != null) {
+            return media.getFile(path.split(":")[1]);
         } else {
             return null;
         }
@@ -216,9 +228,9 @@ public class OperatingSystem extends ComputerPart {
      */
     public File addFile(String path, FileType type) {
 
-        HardDrive hardDrive = getHardDrive(path);
-        if (hardDrive != null) {
-            return hardDrive.addFile(path.split(":")[1], type);
+        MediaProvider media = getMedia(path);
+        if (media != null) {
+            return media.addFile(path.split(":")[1], type);
         } else {
             return null;
         }

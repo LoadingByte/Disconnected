@@ -43,7 +43,7 @@ public class Reputation {
      * Creates a new empty reputation object.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    public Reputation() {
+    protected Reputation() {
 
     }
 

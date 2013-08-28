@@ -36,22 +36,22 @@ public class Program extends ComputerPart {
      * Creates a new empty program.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    public Program() {
+    protected Program() {
 
     }
 
     /**
-     * Creates a new program and sets the computer, the name, the version, the vulnerabilities and the required right level.
+     * Creates a new program and sets the host computer, the name, the version, the vulnerabilities and the required right level.
      * 
-     * @param computer The computer this part is built in.
+     * @param host The host computer this part is built in.
      * @param name The name the program has.
      * @param version The current version the program has.
      * @param vulnerabilities The vulnerabilities the program has.
      * @param rightLevel The required right level a user need for executing the program.
      */
-    protected Program(Computer computer, String name, Version version, List<Vulnerability> vulnerabilities, String rightLevel) {
+    protected Program(Computer host, String name, Version version, List<Vulnerability> vulnerabilities, String rightLevel) {
 
-        super(computer, name, version, vulnerabilities);
+        super(host, name, version, vulnerabilities);
 
         this.rightLevel = rightLevel;
     }

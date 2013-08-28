@@ -54,22 +54,22 @@ public class Mainboard extends Hardware {
      * Creates a new empty mainboard.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    public Mainboard() {
+    protected Mainboard() {
 
     }
 
     /**
-     * Creates a new mainboard and sets the computer, the name, the version, the vulnerabilities and a list of all avaiable mainboard slots.
+     * Creates a new mainboard and sets the host computer, the name, the version, the vulnerabilities and a list of all avaiable mainboard slots.
      * 
-     * @param computer The computer this part is built in.
+     * @param host The host computer this part is built in.
      * @param name The name the mainboard has.
      * @param version The current version the mainboard has.
      * @param vulnerabilities The vulnerabilities the mainboard has.
      * @param slots A list of all avaiable mainboard slots.
      */
-    public Mainboard(Computer computer, String name, Version version, List<Vulnerability> vulnerabilities, List<MainboradSlot> slots) {
+    public Mainboard(Computer host, String name, Version version, List<Vulnerability> vulnerabilities, List<MainboradSlot> slots) {
 
-        super(computer, name, version, vulnerabilities);
+        super(host, name, version, vulnerabilities);
 
         this.slots = slots;
     }
@@ -146,7 +146,7 @@ public class Mainboard extends Hardware {
          * Creates a new empty mainboard slot.
          * This is only recommended for direct field access (e.g. for serialization).
          */
-        public MainboradSlot() {
+        protected MainboradSlot() {
 
         }
 

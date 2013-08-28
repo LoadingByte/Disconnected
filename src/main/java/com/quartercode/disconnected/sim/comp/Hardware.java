@@ -45,21 +45,21 @@ public class Hardware extends ComputerPart {
      * Creates a new empty hardware part.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    public Hardware() {
+    protected Hardware() {
 
     }
 
     /**
-     * Creates a new hardware part and sets the computer, the name, the version and the vulnerabilities.
+     * Creates a new hardware part and sets the host computer, the name, the version and the vulnerabilities.
      * 
-     * @param computer The computer this part is built in.
+     * @param host The host computer this part is built in.
      * @param name The name the hardware part has.
      * @param version The current version hardware the part has.
      * @param vulnerabilities The vulnerabilities the hardware part has.
      */
-    public Hardware(Computer computer, String name, Version version, List<Vulnerability> vulnerabilities) {
+    public Hardware(Computer host, String name, Version version, List<Vulnerability> vulnerabilities) {
 
-        super(computer, name, version, vulnerabilities);
+        super(host, name, version, vulnerabilities);
     }
 
 }

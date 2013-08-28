@@ -49,10 +49,10 @@ public class DestroyInterest extends Interest implements HasTarget {
     private Member target;
 
     /**
-     * Creates a new empty destroy interest object.
+     * Creates a new empty destroy interest.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    public DestroyInterest() {
+    protected DestroyInterest() {
 
     }
 

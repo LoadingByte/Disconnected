@@ -30,7 +30,7 @@ public class ReputationTest {
     @Before
     public void setUp() {
 
-        reputation = new Reputation();
+        reputation = new Reputation(null);
         reputation.setValue(10);
     }
 

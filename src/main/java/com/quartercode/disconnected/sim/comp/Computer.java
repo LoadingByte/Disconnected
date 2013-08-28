@@ -59,7 +59,7 @@ public class Computer {
      * Creates a new empty computer.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    public Computer() {
+    protected Computer() {
 
     }
 
@@ -116,13 +116,11 @@ public class Computer {
     /**
      * Returns the hardware parts in the computer which have the given type as a superclass.
      * 
-     * @param <T>
-     * 
      * @param type The type to use for the selection.
      * @return The hardware parts in the computer which have the given type as a superclass.
      */
     @SuppressWarnings ("unchecked")
-    public <T extends Hardware> List<T> getHardware(Class<T> type) {
+    public <T> List<T> getHardware(Class<T> type) {
 
         List<T> hardware = new ArrayList<T>();
         for (Hardware hardwarePart : this.hardware) {

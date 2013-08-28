@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.util.CloneUtil;
+import com.quartercode.disconnected.util.InfoString;
 
 /**
  * This class stores information about a spefific computer part, like a hardware part or an operating system.
@@ -45,12 +46,12 @@ import com.quartercode.disconnected.util.CloneUtil;
  * @see Program
  */
 @XmlAccessorType (XmlAccessType.FIELD)
-public class ComputerPart implements Serializable {
+public class ComputerPart implements InfoString, Serializable {
 
     private static final long   serialVersionUID = 1L;
 
     @XmlTransient
-    private Computer            computer;
+    private Computer            host;
 
     private String              name;
     private Version             version;
@@ -61,36 +62,36 @@ public class ComputerPart implements Serializable {
      * Creates a new empty computer part.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    public ComputerPart() {
+    protected ComputerPart() {
 
     }
 
     /**
-     * Creates a new computer part and sets the computer, the name, the version and the vulnerabilities.
+     * Creates a new computer part and sets the host computer, the name, the version and the vulnerabilities.
      * 
-     * @param computer The computer this part is built in.
+     * @param host The host computer this part is built in.
      * @param name The name the part has.
      * @param version The current version the part has.
      * @param vulnerabilities The vulnerabilities the part has.
      */
-    protected ComputerPart(Computer computer, String name, Version version, List<Vulnerability> vulnerabilities) {
+    protected ComputerPart(Computer host, String name, Version version, List<Vulnerability> vulnerabilities) {
 
         Validate.notNull(name, "Name can't be null");
 
-        this.computer = computer;
+        this.host = host;
         this.name = name;
         this.version = version;
         this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
     }
 
     /**
-     * Returns the computer this part is built in.
+     * Returns the host computer this part is built in.
      * 
-     * @return The computer this part is built in.
+     * @return The host computer this part is built in.
      */
-    public Computer getComputer() {
+    public Computer getHost() {
 
-        return computer;
+        return host;
     }
 
     /**
@@ -132,12 +133,12 @@ public class ComputerPart implements Serializable {
     @XmlAttribute
     public String getId() {
 
-        return computer.getId() + "." + computer.getParts().indexOf(this);
+        return host.getId() + "." + host.getParts().indexOf(this);
     }
 
     public void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
 
-        computer = (Computer) parent;
+        host = (Computer) parent;
     }
 
     @Override
@@ -194,11 +195,7 @@ public class ComputerPart implements Serializable {
         return true;
     }
 
-    /**
-     * Returns an informational string about the part containing the name, the version and the amount of vulnerabilities.
-     * 
-     * @return An informational string about the part containing the name, the version and the amount of vulnerabilities.
-     */
+    @Override
     public String toInfoString() {
 
         return name + " " + version + ", " + vulnerabilities.size() + " vulns";

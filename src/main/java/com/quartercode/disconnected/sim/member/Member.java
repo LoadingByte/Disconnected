@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.member.interest.Interest;
+import com.quartercode.disconnected.util.InfoString;
 
 /**
  * This class represents a member of a simulation (someone who have specific interests).
@@ -39,7 +40,7 @@ import com.quartercode.disconnected.sim.member.interest.Interest;
  * @see Reputation
  */
 @XmlAccessorType (XmlAccessType.FIELD)
-public class Member {
+public class Member implements InfoString {
 
     @XmlAttribute
     @XmlID
@@ -53,7 +54,7 @@ public class Member {
      * Creates a new empty member.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    public Member() {
+    protected Member() {
 
     }
 
@@ -175,11 +176,7 @@ public class Member {
         return true;
     }
 
-    /**
-     * Returns an informational string about the member containing the name, the version and the amount of vulnerabilities.
-     * 
-     * @return An informational string about the part containing the name, the version and the amount of vulnerabilities.
-     */
+    @Override
     public String toInfoString() {
 
         return name + ", " + interests.size() + "interests, computer" + computer.getId();

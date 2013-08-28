@@ -22,11 +22,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.sim.comp.Computer;
+import com.quartercode.disconnected.sim.comp.Media.File;
+import com.quartercode.disconnected.sim.comp.Media.File.FileType;
 import com.quartercode.disconnected.sim.comp.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
-import com.quartercode.disconnected.sim.comp.hardware.HardDrive.File;
-import com.quartercode.disconnected.sim.comp.hardware.HardDrive.File.FileType;
 import com.quartercode.disconnected.util.ByteUnit;
 
 public class FileTest {

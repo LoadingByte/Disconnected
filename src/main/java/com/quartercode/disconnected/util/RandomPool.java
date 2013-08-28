@@ -139,6 +139,12 @@ public class RandomPool {
         }
     }
 
+    /**
+     * Selects the next random which can be used for generating one thing.
+     * The returned random should only be used for only one generation.
+     * 
+     * @return The next random which can be used for generating one thing.
+     */
     protected Random nextRandom() {
 
         Random next = randoms.get(currentIndex);

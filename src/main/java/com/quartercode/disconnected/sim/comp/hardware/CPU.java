@@ -46,23 +46,23 @@ public class CPU extends Hardware {
      * Creates a new empty cpu.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    public CPU() {
+    protected CPU() {
 
     }
 
     /**
-     * Creates a new cpu and sets the computer, the name, the version, the vulnerabilities, the count of possible threads and the frequency.
+     * Creates a new cpu and sets the host computer, the name, the version, the vulnerabilities, the count of possible threads and the frequency.
      * 
-     * @param computer The computer this part is built in.
+     * @param host The host computer this part is built in.
      * @param name The name the cpu has.
      * @param version The current version the cpu has.
      * @param vulnerabilities The vulnerabilities the cpu has.
      * @param threads The count of possible threads running at the same time.
      * @param frequency The frequency of the cpu, given in hertz.
      */
-    public CPU(Computer computer, String name, Version version, List<Vulnerability> vulnerabilities, int threads, long frequency) {
+    public CPU(Computer host, String name, Version version, List<Vulnerability> vulnerabilities, int threads, long frequency) {
 
-        super(computer, name, version, vulnerabilities);
+        super(host, name, version, vulnerabilities);
 
         this.threads = threads;
         this.frequency = frequency;

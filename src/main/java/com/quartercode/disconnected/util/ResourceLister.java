@@ -38,7 +38,9 @@ public class ResourceLister {
      * @param path The parent classpath directory to search in. Has to start with "/".
      * @param directories If enabled, all directories will also be returned.
      * @return All classpath resources which can be found under the given path.
-     * @throws IOException Something goes wrong while reading from the jar file (if necessary).
+     * @throws IOException Something goes wrong while reading from the jar file (if it's a jar).
+     * @throws IllegalStateException One of the classpath entries on this process doesn't exist.
+     * @throws IllegalArgumentException The parts doesn't start with "/" (this can't list relative resources).
      */
     public static List<String> getResources(String path, boolean directories) throws IOException {
 
