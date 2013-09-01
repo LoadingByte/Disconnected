@@ -22,14 +22,13 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import com.quartercode.disconnected.sim.comp.Computer;
-import com.quartercode.disconnected.sim.comp.Hardware;
-import com.quartercode.disconnected.sim.comp.Media;
-import com.quartercode.disconnected.sim.comp.Media.File;
-import com.quartercode.disconnected.sim.comp.Media.File.FileType;
-import com.quartercode.disconnected.sim.comp.MediaProvider;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSlot;
+import com.quartercode.disconnected.sim.comp.media.File;
+import com.quartercode.disconnected.sim.comp.media.File.FileType;
+import com.quartercode.disconnected.sim.comp.media.Media;
+import com.quartercode.disconnected.sim.comp.media.MediaProvider;
 
 /**
  * This class represents a hard drive of a computer.
@@ -160,7 +159,7 @@ public class HardDrive extends Hardware implements MediaProvider {
     @Override
     public String toString() {
 
-        return "HardDrive [media=" + media + "]";
+        return getClass().getName() + " [" + toInfoString() + ", media: " + media + "]";
     }
 
 }

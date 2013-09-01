@@ -21,11 +21,16 @@ package com.quartercode.disconnected.test.profile;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import javax.xml.bind.JAXBException;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import com.quartercode.disconnected.Disconnected;
+import com.quartercode.disconnected.Main;
+import com.quartercode.disconnected.Registry;
 import com.quartercode.disconnected.profile.ProfileSerializer;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
@@ -34,6 +39,13 @@ public class ProfileSerializerTest {
 
     private Simulation simulation;
 
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+
+        Disconnected.setRegistry(new Registry());
+        Main.fillRegistry();
+    }
+
     @Before
     public void setUp() {
 
@@ -41,7 +53,7 @@ public class ProfileSerializerTest {
     }
 
     @Test
-    public void testSerializeEquals() throws IOException {
+    public void testSerializeEquals() throws IOException, JAXBException {
 
         StringWriter serialized = new StringWriter();
         WriterOutputStream outputStream = new WriterOutputStream(serialized);

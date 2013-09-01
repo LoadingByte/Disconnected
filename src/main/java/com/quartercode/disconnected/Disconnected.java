@@ -28,6 +28,7 @@ import com.quartercode.disconnected.sim.run.Ticker;
  */
 public class Disconnected {
 
+    private static Registry       registry;
     private static ProfileManager profileManager;
     private static Ticker         ticker;
 
@@ -61,6 +62,26 @@ public class Disconnected {
     public static String getVendor() {
 
         return Disconnected.class.getPackage().getImplementationVendor();
+    }
+
+    /**
+     * Returns the active registry for holding all kinds of classes for a later use.
+     * 
+     * @return The active registry for holding all kinds of classes for a later use.
+     */
+    public static Registry getRegistry() {
+
+        return registry;
+    }
+
+    /**
+     * Sets the active registry for holding all kinds of classes to a new one.
+     * 
+     * @param registry The new active registry for holding all kinds of classes.
+     */
+    public static void setRegistry(Registry registry) {
+
+        Disconnected.registry = registry;
     }
 
     /**

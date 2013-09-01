@@ -18,10 +18,7 @@
 
 package com.quartercode.disconnected.sim.member.interest;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.member.Member;
@@ -36,11 +33,8 @@ import com.quartercode.disconnected.sim.run.action.Action;
  * @see MemberGroup
  * @see Action
  */
-@XmlAccessorType (XmlAccessType.FIELD)
-@XmlSeeAlso (DestroyInterest.class)
 public abstract class Interest implements ReputationChangeProvider {
 
-    @XmlAttribute
     private float priority;
 
     /**
@@ -66,6 +60,7 @@ public abstract class Interest implements ReputationChangeProvider {
      * 
      * @return The priority the interest has for the group or member.
      */
+    @XmlAttribute
     public float getPriority() {
 
         return priority;

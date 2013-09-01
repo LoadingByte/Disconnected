@@ -19,10 +19,15 @@
 package com.quartercode.disconnected.sim.comp;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
 import com.quartercode.disconnected.Disconnected;
-import com.quartercode.disconnected.sim.comp.Media.File;
-import com.quartercode.disconnected.sim.comp.Media.File.FileType;
+import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
+import com.quartercode.disconnected.sim.comp.media.File;
+import com.quartercode.disconnected.sim.comp.media.File.FileType;
+import com.quartercode.disconnected.sim.comp.media.MediaProvider;
+import com.quartercode.disconnected.sim.comp.program.Program;
 import com.quartercode.disconnected.sim.run.TickTimer;
 import com.quartercode.disconnected.sim.run.TickTimer.TimerTask;
 
@@ -30,9 +35,10 @@ import com.quartercode.disconnected.sim.run.TickTimer.TimerTask;
  * This class stores information about an operating system.
  * This also contains a list of all vulnerabilities this operating system has.
  * 
- * @see ComputerPart
+ * @see HostedComputerPart
+ * @see Vulnerability
  */
-public class OperatingSystem extends ComputerPart {
+public class OperatingSystem extends HostedComputerPart implements Vulnerable {
 
     /**
      * This enum represents the right levels a user can has on an operating system.
@@ -56,12 +62,17 @@ public class OperatingSystem extends ComputerPart {
         OFF, SWITCHING_OFF, ON, SWITCHING_ON;
     }
 
-    private static final long serialVersionUID = 1L;
+    private static final long   serialVersionUID = 1L;
 
-    private int               switchOnTime;
-    private int               switchOffTime;
+    @XmlElement (name = "vulnerability")
+    private List<Vulnerability> vulnerabilities  = new ArrayList<Vulnerability>();
+    @XmlElement
+    private int                 switchOnTime;
+    @XmlElement
+    private int                 switchOffTime;
 
-    private State             state;
+    @XmlElement
+    private State               state;
 
     /**
      * Creates a new empty operating system.
@@ -83,10 +94,17 @@ public class OperatingSystem extends ComputerPart {
      */
     public OperatingSystem(Computer host, String name, Version version, List<Vulnerability> vulnerabilities, int switchOnTime, int switchOffTime) {
 
-        super(host, name, version, vulnerabilities);
+        super(host, name, version);
 
+        this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
         this.switchOnTime = switchOnTime;
         this.switchOffTime = switchOffTime;
+    }
+
+    @Override
+    public List<Vulnerability> getVulnerabilities() {
+
+        return Collections.unmodifiableList(vulnerabilities);
     }
 
     /**
@@ -244,6 +262,7 @@ public class OperatingSystem extends ComputerPart {
         result = prime * result + (state == null ? 0 : state.hashCode());
         result = prime * result + switchOffTime;
         result = prime * result + switchOnTime;
+        result = prime * result + (vulnerabilities == null ? 0 : vulnerabilities.hashCode());
         return result;
     }
 
@@ -256,7 +275,7 @@ public class OperatingSystem extends ComputerPart {
         if (!super.equals(obj)) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (! (obj instanceof OperatingSystem)) {
             return false;
         }
         OperatingSystem other = (OperatingSystem) obj;
@@ -269,13 +288,26 @@ public class OperatingSystem extends ComputerPart {
         if (switchOnTime != other.switchOnTime) {
             return false;
         }
+        if (vulnerabilities == null) {
+            if (other.vulnerabilities != null) {
+                return false;
+            }
+        } else if (!vulnerabilities.equals(other.vulnerabilities)) {
+            return false;
+        }
         return true;
+    }
+
+    @Override
+    public String toInfoString() {
+
+        return super.toInfoString() + ", " + vulnerabilities.size() + " vulns, " + state;
     }
 
     @Override
     public String toString() {
 
-        return getClass().getName() + " [switchOnTime=" + switchOnTime + ", switchOffTime=" + switchOffTime + ", state=" + state + ", toInfoString()=" + toInfoString() + "]";
+        return getClass().getName() + "[" + toInfoString() + "]";
     }
 
 }

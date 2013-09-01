@@ -24,6 +24,11 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import com.quartercode.disconnected.profile.ProfileManager;
+import com.quartercode.disconnected.sim.comp.hardware.CPU;
+import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
+import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
+import com.quartercode.disconnected.sim.comp.hardware.RAM;
+import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
 import com.quartercode.disconnected.sim.run.TickAction;
 import com.quartercode.disconnected.sim.run.TickSimulator;
 import com.quartercode.disconnected.sim.run.TickTimer;
@@ -59,6 +64,10 @@ public class Main {
         // Print information about the software
         LOGGER.info("Version " + Disconnected.getVersion());
 
+        // Initalize registry
+        Disconnected.setRegistry(new Registry());
+        fillRegistry();
+
         // Initalize profile manager and load stored profiles (TODO: Add code for loading).
         Disconnected.setProfileManager(new ProfileManager());
 
@@ -67,6 +76,21 @@ public class Main {
         tickActions.add(new TickTimer());
         tickActions.add(new TickSimulator());
         Disconnected.setTicker(new Ticker(tickActions.toArray(new TickAction[tickActions.size()])));
+    }
+
+    /**
+     * Fills the active registry with the default values which are needed for running vanilla disconnected.
+     */
+    public static void fillRegistry() {
+
+        // Fill registry with computer parts
+        Disconnected.getRegistry().registerClass(Mainboard.class);
+        Disconnected.getRegistry().registerClass(CPU.class);
+        Disconnected.getRegistry().registerClass(RAM.class);
+        Disconnected.getRegistry().registerClass(HardDrive.class);
+
+        // Fill registry with interests
+        Disconnected.getRegistry().registerClass(DestroyInterest.class);
     }
 
     private Main() {

@@ -19,44 +19,30 @@
 package com.quartercode.disconnected.sim.comp;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang.Validate;
+import com.quartercode.disconnected.sim.comp.program.Program;
 import com.quartercode.disconnected.util.CloneUtil;
 import com.quartercode.disconnected.util.InfoString;
 
 /**
- * This class stores information about a spefific computer part, like a hardware part or an operating system.
- * This also contains a list of all vulnerabilities this part has.
+ * This class stores information about a generic computer part, like a hardware part or an operating system.
+ * A part stores the name and version, everything else is defined by subclasses.
  * 
  * @see Computer
  * @see Version
- * @see Vulnerability
  * 
- * @see Hardware
- * @see OperatingSystem
+ * @see HostedComputerPart
  * @see Program
  */
-@XmlAccessorType (XmlAccessType.FIELD)
 public class ComputerPart implements InfoString, Serializable {
 
-    private static final long   serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-    @XmlTransient
-    private Computer            host;
-
-    private String              name;
-    private Version             version;
-    @XmlElement (name = "vulnerability")
-    private List<Vulnerability> vulnerabilities  = new ArrayList<Vulnerability>();
+    @XmlElement
+    private String            name;
+    @XmlElement
+    private Version           version;
 
     /**
      * Creates a new empty computer part.
@@ -67,31 +53,17 @@ public class ComputerPart implements InfoString, Serializable {
     }
 
     /**
-     * Creates a new computer part and sets the host computer, the name, the version and the vulnerabilities.
+     * Creates a new computer part and sets the name and the version.
      * 
-     * @param host The host computer this part is built in.
      * @param name The name the part has.
      * @param version The current version the part has.
-     * @param vulnerabilities The vulnerabilities the part has.
      */
-    protected ComputerPart(Computer host, String name, Version version, List<Vulnerability> vulnerabilities) {
+    protected ComputerPart(String name, Version version) {
 
         Validate.notNull(name, "Name can't be null");
 
-        this.host = host;
         this.name = name;
         this.version = version;
-        this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
-    }
-
-    /**
-     * Returns the host computer this part is built in.
-     * 
-     * @return The host computer this part is built in.
-     */
-    public Computer getHost() {
-
-        return host;
     }
 
     /**
@@ -114,33 +86,6 @@ public class ComputerPart implements InfoString, Serializable {
         return version;
     }
 
-    /**
-     * Returns the vulnerabilities the part has.
-     * 
-     * @return The vulnerabilities the part has.
-     */
-    public List<Vulnerability> getVulnerabilities() {
-
-        return Collections.unmodifiableList(vulnerabilities);
-    }
-
-    /**
-     * Generates an unique id which is used to reference to this computer part.
-     * 
-     * @return An unique id which is used to reference to this computer part.
-     */
-    @XmlID
-    @XmlAttribute
-    public String getId() {
-
-        return host.getId() + "." + host.getParts().indexOf(this);
-    }
-
-    public void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-
-        host = (Computer) parent;
-    }
-
     @Override
     public ComputerPart clone() {
 
@@ -154,7 +99,6 @@ public class ComputerPart implements InfoString, Serializable {
         int result = 1;
         result = prime * result + (name == null ? 0 : name.hashCode());
         result = prime * result + (version == null ? 0 : version.hashCode());
-        result = prime * result + (vulnerabilities == null ? 0 : vulnerabilities.hashCode());
         return result;
     }
 
@@ -185,20 +129,13 @@ public class ComputerPart implements InfoString, Serializable {
         } else if (!version.equals(other.version)) {
             return false;
         }
-        if (vulnerabilities == null) {
-            if (other.vulnerabilities != null) {
-                return false;
-            }
-        } else if (!vulnerabilities.equals(other.vulnerabilities)) {
-            return false;
-        }
         return true;
     }
 
     @Override
     public String toInfoString() {
 
-        return name + " " + version + ", " + vulnerabilities.size() + " vulns";
+        return name + " " + version;
     }
 
     @Override

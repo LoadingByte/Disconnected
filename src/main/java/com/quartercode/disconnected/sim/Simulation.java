@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -41,7 +39,6 @@ import com.quartercode.disconnected.sim.member.interest.Interest;
  * @see Computer
  */
 @XmlRootElement (namespace = "http://quartercode.com/")
-@XmlAccessorType (XmlAccessType.FIELD)
 public class Simulation {
 
     @XmlElementWrapper (name = "members")
@@ -259,7 +256,7 @@ public class Simulation {
     @Override
     public String toString() {
 
-        return getClass().getName() + " [members=" + members + ", groups=" + groups + ", computers=" + computers + "]";
+        return getClass().getName() + " [members=" + members.size() + ", groups=" + groups.size() + ", computers=" + computers.size() + "]";
     }
 
 }

@@ -18,8 +18,6 @@
 
 package com.quartercode.disconnected.sim.member;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlValue;
@@ -30,13 +28,11 @@ import javax.xml.bind.annotation.XmlValue;
  * 
  * @see Member
  */
-@XmlAccessorType (XmlAccessType.FIELD)
 public class Reputation {
 
-    @XmlAttribute
     @XmlIDREF
+    @XmlAttribute
     private Member member;
-    @XmlValue
     private int    value;
 
     /**
@@ -84,6 +80,7 @@ public class Reputation {
      * 
      * @return The current stored reputation value.
      */
+    @XmlValue
     public int getValue() {
 
         return value;

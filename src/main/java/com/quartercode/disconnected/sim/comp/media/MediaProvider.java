@@ -16,10 +16,10 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.comp;
+package com.quartercode.disconnected.sim.comp.media;
 
-import com.quartercode.disconnected.sim.comp.Media.File;
-import com.quartercode.disconnected.sim.comp.Media.File.FileType;
+import com.quartercode.disconnected.sim.comp.Computer;
+import com.quartercode.disconnected.sim.comp.media.File.FileType;
 
 public interface MediaProvider {
 

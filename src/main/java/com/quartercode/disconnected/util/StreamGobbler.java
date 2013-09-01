@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.launch;
+package com.quartercode.disconnected.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;

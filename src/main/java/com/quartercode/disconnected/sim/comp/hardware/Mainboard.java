@@ -32,7 +32,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.ComputerPart;
-import com.quartercode.disconnected.sim.comp.Hardware;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 
@@ -43,6 +42,7 @@ import com.quartercode.disconnected.sim.comp.Vulnerability;
  * @see ComputerPart
  * @see Hardware
  */
+@XmlAccessorType (XmlAccessType.FIELD)
 public class Mainboard extends Hardware {
 
     private static final long   serialVersionUID = 1L;
@@ -103,7 +103,7 @@ public class Mainboard extends Hardware {
         if (!super.equals(obj)) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (! (obj instanceof Mainboard)) {
             return false;
         }
         Mainboard other = (Mainboard) obj;
@@ -120,7 +120,7 @@ public class Mainboard extends Hardware {
     @Override
     public String toString() {
 
-        return getClass().getName() + " [slots=" + slots + ", toInfoString()=" + toInfoString() + "]";
+        return getClass().getName() + " [" + toInfoString() + ", " + slots.size() + " slots]";
     }
 
     /**
@@ -220,7 +220,7 @@ public class Mainboard extends Hardware {
             if (obj == null) {
                 return false;
             }
-            if (getClass() != obj.getClass()) {
+            if (! (obj instanceof MainboradSlot)) {
                 return false;
             }
             MainboradSlot other = (MainboradSlot) obj;
@@ -244,7 +244,7 @@ public class Mainboard extends Hardware {
         @Override
         public String toString() {
 
-            return getClass().getName() + " [type=" + type + ", content=" + content.toInfoString() + "]";
+            return getClass().getName() + " [type " + type + ", holding " + content.toInfoString() + "]";
         }
 
     }

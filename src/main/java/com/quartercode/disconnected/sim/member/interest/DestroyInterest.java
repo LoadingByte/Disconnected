@@ -20,12 +20,12 @@ package com.quartercode.disconnected.sim.member.interest;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.ComputerPart;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
+import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.run.action.Action;
@@ -42,10 +42,10 @@ import com.quartercode.disconnected.util.ProbabilityUtil;
  * @see Interest
  * @see HasTarget
  */
-@XmlAccessorType (XmlAccessType.FIELD)
 public class DestroyInterest extends Interest implements HasTarget {
 
     @XmlIDREF
+    @XmlElement
     private Member target;
 
     /**
@@ -102,7 +102,9 @@ public class DestroyInterest extends Interest implements HasTarget {
             // Collect all vulnerabilities
             List<Vulnerability> vulnerabilities = new ArrayList<Vulnerability>();
             for (ComputerPart part : member.getComputer().getParts()) {
-                vulnerabilities.addAll(part.getVulnerabilities());
+                if (part instanceof Vulnerable) {
+                    vulnerabilities.addAll( ((Vulnerable) part).getVulnerabilities());
+                }
             }
 
             // Take the first avaiable vulnerability and quickly develop a new exploit

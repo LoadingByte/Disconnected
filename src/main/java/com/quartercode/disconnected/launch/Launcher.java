@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.quartercode.disconnected.Main;
+import com.quartercode.disconnected.util.StreamGobbler;
 
 /**
  * This class launches another main method inside the same jar using a second vm.

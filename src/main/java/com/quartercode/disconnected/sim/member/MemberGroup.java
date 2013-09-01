@@ -21,8 +21,6 @@ package com.quartercode.disconnected.sim.member;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.member.interest.Interest;
@@ -36,11 +34,10 @@ import com.quartercode.disconnected.sim.member.interest.Interest;
  * @see Reputation
  * @see Interest
  */
-@XmlAccessorType (XmlAccessType.FIELD)
 public class MemberGroup {
 
-    @XmlElement (name = "member")
     @XmlIDREF
+    @XmlElement (name = "member")
     private final List<Member>     members     = new CopyOnWriteArrayList<Member>();
     @XmlElement (name = "reputation")
     private final List<Reputation> reputations = new CopyOnWriteArrayList<Reputation>();

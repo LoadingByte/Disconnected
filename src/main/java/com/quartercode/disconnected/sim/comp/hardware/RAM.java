@@ -22,7 +22,6 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import com.quartercode.disconnected.sim.comp.Computer;
-import com.quartercode.disconnected.sim.comp.Hardware;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSlot;
@@ -107,7 +106,7 @@ public class RAM extends Hardware {
         if (!super.equals(obj)) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (! (obj instanceof RAM)) {
             return false;
         }
         RAM other = (RAM) obj;
@@ -123,7 +122,7 @@ public class RAM extends Hardware {
     @Override
     public String toString() {
 
-        return getClass().getName() + " [size=" + size + ", frequency=" + frequency + ", getName()=" + getName() + ", getVersion()=" + getVersion() + ", getVulnerabilities()=" + getVulnerabilities() + "]";
+        return getClass().getName() + " [" + toInfoString() + ", " + size + " bytes size, " + frequency + " hertz frequency]";
     }
 
 }

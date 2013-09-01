@@ -21,9 +21,6 @@ package com.quartercode.disconnected.sim.member;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
@@ -39,15 +36,13 @@ import com.quartercode.disconnected.util.InfoString;
  * @see Interest
  * @see Reputation
  */
-@XmlAccessorType (XmlAccessType.FIELD)
 public class Member implements InfoString {
 
-    @XmlAttribute
     @XmlID
+    @XmlElement
     private String               name;
     @XmlElement (name = "interest")
     private final List<Interest> interests = new CopyOnWriteArrayList<Interest>();
-    @XmlIDREF
     private Computer             computer;
 
     /**
@@ -113,6 +108,7 @@ public class Member implements InfoString {
      * 
      * @return The computer the member has access on.
      */
+    @XmlIDREF
     public Computer getComputer() {
 
         return computer;
