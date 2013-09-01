@@ -116,13 +116,12 @@ public class Computer {
      * @param type The type to use for the selection.
      * @return The hardware parts in the computer which have the given type as a superclass.
      */
-    @SuppressWarnings ("unchecked")
     public <T> List<T> getHardware(Class<T> type) {
 
         List<T> hardware = new ArrayList<T>();
         for (Hardware hardwarePart : this.hardware) {
             if (type.isAssignableFrom(hardwarePart.getClass())) {
-                hardware.add((T) hardwarePart);
+                hardware.add(type.cast(hardwarePart));
             }
         }
         return hardware;

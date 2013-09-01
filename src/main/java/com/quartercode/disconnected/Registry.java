@@ -55,12 +55,12 @@ public class Registry {
      * @return The registered classes which have the given type as a superclass.
      */
     @SuppressWarnings ("unchecked")
-    public <T> List<T> getClasses(Class<T> type) {
+    public <T> List<Class<? extends T>> getClasses(Class<T> type) {
 
-        List<T> classes = new ArrayList<T>();
+        List<Class<? extends T>> classes = new ArrayList<Class<? extends T>>();
         for (Class<?> c : this.classes) {
             if (type.isAssignableFrom(c)) {
-                classes.add((T) c);
+                classes.add((Class<? extends T>) c);
             }
         }
         return classes;

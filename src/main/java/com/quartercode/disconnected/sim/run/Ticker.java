@@ -73,12 +73,11 @@ public class Ticker {
      * @param type The type to use.
      * @return The tick actions which has the given type as a superclass.
      */
-    @SuppressWarnings ("unchecked")
     public <T> T getAction(Class<T> type) {
 
         for (TickAction action : actions) {
             if (type.isAssignableFrom(action.getClass())) {
-                return (T) action;
+                return type.cast(action);
             }
         }
 

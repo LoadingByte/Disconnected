@@ -28,6 +28,7 @@ import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
+import com.quartercode.disconnected.sim.comp.program.Program;
 import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
 import com.quartercode.disconnected.sim.run.TickAction;
 import com.quartercode.disconnected.sim.run.TickSimulator;
@@ -83,13 +84,15 @@ public class Main {
      */
     public static void fillRegistry() {
 
-        // Fill registry with computer parts
+        Disconnected.getRegistry().registerClass(Program.class);
+
+        // Hardware
         Disconnected.getRegistry().registerClass(Mainboard.class);
         Disconnected.getRegistry().registerClass(CPU.class);
         Disconnected.getRegistry().registerClass(RAM.class);
         Disconnected.getRegistry().registerClass(HardDrive.class);
 
-        // Fill registry with interests
+        // Interests
         Disconnected.getRegistry().registerClass(DestroyInterest.class);
     }
 
