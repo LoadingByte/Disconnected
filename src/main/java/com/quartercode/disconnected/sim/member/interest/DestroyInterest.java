@@ -26,13 +26,13 @@ import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.ComputerPart;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
+import com.quartercode.disconnected.sim.comp.attack.Attack;
+import com.quartercode.disconnected.sim.comp.attack.Exploit;
+import com.quartercode.disconnected.sim.comp.attack.Payload;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
-import com.quartercode.disconnected.sim.run.action.Action;
-import com.quartercode.disconnected.sim.run.action.AttackAction;
-import com.quartercode.disconnected.sim.run.attack.Attack;
-import com.quartercode.disconnected.sim.run.attack.Exploit;
-import com.quartercode.disconnected.sim.run.attack.Payload;
+import com.quartercode.disconnected.sim.member.action.Action;
+import com.quartercode.disconnected.sim.member.action.AttackAction;
 import com.quartercode.disconnected.util.ProbabilityUtil;
 
 /**

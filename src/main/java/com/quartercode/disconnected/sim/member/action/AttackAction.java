@@ -16,14 +16,14 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.run.action;
+package com.quartercode.disconnected.sim.member.action;
 
 import com.quartercode.disconnected.sim.Simulation;
+import com.quartercode.disconnected.sim.comp.attack.Attack;
+import com.quartercode.disconnected.sim.comp.attack.Exploit;
+import com.quartercode.disconnected.sim.comp.attack.Payload;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.interest.ReputationChangeProvider;
-import com.quartercode.disconnected.sim.run.attack.Attack;
-import com.quartercode.disconnected.sim.run.attack.Exploit;
-import com.quartercode.disconnected.sim.run.attack.Payload;
 import com.quartercode.disconnected.sim.run.util.ScriptExecutor;
 import com.quartercode.disconnected.util.ProbabilityUtil;
 

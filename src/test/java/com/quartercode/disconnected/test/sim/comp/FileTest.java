@@ -74,8 +74,8 @@ public class FileTest {
     @Test
     public void testCalcSpace() {
 
-        Assert.assertEquals("Filled bytes", 12, hardDrive.getFilled());
-        Assert.assertEquals("Free bytes", hardDrive.getSize() - 12, hardDrive.getFree());
+        Assert.assertEquals("Filled bytes", 12288, hardDrive.getFilled());
+        Assert.assertEquals("Free bytes", hardDrive.getSize() - 12288, hardDrive.getFree());
         Assert.assertEquals("Filled + free = size", hardDrive.getSize(), hardDrive.getFilled() + hardDrive.getFree());
     }
 

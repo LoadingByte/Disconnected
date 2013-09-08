@@ -23,7 +23,7 @@ import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
-import com.quartercode.disconnected.sim.run.action.Action;
+import com.quartercode.disconnected.sim.member.action.Action;
 
 /**
  * This abstract class represents an interest of a member or a global one from a member group.
