@@ -40,7 +40,7 @@ public class ProfileSerializerTest {
     private Simulation simulation;
 
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
+    public static void setUpBeforeClass() {
 
         Disconnected.setRegistry(new Registry());
         Main.fillRegistry();

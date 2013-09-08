@@ -20,8 +20,8 @@ package com.quartercode.disconnected.test.util;
 
 import org.junit.Assert;
 import org.junit.Test;
-import com.quartercode.disconnected.util.ByteUnit;
-import com.quartercode.disconnected.util.SpeedUnit;
+import com.quartercode.disconnected.util.size.ByteUnit;
+import com.quartercode.disconnected.util.size.SpeedUnit;
 
 public class ByteSpeedUnitTest {
 

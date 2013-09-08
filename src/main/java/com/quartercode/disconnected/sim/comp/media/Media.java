@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.media.File.FileType;
+import com.quartercode.disconnected.util.size.SizeObject;
 
 /**
  * This class represents a media of a computer.
@@ -30,7 +31,7 @@ import com.quartercode.disconnected.sim.comp.media.File.FileType;
  * 
  * @see File
  */
-public class Media implements MediaProvider {
+public class Media implements MediaProvider, SizeObject {
 
     @XmlIDREF
     @XmlAttribute
@@ -138,6 +139,7 @@ public class Media implements MediaProvider {
      * 
      * @param file The existing file object to add to the media.
      * @param path The path the file will be located under.
+     * @throws IllegalStateException There's a non-directory file in the path.
      */
     protected void addFile(File file, String path) {
 
@@ -156,6 +158,8 @@ public class Media implements MediaProvider {
                         current.addChildFile(dir);
                         dir.resolveId();
                     }
+                } else if (current.getChildFile(part).getType() != FileType.DIRECTORY) {
+                    throw new IllegalStateException("File path '" + path + " isn't valid: file '" + current.getChildFile(part).getLocalPath() + "' isn't a directory");
                 }
                 current = current.getChildFile(part);
             }

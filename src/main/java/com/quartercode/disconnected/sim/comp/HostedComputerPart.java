@@ -81,7 +81,7 @@ public class HostedComputerPart extends ComputerPart {
     @XmlAttribute
     public String getId() {
 
-        return "computer:" + host.getId() + "-part:" + host.getParts().indexOf(this);
+        return host.getId() + "-" + host.getParts().indexOf(this);
     }
 
     public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {

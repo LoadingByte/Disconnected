@@ -27,8 +27,8 @@ import com.quartercode.disconnected.profile.ProfileManager;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
+import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
-import com.quartercode.disconnected.sim.comp.program.Program;
 import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
 import com.quartercode.disconnected.sim.run.TickAction;
 import com.quartercode.disconnected.sim.run.TickSimulator;
@@ -84,13 +84,15 @@ public class Main {
      */
     public static void fillRegistry() {
 
-        Disconnected.getRegistry().registerClass(Program.class);
-
         // Hardware
         Disconnected.getRegistry().registerClass(Mainboard.class);
         Disconnected.getRegistry().registerClass(CPU.class);
         Disconnected.getRegistry().registerClass(RAM.class);
         Disconnected.getRegistry().registerClass(HardDrive.class);
+        Disconnected.getRegistry().registerClass(NetworkInterface.class);
+
+        // Programs
+        // Nothing here yet
 
         // Interests
         Disconnected.getRegistry().registerClass(DestroyInterest.class);

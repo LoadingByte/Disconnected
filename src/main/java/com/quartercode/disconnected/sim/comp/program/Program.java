@@ -20,14 +20,17 @@ package com.quartercode.disconnected.sim.comp.program;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import javax.xml.bind.annotation.XmlElement;
 import com.quartercode.disconnected.sim.comp.ComputerPart;
 import com.quartercode.disconnected.sim.comp.OperatingSystem.RightLevel;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
-import com.quartercode.disconnected.sim.comp.media.FileContent;
+import com.quartercode.disconnected.util.size.SizeObject;
 
 /**
  * This class stores information about a program.
@@ -40,15 +43,15 @@ import com.quartercode.disconnected.sim.comp.media.FileContent;
  * @see ProgramExecutor
  * @see Process
  */
-public class Program extends ComputerPart implements FileContent, Vulnerable {
+public abstract class Program extends ComputerPart implements SizeObject, Vulnerable {
 
-    private static final long                serialVersionUID = 1L;
-
-    private Class<? extends ProgramExecutor> executor;
+    private static final long           serialVersionUID = 1L;
 
     @XmlElement (name = "vulnerability")
-    private List<Vulnerability>              vulnerabilities  = new ArrayList<Vulnerability>();
-    private RightLevel                       rightLevel;
+    private List<Vulnerability>         vulnerabilities  = new ArrayList<Vulnerability>();
+    @XmlElement
+    private RightLevel                  rightLevel;
+    private final Map<String, Class<?>> parameters       = new HashMap<String, Class<?>>();
 
     /**
      * Creates a new empty program.
@@ -59,20 +62,18 @@ public class Program extends ComputerPart implements FileContent, Vulnerable {
     }
 
     /**
-     * Creates a new program and sets the name, the version, the vulnerabilities, the executor and the required right level.
+     * Creates a new program and sets the name, the version, the vulnerabilities and the required right level.
      * 
      * @param name The name the program has.
      * @param version The current version the program has.
      * @param vulnerabilities The vulnerabilities the program has.
-     * @param executor The program executor which takes care of acutally running a program.
      * @param rightLevel The required right level a user need for executing the program.
      */
-    public Program(String name, Version version, List<Vulnerability> vulnerabilities, Class<? extends ProgramExecutor> executor, RightLevel rightLevel) {
+    public Program(String name, Version version, List<Vulnerability> vulnerabilities, RightLevel rightLevel) {
 
         super(name, version);
 
         this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
-        this.executor = executor;
         this.rightLevel = rightLevel;
     }
 
@@ -93,32 +94,67 @@ public class Program extends ComputerPart implements FileContent, Vulnerable {
     }
 
     /**
-     * Creates a new program executor instance for this program which takes care of acutally running a program.
+     * Returns a list of required execution parameters with their types an executor uses.
      * 
-     * @return A new program executor instance for this program which takes care of acutally running a program.
-     * @throws RuntimeException An exception occurred while initalizing the new program executor instance
+     * @return A list of required execution parameters with their types an executor uses.
      */
-    public ProgramExecutor createExecutor() {
+    public Map<String, Class<?>> getParameters() {
 
-        try {
-            return executor.newInstance();
-        }
-        catch (Exception e) {
-            throw new RuntimeException("Exception while initalizing new program executor instance", e);
-        }
+        return Collections.unmodifiableMap(parameters);
     }
 
-    @Override
-    public long getSize() {
+    /**
+     * Adds a new required execution parameter an executor uses.
+     * If the parameter already exists, this overwrites the old one.
+     * This adding method should only be used by subclasses.
+     * 
+     * @param name The name for the new parameter.
+     * @param type The type an argument which represents the parameter must have.
+     */
+    protected void addParameter(String name, Class<?> type) {
 
-        return 0;
+        if (parameters.containsKey(name)) {
+            parameters.remove(name);
+        }
+        parameters.put(name, type);
     }
+
+    /**
+     * Creates a new program executor instance for this program which takes care of acutally running a program.
+     * This also checks the argument map.
+     * 
+     * @param host The host process which uses the created executor for running the program instance.
+     * @param arguments The argument map which contains values for the defined parameters.
+     * @return A new program executor instance for this program which takes care of acutally running a program.
+     * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
+     */
+    public ProgramExecutor createExecutor(Process host, Map<String, Object> arguments) {
+
+        for (Entry<String, Class<?>> parameter : parameters.entrySet()) {
+            if (!arguments.containsKey(parameter.getKey()) || !parameter.getValue().isAssignableFrom(arguments.get(parameter.getKey()).getClass())) {
+                throw new IllegalArgumentException("No or wrong argument type for parameter \"" + parameter.getKey() + "\" (type " + parameter.getValue().getName() + ")");
+            }
+        }
+
+        return createExecutorInstance(host, arguments);
+    }
+
+    /**
+     * Creates a new program executor instance for this program which takes care of acutally running a program.
+     * This is used internally and shouldn't be called from outside.
+     * 
+     * @param host The host process which uses the created executor for running the program instance.
+     * @param arguments The argument map which contains values for the defined parameters.
+     * @return A new program executor instance for this program which takes care of acutally running a program.
+     */
+    protected abstract ProgramExecutor createExecutorInstance(Process host, Map<String, Object> arguments);
 
     @Override
     public int hashCode() {
 
         final int prime = 31;
         int result = super.hashCode();
+        result = prime * result + (parameters == null ? 0 : parameters.hashCode());
         result = prime * result + (rightLevel == null ? 0 : rightLevel.hashCode());
         result = prime * result + (vulnerabilities == null ? 0 : vulnerabilities.hashCode());
         return result;
@@ -133,10 +169,17 @@ public class Program extends ComputerPart implements FileContent, Vulnerable {
         if (!super.equals(obj)) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (! (obj instanceof Program)) {
             return false;
         }
         Program other = (Program) obj;
+        if (parameters == null) {
+            if (other.parameters != null) {
+                return false;
+            }
+        } else if (!parameters.equals(other.parameters)) {
+            return false;
+        }
         if (rightLevel != other.rightLevel) {
             return false;
         }
@@ -153,7 +196,7 @@ public class Program extends ComputerPart implements FileContent, Vulnerable {
     @Override
     public String toInfoString() {
 
-        return super.toInfoString() + ", " + vulnerabilities.size() + " vulns, requires " + rightLevel;
+        return super.toInfoString() + ", " + vulnerabilities.size() + " vulns, requires " + rightLevel + ", " + parameters.size() + " parameters";
     }
 
     @Override

@@ -27,7 +27,7 @@ import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.media.File;
 import com.quartercode.disconnected.sim.comp.media.File.FileType;
-import com.quartercode.disconnected.util.ByteUnit;
+import com.quartercode.disconnected.util.size.ByteUnit;
 
 public class FileTest {
 

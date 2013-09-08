@@ -22,6 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.Computer;
+import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
+import com.quartercode.disconnected.sim.comp.net.Packet;
+import com.quartercode.disconnected.sim.comp.program.Process;
+import com.quartercode.disconnected.sim.comp.program.ProgramExecutor.OSProgramState;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
@@ -85,6 +89,27 @@ public class TickSimulator implements TickAction {
     public void update() {
 
         if (simulation != null) {
+            // Execute process ticks
+            for (Computer computer : simulation.getComputers()) {
+                for (Process process : new ArrayList<Process>(computer.getOperatingSystem().getProcesses())) {
+                    if (process.getExecutor().getOsState() == OSProgramState.RUNNING || process.getExecutor().getOsState() == OSProgramState.INTERRUPTED) {
+                        process.getExecutor().update();
+                    } else if (process.getExecutor().getOsState() == OSProgramState.STOPPED) {
+                        process.getHost().unregisterProcess(process);
+                    }
+                }
+            }
+
+            // Send remaining packets from network interfaces
+            for (Computer computer : simulation.getComputers()) {
+                for (NetworkInterface networkInterface : computer.getHardware(NetworkInterface.class)) {
+                    Packet packet = null;
+                    while ( (packet = networkInterface.nextPacket(true)) != null) {
+                        packet.getReceiver().getIp().getHost().receivePacket(packet);
+                    }
+                }
+            }
+
             // Generate new members and computers
             int newComputers = RandomPool.PUBLIC.nextInt(ProbabilityUtil.gen(0.008F) ? 50 : 8) - 5;
             if (newComputers > 0) {

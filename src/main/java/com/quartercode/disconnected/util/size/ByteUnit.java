@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.util;
+package com.quartercode.disconnected.util.size;
 
 /**
  * A byte unit represents a unit for bytes. There are several stages like "kilo-", "mega-", "giga-" etc.

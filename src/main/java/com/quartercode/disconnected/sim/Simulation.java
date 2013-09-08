@@ -173,6 +173,25 @@ public class Simulation {
     }
 
     /**
+     * Returns all interests of all members and member groups.
+     * 
+     * @return All interests of all members and member groups.
+     */
+    public List<Interest> getInterests() {
+
+        List<Interest> interests = new ArrayList<Interest>();
+
+        for (Member member : members) {
+            interests.addAll(member.getInterests());
+        }
+        for (MemberGroup group : groups) {
+            interests.addAll(group.getInterests());
+        }
+
+        return interests;
+    }
+
+    /**
      * Returns all computers of the simulation.
      * 
      * @return All computers of the simulation.
@@ -200,25 +219,6 @@ public class Simulation {
     public void removeComputer(Computer computer) {
 
         computers.remove(computer);
-    }
-
-    /**
-     * Returns all interests of all members and member groups.
-     * 
-     * @return All interests of all members and member groups.
-     */
-    public List<Interest> getInterests() {
-
-        List<Interest> interests = new ArrayList<Interest>();
-
-        for (Member member : members) {
-            interests.addAll(member.getInterests());
-        }
-        for (MemberGroup group : groups) {
-            interests.addAll(group.getInterests());
-        }
-
-        return interests;
     }
 
     @Override

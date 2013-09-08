@@ -31,12 +31,14 @@ import com.quartercode.disconnected.sim.comp.hardware.Hardware;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard.MainboradSlot;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSlot;
+import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
+import com.quartercode.disconnected.sim.comp.net.IP;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
-import com.quartercode.disconnected.util.ByteUnit;
 import com.quartercode.disconnected.util.LocationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
+import com.quartercode.disconnected.util.size.ByteUnit;
 
 /**
  * This utility class generates a simulation.
@@ -130,12 +132,17 @@ public class SimulationGenerator {
             mainboradSlots.add(new MainboradSlot(CPU.class));
             mainboradSlots.add(new MainboradSlot(RAM.class));
             mainboradSlots.add(new MainboradSlot(HardDrive.class));
+            mainboradSlots.add(new MainboradSlot(NetworkInterface.class));
             computer.addHardware(new Mainboard(computer, "MB XYZ 2000 Pro", new Version(1, 2, 5), null, mainboradSlots));
 
             List<Hardware> hardware = new ArrayList<Hardware>();
             hardware.add(new CPU(computer, "Intel Core i7-4950HQ", new Version(1, 0, 0), null, 8, 2400000000L));
             hardware.add(new RAM(computer, "EpicRAM 4194304", new Version(1, 0, 5), null, ByteUnit.BYTE.convert(4, ByteUnit.MEGABYTE), 1600000000L));
             hardware.add(new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE)));
+
+            NetworkInterface networkInterface = new NetworkInterface(computer, "NI FiberScore Ultimate", new Version(1, 2, 0), null);
+            networkInterface.setIp(new IP(networkInterface, "127.0.0.1"));
+            hardware.add(networkInterface);
 
             for (MainboradSlot slot : computer.getHardware(Mainboard.class).get(0).getSlots()) {
                 Hardware useHardware = null;

@@ -22,11 +22,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
 import com.quartercode.disconnected.sim.comp.media.File;
 import com.quartercode.disconnected.sim.comp.media.File.FileType;
 import com.quartercode.disconnected.sim.comp.media.MediaProvider;
+import com.quartercode.disconnected.sim.comp.net.Address;
+import com.quartercode.disconnected.sim.comp.net.Packet;
+import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.Program;
 import com.quartercode.disconnected.sim.run.TickTimer;
 import com.quartercode.disconnected.sim.run.TickTimer.TimerTask;
@@ -49,7 +53,22 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      */
     public static enum RightLevel {
 
-        GUEST, USER, ADMIN, SYSTEM;
+        /**
+         * A guest only has a minimum of rights. You can compare a guest access with a kiosk mode for operating systems.
+         */
+        GUEST,
+        /**
+         * A user is typically using installed applications, but he doesn't modify the computer or os in any way.
+         */
+        USER,
+        /**
+         * An adiministrator modifies the computer or the os, for example he can install programs or change system properties.
+         */
+        ADMIN,
+        /**
+         * The system authority is the superuser on the os and can do everything the os provides.
+         */
+        SYSTEM;
     }
 
     /**
@@ -57,8 +76,9 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      * 
      * @see OperatingSystem
      */
-    public static enum State {
+    public static enum OSState {
 
+        // TODO: That's not graceful at all!
         OFF, SWITCHING_OFF, ON, SWITCHING_ON;
     }
 
@@ -72,7 +92,10 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     private int                 switchOffTime;
 
     @XmlElement
-    private State               state;
+    private OSState             state;
+    @XmlElementWrapper (name = "processes")
+    @XmlElement (name = "process")
+    private final List<Process> processes        = new ArrayList<Process>();
 
     /**
      * Creates a new empty operating system.
@@ -132,7 +155,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      * 
      * @return The current state of the operation system.
      */
-    public State getState() {
+    public OSState getState() {
 
         return state;
     }
@@ -143,29 +166,79 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      * 
      * @param state The state to switch the system to.
      */
-    public void switchState(final State state) {
+    public void switchState(OSState state) {
 
-        if (state == State.ON && this.state == State.OFF) {
-            this.state = State.SWITCHING_ON;
+        if (state == OSState.ON && this.state == OSState.OFF) {
+            this.state = OSState.SWITCHING_ON;
             Disconnected.getTicker().getAction(TickTimer.class).schedule(new TimerTask(switchOnTime) {
 
                 @Override
                 public void run() {
 
-                    OperatingSystem.this.state = State.ON;
+                    OperatingSystem.this.state = OSState.ON;
                 }
             });
-        } else if (state == State.OFF && this.state == State.ON) {
-            this.state = State.SWITCHING_OFF;
+        } else if (state == OSState.OFF && this.state == OSState.ON) {
+            this.state = OSState.SWITCHING_OFF;
             Disconnected.getTicker().getAction(TickTimer.class).schedule(new TimerTask(switchOffTime) {
 
                 @Override
                 public void run() {
 
-                    OperatingSystem.this.state = State.OFF;
+                    OperatingSystem.this.state = OSState.OFF;
                 }
             });
         }
+    }
+
+    /**
+     * Returns a list of all current running processes.
+     * 
+     * @return A list of all current running processes.
+     */
+    public List<Process> getProcesses() {
+
+        return Collections.unmodifiableList(processes);
+    }
+
+    /**
+     * Returns the process which is bound to the given address.
+     * This returns null if there isn't any process with the given binding.
+     * 
+     * @param binding The address to inspect.
+     * @return The process which binds itself to the given address.
+     */
+    public Process getProcess(Address binding) {
+
+        for (Process process : processes) {
+            if (process.getExecutor().getPacketListener(binding) != null) {
+                return process;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Registers a new process to the operating system.
+     * This should only be used by the process object.
+     * 
+     * @param process The process to register to this operating system.
+     */
+    public void registerProcess(Process process) {
+
+        processes.add(process);
+    }
+
+    /**
+     * Unregisters a process from the operating system.
+     * This should only be used by the process object.
+     * 
+     * @param process The process to unregister from this operating system.
+     */
+    public void unregisterProcess(Process process) {
+
+        processes.remove(process);
     }
 
     /**
@@ -254,11 +327,36 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         }
     }
 
+    /**
+     * Sends a new packet from the sender to the receiver address of the given packet.
+     * 
+     * @param packet The packet to send.
+     */
+    public void sendPacket(Packet packet) {
+
+        packet.getSender().getIp().getHost().offerPacket(packet);
+    }
+
+    /**
+     * This method takes an incoming packet and distributes it to the target port.
+     * 
+     * @param packet The packet which came in and called the method.
+     */
+    public void handlePacket(Packet packet) {
+
+        System.out.println("Received packet: " + packet.toInfoString());
+
+        if (getProcess(packet.getReceiver()) != null) {
+            getProcess(packet.getReceiver()).getExecutor().offerPacket(packet);
+        }
+    }
+
     @Override
     public int hashCode() {
 
         final int prime = 31;
         int result = super.hashCode();
+        result = prime * result + (processes == null ? 0 : processes.hashCode());
         result = prime * result + (state == null ? 0 : state.hashCode());
         result = prime * result + switchOffTime;
         result = prime * result + switchOnTime;
@@ -279,6 +377,13 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
             return false;
         }
         OperatingSystem other = (OperatingSystem) obj;
+        if (processes == null) {
+            if (other.processes != null) {
+                return false;
+            }
+        } else if (!processes.equals(other.processes)) {
+            return false;
+        }
         if (state != other.state) {
             return false;
         }

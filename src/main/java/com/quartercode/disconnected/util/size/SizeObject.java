@@ -16,19 +16,18 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.comp.media;
-
-import java.io.Serializable;
+package com.quartercode.disconnected.util.size;
 
 /**
- * This interface declares methods a possible content object of a file must have.
+ * This interface declares a method to derive the size of an object.
+ * The size usually is given as an amount of bytes.
  */
-public interface FileContent extends Serializable {
+public interface SizeObject {
 
     /**
-     * Returns the size of the implementing object if it's stored in a file.
+     * Returns the size of the implementing object in bytes.
      * 
-     * @return The size of the implementing object if it's stored in a file.
+     * @return The size of the implementing object in bytes.
      */
     public long getSize();
 

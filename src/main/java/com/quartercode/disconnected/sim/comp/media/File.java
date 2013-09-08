@@ -26,6 +26,10 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlTransient;
+import org.apache.commons.lang.Validate;
+import com.quartercode.disconnected.util.size.SizeObject;
+import com.quartercode.disconnected.util.size.SizeUtil;
 
 /**
  * This class represents a file on a media.
@@ -33,14 +37,21 @@ import javax.xml.bind.annotation.XmlID;
  * 
  * @see Media
  */
-public class File implements Serializable {
+public class File implements Serializable, SizeObject {
 
     /**
      * The file type represents if a file is a content file or a directory.
      */
     public static enum FileType {
 
-        FILE, DIRECTORY;
+        /**
+         * A normal file which can hold an object as its content.
+         */
+        FILE,
+        /**
+         * A folder which can have child files.
+         */
+        DIRECTORY;
     }
 
     /**
@@ -58,6 +69,7 @@ public class File implements Serializable {
     private String             name;
     @XmlAttribute
     private FileType           type;
+    @XmlElement
     private Object             content;
     @XmlElement (name = "child")
     private final List<File>   childs           = new ArrayList<File>();
@@ -194,6 +206,7 @@ public class File implements Serializable {
      * 
      * @return The content the file has (if this file is a content one).
      */
+    @XmlTransient
     public Object getContent() {
 
         return type == FileType.FILE ? content : null;
@@ -204,15 +217,18 @@ public class File implements Serializable {
      * This throws an OutOfSpaceException if there isn't enough space on the host drive for the new content.
      * 
      * @param content The new content to write into the file.
+     * @throws IllegalArgumentException Can't derive size type from given content.
      * @throws OutOfSpaceException If there isn't enough space on the host drive for the new content.
      */
     public void setContent(Object content) {
 
         if (type == FileType.FILE) {
+            Validate.isTrue(SizeUtil.accept(content), "Size of type " + content.getClass().getName() + " can't be derived");
+
             Object oldContent = this.content;
             this.content = content;
 
-            if (host.getFilled() > host.getFree()) {
+            if (host.getRootFile() != null && host.getFilled() > host.getFree()) {
                 long size = getSize();
                 this.content = oldContent;
                 throw new OutOfSpaceException(host, size);
@@ -222,18 +238,21 @@ public class File implements Serializable {
 
     /**
      * Returns the size this file has in bytes (if this file is a content one).
-     * Directories don't have a size.
+     * Directories have the size of all their childs.
      * 
      * @return The size this file has in bytes (if this file is a content one).
      */
+    @Override
     public long getSize() {
 
         if (type == FileType.FILE && content != null) {
-            if (content instanceof FileContent) {
-                return ((FileContent) content).getSize();
-            } else {
-                return content.toString().length();
+            return SizeUtil.getSize(content);
+        } else if (type == FileType.DIRECTORY && !childs.isEmpty()) {
+            long size = 0;
+            for (File child : childs) {
+                size += child.getSize();
             }
+            return size;
         } else {
             return 0;
         }
@@ -360,7 +379,7 @@ public class File implements Serializable {
      */
     protected void resolveId() {
 
-        id = "computer:" + host.getHost().getId() + "-file:" + getGlobalPath();
+        id = host.getHost().getId() + "-" + getGlobalPath();
 
         if (childs != null) {
             for (File child : childs) {
