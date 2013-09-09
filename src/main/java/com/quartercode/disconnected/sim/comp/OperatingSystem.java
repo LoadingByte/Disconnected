@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
-import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
 import com.quartercode.disconnected.sim.comp.media.File;
 import com.quartercode.disconnected.sim.comp.media.File.FileType;
@@ -32,8 +31,6 @@ import com.quartercode.disconnected.sim.comp.net.Address;
 import com.quartercode.disconnected.sim.comp.net.Packet;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.Program;
-import com.quartercode.disconnected.sim.run.TickTimer;
-import com.quartercode.disconnected.sim.run.TickTimer.TimerTask;
 
 /**
  * This class stores information about an operating system.
@@ -71,28 +68,11 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         SYSTEM;
     }
 
-    /**
-     * The state of an operating system defines if the system is turned on/off, is switching states etc.
-     * 
-     * @see OperatingSystem
-     */
-    public static enum OSState {
-
-        // TODO: That's not graceful at all!
-        OFF, SWITCHING_OFF, ON, SWITCHING_ON;
-    }
-
     private static final long   serialVersionUID = 1L;
 
     @XmlElement (name = "vulnerability")
     private List<Vulnerability> vulnerabilities  = new ArrayList<Vulnerability>();
-    @XmlElement
-    private int                 switchOnTime;
-    @XmlElement
-    private int                 switchOffTime;
 
-    @XmlElement
-    private OSState             state;
     @XmlElementWrapper (name = "processes")
     @XmlElement (name = "process")
     private final List<Process> processes        = new ArrayList<Process>();
@@ -120,75 +100,12 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         super(host, name, version);
 
         this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
-        this.switchOnTime = switchOnTime;
-        this.switchOffTime = switchOffTime;
     }
 
     @Override
     public List<Vulnerability> getVulnerabilities() {
 
         return Collections.unmodifiableList(vulnerabilities);
-    }
-
-    /**
-     * Returns the amount of ticks the system needs to switch on (boot up).
-     * 
-     * @return The amount of ticks the system needs to switch on (boot up).
-     */
-    public int getSwitchOnTime() {
-
-        return switchOnTime;
-    }
-
-    /**
-     * Returns the amount of ticks the system needs to switch off (shutdown).
-     * 
-     * @return The amount of ticks the system needs to switch off (shutdown).
-     */
-    public int getSwitchOffTime() {
-
-        return switchOffTime;
-    }
-
-    /**
-     * Returns the current state of the operation system.
-     * 
-     * @return The current state of the operation system.
-     */
-    public OSState getState() {
-
-        return state;
-    }
-
-    /**
-     * Switches the state of the system.
-     * This may take a while (for example, this method will boot the system or shut it down).
-     * 
-     * @param state The state to switch the system to.
-     */
-    public void switchState(OSState state) {
-
-        if (state == OSState.ON && this.state == OSState.OFF) {
-            this.state = OSState.SWITCHING_ON;
-            Disconnected.getTicker().getAction(TickTimer.class).schedule(new TimerTask(switchOnTime) {
-
-                @Override
-                public void run() {
-
-                    OperatingSystem.this.state = OSState.ON;
-                }
-            });
-        } else if (state == OSState.OFF && this.state == OSState.ON) {
-            this.state = OSState.SWITCHING_OFF;
-            Disconnected.getTicker().getAction(TickTimer.class).schedule(new TimerTask(switchOffTime) {
-
-                @Override
-                public void run() {
-
-                    OperatingSystem.this.state = OSState.OFF;
-                }
-            });
-        }
     }
 
     /**
@@ -334,7 +251,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      */
     public void sendPacket(Packet packet) {
 
-        packet.getSender().getIp().getHost().offerPacket(packet);
+        packet.getSender().getIp().getHost().sendPacket(packet);
     }
 
     /**
@@ -344,10 +261,8 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      */
     public void handlePacket(Packet packet) {
 
-        System.out.println("Received packet: " + packet.toInfoString());
-
         if (getProcess(packet.getReceiver()) != null) {
-            getProcess(packet.getReceiver()).getExecutor().offerPacket(packet);
+            getProcess(packet.getReceiver()).getExecutor().receivePacket(packet);
         }
     }
 
@@ -357,9 +272,6 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (processes == null ? 0 : processes.hashCode());
-        result = prime * result + (state == null ? 0 : state.hashCode());
-        result = prime * result + switchOffTime;
-        result = prime * result + switchOnTime;
         result = prime * result + (vulnerabilities == null ? 0 : vulnerabilities.hashCode());
         return result;
     }
@@ -384,15 +296,6 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         } else if (!processes.equals(other.processes)) {
             return false;
         }
-        if (state != other.state) {
-            return false;
-        }
-        if (switchOffTime != other.switchOffTime) {
-            return false;
-        }
-        if (switchOnTime != other.switchOnTime) {
-            return false;
-        }
         if (vulnerabilities == null) {
             if (other.vulnerabilities != null) {
                 return false;
@@ -406,7 +309,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     @Override
     public String toInfoString() {
 
-        return super.toInfoString() + ", " + vulnerabilities.size() + " vulns, " + state;
+        return super.toInfoString() + ", " + vulnerabilities.size() + " vulns";
     }
 
     @Override

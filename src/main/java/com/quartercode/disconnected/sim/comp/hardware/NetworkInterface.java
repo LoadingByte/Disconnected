@@ -97,7 +97,7 @@ public class NetworkInterface extends Hardware {
      * 
      * @param packet The new packet for delivery.
      */
-    public void offerPacket(Packet packet) {
+    public void sendPacket(Packet packet) {
 
         remainingPackets.offer(packet);
     }
@@ -108,7 +108,7 @@ public class NetworkInterface extends Hardware {
      * @param remove True if the returned packet should be removed from the queue.
      * @return The packet which should be sent next.
      */
-    public Packet nextPacket(boolean remove) {
+    public Packet nextDeliveryPacket(boolean remove) {
 
         if (remove) {
             return remainingPackets.poll();

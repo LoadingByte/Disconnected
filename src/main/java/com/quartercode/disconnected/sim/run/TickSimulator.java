@@ -104,7 +104,7 @@ public class TickSimulator implements TickAction {
             for (Computer computer : simulation.getComputers()) {
                 for (NetworkInterface networkInterface : computer.getHardware(NetworkInterface.class)) {
                     Packet packet = null;
-                    while ( (packet = networkInterface.nextPacket(true)) != null) {
+                    while ( (packet = networkInterface.nextDeliveryPacket(true)) != null) {
                         packet.getReceiver().getIp().getHost().receivePacket(packet);
                     }
                 }

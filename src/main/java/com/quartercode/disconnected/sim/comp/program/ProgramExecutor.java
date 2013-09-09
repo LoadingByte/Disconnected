@@ -239,7 +239,7 @@ public abstract class ProgramExecutor {
      * 
      * @param packet The new packet for processing.
      */
-    public void offerPacket(Packet packet) {
+    public void receivePacket(Packet packet) {
 
         remainingPackets.offer(packet);
     }
@@ -250,7 +250,7 @@ public abstract class ProgramExecutor {
      * @param remove True if the returned packet should be removed from the queue.
      * @return The packet which should be processed next.
      */
-    protected Packet nextPacket(boolean remove) {
+    protected Packet nextReceivedPacket(boolean remove) {
 
         if (remove) {
             return remainingPackets.poll();
