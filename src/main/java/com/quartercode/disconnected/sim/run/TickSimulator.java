@@ -138,7 +138,7 @@ public class TickSimulator implements TickAction {
                 }
             }
 
-            // Generate global group interests against members with bas reputation
+            // Generate global group interests against members with bad reputation
             for (MemberGroup group : simulation.getGroups()) {
                 targetLoop:
                 for (Member target : simulation.getMembers()) {
@@ -176,52 +176,10 @@ public class TickSimulator implements TickAction {
                 }
             }
 
-            // Generate member interests against members of other groups
-            memberLoop:
-            for (Member member : simulation.getMembers()) {
-                if (ProbabilityUtil.genPseudo(RandomPool.PUBLIC.nextFloat() / 100F)) {
-                    if (member.getInterests().size() < 5) {
-                        MemberGroup group = simulation.getGroup(member);
-                        targetLoop:
-                        for (Member target : simulation.getMembers()) {
-                            if (!simulation.getGroup(target).equals(group)) {
-                                for (Interest interest : member.getInterests()) {
-                                    if (interest instanceof HasTarget && ((HasTarget) interest).getTarget().equals(target)) {
-                                        continue targetLoop;
-                                    }
-                                }
-
-                                if (ProbabilityUtil.genPseudo(RandomPool.PUBLIC.nextFloat() + -group.getReputation(target).getValue() / 100F)) {
-                                    float priority = RandomPool.PUBLIC.nextFloat() + -group.getReputation(target).getValue() / /* 200F */40F;
-                                    if (priority > 1) {
-                                        priority = 1;
-                                    }
-                                    member.addInterest(new DestroyInterest(priority, target));
-                                    continue memberLoop;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Execute member interests
-            for (Member member : simulation.getMembers()) {
-                if (simulation.getMembers().contains(member)) {
-                    for (Interest interest : new ArrayList<Interest>(member.getInterests())) {
-                        if (interest instanceof HasTarget && !simulation.getMembers().contains( ((HasTarget) interest).getTarget())) {
-                            continue;
-                        } else {
-                            Action action = interest.getAction(simulation, member);
-                            if (action != null) {
-                                if (action.execute(simulation, member)) {
-                                    member.removeInterest(interest);
-                                }
-
-                                break;
-                            }
-                        }
-                    }
+            // Simulate members
+            for (Member member : new ArrayList<Member>(simulation.getMembers())) {
+                if (member.getAiController() != null) {
+                    member.getAiController().update(simulation);
                 }
             }
         }

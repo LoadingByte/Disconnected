@@ -122,17 +122,6 @@ public class Process implements Serializable, InfoString {
         return executor;
     }
 
-    // TEMPDIS
-    // /**
-    // * Waits for the process execution thread to finish.
-    // *
-    // * @throws InterruptedException Any thread has interrupted the calling thread.
-    // */
-    // public void join() throws InterruptedException {
-    //
-    // executionThread.join();
-    // }
-
     /**
      * Returns the unique id the process has.
      * 

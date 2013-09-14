@@ -33,9 +33,11 @@ import com.quartercode.disconnected.sim.comp.hardware.Mainboard.MainboradSlot;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSlot;
 import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
+import com.quartercode.disconnected.sim.comp.media.File.FileType;
 import com.quartercode.disconnected.sim.comp.net.IP;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
+import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.util.LocationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.size.ByteUnit;
@@ -138,7 +140,12 @@ public class SimulationGenerator {
             List<Hardware> hardware = new ArrayList<Hardware>();
             hardware.add(new CPU(computer, "Intel Core i7-4950HQ", new Version(1, 0, 0), null, 8, 2400000000L));
             hardware.add(new RAM(computer, "EpicRAM 4194304", new Version(1, 0, 5), null, ByteUnit.BYTE.convert(4, ByteUnit.MEGABYTE), 1600000000L));
-            hardware.add(new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE)));
+
+            HardDrive hardDrive = new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
+            hardware.add(hardDrive);
+            hardDrive.setLetter('C');
+            hardDrive.addFile("/test1/test2/test3.dat", FileType.FILE);
+            hardDrive.addFile("/test1/test5/config.txt", FileType.FILE);
 
             NetworkInterface networkInterface = new NetworkInterface(computer, "NI FiberScore Ultimate", new Version(1, 2, 0), null);
             networkInterface.setIp(new IP(networkInterface, "127.0.0.1"));
@@ -203,7 +210,9 @@ public class SimulationGenerator {
         }
 
         for (int counter = 0; counter < amount; counter++) {
-            members.add(new Member("member-" + (idDelta + counter)));
+            Member member = new Member("member-" + (idDelta + counter));
+            members.add(member);
+            member.setAiController(new UserController(member));
         }
 
         return members;

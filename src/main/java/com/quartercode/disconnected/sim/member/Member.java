@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.Computer;
+import com.quartercode.disconnected.sim.member.ai.AIController;
 import com.quartercode.disconnected.sim.member.interest.Interest;
 import com.quartercode.disconnected.util.InfoString;
 
@@ -41,9 +42,10 @@ public class Member implements InfoString {
     @XmlID
     @XmlElement
     private String               name;
+    private Computer             computer;
+    private AIController         aiController;
     @XmlElement (name = "interest")
     private final List<Interest> interests = new CopyOnWriteArrayList<Interest>();
-    private Computer             computer;
 
     /**
      * Creates a new empty member.
@@ -74,6 +76,48 @@ public class Member implements InfoString {
     }
 
     /**
+     * Returns the computer the member has access on.
+     * 
+     * @return The computer the member has access on.
+     */
+    @XmlIDREF
+    public Computer getComputer() {
+
+        return computer;
+    }
+
+    /**
+     * Sets the computer the member has access on to a new one.
+     * 
+     * @param computer The new computer the member will have access on
+     */
+    public void setComputer(Computer computer) {
+
+        this.computer = computer;
+    }
+
+    /**
+     * Returns the ai controller which executes the update tick on this member.
+     * 
+     * @return The ai controller which executes the update tick on this member.
+     */
+    @XmlElement
+    public AIController getAiController() {
+
+        return aiController;
+    }
+
+    /**
+     * Sets the ai controller which executes the update tick on this member to a new one.
+     * 
+     * @param aiController The new ai controller which executes the update tick on this member.
+     */
+    public void setAiController(AIController aiController) {
+
+        this.aiController = aiController;
+    }
+
+    /**
      * Returns the interests of this member.
      * 
      * @return The interests of this member.
@@ -101,27 +145,6 @@ public class Member implements InfoString {
     public void removeInterest(Interest interest) {
 
         interests.remove(interest);
-    }
-
-    /**
-     * Returns the computer the member has access on.
-     * 
-     * @return The computer the member has access on.
-     */
-    @XmlIDREF
-    public Computer getComputer() {
-
-        return computer;
-    }
-
-    /**
-     * Sets the computer the member has access on to a new one.
-     * 
-     * @param computer The new computer the member will have access on
-     */
-    public void setComputer(Computer computer) {
-
-        this.computer = computer;
     }
 
     @Override
@@ -175,7 +198,7 @@ public class Member implements InfoString {
     @Override
     public String toInfoString() {
 
-        return name + ", " + interests.size() + "interests, computer" + computer.getId();
+        return name + ", computer " + computer.getId() + ", " + interests.size() + " interests";
     }
 
     @Override

@@ -29,6 +29,7 @@ import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
 import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
+import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
 import com.quartercode.disconnected.sim.run.TickAction;
 import com.quartercode.disconnected.sim.run.TickSimulator;
@@ -93,6 +94,9 @@ public class Main {
 
         // Programs
         // Nothing here yet
+
+        // AI Controllers
+        Disconnected.getRegistry().registerClass(UserController.class);
 
         // Interests
         Disconnected.getRegistry().registerClass(DestroyInterest.class);
