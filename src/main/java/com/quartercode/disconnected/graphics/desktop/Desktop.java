@@ -114,7 +114,7 @@ public class Desktop extends GraphicsState {
                 @Override
                 public void run() {
 
-                    setVisible(!isVisible());
+                    window.setVisible(!window.isVisible());
                 }
             });
 

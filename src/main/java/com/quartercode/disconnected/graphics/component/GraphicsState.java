@@ -50,4 +50,10 @@ public class GraphicsState extends Widget {
         return themeResource;
     }
 
+    @Override
+    public void setVisible(boolean visible) {
+
+        throw new RuntimeException("The visibility of a graphics state can't be changed");
+    }
+
 }
