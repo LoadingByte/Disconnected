@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected;
 
+import com.quartercode.disconnected.graphics.GraphicsManager;
 import com.quartercode.disconnected.profile.ProfileManager;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.run.TickSimulator;
@@ -28,11 +29,12 @@ import com.quartercode.disconnected.sim.run.Ticker;
  */
 public class Disconnected {
 
-    private static Registry       registry;
-    private static ProfileManager profileManager;
-    private static Ticker         ticker;
+    private static Registry        registry;
+    private static ProfileManager  profileManager;
+    private static Ticker          ticker;
+    private static GraphicsManager graphicsManager;
 
-    private static Simulation     simulation;
+    private static Simulation      simulation;
 
     /**
      * Returns the title of the product.
@@ -122,6 +124,26 @@ public class Disconnected {
     public static void setTicker(Ticker ticker) {
 
         Disconnected.ticker = ticker;
+    }
+
+    /**
+     * Returns the active graphics manager.
+     * 
+     * @return The active graphics manager.
+     */
+    public static GraphicsManager getGraphicsManager() {
+
+        return graphicsManager;
+    }
+
+    /**
+     * Sets the active graphics manager to a new graphics manager.
+     * 
+     * @param graphicsManager The new active graphics manager.
+     */
+    public static void setGraphicsManager(GraphicsManager graphicsManager) {
+
+        Disconnected.graphicsManager = graphicsManager;
     }
 
     /**

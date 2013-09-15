@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import com.quartercode.disconnected.graphics.GraphicsManager;
+import com.quartercode.disconnected.graphics.desktop.Desktop;
 import com.quartercode.disconnected.profile.ProfileManager;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
@@ -72,6 +74,11 @@ public class Main {
 
         // Initalize profile manager and load stored profiles (TODO: Add code for loading).
         Disconnected.setProfileManager(new ProfileManager());
+
+        // Initalize graphics manager and start it
+        Disconnected.setGraphicsManager(new GraphicsManager());
+        Disconnected.getGraphicsManager().setRunning(true);
+        Disconnected.getGraphicsManager().setState(new Desktop());
 
         // Initalize ticker
         List<TickAction> tickActions = new ArrayList<TickAction>();
