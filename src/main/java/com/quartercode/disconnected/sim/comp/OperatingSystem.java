@@ -165,9 +165,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      */
     public List<MediaProvider> getMedia() {
 
-        List<MediaProvider> media = new ArrayList<MediaProvider>();
-        media.addAll(getHost().getHardware(MediaProvider.class));
-        return media;
+        return getHost().getHardware(MediaProvider.class);
     }
 
     /**

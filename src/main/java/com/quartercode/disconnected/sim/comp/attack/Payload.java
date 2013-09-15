@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.sim.comp.attack;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import com.quartercode.disconnected.sim.comp.OperatingSystem;
 
@@ -62,7 +63,7 @@ public class Payload {
      */
     public List<String> getScripts() {
 
-        return scripts;
+        return Collections.unmodifiableList(scripts);
     }
 
     @Override
