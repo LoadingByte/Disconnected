@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.sim.member;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
@@ -30,7 +30,7 @@ import com.quartercode.disconnected.sim.member.interest.Interest;
 import com.quartercode.disconnected.util.InfoString;
 
 /**
- * This class represents a member of a simulation (someone who have specific interests).
+ * This class represents a member of a simulation (someone who has a brain containing specific interests and knowledge entries).
  * The member doesn't know his simulation, so you could use one member in multiple simulations.
  * A member also has interests and stores the reputation of a group to him.
  * 
@@ -41,11 +41,11 @@ public class Member implements InfoString {
 
     @XmlID
     @XmlElement
-    private String               name;
-    private Computer             computer;
-    private AIController         aiController;
-    @XmlElement (name = "interest")
-    private final List<Interest> interests = new CopyOnWriteArrayList<Interest>();
+    private String                name;
+    private Computer              computer;
+    private AIController          aiController;
+    @XmlElement
+    private final List<BrainData> brainData = new ArrayList<BrainData>();
 
     /**
      * Creates a new empty member.
@@ -118,33 +118,50 @@ public class Member implements InfoString {
     }
 
     /**
-     * Returns the interests of this member.
+     * Returns the brain data of this member.
      * 
-     * @return The interests of this member.
+     * @return The brain data of this member.
      */
-    public List<Interest> getInterests() {
+    public List<BrainData> getBrainData() {
 
-        return Collections.unmodifiableList(interests);
+        return Collections.unmodifiableList(brainData);
     }
 
     /**
-     * Adds a interest to the member.
+     * Returns the brain data entries in the computer which have the given type as a superclass.
      * 
-     * @param interest The interest to add to the member.
+     * @param type The type to use for the selection.
+     * @return The brain data entries in the computer which have the given type as a superclass.
      */
-    public void addInterest(Interest interest) {
+    public <T> List<T> getBrainData(Class<T> type) {
 
-        interests.add(interest);
+        List<T> brainData = new ArrayList<T>();
+        for (BrainData brainDataEntry : this.brainData) {
+            if (type.isAssignableFrom(brainDataEntry.getClass())) {
+                brainData.add(type.cast(brainDataEntry));
+            }
+        }
+        return brainData;
     }
 
     /**
-     * Removes a interest from the member.
+     * Adds a brain data entry to the member.
      * 
-     * @param interest The interest to remove from the member.
+     * @param brainData The brain data entry to add to the member.
      */
-    public void removeInterest(Interest interest) {
+    public void addBrainData(BrainData brainData) {
 
-        interests.remove(interest);
+        this.brainData.add(brainData);
+    }
+
+    /**
+     * Removes a brain data entry from the member.
+     * 
+     * @param brainData The brain data entry to remove from the member.
+     */
+    public void removeBrainData(BrainData brainData) {
+
+        this.brainData.remove(brainData);
     }
 
     @Override
@@ -152,8 +169,8 @@ public class Member implements InfoString {
 
         final int prime = 31;
         int result = 1;
+        result = prime * result + (brainData == null ? 0 : brainData.hashCode());
         result = prime * result + (computer == null ? 0 : computer.hashCode());
-        result = prime * result + (interests == null ? 0 : interests.hashCode());
         result = prime * result + (name == null ? 0 : name.hashCode());
         return result;
     }
@@ -167,22 +184,22 @@ public class Member implements InfoString {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (! (obj instanceof Member)) {
             return false;
         }
         Member other = (Member) obj;
+        if (brainData == null) {
+            if (other.brainData != null) {
+                return false;
+            }
+        } else if (!brainData.equals(other.brainData)) {
+            return false;
+        }
         if (computer == null) {
             if (other.computer != null) {
                 return false;
             }
         } else if (!computer.equals(other.computer)) {
-            return false;
-        }
-        if (interests == null) {
-            if (other.interests != null) {
-                return false;
-            }
-        } else if (!interests.equals(other.interests)) {
             return false;
         }
         if (name == null) {
@@ -198,7 +215,7 @@ public class Member implements InfoString {
     @Override
     public String toInfoString() {
 
-        return name + ", computer " + computer.getId() + ", " + interests.size() + " interests";
+        return name + ", computer " + computer.getId() + ", " + brainData.size() + " brain data entries";
     }
 
     @Override

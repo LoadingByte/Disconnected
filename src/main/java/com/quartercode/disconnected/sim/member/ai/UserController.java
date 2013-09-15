@@ -58,12 +58,12 @@ public class UserController extends AIController {
 
         // Generate member interests against members of other groups
         if (ProbabilityUtil.genPseudo(RandomPool.PUBLIC.nextFloat() / 100F)) {
-            if (getMember().getInterests().size() < 5) {
+            if (getMember().getBrainData(Interest.class).size() < 5) {
                 MemberGroup group = simulation.getGroup(getMember());
                 targetLoop:
                 for (Member target : simulation.getMembers()) {
                     if (!simulation.getGroup(target).equals(group)) {
-                        for (Interest interest : getMember().getInterests()) {
+                        for (Interest interest : getMember().getBrainData(Interest.class)) {
                             if (interest instanceof HasTarget && ((HasTarget) interest).getTarget().equals(target)) {
                                 continue targetLoop;
                             }
@@ -74,7 +74,7 @@ public class UserController extends AIController {
                             if (priority > 1) {
                                 priority = 1;
                             }
-                            getMember().addInterest(new DestroyInterest(priority, target));
+                            getMember().addBrainData(new DestroyInterest(priority, target));
                             break;
                         }
                     }
@@ -83,14 +83,14 @@ public class UserController extends AIController {
         }
 
         // Execute member interests
-        for (Interest interest : new ArrayList<Interest>(getMember().getInterests())) {
+        for (Interest interest : new ArrayList<Interest>(getMember().getBrainData(Interest.class))) {
             if (interest instanceof HasTarget && !simulation.getMembers().contains( ((HasTarget) interest).getTarget())) {
                 continue;
             } else {
                 Action action = interest.getAction(simulation, getMember());
                 if (action != null) {
                     if (action.execute(simulation, getMember())) {
-                        getMember().removeInterest(interest);
+                        getMember().removeBrainData(interest);
                     }
 
                     break;

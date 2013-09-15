@@ -18,7 +18,6 @@
 
 package com.quartercode.disconnected.sim;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -28,7 +27,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
-import com.quartercode.disconnected.sim.member.interest.Interest;
 
 /**
  * This clas represents a simulation which stores information about the members, member groups and computers.
@@ -170,25 +168,6 @@ public class Simulation {
     public void removeGroup(MemberGroup group) {
 
         groups.remove(group);
-    }
-
-    /**
-     * Returns all interests of all members and member groups.
-     * 
-     * @return All interests of all members and member groups.
-     */
-    public List<Interest> getInterests() {
-
-        List<Interest> interests = new ArrayList<Interest>();
-
-        for (Member member : members) {
-            interests.addAll(member.getInterests());
-        }
-        for (MemberGroup group : groups) {
-            interests.addAll(group.getInterests());
-        }
-
-        return interests;
     }
 
     /**

@@ -131,9 +131,9 @@ public class TickSimulator implements TickAction {
                 }
             }
             for (Member member : simulation.getMembers()) {
-                for (Interest interest : new ArrayList<Interest>(member.getInterests())) {
+                for (Interest interest : new ArrayList<Interest>(member.getBrainData(Interest.class))) {
                     if (interest instanceof HasTarget && !simulation.getMembers().contains( ((HasTarget) interest).getTarget())) {
-                        member.removeInterest(interest);
+                        member.removeBrainData(interest);
                     }
                 }
             }

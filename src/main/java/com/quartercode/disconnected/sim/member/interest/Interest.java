@@ -21,6 +21,7 @@ package com.quartercode.disconnected.sim.member.interest;
 import javax.xml.bind.annotation.XmlAttribute;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.sim.Simulation;
+import com.quartercode.disconnected.sim.member.BrainData;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.action.Action;
@@ -33,7 +34,7 @@ import com.quartercode.disconnected.sim.member.action.Action;
  * @see MemberGroup
  * @see Action
  */
-public abstract class Interest implements ReputationChangeProvider {
+public abstract class Interest extends BrainData implements ReputationChangeProvider {
 
     private float priority;
 

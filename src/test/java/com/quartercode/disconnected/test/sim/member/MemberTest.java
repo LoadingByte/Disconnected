@@ -31,8 +31,8 @@ public class MemberTest {
     public void setUp() {
 
         member = new Member("member");
-        member.addInterest(new EmptyInterest(0.1F));
-        member.addInterest(new EmptyInterest(0.2F));
+        member.addBrainData(new EmptyInterest(0.1F));
+        member.addBrainData(new EmptyInterest(0.2F));
     }
 
     @Test
@@ -42,23 +42,23 @@ public class MemberTest {
     }
 
     @Test
-    public void testGetInterests() {
+    public void testGetBrainData() {
 
-        Assert.assertEquals("Interest count", 2, member.getInterests().size());
+        Assert.assertEquals("Brain data count", 2, member.getBrainData().size());
     }
 
     @Test
-    public void testAddInterest() {
+    public void testAddBrainData() {
 
-        member.addInterest(new EmptyInterest(0.3F));
-        Assert.assertEquals("Interest count", 3, member.getInterests().size());
+        member.addBrainData(new EmptyInterest(0.3F));
+        Assert.assertEquals("Brain data count", 3, member.getBrainData().size());
     }
 
     @Test
-    public void testRemoveInterest() {
+    public void testRemoveBrainData() {
 
-        member.removeInterest(member.getInterests().get(0));
-        Assert.assertEquals("Member count", 1, member.getInterests().size());
+        member.removeBrainData(member.getBrainData().get(0));
+        Assert.assertEquals("Brain data count", 1, member.getBrainData().size());
     }
 
 }
