@@ -18,15 +18,12 @@
 
 package com.quartercode.disconnected.sim.comp.net;
 
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.apache.commons.lang.Validate;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import com.quartercode.disconnected.util.InfoString;
-import com.quartercode.disconnected.util.MapAdapter;
 import com.quartercode.disconnected.util.size.SizeObject;
 import com.quartercode.disconnected.util.size.SizeUtil;
 
@@ -34,27 +31,14 @@ import com.quartercode.disconnected.util.size.SizeUtil;
  * This class represents a packet which can be sent between network interfaces.
  * A packet contains a sender, a receiver (both represented by addresses) and a data map which holds the data which should be sent.
  */
+@XmlAccessorType (XmlAccessType.FIELD)
 public class Packet implements SizeObject, InfoString {
 
-    private static Map<String, Object> parseDataArray(Object... data) {
-
-        if (data.length % 2 == 0) {
-            Map<String, Object> dataMap = new HashMap<String, Object>();
-            for (int counter = 0; counter < data.length; counter += 2) {
-                dataMap.put(String.valueOf(data[counter]), data[counter + 1]);
-            }
-            return dataMap;
-        } else {
-            throw new IllegalArgumentException("Data array must have an equal amount of keys and values");
-        }
-    }
-
-    @XmlElement
-    private Address             sender;
-    @XmlElement
-    private Address             receiver;
-    @XmlJavaTypeAdapter (MapAdapter.class)
-    private Map<String, Object> data;
+    private Address      sender;
+    private Address      receiver;
+    private Object       data;
+    private List<String> target;
+    private int          targetIndex;
 
     /**
      * Creates a new empty packet.
@@ -65,38 +49,20 @@ public class Packet implements SizeObject, InfoString {
     }
 
     /**
-     * Creates a new packet and sets the addresses and the data map.
+     * Creates a new packet and sets the addresses and the data payload. Also sets the target array.
      * 
      * @param sender The address which is sending the packet.
      * @param receiver The address which will receive the packet.
-     * @param data The data map which holds the data which should be sent.
+     * @param data The data payload object which should be sent.
+     * @param target The target array which is used by the receiver to resolve the purpose of the packet.
      * @throws IllegalArgumentException Can't derive size type from one of the given data values.
      */
-    public Packet(Address sender, Address receiver, Map<String, Object> data) {
-
-        for (Object value : data.values()) {
-            if (value != null) {
-                Validate.isTrue(SizeUtil.accept(value), "Size of type " + value.getClass().getName() + " can't be derived");
-            }
-        }
+    public Packet(Address sender, Address receiver, Object data, String... target) {
 
         this.sender = sender;
         this.receiver = receiver;
         this.data = data;
-    }
-
-    /**
-     * Creates a new packet and sets the addresses and the data map.
-     * The data parameter must be an array with key-value-pairs (e.g. ["key1", value1, "key2", value2]).
-     * 
-     * @param sender The address which is sending the packet.
-     * @param receiver The address which will receive the packet.
-     * @param data The data which should be sent in key-value-pairs (e.g. ["key1", value1, "key2", value2]).
-     * @throws IllegalArgumentException The data array hasn't an equal amount of keys and values or can't derive size type from one of the given data values.
-     */
-    public Packet(Address sender, Address receiver, Object... data) {
-
-        this(sender, receiver, parseDataArray(data));
+        this.target = Arrays.asList(target);
     }
 
     /**
@@ -120,49 +86,52 @@ public class Packet implements SizeObject, InfoString {
     }
 
     /**
-     * Returns the data map which holds the data which should be sent.
-     * This can't be modified after construction.
+     * Returns the data payload object which should be sent.
+     * The payload can't be modified after construction.
      * 
-     * @return The data map which holds the data which should be sent.
+     * @return The data payload object which should be sent.
      */
-    public Map<String, Object> getData() {
+    public Object getData() {
 
-        return Collections.unmodifiableMap(data);
+        return data;
     }
 
     /**
-     * Returns the value of a given key which should be sent.
-     * This uses the data map which can't be modified after construction.
+     * Returns the whole target array (or list) which is used by the receiver to resolve the purpose of the packet.
      * 
-     * @param key The value of that key is returned.
-     * @return The value of a given key which should be sent.
+     * @return The target array which is used by the receiver to resolve the purpose of the packet.
      */
-    public Object get(String key) {
+    public List<String> getTarget() {
 
-        return data.get(key);
+        return Collections.unmodifiableList(target);
     }
 
     /**
-     * Returns true if the packet contains a data entry with the given key.
+     * Returns the next target string from the target array and optional increments the index for the next request.
+     * Returns null if there's no element with the current index.
      * 
-     * @param key The key to check for.
-     * @return True if the packet contains a data entry with the given key.
+     * @param increment True if the target index should be incremented. This will return the next target string on the next request.
+     * @return The next target string from the target array.
      */
-    public boolean contains(String key) {
+    public String nextTarget(boolean increment) {
 
-        return data.containsKey(key);
+        if (targetIndex < target.size()) {
+            int requestIndex = targetIndex;
+            if (increment) {
+                targetIndex++;
+            }
+            return target.get(requestIndex);
+        } else {
+            return null;
+        }
     }
 
     /**
-     * Returns true if the packet contains a data entry with the given key-value-pair.
-     * 
-     * @param key The key to check for.
-     * @param value The value to check the key for.
-     * @return True if the packet contains a data entry with the given key-value-pair.
+     * Resets the target index which is used by {@link #nextTarget(boolean)} for storing the last target string.
      */
-    public boolean contains(String key, Object value) {
+    public void resetTargetIndex() {
 
-        return data.containsKey(key);
+        targetIndex = 0;
     }
 
     /**
@@ -174,11 +143,7 @@ public class Packet implements SizeObject, InfoString {
     @Override
     public long getSize() {
 
-        long size = 0;
-        for (Entry<String, Object> entry : data.entrySet()) {
-            size += SizeUtil.getSize(entry.getKey());
-            size += SizeUtil.getSize(entry.getValue());
-        }
+        long size = SizeUtil.getSize(data) + SizeUtil.getSize(target);
         return size;
     }
 
@@ -190,6 +155,7 @@ public class Packet implements SizeObject, InfoString {
         result = prime * result + (data == null ? 0 : data.hashCode());
         result = prime * result + (receiver == null ? 0 : receiver.hashCode());
         result = prime * result + (sender == null ? 0 : sender.hashCode());
+        result = prime * result + (target == null ? 0 : target.hashCode());
         return result;
     }
 
@@ -227,13 +193,20 @@ public class Packet implements SizeObject, InfoString {
         } else if (!sender.equals(other.sender)) {
             return false;
         }
+        if (target == null) {
+            if (other.target != null) {
+                return false;
+            }
+        } else if (!target.equals(other.target)) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public String toInfoString() {
 
-        return sender.toInfoString() + " to " + receiver.toInfoString() + ", payload " + data;
+        return sender.toInfoString() + " to " + receiver.toInfoString() + ", payload " + data + " with first target " + target.get(0);
     }
 
     @Override
