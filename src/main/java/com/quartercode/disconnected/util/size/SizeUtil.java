@@ -33,13 +33,14 @@ public class SizeUtil {
      */
     public static boolean accept(Object object) {
 
-        return object == null || object instanceof SizeObject || object instanceof String || object instanceof Boolean || object instanceof Number;
+        return object == null || object instanceof SizeObject || object instanceof String || object instanceof Boolean || object instanceof Number || object instanceof Iterable;
     }
 
     /**
      * Returns the size of an object in bytes (of course, it's a fictitious size).
      * If the object is a {@link SizeObject}. the size can be derived using {@link SizeObject#getSize()}.
      * In the case of a string, the size is equally to the length * 256. A boolean always has a size of 1, a number needs a byte for every digit.
+     * If the object is an {@link Iterable}, every entry of the collection will add to the size.
      * 
      * @param object The object to calculate the size of.
      * @return The size of the object in bytes (of course, it's a fictitious size).
@@ -57,6 +58,12 @@ public class SizeUtil {
             return object.toString().length() * 256;
         } else if (object instanceof Number) {
             return object.toString().length();
+        } else if (object instanceof Iterable) {
+            long size = 0;
+            for (Object entry : (Iterable<?>) object) {
+                size += getSize(entry);
+            }
+            return size;
         } else {
             throw new IllegalArgumentException("Type " + object.getClass().getName() + " isn't a SizeObject, string, boolean or number");
         }
