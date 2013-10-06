@@ -9,7 +9,7 @@
 
     <name>Disconnected</name>
     <url>http://maven.apache.org</url>
-    <description>Disconnected is a large sandox-type hacking game which simulates the entire world for giving realistic reactions of the society.</description>
+    <description>Disconnected is a large sandbox-type hacking game which simulates the entire world for giving realistic reactions of the society.</description>
     <inceptionYear>2013</inceptionYear>
 
     <properties>

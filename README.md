@@ -1,7 +1,7 @@
 Disconnected
 ============
 
-Disconnected is a large sandox-type hacking game which simulates the entire world for giving realistic reactions of the society.
+Disconnected is a large sandbox-type hacking game which simulates the entire world for giving realistic reactions of the society.
 
 License
 -------
@@ -40,3 +40,4 @@ If you downloaded a binaries package or built your own one, you have several opt
         $ java -jar disconnected-<version>.jar
 
 You need the Java JRE for every of those methods. If you haven't done yet, download it [here](www.java.com/download).
+
