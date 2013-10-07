@@ -26,16 +26,16 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.member.ai.AIController;
-import com.quartercode.disconnected.sim.member.interest.Interest;
 import com.quartercode.disconnected.util.InfoString;
 
 /**
  * This class represents a member of a simulation (someone who has a brain containing specific interests and knowledge entries).
  * The member doesn't know his simulation, so you could use one member in multiple simulations.
- * A member also has interests and stores the reputation of a group to him.
+ * A member also holds brain data like interest or knowledge chunks.
+ * An AIController controls the behavior of the member (if no controller is set, the member is a human player).
  * 
- * @see Interest
- * @see Reputation
+ * @see BrainData
+ * @see AIController
  */
 public class Member implements InfoString {
 
