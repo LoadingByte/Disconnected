@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.sim.run.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import com.quartercode.disconnected.sim.Location;
 import com.quartercode.disconnected.sim.Simulation;
@@ -155,7 +156,7 @@ public class SimulationGenerator {
             hardDrive.addFile("/test1/test5/config.txt", FileType.FILE);
 
             NetworkInterface networkInterface = new NetworkInterface(computer, "NI FiberScore Ultimate", new Version(1, 2, 0), null);
-            networkInterface.setIp(new IP(networkInterface, "127.0.0.1"));
+            generateIP(networkInterface, simulation);
             hardware.add(networkInterface);
 
             for (MainboradSlot slot : computer.getHardware(Mainboard.class).get(0).getSlots()) {
@@ -177,6 +178,26 @@ public class SimulationGenerator {
         }
 
         return computers;
+    }
+
+    private static void generateIP(NetworkInterface host, Simulation simulation) {
+
+        gen:
+        while (true) {
+            int[] parts = new int[4];
+            for (int counter = 0; counter < parts.length; counter++) {
+                parts[counter] = simulation.RANDOM.nextInt(255) + 1;
+            }
+            for (Computer computer : simulation.getComputers()) {
+                for (NetworkInterface testInterface : computer.getHardware(NetworkInterface.class)) {
+                    if (Arrays.equals(testInterface.getIp().getParts(), parts)) {
+                        continue gen;
+                    }
+                }
+            }
+            host.setIp(new IP(host, parts));
+            break;
+        }
     }
 
     /**
