@@ -70,7 +70,7 @@ public class AttackAction extends Action {
         ScriptExecutor.execute(attack.getExploit().getVulnerability().getScripts(), simulation, attack.getTarget(), member);
 
         // Calculate the success (of course, this is not final)
-        if (ProbabilityUtil.gen(0.2F)) {
+        if (ProbabilityUtil.gen(0.2F, simulation.RANDOM)) {
             // Execute the payload
             simulation.getGroup(attack.getTarget()).getReputation(member).addValue(getReputationChangeProvider().getReputationChange(simulation, member, simulation.getGroup(attack.getTarget())));
             ScriptExecutor.execute(attack.getPayload().getScripts(), simulation, attack.getTarget(), member);

@@ -40,7 +40,6 @@ import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.util.LocationGenerator;
-import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 /**
@@ -82,9 +81,9 @@ public class SimulationGenerator {
         for (MemberGroup group : simulation.getGroups()) {
             for (Member member : simulation.getMembers()) {
                 if (group.getMembers().contains(member)) {
-                    group.getReputation(member).addValue(RandomPool.PUBLIC.nextInt(10));
+                    group.getReputation(member).addValue(simulation.RANDOM.nextInt(10));
                 } else {
-                    group.getReputation(member).subtractValue(RandomPool.PUBLIC.nextInt(12));
+                    group.getReputation(member).subtractValue(simulation.RANDOM.nextInt(12));
                 }
             }
         }
@@ -151,6 +150,7 @@ public class SimulationGenerator {
             HardDrive hardDrive = new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
             hardware.add(hardDrive);
             hardDrive.setLetter('C');
+            // Generate some test files
             hardDrive.addFile("/test1/test2/test3.dat", FileType.FILE);
             hardDrive.addFile("/test1/test5/config.txt", FileType.FILE);
 
@@ -240,7 +240,7 @@ public class SimulationGenerator {
         List<Member> members = generateMembers(simulation, computers.size());
 
         for (int counter = 0; counter < members.size(); counter++) {
-            groups.get(RandomPool.PUBLIC.nextInt(groups.size())).addMember(members.get(counter));
+            groups.get(simulation.RANDOM.nextInt(groups.size())).addMember(members.get(counter));
             members.get(counter).setComputer(computers.get(counter));
         }
 

@@ -27,7 +27,6 @@ import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
 import com.quartercode.disconnected.sim.member.interest.HasTarget;
 import com.quartercode.disconnected.sim.member.interest.Interest;
 import com.quartercode.disconnected.util.ProbabilityUtil;
-import com.quartercode.disconnected.util.RandomPool;
 
 /**
  * The user controller simulates a typical computer user.
@@ -59,7 +58,7 @@ public class UserController extends AIController {
     public void update(Simulation simulation) {
 
         // Generate member interests against members of other groups
-        if (ProbabilityUtil.genPseudo(RandomPool.PUBLIC.nextFloat() / 100F)) {
+        if (ProbabilityUtil.genPseudo(simulation.RANDOM.nextFloat() / 100F, simulation.RANDOM)) {
             if (getMember().getBrainData(Interest.class).size() < 5) {
                 MemberGroup group = simulation.getGroup(getMember());
                 targetLoop:
@@ -71,8 +70,8 @@ public class UserController extends AIController {
                             }
                         }
 
-                        if (ProbabilityUtil.genPseudo(RandomPool.PUBLIC.nextFloat() + -group.getReputation(target).getValue() / 100F)) {
-                            float priority = RandomPool.PUBLIC.nextFloat() - group.getReputation(target).getValue() / 40F;
+                        if (ProbabilityUtil.genPseudo(simulation.RANDOM.nextFloat() + -group.getReputation(target).getValue() / 100F, simulation.RANDOM)) {
+                            float priority = simulation.RANDOM.nextFloat() - group.getReputation(target).getValue() / 40F;
                             if (priority > 1) {
                                 priority = 1;
                             }

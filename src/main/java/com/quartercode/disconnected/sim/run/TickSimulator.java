@@ -34,7 +34,6 @@ import com.quartercode.disconnected.sim.member.interest.HasTarget;
 import com.quartercode.disconnected.sim.member.interest.Interest;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
 import com.quartercode.disconnected.util.ProbabilityUtil;
-import com.quartercode.disconnected.util.RandomPool;
 
 /**
  * This class implements the root tick update mechanisms for the entire simulation.
@@ -111,7 +110,7 @@ public class TickSimulator implements TickAction {
             }
 
             // Generate new members and computers
-            int newComputers = RandomPool.PUBLIC.nextInt(ProbabilityUtil.gen(0.008F) ? 50 : 8) - 5;
+            int newComputers = simulation.RANDOM.nextInt(ProbabilityUtil.gen(0.008F, simulation.RANDOM) ? 50 : 8) - 5;
             if (newComputers > 0) {
                 List<Computer> computers = SimulationGenerator.generateComputers(simulation, newComputers, simulation.getComputers());
                 for (Computer computer : computers) {
@@ -149,7 +148,7 @@ public class TickSimulator implements TickAction {
                     }
 
                     if (group.getReputation(target).getValue() <= -10) {
-                        if (ProbabilityUtil.genPseudo(-group.getReputation(target).getValue() / 20F)) {
+                        if (ProbabilityUtil.genPseudo(-group.getReputation(target).getValue() / 20F, simulation.RANDOM)) {
                             float priority = -group.getReputation(target).getValue() / 400F;
                             if (priority > 1) {
                                 priority = 1;

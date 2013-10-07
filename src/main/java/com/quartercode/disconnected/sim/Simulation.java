@@ -31,6 +31,7 @@ import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.ai.AIController;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
+import com.quartercode.disconnected.util.RandomPool;
 
 /**
  * This clas represents a simulation which stores information about the members, member groups and computers.
@@ -42,6 +43,11 @@ import com.quartercode.disconnected.sim.member.ai.PlayerController;
  */
 @XmlRootElement (namespace = "http://quartercode.com/")
 public class Simulation {
+
+    /**
+     * This is a public random pool you can quickly access if you need random numbers for a specific simulation.
+     */
+    public final RandomPool         RANDOM    = new RandomPool(1000);
 
     @XmlElementWrapper (name = "members")
     @XmlElement (name = "member")
