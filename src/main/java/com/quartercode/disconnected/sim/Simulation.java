@@ -30,6 +30,7 @@ import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.ai.AIController;
+import com.quartercode.disconnected.sim.member.ai.PlayerController;
 
 /**
  * This clas represents a simulation which stores information about the members, member groups and computers.
@@ -99,9 +100,7 @@ public class Simulation {
 
         List<Member> members = new ArrayList<Member>();
         for (Member member : this.members) {
-            if (member.getAiController() == null && controllerType == null) {
-                members.add(member);
-            } else if (member.getAiController() != null && controllerType != null && controllerType.isAssignableFrom(member.getAiController().getClass())) {
+            if (controllerType.isAssignableFrom(member.getAiController().getClass())) {
                 members.add(member);
             }
         }
@@ -126,10 +125,20 @@ public class Simulation {
         return null;
     }
 
+    /**
+     * Returns the player who is interacting with the computer this program runs on.
+     * 
+     * @return the player on the real local computer.
+     */
     public Member getLocalPlayer() {
 
         if (localPlayerCache == null) {
-            localPlayerCache = getMembersByController(null).get(0);
+            for (Member member : getMembersByController(PlayerController.class)) {
+                if ( ((PlayerController) member.getAiController()).isLocal()) {
+                    localPlayerCache = member;
+                    break;
+                }
+            }
         }
         return localPlayerCache;
     }
