@@ -18,15 +18,18 @@
 
 package com.quartercode.disconnected.sim;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
+import com.quartercode.disconnected.sim.member.ai.AIController;
 
 /**
  * This clas represents a simulation which stores information about the members, member groups and computers.
@@ -42,6 +45,8 @@ public class Simulation {
     @XmlElementWrapper (name = "members")
     @XmlElement (name = "member")
     private final List<Member>      members   = new CopyOnWriteArrayList<Member>();
+    @XmlTransient
+    private Member                  localPlayerCache;
     @XmlElementWrapper (name = "groups")
     @XmlElement (name = "group")
     private final List<MemberGroup> groups    = new CopyOnWriteArrayList<MemberGroup>();
@@ -85,6 +90,25 @@ public class Simulation {
     }
 
     /**
+     * Returns the members of the simulation which have an {@link AIController} with the given type as a superclass.
+     * 
+     * @param controllerType The type to use for the {@link AIController}-selection.
+     * @return The members of the simulation which have an {@link AIController} with the given type as a superclass.
+     */
+    public List<Member> getMembersByController(Class<? extends AIController> controllerType) {
+
+        List<Member> members = new ArrayList<Member>();
+        for (Member member : this.members) {
+            if (member.getAiController() == null && controllerType == null) {
+                members.add(member);
+            } else if (member.getAiController() != null && controllerType != null && controllerType.isAssignableFrom(member.getAiController().getClass())) {
+                members.add(member);
+            }
+        }
+        return members;
+    }
+
+    /**
      * Returns the member of this simulation which controls the given computer.
      * Returns null if the given computer isn't controlled by any member.
      * 
@@ -100,6 +124,14 @@ public class Simulation {
         }
 
         return null;
+    }
+
+    public Member getLocalPlayer() {
+
+        if (localPlayerCache == null) {
+            localPlayerCache = getMembersByController(null).get(0);
+        }
+        return localPlayerCache;
     }
 
     /**
