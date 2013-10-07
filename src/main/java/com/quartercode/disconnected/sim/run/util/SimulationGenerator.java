@@ -37,6 +37,7 @@ import com.quartercode.disconnected.sim.comp.media.File.FileType;
 import com.quartercode.disconnected.sim.comp.net.IP;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
+import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.util.LocationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
@@ -70,6 +71,12 @@ public class SimulationGenerator {
         for (Member member : generateMembers(simulation, simulation.getComputers(), simulation.getGroups())) {
             simulation.addMember(member);
         }
+
+        // Add local player
+        Member localPlayer = new Member("player");
+        localPlayer.setComputer(new Computer("p"));
+        localPlayer.setAiController(new PlayerController(localPlayer, true));
+        simulation.addMember(localPlayer);
 
         // Generate reputations
         for (MemberGroup group : simulation.getGroups()) {

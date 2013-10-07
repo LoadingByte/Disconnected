@@ -22,7 +22,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.sim.member.ai.UserController;
@@ -47,10 +46,13 @@ public class SimulationTest {
     @Test
     public void testGetMembersByController() {
 
-        Member localPlayer = new Member("player");
-        localPlayer.setComputer(new Computer("p"));
-        localPlayer.setAiController(new PlayerController(localPlayer, true));
-        simulation.addMember(localPlayer);
+        Member localPlayer = null;
+        for (Member member : simulation.getMembersByController(PlayerController.class)) {
+            if ( ((PlayerController) member.getAiController()).isLocal()) {
+                localPlayer = member;
+                break;
+            }
+        }
 
         simulation.getMembersByController(UserController.class);
         Assert.assertEquals("Local player equals", localPlayer, simulation.getLocalPlayer());

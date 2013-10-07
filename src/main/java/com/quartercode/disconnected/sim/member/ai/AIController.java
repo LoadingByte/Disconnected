@@ -18,6 +18,8 @@
 
 package com.quartercode.disconnected.sim.member.ai;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.member.Member;
 
@@ -26,6 +28,8 @@ import com.quartercode.disconnected.sim.member.Member;
  */
 public abstract class AIController {
 
+    @XmlIDREF
+    @XmlAttribute
     private Member member;
 
     /**

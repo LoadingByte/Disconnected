@@ -32,6 +32,8 @@ import com.quartercode.disconnected.util.RandomPool;
 /**
  * The user controller simulates a typical computer user.
  * An ai controller executes tick updates for a member type.
+ * 
+ * @see AIController
  */
 public class UserController extends AIController {
 

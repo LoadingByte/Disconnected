@@ -31,6 +31,7 @@ import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
 import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
+import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
 import com.quartercode.disconnected.sim.run.TickAction;
@@ -103,6 +104,7 @@ public class Main {
         // Nothing here yet
 
         // AI Controllers
+        Disconnected.getRegistry().registerClass(PlayerController.class);
         Disconnected.getRegistry().registerClass(UserController.class);
 
         // Interests

@@ -18,15 +18,19 @@
 
 package com.quartercode.disconnected.sim.member.ai;
 
+import javax.xml.bind.annotation.XmlElement;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.member.Member;
 
 /**
  * The player controller represents a human player playing the game.
  * This class is just for representation and doesn't simulate anything.
+ * 
+ * @see AIController
  */
 public class PlayerController extends AIController {
 
+    @XmlElement
     private boolean local;
 
     /**
