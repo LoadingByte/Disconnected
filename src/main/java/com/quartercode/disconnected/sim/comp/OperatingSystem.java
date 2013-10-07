@@ -21,6 +21,7 @@ package com.quartercode.disconnected.sim.comp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
@@ -137,14 +138,40 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     }
 
     /**
-     * Registers a new process to the operating system.
-     * This should only be used by the process object.
+     * Creates a new process using the program stored in the given file.
      * 
-     * @param process The process to register to this operating system.
+     * @param file The process launch file which contains the program for the process.
+     * @param arguments The argument map which contains values for the defined parameters.
+     * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
      */
-    public void registerProcess(Process process) {
+    public Process createProcess(File file, Map<String, Object> arguments) {
 
+        List<Integer> pids = new ArrayList<Integer>();
+        for (Process process : processes) {
+            pids.add(process.getPid());
+        }
+        // Start at one (0 is typically the kernel)
+        int pid = 1;
+        while (pids.contains(pid)) {
+            pid++;
+        }
+
+        return createProcess(file, arguments, pid);
+    }
+
+    /**
+     * Creates a new process using the program stored in the given file using the given pid.
+     * 
+     * @param file The process launch file which contains the program for the process.
+     * @param arguments The argument map which contains values for the defined parameters.
+     * @param pid A unique process id the process has This is used to identify the process.
+     * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
+     */
+    public Process createProcess(File file, Map<String, Object> arguments, int pid) {
+
+        Process process = new Process(this, pid, file, arguments);
         processes.add(process);
+        return process;
     }
 
     /**
@@ -153,7 +180,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      * 
      * @param process The process to unregister from this operating system.
      */
-    public void unregisterProcess(Process process) {
+    public void destroyProcess(Process process) {
 
         processes.remove(process);
     }

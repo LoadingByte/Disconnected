@@ -94,7 +94,7 @@ public class TickSimulator implements TickAction {
                     if (process.getExecutor().getOsState() == OSProgramState.RUNNING || process.getExecutor().getOsState() == OSProgramState.INTERRUPTED) {
                         process.getExecutor().update();
                     } else if (process.getExecutor().getOsState() == OSProgramState.STOPPED) {
-                        process.getHost().unregisterProcess(process);
+                        process.getHost().destroyProcess(process);
                     }
                 }
             }

@@ -61,6 +61,7 @@ public class Process implements Serializable, InfoString {
 
     /**
      * Creates a new process using the program stored in the given file.
+     * This should only be used directly by the operating system.
      * 
      * @param host The host operating system the process will be ran on.
      * @param pid A unique process id the process has This is used to identify the process.
@@ -68,7 +69,7 @@ public class Process implements Serializable, InfoString {
      * @param arguments The argument map which contains values for the defined parameters.
      * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
      */
-    public Process(final OperatingSystem host, int pid, File file, Map<String, Object> arguments) {
+    public Process(OperatingSystem host, int pid, File file, Map<String, Object> arguments) {
 
         if (! (file.getContent() instanceof Program)) {
             throw new IllegalArgumentException("Process launch file must contain a program");
@@ -79,7 +80,6 @@ public class Process implements Serializable, InfoString {
         this.file = file;
         Program program = (Program) file.getContent();
         executor = program.createExecutor(this, arguments);
-        host.registerProcess(this);
     }
 
     /**
