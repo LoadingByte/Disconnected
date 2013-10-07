@@ -25,6 +25,7 @@ import com.quartercode.disconnected.sim.Location;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.OperatingSystem.RightLevel;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
@@ -36,6 +37,7 @@ import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 import com.quartercode.disconnected.sim.comp.media.File.FileType;
 import com.quartercode.disconnected.sim.comp.net.IP;
+import com.quartercode.disconnected.sim.comp.program.ExploitProgram;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
@@ -74,7 +76,8 @@ public class SimulationGenerator {
 
         // Add local player
         Member localPlayer = new Member("player");
-        localPlayer.setComputer(new Computer("p"));
+        localPlayer.setComputer(generateComputers(simulation, 1, simulation.getComputers()).get(0));
+        simulation.addComputer(localPlayer.getComputer());
         localPlayer.setAiController(new PlayerController(localPlayer, true));
         simulation.addMember(localPlayer);
 
@@ -152,8 +155,8 @@ public class SimulationGenerator {
             hardware.add(hardDrive);
             hardDrive.setLetter('C');
             // Generate some test files
-            hardDrive.addFile("/test1/test2/test3.dat", FileType.FILE);
-            hardDrive.addFile("/test1/test5/config.txt", FileType.FILE);
+            hardDrive.addFile("/opt/exploit.run", FileType.FILE);
+            hardDrive.getFile("/opt/exploit.run").setContent(new ExploitProgram("Exploiter", new Version("1.0.0"), null, RightLevel.USER));
 
             NetworkInterface networkInterface = new NetworkInterface(computer, "NI FiberScore Ultimate", new Version(1, 2, 0), null);
             generateIP(networkInterface, simulation);
