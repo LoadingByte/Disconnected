@@ -37,7 +37,7 @@ import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 import com.quartercode.disconnected.sim.comp.media.File.FileType;
 import com.quartercode.disconnected.sim.comp.net.IP;
-import com.quartercode.disconnected.sim.comp.program.ExploitProgram;
+import com.quartercode.disconnected.sim.comp.programs.ExploitProgram;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;

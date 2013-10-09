@@ -59,6 +59,7 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
      */
     protected Program() {
 
+        addParameters();
     }
 
     /**
@@ -75,6 +76,8 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
 
         this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
         this.rightLevel = rightLevel;
+
+        addParameters();
     }
 
     @Override
@@ -117,6 +120,14 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
             parameters.remove(name);
         }
         parameters.put(name, type);
+    }
+
+    /**
+     * This method should be implemented by the extending class and adds its required parameters.
+     * Without overriding it, it doesn't do anything.
+     */
+    protected void addParameters() {
+
     }
 
     /**
