@@ -18,6 +18,8 @@
 
 package com.quartercode.disconnected.graphics;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -107,7 +109,9 @@ public class UpdateThread extends Thread {
     public void run() {
 
         try {
-            Display.setDisplayMode(new DisplayMode(1200, 700));
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            // Display.setDisplayMode(new DisplayMode(1200, 700));
+            Display.setDisplayMode(new DisplayMode((int) (screenSize.width * 0.75F), (int) (screenSize.height * 0.75F)));
             // Display.setFullscreen(true);
             Display.setTitle("Disconnected " + Disconnected.getVersion());
             ByteBuffer[] icons = new ByteBuffer[4];
