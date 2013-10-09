@@ -26,6 +26,7 @@ import java.util.Queue;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlIDREF;
+import com.quartercode.disconnected.sim.comp.Desktop.Window;
 import com.quartercode.disconnected.sim.comp.net.Address;
 import com.quartercode.disconnected.sim.comp.net.Packet;
 import com.quartercode.disconnected.sim.comp.net.PacketListener;
@@ -232,6 +233,16 @@ public abstract class ProgramExecutor {
         if (osState != OSProgramState.STOPPED) {
             osState = OSProgramState.STOPPED;
         }
+    }
+
+    /**
+     * Opens a new already created window on the host's desktop.
+     * 
+     * @param window The window to open on the host's desktop.
+     */
+    protected void openWindow(Window window) {
+
+        host.getHost().getDesktop().addWindow(window);
     }
 
     /**

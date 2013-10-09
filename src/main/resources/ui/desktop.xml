@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE themes PUBLIC "-//www.matthiasmann.de//TWL-Theme//EN" "http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd">
 <themes>
-    <include filename="cursors.xml"/>
+    <include filename="default.xml"/>
 
     <images file="images/big/background.png">
         <area name="background-image" xywh="*"/>
     </images>
 
     <images file="images/components.png">
-        <area name="button.normal" xywh="2,2,19,21" splitx="L6,R6" splity="T2,B2" nocenter="true"/>
-        <select name="button.background">
-            <alias ref="button.normal" if="pressed" tint="#007800"/>
-            <alias ref="button.normal" if="hover" tint="#00C800"/>
-            <alias ref="button.normal" tint="#0196FF"/>
-        </select>
         <area name="launch-button.normal" xywh="44,2,17,16" splitx="L3,R3" splity="T1,B1"/>
         <select name="launch-button.background">
             <alias ref="launch-button.normal" if="pressed" tint="#00C800"/>
@@ -53,106 +47,52 @@
         </select>
     </images>
 
-    <fontDef name="white" filename="font/font.fnt" default="true" color="#FFFFFF">
-        <fontParam if="error" color="#FF0000"/>
-        <fontParam if="warning" color="#FFA400"/>
-        <fontParam if="disabled" color="#808080"/>
-        <fontParam if="textSelection" color="#0032FF"/>
-    </fontDef>
-
-    <fontDef name="black" filename="font/font.fnt" color="#000000">
-        <fontParam if="error" color="#640000"/>
-        <fontParam if="warning" color="#503200"/>
-        <fontParam if="disabled" color="#262728"/>
-        <fontParam if="textSelection" color="#000064"/>
-    </fontDef>
-
-    <fontDef name="button.font.white" filename="font/font.fnt" color="#DBFFFF">
-        <fontParam if="disabled" color="gray"/>
-        <fontParam if="pressed" color="#96FF96"/>
-        <fontParam if="hover" color="#C7FFC7"/>
-    </fontDef>
-
-    <fontDef name="button.font.black" filename="font/font.fnt" color="#001818">
-        <fontParam if="disabled" color="#282828"/>
-        <fontParam if="pressed" color="#004B00"/>
-        <fontParam if="hover" color="#006400"/>
-    </fontDef>
-
-    <inputMapDef name="-defaultInputMap">
-        <action name="selectAll">ctrl A</action>
-        <action name="cut">ctrl X</action>
-        <action name="copy">ctrl C</action>
-        <action name="paste">ctrl V</action>
-    </inputMapDef>
-
-    <theme name="-defaults">
-        <param name="background"><image>none</image></param>
-        <param name="overlay"><image>none</image></param>
-        <param name="font"><font>white</font></param>
-        <param name="textAlignment"><enum type="alignment">left</enum></param>
-        <param name="minWidth"><int>0</int></param>
-        <param name="minHeight"><int>0</int></param>
-        <param name="maxWidth"><int>0</int></param>
-        <param name="maxHeight"><int>0</int></param>
-        <param name="inputMap"><inputMap>-defaultInputMap</inputMap></param>
-    </theme>
-
-    <theme name="label" ref="-defaults" allowWildcard="true">
-    </theme>
-
-    <theme name="button" ref="-defaults">
-        <param name="background"><image>button.background</image></param>
-        <param name="font"><font>button.font.white</font></param>
-        <param name="border"><border>10,5</border></param>
-    </theme>
-
-    <theme name="launch-button" ref="-defaults">
-        <param name="background"><image>launch-button.background</image></param>
-        <param name="font"><font>button.font.black</font></param>
-        <param name="border"><border>12,7</border></param>
-    </theme>
-
-    <theme name="taskbar-button-active" ref="-defaults">
-        <param name="background"><image>taskbar-button-active.background</image></param>
-        <param name="font"><font>button.font.black</font></param>
-        <param name="border"><border>10,5</border></param>
-    </theme>
-
-    <theme name="taskbar-button-inactive" ref="-defaults">
-        <param name="background"><image>taskbar-button-inactive.background</image></param>
-        <param name="font"><font>button.font.white</font></param>
-        <param name="border"><border>10,5</border></param>
-    </theme>
-
-    <theme name="frame" ref="-defaults" allowWildcard="true">
-        <param name="background"><image>frame.background</image></param>
-        <param name="border"><border>background.border</border></param>
-        <param name="titleAreaTop"><int>4</int></param>
-        <param name="titleAreaLeft"><int>6</int></param>
-        <param name="titleAreaRight"><int>-24</int></param>
-        <param name="titleAreaBottom"><int>20</int></param>
-        <param name="hasCloseButton"><bool>true</bool></param>
-        <param name="closeButtonX"><int>-22</int></param>
-        <param name="closeButtonY"><int>6</int></param>
-        <param name="hasResizeHandle"><bool>false</bool></param>
-        <param name="resizeHandleX"><int>-18</int></param>
-        <param name="resizeHandleY"><int>-18</int></param>
-        <param name="fadeColorInactive"><color>white</color></param>
-        <param name="fadeDurationActivate"><int>0</int></param>
-        <param name="fadeDurationDeactivate"><int>0</int></param>
-        <param name="fadeDurationShow"><int>0</int></param>
-        <param name="fadeDurationHide"><int>0</int></param>
-        <param name="mouseCursor"><cursor>arrow.*</cursor></param>
-        <theme name="title" ref="label">
-            <param name="textAlignment"><enum type="alignment">center</enum></param>
-        </theme>
-        <theme name="closeButton" ref="-defaults">
-            <param name="background"><image>frame.closebutton.background</image></param>
-        </theme>
-    </theme>
-
     <theme name="desktop" ref="-defaults">
         <param name="background"><image>background-image</image></param>
+
+        <theme name="frame" ref="-defaults" allowWildcard="true">
+            <param name="background"><image>frame.background</image></param>
+            <param name="border"><border>background.border</border></param>
+            <param name="titleAreaTop"><int>4</int></param>
+            <param name="titleAreaLeft"><int>6</int></param>
+            <param name="titleAreaRight"><int>-24</int></param>
+            <param name="titleAreaBottom"><int>20</int></param>
+            <param name="hasCloseButton"><bool>true</bool></param>
+            <param name="closeButtonX"><int>-22</int></param>
+            <param name="closeButtonY"><int>6</int></param>
+            <param name="hasResizeHandle"><bool>false</bool></param>
+            <param name="resizeHandleX"><int>-18</int></param>
+            <param name="resizeHandleY"><int>-18</int></param>
+            <param name="fadeColorInactive"><color>white</color></param>
+            <param name="fadeDurationActivate"><int>0</int></param>
+            <param name="fadeDurationDeactivate"><int>0</int></param>
+            <param name="fadeDurationShow"><int>0</int></param>
+            <param name="fadeDurationHide"><int>0</int></param>
+            <param name="mouseCursor"><cursor>arrow.*</cursor></param>
+            <theme name="title" ref="label">
+                <param name="textAlignment"><enum type="alignment">center</enum></param>
+            </theme>
+            <theme name="closeButton" ref="-defaults">
+                <param name="background"><image>frame.closebutton.background</image></param>
+            </theme>
+        </theme>
+
+        <theme name="launch-button" ref="-defaults">
+            <param name="background"><image>launch-button.background</image></param>
+            <param name="font"><font>button.font.black</font></param>
+            <param name="border"><border>12,7</border></param>
+        </theme>
+
+        <theme name="taskbar-button-active" ref="-defaults">
+            <param name="background"><image>taskbar-button-active.background</image></param>
+            <param name="font"><font>button.font.black</font></param>
+            <param name="border"><border>10,5</border></param>
+        </theme>
+
+        <theme name="taskbar-button-inactive" ref="-defaults">
+            <param name="background"><image>taskbar-button-inactive.background</image></param>
+            <param name="font"><font>button.font.white</font></param>
+            <param name="border"><border>10,5</border></param>
+        </theme>
     </theme>
 </themes>

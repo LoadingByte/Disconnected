@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
@@ -38,8 +40,10 @@ import com.quartercode.disconnected.sim.comp.program.Program;
  * This also contains a list of all vulnerabilities this operating system has.
  * 
  * @see HostedComputerPart
+ * @see Desktop
  * @see Vulnerability
  */
+@XmlAccessorType (XmlAccessType.FIELD)
 public class OperatingSystem extends HostedComputerPart implements Vulnerable {
 
     /**
@@ -77,6 +81,8 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     @XmlElementWrapper (name = "processes")
     @XmlElement (name = "process")
     private final List<Process> processes        = new ArrayList<Process>();
+
+    private final Desktop       desktop          = new Desktop();
 
     /**
      * Creates a new empty operating system.
@@ -183,6 +189,17 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     public void destroyProcess(Process process) {
 
         processes.remove(process);
+    }
+
+    /**
+     * Returns the desktop the os displays.
+     * The desktop displays windows which can be opened by programs.
+     * 
+     * @return The desktop the os displays.
+     */
+    public Desktop getDesktop() {
+
+        return desktop;
     }
 
     /**

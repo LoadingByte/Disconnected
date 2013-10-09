@@ -18,36 +18,37 @@
 
 package com.quartercode.disconnected.graphics.desktop;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import com.quartercode.disconnected.graphics.component.GraphicsState;
+import com.quartercode.disconnected.sim.comp.Desktop;
+import com.quartercode.disconnected.sim.comp.Desktop.Window;
 import de.matthiasmann.twl.BoxLayout;
 import de.matthiasmann.twl.BoxLayout.Direction;
 import de.matthiasmann.twl.Button;
 import de.matthiasmann.twl.DesktopArea;
 import de.matthiasmann.twl.Event;
 import de.matthiasmann.twl.GUI;
+import de.matthiasmann.twl.Widget;
 
 /**
  * A desktop can display windows on his window area. Every window has a frame widget which gets rendered.
  * 
+ * @see Desktop
  * @see Window
+ * @see Frame
  */
-public class Desktop extends GraphicsState {
+public class DesktopWidget extends Widget {
 
-    private final List<Window> windows = new ArrayList<Window>();
+    private final Desktop desktop;
 
-    public DesktopArea         windowArea;
-    public BoxLayout           taskbar;
-    public Button              launchButton;
+    public DesktopArea    windowArea;
+    public BoxLayout      taskbar;
+    public Button         launchButton;
 
     /**
-     * Creates a new desktop and sets it up.
+     * Creates a new desktop widget and sets it up.
      */
-    public Desktop() {
+    public DesktopWidget(Desktop desktop) {
 
-        super("/ui/desktop.xml");
+        this.desktop = desktop;
 
         setTheme("");
 
@@ -61,7 +62,7 @@ public class Desktop extends GraphicsState {
         add(taskbar);
 
         launchButton = new Button();
-        launchButton.setTheme("/launch-button");
+        launchButton.setTheme("launch-button");
         launchButton.setText("Launch");
         launchButton.addCallback(new Runnable() {
 
@@ -69,62 +70,66 @@ public class Desktop extends GraphicsState {
             public void run() {
 
                 // TODO: Display launch menu
+                DesktopWidget.this.desktop.addWindow(new Window(new TestFrame(), "AppX", "ApplicationX"));
             }
         });
         add(launchButton);
     }
 
     /**
-     * Returns a list of all windows this desktop currently holds (all visible and invisible windows).
+     * Returns the desktop this widget is rendering.
+     * The returned object holds all windows which can be displayed on this widget.
      * 
-     * @return A list of all windows this desktop currently holds (all visible and invisible windows).
+     * @return The desktop this widget is rendering.
      */
-    public List<Window> getWindows() {
+    public Desktop getDesktop() {
 
-        return Collections.unmodifiableList(windows);
+        return desktop;
     }
 
     /**
-     * Adds a new window to the desktop.
+     * Calls the utility to add a new window to the desktop area.
      * The new window will be visible if the render frame is visible.
      * 
      * @param window The new window to add to the desktop.
      */
-    public void addWindow(final Window window) {
+    public void callAddWindow(final Window window) {
 
-        if (!windows.contains(window)) {
-            window.getFrame().addCloseCallback(new Runnable() {
+        window.getFrame().addCloseCallback(new Runnable() {
 
-                @Override
-                public void run() {
+            @Override
+            public void run() {
 
-                    removeWindow(window);
-                }
-            });
-            window.getTaskbarButton().addCallback(Event.MOUSE_RBUTTON, new Runnable() {
+                desktop.removeWindow(window);
+            }
+        });
+        window.getFrame().getTaskbarButton().addCallback(Event.MOUSE_RBUTTON, new Runnable() {
 
-                @Override
-                public void run() {
+            @Override
+            public void run() {
 
-                    removeWindow(window);
-                }
-            });
-            window.getTaskbarButton().addCallback(Event.MOUSE_LBUTTON, new Runnable() {
+                desktop.removeWindow(window);
+            }
+        });
+        window.getFrame().getTaskbarButton().addCallback(Event.MOUSE_LBUTTON, new Runnable() {
 
-                @Override
-                public void run() {
+            @Override
+            public void run() {
 
-                    window.setVisible(!window.isVisible());
-                }
-            });
+                window.setVisible(!window.isVisible());
+            }
+        });
 
-            windows.add(window);
-
+        try {
             windowArea.add(window.getFrame());
+            window.getFrame().center(0.5F, 0.5F);
             windowArea.invalidateLayout();
 
-            taskbar.add(window.getTaskbarButton());
+            taskbar.add(window.getFrame().getTaskbarButton());
             taskbar.invalidateLayout();
+        }
+        catch (IllegalArgumentException e) {
+            // TODO: Replace workaround with real solution
         }
     }
 
@@ -134,14 +139,12 @@ public class Desktop extends GraphicsState {
      * 
      * @param window The window to remove from the desktop.
      */
-    public void removeWindow(Window window) {
-
-        windows.remove(window);
+    public void callRemoveWindow(Window window) {
 
         windowArea.removeChild(window.getFrame());
         windowArea.invalidateLayout();
 
-        taskbar.removeChild(window.getTaskbarButton());
+        taskbar.removeChild(window.getFrame().getTaskbarButton());
         taskbar.invalidateLayout();
     }
 
@@ -160,10 +163,23 @@ public class Desktop extends GraphicsState {
     @Override
     protected void afterAddToGUI(GUI gui) {
 
-        super.afterAddToGUI(gui);
-
         setTheme("desktop");
-        taskbar.validateLayout();
+
+        for (Window window : desktop.getWindows()) {
+            callAddWindow(window);
+        }
+
+        desktop.addPushReceiver(this);
+    }
+
+    @Override
+    protected void beforeRemoveFromGUI(GUI gui) {
+
+        for (Window window : desktop.getWindows()) {
+            callRemoveWindow(window);
+        }
+
+        desktop.removePushReceiver(this);
     }
 
 }

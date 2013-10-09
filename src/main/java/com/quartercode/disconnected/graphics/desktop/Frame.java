@@ -19,6 +19,9 @@
 package com.quartercode.disconnected.graphics.desktop;
 
 import org.apache.commons.lang.Validate;
+import com.quartercode.disconnected.graphics.component.MultiactionButton;
+import com.quartercode.disconnected.sim.comp.Desktop;
+import com.quartercode.disconnected.sim.comp.Desktop.Window;
 import de.matthiasmann.twl.ResizableFrame;
 import de.matthiasmann.twl.Widget;
 import de.matthiasmann.twleffects.MinimizeEffect;
@@ -31,12 +34,63 @@ import de.matthiasmann.twleffects.MinimizeEffect;
  */
 public class Frame extends ResizableFrame {
 
+    private final MultiactionButton taskbarButton;
+
     /**
      * Creates and prepares a new frame.
      */
     public Frame() {
 
-        setTheme("/frame");
+        setTheme("frame");
+
+        taskbarButton = new MultiactionButton();
+        setVisible(true);
+    }
+
+    /**
+     * Returns the name of the frame.
+     * The name will be displayed in the taskbar.
+     * 
+     * @return The name of the frame.
+     */
+    public String getName() {
+
+        return taskbarButton.getText();
+    }
+
+    /**
+     * Sets the name of the frame to a new one.
+     * The name will be displayed in the taskbar.
+     * 
+     * @param name The new name of the frame.
+     */
+    public void setName(String name) {
+
+        taskbarButton.setText(name);
+    }
+
+    /**
+     * Returns the title of the frame.
+     * The title will be displayed in the title bar of the frame
+     * 
+     * @return The title of the frame.
+     */
+    @Override
+    public String getTitle() {
+
+        return super.getTitle();
+    }
+
+    /**
+     * Sets the title of the frame to a new one.
+     * The title will be displayed in the title bar of the frame
+     * 
+     * @param title The new title of the frame.
+     */
+    @Override
+    public void setTitle(String title) {
+
+        super.setTitle(title);
     }
 
     /**
@@ -60,6 +114,20 @@ public class Frame extends ResizableFrame {
                 setRenderOffscreen(minimizeEffect);
             }
         }
+
+        taskbarButton.setTheme(visible ? "taskbar-button-active" : "taskbar-button-inactive");
+        taskbarButton.reapplyTheme();
+    }
+
+    /**
+     * Returns the taskbar button which represents the frame.
+     * The taskbar button object should only be used to add hooks.
+     * 
+     * @return the taskbar button which represents the frame.
+     */
+    protected MultiactionButton getTaskbarButton() {
+
+        return taskbarButton;
     }
 
     /**

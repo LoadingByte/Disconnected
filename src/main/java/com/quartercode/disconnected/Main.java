@@ -24,8 +24,9 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import com.quartercode.disconnected.graphics.GraphicsManager;
-import com.quartercode.disconnected.graphics.desktop.Desktop;
+import com.quartercode.disconnected.graphics.desktop.DesktopState;
 import com.quartercode.disconnected.profile.ProfileManager;
+import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
@@ -39,6 +40,7 @@ import com.quartercode.disconnected.sim.run.TickAction;
 import com.quartercode.disconnected.sim.run.TickSimulator;
 import com.quartercode.disconnected.sim.run.TickTimer;
 import com.quartercode.disconnected.sim.run.Ticker;
+import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
 import com.quartercode.disconnected.util.LogExceptionHandler;
 
 /**
@@ -80,13 +82,18 @@ public class Main {
         // Initalize graphics manager and start it
         Disconnected.setGraphicsManager(new GraphicsManager());
         Disconnected.getGraphicsManager().setRunning(true);
-        Disconnected.getGraphicsManager().setState(new Desktop());
 
         // Initalize ticker
         List<TickAction> tickActions = new ArrayList<TickAction>();
         tickActions.add(new TickTimer());
         tickActions.add(new TickSimulator());
         Disconnected.setTicker(new Ticker(tickActions.toArray(new TickAction[tickActions.size()])));
+
+        // DEBUG: Generate and set new simulation
+        Simulation simulation = SimulationGenerator.generateSimulation(10, 2);
+        Disconnected.setSimulation(simulation);
+        // DEBUG: Start "game" with current simulation
+        Disconnected.getGraphicsManager().setState(new DesktopState(simulation));
     }
 
     /**
