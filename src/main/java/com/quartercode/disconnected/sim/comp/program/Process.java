@@ -19,9 +19,15 @@
 package com.quartercode.disconnected.sim.comp.program;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.OperatingSystem;
@@ -36,20 +42,25 @@ import com.quartercode.disconnected.util.InfoString;
  * @see ProgramExecutor
  * @see File
  */
+@XmlAccessorType (XmlAccessType.FIELD)
 public class Process implements Serializable, InfoString {
 
-    private static final long serialVersionUID = 1L;
+    private static final long   serialVersionUID = 1L;
 
     @XmlIDREF
     @XmlAttribute
-    private OperatingSystem   host;
-    @XmlAttribute
-    private int               pid;
+    private OperatingSystem     host;
     @XmlIDREF
-    private File              file;
+    private Process             parent;
+    @XmlAttribute
+    private int                 pid;
+    @XmlIDREF
+    private File                file;
+    private ProgramExecutor     executor;
 
-    @XmlElement
-    private ProgramExecutor   executor;
+    @XmlElementWrapper (name = "childs")
+    @XmlElement (name = "child")
+    private final List<Process> childs           = new ArrayList<Process>();
 
     /**
      * Creates a new empty process.
@@ -64,22 +75,29 @@ public class Process implements Serializable, InfoString {
      * This should only be used directly by the operating system.
      * 
      * @param host The host operating system the process will be ran on.
+     * @param parent The parent process which created this process.
      * @param pid A unique process id the process has This is used to identify the process.
      * @param file The process launch file which contains the program for the process.
      * @param arguments The argument map which contains values for the defined parameters.
      * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
      */
-    public Process(OperatingSystem host, int pid, File file, Map<String, Object> arguments) {
+    public Process(OperatingSystem host, Process parent, int pid, File file, Map<String, Object> arguments) {
 
-        if (! (file.getContent() instanceof Program)) {
+        if ( (parent == null || pid == 0) && ! (parent == null && pid == 0)) {
+            throw new IllegalArgumentException("Can't start a kernel process without parent==null, pid==0");
+        } else if (pid != 0 && ! (file.getContent() instanceof Program)) {
             throw new IllegalArgumentException("Process launch file must contain a program");
         }
 
         this.host = host;
+        this.parent = parent;
         this.pid = pid;
         this.file = file;
-        Program program = (Program) file.getContent();
-        executor = program.createExecutor(this, arguments);
+
+        if (pid != 0) {
+            Program program = (Program) file.getContent();
+            executor = program.createExecutor(this, arguments);
+        }
     }
 
     /**
@@ -90,6 +108,16 @@ public class Process implements Serializable, InfoString {
     public OperatingSystem getHost() {
 
         return host;
+    }
+
+    /**
+     * Returns the parent process which created this process.
+     * 
+     * @return The parent process which created this process.
+     */
+    public Process getParent() {
+
+        return parent;
     }
 
     /**
@@ -123,6 +151,71 @@ public class Process implements Serializable, InfoString {
     }
 
     /**
+     * Returns the child processes this process started.
+     * 
+     * @return The child processes this process started.
+     */
+    public List<Process> getChilds() {
+
+        return Collections.unmodifiableList(childs);
+    }
+
+    /**
+     * Returns all child processes and their child processes etc. recursively.
+     * 
+     * @return All child processes and their child processes etc.
+     */
+    public List<Process> getAllChilds() {
+
+        List<Process> allChilds = new ArrayList<Process>();
+        for (Process child : childs) {
+            allChilds.add(child);
+            allChilds.addAll(child.getAllChilds());
+        }
+        return allChilds;
+    }
+
+    /**
+     * Creates a new child process using the program stored in the given file.
+     * The new process will be a child of this process.
+     * 
+     * @param file The process launch file which contains the program for the process.
+     * @param arguments The argument map which contains values for the defined parameters.
+     * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
+     */
+    public Process createChild(File file, Map<String, Object> arguments) {
+
+        return createChild(file, arguments, host.requestPid());
+    }
+
+    /**
+     * Creates a new child process using the program stored in the given file using the given pid.
+     * The new process will be a child of this process.
+     * 
+     * @param file The process launch file which contains the program for the process.
+     * @param arguments The argument map which contains values for the defined parameters.
+     * @param pid A unique process id the process has This is used to identify the process.
+     * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
+     */
+    public Process createChild(File file, Map<String, Object> arguments, int pid) {
+
+        Process process = new Process(host, this, pid, file, arguments);
+        childs.add(process);
+        return process;
+    }
+
+    /**
+     * Unregisters a process from the operating system.
+     * This should only be used by the process object.
+     * 
+     * @param process The process to unregister from this operating system.
+     */
+    public void unregisterChild(Process process) {
+
+        childs.remove(process);
+    }
+
+    /**
      * Returns the unique id the process has.
      * 
      * @return The unique id the process has.
@@ -139,6 +232,7 @@ public class Process implements Serializable, InfoString {
 
         final int prime = 31;
         int result = 1;
+        result = prime * result + (childs == null ? 0 : childs.hashCode());
         result = prime * result + (executor == null ? 0 : executor.hashCode());
         result = prime * result + (file == null ? 0 : file.hashCode());
         result = prime * result + pid;
@@ -154,10 +248,17 @@ public class Process implements Serializable, InfoString {
         if (obj == null) {
             return false;
         }
-        if (! (obj instanceof Process)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
         Process other = (Process) obj;
+        if (childs == null) {
+            if (other.childs != null) {
+                return false;
+            }
+        } else if (!childs.equals(other.childs)) {
+            return false;
+        }
         if (executor == null) {
             if (other.executor != null) {
                 return false;
@@ -181,7 +282,7 @@ public class Process implements Serializable, InfoString {
     @Override
     public String toInfoString() {
 
-        return "pid " + pid + " on " + host.getId() + ", created from " + file.getGlobalPath() + ", ran by " + executor.getClass().getName();
+        return "pid " + pid + " on " + host.getId() + ", source " + file.getGlobalPath() + ", logic in " + executor.getClass().getName() + ", " + childs.size() + " childs";
     }
 
     @Override

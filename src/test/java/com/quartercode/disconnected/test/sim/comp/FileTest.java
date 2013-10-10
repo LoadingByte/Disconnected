@@ -41,7 +41,7 @@ public class FileTest {
 
         computer = new Computer("0");
 
-        operatingSystem = new OperatingSystem(computer, "OperatingSystem", new Version(1, 0, 0), null, 0, 0);
+        operatingSystem = new OperatingSystem(computer, "OperatingSystem", new Version(1, 0, 0), null);
         computer.setOperatingSystem(operatingSystem);
 
         hardDrive = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));

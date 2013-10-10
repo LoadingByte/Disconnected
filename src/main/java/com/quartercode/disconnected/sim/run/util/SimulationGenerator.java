@@ -154,6 +154,8 @@ public class SimulationGenerator {
             HardDrive hardDrive = new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
             hardware.add(hardDrive);
             hardDrive.setLetter('C');
+            // Generate kernel file (temp)
+            hardDrive.addFile("/bin/kernel", FileType.FILE);
             // Generate some test files
             hardDrive.addFile("/opt/exploit.run", FileType.FILE);
             hardDrive.getFile("/opt/exploit.run").setContent(new ExploitProgram("Exploiter", new Version("1.0.0"), null, RightLevel.USER));
@@ -177,7 +179,7 @@ public class SimulationGenerator {
                 }
             }
 
-            computer.setOperatingSystem(new OperatingSystem(computer, "Frames", new Version(3, 7, 65), null, 200, 100));
+            computer.setOperatingSystem(new OperatingSystem(computer, "Frames", new Version(3, 7, 65), null));
         }
 
         return computers;

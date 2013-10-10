@@ -21,11 +21,9 @@ package com.quartercode.disconnected.sim.comp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
 import com.quartercode.disconnected.sim.comp.media.File;
 import com.quartercode.disconnected.sim.comp.media.File.FileType;
@@ -78,11 +76,8 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     @XmlElement (name = "vulnerability")
     private List<Vulnerability> vulnerabilities  = new ArrayList<Vulnerability>();
 
-    @XmlElementWrapper (name = "processes")
-    @XmlElement (name = "process")
-    private final List<Process> processes        = new ArrayList<Process>();
-
-    private final Desktop       desktop          = new Desktop();
+    private Process             rootProcess;
+    private Desktop             desktop;
 
     /**
      * Creates a new empty operating system.
@@ -99,14 +94,14 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      * @param name The name the operating system has.
      * @param version The current version the operating system has.
      * @param vulnerabilities The vulnerabilities the operating system has.
-     * @param switchOnTime The amount of ticks the system needs to switch on (boot up).
-     * @param switchOffTime The amount of ticks the system needs to switch off (shutdown).
      */
-    public OperatingSystem(Computer host, String name, Version version, List<Vulnerability> vulnerabilities, int switchOnTime, int switchOffTime) {
+    public OperatingSystem(Computer host, String name, Version version, List<Vulnerability> vulnerabilities) {
 
         super(host, name, version);
 
         this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
+        rootProcess = new Process(this, null, 0, getFile("/bin/kernel"), null);
+        desktop = new Desktop();
     }
 
     @Override
@@ -116,13 +111,27 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     }
 
     /**
+     * Returns the root process with the pid 0.
+     * The root process gets started by the os kernel.
+     * 
+     * @return The root process with the pid 0.
+     */
+    public Process getRootProcess() {
+
+        return rootProcess;
+    }
+
+    /**
      * Returns a list of all current running processes.
      * 
      * @return A list of all current running processes.
      */
-    public List<Process> getProcesses() {
+    public List<Process> getAllProcesses() {
 
-        return Collections.unmodifiableList(processes);
+        List<Process> processes = new ArrayList<Process>();
+        processes.add(rootProcess);
+        processes.addAll(rootProcess.getAllChilds());
+        return processes;
     }
 
     /**
@@ -134,7 +143,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      */
     public Process getProcess(Address binding) {
 
-        for (Process process : processes) {
+        for (Process process : getAllProcesses()) {
             if (process.getExecutor().getPacketListener(binding) != null) {
                 return process;
             }
@@ -144,51 +153,21 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     }
 
     /**
-     * Creates a new process using the program stored in the given file.
+     * Calculates and returns a new pid for a new process.
      * 
-     * @param file The process launch file which contains the program for the process.
-     * @param arguments The argument map which contains values for the defined parameters.
-     * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
+     * @return The calculated pid.
      */
-    public Process createProcess(File file, Map<String, Object> arguments) {
+    public synchronized int requestPid() {
 
         List<Integer> pids = new ArrayList<Integer>();
-        for (Process process : processes) {
+        for (Process process : getAllProcesses()) {
             pids.add(process.getPid());
         }
-        // Start at one (0 is typically the kernel)
-        int pid = 1;
+        int pid = 0;
         while (pids.contains(pid)) {
             pid++;
         }
-
-        return createProcess(file, arguments, pid);
-    }
-
-    /**
-     * Creates a new process using the program stored in the given file using the given pid.
-     * 
-     * @param file The process launch file which contains the program for the process.
-     * @param arguments The argument map which contains values for the defined parameters.
-     * @param pid A unique process id the process has This is used to identify the process.
-     * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
-     */
-    public Process createProcess(File file, Map<String, Object> arguments, int pid) {
-
-        Process process = new Process(this, pid, file, arguments);
-        processes.add(process);
-        return process;
-    }
-
-    /**
-     * Unregisters a process from the operating system.
-     * This should only be used by the process object.
-     * 
-     * @param process The process to unregister from this operating system.
-     */
-    public void destroyProcess(Process process) {
-
-        processes.remove(process);
+        return pid;
     }
 
     /**
@@ -313,7 +292,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
 
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (processes == null ? 0 : processes.hashCode());
+        result = prime * result + (rootProcess == null ? 0 : rootProcess.hashCode());
         result = prime * result + (vulnerabilities == null ? 0 : vulnerabilities.hashCode());
         return result;
     }
@@ -327,15 +306,15 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         if (!super.equals(obj)) {
             return false;
         }
-        if (! (obj instanceof OperatingSystem)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
         OperatingSystem other = (OperatingSystem) obj;
-        if (processes == null) {
-            if (other.processes != null) {
+        if (rootProcess == null) {
+            if (other.rootProcess != null) {
                 return false;
             }
-        } else if (!processes.equals(other.processes)) {
+        } else if (!rootProcess.equals(other.rootProcess)) {
             return false;
         }
         if (vulnerabilities == null) {

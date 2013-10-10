@@ -90,11 +90,11 @@ public class TickSimulator implements TickAction {
         if (simulation != null) {
             // Execute process ticks
             for (Computer computer : simulation.getComputers()) {
-                for (Process process : new ArrayList<Process>(computer.getOperatingSystem().getProcesses())) {
+                for (Process process : new ArrayList<Process>(computer.getOperatingSystem().getAllProcesses())) {
                     if (process.getExecutor().getOsState() == OSProgramState.RUNNING || process.getExecutor().getOsState() == OSProgramState.INTERRUPTED) {
                         process.getExecutor().update();
                     } else if (process.getExecutor().getOsState() == OSProgramState.STOPPED) {
-                        process.getHost().destroyProcess(process);
+                        process.getParent().unregisterChild(process);
                     }
                 }
             }

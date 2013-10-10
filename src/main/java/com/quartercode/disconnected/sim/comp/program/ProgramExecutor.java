@@ -22,11 +22,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.Desktop.Window;
+import com.quartercode.disconnected.sim.comp.media.File;
 import com.quartercode.disconnected.sim.comp.net.Address;
 import com.quartercode.disconnected.sim.comp.net.Packet;
 import com.quartercode.disconnected.sim.comp.net.PacketListener;
@@ -236,13 +238,27 @@ public abstract class ProgramExecutor {
     }
 
     /**
+     * Creates a new process using the program stored in the given file.
+     * The new process will be a child of the process which hosts this executor.
+     * 
+     * @param file The process launch file which contains the program for the process.
+     * @param arguments The argument map which contains values for the defined parameters.
+     * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
+     */
+    protected Process createProcess(File file, Map<String, Object> arguments) {
+
+        return host.createChild(file, arguments);
+    }
+
+    /**
      * Opens a new already created window on the host's desktop.
      * 
      * @param window The window to open on the host's desktop.
      */
-    protected void openWindow(Window window) {
+    protected Window openWindow(Window window) {
 
         host.getHost().getDesktop().addWindow(window);
+        return window;
     }
 
     /**
