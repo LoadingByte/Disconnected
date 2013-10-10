@@ -101,7 +101,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
 
         this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
         rootProcess = new Process(this, null, 0, getFile("/bin/kernel"), null);
-        desktop = new Desktop();
+        desktop = new Desktop(this);
     }
 
     @Override

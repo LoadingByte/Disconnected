@@ -142,7 +142,7 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
     public ProgramExecutor createExecutor(Process host, Map<String, Object> arguments) {
 
         for (Entry<String, Class<?>> parameter : parameters.entrySet()) {
-            if (!arguments.containsKey(parameter.getKey()) || !parameter.getValue().isAssignableFrom(arguments.get(parameter.getKey()).getClass())) {
+            if (arguments == null || !arguments.containsKey(parameter.getKey()) || !parameter.getValue().isAssignableFrom(arguments.get(parameter.getKey()).getClass())) {
                 throw new IllegalArgumentException("No or wrong argument type for parameter \"" + parameter.getKey() + "\" (type " + parameter.getValue().getName() + ")");
             }
         }

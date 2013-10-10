@@ -23,8 +23,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.graphics.desktop.DesktopWidget;
 import com.quartercode.disconnected.graphics.desktop.Frame;
 
@@ -36,6 +38,9 @@ import com.quartercode.disconnected.graphics.desktop.Frame;
  */
 public class Desktop {
 
+    @XmlIDREF
+    @XmlAttribute
+    private final OperatingSystem    host;
     @XmlElementWrapper (name = "windows")
     @XmlElement (name = "window")
     private final List<Window>       windows       = new ArrayList<Window>();
@@ -43,9 +48,22 @@ public class Desktop {
 
     /**
      * Creates a new desktop.
+     * 
+     * @param host The host operating system which uses this desktop.
      */
-    public Desktop() {
+    public Desktop(OperatingSystem host) {
 
+        this.host = host;
+    }
+
+    /**
+     * Returns the host operating system which uses this desktop.
+     * 
+     * @return The host operating system which uses this desktop.
+     */
+    public OperatingSystem getHost() {
+
+        return host;
     }
 
     /**
@@ -66,7 +84,9 @@ public class Desktop {
      */
     public void addWindow(Window window) {
 
-        if (!windows.contains(window)) {
+        if (window.isClosed()) {
+            throw new IllegalStateException("Can't add window: Window already closed");
+        } else if (!windows.contains(window)) {
             windows.add(window);
 
             for (DesktopWidget pushReceiver : pushReceivers) {
@@ -84,6 +104,7 @@ public class Desktop {
     public void removeWindow(Window window) {
 
         if (windows.contains(window)) {
+            window.closed = true;
             windows.remove(window);
 
             for (DesktopWidget pushReceiver : pushReceivers) {
@@ -122,10 +143,11 @@ public class Desktop {
      */
     public static class Window {
 
-        private String name;
-        private String title;
+        private String  name;
+        private String  title;
+        private boolean closed;
 
-        private Frame  frame;
+        private Frame   frame;
 
         /**
          * Creates a new empty window.
@@ -203,6 +225,16 @@ public class Desktop {
 
             this.title = title;
             frame.setTitle(title);
+        }
+
+        /**
+         * Returns if the window is closed.
+         * 
+         * @return If the window is closed.
+         */
+        public boolean isClosed() {
+
+            return closed;
         }
 
         /**

@@ -236,9 +236,11 @@ public class SimulationGenerator {
 
         int idDelta = 0;
         for (Member member : simulation.getMembers()) {
-            int id = Integer.parseInt(member.getName().replace("member-", ""));
-            if (id + 1 > idDelta) {
-                idDelta = id + 1;
+            if (member.getName().startsWith("member-")) {
+                int id = Integer.parseInt(member.getName().replace("member-", ""));
+                if (id + 1 > idDelta) {
+                    idDelta = id + 1;
+                }
             }
         }
 

@@ -19,21 +19,12 @@
 package com.quartercode.disconnected.sim.run;
 
 import java.util.ArrayList;
-import java.util.List;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.net.Packet;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.ProgramExecutor.OSProgramState;
-import com.quartercode.disconnected.sim.member.Member;
-import com.quartercode.disconnected.sim.member.MemberGroup;
-import com.quartercode.disconnected.sim.member.action.Action;
-import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
-import com.quartercode.disconnected.sim.member.interest.HasTarget;
-import com.quartercode.disconnected.sim.member.interest.Interest;
-import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
-import com.quartercode.disconnected.util.ProbabilityUtil;
 
 /**
  * This class implements the root tick update mechanisms for the entire simulation.
@@ -91,10 +82,12 @@ public class TickSimulator implements TickAction {
             // Execute process ticks
             for (Computer computer : simulation.getComputers()) {
                 for (Process process : new ArrayList<Process>(computer.getOperatingSystem().getAllProcesses())) {
-                    if (process.getExecutor().getOsState() == OSProgramState.RUNNING || process.getExecutor().getOsState() == OSProgramState.INTERRUPTED) {
-                        process.getExecutor().update();
-                    } else if (process.getExecutor().getOsState() == OSProgramState.STOPPED) {
-                        process.getParent().unregisterChild(process);
+                    if (process.getPid() != 0) {
+                        if (process.getExecutor().getOsState() == OSProgramState.RUNNING || process.getExecutor().getOsState() == OSProgramState.INTERRUPTED) {
+                            process.getExecutor().update();
+                        } else if (process.getExecutor().getOsState() == OSProgramState.STOPPED) {
+                            process.getParent().unregisterChild(process);
+                        }
                     }
                 }
             }
@@ -109,78 +102,79 @@ public class TickSimulator implements TickAction {
                 }
             }
 
-            // Generate new members and computers
-            int newComputers = simulation.RANDOM.nextInt(ProbabilityUtil.gen(0.008F, simulation.RANDOM) ? 50 : 8) - 5;
-            if (newComputers > 0) {
-                List<Computer> computers = SimulationGenerator.generateComputers(simulation, newComputers, simulation.getComputers());
-                for (Computer computer : computers) {
-                    simulation.addComputer(computer);
-                }
-                for (Member member : SimulationGenerator.generateMembers(simulation, computers, simulation.getGroups())) {
-                    simulation.addMember(member);
-                }
-            }
-
-            // Clean interests
-            for (MemberGroup group : simulation.getGroups()) {
-                for (Interest interest : new ArrayList<Interest>(group.getInterests())) {
-                    if (interest instanceof HasTarget && !simulation.getMembers().contains( ((HasTarget) interest).getTarget())) {
-                        group.removeInterest(interest);
-                    }
-                }
-            }
-            for (Member member : simulation.getMembers()) {
-                for (Interest interest : new ArrayList<Interest>(member.getBrainData(Interest.class))) {
-                    if (interest instanceof HasTarget && !simulation.getMembers().contains( ((HasTarget) interest).getTarget())) {
-                        member.removeBrainData(interest);
-                    }
-                }
-            }
-
-            // Generate global group interests against members with bad reputation
-            for (MemberGroup group : simulation.getGroups()) {
-                targetLoop:
-                for (Member target : simulation.getMembers()) {
-                    for (Interest interest : group.getInterests()) {
-                        if (interest instanceof HasTarget && ((HasTarget) interest).getTarget().equals(target)) {
-                            continue targetLoop;
-                        }
-                    }
-
-                    if (group.getReputation(target).getValue() <= -10) {
-                        if (ProbabilityUtil.genPseudo(-group.getReputation(target).getValue() / 20F, simulation.RANDOM)) {
-                            float priority = -group.getReputation(target).getValue() / 400F;
-                            if (priority > 1) {
-                                priority = 1;
-                            }
-                            group.addInterest(new DestroyInterest(priority, target));
-                        }
-                    }
-                }
-            }
-
-            // Execute global group interests
-            for (MemberGroup group : simulation.getGroups()) {
-                for (Interest interest : new ArrayList<Interest>(group.getInterests())) {
-                    for (Member member : simulation.getMembers()) {
-                        Action action = interest.getAction(simulation, member);
-                        if (action != null) {
-                            if (action.execute(simulation, member)) {
-                                group.removeInterest(interest);
-                            }
-
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // Simulate members
-            for (Member member : new ArrayList<Member>(simulation.getMembers())) {
-                if (member.getAiController() != null) {
-                    member.getAiController().update(simulation);
-                }
-            }
+            // TEMPDIS
+            // // Generate new members and computers
+            // int newComputers = simulation.RANDOM.nextInt(ProbabilityUtil.gen(0.008F, simulation.RANDOM) ? 50 : 8) - 5;
+            // if (newComputers > 0) {
+            // List<Computer> computers = SimulationGenerator.generateComputers(simulation, newComputers, simulation.getComputers());
+            // for (Computer computer : computers) {
+            // simulation.addComputer(computer);
+            // }
+            // for (Member member : SimulationGenerator.generateMembers(simulation, computers, simulation.getGroups())) {
+            // simulation.addMember(member);
+            // }
+            // }
+            //
+            // // Clean interests
+            // for (MemberGroup group : simulation.getGroups()) {
+            // for (Interest interest : new ArrayList<Interest>(group.getInterests())) {
+            // if (interest instanceof HasTarget && !simulation.getMembers().contains( ((HasTarget) interest).getTarget())) {
+            // group.removeInterest(interest);
+            // }
+            // }
+            // }
+            // for (Member member : simulation.getMembers()) {
+            // for (Interest interest : new ArrayList<Interest>(member.getBrainData(Interest.class))) {
+            // if (interest instanceof HasTarget && !simulation.getMembers().contains( ((HasTarget) interest).getTarget())) {
+            // member.removeBrainData(interest);
+            // }
+            // }
+            // }
+            //
+            // // Generate global group interests against members with bad reputation
+            // for (MemberGroup group : simulation.getGroups()) {
+            // targetLoop:
+            // for (Member target : simulation.getMembers()) {
+            // for (Interest interest : group.getInterests()) {
+            // if (interest instanceof HasTarget && ((HasTarget) interest).getTarget().equals(target)) {
+            // continue targetLoop;
+            // }
+            // }
+            //
+            // if (group.getReputation(target).getValue() <= -10) {
+            // if (ProbabilityUtil.genPseudo(-group.getReputation(target).getValue() / 20F, simulation.RANDOM)) {
+            // float priority = -group.getReputation(target).getValue() / 400F;
+            // if (priority > 1) {
+            // priority = 1;
+            // }
+            // group.addInterest(new DestroyInterest(priority, target));
+            // }
+            // }
+            // }
+            // }
+            //
+            // // Execute global group interests
+            // for (MemberGroup group : simulation.getGroups()) {
+            // for (Interest interest : new ArrayList<Interest>(group.getInterests())) {
+            // for (Member member : simulation.getMembers()) {
+            // Action action = interest.getAction(simulation, member);
+            // if (action != null) {
+            // if (action.execute(simulation, member)) {
+            // group.removeInterest(interest);
+            // }
+            //
+            // break;
+            // }
+            // }
+            // }
+            // }
+            //
+            // // Simulate members
+            // for (Member member : new ArrayList<Member>(simulation.getMembers())) {
+            // if (member.getAiController() != null) {
+            // member.getAiController().update(simulation);
+            // }
+            // }
         }
     }
 

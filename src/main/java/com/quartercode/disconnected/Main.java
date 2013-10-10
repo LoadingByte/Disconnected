@@ -93,6 +93,7 @@ public class Main {
         Simulation simulation = SimulationGenerator.generateSimulation(10, 2);
         Disconnected.setSimulation(simulation);
         // DEBUG: Start "game" with current simulation
+        Disconnected.getTicker().setRunning(true);
         Disconnected.getGraphicsManager().setState(new DesktopState(simulation));
     }
 
