@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import com.quartercode.disconnected.graphics.desktop.DesktopWidget;
 import com.quartercode.disconnected.graphics.desktop.Frame;
 
@@ -34,6 +36,8 @@ import com.quartercode.disconnected.graphics.desktop.Frame;
  */
 public class Desktop {
 
+    @XmlElementWrapper (name = "windows")
+    @XmlElement (name = "window")
     private final List<Window>       windows       = new ArrayList<Window>();
     private final Set<DesktopWidget> pushReceivers = new HashSet<DesktopWidget>();
 
@@ -60,7 +64,7 @@ public class Desktop {
      * 
      * @param window The new window to add to the desktop.
      */
-    public void addWindow(final Window window) {
+    public void addWindow(Window window) {
 
         if (!windows.contains(window)) {
             windows.add(window);
@@ -118,10 +122,18 @@ public class Desktop {
      */
     public static class Window {
 
-        private String      name;
-        private String      title;
+        private String name;
+        private String title;
 
-        private final Frame frame;
+        private Frame  frame;
+
+        /**
+         * Creates a new empty window.
+         * This is only recommended for direct field access (e.g. for serialization).
+         */
+        public Window() {
+
+        }
 
         /**
          * Creates a new window wrapping around the given frame.
@@ -202,6 +214,36 @@ public class Desktop {
         public Frame getFrame() {
 
             return frame;
+        }
+
+        /**
+         * Returns the class the frame has.
+         * This is only recommended for serialization.
+         * 
+         * @return the class the frame has.
+         */
+        public Class<? extends Frame> getFrameClass() {
+
+            return frame.getClass();
+        }
+
+        /**
+         * Sets the class for the frame to a new one and creates a new frame.
+         * This is only recommended for serialization.
+         * 
+         * @param c The class for the new frame.
+         * @throws InstantiationException Something goes wrong while creating the new frame object.
+         * @throws IllegalAccessException The class for the new frame object is not accessable.
+         */
+        public void setFrameClass(Class<? extends Frame> c) throws InstantiationException, IllegalAccessException {
+
+            frame = c.newInstance();
+            if (name != null) {
+                frame.setName(name);
+            }
+            if (title != null) {
+                frame.setTitle(title);
+            }
         }
 
         /**
