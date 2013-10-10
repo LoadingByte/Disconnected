@@ -40,11 +40,19 @@ public class Desktop {
 
     @XmlIDREF
     @XmlAttribute
-    private final OperatingSystem    host;
+    private OperatingSystem          host;
     @XmlElementWrapper (name = "windows")
     @XmlElement (name = "window")
     private final List<Window>       windows       = new ArrayList<Window>();
     private final Set<DesktopWidget> pushReceivers = new HashSet<DesktopWidget>();
+
+    /**
+     * Creates a new empty desktop.
+     * This is only recommended for direct field access (e.g. for serialization).
+     */
+    public Desktop() {
+
+    }
 
     /**
      * Creates a new desktop.
