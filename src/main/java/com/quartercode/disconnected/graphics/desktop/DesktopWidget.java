@@ -20,6 +20,7 @@ package com.quartercode.disconnected.graphics.desktop;
 
 import com.quartercode.disconnected.sim.comp.Desktop;
 import com.quartercode.disconnected.sim.comp.Desktop.Window;
+import com.quartercode.disconnected.sim.comp.OperatingSystem;
 import de.matthiasmann.twl.BoxLayout;
 import de.matthiasmann.twl.BoxLayout.Direction;
 import de.matthiasmann.twl.Button;
@@ -70,7 +71,8 @@ public class DesktopWidget extends Widget {
             public void run() {
 
                 // TODO: Display launch menu
-                DesktopWidget.this.desktop.addWindow(new Window(new TestFrame(), "AppX", "ApplicationX"));
+                OperatingSystem os = DesktopWidget.this.desktop.getHost();
+                os.getRootProcess().createChild(os.getFile("C:/bin/sysviewer"), null);
             }
         });
         add(launchButton);

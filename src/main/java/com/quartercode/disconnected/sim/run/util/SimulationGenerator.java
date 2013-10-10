@@ -36,8 +36,10 @@ import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSl
 import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 import com.quartercode.disconnected.sim.comp.media.File.FileType;
+import com.quartercode.disconnected.sim.comp.media.Media;
 import com.quartercode.disconnected.sim.comp.net.IP;
 import com.quartercode.disconnected.sim.comp.programs.ExploitProgram;
+import com.quartercode.disconnected.sim.comp.programs.SystemViewerProgram;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
@@ -154,11 +156,7 @@ public class SimulationGenerator {
             HardDrive hardDrive = new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
             hardware.add(hardDrive);
             hardDrive.setLetter('C');
-            // Generate kernel file (temp)
-            hardDrive.addFile("/bin/kernel", FileType.FILE);
-            // Generate some test files
-            hardDrive.addFile("/opt/exploit.run", FileType.FILE);
-            hardDrive.getFile("/opt/exploit.run").setContent(new ExploitProgram("Exploiter", new Version("1.0.0"), null, RightLevel.USER));
+            fillFileSystem(hardDrive.resolveMedia());
 
             NetworkInterface networkInterface = new NetworkInterface(computer, "NI FiberScore Ultimate", new Version(1, 2, 0), null);
             generateIP(networkInterface, simulation);
@@ -183,6 +181,21 @@ public class SimulationGenerator {
         }
 
         return computers;
+    }
+
+    // Temporary method for generating the kernel and some basic programs
+    private static void fillFileSystem(Media media) {
+
+        // Generate kernel file (temp)
+        media.addFile("/bin/kernel", FileType.FILE);
+
+        // Generate basic programs
+        media.addFile("/bin/sysviewer", FileType.FILE);
+        media.getFile("/bin/sysviewer").setContent(new SystemViewerProgram("System Viewer", new Version("1.0.0"), null, RightLevel.USER));
+
+        // Generate some test files
+        media.addFile("/opt/exploit.run", FileType.FILE);
+        media.getFile("/opt/exploit.run").setContent(new ExploitProgram("Exploiter", new Version("1.0.0"), null, RightLevel.USER));
     }
 
     private static void generateIP(NetworkInterface host, Simulation simulation) {

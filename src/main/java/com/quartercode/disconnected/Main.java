@@ -33,6 +33,7 @@ import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
 import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 import com.quartercode.disconnected.sim.comp.programs.ExploitProgram;
+import com.quartercode.disconnected.sim.comp.programs.SystemViewerProgram;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
@@ -110,6 +111,7 @@ public class Main {
         Disconnected.getRegistry().registerClass(NetworkInterface.class);
 
         // Programs
+        Disconnected.getRegistry().registerClass(SystemViewerProgram.class);
         Disconnected.getRegistry().registerClass(ExploitProgram.class);
 
         // AI Controllers
