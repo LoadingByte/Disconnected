@@ -255,10 +255,9 @@ public abstract class ProgramExecutor {
      * 
      * @param window The window to open on the host's desktop.
      */
-    protected Window openWindow(Window window) {
+    protected void openWindow(Window<?> window) {
 
         host.getHost().getDesktop().addWindow(window);
-        return window;
     }
 
     /**

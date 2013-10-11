@@ -23,10 +23,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.graphics.desktop.DesktopWidget;
 import com.quartercode.disconnected.graphics.desktop.Frame;
 
@@ -38,12 +34,8 @@ import com.quartercode.disconnected.graphics.desktop.Frame;
  */
 public class Desktop {
 
-    @XmlIDREF
-    @XmlAttribute
     private OperatingSystem          host;
-    @XmlElementWrapper (name = "windows")
-    @XmlElement (name = "window")
-    private final List<Window>       windows       = new ArrayList<Window>();
+    private final List<Window<?>>    windows       = new ArrayList<Window<?>>();
     private final Set<DesktopWidget> pushReceivers = new HashSet<DesktopWidget>();
 
     /**
@@ -79,7 +71,7 @@ public class Desktop {
      * 
      * @return A list of all windows this desktop currently holds (all visible and invisible windows).
      */
-    public List<Window> getWindows() {
+    public List<Window<?>> getWindows() {
 
         return Collections.unmodifiableList(windows);
     }
@@ -90,7 +82,7 @@ public class Desktop {
      * 
      * @param window The new window to add to the desktop.
      */
-    public void addWindow(Window window) {
+    public void addWindow(Window<?> window) {
 
         if (window.isClosed()) {
             throw new IllegalStateException("Can't add window: Window already closed");
@@ -109,7 +101,7 @@ public class Desktop {
      * 
      * @param window The window to remove from the desktop.
      */
-    public void removeWindow(Window window) {
+    public void removeWindow(Window<?> window) {
 
         if (windows.contains(window)) {
             window.closed = true;
@@ -147,15 +139,16 @@ public class Desktop {
      * A window represents a frame widget as a lightweight wrapper.
      * Classes on the outside can change visible parameters of the window, like the name in the taskbar or the frame title.
      * 
+     * @param <F> The type of the frame this window wraps around.
      * @see Frame
      */
-    public static class Window {
+    public static class Window<F extends Frame> {
 
         private String  name;
         private String  title;
         private boolean closed;
 
-        private Frame   frame;
+        private F       frame;
 
         /**
          * Creates a new empty window.
@@ -170,7 +163,7 @@ public class Desktop {
          * 
          * @param frame The frame the new window wraps around.
          */
-        public Window(Frame frame) {
+        public Window(F frame) {
 
             this.frame = frame;
             setVisible(true);
@@ -183,7 +176,7 @@ public class Desktop {
          * @param name The name for the window which will be displayed in the taskbar.
          * @param title The title for the window which will be displayed in the title bar of the frame.
          */
-        public Window(Frame frame, String name, String title) {
+        public Window(F frame, String name, String title) {
 
             this(frame);
 
@@ -251,39 +244,9 @@ public class Desktop {
          * 
          * @return The frame this window wraps around.
          */
-        public Frame getFrame() {
+        public F getFrame() {
 
             return frame;
-        }
-
-        /**
-         * Returns the class the frame has.
-         * This is only recommended for serialization.
-         * 
-         * @return the class the frame has.
-         */
-        public Class<? extends Frame> getFrameClass() {
-
-            return frame.getClass();
-        }
-
-        /**
-         * Sets the class for the frame to a new one and creates a new frame.
-         * This is only recommended for serialization.
-         * 
-         * @param c The class for the new frame.
-         * @throws InstantiationException Something goes wrong while creating the new frame object.
-         * @throws IllegalAccessException The class for the new frame object is not accessable.
-         */
-        public void setFrameClass(Class<? extends Frame> c) throws InstantiationException, IllegalAccessException {
-
-            frame = c.newInstance();
-            if (name != null) {
-                frame.setName(name);
-            }
-            if (title != null) {
-                frame.setTitle(title);
-            }
         }
 
         /**

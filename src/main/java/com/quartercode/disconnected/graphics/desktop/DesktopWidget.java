@@ -95,7 +95,7 @@ public class DesktopWidget extends Widget {
      * 
      * @param window The new window to add to the desktop.
      */
-    public void callAddWindow(final Window window) {
+    public void callAddWindow(final Window<?> window) {
 
         window.getFrame().addCloseCallback(new Runnable() {
 
@@ -141,7 +141,7 @@ public class DesktopWidget extends Widget {
      * 
      * @param window The window to remove from the desktop.
      */
-    public void callRemoveWindow(Window window) {
+    public void callRemoveWindow(Window<?> window) {
 
         windowArea.removeChild(window.getFrame());
         windowArea.invalidateLayout();
@@ -167,7 +167,7 @@ public class DesktopWidget extends Widget {
 
         setTheme("desktop");
 
-        for (Window window : desktop.getWindows()) {
+        for (Window<?> window : desktop.getWindows()) {
             callAddWindow(window);
         }
 
@@ -177,7 +177,7 @@ public class DesktopWidget extends Widget {
     @Override
     protected void beforeRemoveFromGUI(GUI gui) {
 
-        for (Window window : desktop.getWindows()) {
+        for (Window<?> window : desktop.getWindows()) {
             callRemoveWindow(window);
         }
 
