@@ -40,7 +40,7 @@ public class DesktopState extends GraphicsState {
      */
     public DesktopState(Simulation simulation) {
 
-        super("/ui/desktop.xml");
+        super("/ui/desktop/desktop.xml");
         setTheme("");
 
         this.simulation = simulation;

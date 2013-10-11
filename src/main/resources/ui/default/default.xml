@@ -4,6 +4,7 @@
     <include filename="cursors.xml"/>
 
     <images file="images/components.png">
+        <area name="tooltip.background" xywh="24,2,9,9"/>
         <area name="button.normal" xywh="2,2,19,21" splitx="L6,R6" splity="T2,B2" nocenter="true"/>
         <select name="button.background">
             <alias ref="button.normal" if="pressed" tint="#007800"/>
@@ -55,6 +56,12 @@
         <param name="maxWidth"><int>0</int></param>
         <param name="maxHeight"><int>0</int></param>
         <param name="inputMap"><inputMap>-defaultInputMap</inputMap></param>
+    </theme>
+
+    <theme name="tooltipwindow" ref="-defaults">
+        <param name="background"><image>tooltip.background</image></param>
+        <param name="border"><border>5</border></param>
+        <param name="fadeInTime"><int>0</int></param>
     </theme>
 
     <theme name="label" ref="-defaults" allowWildcard="true">

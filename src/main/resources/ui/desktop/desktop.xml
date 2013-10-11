@@ -3,24 +3,24 @@
 <themes>
     <include filename="default.xml"/>
 
-    <images file="images/big/background.png">
+    <images file="images/background.png">
         <area name="background-image" xywh="*"/>
     </images>
 
     <images file="images/components.png">
-        <area name="launch-button.normal" xywh="44,2,17,16" splitx="L3,R3" splity="T1,B1"/>
+        <area name="launch-button.normal" xywh="22,2,17,16" splitx="L3,R3" splity="T1,B1"/>
         <select name="launch-button.background">
             <alias ref="launch-button.normal" if="pressed" tint="#00C800"/>
             <alias ref="launch-button.normal" if="hover" tint="#00FF00"/>
             <alias ref="launch-button.normal" tint="#00C7FF"/>
         </select>
-        <area name="taskbar-button-active.normal" xywh="44,2,17,16" splitx="L3,R3" splity="T1,B1"/>
+        <area name="taskbar-button-active.normal" xywh="22,2,17,16" splitx="L3,R3" splity="T1,B1"/>
         <select name="taskbar-button-active.background">
             <alias ref="taskbar-button-active.normal" if="pressed" tint="#00C800"/>
             <alias ref="taskbar-button-active.normal" if="hover" tint="#00FF00"/>
             <alias ref="taskbar-button-active.normal" tint="#00FFFF"/>
         </select>
-        <area name="taskbar-button-inactive.normal" xywh="24,2,17,16" splitx="L3,R3" splity="T1,B1" nocenter="true"/>
+        <area name="taskbar-button-inactive.normal" xywh="2,2,17,16" splitx="L3,R3" splity="T1,B1" nocenter="true"/>
         <select name="taskbar-button-inactive.background">
             <alias ref="taskbar-button-inactive.normal" if="pressed" tint="#00C800"/>
             <alias ref="taskbar-button-inactive.normal" if="hover" tint="#00FF00"/>
@@ -28,10 +28,10 @@
         </select>
 
         <composed name="frame.background" border="25,5,5,5">
-            <area xywh="76,2,9,9" splitx="L3,R3" splity="T3,B3" border="3" tint="#0000FF"/>
+            <area xywh="42,2,9,9" splitx="L3,R3" splity="T3,B3" border="3" tint="#0000FF"/>
             <grid weightsX="0,1,0" weightsY="0,1" inset="4">
                 <alias ref="none"/>
-                <area xywh="24,21,128,7" sizeOverwriteV="18" splitx="L4,R5" splity="T4,B2" tint="#0063FF"/>
+                <area xywh="2,21,128,7" splitx="L4,R5" splity="T4,B2" tint="#0063FF" sizeOverwriteV="28"/>
                 <alias ref="none"/>
                 <alias ref="none"/>
                 <alias ref="none"/>
@@ -39,7 +39,7 @@
             </grid>
         </composed>
 
-        <area name="frame.closebutton.normal" xywh="64,2,9,8"/>
+        <area name="frame.closebutton.normal" xywh="55,2,15,15" splitx="L4,R4" splity="T4,B4" sizeOverwriteH="20" sizeOverwriteV="20"/>
         <select name="frame.closebutton.background">
             <alias ref="frame.closebutton.normal" if="pressed" tint="#00C800"/>
             <alias ref="frame.closebutton.normal" if="hover" tint="#00FF00"/>
@@ -50,16 +50,16 @@
     <theme name="desktop" ref="-defaults">
         <param name="background"><image>background-image</image></param>
 
-        <theme name="frame" ref="-defaults" allowWildcard="true">
+        <theme name="frame" ref="-defaults">
             <param name="background"><image>frame.background</image></param>
             <param name="border"><border>background.border</border></param>
-            <param name="titleAreaTop"><int>4</int></param>
-            <param name="titleAreaLeft"><int>6</int></param>
-            <param name="titleAreaRight"><int>-24</int></param>
-            <param name="titleAreaBottom"><int>20</int></param>
+            <param name="titleAreaTop"><int>8</int></param>
+            <param name="titleAreaLeft"><int>20</int></param>
+            <param name="titleAreaRight"><int>-40</int></param>
+            <param name="titleAreaBottom"><int>28</int></param>
             <param name="hasCloseButton"><bool>true</bool></param>
-            <param name="closeButtonX"><int>-22</int></param>
-            <param name="closeButtonY"><int>6</int></param>
+            <param name="closeButtonX"><int>-30</int></param>
+            <param name="closeButtonY"><int>9</int></param>
             <param name="hasResizeHandle"><bool>false</bool></param>
             <param name="resizeHandleX"><int>-18</int></param>
             <param name="resizeHandleY"><int>-18</int></param>
