@@ -21,8 +21,6 @@ package com.quartercode.disconnected.sim.comp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
 import com.quartercode.disconnected.sim.comp.media.File;
@@ -41,7 +39,6 @@ import com.quartercode.disconnected.sim.comp.program.Program;
  * @see Desktop
  * @see Vulnerability
  */
-@XmlAccessorType (XmlAccessType.FIELD)
 public class OperatingSystem extends HostedComputerPart implements Vulnerable {
 
     /**
@@ -76,6 +73,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     @XmlElement (name = "vulnerability")
     private List<Vulnerability> vulnerabilities  = new ArrayList<Vulnerability>();
 
+    @XmlElement
     private Process             rootProcess;
     private Desktop             desktop;
 
@@ -100,7 +98,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         super(host, name, version);
 
         this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
-        rootProcess = new Process(this, null, 0, getFile("/bin/kernel"), null);
+        rootProcess = new Process(this, null, 0, getFile("C:/bin/kernel"), null);
         desktop = new Desktop(this);
     }
 
