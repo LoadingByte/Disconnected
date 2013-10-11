@@ -18,10 +18,9 @@ We use maven to handle our dependencies and build. To compile Disconnected, foll
 * Install [Maven 3](http://maven.apache.org/download.html).
 * Check out this repository (clone or download).
 * Download the [TWL-Library](http://twl.l33tlabs.org/demo/twl.zip) and unzip the package.
-* Open a command prompt, navigate to the folder which contains both `TWL.jar` and `TWLEffects.jar` and run:
+* Open a command prompt, navigate to the folder which contains `TWL.jar` and run:
 
         $ mvn install:install-file -Dfile=TWL.jar -DgroupId=de.matthiasmann.twl -DartifactId=twl -Dversion=1.0 -Dpackaging=jar
-        $ mvn install:install-file -Dfile=TWLEffects.jar -DgroupId=de.matthiasmann.twl -DartifactId=twleffects -Dversion=1.0 -Dpackaging=jar
 
 * Navigate to the project folder of this repository which contains a `pom.xml` and run:
 

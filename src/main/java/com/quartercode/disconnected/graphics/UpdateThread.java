@@ -39,7 +39,6 @@ import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 import de.matthiasmann.twl.theme.ThemeManager;
 import de.matthiasmann.twl.utils.PNGDecoder;
-import de.matthiasmann.twleffects.lwjgl.LWJGLEffectsRenderer;
 
 /**
  * This thread executes the OpenGL update which keeps the lwjgl display alive.
@@ -124,7 +123,7 @@ public class UpdateThread extends Thread {
             Display.setVSyncEnabled(true);
             Display.create();
 
-            renderer = new LWJGLEffectsRenderer();
+            renderer = new LWJGLRenderer();
             renderer.setUseSWMouseCursors(true);
             gui = new GUI(root, renderer);
             gui.setSize();
@@ -168,6 +167,7 @@ public class UpdateThread extends Thread {
             currentTheme.destroy();
         }
         Display.destroy();
+        System.exit(0);
     }
 
     private ByteBuffer loadImage(URL url) throws IOException {

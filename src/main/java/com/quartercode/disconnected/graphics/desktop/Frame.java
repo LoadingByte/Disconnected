@@ -24,7 +24,6 @@ import com.quartercode.disconnected.sim.comp.Desktop;
 import com.quartercode.disconnected.sim.comp.Desktop.Window;
 import de.matthiasmann.twl.ResizableFrame;
 import de.matthiasmann.twl.Widget;
-import de.matthiasmann.twleffects.MinimizeEffect;
 
 /**
  * A frame is the displayed component of a desktop window.
@@ -108,10 +107,6 @@ public class Frame extends ResizableFrame {
 
             if (visible) {
                 requestKeyboardFocus();
-            } else if (getFadeDurationHide() > 0) {
-                MinimizeEffect minimizeEffect = new MinimizeEffect(this);
-                minimizeEffect.setAnimationDuration(getFadeDurationHide());
-                setRenderOffscreen(minimizeEffect);
             }
         }
 
