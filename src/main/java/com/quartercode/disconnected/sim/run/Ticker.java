@@ -34,11 +34,21 @@ import org.apache.commons.lang.Validate;
  */
 public class Ticker {
 
-    private static final Logger    LOGGER  = Logger.getLogger(Ticker.class.getName());
+    /**
+     * The amount of milliseconds the ticker will wait from one tick to another by default.
+     */
+    public static final int        DEFAULT_DELAY            = 50;
+
+    /**
+     * The amount of ticks called in one second by default.
+     */
+    public static final int        DEFAULT_TICKS_PER_SECOND = 1000 / DEFAULT_DELAY;
+
+    private static final Logger    LOGGER                   = Logger.getLogger(Ticker.class.getName());
 
     private TickThread             thread;
-    private final List<TickAction> actions = new ArrayList<TickAction>();
-    private int                    delay   = 50;
+    private final List<TickAction> actions                  = new ArrayList<TickAction>();
+    private int                    delay                    = DEFAULT_DELAY;
 
     /**
      * Creates a new ticker without any tick actions.
