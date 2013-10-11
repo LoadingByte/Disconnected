@@ -58,9 +58,9 @@ public class Process implements Serializable, InfoString {
     private File                file;
     private ProgramExecutor     executor;
 
-    @XmlElementWrapper (name = "childs")
+    @XmlElementWrapper (name = "children")
     @XmlElement (name = "child")
-    private final List<Process> childs           = new ArrayList<Process>();
+    private final List<Process> children         = new ArrayList<Process>();
 
     /**
      * Creates a new empty process.
@@ -155,9 +155,9 @@ public class Process implements Serializable, InfoString {
      * 
      * @return The child processes this process started.
      */
-    public List<Process> getChilds() {
+    public List<Process> getChildren() {
 
-        return Collections.unmodifiableList(childs);
+        return Collections.unmodifiableList(children);
     }
 
     /**
@@ -165,14 +165,14 @@ public class Process implements Serializable, InfoString {
      * 
      * @return All child processes and their child processes etc.
      */
-    public List<Process> getAllChilds() {
+    public List<Process> getAllChildren() {
 
-        List<Process> allChilds = new ArrayList<Process>();
-        for (Process child : childs) {
-            allChilds.add(child);
-            allChilds.addAll(child.getAllChilds());
+        List<Process> allChildren = new ArrayList<Process>();
+        for (Process child : children) {
+            allChildren.add(child);
+            allChildren.addAll(child.getAllChildren());
         }
-        return allChilds;
+        return allChildren;
     }
 
     /**
@@ -200,7 +200,7 @@ public class Process implements Serializable, InfoString {
     public Process createChild(File file, Map<String, Object> arguments, int pid) {
 
         Process process = new Process(host, this, pid, file, arguments);
-        childs.add(process);
+        children.add(process);
         return process;
     }
 
@@ -212,7 +212,7 @@ public class Process implements Serializable, InfoString {
      */
     public void unregisterChild(Process process) {
 
-        childs.remove(process);
+        children.remove(process);
     }
 
     /**
@@ -232,7 +232,7 @@ public class Process implements Serializable, InfoString {
 
         final int prime = 31;
         int result = 1;
-        result = prime * result + (childs == null ? 0 : childs.hashCode());
+        result = prime * result + (children == null ? 0 : children.hashCode());
         result = prime * result + (executor == null ? 0 : executor.hashCode());
         result = prime * result + (file == null ? 0 : file.hashCode());
         result = prime * result + pid;
@@ -252,11 +252,11 @@ public class Process implements Serializable, InfoString {
             return false;
         }
         Process other = (Process) obj;
-        if (childs == null) {
-            if (other.childs != null) {
+        if (children == null) {
+            if (other.children != null) {
                 return false;
             }
-        } else if (!childs.equals(other.childs)) {
+        } else if (!children.equals(other.children)) {
             return false;
         }
         if (executor == null) {
@@ -282,7 +282,7 @@ public class Process implements Serializable, InfoString {
     @Override
     public String toInfoString() {
 
-        return "pid " + pid + " on " + host.getId() + ", source " + file.getGlobalPath() + ", logic in " + executor.getClass().getName() + ", " + childs.size() + " childs";
+        return "pid " + pid + " on " + host.getId() + ", source " + file.getGlobalPath() + ", logic in " + executor.getClass().getName() + ", " + children.size() + " children";
     }
 
     @Override

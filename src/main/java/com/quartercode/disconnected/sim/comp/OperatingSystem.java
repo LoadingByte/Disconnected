@@ -130,7 +130,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
 
         List<Process> processes = new ArrayList<Process>();
         processes.add(rootProcess);
-        processes.addAll(rootProcess.getAllChilds());
+        processes.addAll(rootProcess.getAllChildren());
         return processes;
     }
 

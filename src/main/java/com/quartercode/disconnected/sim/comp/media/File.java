@@ -72,7 +72,7 @@ public class File implements Serializable, SizeObject {
     @XmlElement
     private Object             content;
     @XmlElement (name = "child")
-    private final List<File>   childs           = new ArrayList<File>();
+    private final List<File>   children         = new ArrayList<File>();
 
     /**
      * Creates a new empty file.
@@ -177,7 +177,7 @@ public class File implements Serializable, SizeObject {
 
     private boolean generatePathSections(File target, List<File> path) {
 
-        for (File child : childs) {
+        for (File child : children) {
             path.add(child);
             if (target.equals(child) || child.generatePathSections(target, path)) {
                 return true;
@@ -238,7 +238,7 @@ public class File implements Serializable, SizeObject {
 
     /**
      * Returns the size this file has in bytes (if this file is a content one).
-     * Directories have the size of all their childs.
+     * Directories have the size of all their children.
      * 
      * @return The size this file has in bytes (if this file is a content one).
      */
@@ -247,9 +247,9 @@ public class File implements Serializable, SizeObject {
 
         if (type == FileType.FILE && content != null) {
             return SizeUtil.getSize(content);
-        } else if (type == FileType.DIRECTORY && !childs.isEmpty()) {
+        } else if (type == FileType.DIRECTORY && !children.isEmpty()) {
             long size = 0;
-            for (File child : childs) {
+            for (File child : children) {
                 size += child.getSize();
             }
             return size;
@@ -266,7 +266,7 @@ public class File implements Serializable, SizeObject {
      */
     public List<File> getChildFiles() {
 
-        return type == FileType.DIRECTORY ? Collections.unmodifiableList(childs) : null;
+        return type == FileType.DIRECTORY ? Collections.unmodifiableList(children) : null;
     }
 
     /**
@@ -278,8 +278,8 @@ public class File implements Serializable, SizeObject {
      */
     public File getChildFile(String name) {
 
-        if (childs != null) {
-            for (File child : childs) {
+        if (children != null) {
+            for (File child : children) {
                 if (child.getName().equals(name)) {
                     return child;
                 }
@@ -299,12 +299,12 @@ public class File implements Serializable, SizeObject {
      */
     protected void addChildFile(File file) {
 
-        if (childs != null) {
-            if (!childs.contains(file)) {
+        if (children != null) {
+            if (!children.contains(file)) {
                 if (file.getSize() > host.getFree()) {
                     throw new OutOfSpaceException(host, file.getSize());
                 } else {
-                    childs.add(file);
+                    children.add(file);
                 }
             }
         }
@@ -318,8 +318,8 @@ public class File implements Serializable, SizeObject {
      */
     protected void removeChildFile(File file) {
 
-        if (childs != null) {
-            childs.remove(file);
+        if (children != null) {
+            children.remove(file);
         }
     }
 
@@ -381,8 +381,8 @@ public class File implements Serializable, SizeObject {
 
         id = host.getHost().getId() + "-" + getGlobalPath();
 
-        if (childs != null) {
-            for (File child : childs) {
+        if (children != null) {
+            for (File child : children) {
                 child.resolveId();
             }
         }
@@ -397,8 +397,8 @@ public class File implements Serializable, SizeObject {
 
         this.host = host;
 
-        if (childs != null) {
-            for (File child : childs) {
+        if (children != null) {
+            for (File child : children) {
                 child.changeHost(host);
             }
         }
@@ -418,7 +418,7 @@ public class File implements Serializable, SizeObject {
 
         final int prime = 31;
         int result = 1;
-        result = prime * result + (childs == null ? 0 : childs.hashCode());
+        result = prime * result + (children == null ? 0 : children.hashCode());
         result = prime * result + (content == null ? 0 : content.hashCode());
         result = prime * result + (name == null ? 0 : name.hashCode());
         result = prime * result + (type == null ? 0 : type.hashCode());
@@ -438,11 +438,11 @@ public class File implements Serializable, SizeObject {
             return false;
         }
         File other = (File) obj;
-        if (childs == null) {
-            if (other.childs != null) {
+        if (children == null) {
+            if (other.children != null) {
                 return false;
             }
-        } else if (!childs.equals(other.childs)) {
+        } else if (!children.equals(other.children)) {
             return false;
         }
         if (content == null) {
@@ -469,10 +469,10 @@ public class File implements Serializable, SizeObject {
     public String toString() {
 
         List<String> childNames = new ArrayList<String>();
-        for (File child : childs) {
+        for (File child : children) {
             childNames.add(child.getName());
         }
-        return getClass().getName() + " [name=" + name + ", type=" + type + ", content=" + content + ", childs=" + childNames + "]";
+        return getClass().getName() + " [name=" + name + ", type=" + type + ", content=" + content + ", children=" + childNames + "]";
     }
 
 }
