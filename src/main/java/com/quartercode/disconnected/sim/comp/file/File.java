@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang.Validate;
+import com.quartercode.disconnected.sim.comp.OperatingSystem;
 import com.quartercode.disconnected.util.size.SizeObject;
 import com.quartercode.disconnected.util.size.SizeUtil;
 
@@ -34,7 +35,7 @@ import com.quartercode.disconnected.util.size.SizeUtil;
  * This class represents a file on a media.
  * Every file knows his path and has a content string. Every directory has a list of child files.
  * 
- * @see Media
+ * @see FileSystem
  */
 public class File implements SizeObject {
 
@@ -53,23 +54,14 @@ public class File implements SizeObject {
         DIRECTORY;
     }
 
-    /**
-     * The seperator which seperates different files in a path string.
-     */
-    public static final String SEPERATOR = "/";
-
-    @XmlID
+    private FileSystem       host;
+    private String           name;
     @XmlAttribute
-    private String             id;
-
-    private Media              host;
-    private String             name;
-    @XmlAttribute
-    private FileType           type;
+    private FileType         type;
     @XmlElement
-    private Object             content;
+    private Object           content;
     @XmlElement (name = "child")
-    private final List<File>   children  = new ArrayList<File>();
+    private final List<File> children = new ArrayList<File>();
 
     /**
      * Creates a new empty file.
@@ -84,7 +76,7 @@ public class File implements SizeObject {
      * 
      * @param host The host which will use this file.
      */
-    protected File(Media host) {
+    protected File(FileSystem host) {
 
         this.host = host;
         name = "root";
@@ -98,7 +90,7 @@ public class File implements SizeObject {
      * @param name The name the new file will have.
      * @param type The type the new file will have.
      */
-    protected File(Media host, String name, FileType type) {
+    protected File(FileSystem host, String name, FileType type) {
 
         this.host = host;
         this.name = name;
@@ -110,7 +102,7 @@ public class File implements SizeObject {
      * 
      * @return The media which hosts this file.
      */
-    public Media getHost() {
+    public FileSystem getHost() {
 
         return host;
     }
@@ -137,15 +129,29 @@ public class File implements SizeObject {
     }
 
     /**
-     * Returns the global path the file has.
+     * Returns the global path the file has on the given operating system.
      * A path is a collection of files seperated by a seperator.
-     * The global path also contains the drive letter and can be used on the os level.
+     * The global path is made out of the mountpoint of the file system and the local file path
+     * It can be used on the os level.
+     * 
+     * @return The global path the file has on the given operating system.
+     */
+    public String getGlobalPath(OperatingSystem operatingSystem) {
+
+        return operatingSystem.getFileSystemMountpoint(host) + ":" + getLocalPath();
+    }
+
+    /**
+     * Returns the global path the file has on the hosting operating system.
+     * A path is a collection of files seperated by a seperator.
+     * The global path is made out of the local mountpoint of the file system and the local file path
+     * It can be used on the os level.
      * 
      * @return The path the file has.
      */
-    public String getGlobalPath() {
+    public String getGlobalHostPath() {
 
-        return host.getLetter() + ":" + getLocalPath();
+        return getGlobalPath(host.getHost().getOperatingSystem());
     }
 
     /**
@@ -158,14 +164,14 @@ public class File implements SizeObject {
     public String getLocalPath() {
 
         if (equals(host.getRootFile())) {
-            return SEPERATOR;
+            return host.getSeperator();
         } else {
             List<File> path = new ArrayList<File>();
             host.getRootFile().generatePathSections(this, path);
 
             String pathString = "";
             for (File pathEntry : path) {
-                pathString += SEPERATOR + pathEntry.getName();
+                pathString += host.getSeperator() + pathEntry.getName();
             }
 
             return pathString.isEmpty() ? null : pathString;
@@ -328,7 +334,7 @@ public class File implements SizeObject {
     public File getParent() {
 
         String path = getLocalPath();
-        return host.getFile(path.substring(0, path.lastIndexOf(SEPERATOR)));
+        return host.getFile(path.substring(0, path.lastIndexOf(host.getSeperator())));
     }
 
     /**
@@ -355,7 +361,7 @@ public class File implements SizeObject {
         remove();
 
         if (path.contains(":")) {
-            host = host.getHost().getOperatingSystem().getMedia(path).resolveMedia();
+            host = host.getHost().getOperatingSystem().getMountedFileSystem(path);
             host.addFile(this, path.split(":")[1]);
         } else {
             host.addFile(this, path);
@@ -372,25 +378,11 @@ public class File implements SizeObject {
     }
 
     /**
-     * Resolves the unique serialization id. This should only be called if the host is set.
-     */
-    protected void resolveId() {
-
-        id = host.getHost().getId() + "-" + getGlobalPath();
-
-        if (children != null) {
-            for (File child : children) {
-                child.resolveId();
-            }
-        }
-    }
-
-    /**
      * Changes the current hosting media of this file to a new one.
      * 
      * @param host The new media which will host this file.
      */
-    protected void changeHost(Media host) {
+    protected void changeHost(FileSystem host) {
 
         this.host = host;
 
@@ -401,10 +393,24 @@ public class File implements SizeObject {
         }
     }
 
+    /**
+     * Returns the unique serialization id for the file.
+     * The id is a combination of the host computer's id and the global path of the file.
+     * It should only be used by a serialization algorithm.
+     * 
+     * @return The unique serialization id for the file.
+     */
+    @XmlAttribute
+    @XmlID
+    protected String getId() {
+
+        return host.getHost().getId() + ">" + getGlobalHostPath();
+    }
+
     public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
 
-        if (parent instanceof Media) {
-            host = (Media) parent;
+        if (parent instanceof FileSystem) {
+            host = (FileSystem) parent;
         } else {
             host = ((File) parent).getHost();
         }

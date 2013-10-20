@@ -25,9 +25,8 @@ import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.file.File;
-import com.quartercode.disconnected.sim.comp.file.File.FileType;
-import com.quartercode.disconnected.sim.comp.file.Media;
-import com.quartercode.disconnected.sim.comp.file.MediaProvider;
+import com.quartercode.disconnected.sim.comp.file.FileSystem;
+import com.quartercode.disconnected.sim.comp.file.FileSystemProvider;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSlot;
 
 /**
@@ -40,9 +39,9 @@ import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSl
  */
 @XmlAccessorType (XmlAccessType.FIELD)
 @NeedsMainboardSlot
-public class HardDrive extends Hardware implements MediaProvider {
+public class HardDrive extends Hardware implements FileSystemProvider {
 
-    private Media media;
+    private FileSystem fileSystem;
 
     /**
      * Creates a new empty hard drive.
@@ -65,61 +64,13 @@ public class HardDrive extends Hardware implements MediaProvider {
 
         super(host, name, version, vulnerabilities);
 
-        media = new Media(host, size);
+        fileSystem = new FileSystem(host, size);
     }
 
     @Override
-    public Media resolveMedia() {
+    public FileSystem getFileSystem() {
 
-        return media;
-    }
-
-    @Override
-    public long getSize() {
-
-        return media.getSize();
-    }
-
-    @Override
-    public char getLetter() {
-
-        return media.getLetter();
-    }
-
-    @Override
-    public void setLetter(char letter) {
-
-        media.setLetter(letter);
-    }
-
-    @Override
-    public File getRootFile() {
-
-        return media.getRootFile();
-    }
-
-    @Override
-    public File getFile(String path) {
-
-        return media.getFile(path);
-    }
-
-    @Override
-    public File addFile(String path, FileType type) {
-
-        return media.addFile(path, type);
-    }
-
-    @Override
-    public long getFilled() {
-
-        return media.getFilled();
-    }
-
-    @Override
-    public long getFree() {
-
-        return media.getFree();
+        return fileSystem;
     }
 
     @Override
@@ -127,7 +78,7 @@ public class HardDrive extends Hardware implements MediaProvider {
 
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (media == null ? 0 : media.hashCode());
+        result = prime * result + (fileSystem == null ? 0 : fileSystem.hashCode());
         return result;
     }
 
@@ -144,11 +95,11 @@ public class HardDrive extends Hardware implements MediaProvider {
             return false;
         }
         HardDrive other = (HardDrive) obj;
-        if (media == null) {
-            if (other.media != null) {
+        if (fileSystem == null) {
+            if (other.fileSystem != null) {
                 return false;
             }
-        } else if (!media.equals(other.media)) {
+        } else if (!fileSystem.equals(other.fileSystem)) {
             return false;
         }
         return true;
@@ -157,7 +108,7 @@ public class HardDrive extends Hardware implements MediaProvider {
     @Override
     public String toString() {
 
-        return getClass().getName() + " [" + toInfoString() + ", media: " + media + "]";
+        return getClass().getName() + " [" + toInfoString() + ", media: " + fileSystem + "]";
     }
 
 }

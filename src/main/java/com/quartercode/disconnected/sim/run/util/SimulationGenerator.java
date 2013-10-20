@@ -28,7 +28,7 @@ import com.quartercode.disconnected.sim.comp.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.OperatingSystem.RightLevel;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
-import com.quartercode.disconnected.sim.comp.file.Media;
+import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.Hardware;
@@ -155,8 +155,7 @@ public class SimulationGenerator {
 
             HardDrive hardDrive = new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
             hardware.add(hardDrive);
-            hardDrive.setLetter('C');
-            fillFileSystem(hardDrive.resolveMedia());
+            fillFileSystem(hardDrive.getFileSystem());
 
             NetworkInterface networkInterface = new NetworkInterface(computer, "NI FiberScore Ultimate", new Version(1, 2, 0), null);
             generateIP(networkInterface, simulation);
@@ -178,24 +177,24 @@ public class SimulationGenerator {
             }
 
             computer.setOperatingSystem(new OperatingSystem(computer, "Frames", new Version(3, 7, 65), null));
+            computer.getOperatingSystem().mountFileSystem(hardDrive.getFileSystem(), 'C');
         }
 
         return computers;
     }
 
     // Temporary method for generating the kernel and some basic programs
-    private static void fillFileSystem(Media media) {
+    private static void fillFileSystem(FileSystem fileSystem) {
 
         // Generate kernel file (temp)
-        media.addFile("/bin/kernel", FileType.FILE);
+        fileSystem.addFile("/system/boot/kernel", FileType.FILE);
 
-        // Generate basic programs
-        media.addFile("/bin/sysviewer", FileType.FILE);
-        media.getFile("/bin/sysviewer").setContent(new SystemViewerProgram("System Viewer", new Version("1.0.0"), null, RightLevel.USER));
+        // Generate programs
+        fileSystem.addFile("/opt/sysviewer/sysviewer.exe", FileType.FILE);
+        fileSystem.getFile("/opt/sysviewer/sysviewer.exe").setContent(new SystemViewerProgram("System Viewer", new Version("1.0.0"), null, RightLevel.USER));
 
-        // Generate some test files
-        media.addFile("/opt/exploit.run", FileType.FILE);
-        media.getFile("/opt/exploit.run").setContent(new ExploitProgram("Exploiter", new Version("1.0.0"), null, RightLevel.USER));
+        fileSystem.addFile("/opt/exploiter/exploiter.exe", FileType.FILE);
+        fileSystem.getFile("/opt/exploiter/exploiter.exe").setContent(new ExploitProgram("Exploiter", new Version("1.0.0"), null, RightLevel.USER));
     }
 
     private static void generateIP(NetworkInterface host, Simulation simulation) {

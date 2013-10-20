@@ -20,44 +20,48 @@ package com.quartercode.disconnected.sim.comp.file;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
+import com.quartercode.disconnected.util.InfoString;
 import com.quartercode.disconnected.util.size.SizeObject;
 
 /**
- * This class represents a media of a computer.
- * The media has a letter (e.g. "C") and stores files which can be accessed like regular files.
+ * This class represents a file system.
+ * The system stores files which can be accessed like regular file objects.
+ * A file system can be virtual or physical.
  * 
  * @see File
  */
-public class Media implements MediaProvider, SizeObject {
+public class FileSystem implements SizeObject, InfoString {
+
+    private final String seperator = "/";
 
     @XmlIDREF
     @XmlAttribute
-    private Computer host;
+    private Computer     host;
     @XmlElement
-    private long     size;
+    private long         size;
 
-    private char     letter;
     @XmlElement
-    private File     rootFile;
+    private File         rootFile;
 
     /**
-     * Creates a new empty media.
+     * Creates a new empty file system.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    protected Media() {
+    protected FileSystem() {
 
     }
 
     /**
-     * Creates a new media and sets the host computer and the size in bytes.
+     * Creates a new file system and sets the hosting computer and the size in bytes.
      * 
      * @param host The computer this media is hosted on.
      * @param size The size of the media, given in bytes.
      */
-    public Media(Computer host, long size) {
+    public FileSystem(Computer host, long size) {
 
         this.host = host;
         this.size = size;
@@ -65,50 +69,59 @@ public class Media implements MediaProvider, SizeObject {
         rootFile = new File(this);
     }
 
-    @Override
-    public Media resolveMedia() {
+    /**
+     * Returns the path seperator which seperates different files in a path string.
+     * 
+     * @return The path seperator which seperates different files in a path string.
+     */
+    public String getSeperator() {
 
-        return this;
+        return seperator;
     }
 
-    @Override
+    /**
+     * Returns the computer this media is hosted on.
+     * This will only return the sotring computer, not any accessing computers.
+     * 
+     * @return The computer this media is hosted to.
+     */
     public Computer getHost() {
 
         return host;
     }
 
+    /**
+     * Returns the size of the media, given in bytes.
+     * 
+     * @return The size of the media, given in bytes.
+     */
     @Override
     public long getSize() {
 
         return size;
     }
 
-    @Override
-    public char getLetter() {
-
-        return letter;
-    }
-
-    @Override
-    public void setLetter(char letter) {
-
-        this.letter = letter;
-
-        if (rootFile != null) {
-            rootFile.resolveId();
-        }
-    }
-
-    @Override
+    /**
+     * Returns the root file which every other file path branches of.
+     * 
+     * @return The root file which every other file path branches of.
+     */
     public File getRootFile() {
 
         return rootFile;
     }
 
-    @Override
+    /**
+     * Returns the file which is stored on the media under the given path.
+     * A path is a collection of files seperated by a seperator.
+     * This will look up the file using a local media path.
+     * 
+     * @param path The path to look in for the file.
+     * @return The file which is stored on the media under the given path.
+     */
     public File getFile(String path) {
 
-        String[] parts = path.split(File.SEPERATOR);
+        String[] parts = path.split(seperator);
 
         File current = rootFile;
         for (String part : parts) {
@@ -123,13 +136,21 @@ public class Media implements MediaProvider, SizeObject {
         return current;
     }
 
-    @Override
+    /**
+     * Creates a new file using the given path and type on this media and returns it.
+     * If the file already exists, the existing file will be returned.
+     * A path is a collection of files seperated by a seperator.
+     * This will get the file location using a local media path.
+     * 
+     * @param path The path the new file will be located under.
+     * @param type The file type the new file should has.
+     * @return The new file (or the existing one, if the file already exists).
+     */
     public File addFile(String path, FileType type) {
 
-        String[] parts = path.split(File.SEPERATOR);
+        String[] parts = path.split(seperator);
         File file = new File(this, parts[parts.length - 1], type);
         addFile(file, path);
-        file.resolveId();
         return file;
     }
 
@@ -143,7 +164,7 @@ public class Media implements MediaProvider, SizeObject {
      */
     protected void addFile(File file, String path) {
 
-        String[] parts = path.split(File.SEPERATOR);
+        String[] parts = path.split(seperator);
 
         File current = rootFile;
         for (int counter = 0; counter < parts.length; counter++) {
@@ -156,7 +177,6 @@ public class Media implements MediaProvider, SizeObject {
                     } else {
                         File dir = new File(this, part, FileType.DIRECTORY);
                         current.addChildFile(dir);
-                        dir.resolveId();
                     }
                 } else if (current.getChildFile(part).getType() != FileType.DIRECTORY) {
                     throw new IllegalStateException("File path '" + path + " isn't valid: file '" + current.getChildFile(part).getLocalPath() + "' isn't a directory");
@@ -166,7 +186,11 @@ public class Media implements MediaProvider, SizeObject {
         }
     }
 
-    @Override
+    /**
+     * Returns the total amount of bytes which are occupied by files.
+     * 
+     * @return The total amount of bytes which are occupied by files.
+     */
     public long getFilled() {
 
         return getFilled(rootFile);
@@ -183,10 +207,28 @@ public class Media implements MediaProvider, SizeObject {
         return filled;
     }
 
-    @Override
+    /**
+     * Returns the total amount of bytes which are not occupied by any files.
+     * 
+     * @return The total amount of bytes which are not occupied by any files.
+     */
     public long getFree() {
 
         return size - getFilled();
+    }
+
+    /**
+     * Returns the unique serialization id for the file system.
+     * The id is a combination of the host computer's id and the mountpoint of the file system.
+     * It should only be used by a serialization algorithm.
+     * 
+     * @return The unique serialization id for the file system.
+     */
+    @XmlAttribute
+    @XmlID
+    protected String getId() {
+
+        return host.getId() + ">" + host.getOperatingSystem().getFileSystemMountpoint(this);
     }
 
     @Override
@@ -194,8 +236,8 @@ public class Media implements MediaProvider, SizeObject {
 
         final int prime = 31;
         int result = 1;
-        result = prime * result + letter;
         result = prime * result + (rootFile == null ? 0 : rootFile.hashCode());
+        result = prime * result + (seperator == null ? 0 : seperator.hashCode());
         result = prime * result + (int) (size ^ size >>> 32);
         return result;
     }
@@ -212,15 +254,19 @@ public class Media implements MediaProvider, SizeObject {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        Media other = (Media) obj;
-        if (letter != other.letter) {
-            return false;
-        }
+        FileSystem other = (FileSystem) obj;
         if (rootFile == null) {
             if (other.rootFile != null) {
                 return false;
             }
         } else if (!rootFile.equals(other.rootFile)) {
+            return false;
+        }
+        if (seperator == null) {
+            if (other.seperator != null) {
+                return false;
+            }
+        } else if (!seperator.equals(other.seperator)) {
             return false;
         }
         if (size != other.size) {
@@ -230,9 +276,15 @@ public class Media implements MediaProvider, SizeObject {
     }
 
     @Override
+    public String toInfoString() {
+
+        return getFilled() + "/" + size + "b filled, host computer " + host.getId();
+    }
+
+    @Override
     public String toString() {
 
-        return getClass().getName() + " [" + size + " bytes size, drive letter " + letter + ", " + getFilled() + " bytes filled]";
+        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }

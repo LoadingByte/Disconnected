@@ -21,11 +21,20 @@ package com.quartercode.disconnected.sim.comp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlIDREF;
+import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
 import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
-import com.quartercode.disconnected.sim.comp.file.MediaProvider;
+import com.quartercode.disconnected.sim.comp.file.FileSystem;
+import com.quartercode.disconnected.sim.comp.file.FileSystemProvider;
+import com.quartercode.disconnected.sim.comp.file.MountException;
 import com.quartercode.disconnected.sim.comp.net.Address;
 import com.quartercode.disconnected.sim.comp.net.Packet;
 import com.quartercode.disconnected.sim.comp.program.Process;
@@ -69,11 +78,15 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     }
 
     @XmlElement (name = "vulnerability")
-    private List<Vulnerability> vulnerabilities = new ArrayList<Vulnerability>();
+    private List<Vulnerability>           vulnerabilities    = new ArrayList<Vulnerability>();
 
     @XmlElement
-    private Process             rootProcess;
-    private Desktop             desktop;
+    private Process                       rootProcess;
+    @XmlElementWrapper (name = "mountedFileSystems")
+    @XmlElement (name = "fileSystem")
+    private final List<MountedFileSystem> mountedFileSystems = new ArrayList<MountedFileSystem>();
+
+    private Desktop                       desktop;
 
     /**
      * Creates a new empty operating system.
@@ -96,7 +109,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         super(host, name, version);
 
         this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
-        rootProcess = new Process(this, null, 0, getFile("C:/bin/kernel"), null);
+        rootProcess = new Process(this, null, 0, getFile("C:/system/boot/kernel"), null);
         desktop = new Desktop(this);
     }
 
@@ -178,27 +191,48 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     }
 
     /**
-     * Returns a list containing all media which are connected to this computer.
+     * Returns a list containing all avaiable file systems which are connected to this computer.
+     * This uses different resources to collect the file systems.
      * 
-     * @return A list containing all media which are connected to this computer.
+     * @return A list containing all avaiable file systems which are connected to this computer.
      */
-    public List<MediaProvider> getMedia() {
+    public List<FileSystem> getAvaiableFileSystems() {
 
-        return getHost().getHardware(MediaProvider.class);
+        List<FileSystem> fileSystems = new ArrayList<FileSystem>();
+        for (FileSystemProvider provider : getHost().getHardware(FileSystemProvider.class)) {
+            fileSystems.add(provider.getFileSystem());
+        }
+        return fileSystems;
     }
 
     /**
-     * Returns the connected media which uses the given letter.
-     * If there is no media with the given letter, this will return null.
+     * Returns a list containing all mounted file systems which is sorted by the mountpoints.
+     * A file system can be mounted and associated with a mountpoint (e.g. "C").
+     * Only mounted file systems can be used.
      * 
-     * @param letter The letter the returned media needs to use.
-     * @return The connected media which uses the given letter.
+     * @return A list containing all mounted file systems.
      */
-    public MediaProvider getMedia(char letter) {
+    public List<FileSystem> getMountedFileSystems() {
 
-        for (MediaProvider media : getMedia()) {
-            if (media.getLetter() == letter) {
-                return media;
+        Map<Character, FileSystem> bindings = new TreeMap<Character, FileSystem>();
+        for (MountedFileSystem mountedFileSystem : mountedFileSystems) {
+            bindings.put(mountedFileSystem.getMountpoint(), mountedFileSystem.getFileSystem());
+        }
+        return new ArrayList<FileSystem>(bindings.values());
+    }
+
+    /**
+     * Returns the mounted file system which uses the given mountpoint.
+     * If there is no file system using the given mountpoint, this will return null.
+     * 
+     * @param mountpoint The mountpoint the returned file system needs to use.
+     * @return The mounted file system which is using the given mountpoint.
+     */
+    public FileSystem getMountedFileSystem(char mountpoint) {
+
+        for (MountedFileSystem mountedFileSystem : mountedFileSystems) {
+            if (mountedFileSystem.getMountpoint() == mountpoint) {
+                return mountedFileSystem.getFileSystem();
             }
         }
 
@@ -206,46 +240,96 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     }
 
     /**
-     * Returns the connected media on which the file under the given path is stored.
-     * A path is a collection of files seperated by a seperator.
-     * This requires a global os path.
-     * If there is no media the file is stored on, this will return null.
+     * Returns the mounted file system which holds the file which is stored under the given path.
+     * A file system can be mounted and associated with a mountpoint (e.g. "C"). Only mounted file systems can be used.
+     * A path is a collection of files seperated by a seperator. This requires a global os path.
+     * If there is no file system the file is stored on, this will return null.
      * 
-     * @param path The file represented by this path is stored on the returned media.
-     * @return The connected media on which the file under the given path is stored.
+     * @param path The file represented by this path is stored on the returned file system.
+     * @return The mounted file system which holds the file which is stored under the given path.
      */
-    public MediaProvider getMedia(String path) {
+    public FileSystem getMountedFileSystem(String path) {
 
         if (path.contains(":")) {
-            return getMedia(path.split(":")[0].charAt(0));
+            return getMountedFileSystem(path.split(":")[0].charAt(0));
         } else {
             return null;
         }
     }
 
     /**
-     * Returns the file which is stored on a media of the computer this os is running on under the given path.
+     * Returns the mountpoint of the given file system.
+     * A file system can be mounted and associated with a mountpoint (e.g. "C").
+     * Only mounted file systems can be used.
+     * 
+     * @param fileSystem The file system which is associated with the returned mountpoint.
+     * @return The mountpoint of the given file system.
+     */
+    public char getFileSystemMountpoint(FileSystem fileSystem) {
+
+        for (MountedFileSystem mountedFileSystem : mountedFileSystems) {
+            if (mountedFileSystem.getFileSystem().equals(fileSystem)) {
+                return mountedFileSystem.getMountpoint();
+            }
+        }
+        return '-';
+    }
+
+    /**
+     * Tries to mount the given file system and binding it to the given mountpoint.
+     * 
+     * @param fileSystem The file system to mount to the os.
+     * @param mountpoint The mountpoint to bind the file system to.
+     * @throws MountException Somethign goes wrong while mounting the file system.
+     */
+    public void mountFileSystem(FileSystem fileSystem, char mountpoint) {
+
+        Validate.notNull(mountpoint, "Mountpoint can't be null");
+        if (getMountedFileSystems().contains(fileSystem)) {
+            throw new MountException(fileSystem, true, "File system already mounted");
+        } else {
+            mountedFileSystems.add(new MountedFileSystem(fileSystem, mountpoint));
+        }
+    }
+
+    /**
+     * Tries to unmount the given file system from the computer.
+     * 
+     * @param fileSystem The file system to unmount from the os.
+     * @throws MountException Somethign goes wrong while unmounting the file system.
+     */
+    public void unmountFileSystem(FileSystem fileSystem) {
+
+        if (!getMountedFileSystems().contains(fileSystem)) {
+            throw new MountException(fileSystem, false, "File system not mounted");
+        } else {
+            mountedFileSystems.remove(fileSystem);
+        }
+    }
+
+    /**
+     * Returns the file which is stored on a mounted file system under the given path.
      * A path is a collection of files seperated by a seperator.
      * This will look up the file using a global os path.
      * 
-     * @param path The path to look in for the file.
-     * @return The file which is stored on a media of the computer this os is running on under the given path.
+     * @param path The path the returned file is stored under.
+     * @return The file which is stored on a mounted file system under the given path.
      */
     public File getFile(String path) {
 
-        MediaProvider media = getMedia(path);
-        if (media != null) {
-            return media.getFile(path.split(":")[1]);
+        FileSystem fileSystem = getMountedFileSystem(path);
+        if (fileSystem != null) {
+            return fileSystem.getFile(path.split(":")[1]);
         } else {
             return null;
         }
     }
 
     /**
-     * Creates a new file using the given path and type on this computer and returns it.
+     * Creates a new file using the given path and type on the associated file system mounted on this computer and returns it.
      * If the file already exists, the existing file will be returned.
      * A path is a collection of files seperated by a seperator.
-     * This will get the file location using a global os path.
+     * This will create the file location using a global os path.
      * 
      * @param path The path the new file will be located under.
      * @param type The file type the new file should has.
@@ -253,9 +337,9 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      */
     public File addFile(String path, FileType type) {
 
-        MediaProvider media = getMedia(path);
-        if (media != null) {
-            return media.addFile(path.split(":")[1], type);
+        FileSystem fileSystem = getMountedFileSystem(path);
+        if (fileSystem != null) {
+            return fileSystem.addFile(path.split(":")[1], type);
         } else {
             return null;
         }
@@ -333,6 +417,61 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     public String toString() {
 
         return getClass().getName() + "[" + toInfoString() + "]";
+    }
+
+    /**
+     * The mounted file system represents a file system which is mounted into an os.
+     * This is used in a datastructure of the os class to store the mountpoints of file systems.
+     * 
+     * @see FileSystem
+     */
+    @XmlAccessorType (XmlAccessType.FIELD)
+    protected static class MountedFileSystem {
+
+        @XmlIDREF
+        private FileSystem fileSystem;
+        private char       mountpoint;
+
+        /**
+         * Creates a new empty mounted file system representation object.
+         * This is only recommended for direct field access (e.g. for serialization).
+         */
+        public MountedFileSystem() {
+
+        }
+
+        /**
+         * Creates a new mounted file system representation object and sets the file system and the mountpoint.
+         * 
+         * @param fileSystem The file system which is represented by this ds object.
+         * @param mountpoint The mountpoint the given file system is using.
+         */
+        public MountedFileSystem(FileSystem fileSystem, char mountpoint) {
+
+            this.fileSystem = fileSystem;
+            this.mountpoint = mountpoint;
+        }
+
+        /**
+         * Returns the file system which is represented by this ds object.
+         * 
+         * @return The file system which is represented by this ds object.
+         */
+        public FileSystem getFileSystem() {
+
+            return fileSystem;
+        }
+
+        /**
+         * Returns the mountpoint the represented file system is using.
+         * 
+         * @return The mountpoint the represented file system is using.
+         */
+        public char getMountpoint() {
+
+            return mountpoint;
+        }
+
     }
 
 }

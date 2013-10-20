@@ -19,36 +19,38 @@
 package com.quartercode.disconnected.sim.comp.file;
 
 /**
- * This runtime exception occures if there is not enough space on a hard drive for handling some new bytes (e.g. from a file).
+ * This runtime exception occures if there is not enough space on a file system for storing some new bytes (e.g. from a file).
+ * 
+ * @see FileSystem
  */
 public class OutOfSpaceException extends RuntimeException {
 
-    private static final long serialVersionUID = 8323952137690040026L;
+    private static final long serialVersionUID = -905196120194774390L;
 
-    private final Media       host;
+    private final FileSystem  fileSystem;
     private final long        size;
 
     /**
-     * Creates a new out of space exception and sets the host which should have handled the new bytes and the amount of new bytes.
+     * Creates a new out of space exception and sets the file system which should have stored the new bytes and the amount of new bytes.
      * 
-     * @param host The hard drive host which should have handled the new bytes,
+     * @param fileSystem The file system which should have stored the new bytes.
      * @param size The amount of new bytes.
      */
-    public OutOfSpaceException(Media host, long size) {
+    public OutOfSpaceException(FileSystem fileSystem, long size) {
 
-        super("Out of space on " + host.getLetter() + ": " + host.getFilled() + "b/" + host.getSize() + "b filled, can't handle " + size + "b");
-        this.host = host;
+        super("Out of space on file system for computer " + fileSystem.getHost().getId() + ": " + fileSystem.getFilled() + "b/" + fileSystem.getSize() + "b filled, can't store " + size + "b");
+        this.fileSystem = fileSystem;
         this.size = size;
     }
 
     /**
-     * Returns the hard drive host which should have handled the new bytes,
+     * Returns the file system which should have stored the new bytes.
      * 
-     * @return The hard drive host which should have handled the new bytes,
+     * @return The file system which should have stored the new bytes.
      */
-    public Media getHost() {
+    public FileSystem getFileSystem() {
 
-        return host;
+        return fileSystem;
     }
 
     /**
