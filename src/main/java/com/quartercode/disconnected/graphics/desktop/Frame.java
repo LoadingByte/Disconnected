@@ -131,7 +131,7 @@ public class Frame extends ResizableFrame {
      * @param x The new relative x center of the frame (0 - 1).
      * @param y The new relative y center of the frame (0 - 1).
      */
-    public void center(float x, float y) {
+    public void setCenter(float x, float y) {
 
         Validate.isTrue(x >= 0 && x <= 1, "Relative x coordinate must be in range 0 <= x <= 1: " + x);
         Validate.isTrue(y >= 0 && y <= 1, "Relative y coordinate must be in range 0 <= y <= 1: " + y);

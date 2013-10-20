@@ -124,7 +124,7 @@ public class DesktopWidget extends Widget {
 
         try {
             windowArea.add(window.getFrame());
-            window.getFrame().center(0.5F, 0.45F);
+            window.getFrame().setCenter(0.2F, 0.2F);
             windowArea.invalidateLayout();
 
             taskbar.add(window.getFrame().getTaskbarButton());

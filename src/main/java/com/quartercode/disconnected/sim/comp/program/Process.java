@@ -279,7 +279,7 @@ public class Process implements InfoString {
     @Override
     public String toInfoString() {
 
-        return "pid " + pid + " on " + host.getId() + ", source " + file.getGlobalPath() + ", logic in " + executor.getClass().getName() + ", " + children.size() + " children";
+        return "pid " + pid + " on " + host.getId() + ", source " + file.getGlobalPath(host) + ", controlled by " + executor.getClass().getName() + ", " + children.size() + " children";
     }
 
     @Override
