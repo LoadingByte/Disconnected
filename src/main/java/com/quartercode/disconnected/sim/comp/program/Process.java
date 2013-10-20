@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.OperatingSystem;
-import com.quartercode.disconnected.sim.comp.media.File;
+import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.util.InfoString;
 
 /**

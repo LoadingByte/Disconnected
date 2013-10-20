@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.comp.media;
+package com.quartercode.disconnected.sim.comp.file;
 
 /**
  * This runtime exception occures if there is not enough space on a hard drive for handling some new bytes (e.g. from a file).

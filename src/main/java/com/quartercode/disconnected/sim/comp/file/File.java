@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.comp.media;
+package com.quartercode.disconnected.sim.comp.file;
 
 import java.io.Serializable;
 import java.util.ArrayList;

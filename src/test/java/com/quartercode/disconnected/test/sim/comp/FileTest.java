@@ -24,9 +24,9 @@ import org.junit.Test;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.Version;
+import com.quartercode.disconnected.sim.comp.file.File;
+import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
-import com.quartercode.disconnected.sim.comp.media.File;
-import com.quartercode.disconnected.sim.comp.media.File.FileType;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 public class FileTest {

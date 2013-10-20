@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.Desktop.Window;
-import com.quartercode.disconnected.sim.comp.media.File;
+import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.net.Address;
 import com.quartercode.disconnected.sim.comp.net.Packet;
 import com.quartercode.disconnected.sim.comp.net.PacketListener;

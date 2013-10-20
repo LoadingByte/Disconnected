@@ -24,11 +24,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
+import com.quartercode.disconnected.sim.comp.file.File;
+import com.quartercode.disconnected.sim.comp.file.File.FileType;
+import com.quartercode.disconnected.sim.comp.file.Media;
+import com.quartercode.disconnected.sim.comp.file.MediaProvider;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSlot;
-import com.quartercode.disconnected.sim.comp.media.File;
-import com.quartercode.disconnected.sim.comp.media.File.FileType;
-import com.quartercode.disconnected.sim.comp.media.Media;
-import com.quartercode.disconnected.sim.comp.media.MediaProvider;
 
 /**
  * This class represents a hard drive of a computer.
