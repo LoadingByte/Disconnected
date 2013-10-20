@@ -45,13 +45,11 @@ import com.quartercode.disconnected.util.size.SizeObject;
  */
 public abstract class Program extends ComputerPart implements SizeObject, Vulnerable {
 
-    private static final long           serialVersionUID = 1L;
-
     @XmlElement (name = "vulnerability")
-    private List<Vulnerability>         vulnerabilities  = new ArrayList<Vulnerability>();
+    private List<Vulnerability>         vulnerabilities = new ArrayList<Vulnerability>();
     @XmlElement
     private RightLevel                  rightLevel;
-    private final Map<String, Class<?>> parameters       = new HashMap<String, Class<?>>();
+    private final Map<String, Class<?>> parameters      = new HashMap<String, Class<?>>();
 
     /**
      * Creates a new empty program.

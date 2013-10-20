@@ -37,10 +37,8 @@ import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
  */
 public class Hardware extends HostedComputerPart implements Vulnerable {
 
-    private static final long   serialVersionUID = 1L;
-
     @XmlElement (name = "vulnerability")
-    private List<Vulnerability> vulnerabilities  = new ArrayList<Vulnerability>();
+    private List<Vulnerability> vulnerabilities = new ArrayList<Vulnerability>();
 
     /**
      * Creates a new empty hardware part.

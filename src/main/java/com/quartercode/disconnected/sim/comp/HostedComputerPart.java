@@ -22,7 +22,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlID;
 import com.quartercode.disconnected.sim.comp.hardware.Hardware;
-import com.quartercode.disconnected.util.CloneUtil;
 
 /**
  * This class stores information about a computer part which is directly hosted on a computer, like a hardware part or an operating system.
@@ -36,9 +35,7 @@ import com.quartercode.disconnected.util.CloneUtil;
  */
 public class HostedComputerPart extends ComputerPart {
 
-    private static final long serialVersionUID = 1L;
-
-    private Computer          host;
+    private Computer host;
 
     /**
      * Creates a new empty hosted computer part.
@@ -87,12 +84,6 @@ public class HostedComputerPart extends ComputerPart {
     public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
 
         host = (Computer) parent;
-    }
-
-    @Override
-    public HostedComputerPart clone() {
-
-        return (HostedComputerPart) CloneUtil.clone(this);
     }
 
     @Override

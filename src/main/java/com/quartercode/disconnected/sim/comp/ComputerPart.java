@@ -18,11 +18,9 @@
 
 package com.quartercode.disconnected.sim.comp;
 
-import java.io.Serializable;
 import javax.xml.bind.annotation.XmlElement;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.sim.comp.program.Program;
-import com.quartercode.disconnected.util.CloneUtil;
 import com.quartercode.disconnected.util.InfoString;
 
 /**
@@ -35,14 +33,12 @@ import com.quartercode.disconnected.util.InfoString;
  * @see HostedComputerPart
  * @see Program
  */
-public class ComputerPart implements InfoString, Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class ComputerPart implements InfoString {
 
     @XmlElement
-    private String            name;
+    private String  name;
     @XmlElement
-    private Version           version;
+    private Version version;
 
     /**
      * Creates a new empty computer part.
@@ -84,12 +80,6 @@ public class ComputerPart implements InfoString, Serializable {
     public Version getVersion() {
 
         return version;
-    }
-
-    @Override
-    public ComputerPart clone() {
-
-        return (ComputerPart) CloneUtil.clone(this);
     }
 
     @Override

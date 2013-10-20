@@ -18,7 +18,6 @@
 
 package com.quartercode.disconnected.sim.comp.program;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,9 +42,7 @@ import com.quartercode.disconnected.util.InfoString;
  * @see File
  */
 @XmlAccessorType (XmlAccessType.FIELD)
-public class Process implements Serializable, InfoString {
-
-    private static final long   serialVersionUID = 1L;
+public class Process implements InfoString {
 
     @XmlIDREF
     @XmlAttribute
@@ -60,7 +57,7 @@ public class Process implements Serializable, InfoString {
 
     @XmlElementWrapper (name = "children")
     @XmlElement (name = "child")
-    private final List<Process> children         = new ArrayList<Process>();
+    private final List<Process> children = new ArrayList<Process>();
 
     /**
      * Creates a new empty process.

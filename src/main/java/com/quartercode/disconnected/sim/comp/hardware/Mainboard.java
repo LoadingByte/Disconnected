@@ -18,7 +18,6 @@
 
 package com.quartercode.disconnected.sim.comp.hardware;
 
-import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -44,8 +43,6 @@ import com.quartercode.disconnected.sim.comp.Vulnerability;
  */
 @XmlAccessorType (XmlAccessType.FIELD)
 public class Mainboard extends Hardware {
-
-    private static final long   serialVersionUID = 1L;
 
     @XmlElement (name = "slot")
     private List<MainboradSlot> slots;
@@ -132,9 +129,7 @@ public class Mainboard extends Hardware {
      * @see Hardware
      */
     @XmlAccessorType (XmlAccessType.FIELD)
-    public static class MainboradSlot implements Serializable {
-
-        private static final long         serialVersionUID = 1L;
+    public static class MainboradSlot {
 
         @XmlAttribute
         private Class<? extends Hardware> type;

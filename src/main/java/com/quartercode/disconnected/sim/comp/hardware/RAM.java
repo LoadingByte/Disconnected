@@ -36,10 +36,8 @@ import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSl
 @NeedsMainboardSlot
 public class RAM extends Hardware {
 
-    private static final long serialVersionUID = 1L;
-
-    private long              size;
-    private long              frequency;
+    private long size;
+    private long frequency;
 
     /**
      * Creates a new empty ram module.

@@ -44,8 +44,6 @@ import com.quartercode.disconnected.sim.comp.net.Packet;
 @NeedsMainboardSlot
 public class NetworkInterface extends Hardware {
 
-    private static final long   serialVersionUID = 1L;
-
     private IP                  ip;
     @XmlElementWrapper (name = "remainingPackets")
     @XmlElement (name = "packet")

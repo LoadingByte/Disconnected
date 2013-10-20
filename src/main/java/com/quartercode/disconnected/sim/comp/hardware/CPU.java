@@ -36,10 +36,8 @@ import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSl
 @NeedsMainboardSlot
 public class CPU extends Hardware {
 
-    private static final long serialVersionUID = 1L;
-
-    private int               threads;
-    private long              frequency;
+    private int  threads;
+    private long frequency;
 
     /**
      * Creates a new empty cpu.

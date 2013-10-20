@@ -18,7 +18,6 @@
 
 package com.quartercode.disconnected.sim.comp.file;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +36,7 @@ import com.quartercode.disconnected.util.size.SizeUtil;
  * 
  * @see Media
  */
-public class File implements Serializable, SizeObject {
+public class File implements SizeObject {
 
     /**
      * The file type represents if a file is a content file or a directory.
@@ -57,9 +56,7 @@ public class File implements Serializable, SizeObject {
     /**
      * The seperator which seperates different files in a path string.
      */
-    public static final String SEPERATOR        = "/";
-
-    private static final long  serialVersionUID = 1L;
+    public static final String SEPERATOR = "/";
 
     @XmlID
     @XmlAttribute
@@ -72,7 +69,7 @@ public class File implements Serializable, SizeObject {
     @XmlElement
     private Object             content;
     @XmlElement (name = "child")
-    private final List<File>   children         = new ArrayList<File>();
+    private final List<File>   children  = new ArrayList<File>();
 
     /**
      * Creates a new empty file.

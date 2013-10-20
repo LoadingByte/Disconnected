@@ -42,9 +42,7 @@ import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSl
 @NeedsMainboardSlot
 public class HardDrive extends Hardware implements MediaProvider {
 
-    private static final long serialVersionUID = 1L;
-
-    private Media             media;
+    private Media media;
 
     /**
      * Creates a new empty hard drive.

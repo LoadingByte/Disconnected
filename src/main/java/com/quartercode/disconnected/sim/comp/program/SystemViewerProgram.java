@@ -43,8 +43,6 @@ import de.matthiasmann.twl.TreeTable;
  */
 public class SystemViewerProgram extends Program {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * Creates a new empty system viewer program.
      * This is only recommended for direct field access (e.g. for serialization).

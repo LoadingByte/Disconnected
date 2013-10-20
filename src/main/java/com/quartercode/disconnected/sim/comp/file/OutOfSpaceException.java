@@ -23,7 +23,7 @@ package com.quartercode.disconnected.sim.comp.file;
  */
 public class OutOfSpaceException extends RuntimeException {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 8323952137690040026L;
 
     private final Media       host;
     private final long        size;
