@@ -44,7 +44,7 @@ public class FileSystem implements SizeObject, InfoString {
     @XmlElement
     private long         size;
 
-    @XmlElement
+    @XmlElement (name = "file")
     private File         rootFile;
 
     /**
@@ -220,7 +220,7 @@ public class FileSystem implements SizeObject, InfoString {
     /**
      * Returns the unique serialization id for the file system.
      * The id is a combination of the host computer's id and the mountpoint of the file system.
-     * It should only be used by a serialization algorithm.
+     * You can only generate an id if the file system has been mounted.
      * 
      * @return The unique serialization id for the file system.
      */
@@ -228,7 +228,11 @@ public class FileSystem implements SizeObject, InfoString {
     @XmlID
     protected String getId() {
 
-        return host.getId() + ">" + host.getOperatingSystem().getFileSystemMountpoint(this);
+        if (host.getOperatingSystem().getFileSystemManager().getMounted().contains(this)) {
+            return host.getId() + "-" + host.getOperatingSystem().getFileSystemManager().getMountpoint(this);
+        } else {
+            return null;
+        }
     }
 
     @Override

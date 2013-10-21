@@ -21,7 +21,7 @@ package com.quartercode.disconnected.sim.comp.attack;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import com.quartercode.disconnected.sim.comp.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 
 /**
  * This class represents a payload which can be executed on a specified operating system.

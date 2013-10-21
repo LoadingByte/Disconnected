@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang.Validate;
-import com.quartercode.disconnected.sim.comp.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.util.size.SizeObject;
 import com.quartercode.disconnected.util.size.SizeUtil;
 
@@ -60,7 +60,7 @@ public class File implements SizeObject {
     private FileType         type;
     @XmlElement
     private Object           content;
-    @XmlElement (name = "child")
+    @XmlElement (name = "file")
     private final List<File> children = new ArrayList<File>();
 
     /**
@@ -138,7 +138,7 @@ public class File implements SizeObject {
      */
     public String getGlobalPath(OperatingSystem operatingSystem) {
 
-        return operatingSystem.getFileSystemMountpoint(host) + ":" + getLocalPath();
+        return operatingSystem.getFileSystemManager().getMountpoint(host) + ":" + getLocalPath();
     }
 
     /**
@@ -361,7 +361,7 @@ public class File implements SizeObject {
         remove();
 
         if (path.contains(":")) {
-            host = host.getHost().getOperatingSystem().getMountedFileSystem(path);
+            host = host.getHost().getOperatingSystem().getFileSystemManager().getMounted(path);
             host.addFile(this, path.split(":")[1]);
         } else {
             host.addFile(this, path);
@@ -404,7 +404,7 @@ public class File implements SizeObject {
     @XmlID
     protected String getId() {
 
-        return host.getHost().getId() + ">" + getGlobalHostPath();
+        return host.getHost().getId() + "-" + getGlobalHostPath();
     }
 
     public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {

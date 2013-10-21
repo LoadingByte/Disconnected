@@ -16,178 +16,66 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.comp;
+package com.quartercode.disconnected.sim.comp.os;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlIDREF;
 import org.apache.commons.lang.Validate;
-import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
 import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.file.FileSystemProvider;
 import com.quartercode.disconnected.sim.comp.file.MountException;
-import com.quartercode.disconnected.sim.comp.net.Address;
-import com.quartercode.disconnected.sim.comp.net.Packet;
-import com.quartercode.disconnected.sim.comp.program.Process;
-import com.quartercode.disconnected.sim.comp.program.Program;
+import com.quartercode.disconnected.util.InfoString;
 
 /**
- * This class stores information about an operating system.
- * This also contains a list of all vulnerabilities this operating system has.
+ * The file system manager is a subclass the {@link OperatingSystem} uses for holding and modifing file systems.
+ * This class only gets used by the {@link OperatingSystem}.
  * 
- * @see HostedComputerPart
- * @see Desktop
- * @see Vulnerability
+ * @see FileSystem
+ * @see OperatingSystem
  */
-public class OperatingSystem extends HostedComputerPart implements Vulnerable {
+public class FileSystemManager implements InfoString {
+
+    private OperatingSystem         host;
+
+    @XmlElement (name = "mountedFileSystem")
+    private List<MountedFileSystem> mountedFileSystems;
 
     /**
-     * This enum represents the right levels a user can has on an operating system.
-     * The right level defines what a user can or cannot do. If a user has a right level, he can use every other right level below his one.
-     * 
-     * @see OperatingSystem
-     * @see Program
-     */
-    public static enum RightLevel {
-
-        /**
-         * A guest only has a minimum of rights. You can compare a guest access with a kiosk mode for operating systems.
-         */
-        GUEST,
-        /**
-         * A user is typically using installed applications, but he doesn't modify the computer or os in any way.
-         */
-        USER,
-        /**
-         * An adiministrator modifies the computer or the os, for example he can install programs or change system properties.
-         */
-        ADMIN,
-        /**
-         * The system authority is the superuser on the os and can do everything the os provides.
-         */
-        SYSTEM;
-    }
-
-    @XmlElement (name = "vulnerability")
-    private List<Vulnerability>           vulnerabilities    = new ArrayList<Vulnerability>();
-
-    @XmlElement
-    private Process                       rootProcess;
-    @XmlElementWrapper (name = "mountedFileSystems")
-    @XmlElement (name = "fileSystem")
-    private final List<MountedFileSystem> mountedFileSystems = new ArrayList<MountedFileSystem>();
-
-    private Desktop                       desktop;
-
-    /**
-     * Creates a new empty operating system.
+     * Creates a new empty file system manager.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    protected OperatingSystem() {
+    protected FileSystemManager() {
 
     }
 
     /**
-     * Creates a new operating system and sets the host computer, the name, the version, the vulnerabilities and the times the os needs for switching on/off.
+     * Creates a new file system manager and sets the host the manager is running for.
      * 
-     * @param host The host computer this part is built in.
-     * @param name The name the operating system has.
-     * @param version The current version the operating system has.
-     * @param vulnerabilities The vulnerabilities the operating system has.
+     * @param host The {@link OperatingSystem} this file system manager is running for.
      */
-    public OperatingSystem(Computer host, String name, Version version, List<Vulnerability> vulnerabilities) {
+    public FileSystemManager(OperatingSystem host) {
 
-        super(host, name, version);
+        this.host = host;
 
-        this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
-        rootProcess = new Process(this, null, 0, getFile("C:/system/boot/kernel"), null);
-        desktop = new Desktop(this);
-    }
-
-    @Override
-    public List<Vulnerability> getVulnerabilities() {
-
-        return Collections.unmodifiableList(vulnerabilities);
+        mountedFileSystems = new ArrayList<MountedFileSystem>();
     }
 
     /**
-     * Returns the root process with the pid 0.
-     * The root process gets started by the os kernel.
+     * Returns the {@link OperatingSystem} this file system manager is running for.
      * 
-     * @return The root process with the pid 0.
+     * @return The {@link OperatingSystem} this file system manager is running for.
      */
-    public Process getRootProcess() {
+    public OperatingSystem getHost() {
 
-        return rootProcess;
-    }
-
-    /**
-     * Returns a list of all current running processes.
-     * 
-     * @return A list of all current running processes.
-     */
-    public List<Process> getAllProcesses() {
-
-        List<Process> processes = new ArrayList<Process>();
-        processes.add(rootProcess);
-        processes.addAll(rootProcess.getAllChildren());
-        return processes;
-    }
-
-    /**
-     * Returns the process which is bound to the given address.
-     * This returns null if there isn't any process with the given binding.
-     * 
-     * @param binding The address to inspect.
-     * @return The process which binds itself to the given address.
-     */
-    public Process getProcess(Address binding) {
-
-        for (Process process : getAllProcesses()) {
-            if (process.getExecutor().getPacketListener(binding) != null) {
-                return process;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Calculates and returns a new pid for a new process.
-     * 
-     * @return The calculated pid.
-     */
-    public synchronized int requestPid() {
-
-        List<Integer> pids = new ArrayList<Integer>();
-        for (Process process : getAllProcesses()) {
-            pids.add(process.getPid());
-        }
-        int pid = 0;
-        while (pids.contains(pid)) {
-            pid++;
-        }
-        return pid;
-    }
-
-    /**
-     * Returns the desktop the os displays.
-     * The desktop displays windows which can be opened by programs.
-     * 
-     * @return The desktop the os displays.
-     */
-    public Desktop getDesktop() {
-
-        return desktop;
+        return host;
     }
 
     /**
@@ -196,10 +84,10 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      * 
      * @return A list containing all avaiable file systems which are connected to this computer.
      */
-    public List<FileSystem> getAvaiableFileSystems() {
+    public List<FileSystem> getAvaiable() {
 
         List<FileSystem> fileSystems = new ArrayList<FileSystem>();
-        for (FileSystemProvider provider : getHost().getHardware(FileSystemProvider.class)) {
+        for (FileSystemProvider provider : host.getHost().getHardware(FileSystemProvider.class)) {
             fileSystems.add(provider.getFileSystem());
         }
         return fileSystems;
@@ -212,7 +100,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      * 
      * @return A list containing all mounted file systems.
      */
-    public List<FileSystem> getMountedFileSystems() {
+    public List<FileSystem> getMounted() {
 
         Map<Character, FileSystem> bindings = new TreeMap<Character, FileSystem>();
         for (MountedFileSystem mountedFileSystem : mountedFileSystems) {
@@ -228,7 +116,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      * @param mountpoint The mountpoint the returned file system needs to use.
      * @return The mounted file system which is using the given mountpoint.
      */
-    public FileSystem getMountedFileSystem(char mountpoint) {
+    public FileSystem getMounted(char mountpoint) {
 
         for (MountedFileSystem mountedFileSystem : mountedFileSystems) {
             if (mountedFileSystem.getMountpoint() == mountpoint) {
@@ -248,10 +136,10 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      * @param path The file represented by this path is stored on the returned file system.
      * @return The mounted file system which holds the file which is stored under the given path.
      */
-    public FileSystem getMountedFileSystem(String path) {
+    public FileSystem getMounted(String path) {
 
         if (path.contains(":")) {
-            return getMountedFileSystem(path.split(":")[0].charAt(0));
+            return getMounted(path.split(":")[0].charAt(0));
         } else {
             return null;
         }
@@ -265,7 +153,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      * @param fileSystem The file system which is associated with the returned mountpoint.
      * @return The mountpoint of the given file system.
      */
-    public char getFileSystemMountpoint(FileSystem fileSystem) {
+    public char getMountpoint(FileSystem fileSystem) {
 
         for (MountedFileSystem mountedFileSystem : mountedFileSystems) {
             if (mountedFileSystem.getFileSystem().equals(fileSystem)) {
@@ -282,10 +170,10 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      * @param mountpoint The mountpoint to bind the file system to.
      * @throws MountException Somethign goes wrong while mounting the file system.
      */
-    public void mountFileSystem(FileSystem fileSystem, char mountpoint) {
+    public void mount(FileSystem fileSystem, char mountpoint) {
 
         Validate.notNull(mountpoint, "Mountpoint can't be null");
-        if (getMountedFileSystems().contains(fileSystem)) {
+        if (getMounted().contains(fileSystem)) {
             throw new MountException(fileSystem, true, "File system already mounted");
         } else {
             mountedFileSystems.add(new MountedFileSystem(fileSystem, mountpoint));
@@ -298,9 +186,9 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      * @param fileSystem The file system to unmount from the os.
      * @throws MountException Somethign goes wrong while unmounting the file system.
      */
-    public void unmountFileSystem(FileSystem fileSystem) {
+    public void unmount(FileSystem fileSystem) {
 
-        if (!getMountedFileSystems().contains(fileSystem)) {
+        if (!getMounted().contains(fileSystem)) {
             throw new MountException(fileSystem, false, "File system not mounted");
         } else {
             mountedFileSystems.remove(fileSystem);
@@ -317,7 +205,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      */
     public File getFile(String path) {
 
-        FileSystem fileSystem = getMountedFileSystem(path);
+        FileSystem fileSystem = getMounted(path);
         if (fileSystem != null) {
             return fileSystem.getFile(path.split(":")[1]);
         } else {
@@ -337,7 +225,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      */
     public File addFile(String path, FileType type) {
 
-        FileSystem fileSystem = getMountedFileSystem(path);
+        FileSystem fileSystem = getMounted(path);
         if (fileSystem != null) {
             return fileSystem.addFile(path.split(":")[1], type);
         } else {
@@ -345,35 +233,17 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         }
     }
 
-    /**
-     * Sends a new packet from the sender to the receiver address of the given packet.
-     * 
-     * @param packet The packet to send.
-     */
-    public void sendPacket(Packet packet) {
+    public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
 
-        packet.getSender().getIp().getHost().sendPacket(packet);
-    }
-
-    /**
-     * This method takes an incoming packet and distributes it to the target port.
-     * 
-     * @param packet The packet which came in and called the method.
-     */
-    public void handlePacket(Packet packet) {
-
-        if (getProcess(packet.getReceiver()) != null) {
-            getProcess(packet.getReceiver()).getExecutor().receivePacket(packet);
-        }
+        host = (OperatingSystem) parent;
     }
 
     @Override
     public int hashCode() {
 
         final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (rootProcess == null ? 0 : rootProcess.hashCode());
-        result = prime * result + (vulnerabilities == null ? 0 : vulnerabilities.hashCode());
+        int result = 1;
+        result = prime * result + (mountedFileSystems == null ? 0 : mountedFileSystems.hashCode());
         return result;
     }
 
@@ -383,25 +253,18 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
+        if (obj == null) {
             return false;
         }
         if (getClass() != obj.getClass()) {
             return false;
         }
-        OperatingSystem other = (OperatingSystem) obj;
-        if (rootProcess == null) {
-            if (other.rootProcess != null) {
+        FileSystemManager other = (FileSystemManager) obj;
+        if (mountedFileSystems == null) {
+            if (other.mountedFileSystems != null) {
                 return false;
             }
-        } else if (!rootProcess.equals(other.rootProcess)) {
-            return false;
-        }
-        if (vulnerabilities == null) {
-            if (other.vulnerabilities != null) {
-                return false;
-            }
-        } else if (!vulnerabilities.equals(other.vulnerabilities)) {
+        } else if (!mountedFileSystems.equals(other.mountedFileSystems)) {
             return false;
         }
         return true;
@@ -410,13 +273,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     @Override
     public String toInfoString() {
 
-        return super.toInfoString() + ", " + vulnerabilities.size() + " vulns";
-    }
-
-    @Override
-    public String toString() {
-
-        return getClass().getName() + "[" + toInfoString() + "]";
+        return getMounted().size() + " mounted";
     }
 
     /**
@@ -425,11 +282,12 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      * 
      * @see FileSystem
      */
-    @XmlAccessorType (XmlAccessType.FIELD)
-    protected static class MountedFileSystem {
+    protected static class MountedFileSystem implements InfoString {
 
         @XmlIDREF
+        @XmlAttribute (name = "name")
         private FileSystem fileSystem;
+        @XmlAttribute
         private char       mountpoint;
 
         /**
@@ -472,6 +330,47 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
             return mountpoint;
         }
 
+        @Override
+        public int hashCode() {
+
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + (fileSystem == null ? 0 : fileSystem.hashCode());
+            result = prime * result + mountpoint;
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            MountedFileSystem other = (MountedFileSystem) obj;
+            if (fileSystem == null) {
+                if (other.fileSystem != null) {
+                    return false;
+                }
+            } else if (!fileSystem.equals(other.fileSystem)) {
+                return false;
+            }
+            if (mountpoint != other.mountpoint) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public String toInfoString() {
+
+            return fileSystem.toInfoString() + ", mounted on " + mountpoint;
+        }
     }
 
 }

@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.sim.comp.file;
 
-import com.quartercode.disconnected.sim.comp.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 
 /**
  * This runtime exception occures if a file system can't be mounted or unmounted.

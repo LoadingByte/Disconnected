@@ -27,11 +27,11 @@ import java.util.Queue;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlIDREF;
-import com.quartercode.disconnected.sim.comp.Desktop.Window;
 import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.net.Address;
 import com.quartercode.disconnected.sim.comp.net.Packet;
 import com.quartercode.disconnected.sim.comp.net.PacketListener;
+import com.quartercode.disconnected.sim.comp.os.Desktop.Window;
 
 /**
  * This abstract class defines a program executor which takes care of acutally running a program.
@@ -162,7 +162,7 @@ public abstract class ProgramExecutor {
      */
     public void addPacketListener(PacketListener packetListener) {
 
-        if (host.getHost().getProcess(packetListener.getBinding()) != null) {
+        if (host.getHost().getProcessManager().getProcess(packetListener.getBinding()) != null) {
             throw new IllegalStateException("There's already a packet listener bound to " + packetListener.getBinding().toInfoString());
         }
 

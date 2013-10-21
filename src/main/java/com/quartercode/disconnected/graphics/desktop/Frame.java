@@ -20,8 +20,8 @@ package com.quartercode.disconnected.graphics.desktop;
 
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.graphics.component.MultiactionButton;
-import com.quartercode.disconnected.sim.comp.Desktop;
-import com.quartercode.disconnected.sim.comp.Desktop.Window;
+import com.quartercode.disconnected.sim.comp.os.Desktop;
+import com.quartercode.disconnected.sim.comp.os.Desktop.Window;
 import de.matthiasmann.twl.ResizableFrame;
 import de.matthiasmann.twl.Widget;
 

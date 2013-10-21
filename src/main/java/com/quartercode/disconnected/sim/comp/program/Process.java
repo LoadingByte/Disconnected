@@ -22,15 +22,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
-import com.quartercode.disconnected.sim.comp.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.file.File;
+import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.util.InfoString;
 
 /**
@@ -41,22 +39,20 @@ import com.quartercode.disconnected.util.InfoString;
  * @see ProgramExecutor
  * @see File
  */
-@XmlAccessorType (XmlAccessType.FIELD)
 public class Process implements InfoString {
 
     @XmlIDREF
     @XmlAttribute
     private OperatingSystem     host;
-    @XmlIDREF
     private Process             parent;
     @XmlAttribute
     private int                 pid;
     @XmlIDREF
     private File                file;
+    @XmlElement
     private ProgramExecutor     executor;
 
-    @XmlElementWrapper (name = "children")
-    @XmlElement (name = "child")
+    @XmlElement (name = "process")
     private final List<Process> children = new ArrayList<Process>();
 
     /**
@@ -182,7 +178,7 @@ public class Process implements InfoString {
      */
     public Process createChild(File file, Map<String, Object> arguments) {
 
-        return createChild(file, arguments, host.requestPid());
+        return createChild(file, arguments, host.getProcessManager().requestPid());
     }
 
     /**
@@ -219,9 +215,16 @@ public class Process implements InfoString {
      */
     @XmlID
     @XmlAttribute
-    public String getId() {
+    protected String getId() {
 
         return host.getHost().getId() + "-" + pid;
+    }
+
+    public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
+
+        if (parent instanceof Process) {
+            this.parent = (Process) parent;
+        }
     }
 
     @Override

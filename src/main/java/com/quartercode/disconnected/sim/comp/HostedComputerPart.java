@@ -22,6 +22,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlID;
 import com.quartercode.disconnected.sim.comp.hardware.Hardware;
+import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 
 /**
  * This class stores information about a computer part which is directly hosted on a computer, like a hardware part or an operating system.

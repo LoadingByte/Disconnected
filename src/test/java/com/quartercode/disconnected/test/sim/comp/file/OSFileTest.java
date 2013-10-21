@@ -23,12 +23,12 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import com.quartercode.disconnected.sim.comp.Computer;
-import com.quartercode.disconnected.sim.comp.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
+import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 public class OSFileTest {
@@ -49,7 +49,7 @@ public class OSFileTest {
         HardDrive hardDrive = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
         fileSystem = hardDrive.getFileSystem();
         computer.addHardware(hardDrive);
-        operatingSystem.mountFileSystem(fileSystem, 'C');
+        operatingSystem.getFileSystemManager().mount(fileSystem, 'C');
 
         testFile = fileSystem.addFile("/test1/test2/test.txt", FileType.FILE);
         testFile.setContent("Test-Content");
@@ -58,16 +58,16 @@ public class OSFileTest {
     @Test
     public void testGetFile() {
 
-        char mountpoint = operatingSystem.getFileSystemMountpoint(fileSystem);
-        Assert.assertEquals("Returned file equals original", testFile, operatingSystem.getFile(mountpoint + ":/test1/test2/test.txt"));
+        char mountpoint = operatingSystem.getFileSystemManager().getMountpoint(fileSystem);
+        Assert.assertEquals("Returned file equals original", testFile, operatingSystem.getFileSystemManager().getFile(mountpoint + ":/test1/test2/test.txt"));
     }
 
     @Test
     @Ignore
     public void testCreateFile() {
 
-        char mountpoint = operatingSystem.getFileSystemMountpoint(fileSystem);
-        operatingSystem.addFile(mountpoint + ":/test1/test2/test-global.txt", FileType.FILE);
+        char mountpoint = operatingSystem.getFileSystemManager().getMountpoint(fileSystem);
+        operatingSystem.getFileSystemManager().addFile(mountpoint + ":/test1/test2/test-global.txt", FileType.FILE);
         Assert.assertNotNull("File was created using global method", fileSystem.getFile("/test1/test2/test-global.txt"));
     }
 
@@ -75,7 +75,7 @@ public class OSFileTest {
     @Ignore
     public void testGetGlobalPath() {
 
-        char mountpoint = operatingSystem.getFileSystemMountpoint(fileSystem);
+        char mountpoint = operatingSystem.getFileSystemManager().getMountpoint(fileSystem);
         Assert.assertEquals("Global path is correct", mountpoint + ":/test1/test2/test.txt", testFile.getGlobalPath(operatingSystem));
     }
 
@@ -85,8 +85,8 @@ public class OSFileTest {
 
         HardDrive hardDrive2 = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
         computer.addHardware(hardDrive2);
-        operatingSystem.mountFileSystem(hardDrive2.getFileSystem(), 'D');
-        char mountpoint = operatingSystem.getFileSystemMountpoint(hardDrive2.getFileSystem());
+        operatingSystem.getFileSystemManager().mount(hardDrive2.getFileSystem(), 'D');
+        char mountpoint = operatingSystem.getFileSystemManager().getMountpoint(hardDrive2.getFileSystem());
 
         testFile.move(mountpoint + ":/test1/test3/test.txt");
         Assert.assertEquals("Moved file exists", testFile, hardDrive2.getFileSystem().getFile("/test1/test3/test.txt"));

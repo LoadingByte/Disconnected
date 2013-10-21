@@ -24,11 +24,11 @@ import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.graphics.component.TreeModel;
 import com.quartercode.disconnected.graphics.component.TreeNode;
 import com.quartercode.disconnected.graphics.desktop.Frame;
-import com.quartercode.disconnected.sim.comp.Desktop.Window;
-import com.quartercode.disconnected.sim.comp.OperatingSystem;
-import com.quartercode.disconnected.sim.comp.OperatingSystem.RightLevel;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
+import com.quartercode.disconnected.sim.comp.os.Desktop.Window;
+import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.os.OperatingSystem.RightLevel;
 import com.quartercode.disconnected.sim.run.TickTimer;
 import com.quartercode.disconnected.sim.run.TickTimer.TimerTask;
 import com.quartercode.disconnected.sim.run.Ticker;
@@ -47,7 +47,7 @@ public class SystemViewerProgram extends Program {
      * Creates a new empty system viewer program.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    public SystemViewerProgram() {
+    protected SystemViewerProgram() {
 
     }
 
@@ -92,7 +92,7 @@ public class SystemViewerProgram extends Program {
 
                             TreeNode processRoot = mainWindow.getFrame().getRootProcessNode();
                             processRoot.removeAllChildren();
-                            generateProcessNodes(processRoot, getHost().getHost().getRootProcess());
+                            generateProcessNodes(processRoot, getHost().getHost().getProcessManager().getRootProcess());
                             for (int counter = 0; counter < mainWindow.getFrame().getProcessTreeWidget().getNumRows(); counter++) {
                                 mainWindow.getFrame().getProcessTreeWidget().setRowExpanded(counter, true);
                             }

@@ -24,8 +24,6 @@ import java.util.List;
 import com.quartercode.disconnected.sim.Location;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.Computer;
-import com.quartercode.disconnected.sim.comp.OperatingSystem;
-import com.quartercode.disconnected.sim.comp.OperatingSystem.RightLevel;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
@@ -38,6 +36,8 @@ import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSl
 import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 import com.quartercode.disconnected.sim.comp.net.IP;
+import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.os.OperatingSystem.RightLevel;
 import com.quartercode.disconnected.sim.comp.program.ExploitProgram;
 import com.quartercode.disconnected.sim.comp.program.SystemViewerProgram;
 import com.quartercode.disconnected.sim.member.Member;
@@ -177,7 +177,7 @@ public class SimulationGenerator {
             }
 
             computer.setOperatingSystem(new OperatingSystem(computer, "Frames", new Version(3, 7, 65), null));
-            computer.getOperatingSystem().mountFileSystem(hardDrive.getFileSystem(), 'C');
+            computer.getOperatingSystem().getFileSystemManager().mount(hardDrive.getFileSystem(), 'C');
         }
 
         return computers;

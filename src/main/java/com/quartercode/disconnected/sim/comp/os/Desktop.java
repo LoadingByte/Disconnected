@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.comp;
+package com.quartercode.disconnected.sim.comp.os;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +42,7 @@ public class Desktop {
      * Creates a new empty desktop.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    public Desktop() {
+    protected Desktop() {
 
     }
 

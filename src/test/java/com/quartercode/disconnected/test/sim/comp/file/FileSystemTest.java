@@ -22,12 +22,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.sim.comp.Computer;
-import com.quartercode.disconnected.sim.comp.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
+import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 public class FileSystemTest {
@@ -46,7 +46,7 @@ public class FileSystemTest {
         HardDrive hardDrive = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
         fileSystem = hardDrive.getFileSystem();
         computer.addHardware(hardDrive);
-        operatingSystem.mountFileSystem(fileSystem, 'C');
+        operatingSystem.getFileSystemManager().mount(fileSystem, 'C');
 
         testFile = fileSystem.addFile("/test1/test2/test.txt", FileType.FILE);
         testFile.setContent("Test-Content");

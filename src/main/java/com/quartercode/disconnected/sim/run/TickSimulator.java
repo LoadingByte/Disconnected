@@ -81,7 +81,7 @@ public class TickSimulator implements TickAction {
         if (simulation != null) {
             // Execute process ticks
             for (Computer computer : simulation.getComputers()) {
-                for (Process process : new ArrayList<Process>(computer.getOperatingSystem().getAllProcesses())) {
+                for (Process process : new ArrayList<Process>(computer.getOperatingSystem().getProcessManager().getAllProcesses())) {
                     if (process.getPid() != 0) {
                         if (process.getExecutor().getOsState() == OSProgramState.RUNNING || process.getExecutor().getOsState() == OSProgramState.INTERRUPTED) {
                             process.getExecutor().update();

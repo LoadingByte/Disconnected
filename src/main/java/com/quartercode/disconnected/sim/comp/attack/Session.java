@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.sim.comp.attack;
 
 import com.quartercode.disconnected.sim.comp.Computer;
-import com.quartercode.disconnected.sim.comp.OperatingSystem.RightLevel;
+import com.quartercode.disconnected.sim.comp.os.OperatingSystem.RightLevel;
 
 /**
  * This class represents an open session to another computer.

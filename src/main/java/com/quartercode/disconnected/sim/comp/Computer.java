@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlID;
 import com.quartercode.disconnected.sim.Location;
 import com.quartercode.disconnected.sim.comp.hardware.Hardware;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
+import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.program.Program;
 
 /**

@@ -122,7 +122,7 @@ public class NetworkInterface extends Hardware {
      */
     public void receivePacket(Packet packet) {
 
-        getHost().getOperatingSystem().handlePacket(packet);
+        getHost().getOperatingSystem().getNetworkManager().handlePacket(packet);
     }
 
     @Override
