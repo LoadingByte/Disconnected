@@ -18,6 +18,10 @@
 
 package com.quartercode.disconnected.util;
 
+/**
+ * Defines the method {@link #toInfoString()} for generating a human-readable informational string.
+ * Info Strings should give a quick overview about what the class stores without providing other information (like the class name).
+ */
 public interface InfoString {
 
     /**
