@@ -173,4 +173,10 @@ public class ProcessManager implements InfoString {
         return getAllProcesses().size() + " processes";
     }
 
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [" + toInfoString() + "]";
+    }
+
 }

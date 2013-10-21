@@ -18,51 +18,52 @@
 
 package com.quartercode.disconnected.sim.comp.attack;
 
-import com.quartercode.disconnected.sim.comp.Computer;
-import com.quartercode.disconnected.sim.comp.os.OperatingSystem.RightLevel;
+import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.os.User;
+import com.quartercode.disconnected.util.InfoString;
 
 /**
- * This class represents an open session to another computer.
- * This also stores the right level for the session. A list of all right levels is provided by the attacked operating system.
+ * This class represents an open session to another operating system.
+ * This also stores the user the session is running on.
  * 
- * @see Computer
- * @see RightLevel
+ * @see OperatingSystem
+ * @see User
  */
-public class Session {
+public class Session implements InfoString {
 
-    private final Computer   computer;
-    private final RightLevel rightLevel;
+    private final OperatingSystem target;
+    private final User            user;
 
     /**
-     * Creates a new open sesson and sets the attacked computer and the inital right level.
+     * Creates a new open sesson and sets the attacked operating system and the user the session uses.
      * 
-     * @param computer The computer this session is connected to.
-     * @param rightLevel The inital right level the session user has.
+     * @param target The operating system this session is connected to.
+     * @param user The user the session uses for executing commands.
      */
-    public Session(Computer computer, RightLevel rightLevel) {
+    public Session(OperatingSystem target, User user) {
 
-        this.computer = computer;
-        this.rightLevel = rightLevel;
+        this.target = target;
+        this.user = user;
     }
 
     /**
-     * Returns the computer this session is connected to.
+     * Returns the operating system this session is connected to.
      * 
-     * @return The computer this session is connected to.
+     * @return The operating system this session is connected to.
      */
-    public Computer getComputer() {
+    public OperatingSystem getTarget() {
 
-        return computer;
+        return target;
     }
 
     /**
-     * Returns the inital right level the session user has.
+     * Returns the user the session uses for executing commands.
      * 
-     * @return The inital right level the session user has.
+     * @return The user the session uses for executing commands.
      */
-    public RightLevel getRightLevel() {
+    public User getUser() {
 
-        return rightLevel;
+        return user;
     }
 
     @Override
@@ -70,8 +71,8 @@ public class Session {
 
         final int prime = 31;
         int result = 1;
-        result = prime * result + (computer == null ? 0 : computer.hashCode());
-        result = prime * result + (rightLevel == null ? 0 : rightLevel.hashCode());
+        result = prime * result + (target == null ? 0 : target.hashCode());
+        result = prime * result + (user == null ? 0 : user.hashCode());
         return result;
     }
 
@@ -88,23 +89,33 @@ public class Session {
             return false;
         }
         Session other = (Session) obj;
-        if (computer == null) {
-            if (other.computer != null) {
+        if (target == null) {
+            if (other.target != null) {
                 return false;
             }
-        } else if (!computer.equals(other.computer)) {
+        } else if (!target.equals(other.target)) {
             return false;
         }
-        if (rightLevel != other.rightLevel) {
+        if (user == null) {
+            if (other.user != null) {
+                return false;
+            }
+        } else if (!user.equals(other.user)) {
             return false;
         }
         return true;
     }
 
     @Override
+    public String toInfoString() {
+
+        return "computer " + target.getHost().getId() + " as " + user.getName();
+    }
+
+    @Override
     public String toString() {
 
-        return getClass().getName() + " [computer=" + computer + ", rightLevel=" + rightLevel + "]";
+        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }

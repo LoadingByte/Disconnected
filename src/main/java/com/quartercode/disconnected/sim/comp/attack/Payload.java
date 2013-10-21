@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.util.InfoString;
 
 /**
  * This class represents a payload which can be executed on a specified operating system.
@@ -29,7 +30,7 @@ import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
  * 
  * @see Exploit
  */
-public class Payload {
+public class Payload implements InfoString {
 
     private final OperatingSystem operatingSystem;
     private final List<String>    scripts;
@@ -107,9 +108,15 @@ public class Payload {
     }
 
     @Override
+    public String toInfoString() {
+
+        return "os " + operatingSystem.getName() + ", " + scripts.size() + " scripts";
+    }
+
+    @Override
     public String toString() {
 
-        return getClass().getName() + " [operatingSystem=" + operatingSystem.toInfoString() + ", scripts=" + scripts + "]";
+        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }

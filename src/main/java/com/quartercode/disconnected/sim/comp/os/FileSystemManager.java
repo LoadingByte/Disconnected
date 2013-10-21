@@ -276,6 +276,12 @@ public class FileSystemManager implements InfoString {
         return getMounted().size() + " mounted";
     }
 
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [" + toInfoString() + "]";
+    }
+
     /**
      * The mounted file system represents a file system which is mounted into an os.
      * This is used in a datastructure of the os class to store the mountpoints of file systems.
@@ -370,6 +376,12 @@ public class FileSystemManager implements InfoString {
         public String toInfoString() {
 
             return fileSystem.toInfoString() + ", mounted on " + mountpoint;
+        }
+
+        @Override
+        public String toString() {
+
+            return getClass().getName() + " [" + toInfoString() + "]";
         }
     }
 

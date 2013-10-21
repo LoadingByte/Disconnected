@@ -36,8 +36,10 @@ import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSl
 import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 import com.quartercode.disconnected.sim.comp.net.IP;
+import com.quartercode.disconnected.sim.comp.os.Group;
+import com.quartercode.disconnected.sim.comp.os.Group.RightOverride;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
-import com.quartercode.disconnected.sim.comp.os.OperatingSystem.RightLevel;
+import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.sim.comp.program.ExploitProgram;
 import com.quartercode.disconnected.sim.comp.program.SystemViewerProgram;
 import com.quartercode.disconnected.sim.member.Member;
@@ -178,6 +180,18 @@ public class SimulationGenerator {
 
             computer.setOperatingSystem(new OperatingSystem(computer, "Frames", new Version(3, 7, 65), null));
             computer.getOperatingSystem().getFileSystemManager().mount(hardDrive.getFileSystem(), 'C');
+
+            Group gRoot = new Group(computer.getOperatingSystem(), "root", RightOverride.ROOT);
+            computer.getOperatingSystem().getUserManager().addGroup(gRoot);
+            Group gGenpop = new Group(computer.getOperatingSystem(), "genpop");
+            computer.getOperatingSystem().getUserManager().addGroup(gGenpop);
+
+            User uRoot = new User(computer.getOperatingSystem(), "root");
+            uRoot.addGroup(gRoot, true);
+            computer.getOperatingSystem().getUserManager().addUser(uRoot);
+            User uGenuser = new User(computer.getOperatingSystem(), "genuser");
+            uGenuser.addGroup(gGenpop, true);
+            computer.getOperatingSystem().getUserManager().addUser(uGenuser);
         }
 
         return computers;
@@ -191,10 +205,10 @@ public class SimulationGenerator {
 
         // Generate programs
         fileSystem.addFile("/opt/sysviewer/sysviewer.exe", FileType.FILE);
-        fileSystem.getFile("/opt/sysviewer/sysviewer.exe").setContent(new SystemViewerProgram("System Viewer", new Version("1.0.0"), null, RightLevel.USER));
+        fileSystem.getFile("/opt/sysviewer/sysviewer.exe").setContent(new SystemViewerProgram("System Viewer", new Version("1.0.0"), null));
 
         fileSystem.addFile("/opt/exploiter/exploiter.exe", FileType.FILE);
-        fileSystem.getFile("/opt/exploiter/exploiter.exe").setContent(new ExploitProgram("Exploiter", new Version("1.0.0"), null, RightLevel.USER));
+        fileSystem.getFile("/opt/exploiter/exploiter.exe").setContent(new ExploitProgram("Exploiter", new Version("1.0.0"), null));
     }
 
     private static void generateIP(NetworkInterface host, Simulation simulation) {

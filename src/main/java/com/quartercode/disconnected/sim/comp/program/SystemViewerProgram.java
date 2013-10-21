@@ -28,7 +28,6 @@ import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.os.Desktop.Window;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
-import com.quartercode.disconnected.sim.comp.os.OperatingSystem.RightLevel;
 import com.quartercode.disconnected.sim.run.TickTimer;
 import com.quartercode.disconnected.sim.run.TickTimer.TimerTask;
 import com.quartercode.disconnected.sim.run.Ticker;
@@ -52,16 +51,15 @@ public class SystemViewerProgram extends Program {
     }
 
     /**
-     * Creates a new system viewer program and sets the name, the version, the vulnerabilities and the required right level.
+     * Creates a new system viewer program and sets the name, the version and the vulnerabilities.
      * 
      * @param name The name the program has.
      * @param version The current version the program has.
      * @param vulnerabilities The vulnerabilities the program has.
-     * @param rightLevel The required right level a user need for executing the program.
      */
-    public SystemViewerProgram(String name, Version version, List<Vulnerability> vulnerabilities, RightLevel rightLevel) {
+    public SystemViewerProgram(String name, Version version, List<Vulnerability> vulnerabilities) {
 
-        super(name, version, vulnerabilities, rightLevel);
+        super(name, version, vulnerabilities);
     }
 
     @Override

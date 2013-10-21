@@ -27,7 +27,6 @@ import com.quartercode.disconnected.sim.comp.HostedComputerPart;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
-import com.quartercode.disconnected.sim.comp.program.Program;
 
 /**
  * This class stores information about an operating system.
@@ -37,42 +36,19 @@ import com.quartercode.disconnected.sim.comp.program.Program;
  * @see Desktop
  * @see Vulnerability
  * @see ProcessManager
+ * @see UserManager
  * @see FileSystemManager
+ * @see NetworkManager
  */
 public class OperatingSystem extends HostedComputerPart implements Vulnerable {
-
-    /**
-     * This enum represents the right levels a user can has on an operating system.
-     * The right level defines what a user can or cannot do. If a user has a right level, he can use every other right level below his one.
-     * 
-     * @see OperatingSystem
-     * @see Program
-     */
-    public static enum RightLevel {
-
-        /**
-         * A guest only has a minimum of rights. You can compare a guest access with a kiosk mode for operating systems.
-         */
-        GUEST,
-        /**
-         * A user is typically using installed applications, but he doesn't modify the computer or os in any way.
-         */
-        USER,
-        /**
-         * An adiministrator modifies the computer or the os, for example he can install programs or change system properties.
-         */
-        ADMIN,
-        /**
-         * The system authority is the superuser on the os and can do everything the os provides.
-         */
-        SYSTEM;
-    }
 
     @XmlElement (name = "vulnerability")
     private List<Vulnerability> vulnerabilities = new ArrayList<Vulnerability>();
 
     @XmlElement
     private ProcessManager      processManager;
+    @XmlElement
+    private UserManager         userManager;
     @XmlElement
     private FileSystemManager   fileSystemManager;
     private NetworkManager      networkManager;
@@ -100,6 +76,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         super(host, name, version);
 
         this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
+        userManager = new UserManager(this);
         fileSystemManager = new FileSystemManager(this);
         processManager = new ProcessManager(this);
         networkManager = new NetworkManager(this);
@@ -120,6 +97,16 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     public ProcessManager getProcessManager() {
 
         return processManager;
+    }
+
+    /**
+     * Returns the user manager which is used for holding and modifing users and groups.
+     * 
+     * @return The user manager which is used for holding and modifing users and groups.
+     */
+    public UserManager getUserManager() {
+
+        return userManager;
     }
 
     /**

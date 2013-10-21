@@ -29,13 +29,12 @@ import com.quartercode.disconnected.sim.comp.ComputerPart;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
-import com.quartercode.disconnected.sim.comp.os.OperatingSystem.RightLevel;
 import com.quartercode.disconnected.util.size.SizeObject;
 
 /**
  * This class stores information about a program.
  * A program object can be stored in a file. The execution is done by a program executor. To run an executor, you need to create a new process.
- * This also contains a list of all vulnerabilities this program has and the required right level.
+ * This also contains a list of all vulnerabilities this program has.
  * 
  * @see ComputerPart
  * @see Vulnerability
@@ -47,8 +46,6 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
 
     @XmlElement (name = "vulnerability")
     private List<Vulnerability>         vulnerabilities = new ArrayList<Vulnerability>();
-    @XmlElement
-    private RightLevel                  rightLevel;
     private final Map<String, Class<?>> parameters      = new HashMap<String, Class<?>>();
 
     /**
@@ -61,19 +58,17 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
     }
 
     /**
-     * Creates a new program and sets the name, the version, the vulnerabilities and the required right level.
+     * Creates a new program and sets the name, the version and the vulnerabilities.
      * 
      * @param name The name the program has.
      * @param version The current version the program has.
      * @param vulnerabilities The vulnerabilities the program has.
-     * @param rightLevel The required right level a user need for executing the program.
      */
-    public Program(String name, Version version, List<Vulnerability> vulnerabilities, RightLevel rightLevel) {
+    public Program(String name, Version version, List<Vulnerability> vulnerabilities) {
 
         super(name, version);
 
         this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
-        this.rightLevel = rightLevel;
 
         addParameters();
     }
@@ -82,16 +77,6 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
     public List<Vulnerability> getVulnerabilities() {
 
         return Collections.unmodifiableList(vulnerabilities);
-    }
-
-    /**
-     * Returns the required right level a user need for executing the program.
-     * 
-     * @return The required right level a user need for executing the program.
-     */
-    public RightLevel getRightLevel() {
-
-        return rightLevel;
     }
 
     /**
@@ -164,7 +149,6 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (parameters == null ? 0 : parameters.hashCode());
-        result = prime * result + (rightLevel == null ? 0 : rightLevel.hashCode());
         result = prime * result + (vulnerabilities == null ? 0 : vulnerabilities.hashCode());
         return result;
     }
@@ -178,7 +162,7 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
         if (!super.equals(obj)) {
             return false;
         }
-        if (! (obj instanceof Program)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
         Program other = (Program) obj;
@@ -187,9 +171,6 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
                 return false;
             }
         } else if (!parameters.equals(other.parameters)) {
-            return false;
-        }
-        if (rightLevel != other.rightLevel) {
             return false;
         }
         if (vulnerabilities == null) {
@@ -205,7 +186,7 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
     @Override
     public String toInfoString() {
 
-        return super.toInfoString() + ", " + vulnerabilities.size() + " vulns, requires " + rightLevel + ", " + parameters.size() + " parameters";
+        return super.toInfoString() + ", " + vulnerabilities.size() + " vulns, " + parameters.size() + " parameters";
     }
 
     @Override
