@@ -107,7 +107,7 @@ public class User implements Comparable<User>, InfoString {
      * @param group The group to add the user to.
      * @param primary True if the new group should become the primary one.
      */
-    public void addGroup(Group group, boolean primary) {
+    public void addToGroup(Group group, boolean primary) {
 
         if (!groups.contains(group)) {
             groups.add(group);
@@ -124,10 +124,10 @@ public class User implements Comparable<User>, InfoString {
      * @param group The group to remove the user from.
      * @throws IllegalStateException The group is the primary one (you have to set another group as primary first).
      */
-    public void removeGroup(Group group) throws IllegalStateException {
+    public void removeFromGroup(Group group) throws IllegalStateException {
 
         if (!getPrimaryGroup().equals(group)) {
-            removeGroup(group);
+            groups.remove(group);
         } else {
             throw new IllegalStateException("Can't remove group " + group.getName() + ": group is primary");
         }

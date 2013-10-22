@@ -187,10 +187,10 @@ public class SimulationGenerator {
             computer.getOperatingSystem().getUserManager().addGroup(gGenpop);
 
             User uRoot = new User(computer.getOperatingSystem(), "root");
-            uRoot.addGroup(gRoot, true);
+            uRoot.addToGroup(gRoot, true);
             computer.getOperatingSystem().getUserManager().addUser(uRoot);
             User uGenuser = new User(computer.getOperatingSystem(), "genuser");
-            uGenuser.addGroup(gGenpop, true);
+            uGenuser.addToGroup(gGenpop, true);
             computer.getOperatingSystem().getUserManager().addUser(uGenuser);
         }
 
