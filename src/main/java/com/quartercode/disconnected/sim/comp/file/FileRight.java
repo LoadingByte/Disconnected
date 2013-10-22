@@ -18,33 +18,48 @@
 
 package com.quartercode.disconnected.sim.comp.file;
 
-import com.quartercode.disconnected.sim.comp.os.Right;
-
 /**
  * File rights control the access to files by users.
  * You can set if a given user/group is allowed to read, write, execute or delete;
  * 
  * @see Right
  */
-public enum FileRight implements Right {
+public enum FileRight {
 
     /**
-     * The read-right determinates if a user is allowed to read the contents from a file or directory.
+     * The read-right determinates if a user is allowed to read the contents from a file or directory (letter 'r').
      */
-    READ,
+    READ ('r'),
     /**
-     * The write-right determinates if a user is allowed to write contents into files or create new files in a directory.
+     * The write-right determinates if a user is allowed to write contents into files or create new files in a directory (letter 'w').
      */
-    WRITE,
+    WRITE ('w'),
     /**
-     * The execute-right determinates if a user is allowed to execute a file.
+     * The execute-right determinates if a user is allowed to execute a file (letter 'x').
      * It cannot be applied to directories.
      */
-    EXECUTE,
+    EXECUTE ('x'),
     /**
-     * The delete-right determinates if a user is allowed to delete a file or a directory.
+     * The delete-right determinates if a user is allowed to delete a file or a directory (letter 'e').
      * In the case of a directory, the user also needs the delete-right on every file or folder in it.
      */
-    DELETE;
+    DELETE ('e');
+
+    private char letter;
+
+    private FileRight(char letter) {
+
+        this.letter = letter;
+    }
+
+    /**
+     * Returns the letter which can be used as an acronym for the right.
+     * 
+     * @return The letter which can be used as an acronym for the right.
+     */
+    public char getLetter() {
+
+        return letter;
+    }
 
 }
