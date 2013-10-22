@@ -22,21 +22,19 @@ We use maven to handle our dependencies and build, so you need the Java JDK and 
 * Open a command prompt, navigate to the folder which contains the folder `TWL` (it should be the root of the fresh archive) and install TWL.
   - On an UNIX-system (like Linux), run the following command:
 
-            cd TWL/ && mv pom.xml_inactive pom.xml && mvn clean install && cd ../
+            cd TWL/ && mv pom.xml_inactive pom.xml && (sed 's/2.8.5/2.9.0/' pom.xml > pom2.xml && mv pom2.xml pom.xml); mvn clean install && cd ../
 
      If `cd` outputs an error you're in the wrong directory.
      If `mv` outputs an error you modified some files. Try it again with a fresh archive.
      If `mvn` outputs an error the system can't build TWL. That's an individual maven problem.
 
-  - On a DOS-system (like Windows), run the following commands:
+  - On a DOS-system (like Windows), it's a bit more complicated:
 
-            cd TWL/
-            rename pom.xml_inactive pom.xml
-            mvn clean install
-            cd ../
+            > Go into the TWL-folder of the archive.
+            > Rename pom.xml_inactive to pom.xml.
+            > Edit pom.xml and change "2.8.5" in line 26 to "2.9.0".
+            > Open a command prompt in this folder and type: mvn clean install
 
-     If `cd` outputs an error you're in the wrong directory.
-     If `rename` outputs an error you modified some files. Try it again with a fresh archive.
      If `mvn` outputs an error the system can't build TWL. That's an individual maven problem.
 
 * Navigate to the project folder of this repository which contains a `pom.xml` and run:
