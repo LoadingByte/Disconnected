@@ -73,27 +73,33 @@ public class Main {
         // Print information about the software
         LOGGER.info("Version " + Disconnected.getVersion());
 
-        // Initalize registry
+        // Initalize & fill registry
+        LOGGER.info("Initalizing & filling class registry");
         Disconnected.setRegistry(new Registry());
         fillRegistry();
 
         // Initalize profile manager and load stored profiles (TODO: Add code for loading).
+        LOGGER.info("Initalizing profile manager");
         Disconnected.setProfileManager(new ProfileManager());
 
         // Initalize graphics manager and start it
+        LOGGER.info("Initalizing & starting graphics manager");
         Disconnected.setGraphicsManager(new GraphicsManager());
         Disconnected.getGraphicsManager().setRunning(true);
 
         // Initalize ticker
+        LOGGER.info("Initalizing ticker");
         List<TickAction> tickActions = new ArrayList<TickAction>();
         tickActions.add(new TickTimer());
         tickActions.add(new TickSimulator());
         Disconnected.setTicker(new Ticker(tickActions.toArray(new TickAction[tickActions.size()])));
 
         // DEBUG: Generate and set new simulation
+        LOGGER.info("DEBUG-ACTION: Generating new simulation");
         Simulation simulation = SimulationGenerator.generateSimulation(10, 2);
         Disconnected.setSimulation(simulation);
         // DEBUG: Start "game" with current simulation
+        LOGGER.info("DEBUG-ACTION: Starting test-game with current simulation");
         Disconnected.getTicker().setRunning(true);
         Disconnected.getGraphicsManager().setState(new DesktopState(simulation));
     }
