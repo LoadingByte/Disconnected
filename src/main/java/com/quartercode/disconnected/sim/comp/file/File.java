@@ -59,7 +59,6 @@ public class File implements SizeObject {
     private String           name;
     @XmlAttribute
     private FileType         type;
-    @XmlAttribute
     private FileRights       rights;
     @XmlElement
     private Object           content;
@@ -92,6 +91,7 @@ public class File implements SizeObject {
      * @param host The host which will use this file.
      * @param name The name the new file will have.
      * @param type The type the new file will have.
+     * @param rights The file rights object which stores the UNIX-like file right attributes.
      */
     protected File(FileSystem host, String name, FileType type, FileRights rights) {
 
@@ -213,6 +213,7 @@ public class File implements SizeObject {
      * 
      * @return The file rights storage.
      */
+    @XmlTransient
     public FileRights getRights() {
 
         return rights;

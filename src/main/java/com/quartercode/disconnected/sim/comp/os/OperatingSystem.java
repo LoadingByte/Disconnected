@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.HostedComputerPart;
 import com.quartercode.disconnected.sim.comp.Version;
@@ -146,6 +147,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      * 
      * @return True if the operating system is running, false if not.
      */
+    @XmlTransient
     public boolean isRunning() {
 
         return processManager.getRootProcess() != null && processManager.getRootProcess().getState() != ProcessState.STOPPED;
@@ -174,6 +176,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         int result = super.hashCode();
         result = prime * result + (fileSystemManager == null ? 0 : fileSystemManager.hashCode());
         result = prime * result + (processManager == null ? 0 : processManager.hashCode());
+        result = prime * result + (userManager == null ? 0 : userManager.hashCode());
         result = prime * result + (vulnerabilities == null ? 0 : vulnerabilities.hashCode());
         return result;
     }
@@ -205,6 +208,13 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         } else if (!processManager.equals(other.processManager)) {
             return false;
         }
+        if (userManager == null) {
+            if (other.userManager != null) {
+                return false;
+            }
+        } else if (!userManager.equals(other.userManager)) {
+            return false;
+        }
         if (vulnerabilities == null) {
             if (other.vulnerabilities != null) {
                 return false;
@@ -218,7 +228,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     @Override
     public String toInfoString() {
 
-        return super.toInfoString() + ", " + vulnerabilities.size() + " vulns, " + processManager.toInfoString() + ", " + fileSystemManager.toInfoString();
+        return super.toInfoString() + ", " + vulnerabilities.size() + " vulns, " + processManager.toInfoString() + ", " + userManager.toInfoString() + ", " + fileSystemManager.toInfoString();
     }
 
     @Override

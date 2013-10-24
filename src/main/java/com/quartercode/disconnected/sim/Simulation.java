@@ -25,7 +25,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
@@ -52,7 +51,6 @@ public class Simulation {
     @XmlElementWrapper (name = "members")
     @XmlElement (name = "member")
     private final List<Member>      members   = new CopyOnWriteArrayList<Member>();
-    @XmlTransient
     private Member                  localPlayerCache;
     @XmlElementWrapper (name = "groups")
     @XmlElement (name = "group")

@@ -34,6 +34,7 @@ import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
 import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 import com.quartercode.disconnected.sim.comp.program.ExploitProgram;
+import com.quartercode.disconnected.sim.comp.program.KernelProgram;
 import com.quartercode.disconnected.sim.comp.program.SystemViewerProgram;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.sim.member.ai.UserController;
@@ -121,6 +122,7 @@ public class Main {
         Disconnected.getRegistry().registerClass(NetworkInterface.class);
 
         // Programs
+        Disconnected.getRegistry().registerClass(KernelProgram.class);
         Disconnected.getRegistry().registerClass(SystemViewerProgram.class);
         Disconnected.getRegistry().registerClass(ExploitProgram.class);
 

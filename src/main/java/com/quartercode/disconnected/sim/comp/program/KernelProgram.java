@@ -62,7 +62,7 @@ public class KernelProgram extends Program {
     }
 
     @Override
-    protected ProgramExecutor createExecutorInstance(final Process host, Map<String, Object> arguments) {
+    protected ProgramExecutor createExecutorInstance(Process host, Map<String, Object> arguments) {
 
         return new ProgramExecutor(host) {
 
