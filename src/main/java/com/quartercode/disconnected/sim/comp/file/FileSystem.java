@@ -149,7 +149,7 @@ public class FileSystem implements SizeObject, InfoString {
     public File addFile(String path, FileType type) {
 
         String[] parts = path.split(seperator);
-        File file = new File(this, parts[parts.length - 1], type);
+        File file = new File(this, parts[parts.length - 1], type, new FileRights("rwd-r---r---"));
         addFile(file, path);
         return file;
     }
@@ -175,7 +175,7 @@ public class FileSystem implements SizeObject, InfoString {
                         current.addChildFile(file);
                         file.setName(part);
                     } else {
-                        File dir = new File(this, part, FileType.DIRECTORY);
+                        File dir = new File(this, part, FileType.DIRECTORY, new FileRights("rwd-r---r---"));
                         current.addChildFile(dir);
                     }
                 } else if (current.getChildFile(part).getType() != FileType.DIRECTORY) {

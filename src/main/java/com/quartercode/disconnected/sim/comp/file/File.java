@@ -52,12 +52,15 @@ public class File implements SizeObject {
          * A folder which can have child files.
          */
         DIRECTORY;
+
     }
 
     private FileSystem       host;
     private String           name;
     @XmlAttribute
     private FileType         type;
+    @XmlAttribute
+    private FileRights       rights;
     @XmlElement
     private Object           content;
     @XmlElement (name = "file")
@@ -90,11 +93,12 @@ public class File implements SizeObject {
      * @param name The name the new file will have.
      * @param type The type the new file will have.
      */
-    protected File(FileSystem host, String name, FileType type) {
+    protected File(FileSystem host, String name, FileType type, FileRights rights) {
 
         this.host = host;
         this.name = name;
         this.type = type;
+        this.rights = rights;
     }
 
     /**
@@ -201,6 +205,28 @@ public class File implements SizeObject {
     public FileType getType() {
 
         return type;
+    }
+
+    /**
+     * Returns the file rights object which stores the UNIX-like file right attributes.
+     * For more documentation on how it works, see the {@link FileRights}-class.
+     * 
+     * @return The file rights storage.
+     */
+    public FileRights getRights() {
+
+        return rights;
+    }
+
+    /**
+     * Changes the file rights storage which stores the UNIX-like file right attributes to a new one.
+     * For more documentation on how it works, see the {@link FileRights}-class.
+     * 
+     * @param rights The new file rights storage.
+     */
+    public void setRights(FileRights rights) {
+
+        this.rights = rights;
     }
 
     /**
