@@ -32,7 +32,7 @@ We use maven to handle our dependencies and build, so you need the Java JDK and 
 
             > Go into the TWL-folder of the archive.
             > Rename pom.xml_inactive to pom.xml.
-            > Edit pom.xml and change "2.8.5" in line 26 to "2.9.0".
+            > Edit pom.xml and change "2.8.5" in line 16 to "2.9.0".
             > Open a command prompt in this folder and type: mvn clean install
 
      If `mvn` outputs an error the system can't build TWL. That's an individual maven problem.

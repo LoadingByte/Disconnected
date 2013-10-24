@@ -159,6 +159,7 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
 
             super.removeAllChildren();
         }
+
     }
 
 }

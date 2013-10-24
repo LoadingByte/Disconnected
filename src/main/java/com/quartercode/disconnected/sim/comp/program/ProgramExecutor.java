@@ -68,6 +68,7 @@ public abstract class ProgramExecutor {
          * If a program is stopped, it wont be able to restart again.
          */
         STOPPED;
+
     }
 
     @XmlIDREF
