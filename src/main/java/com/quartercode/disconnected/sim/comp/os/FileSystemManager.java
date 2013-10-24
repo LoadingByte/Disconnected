@@ -233,6 +233,23 @@ public class FileSystemManager implements InfoString {
         }
     }
 
+    /**
+     * Changes the running state of the file system manager.
+     * 
+     * @param running True if the file system manager is running, false if not.
+     */
+    public void setRunning(boolean running) {
+
+        if (running) {
+            // Mount every avaiable file system (temp)
+            for (FileSystem fileSystem : getAvaiable()) {
+                mount(fileSystem, (char) ('C' + getMounted().size()));
+            }
+        } else {
+            mountedFileSystems.clear();
+        }
+    }
+
     public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
 
         host = (OperatingSystem) parent;

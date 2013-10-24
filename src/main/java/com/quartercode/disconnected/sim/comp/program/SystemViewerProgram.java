@@ -28,9 +28,11 @@ import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.os.Desktop.Window;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
 import com.quartercode.disconnected.sim.run.TickTimer;
 import com.quartercode.disconnected.sim.run.TickTimer.TimerTask;
 import com.quartercode.disconnected.sim.run.Ticker;
+import com.quartercode.disconnected.util.size.ByteUnit;
 import de.matthiasmann.twl.ScrollPane;
 import de.matthiasmann.twl.TreeTable;
 
@@ -65,7 +67,7 @@ public class SystemViewerProgram extends Program {
     @Override
     public long getSize() {
 
-        return 0;
+        return ByteUnit.BYTE.convert(20, ByteUnit.KILOBYTE);
     }
 
     @Override
@@ -106,12 +108,12 @@ public class SystemViewerProgram extends Program {
                     };
                     Disconnected.getTicker().getAction(TickTimer.class).schedule(processTreeUpdateTask);
                 } else if (mainWindow.isClosed()) {
-                    interrupt();
+                    getHost().interrupt();
                 }
 
-                if (getOsState() == OSProgramState.INTERRUPTED) {
+                if (getHost().getState() == ProcessState.INTERRUPTED) {
                     processTreeUpdateTask.cancel();
-                    stop();
+                    getHost().stop();
                 }
             }
         };

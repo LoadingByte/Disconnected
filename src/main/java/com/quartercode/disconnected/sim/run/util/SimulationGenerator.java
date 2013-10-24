@@ -41,6 +41,7 @@ import com.quartercode.disconnected.sim.comp.os.Group.RightOverride;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.sim.comp.program.ExploitProgram;
+import com.quartercode.disconnected.sim.comp.program.KernelProgram;
 import com.quartercode.disconnected.sim.comp.program.SystemViewerProgram;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
@@ -179,7 +180,6 @@ public class SimulationGenerator {
             }
 
             computer.setOperatingSystem(new OperatingSystem(computer, "Frames", new Version(3, 7, 65), null));
-            computer.getOperatingSystem().getFileSystemManager().mount(hardDrive.getFileSystem(), 'C');
 
             Group gRoot = new Group(computer.getOperatingSystem(), "root", RightOverride.ROOT);
             computer.getOperatingSystem().getUserManager().addGroup(gRoot);
@@ -202,6 +202,7 @@ public class SimulationGenerator {
 
         // Generate kernel file (temp)
         fileSystem.addFile("/system/boot/kernel", FileType.FILE);
+        fileSystem.getFile("/system/boot/kernel").setContent(new KernelProgram("Kernel", new Version("1.0.0"), null));
 
         // Generate programs
         fileSystem.addFile("/opt/sysviewer/sysviewer.exe", FileType.FILE);

@@ -72,7 +72,7 @@ public class DesktopWidget extends Widget {
 
                 // TODO: Display launch menu
                 OperatingSystem os = DesktopWidget.this.desktop.getHost();
-                os.getProcessManager().getRootProcess().createChild(os.getFileSystemManager().getFile("C:/bin/sysviewer"), null);
+                os.getProcessManager().getRootProcess().createChild(os.getFileSystemManager().getFile("C:/opt/sysviewer/sysviewer.exe"), null);
             }
         });
         add(launchButton);

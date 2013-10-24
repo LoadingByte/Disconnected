@@ -56,8 +56,6 @@ public class ProcessManager implements InfoString {
     public ProcessManager(OperatingSystem host) {
 
         this.host = host;
-
-        rootProcess = new Process(host, null, 0, host.getFileSystemManager().getFile("C:/system/boot/kernel"), null);
     }
 
     /**
@@ -128,6 +126,20 @@ public class ProcessManager implements InfoString {
             pid++;
         }
         return pid;
+    }
+
+    /**
+     * Changes the running state of the process manager.
+     * 
+     * @param running True if the process manager is running, false if not.
+     */
+    public void setRunning(boolean running) {
+
+        if (running) {
+            rootProcess = new Process(host, null, 0, host.getFileSystemManager().getFile("C:/system/boot/kernel"), null);
+        } else {
+            rootProcess.interrupt();
+        }
     }
 
     public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {

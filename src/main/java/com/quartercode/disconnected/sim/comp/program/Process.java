@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
+import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.util.InfoString;
@@ -41,6 +42,34 @@ import com.quartercode.disconnected.util.InfoString;
  */
 public class Process implements InfoString {
 
+    /**
+     * The process state defines the global state of the process the os can see.
+     * It stores if the process is running, interrupted etc.
+     */
+    public static enum ProcessState {
+
+        /**
+         * The process is running and the update executes every tick.
+         * This is the default state of a process.
+         */
+        RUNNING,
+        /**
+         * The execution is suspended, tick updates will be ignored.
+         */
+        SUSPENDED,
+        /**
+         * The execution is interrupted friendly and should be stopped soon.
+         * If a process notes this state, it should try to execute last activities and the stop the execution.
+         */
+        INTERRUPTED,
+        /**
+         * The execution is permanently stopped.
+         * If a process is stopped, it wont be able to start again.
+         */
+        STOPPED;
+
+    }
+
     @XmlIDREF
     @XmlAttribute
     private OperatingSystem     host;
@@ -52,6 +81,8 @@ public class Process implements InfoString {
     @XmlElement
     private ProgramExecutor     executor;
 
+    @XmlElement
+    private ProcessState        state    = ProcessState.RUNNING;
     @XmlElement (name = "process")
     private final List<Process> children = new ArrayList<Process>();
 
@@ -76,21 +107,15 @@ public class Process implements InfoString {
      */
     public Process(OperatingSystem host, Process parent, int pid, File file, Map<String, Object> arguments) {
 
-        if ( (parent == null || pid == 0) && ! (parent == null && pid == 0)) {
-            throw new IllegalArgumentException("Can't start a kernel process without parent==null, pid==0");
-        } else if (pid != 0 && ! (file.getContent() instanceof Program)) {
-            throw new IllegalArgumentException("Process launch file must contain a program");
-        }
+        Validate.isTrue(file.getContent() instanceof Program, "Process launch file must contain a program");
 
         this.host = host;
         this.parent = parent;
         this.pid = pid;
         this.file = file;
 
-        if (pid != 0) {
-            Program program = (Program) file.getContent();
-            executor = program.createExecutor(this, arguments);
-        }
+        Program program = (Program) file.getContent();
+        executor = program.createExecutor(this, arguments);
     }
 
     /**
@@ -141,6 +166,78 @@ public class Process implements InfoString {
     public ProgramExecutor getExecutor() {
 
         return executor;
+    }
+
+    /**
+     * Returns the process state which defines the global state of the process the os can see.
+     * It stores if the process is running, interrupted etc.
+     * 
+     * @return The process state which defines the global state of the process the os can see.
+     */
+    public ProcessState getState() {
+
+        return state;
+    }
+
+    /**
+     * Changes the process state which defines the global state of the process the os can see.
+     * This also applies the new state to every child process.
+     * 
+     * @param state The new process state.
+     */
+    protected void setState(ProcessState state) {
+
+        this.state = state;
+
+        for (Process child : children) {
+            child.setState(state);
+        }
+    }
+
+    /**
+     * Suspends the execution temporarily, tick updates will be ignored.
+     * Suspension only works if the execution is running. During the interruption, an execution can't be suspended.
+     */
+    public void suspend() {
+
+        if (state == ProcessState.RUNNING) {
+            setState(ProcessState.SUSPENDED);
+        }
+    }
+
+    /**
+     * Suspends a suspended process.
+     * Resuming only works if the execution is suspended.
+     */
+    public void resume() {
+
+        if (state == ProcessState.SUSPENDED) {
+            setState(ProcessState.RUNNING);
+        }
+    }
+
+    /**
+     * Interrupts the execution friendly which should be stopped soon.
+     * If the process notes the interruption, it should try to execute last activities and the stop the execution.
+     * Interruption only works if the execution is running.
+     */
+    public void interrupt() {
+
+        if (state == ProcessState.RUNNING) {
+            setState(ProcessState.INTERRUPTED);
+        }
+    }
+
+    /**
+     * Forces the process to stop the execution.
+     * This will act like {@link #suspend()}, apart from the fact that a stopped program wont ever be able to resume.
+     * The forced stopping action should only be used if the further execution of the program must be stopped, or if the interruption finished.
+     */
+    public void stop() {
+
+        if (state != ProcessState.STOPPED) {
+            setState(ProcessState.STOPPED);
+        }
     }
 
     /**
@@ -282,7 +379,7 @@ public class Process implements InfoString {
     @Override
     public String toInfoString() {
 
-        return "pid " + pid + " on " + host.getId() + ", source " + file.getGlobalPath(host) + ", controlled by " + executor.getClass().getName() + ", " + children.size() + " children";
+        return "pid " + pid + " on " + host.getId() + ", source " + file.getGlobalPath(host) + ", " + state.name().toLowerCase() + ", " + children.size() + " children";
     }
 
     @Override

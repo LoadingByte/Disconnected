@@ -24,7 +24,7 @@ import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.net.Packet;
 import com.quartercode.disconnected.sim.comp.program.Process;
-import com.quartercode.disconnected.sim.comp.program.ProgramExecutor.OSProgramState;
+import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
 
 /**
  * This class implements the root tick update mechanisms for the entire simulation.
@@ -81,11 +81,11 @@ public class TickSimulator implements TickAction {
         if (simulation != null) {
             // Execute process ticks
             for (Computer computer : simulation.getComputers()) {
-                for (Process process : new ArrayList<Process>(computer.getOperatingSystem().getProcessManager().getAllProcesses())) {
-                    if (process.getPid() != 0) {
-                        if (process.getExecutor().getOsState() == OSProgramState.RUNNING || process.getExecutor().getOsState() == OSProgramState.INTERRUPTED) {
+                if (computer.getOperatingSystem().isRunning()) {
+                    for (Process process : new ArrayList<Process>(computer.getOperatingSystem().getProcessManager().getAllProcesses())) {
+                        if (process.getState() == ProcessState.RUNNING || process.getState() == ProcessState.INTERRUPTED) {
                             process.getExecutor().update();
-                        } else if (process.getExecutor().getOsState() == OSProgramState.STOPPED) {
+                        } else if (process.getState() == ProcessState.STOPPED) {
                             process.getParent().unregisterChild(process);
                         }
                     }

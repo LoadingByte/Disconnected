@@ -27,6 +27,7 @@ import com.quartercode.disconnected.sim.comp.HostedComputerPart;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
+import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
 
 /**
  * This class stores information about an operating system.
@@ -76,9 +77,9 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         super(host, name, version);
 
         this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
+        processManager = new ProcessManager(this);
         userManager = new UserManager(this);
         fileSystemManager = new FileSystemManager(this);
-        processManager = new ProcessManager(this);
         networkManager = new NetworkManager(this);
         desktop = new Desktop(this);
     }
@@ -138,6 +139,32 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     public Desktop getDesktop() {
 
         return desktop;
+    }
+
+    /**
+     * Returns if the operating system is running.
+     * 
+     * @return True if the operating system is running, false if not.
+     */
+    public boolean isRunning() {
+
+        return processManager.getRootProcess() != null && processManager.getRootProcess().getState() != ProcessState.STOPPED;
+    }
+
+    /**
+     * Changes the running state of the operating system.
+     * 
+     * @param running True if the operating system is running, false if not.
+     */
+    public void setRunning(boolean running) {
+
+        if (running) {
+            fileSystemManager.setRunning(true);
+            processManager.setRunning(true);
+        } else {
+            processManager.setRunning(false);
+            fileSystemManager.setRunning(false);
+        }
     }
 
     @Override

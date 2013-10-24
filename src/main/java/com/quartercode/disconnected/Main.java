@@ -27,6 +27,7 @@ import com.quartercode.disconnected.graphics.GraphicsManager;
 import com.quartercode.disconnected.graphics.desktop.DesktopState;
 import com.quartercode.disconnected.profile.ProfileManager;
 import com.quartercode.disconnected.sim.Simulation;
+import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
@@ -97,6 +98,9 @@ public class Main {
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG-ACTION: Generating new simulation");
         Simulation simulation = SimulationGenerator.generateSimulation(10, 2);
+        for (Computer computer : simulation.getComputers()) {
+            computer.getOperatingSystem().setRunning(true);
+        }
         Disconnected.setSimulation(simulation);
         // DEBUG: Start "game" with current simulation
         LOGGER.info("DEBUG-ACTION: Starting test-game with current simulation");

@@ -43,41 +43,11 @@ import com.quartercode.disconnected.sim.comp.os.Desktop.Window;
  */
 public abstract class ProgramExecutor {
 
-    /**
-     * The operating system program state defines the global state of the program the os can see.
-     * It stores if the program is running, interrupted etc.
-     */
-    public static enum OSProgramState {
-
-        /**
-         * The program is running and the update executes every tick.
-         * This is the default state of an executor.
-         */
-        RUNNING,
-        /**
-         * The execution is suspended, tick updates will be ignored.
-         */
-        SUSPENDED,
-        /**
-         * The execution is interrupted friendly and should be stopped soon.
-         * If a program notes this state, it should try to execute last activities and the stop the execution.
-         */
-        INTERRUPTED,
-        /**
-         * The execution is permanently stopped.
-         * If a program is stopped, it wont be able to restart again.
-         */
-        STOPPED;
-
-    }
-
     @XmlIDREF
     private Process                    host;
     @XmlElementWrapper (name = "packetListeners")
     @XmlElement (name = "listener")
     private final List<PacketListener> packetListeners  = new ArrayList<PacketListener>();
-    @XmlElement
-    private OSProgramState             osState          = OSProgramState.RUNNING;
     @XmlElementWrapper (name = "remainingPackets")
     @XmlElement (name = "packet")
     private final Queue<Packet>        remainingPackets = new LinkedList<Packet>();
@@ -179,63 +149,6 @@ public abstract class ProgramExecutor {
     public void removePacketListener(PacketListener packetListener) {
 
         packetListeners.remove(packetListener);
-    }
-
-    /**
-     * Returns the operating system program state which defines the global state of the program the os can see.
-     * It stores if the program is running, interrupted etc.
-     * 
-     * @return The operating system program state which defines the global state of the program the os can see.
-     */
-    public OSProgramState getOsState() {
-
-        return osState;
-    }
-
-    /**
-     * Suspends the execution temporarily, tick updates will be ignored.
-     * Suspension only works if the execution is running. During the interruption, an execution can't be suspended.
-     */
-    public void suspend() {
-
-        if (osState == OSProgramState.RUNNING) {
-            osState = OSProgramState.SUSPENDED;
-        }
-    }
-
-    /**
-     * Suspends a suspended executor.
-     * Resuming only works if the execution is suspended.
-     */
-    public void resume() {
-
-        if (osState == OSProgramState.SUSPENDED) {
-            osState = OSProgramState.RUNNING;
-        }
-    }
-
-    /**
-     * Interrupts the execution friendly which should be stopped soon.
-     * If the program notes the interruption, it should try to execute last activities and the stop the execution.
-     * Interruption only works if the execution is running.
-     */
-    public void interrupt() {
-
-        if (osState == OSProgramState.RUNNING) {
-            osState = OSProgramState.INTERRUPTED;
-        }
-    }
-
-    /**
-     * Forces the program to stop the execution.
-     * This will act like {@link #suspend()}, apart from the fact that a stopped program wont ever be able to resume.
-     * The forced stopping action should only be used if the further execution of the program must be stopped, or if the interruption finished.
-     */
-    public void stop() {
-
-        if (osState != OSProgramState.STOPPED) {
-            osState = OSProgramState.STOPPED;
-        }
     }
 
     /**
