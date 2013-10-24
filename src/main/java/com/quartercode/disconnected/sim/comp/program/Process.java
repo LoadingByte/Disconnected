@@ -180,39 +180,66 @@ public class Process implements InfoString {
     }
 
     /**
+     * Returns if this process and every child is stopped.
+     * This acts recursively and checks every child and their childs etc.
+     * 
+     * @return If this process and every child is stopped.
+     */
+    public boolean isCompletelyStopped() {
+
+        if (state != ProcessState.STOPPED) {
+            return false;
+        } else {
+            for (Process child : children) {
+                if (!child.isCompletelyStopped()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    /**
      * Changes the process state which defines the global state of the process the os can see.
      * This also applies the new state to every child process.
      * 
      * @param state The new process state.
+     * @param recursive True if the state change should affect the child processes.
      */
-    protected void setState(ProcessState state) {
+    protected void setState(ProcessState state, boolean recursive) {
 
         this.state = state;
 
-        for (Process child : children) {
-            child.setState(state);
+        if (recursive) {
+            for (Process child : children) {
+                child.setState(state, recursive);
+            }
         }
     }
 
     /**
      * Suspends the execution temporarily, tick updates will be ignored.
      * Suspension only works if the execution is running. During the interruption, an execution can't be suspended.
+     * 
+     * @param recursive True if the state change should affect the child processes.
      */
-    public void suspend() {
+    public void suspend(boolean recursive) {
 
         if (state == ProcessState.RUNNING) {
-            setState(ProcessState.SUSPENDED);
+            setState(ProcessState.SUSPENDED, recursive);
         }
     }
 
     /**
      * Suspends a suspended process.
      * Resuming only works if the execution is suspended.
+     * 
+     * @param recursive True if the state change should affect the child processes.
      */
-    public void resume() {
+    public void resume(boolean recursive) {
 
         if (state == ProcessState.SUSPENDED) {
-            setState(ProcessState.RUNNING);
+            setState(ProcessState.RUNNING, recursive);
         }
     }
 
@@ -220,23 +247,27 @@ public class Process implements InfoString {
      * Interrupts the execution friendly which should be stopped soon.
      * If the process notes the interruption, it should try to execute last activities and the stop the execution.
      * Interruption only works if the execution is running.
+     * 
+     * @param recursive True if the state change should affect the child processes.
      */
-    public void interrupt() {
+    public void interrupt(boolean recursive) {
 
         if (state == ProcessState.RUNNING) {
-            setState(ProcessState.INTERRUPTED);
+            setState(ProcessState.INTERRUPTED, recursive);
         }
     }
 
     /**
      * Forces the process to stop the execution.
      * This will act like {@link #suspend()}, apart from the fact that a stopped program wont ever be able to resume.
-     * The forced stopping action should only be used if the further execution of the program must be stopped, or if the interruption finished.
+     * The forced stopping action should only be used if the further execution of the program must be stopped or if the interruption finished.
+     * 
+     * @param recursive True if the state change should affect the child processes.
      */
-    public void stop() {
+    public void stop(boolean recursive) {
 
         if (state != ProcessState.STOPPED) {
-            setState(ProcessState.STOPPED);
+            setState(ProcessState.STOPPED, recursive);
         }
     }
 

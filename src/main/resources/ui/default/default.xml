@@ -13,6 +13,135 @@
         </select>
     </images>
 
+    <images file="images/simple.png">
+        <area name="-borderA" border="3" xywh="0,0,9,9" splitx="L3,R3" splity="T3,B3"/>
+        <area name="-borderB" border="3" xywh="10,0,9,9" splitx="L3,R3" splity="T3,B3"/>
+        <area name="-borderC" border="3" xywh="20,0,9,9" splitx="L3,R3" splity="T3,B3"/>
+        <area name="-borderD" border="3" xywh="30,0,9,9" splitx="L3,R3" splity="T3,B3"/>
+        <area name="-borderE" border="3" xywh="40,0,9,9" splitx="L3,R3" splity="T3,B3"/>
+        <area name="-borderF" border="3" xywh="50,0,9,9" splitx="L3,R3" splity="T3,B3"/>
+        <area name="-borderG" border="3" xywh="60,0,9,9" splitx="L3,R3" splity="T3,B3"/>
+        <area name="-borderH" border="3" xywh="70,0,9,9" splitx="L3,R3" splity="T3,B3"/>
+        <area name="-iconA" xywh="0,10,9,6"/>
+        <area name="-iconB" xywh="0,16,10,9"/>
+        <area name="-iconC" xywh="10,10,14,14"/>
+        <area name="-iconD" xywh="0,25,9,6"/>
+        <area name="-iconE" xywh="0,31,6,9"/>
+        <area name="-iconF" xywh="6,31,6,9"/>
+        <area name="-iconG" xywh="28,12,7,7"/>
+        <!-- iconH icon based on famfamfam Icon "arrow_turn_right.png" -->
+        <area name="-iconH" xywh="68,10,15,15"/>
+        <!-- iconI icon based on famfamfam Icon "folder.png" -->
+        <area name="-iconI" xywh="53,10,14,11"/>
+        <!-- iconJ icon based on famfamfam Icon "key.png" -->
+        <area name="-iconJ" xywh="24,41,16,16"/>
+        <!-- iconK icon based on famfamfam Icon "arrow_refresh.png" -->
+        <area name="-iconK" xywh="41,41,16,16"/>
+        <!-- iconL icon based on famfamfam Icon "book_open.png" -->
+        <area name="-iconL" xywh="36,10,16,14"/>
+        <area name="-iconM" xywh="20,41,3,13"/>
+        <area name="-iconN" xywh="30,20,4,4"/>
+        <area name="-iconO" xywh="29,25,12,12"/>
+        <area name="-iconP" xywh="42,25,12,12"/>
+        <area name="-iconQ" xywh="0,51,13,3"/>
+        <area name="-iconR" xywh="58,41,13,16"/>
+        <area name="-gradA" xywh="0,62,128,1"/>
+        <area name="-gradB" xywh="0,59,128,1"/>
+        <area name="-gradC" xywh="25,21,1,1"/>
+        <area name="-selH" repeatX="true" tiled="true" xywh="26,10,8,1"/>
+        <area name="-selV" repeatY="true" tiled="true" xywh="26,10,1,8"/>
+
+        <composed name="--selection">
+            <grid weightsX="1" weightsY="0,1,0">
+                <alias ref="-selH"/>
+                <alias ref="none"/>
+                <alias ref="-selH"/>
+            </grid>
+            <grid weightsX="0,1,0" weightsY="1">
+                <alias ref="-selV"/>
+                <alias ref="none"/>
+                <alias ref="-selV"/>
+            </grid>
+        </composed>
+        <alias name="-selection" ref="--selection" inset="2" if="keyboardFocus"/>
+
+        <select name="valueadjuster.display.background">
+            <alias ref="-borderB" if="disabled" tint="#8fff"/>
+            <alias ref="-borderE" if="armed | pressed"/>
+            <alias ref="-borderB"/>
+        </select>
+        <alias name="valueadjuster.display.overlay" ref="-selection"/>
+
+        <alias name="-icon.upbutton" ref="-iconD" inset="5,3,5,4"/>
+        <alias name="-icon.downbutton" ref="-iconA" inset="5,3,5,4"/>
+        <alias name="-icon.leftbutton" ref="-iconE" inset="3,4,4,6"/>
+        <alias name="-icon.rightbutton" ref="-iconF" inset="3,4,4,6"/>
+
+        <alias name="scrollbar.thumb.background" ref="valueadjuster.display.background"/>
+        <area name="scrollbar.background" tiled="true" xywh="12,24,16,16"/>
+
+        <select name="vscrollbar.upbutton.background">
+            <composed if="armed">
+                <alias ref="-borderD"/>
+                <alias ref="-icon.upbutton" inset="1,1,-1,-1"/>
+            </composed>
+            <composed>
+                <alias ref="-borderA"/>
+                <alias ref="-icon.upbutton"/>
+            </composed>
+        </select>
+        <select name="vscrollbar.downbutton.background">
+            <composed if="armed">
+                <alias ref="-borderD"/>
+                <alias ref="-icon.downbutton" inset="1,1,-1,-1"/>
+            </composed>
+            <composed>
+                <alias ref="-borderA"/>
+                <alias ref="-icon.downbutton"/>
+            </composed>
+        </select>
+
+        <select name="hscrollbar.leftbutton.background">
+            <composed if="armed">
+                <alias ref="-borderD"/>
+                <alias ref="-icon.leftbutton" inset="1,1,-1,-1"/>
+            </composed>
+            <composed>
+                <alias ref="-borderA"/>
+                <alias ref="-icon.leftbutton"/>
+            </composed>
+        </select>
+        <select name="hscrollbar.rightbutton.background">
+            <composed if="armed">
+                <alias ref="-borderD"/>
+                <alias ref="-icon.rightbutton" inset="1,1,-1,-1"/>
+            </composed>
+            <composed>
+                <alias ref="-borderA"/>
+                <alias ref="-icon.rightbutton"/>
+            </composed>
+        </select>
+
+        <select name="treetable.treebutton.background" inset="2,1,0,4">
+            <area unless="selected" xywh="0,41,9,9"/>
+            <area xywh="10,41,9,9"/>
+        </select>
+        <composed name="columnHeader.background" inset="-3,0">
+            <alias ref="-borderB"/>
+            <grid weightsX="1,0" weightsY="1">
+                <alias ref="none"/>
+                <select center="true" inset="0,0,0,3">
+                    <alias ref="-iconD" if="sortAscending"/>
+                    <alias ref="-iconA" if="sortDescending"/>
+                </select>
+            </grid>
+        </composed>
+
+        <alias name="table.row.background" ref="-gradC" if="rowSelected"/>
+        <alias name="table.row.overlay" ref="--selection" inset="1" if="keyboardFocus + !hasFocusedChild + leadRow"/>
+        <alias name="table.row.dropmarker" ref="-gradC"/>
+    </images>
+
     <fontDef name="white" filename="font/font.fnt" default="true" color="#FFFFFF">
         <fontParam if="error" color="#FF0000"/>
         <fontParam if="warning" color="#FFA400"/>
@@ -64,12 +193,129 @@
         <param name="fadeInTime"><int>0</int></param>
     </theme>
 
-    <theme name="label" ref="-defaults" allowWildcard="true">
+    <theme name="label" ref="-defaults">
     </theme>
 
     <theme name="button" ref="-defaults">
         <param name="background"><image>button.background</image></param>
         <param name="font"><font>button.font.white</font></param>
         <param name="border"><border>10,5</border></param>
+    </theme>
+
+    <theme name="hscrollbar" ref="-defaults">
+        <param name="background"><image>scrollbar.background</image></param>
+        <theme name="leftbutton" ref="-defaults">
+            <param name=""><image>hscrollbar.leftbutton.*</image></param>
+            <param name="minWidth"><int>16</int></param>
+        </theme>
+        <theme name="rightbutton" ref="-defaults">
+            <param name=""><image>hscrollbar.rightbutton.*</image></param>
+            <param name="minWidth"><int>16</int></param>
+        </theme>
+        <theme name="thumb" ref="-defaults">
+            <param name=""><image>scrollbar.thumb.*</image></param>
+        </theme>
+        <param name="scaleThumb"><bool>true</bool></param>
+        <param name="minWidth"><int>48</int></param>
+        <param name="minHeight"><int>16</int></param>
+    </theme>
+
+    <theme name="vscrollbar" ref="-defaults">
+        <param name="background"><image>scrollbar.background</image></param>
+        <theme name="upbutton" ref="-defaults">
+            <param name=""><image>vscrollbar.upbutton.*</image></param>
+            <param name="minHeight"><int>16</int></param>
+        </theme>
+        <theme name="downbutton" ref="-defaults">
+            <param name=""><image>vscrollbar.downbutton.*</image></param>
+            <param name="minHeight"><int>16</int></param>
+        </theme>
+        <theme name="thumb" ref="-defaults">
+            <param name=""><image>scrollbar.thumb.*</image></param>
+        </theme>
+        <param name="scaleThumb"><bool>true</bool></param>
+        <param name="minWidth"><int>16</int></param>
+        <param name="minHeight"><int>48</int></param>
+    </theme>
+
+    <theme name="scrollpane" ref="-defaults">
+        <theme name="hscrollbar" ref="hscrollbar"/>
+        <theme name="vscrollbar" ref="vscrollbar"/>
+        <param name="minWidth"><int>100</int></param>
+        <param name="minHeight"><int>100</int></param>
+        <param name="maxWidth"><int>32767</int></param>
+        <param name="maxHeight"><int>32767</int></param>
+        <param name="hasDragButton"><bool>false</bool></param>
+        <param name="autoScrollArea"><int>5</int></param>
+        <param name="autoScrollSpeed"><int>10</int></param>
+        <param name="scrollbarsAlwaysVisible"><bool>false</bool></param>
+    </theme>
+
+    <theme name="tableScrollPane" ref="scrollpane">
+        <param name="background"><image>-borderC</image></param>
+        <param name="border"><border>2</border></param>
+    </theme>
+
+    <theme name="-treecellrenderer" ref="-defaults">
+        <param name="treeIndent"><int>15</int></param>
+        <param name="treeButtonSize"><dimension>14,11</dimension></param>
+    </theme>
+    <theme name="table" ref="-defaults" allowWildcard="true">
+        <param name="rowHeight"><int>font.lineHeight + 6</int></param>
+        <theme name="stringcellrenderer" ref="-defaults">
+            <param name="font"><font>black</font></param>
+            <param name="border"><border>0,3,0,0</border></param>
+        </theme>
+        <theme name="TreeLeafCellRenderer" ref="-treecellrenderer"/>
+        <theme name="TreeNodeCellRenderer" ref="-treecellrenderer"/>
+        <theme name="PropertyEditorCellRender" ref="-treecellrenderer"/>
+        <theme name="PropertyListCellRenderer" ref="-treecellrenderer">
+            <param name=""><image>propertysheet.sublist.*</image></param>
+            <theme name="label" ref="label"/>
+        </theme>
+        <theme name="spanrenderer" ref="-defaults"/>
+        <theme name="treeButton" ref="-defaults">
+            <param name=""><image>treetable.treebutton.*</image></param>
+        </theme>
+        <theme name="columnHeader" ref="button">
+            <param name=""><image>columnHeader.*</image></param>
+        </theme>
+        <param name="columnHeaderWidth"><int>256</int></param>
+        <param name="columnHeaderHeight"><int>20</int></param>
+        <param name="columnDividerDragableDistance"><int>3</int></param>
+        <param name="columnResizeCursor"><cursor>cursor.resizecolumn</cursor></param>
+        <param name="columnDivider"><image>none</image></param>
+        <param name="columnWidths"><map/></param>
+        <param name="ensureColumnHeaderMinWidth"><bool>true</bool></param>
+        <param name="row"><image>table.row.*</image></param>
+        <param name="inputMap"><inputMapDef ref="-defaultInputMap">
+            <action name="toggleSelectionOnLeadRow">ctrl SPACE</action>
+            <action name="selectNextRow">DOWN</action>
+            <action name="selectPreviousRow">UP</action>
+            <action name="selectNextPage">NEXT</action>
+            <action name="selectPreviousPage">PRIOR</action>
+            <action name="selectFirstRow">HOME</action>
+            <action name="selectLastRow">END</action>
+            <action name="extendSelectionToNextRow">shift DOWN</action>
+            <action name="extendSelectionToPreviousRow">shift UP</action>
+            <action name="extendSelectionToNextPage">shift NEXT</action>
+            <action name="extendSelectionToPreviousPage">shift PRIOR</action>
+            <action name="extendSelectionToFirstRow">shift HOME</action>
+            <action name="extendSelectionToLastRow">shift END</action>
+            <action name="moveLeadToNextRow">ctrl DOWN</action>
+            <action name="moveLeadToPreviousRow">ctrl UP</action>
+            <action name="moveLeadToNextPage">ctrl NEXT</action>
+            <action name="moveLeadToPreviousPage">ctrl PRIOR</action>
+            <action name="moveLeadToFirstRow">ctrl HOME</action>
+            <action name="moveLeadToLastRow">ctrl END</action>
+            <action name="expandLeadRow">ADD</action>
+            <action name="collapseLeadRow">SUBTRACT</action>
+        </inputMapDef></param>
+        <theme name="ComboBoxCellRenderer">
+            <param name="comboBoxHeight"><int>20</int></param>
+        </theme>
+        <theme name="EditFieldCellRenderer">
+            <param name="editFieldHeight"><int>20</int></param>
+        </theme>
     </theme>
 </themes>

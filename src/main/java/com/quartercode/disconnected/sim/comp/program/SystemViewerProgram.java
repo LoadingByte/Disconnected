@@ -20,7 +20,6 @@ package com.quartercode.disconnected.sim.comp.program;
 
 import java.util.List;
 import java.util.Map;
-import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.graphics.component.TreeModel;
 import com.quartercode.disconnected.graphics.component.TreeNode;
 import com.quartercode.disconnected.graphics.desktop.Frame;
@@ -29,8 +28,6 @@ import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.os.Desktop.Window;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
-import com.quartercode.disconnected.sim.run.TickTimer;
-import com.quartercode.disconnected.sim.run.TickTimer.TimerTask;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.util.size.ByteUnit;
 import de.matthiasmann.twl.ScrollPane;
@@ -76,7 +73,7 @@ public class SystemViewerProgram extends Program {
         return new ProgramExecutor(host) {
 
             private Window<SystemViewerFrame> mainWindow;
-            private TimerTask                 processTreeUpdateTask;
+            private int                       mainWindowUpdateElapsed = 0;
 
             @Override
             public void update() {
@@ -84,37 +81,66 @@ public class SystemViewerProgram extends Program {
                 if (mainWindow == null) {
                     mainWindow = new Window<SystemViewerFrame>(new SystemViewerFrame(), getName(), getName());
                     openWindow(mainWindow);
-
-                    processTreeUpdateTask = new TimerTask(0, Ticker.DEFAULT_TICKS_PER_SECOND) {
-
-                        @Override
-                        public void run() {
-
-                            TreeNode processRoot = mainWindow.getFrame().getRootProcessNode();
-                            processRoot.removeAllChildren();
-                            generateProcessNodes(processRoot, getHost().getHost().getProcessManager().getRootProcess());
-                            for (int counter = 0; counter < mainWindow.getFrame().getProcessTreeWidget().getNumRows(); counter++) {
-                                mainWindow.getFrame().getProcessTreeWidget().setRowExpanded(counter, true);
-                            }
-                        }
-
-                        private void generateProcessNodes(TreeNode parent, Process process) {
-
-                            TreeNode node = parent.addChild(process.getFile().getName(), "NYI", process.getPid());
-                            for (Process childProcess : process.getChildren()) {
-                                generateProcessNodes(node, childProcess);
-                            }
-                        }
-                    };
-                    Disconnected.getTicker().getAction(TickTimer.class).schedule(processTreeUpdateTask);
                 } else if (mainWindow.isClosed()) {
-                    getHost().interrupt();
+                    getHost().interrupt(true);
+                } else {
+                    mainWindowUpdateElapsed++;
+                    if (mainWindowUpdateElapsed >= Ticker.DEFAULT_TICKS_PER_SECOND) {
+                        mainWindowUpdateElapsed = 0;
+                        updateMainWindow();
+                    }
                 }
 
                 if (getHost().getState() == ProcessState.INTERRUPTED) {
-                    processTreeUpdateTask.cancel();
-                    getHost().stop();
+                    if (!mainWindow.isClosed()) {
+                        mainWindow.close();
+                    }
+                    getHost().stop(false);
                 }
+            }
+
+            private void updateMainWindow() {
+
+                TreeNode processRoot = mainWindow.getFrame().getRootProcessNode();
+                processRoot.removeAllChildren();
+                updateProcessNodes(processRoot, getHost().getHost().getProcessManager().getRootProcess());
+                for (int counter = 0; counter < mainWindow.getFrame().getProcessTreeWidget().getNumRows(); counter++) {
+                    mainWindow.getFrame().getProcessTreeWidget().setRowExpanded(counter, true);
+                }
+            }
+
+            private void updateProcessNodes(TreeNode parent, Process process) {
+
+                TreeNode node = updateProcessNode(parent, process);
+                if (node != null) {
+                    for (Process childProcess : process.getChildren()) {
+                        updateProcessNodes(node, childProcess);
+                    }
+                }
+            }
+
+            private TreeNode updateProcessNode(TreeNode parent, Process process) {
+
+                for (TreeNode node : parent.getChildren()) {
+                    if (node.getData(0).equals(process.getFile().getName())) {
+                        for (TreeNode child : node.getChildren()) {
+                            boolean found = false;
+                            for (Process childProcess : process.getChildren()) {
+                                if (childProcess.getPid() == (Integer) child.getData(2)) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                node.removeChild(parent);
+                            }
+                        }
+
+                        return node;
+                    }
+                }
+
+                return parent.addChild(process.getFile().getName(), "NYI", process.getPid());
             }
         };
     }

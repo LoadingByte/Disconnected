@@ -85,7 +85,7 @@ public class TickSimulator implements TickAction {
                     for (Process process : new ArrayList<Process>(computer.getOperatingSystem().getProcessManager().getAllProcesses())) {
                         if (process.getState() == ProcessState.RUNNING || process.getState() == ProcessState.INTERRUPTED) {
                             process.getExecutor().update();
-                        } else if (process.getState() == ProcessState.STOPPED) {
+                        } else if (process.isCompletelyStopped()) {
                             process.getParent().unregisterChild(process);
                         }
                     }

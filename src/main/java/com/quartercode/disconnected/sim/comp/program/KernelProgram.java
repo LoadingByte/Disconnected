@@ -81,7 +81,7 @@ public class KernelProgram extends Program {
 
                 // Force stop after 5 seconds
                 if (elapsedSinceInterrupt > Ticker.DEFAULT_TICKS_PER_SECOND * 5) {
-                    getHost().stop();
+                    getHost().stop(true);
                     elapsedSinceInterrupt = -1;
                 }
             }

@@ -93,7 +93,17 @@ public class GraphicsManager {
      */
     public void setState(GraphicsState state) {
 
-        updateThread.getRoot().setState(state);;
+        updateThread.getRoot().setState(state);
+    }
+
+    /**
+     * Invokes the given {@link Runnable} in the graphics update thread.
+     * 
+     * @param runnable The runnable to invoke in the update thread.
+     */
+    public void invoke(Runnable runnable) {
+
+        updateThread.invoke(runnable);
     }
 
 }

@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.lwjgl.LWJGLException;
@@ -47,12 +49,14 @@ import de.matthiasmann.twl.utils.PNGDecoder;
  */
 public class UpdateThread extends Thread {
 
-    private static final Logger LOGGER = Logger.getLogger(UpdateThread.class.getName());
+    private static final Logger   LOGGER   = Logger.getLogger(UpdateThread.class.getName());
 
-    private final RootWidget    root;
-    private GUI                 gui;
-    private LWJGLRenderer       renderer;
-    private ThemeManager        currentTheme;
+    private final RootWidget      root;
+    private GUI                   gui;
+    private LWJGLRenderer         renderer;
+    private ThemeManager          currentTheme;
+
+    private final Queue<Runnable> toInvoke = new LinkedList<Runnable>();
 
     /**
      * Creates a new update thread.
@@ -104,6 +108,16 @@ public class UpdateThread extends Thread {
         return currentTheme;
     }
 
+    /**
+     * Invokes the given {@link Runnable} in the graphics update thread.
+     * 
+     * @param runnable The runnable to invoke in the update thread.
+     */
+    public void invoke(Runnable runnable) {
+
+        toInvoke.offer(runnable);
+    }
+
     @Override
     public void run() {
 
@@ -144,6 +158,9 @@ public class UpdateThread extends Thread {
                     }
                 }
 
+                if (!toInvoke.isEmpty()) {
+                    toInvoke.poll().run();
+                }
                 gui.update();
                 Display.sync(60);
                 Display.update();

@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.graphics.desktop.DesktopWidget;
 import com.quartercode.disconnected.graphics.desktop.Frame;
 
@@ -82,22 +83,32 @@ public class Desktop {
      * 
      * @param window The new window to add to the desktop.
      */
-    public void addWindow(Window<?> window) {
+    public void addWindow(final Window<?> window) {
 
-        if (window.isClosed()) {
+        if (window.desktop != null) {
+            throw new IllegalStateException("Can't add window: Window already used elsewhere");
+        } else if (window.isClosed()) {
             throw new IllegalStateException("Can't add window: Window already closed");
         } else if (!windows.contains(window)) {
+            window.desktop = this;
             windows.add(window);
 
-            for (DesktopWidget pushReceiver : pushReceivers) {
-                pushReceiver.callAddWindow(window);
-            }
+            Disconnected.getGraphicsManager().invoke(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    for (DesktopWidget pushReceiver : pushReceivers) {
+                        pushReceiver.callAddWindow(window);
+                    }
+                }
+            });
         }
     }
 
     /**
      * Removes a window from the desktop.
-     * The window wont be just minimized, it will be removed until it gets added again.
+     * The window wont be just minimized, it will be removed completely.
      * 
      * @param window The window to remove from the desktop.
      */
@@ -105,6 +116,7 @@ public class Desktop {
 
         if (windows.contains(window)) {
             window.closed = true;
+            window.desktop = null;
             windows.remove(window);
 
             for (DesktopWidget pushReceiver : pushReceivers) {
@@ -148,6 +160,7 @@ public class Desktop {
         private String  title;
         private boolean closed;
 
+        private Desktop desktop;
         private F       frame;
 
         /**
@@ -229,16 +242,6 @@ public class Desktop {
         }
 
         /**
-         * Returns if the window is closed.
-         * 
-         * @return If the window is closed.
-         */
-        public boolean isClosed() {
-
-            return closed;
-        }
-
-        /**
          * Returns the frame this window wraps around.
          * The frame object should only be used to add hooks.
          * 
@@ -258,7 +261,7 @@ public class Desktop {
          */
         public boolean isVisible() {
 
-            return frame.isVisible();
+            return !closed && frame.isVisible();
         }
 
         /**
@@ -268,9 +271,43 @@ public class Desktop {
          * 
          * @param visible Determinates if the wrapped frame should be visible.
          */
-        public void setVisible(boolean visible) {
+        public void setVisible(final boolean visible) {
 
-            frame.setVisible(visible);
+            Disconnected.getGraphicsManager().invoke(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    frame.setVisible(visible);
+                }
+            });
+        }
+
+        /**
+         * Returns if the window is closed.
+         * 
+         * @return If the window is closed.
+         */
+        public boolean isClosed() {
+
+            return closed;
+        }
+
+        /**
+         * Removes the window from the desktop it's on.
+         * The window wont be just minimized, it will be closed completely.
+         * This just calls {@link Desktop#removeWindow(Window)} on the parent desktop.
+         */
+        public void close() {
+
+            Disconnected.getGraphicsManager().invoke(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    desktop.removeWindow(Window.this);
+                }
+            });
         }
 
     }
