@@ -76,6 +76,12 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
     }
 
     @Override
+    public boolean hasChild(TreeNode child) {
+
+        return getChildIndex(child) >= 0;
+    }
+
+    @Override
     public TreeNode addChild(Object... data) {
 
         TreeNodeImpl child = new TreeNodeImpl(this, data);
@@ -137,6 +143,12 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
         }
 
         @Override
+        public boolean hasChild(TreeNode child) {
+
+            return getChildIndex(child) >= 0;
+        }
+
+        @Override
         public TreeNode addChild(Object... data) {
 
             TreeNodeImpl child = new TreeNodeImpl(this, data);
@@ -148,9 +160,11 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
         @Override
         public void removeChild(TreeNode child) {
 
-            removeChild(getChildIndex(child));
-            if (getNumChildren() == 0) {
-                setLeaf(true);
+            if (hasChild(child)) {
+                removeChild(getChildIndex(child));
+                if (getNumChildren() == 0) {
+                    setLeaf(true);
+                }
             }
         }
 

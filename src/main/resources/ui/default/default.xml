@@ -198,7 +198,7 @@
         <theme name="treeButton" ref="-defaults">
             <param name=""><image>treetable.treebutton.*</image></param>
         </theme>
-        <theme name="columnHeader" ref="button">
+        <theme name="columnHeader" ref="label">
             <param name=""><image>columnHeader.*</image></param>
         </theme>
         <param name="columnHeaderWidth"><int>256</int></param>

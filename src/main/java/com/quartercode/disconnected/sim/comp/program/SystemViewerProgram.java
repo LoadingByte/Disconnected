@@ -18,8 +18,11 @@
 
 package com.quartercode.disconnected.sim.comp.program;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.graphics.component.TreeModel;
 import com.quartercode.disconnected.graphics.component.TreeNode;
 import com.quartercode.disconnected.graphics.desktop.Frame;
@@ -30,6 +33,9 @@ import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.util.size.ByteUnit;
+import de.matthiasmann.twl.Event;
+import de.matthiasmann.twl.Event.Type;
+import de.matthiasmann.twl.ScrollPane;
 import de.matthiasmann.twl.TreeTable;
 
 /**
@@ -101,37 +107,54 @@ public class SystemViewerProgram extends Program {
             private void updateMainWindow() {
 
                 TreeNode processRoot = mainWindow.getFrame().getRootProcessNode();
-                processRoot.removeAllChildren();
-                updateProcessNodes(processRoot, getHost().getHost().getProcessManager().getRootProcess());
-                for (int counter = 0; counter < mainWindow.getFrame().getProcessTreeWidget().getNumRows(); counter++) {
-                    mainWindow.getFrame().getProcessTreeWidget().setRowExpanded(counter, true);
-                }
-            }
-
-            private void updateProcessNodes(TreeNode parent, Process process) {
-
-                TreeNode node = updateProcessNode(parent, process);
-                if (node != null) {
-                    for (Process childProcess : process.getChildren()) {
-                        updateProcessNodes(node, childProcess);
+                List<TreeNode> addedNodes = updateProcessNodes(processRoot, getHost().getHost().getProcessManager().getRootProcess());
+                for (TreeNode node : addedNodes) {
+                    if (!node.isLeaf()) {
+                        mainWindow.getFrame().getProcessTreeWidget().setRowExpanded(mainWindow.getFrame().getProcessTreeWidget().getRowFromNode(node), true);
                     }
                 }
             }
 
-            private TreeNode updateProcessNode(TreeNode parent, Process process) {
+            private List<TreeNode> updateProcessNodes(TreeNode parent, Process process) {
 
-                for (TreeNode node : parent.getChildren()) {
-                    if (node.getData(0).equals(process.getFile().getName())) {
-                        for (TreeNode child : node.getChildren()) {
+                List<TreeNode> addedNodes = new ArrayList<TreeNode>();
+
+                AtomicBoolean added = new AtomicBoolean();
+                TreeNode node = updateProcessNode(parent, process, added);
+                if (added.get()) {
+                    addedNodes.add(node);
+                }
+                if (node != null) {
+                    for (Process childProcess : new ArrayList<Process>(process.getChildren())) {
+                        addedNodes.addAll(updateProcessNodes(node, childProcess));
+                    }
+                }
+
+                return addedNodes;
+            }
+
+            private TreeNode updateProcessNode(TreeNode parent, Process process, AtomicBoolean added) {
+
+                added.set(false);
+                for (final TreeNode node : parent.getChildren()) {
+                    if (node.getData(1).equals(process.getPid())) {
+                        for (final TreeNode child : node.getChildren()) {
                             boolean found = false;
                             for (Process childProcess : process.getChildren()) {
-                                if (childProcess.getPid() == (Integer) child.getData(2)) {
+                                if (child.getData(1).equals(childProcess.getPid())) {
                                     found = true;
                                     break;
                                 }
                             }
                             if (!found) {
-                                node.removeChild(parent);
+                                Disconnected.getGraphicsManager().invoke(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+
+                                        node.removeChild(child);
+                                    }
+                                });
                             }
                         }
 
@@ -139,7 +162,8 @@ public class SystemViewerProgram extends Program {
                     }
                 }
 
-                return parent.addChild(process.getFile().getName(), "NYI", process.getPid());
+                added.set(true);
+                return parent.addChild(process.getFile().getName(), process.getPid(), "NYI", process.getState());
             }
         };
     }
@@ -151,13 +175,16 @@ public class SystemViewerProgram extends Program {
 
         private SystemViewerFrame() {
 
-            processTree = new TreeModel("Process", "User", "PID");
+            processTree = new TreeModel("Process", "PID", "User", "Status");
 
             processTreeWidget = new TreeTable(processTree);
             processTreeWidget.setTheme("/table");
             processTreeWidget.setDefaultSelectionManager();
 
-            add(processTreeWidget);
+            ScrollPane scrollPane = new ScrollPane(processTreeWidget);
+            scrollPane.setTheme("/scrollpane");
+
+            add(scrollPane);
         }
 
         private TreeNode getRootProcessNode() {
@@ -178,9 +205,24 @@ public class SystemViewerProgram extends Program {
             setMinSize(500, 150);
 
             processTreeWidget.setPosition(getInnerX(), getInnerY());
-            setColumnWidth(processTreeWidget, 0, 0.6F);
-            setColumnWidth(processTreeWidget, 1, 0.3F);
-            setColumnWidth(processTreeWidget, 2, 0.1F);
+            layoutTableColumns();
+        }
+
+        @Override
+        protected boolean handleEvent(Event evt) {
+
+            if (evt.getType() == Type.MOUSE_DRAGGED) {
+                layoutTableColumns();
+            }
+            return super.handleEvent(evt);
+        }
+
+        private void layoutTableColumns() {
+
+            setColumnWidth(processTreeWidget, 0, 0.5F);
+            setColumnWidth(processTreeWidget, 1, 0.1F);
+            setColumnWidth(processTreeWidget, 2, 0.2F);
+            setColumnWidth(processTreeWidget, 3, 0.2F);
         }
 
         private void setColumnWidth(TreeTable table, int column, float width) {

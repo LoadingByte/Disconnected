@@ -36,6 +36,14 @@ public interface TreeNode extends TreeTableNode {
     public TreeNode[] getChildren();
 
     /**
+     * Returns if the given node is a child of this node.
+     * 
+     * @param child The node to check.
+     * @return True if the given node is a child of this node.
+     */
+    public boolean hasChild(TreeNode child);
+
+    /**
      * Adds a new child node to this node using the given data array for the columns of the table.
      * 
      * @param data The data to use for the columns of the table.
