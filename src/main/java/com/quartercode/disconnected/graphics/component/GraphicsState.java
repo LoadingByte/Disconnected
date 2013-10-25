@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.graphics.component;
 
+import java.net.URL;
 import de.matthiasmann.twl.Widget;
 
 /**
@@ -28,14 +29,14 @@ import de.matthiasmann.twl.Widget;
  */
 public class GraphicsState extends Widget {
 
-    private final String themeResource;
+    private final URL themeResource;
 
     /**
      * Creates a new empty state which defines what should be drawn.
      * 
      * @param themeResource The theme resource (file) as a resource url.
      */
-    public GraphicsState(String themeResource) {
+    public GraphicsState(URL themeResource) {
 
         this.themeResource = themeResource;
     }
@@ -45,7 +46,7 @@ public class GraphicsState extends Widget {
      * 
      * @return The theme resource (file) as a resource url.
      */
-    public String getThemeResource() {
+    public URL getThemeResource() {
 
         return themeResource;
     }

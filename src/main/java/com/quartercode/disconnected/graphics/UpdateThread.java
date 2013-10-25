@@ -152,7 +152,7 @@ public class UpdateThread extends Thread {
                     }
                     lastState = root.getState();
                     if (lastState != null) {
-                        currentTheme = ThemeManager.createThemeManager(lastState.getClass().getResource(lastState.getThemeResource()), renderer);
+                        currentTheme = ThemeManager.createThemeManager(lastState.getThemeResource(), renderer);
                         gui.applyTheme(currentTheme);
                         root.add(lastState);
                     }

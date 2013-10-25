@@ -30,7 +30,6 @@ import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.util.size.ByteUnit;
-import de.matthiasmann.twl.ScrollPane;
 import de.matthiasmann.twl.TreeTable;
 
 /**
@@ -157,12 +156,8 @@ public class SystemViewerProgram extends Program {
             processTreeWidget = new TreeTable(processTree);
             processTreeWidget.setTheme("/table");
             processTreeWidget.setDefaultSelectionManager();
-            processTreeWidget.collapseAll();
 
-            ScrollPane scrollPane = new ScrollPane(processTreeWidget);
-            scrollPane.setTheme("/tableScrollPane");
-
-            add(scrollPane);
+            add(processTreeWidget);
         }
 
         private TreeNode getRootProcessNode() {
