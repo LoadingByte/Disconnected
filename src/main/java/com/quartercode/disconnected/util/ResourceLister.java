@@ -47,7 +47,7 @@ public class ResourceLister {
         if (path.startsWith("/")) {
             List<String> resources = new ArrayList<String>();
 
-            for (String entry : System.getProperty("java.class.path", ".").split(";")) {
+            for (String entry : System.getProperty("java.class.path", ".").split(System.getProperty("path.separator"))) {
                 File file = new File(entry);
                 if (file.exists()) {
                     if (file.isDirectory()) {

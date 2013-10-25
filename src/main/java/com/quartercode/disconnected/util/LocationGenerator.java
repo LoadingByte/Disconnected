@@ -20,11 +20,10 @@ package com.quartercode.disconnected.util;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.imageio.ImageIO;
 import org.apache.commons.lang.Validate;
+import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.sim.Location;
 
 /**
@@ -33,8 +32,6 @@ import com.quartercode.disconnected.sim.Location;
  * @see Location
  */
 public class LocationGenerator {
-
-    private static BufferedImage map;
 
     /**
      * Generates the given amount of locations on an earth map.
@@ -58,14 +55,7 @@ public class LocationGenerator {
 
         Validate.isTrue(amount > 0, "Generation amount must be > 0: ", amount);
 
-        if (map == null) {
-            try {
-                map = ImageIO.read(LocationGenerator.class.getResource("/data/map.png"));
-            }
-            catch (IOException e) {
-                throw new RuntimeException("Can't read map data image", e);
-            }
-        }
+        BufferedImage map = (BufferedImage) Disconnected.getRS().get("map.png");
 
         if (ignore == null) {
             ignore = new ArrayList<Location>();

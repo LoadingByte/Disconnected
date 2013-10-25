@@ -23,6 +23,8 @@ import com.quartercode.disconnected.profile.ProfileManager;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.run.TickSimulator;
 import com.quartercode.disconnected.sim.run.Ticker;
+import com.quartercode.disconnected.util.Registry;
+import com.quartercode.disconnected.util.ResourceStore;
 
 /**
  * A static storage class which stores important game values.
@@ -30,6 +32,7 @@ import com.quartercode.disconnected.sim.run.Ticker;
 public class Disconnected {
 
     private static Registry        registry;
+    private static ResourceStore   resourceStore;
     private static ProfileManager  profileManager;
     private static Ticker          ticker;
     private static GraphicsManager graphicsManager;
@@ -87,6 +90,26 @@ public class Disconnected {
     }
 
     /**
+     * Returns the active resource store for loading all kinds of resources before the game starts.
+     * 
+     * @return The active resource store for holding all kinds of resources before the game starts.
+     */
+    public static ResourceStore getRS() {
+
+        return resourceStore;
+    }
+
+    /**
+     * Sets the active registry for holding all kinds of classes to a new one.
+     * 
+     * @param registry The new active registry for holding all kinds of classes.
+     */
+    public static void setRS(ResourceStore resourceStore) {
+
+        Disconnected.resourceStore = resourceStore;
+    }
+
+    /**
      * Returns the active profile manager for storing loaded profiles (which are actually simulations).
      * 
      * @return The active profile manager.
@@ -101,7 +124,7 @@ public class Disconnected {
      * 
      * @param profileManager The new active profile manager.
      */
-    public static void setProfileManager(ProfileManager profileManager) {
+    protected static void setProfileManager(ProfileManager profileManager) {
 
         Disconnected.profileManager = profileManager;
     }
@@ -121,7 +144,7 @@ public class Disconnected {
      * 
      * @param ticker The new ticker which will control the tick thread.
      */
-    public static void setTicker(Ticker ticker) {
+    protected static void setTicker(Ticker ticker) {
 
         Disconnected.ticker = ticker;
     }
@@ -141,7 +164,7 @@ public class Disconnected {
      * 
      * @param graphicsManager The new active graphics manager.
      */
-    public static void setGraphicsManager(GraphicsManager graphicsManager) {
+    protected static void setGraphicsManager(GraphicsManager graphicsManager) {
 
         Disconnected.graphicsManager = graphicsManager;
     }

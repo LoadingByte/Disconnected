@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected;
+package com.quartercode.disconnected.util;
 
 import java.util.ArrayList;
 import java.util.Collections;

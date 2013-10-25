@@ -30,20 +30,24 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.Main;
-import com.quartercode.disconnected.Registry;
 import com.quartercode.disconnected.profile.ProfileSerializer;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
+import com.quartercode.disconnected.util.Registry;
+import com.quartercode.disconnected.util.ResourceStore;
 
 public class ProfileSerializerTest {
 
     private Simulation simulation;
 
     @BeforeClass
-    public static void setUpBeforeClass() {
+    public static void setUpBeforeClass() throws IOException {
 
         Disconnected.setRegistry(new Registry());
-        Main.fillRegistry();
+        Main.fillRegistry(Disconnected.getRegistry());
+
+        Disconnected.setRS(new ResourceStore());
+        Main.fillResourceStore(Disconnected.getRS());
     }
 
     @Before

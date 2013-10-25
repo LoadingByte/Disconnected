@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -45,6 +46,8 @@ import com.quartercode.disconnected.sim.run.TickTimer;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
 import com.quartercode.disconnected.util.LogExceptionHandler;
+import com.quartercode.disconnected.util.Registry;
+import com.quartercode.disconnected.util.ResourceStore;
 
 /**
  * The main class which initalizes the whole game.
@@ -78,7 +81,18 @@ public class Main {
         // Initalize & fill registry
         LOGGER.info("Initalizing & filling class registry");
         Disconnected.setRegistry(new Registry());
-        fillRegistry();
+        fillRegistry(Disconnected.getRegistry());
+
+        // Initalize & fill resource store
+        try {
+            LOGGER.info("Initalizing & filling resource store");
+            Disconnected.setRS(new ResourceStore());
+            fillResourceStore(Disconnected.getRS());
+        }
+        catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Can't fill resource store", e);
+            return;
+        }
 
         // Initalize profile manager and load stored profiles (TODO: Add code for loading).
         LOGGER.info("Initalizing profile manager");
@@ -110,28 +124,41 @@ public class Main {
     }
 
     /**
-     * Fills the active registry with the default values which are needed for running vanilla disconnected.
+     * Fills the given registry with the default values which are needed for running vanilla disconnected.
+     * 
+     * @param registry The registry to fill.
      */
-    public static void fillRegistry() {
+    public static void fillRegistry(Registry registry) {
 
         // Hardware
-        Disconnected.getRegistry().registerClass(Mainboard.class);
-        Disconnected.getRegistry().registerClass(CPU.class);
-        Disconnected.getRegistry().registerClass(RAM.class);
-        Disconnected.getRegistry().registerClass(HardDrive.class);
-        Disconnected.getRegistry().registerClass(NetworkInterface.class);
+        registry.registerClass(Mainboard.class);
+        registry.registerClass(CPU.class);
+        registry.registerClass(RAM.class);
+        registry.registerClass(HardDrive.class);
+        registry.registerClass(NetworkInterface.class);
 
         // Programs
-        Disconnected.getRegistry().registerClass(KernelProgram.class);
-        Disconnected.getRegistry().registerClass(SystemViewerProgram.class);
-        Disconnected.getRegistry().registerClass(ExploitProgram.class);
+        registry.registerClass(KernelProgram.class);
+        registry.registerClass(SystemViewerProgram.class);
+        registry.registerClass(ExploitProgram.class);
 
         // AI Controllers
-        Disconnected.getRegistry().registerClass(PlayerController.class);
-        Disconnected.getRegistry().registerClass(UserController.class);
+        registry.registerClass(PlayerController.class);
+        registry.registerClass(UserController.class);
 
         // Interests
-        Disconnected.getRegistry().registerClass(DestroyInterest.class);
+        registry.registerClass(DestroyInterest.class);
+    }
+
+    /**
+     * Fills the given resource store with the default resource objects which are needed for running vanilla disconnected.
+     * 
+     * @param resourceStore The resource store to fill.
+     * @throws IOException Something goes wrong while reading from a jar file or resource.
+     */
+    public static void fillResourceStore(ResourceStore resourceStore) throws IOException {
+
+        resourceStore.loadFromClasspath("/data");
     }
 
     private Main() {
