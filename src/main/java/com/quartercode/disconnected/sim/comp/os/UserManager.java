@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlElement;
 import com.quartercode.disconnected.util.InfoString;
 
 /**
- * The user is a subclass the {@link OperatingSystem} uses for holding and modifing users and groups.
+ * The user manager is a subclass the {@link OperatingSystem} uses for holding and modifing users and groups.
  * This class only gets used by the {@link OperatingSystem}.
  * 
  * @see User
@@ -121,7 +121,7 @@ public class UserManager implements InfoString {
      * Registers a new group to the system.
      * Groups are used for defining rights for multiple users.
      * 
-     * @param user The new group to register to the system.
+     * @param group The new group to register to the system.
      */
     public void addGroup(Group group) {
 
@@ -132,7 +132,7 @@ public class UserManager implements InfoString {
      * Unregisters a group from the system.
      * Groups are used for defining rights for multiple users.
      * 
-     * @param user The group to unregister from the system.
+     * @param group The group to unregister from the system.
      */
     public void removeGroup(Group group) {
 

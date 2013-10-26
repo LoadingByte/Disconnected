@@ -102,7 +102,7 @@ public class Disconnected {
     /**
      * Sets the active registry for holding all kinds of classes to a new one.
      * 
-     * @param registry The new active registry for holding all kinds of classes.
+     * @param resourceStore The new active registry for holding all kinds of classes.
      */
     public static void setRS(ResourceStore resourceStore) {
 
