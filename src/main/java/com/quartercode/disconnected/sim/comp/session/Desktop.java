@@ -31,19 +31,12 @@ import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram.Deskt
  * This class holds the windows, another class in the graphics-package renders them.
  * 
  * @see Window
+ * @see DesktopSession
  */
 public class Desktop {
 
-    private DesktopSession        host;
+    private final DesktopSession  host;
     private final List<Window<?>> windows = new ArrayList<Window<?>>();
-
-    /**
-     * Creates a new empty desktop.
-     * This is only recommended for direct field access (e.g. for serialization).
-     */
-    protected Desktop() {
-
-    }
 
     /**
      * Creates a new desktop.

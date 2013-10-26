@@ -32,8 +32,9 @@ import com.quartercode.disconnected.util.size.ByteUnit;
  * The desktop session program is a session with a graphical user interface (desktop).
  * It can't be used by the ai.
  * 
- * @see SessionProgram
+ * @see DesktopSession
  * @see Desktop
+ * @see SessionProgram
  */
 public class DesktopSessionProgram extends SessionProgram {
 
@@ -46,7 +47,7 @@ public class DesktopSessionProgram extends SessionProgram {
     }
 
     /**
-     * Creates a new desktop session program for sessions with a graphical user interface (desktop)
+     * Creates a new desktop session program for sessions with a graphical user interface (desktop).
      * This also sets the name, the version and the vulnerabilities of the program.
      * 
      * @param name The name the session program has.
@@ -74,8 +75,9 @@ public class DesktopSessionProgram extends SessionProgram {
      * A desktop session is a session with a graphical user interface (desktop).
      * Such a desktop session can't be used by the ai.
      * 
-     * @see Session
      * @see Desktop
+     * @see DesktopSessionProgram
+     * @see Session
      */
     public static class DesktopSession extends Session {
 
@@ -113,7 +115,7 @@ public class DesktopSessionProgram extends SessionProgram {
         }
 
         /**
-         * Returns a list containing all active desktop widgets created by this session-
+         * Returns a list containing all active desktop widgets created by this session.
          * 
          * @return A list with this session's desktop widgets.
          */

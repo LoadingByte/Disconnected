@@ -46,6 +46,8 @@ public class DesktopWidget extends Widget {
 
     /**
      * Creates a new desktop widget and sets it up.
+     * 
+     * @param desktop The desktop to use for the widget.
      */
     public DesktopWidget(Desktop desktop) {
 
