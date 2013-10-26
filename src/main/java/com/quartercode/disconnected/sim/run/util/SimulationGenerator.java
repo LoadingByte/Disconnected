@@ -40,6 +40,7 @@ import com.quartercode.disconnected.sim.comp.os.Group;
 import com.quartercode.disconnected.sim.comp.os.Group.RightOverride;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.os.User;
+import com.quartercode.disconnected.sim.comp.program.DesktopSessionProgram;
 import com.quartercode.disconnected.sim.comp.program.ExploitProgram;
 import com.quartercode.disconnected.sim.comp.program.KernelProgram;
 import com.quartercode.disconnected.sim.comp.program.SystemViewerProgram;
@@ -203,6 +204,10 @@ public class SimulationGenerator {
         // Generate kernel file (temp)
         fileSystem.addFile("/system/boot/kernel", FileType.FILE);
         fileSystem.getFile("/system/boot/kernel").setContent(new KernelProgram("Kernel", new Version("1.0.0"), null));
+
+        // Generate session programs
+        fileSystem.addFile("/system/bin/desktops.exe", FileType.FILE);
+        fileSystem.getFile("/system/bin/desktops.exe").setContent(new DesktopSessionProgram("Desktop Session", new Version("1.0.0"), null));
 
         // Generate programs
         fileSystem.addFile("/opt/sysviewer/sysviewer.exe", FileType.FILE);

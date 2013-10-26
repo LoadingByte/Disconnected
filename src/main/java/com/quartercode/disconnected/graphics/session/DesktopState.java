@@ -16,10 +16,15 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.graphics.desktop;
+package com.quartercode.disconnected.graphics.session;
 
+import java.util.HashMap;
+import java.util.Map;
 import com.quartercode.disconnected.graphics.component.GraphicsState;
 import com.quartercode.disconnected.sim.Simulation;
+import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.program.DesktopSessionProgram.DesktopSession;
+import com.quartercode.disconnected.sim.comp.program.Process;
 import de.matthiasmann.twl.GUI;
 
 /**
@@ -65,7 +70,12 @@ public class DesktopState extends GraphicsState {
     @Override
     protected void afterAddToGUI(GUI gui) {
 
-        desktopWidget = new DesktopWidget(simulation.getLocalPlayer().getComputer().getOperatingSystem().getDesktop());
+        // Open a new desktop session (temp)
+        OperatingSystem os = simulation.getLocalPlayer().getComputer().getOperatingSystem();
+        Map<String, Object> arguments = new HashMap<String, Object>();
+        arguments.put("user", os.getUserManager().getUsers().get(0));
+        Process process = os.getProcessManager().getRootProcess().createChild(os.getFileSystemManager().getFile("C:/system/bin/desktops.exe"), arguments);
+        desktopWidget = ((DesktopSession) process.getExecutor()).createWidget();
         add(desktopWidget);
     }
 

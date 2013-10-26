@@ -25,11 +25,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.graphics.component.TreeModel;
 import com.quartercode.disconnected.graphics.component.TreeNode;
-import com.quartercode.disconnected.graphics.desktop.Frame;
+import com.quartercode.disconnected.graphics.session.Frame;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
-import com.quartercode.disconnected.sim.comp.os.Desktop.Window;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.program.Desktop.Window;
 import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.util.size.ByteUnit;
@@ -163,7 +163,8 @@ public class SystemViewerProgram extends Program {
                 }
 
                 added.set(true);
-                return parent.addChild(process.getFile().getName(), process.getPid(), "NYI", process.getState());
+                String session = process.getSession() == null ? "" : process.getSession().getUser().getName();
+                return parent.addChild(process.getFile().getName(), process.getPid(), session, process.getState());
             }
         };
     }

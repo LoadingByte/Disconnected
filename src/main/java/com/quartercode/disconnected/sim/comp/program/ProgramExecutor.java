@@ -31,7 +31,9 @@ import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.net.Address;
 import com.quartercode.disconnected.sim.comp.net.Packet;
 import com.quartercode.disconnected.sim.comp.net.PacketListener;
-import com.quartercode.disconnected.sim.comp.os.Desktop.Window;
+import com.quartercode.disconnected.sim.comp.program.Desktop.Window;
+import com.quartercode.disconnected.sim.comp.program.DesktopSessionProgram.DesktopSession;
+import com.quartercode.disconnected.sim.comp.program.SessionProgram.Session;
 
 /**
  * This abstract class defines a program executor which takes care of acutally running a program.
@@ -75,7 +77,6 @@ public abstract class ProgramExecutor {
      * 
      * @return The host process which uses the created executor for running the program instance.
      */
-
     public Process getHost() {
 
         return host;
@@ -166,12 +167,19 @@ public abstract class ProgramExecutor {
 
     /**
      * Opens a new already created window on the host's desktop.
+     * Throws an exception if the host process isn't running under a desktop session.
      * 
      * @param window The window to open on the host's desktop.
+     * @throws IllegalStateException The host process isn't running under a desktop session.
      */
     protected void openWindow(Window<?> window) {
 
-        host.getHost().getDesktop().addWindow(window);
+        Session session = host.getSession();
+        if (session instanceof DesktopSession) {
+            ((DesktopSession) session).getDesktop().addWindow(window);
+        } else {
+            throw new IllegalStateException("The host process is running under " + session.toInfoString() + "; desktop session needed");
+        }
     }
 
     /**

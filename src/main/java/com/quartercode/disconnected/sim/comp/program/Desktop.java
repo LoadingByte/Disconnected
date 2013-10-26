@@ -16,16 +16,15 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.comp.os;
+package com.quartercode.disconnected.sim.comp.program;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import com.quartercode.disconnected.Disconnected;
-import com.quartercode.disconnected.graphics.desktop.DesktopWidget;
-import com.quartercode.disconnected.graphics.desktop.Frame;
+import com.quartercode.disconnected.graphics.session.DesktopWidget;
+import com.quartercode.disconnected.graphics.session.Frame;
+import com.quartercode.disconnected.sim.comp.program.DesktopSessionProgram.DesktopSession;
 
 /**
  * A desktop can hold and display windows.
@@ -35,9 +34,8 @@ import com.quartercode.disconnected.graphics.desktop.Frame;
  */
 public class Desktop {
 
-    private OperatingSystem          host;
-    private final List<Window<?>>    windows       = new ArrayList<Window<?>>();
-    private final Set<DesktopWidget> pushReceivers = new HashSet<DesktopWidget>();
+    private DesktopSession        host;
+    private final List<Window<?>> windows = new ArrayList<Window<?>>();
 
     /**
      * Creates a new empty desktop.
@@ -50,19 +48,19 @@ public class Desktop {
     /**
      * Creates a new desktop.
      * 
-     * @param host The host operating system which uses this desktop.
+     * @param host The hosting desktop session which uses this desktop.
      */
-    public Desktop(OperatingSystem host) {
+    public Desktop(DesktopSession host) {
 
         this.host = host;
     }
 
     /**
-     * Returns the host operating system which uses this desktop.
+     * Returns the hosting desktop session which uses this desktop.
      * 
-     * @return The host operating system which uses this desktop.
+     * @return The hosting desktop session which uses this desktop.
      */
-    public OperatingSystem getHost() {
+    public DesktopSession getHost() {
 
         return host;
     }
@@ -98,8 +96,8 @@ public class Desktop {
                 @Override
                 public void run() {
 
-                    for (DesktopWidget pushReceiver : pushReceivers) {
-                        pushReceiver.callAddWindow(window);
+                    for (DesktopWidget widget : host.getWidgets()) {
+                        widget.callAddWindow(window);
                     }
                 }
             });
@@ -119,32 +117,10 @@ public class Desktop {
             window.desktop = null;
             windows.remove(window);
 
-            for (DesktopWidget pushReceiver : pushReceivers) {
-                pushReceiver.callRemoveWindow(window);
+            for (DesktopWidget widget : host.getWidgets()) {
+                widget.callRemoveWindow(window);
             }
         }
-    }
-
-    /**
-     * Adds a desktop widget push receiver to the desktop.
-     * In this case, push receivers are graphical desktop widgets and render the windows of a desktop.
-     * 
-     * @param pushReceiver The desktop widget push receiver to add to the desktop.
-     */
-    public void addPushReceiver(DesktopWidget pushReceiver) {
-
-        pushReceivers.add(pushReceiver);
-    }
-
-    /**
-     * Removes a desktop widget push receiver from the desktop.
-     * In this case, push receivers are graphical desktop widgets and render the windows of a desktop.
-     * 
-     * @param pushReceiver The desktop widget push receiver to remove from the desktop.
-     */
-    public void removePushReceiver(DesktopWidget pushReceiver) {
-
-        pushReceivers.remove(pushReceiver);
     }
 
     /**

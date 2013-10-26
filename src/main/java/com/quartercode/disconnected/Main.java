@@ -25,7 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import com.quartercode.disconnected.graphics.GraphicsManager;
-import com.quartercode.disconnected.graphics.desktop.DesktopState;
+import com.quartercode.disconnected.graphics.session.DesktopState;
 import com.quartercode.disconnected.profile.ProfileManager;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.Computer;
@@ -34,6 +34,7 @@ import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
 import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
+import com.quartercode.disconnected.sim.comp.program.DesktopSessionProgram;
 import com.quartercode.disconnected.sim.comp.program.ExploitProgram;
 import com.quartercode.disconnected.sim.comp.program.KernelProgram;
 import com.quartercode.disconnected.sim.comp.program.SystemViewerProgram;
@@ -139,6 +140,9 @@ public class Main {
 
         // Programs
         registry.registerClass(KernelProgram.class);
+
+        registry.registerClass(DesktopSessionProgram.class);
+
         registry.registerClass(SystemViewerProgram.class);
         registry.registerClass(ExploitProgram.class);
 
