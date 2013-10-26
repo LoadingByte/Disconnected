@@ -361,9 +361,9 @@ public class Process implements InfoString {
         final int prime = 31;
         int result = 1;
         result = prime * result + (children == null ? 0 : children.hashCode());
-        result = prime * result + (executor == null ? 0 : executor.hashCode());
         result = prime * result + (file == null ? 0 : file.hashCode());
         result = prime * result + pid;
+        result = prime * result + (state == null ? 0 : state.hashCode());
         return result;
     }
 
@@ -387,13 +387,6 @@ public class Process implements InfoString {
         } else if (!children.equals(other.children)) {
             return false;
         }
-        if (executor == null) {
-            if (other.executor != null) {
-                return false;
-            }
-        } else if (!executor.equals(other.executor)) {
-            return false;
-        }
         if (file == null) {
             if (other.file != null) {
                 return false;
@@ -402,6 +395,9 @@ public class Process implements InfoString {
             return false;
         }
         if (pid != other.pid) {
+            return false;
+        }
+        if (state != other.state) {
             return false;
         }
         return true;
