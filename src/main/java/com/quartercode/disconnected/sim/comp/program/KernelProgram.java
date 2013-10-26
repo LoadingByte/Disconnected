@@ -21,6 +21,7 @@ package com.quartercode.disconnected.sim.comp.program;
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
@@ -33,6 +34,7 @@ import com.quartercode.disconnected.util.size.ByteUnit;
  * 
  * @see OperatingSystem
  */
+@XmlSeeAlso ({ KernelProgram.KernelProgramExecutor.class })
 public class KernelProgram extends Program {
 
     /**
@@ -64,28 +66,40 @@ public class KernelProgram extends Program {
     @Override
     protected ProgramExecutor createExecutorInstance(Process host, Map<String, Object> arguments) {
 
-        return new ProgramExecutor(host) {
+        return new KernelProgramExecutor(host);
+    }
 
-            @XmlElement
-            private int elapsedSinceInterrupt = -1;
+    protected static class KernelProgramExecutor extends ProgramExecutor {
 
-            @Override
-            public void update() {
+        @XmlElement
+        private int elapsedSinceInterrupt = -1;
 
-                if (getHost().getState() == ProcessState.INTERRUPTED) {
-                    elapsedSinceInterrupt = 0;
-                }
-                if (elapsedSinceInterrupt >= 0) {
-                    elapsedSinceInterrupt++;
-                }
+        protected KernelProgramExecutor() {
 
-                // Force stop after 5 seconds
-                if (elapsedSinceInterrupt > Ticker.DEFAULT_TICKS_PER_SECOND * 5) {
-                    getHost().stop(true);
-                    elapsedSinceInterrupt = -1;
-                }
+        }
+
+        protected KernelProgramExecutor(Process host) {
+
+            super(host);
+        }
+
+        @Override
+        public void update() {
+
+            if (getHost().getState() == ProcessState.INTERRUPTED) {
+                elapsedSinceInterrupt = 0;
             }
-        };
+            if (elapsedSinceInterrupt >= 0) {
+                elapsedSinceInterrupt++;
+            }
+
+            // Force stop after 5 seconds
+            if (elapsedSinceInterrupt > Ticker.DEFAULT_TICKS_PER_SECOND * 5) {
+                getHost().stop(true);
+                elapsedSinceInterrupt = -1;
+            }
+        }
+
     }
 
 }
