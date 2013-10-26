@@ -38,8 +38,6 @@ import com.quartercode.disconnected.util.InfoString;
  */
 public abstract class SessionProgram extends Program {
 
-    private boolean serializable;
-
     /**
      * Creates a new empty session program.
      * This is only recommended for direct field access (e.g. for serialization).
@@ -49,46 +47,21 @@ public abstract class SessionProgram extends Program {
     }
 
     /**
-     * Creates a new session program and only sets the serializable attribute.
-     * This can be used by subclasses with default constructors.
-     * 
-     * @param serializable True if session instances are serializable.
-     */
-    protected SessionProgram(boolean serializable) {
-
-        this.serializable = serializable;
-    }
-
-    /**
-     * Creates a new session program and sets the name, the version, the vulnerabilities and if session instances are serializable.
+     * Creates a new session program and sets the name, the version and the vulnerabilities.
      * 
      * @param name The name the session program has.
      * @param version The current version the session program has.
      * @param vulnerabilities The vulnerabilities the session program has.
-     * @param serializable True if session instances are serializable.
      */
-    protected SessionProgram(String name, Version version, List<Vulnerability> vulnerabilities, boolean serializable) {
+    protected SessionProgram(String name, Version version, List<Vulnerability> vulnerabilities) {
 
         super(name, version, vulnerabilities);
-
-        this.serializable = serializable;
     }
 
     @Override
     protected void addParameters() {
 
         addParameter("user", User.class);
-    }
-
-    /**
-     * Returns true if instances of this session program are serializable, false if not.
-     * Sessions which are not serializable must be closed before the simulation can be serialized.
-     * 
-     * @return True if instances of this session program are serializable, false if not.
-     */
-    public boolean isSerializable() {
-
-        return serializable;
     }
 
     @Override
@@ -116,7 +89,15 @@ public abstract class SessionProgram extends Program {
     public static abstract class Session extends ProgramExecutor implements InfoString {
 
         @XmlIDREF
-        private final User user;
+        private User user;
+
+        /**
+         * Creates a new empty session.
+         * This is only recommended for direct field access (e.g. for serialization).
+         */
+        protected Session() {
+
+        }
 
         /**
          * Creates a new session instance and sets the parent process and the user the session is running under.
@@ -127,7 +108,6 @@ public abstract class SessionProgram extends Program {
         protected Session(Process host, User user) {
 
             super(host);
-
             this.user = user;
         }
 
@@ -141,6 +121,14 @@ public abstract class SessionProgram extends Program {
 
             return user;
         }
+
+        /**
+         * Returns true if this session instance is serializable, false if not.
+         * Sessions which are not serializable must be closed before the simulation can be serialized.
+         * 
+         * @return True if this session instance is serializable.
+         */
+        public abstract boolean isSerializable();
 
         /**
          * Closes the session.

@@ -43,7 +43,6 @@ public class DesktopSessionProgram extends SessionProgram {
      */
     protected DesktopSessionProgram() {
 
-        super(false);
     }
 
     /**
@@ -56,7 +55,7 @@ public class DesktopSessionProgram extends SessionProgram {
      */
     public DesktopSessionProgram(String name, Version version, List<Vulnerability> vulnerabilities) {
 
-        super(name, version, vulnerabilities, false);
+        super(name, version, vulnerabilities);
     }
 
     @Override
@@ -95,6 +94,12 @@ public class DesktopSessionProgram extends SessionProgram {
 
             desktop = new Desktop(this);
             widgets = new ArrayList<DesktopWidget>();
+        }
+
+        @Override
+        public boolean isSerializable() {
+
+            return false;
         }
 
         /**
