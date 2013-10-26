@@ -31,7 +31,6 @@ import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.program.Process;
-import com.quartercode.disconnected.sim.comp.session.SessionProgram;
 import com.quartercode.disconnected.sim.comp.session.SessionProgram.Session;
 
 /**
@@ -74,9 +73,11 @@ public class ProfileSerializer {
         marshaller.marshal(simulation, outputStream);
 
         for (Computer computer : simulation.getComputers()) {
-            for (Process process : computer.getOperatingSystem().getProcessManager().getAllProcesses()) {
-                if (process.getExecutor() instanceof Session && ! ((SessionProgram) process.getFile().getContent()).isSerializable()) {
-                    throw new IllegalStateException("Can't serialize: There are open sessions which aren't serializable");
+            if (computer.getOperatingSystem().getProcessManager().getRootProcess() != null) {
+                for (Process process : computer.getOperatingSystem().getProcessManager().getAllProcesses()) {
+                    if (process.getExecutor() instanceof Session && ! ((Session) process.getExecutor()).isSerializable()) {
+                        throw new IllegalStateException("Can't serialize: There are open sessions which aren't serializable");
+                    }
                 }
             }
         }
