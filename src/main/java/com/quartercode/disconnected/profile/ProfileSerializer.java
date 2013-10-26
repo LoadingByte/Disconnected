@@ -29,6 +29,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.sim.Simulation;
+import com.quartercode.disconnected.sim.comp.Computer;
+import com.quartercode.disconnected.sim.comp.program.Process;
+import com.quartercode.disconnected.sim.comp.session.SessionProgram;
+import com.quartercode.disconnected.sim.comp.session.SessionProgram.Session;
 
 /**
  * This utility class loads a saves stored profile simulations for serializing simulations.
@@ -60,6 +64,7 @@ public class ProfileSerializer {
      * 
      * @param outputStream The output stream for writing.
      * @param simulation The profile simulation to serialize.
+     * @throws IllegalStateException There are open sessions which aren't serializable.
      * @throws JAXBException An exception occurred while serializing the xml document.
      */
     public static void serialize(OutputStream outputStream, Simulation simulation) throws JAXBException {
@@ -67,6 +72,14 @@ public class ProfileSerializer {
         Marshaller marshaller = context.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         marshaller.marshal(simulation, outputStream);
+
+        for (Computer computer : simulation.getComputers()) {
+            for (Process process : computer.getOperatingSystem().getProcessManager().getAllProcesses()) {
+                if (process.getExecutor() instanceof Session && ! ((SessionProgram) process.getFile().getContent()).isSerializable()) {
+                    throw new IllegalStateException("Can't serialize: There are open sessions which aren't serializable");
+                }
+            }
+        }
     }
 
     /**
