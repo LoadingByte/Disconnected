@@ -66,7 +66,7 @@ If you want to add a feature to the develop branch, you have to complete it befo
 Because of that, adding things directly to the develop branch is only recommended for very small features and bugfixes.
 
 If you want to create a feature which is larger than "very small", you should consider creating a new feature branch from develop.
-Feature branches can have any name beside from "master", "develop", "alpha-*", "beta-*" and "release-*".
+Feature branch should be named like <creator>/<feature>. Every letter should be lower-case (example: loadingbyte/sessions).
 On this branch, you can do what you want, nobody expects anything fully usable on a feature branch.
 You can develop your feature and commit every change, even if you break the feature with a new commit.
 When you're done with your feature, you can simply merge your feature branch into the develop branch. Of course, you can also throw your feature away.
@@ -135,8 +135,8 @@ Here's a graph demonstrating the branching model:
                   |                                         |
                   V                                         V
 
-Release Model for Noobs (and users)
----------------------------------
+Release Model for Noobs (and Users)
+-----------------------------------
 
 For the user, every new version starts with an alpha. The alpha is very experimental, but it's "stable".
 If you want to take an early look on a new version, try the alpha.
