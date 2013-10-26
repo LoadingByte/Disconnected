@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.comp.program;
+package com.quartercode.disconnected.sim.comp.session;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +24,7 @@ import java.util.List;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.graphics.session.DesktopWidget;
 import com.quartercode.disconnected.graphics.session.Frame;
-import com.quartercode.disconnected.sim.comp.program.DesktopSessionProgram.DesktopSession;
+import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram.DesktopSession;
 
 /**
  * A desktop can hold and display windows.

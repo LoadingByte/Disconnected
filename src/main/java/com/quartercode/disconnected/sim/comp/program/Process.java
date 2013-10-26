@@ -31,7 +31,8 @@ import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.os.User;
-import com.quartercode.disconnected.sim.comp.program.SessionProgram.Session;
+import com.quartercode.disconnected.sim.comp.session.SessionProgram;
+import com.quartercode.disconnected.sim.comp.session.SessionProgram.Session;
 import com.quartercode.disconnected.util.InfoString;
 
 /**

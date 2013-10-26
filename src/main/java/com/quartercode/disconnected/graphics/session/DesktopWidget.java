@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.graphics.session;
 
-import com.quartercode.disconnected.sim.comp.program.Desktop;
-import com.quartercode.disconnected.sim.comp.program.Desktop.Window;
 import com.quartercode.disconnected.sim.comp.program.Process;
+import com.quartercode.disconnected.sim.comp.session.Desktop;
+import com.quartercode.disconnected.sim.comp.session.Desktop.Window;
 import de.matthiasmann.twl.BoxLayout;
 import de.matthiasmann.twl.BoxLayout.Direction;
 import de.matthiasmann.twl.Button;

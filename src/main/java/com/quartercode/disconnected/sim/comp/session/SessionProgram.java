@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.comp.program;
+package com.quartercode.disconnected.sim.comp.session;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +24,9 @@ import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.os.User;
+import com.quartercode.disconnected.sim.comp.program.Process;
+import com.quartercode.disconnected.sim.comp.program.Program;
+import com.quartercode.disconnected.sim.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.util.InfoString;
 
 /**

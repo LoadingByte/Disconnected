@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.comp.program;
+package com.quartercode.disconnected.sim.comp.session;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,6 +25,7 @@ import com.quartercode.disconnected.graphics.session.DesktopWidget;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.os.User;
+import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 /**

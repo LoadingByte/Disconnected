@@ -31,9 +31,9 @@ import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.net.Address;
 import com.quartercode.disconnected.sim.comp.net.Packet;
 import com.quartercode.disconnected.sim.comp.net.PacketListener;
-import com.quartercode.disconnected.sim.comp.program.Desktop.Window;
-import com.quartercode.disconnected.sim.comp.program.DesktopSessionProgram.DesktopSession;
-import com.quartercode.disconnected.sim.comp.program.SessionProgram.Session;
+import com.quartercode.disconnected.sim.comp.session.Desktop.Window;
+import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram.DesktopSession;
+import com.quartercode.disconnected.sim.comp.session.SessionProgram.Session;
 
 /**
  * This abstract class defines a program executor which takes care of acutally running a program.

@@ -23,8 +23,8 @@ import java.util.Map;
 import com.quartercode.disconnected.graphics.component.GraphicsState;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
-import com.quartercode.disconnected.sim.comp.program.DesktopSessionProgram.DesktopSession;
 import com.quartercode.disconnected.sim.comp.program.Process;
+import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram.DesktopSession;
 import de.matthiasmann.twl.GUI;
 
 /**

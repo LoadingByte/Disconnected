@@ -28,8 +28,8 @@ import com.quartercode.disconnected.sim.comp.HostedComputerPart;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
-import com.quartercode.disconnected.sim.comp.program.Desktop;
 import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
+import com.quartercode.disconnected.sim.comp.session.Desktop;
 
 /**
  * This class stores information about an operating system.
