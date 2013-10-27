@@ -70,7 +70,7 @@ public class Group implements Comparable<User>, InfoString {
     }
 
     /**
-     * Creates a new group and sets the host system the object is used for and his name and a {@link RightOverride}..
+     * Creates a new group and sets the host system the object is used for and his name and a {@link RightOverride}.
      * 
      * @param host The host operating system the group is used for.
      * @param name The name the group has.
