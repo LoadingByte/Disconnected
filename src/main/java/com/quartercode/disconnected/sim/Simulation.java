@@ -30,6 +30,7 @@ import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.ai.AIController;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
+import com.quartercode.disconnected.util.InfoString;
 import com.quartercode.disconnected.util.RandomPool;
 
 /**
@@ -41,7 +42,7 @@ import com.quartercode.disconnected.util.RandomPool;
  * @see Computer
  */
 @XmlRootElement (namespace = "http://quartercode.com/")
-public class Simulation {
+public class Simulation implements InfoString {
 
     /**
      * This is a public random pool you can quickly access if you need random numbers for a specific simulation.
@@ -251,6 +252,8 @@ public class Simulation {
         final int prime = 31;
         int result = 1;
         result = prime * result + (computers == null ? 0 : computers.hashCode());
+        result = prime * result + (groups == null ? 0 : groups.hashCode());
+        result = prime * result + (members == null ? 0 : members.hashCode());
         return result;
     }
 
@@ -274,13 +277,33 @@ public class Simulation {
         } else if (!computers.equals(other.computers)) {
             return false;
         }
+        if (groups == null) {
+            if (other.groups != null) {
+                return false;
+            }
+        } else if (!groups.equals(other.groups)) {
+            return false;
+        }
+        if (members == null) {
+            if (other.members != null) {
+                return false;
+            }
+        } else if (!members.equals(other.members)) {
+            return false;
+        }
         return true;
+    }
+
+    @Override
+    public String toInfoString() {
+
+        return members.size() + " members, " + groups.size() + " groups, " + computers.size() + " computers";
     }
 
     @Override
     public String toString() {
 
-        return getClass().getName() + " [members=" + members.size() + ", groups=" + groups.size() + ", computers=" + computers.size() + "]";
+        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }

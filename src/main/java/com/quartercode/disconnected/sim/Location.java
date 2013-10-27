@@ -20,11 +20,12 @@ package com.quartercode.disconnected.sim;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import org.apache.commons.lang.Validate;
+import com.quartercode.disconnected.util.InfoString;
 
 /**
  * This class stores a location using x and y relative coordinates.
  */
-public class Location {
+public class Location implements InfoString {
 
     private float x;
     private float y;
@@ -125,9 +126,15 @@ public class Location {
     }
 
     @Override
+    public String toInfoString() {
+
+        return "(" + x + "/" + y + ")";
+    }
+
+    @Override
     public String toString() {
 
-        return getClass().getName() + " [x=" + x + ", y=" + y + "]";
+        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }

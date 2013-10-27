@@ -28,6 +28,7 @@ import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.file.FileSystemProvider;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSlot;
+import com.quartercode.disconnected.util.InfoString;
 
 /**
  * This class represents a hard drive of a computer.
@@ -39,7 +40,7 @@ import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSl
  */
 @XmlAccessorType (XmlAccessType.FIELD)
 @NeedsMainboardSlot
-public class HardDrive extends Hardware implements FileSystemProvider {
+public class HardDrive extends Hardware implements FileSystemProvider, InfoString {
 
     private FileSystem fileSystem;
 
@@ -106,9 +107,15 @@ public class HardDrive extends Hardware implements FileSystemProvider {
     }
 
     @Override
+    public String toInfoString() {
+
+        return super.toInfoString() + ", fs " + fileSystem.toInfoString();
+    }
+
+    @Override
     public String toString() {
 
-        return getClass().getName() + " [" + toInfoString() + ", media: " + fileSystem + "]";
+        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }

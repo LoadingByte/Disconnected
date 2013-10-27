@@ -58,8 +58,8 @@ public class FileSystem implements SizeObject, InfoString {
     /**
      * Creates a new file system and sets the hosting computer and the size in bytes.
      * 
-     * @param host The computer this media is hosted on.
-     * @param size The size of the media, given in bytes.
+     * @param host The computer this file system is hosted on.
+     * @param size The size of the file system, given in bytes.
      */
     public FileSystem(Computer host, long size) {
 
@@ -80,10 +80,10 @@ public class FileSystem implements SizeObject, InfoString {
     }
 
     /**
-     * Returns the computer this media is hosted on.
+     * Returns the computer this file system is hosted on.
      * This will only return the sotring computer, not any accessing computers.
      * 
-     * @return The computer this media is hosted to.
+     * @return The computer this file system is hosted to.
      */
     public Computer getHost() {
 
@@ -91,9 +91,9 @@ public class FileSystem implements SizeObject, InfoString {
     }
 
     /**
-     * Returns the size of the media, given in bytes.
+     * Returns the size of the file system, given in bytes.
      * 
-     * @return The size of the media, given in bytes.
+     * @return The size of the file system, given in bytes.
      */
     @Override
     public long getSize() {
@@ -112,12 +112,12 @@ public class FileSystem implements SizeObject, InfoString {
     }
 
     /**
-     * Returns the file which is stored on the media under the given path.
+     * Returns the file which is stored on the file system under the given path.
      * A path is a collection of files seperated by a seperator.
-     * This will look up the file using a local media path.
+     * This will look up the file using a local file system path.
      * 
      * @param path The path to look in for the file.
-     * @return The file which is stored on the media under the given path.
+     * @return The file which is stored on the file system under the given path.
      */
     public File getFile(String path) {
 
@@ -137,10 +137,10 @@ public class FileSystem implements SizeObject, InfoString {
     }
 
     /**
-     * Creates a new file using the given path and type on this media and returns it.
+     * Creates a new file using the given path and type on this file system and returns it.
      * If the file already exists, the existing file will be returned.
      * A path is a collection of files seperated by a seperator.
-     * This will get the file location using a local media path.
+     * This will get the file location using a local file system path.
      * 
      * @param path The path the new file will be located under.
      * @param type The file type the new file should has.
@@ -155,10 +155,10 @@ public class FileSystem implements SizeObject, InfoString {
     }
 
     /**
-     * Adds an existing file to the media.
+     * Adds an existing file to the file system.
      * If the given path doesn't exist, this creates a new one.
      * 
-     * @param file The existing file object to add to the media.
+     * @param file The existing file object to add to the file system.
      * @param path The path the file will be located under.
      * @throws IllegalStateException There's a non-directory file in the path.
      */
@@ -179,7 +179,7 @@ public class FileSystem implements SizeObject, InfoString {
                         current.addChildFile(dir);
                     }
                 } else if (current.getChildFile(part).getType() != FileType.DIRECTORY) {
-                    throw new IllegalStateException("File path '" + path + " isn't valid: file '" + current.getChildFile(part).getLocalPath() + "' isn't a directory");
+                    throw new IllegalStateException("File path '" + path + " isn't valid: File '" + current.getChildFile(part).getLocalPath() + "' isn't a directory");
                 }
                 current = current.getChildFile(part);
             }

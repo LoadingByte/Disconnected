@@ -32,7 +32,7 @@ import com.quartercode.disconnected.util.size.SizeObject;
 import com.quartercode.disconnected.util.size.SizeUtil;
 
 /**
- * This class represents a file on a media.
+ * This class represents a file on a file system.
  * Every file knows his path and has a content string. Every directory has a list of child files.
  * 
  * @see FileSystem
@@ -74,7 +74,7 @@ public class File implements SizeObject {
     }
 
     /**
-     * Creates a new root file for a given media host.
+     * Creates a new root file for a given file system host.
      * 
      * @param host The host which will use this file.
      */
@@ -86,7 +86,7 @@ public class File implements SizeObject {
     }
 
     /**
-     * Creates a new file for the given media host using the given name and file type.
+     * Creates a new file for the given file system host using the given name and file type.
      * 
      * @param host The host which will use this file.
      * @param name The name the new file will have.
@@ -102,9 +102,9 @@ public class File implements SizeObject {
     }
 
     /**
-     * Returns the media which hosts this file.
+     * Returns the file system which hosts this file.
      * 
-     * @return The media which hosts this file.
+     * @return The file system which hosts this file.
      */
     public FileSystem getHost() {
 
@@ -161,7 +161,7 @@ public class File implements SizeObject {
     /**
      * Returns the local the path the file has.
      * A path is a collection of files seperated by a seperator.
-     * The local path can be used on the hardware level to look up a file on a given hard drive.
+     * The local path can be used on the hardware level to look up a file on a given file system.
      * 
      * @return The path the file has.
      */
@@ -209,7 +209,7 @@ public class File implements SizeObject {
 
     /**
      * Returns the file rights object which stores the UNIX-like file right attributes.
-     * For more documentation on how it works, see the {@link FileRights}-class.
+     * For more documentation on how it works, see the {@link FileRights} class.
      * 
      * @return The file rights storage.
      */
@@ -221,7 +221,7 @@ public class File implements SizeObject {
 
     /**
      * Changes the file rights storage which stores the UNIX-like file right attributes to a new one.
-     * For more documentation on how it works, see the {@link FileRights}-class.
+     * For more documentation on how it works, see the {@link FileRights} class.
      * 
      * @param rights The new file rights storage.
      */
@@ -396,7 +396,7 @@ public class File implements SizeObject {
     }
 
     /**
-     * Removes this file from the hard drive.
+     * Removes this file from the file system.
      * If this file is a directory, all child files will also be removed.
      */
     public void remove() {
@@ -405,9 +405,9 @@ public class File implements SizeObject {
     }
 
     /**
-     * Changes the current hosting media of this file to a new one.
+     * Changes the current hosting file system of this file to a new one.
      * 
-     * @param host The new media which will host this file.
+     * @param host The new file system which will host this file.
      */
     protected void changeHost(FileSystem host) {
 

@@ -30,6 +30,7 @@ import com.quartercode.disconnected.sim.comp.hardware.Hardware;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.program.Program;
+import com.quartercode.disconnected.util.InfoString;
 
 /**
  * This class stores information about a computer, like the mainboard, other hardware, programs etc.
@@ -42,7 +43,7 @@ import com.quartercode.disconnected.sim.comp.program.Program;
  * @see OperatingSystem
  * @see Program
  */
-public class Computer {
+public class Computer implements InfoString {
 
     @XmlAttribute
     @XmlID
@@ -205,7 +206,7 @@ public class Computer {
         if (obj == null) {
             return false;
         }
-        if (! (obj instanceof Computer)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
         Computer other = (Computer) obj;
@@ -241,13 +242,19 @@ public class Computer {
     }
 
     @Override
+    public String toInfoString() {
+
+        String hardwareInfo = "";
+        for (Hardware hardwarePart : hardware) {
+            hardwareInfo += hardwarePart.toInfoString() + ", ";
+        }
+        return "computer " + id + ", loc " + location.toInfoString() + ", " + hardwareInfo + operatingSystem.toInfoString();
+    }
+
+    @Override
     public String toString() {
 
-        List<String> hardwareInfo = new ArrayList<String>();
-        for (Hardware hardwarePart : hardware) {
-            hardwareInfo.add(hardwarePart.toInfoString());
-        }
-        return getClass().getName() + " [id=" + id + ", location=" + location + ", hardware=" + hardwareInfo + ", operatingSystem=" + operatingSystem.toInfoString() + "]";
+        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }
