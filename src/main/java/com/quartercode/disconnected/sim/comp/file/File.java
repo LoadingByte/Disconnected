@@ -434,7 +434,7 @@ public class File implements SizeObject {
         return host.getHost().getId() + "-" + getGlobalHostPath();
     }
 
-    public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
+    protected void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
 
         if (parent instanceof FileSystem) {
             host = (FileSystem) parent;

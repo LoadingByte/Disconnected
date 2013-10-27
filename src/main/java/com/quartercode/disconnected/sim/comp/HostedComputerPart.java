@@ -82,7 +82,7 @@ public class HostedComputerPart extends ComputerPart {
         return host.getId() + "-" + host.getParts().indexOf(this);
     }
 
-    public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
+    protected void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
 
         host = (Computer) parent;
     }

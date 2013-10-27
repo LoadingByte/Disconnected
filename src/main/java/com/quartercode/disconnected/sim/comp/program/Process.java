@@ -348,7 +348,7 @@ public class Process implements InfoString {
         return host.getHost().getId() + "-" + pid;
     }
 
-    public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
+    protected void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
 
         if (parent instanceof Process) {
             this.parent = (Process) parent;

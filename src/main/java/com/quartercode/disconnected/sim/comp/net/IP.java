@@ -135,7 +135,7 @@ public class IP {
         return parts[0] + "." + parts[1] + "." + parts[2] + "." + parts[3];
     }
 
-    public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
+    protected void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
 
         host = (NetworkInterface) parent;
     }

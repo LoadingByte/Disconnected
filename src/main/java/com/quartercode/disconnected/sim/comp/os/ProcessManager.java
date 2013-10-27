@@ -142,7 +142,7 @@ public class ProcessManager implements InfoString {
         }
     }
 
-    public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
+    protected void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
 
         host = (OperatingSystem) parent;
     }
