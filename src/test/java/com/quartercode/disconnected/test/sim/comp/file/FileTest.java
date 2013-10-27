@@ -28,6 +28,7 @@ import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 public class FileTest {
@@ -48,7 +49,7 @@ public class FileTest {
         computer.addHardware(hardDrive);
         operatingSystem.getFileSystemManager().mount(fileSystem, 'C');
 
-        testFile = fileSystem.addFile("/test1/test2/test.txt", FileType.FILE);
+        testFile = fileSystem.addFile("/test1/test2/test.txt", FileType.FILE, new User(null, null));
         testFile.setContent("Test-Content");
     }
 

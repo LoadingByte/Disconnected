@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
+import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.util.InfoString;
 import com.quartercode.disconnected.util.size.SizeObject;
 
@@ -144,12 +145,13 @@ public class FileSystem implements SizeObject, InfoString {
      * 
      * @param path The path the new file will be located under.
      * @param type The file type the new file should has.
+     * @param user The user who owns the new file.
      * @return The new file (or the existing one, if the file already exists).
      */
-    public File addFile(String path, FileType type) {
+    public File addFile(String path, FileType type, User user) {
 
         String[] parts = path.split(seperator);
-        File file = new File(this, parts[parts.length - 1], type, new FileRights("rwd-r---r---"));
+        File file = new File(this, parts[parts.length - 1], type, new FileRights("rwd-r---r---"), user, user.getPrimaryGroup());
         addFile(file, path);
         return file;
     }
@@ -175,7 +177,7 @@ public class FileSystem implements SizeObject, InfoString {
                         current.addChildFile(file);
                         file.setName(part);
                     } else {
-                        File dir = new File(this, part, FileType.DIRECTORY, new FileRights("rwd-r---r---"));
+                        File dir = new File(this, part, FileType.DIRECTORY, new FileRights("rwd-r---r---"), file.getOwner(), file.getGroup());
                         current.addChildFile(dir);
                     }
                 } else if (current.getChildFile(part).getType() != FileType.DIRECTORY) {

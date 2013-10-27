@@ -37,7 +37,6 @@ import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 import com.quartercode.disconnected.sim.comp.net.IP;
 import com.quartercode.disconnected.sim.comp.os.Group;
-import com.quartercode.disconnected.sim.comp.os.Group.RightOverride;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.sim.comp.program.ExploitProgram;
@@ -159,7 +158,6 @@ public class SimulationGenerator {
 
             HardDrive hardDrive = new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
             hardware.add(hardDrive);
-            fillFileSystem(hardDrive.getFileSystem());
 
             NetworkInterface networkInterface = new NetworkInterface(computer, "NI FiberScore Ultimate", new Version(1, 2, 0), null);
             generateIP(networkInterface, simulation);
@@ -181,39 +179,38 @@ public class SimulationGenerator {
             }
 
             computer.setOperatingSystem(new OperatingSystem(computer, "Frames", new Version(3, 7, 65), null));
+            computer.getOperatingSystem().getUserManager().addUser(new User(computer.getOperatingSystem(), User.SUPERUSER_NAME));
 
-            Group gRoot = new Group(computer.getOperatingSystem(), "root", RightOverride.ROOT);
-            computer.getOperatingSystem().getUserManager().addGroup(gRoot);
-            Group gGenpop = new Group(computer.getOperatingSystem(), "genpop");
-            computer.getOperatingSystem().getUserManager().addGroup(gGenpop);
+            Group genpop = new Group(computer.getOperatingSystem(), "genpop");
+            computer.getOperatingSystem().getUserManager().addGroup(genpop);
+            User genuser = new User(computer.getOperatingSystem(), "genuser");
+            genuser.addToGroup(genpop, true);
+            computer.getOperatingSystem().getUserManager().addUser(genuser);
 
-            User uRoot = new User(computer.getOperatingSystem(), "root");
-            uRoot.addToGroup(gRoot, true);
-            computer.getOperatingSystem().getUserManager().addUser(uRoot);
-            User uGenuser = new User(computer.getOperatingSystem(), "genuser");
-            uGenuser.addToGroup(gGenpop, true);
-            computer.getOperatingSystem().getUserManager().addUser(uGenuser);
+            fillFileSystem(hardDrive.getFileSystem(), genuser);
         }
 
         return computers;
     }
 
     // Temporary method for generating the kernel and some basic programs
-    private static void fillFileSystem(FileSystem fileSystem) {
+    private static void fillFileSystem(FileSystem fileSystem, User user) {
+
+        User superuser = fileSystem.getHost().getOperatingSystem().getUserManager().getSuperuser();
 
         // Generate kernel file (temp)
-        fileSystem.addFile("/system/boot/kernel", FileType.FILE);
+        fileSystem.addFile("/system/boot/kernel", FileType.FILE, superuser);
         fileSystem.getFile("/system/boot/kernel").setContent(new KernelProgram("Kernel", new Version("1.0.0"), null));
 
         // Generate session programs
-        fileSystem.addFile("/system/bin/desktops.exe", FileType.FILE);
+        fileSystem.addFile("/system/bin/desktops.exe", FileType.FILE, superuser);
         fileSystem.getFile("/system/bin/desktops.exe").setContent(new DesktopSessionProgram("Desktop Session", new Version("1.0.0"), null));
 
         // Generate programs
-        fileSystem.addFile("/opt/sysviewer/sysviewer.exe", FileType.FILE);
+        fileSystem.addFile("/opt/sysviewer/sysviewer.exe", FileType.FILE, user);
         fileSystem.getFile("/opt/sysviewer/sysviewer.exe").setContent(new SystemViewerProgram("System Viewer", new Version("1.0.0"), null));
 
-        fileSystem.addFile("/opt/exploiter/exploiter.exe", FileType.FILE);
+        fileSystem.addFile("/opt/exploiter/exploiter.exe", FileType.FILE, user);
         fileSystem.getFile("/opt/exploiter/exploiter.exe").setContent(new ExploitProgram("Exploiter", new Version("1.0.0"), null));
     }
 

@@ -30,13 +30,17 @@ import com.quartercode.disconnected.sim.comp.file.FileRights.FileAccessor;
 import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
+import com.quartercode.disconnected.sim.comp.os.Group;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 public class FileRightsTest {
 
     private FileSystem fileSystem;
     private File       testFile;
+    private User       testUser;
+    private Group      testGroup;
 
     @Before
     public void setUp() {
@@ -51,7 +55,13 @@ public class FileRightsTest {
         computer.addHardware(hardDrive);
         operatingSystem.getFileSystemManager().mount(fileSystem, 'C');
 
-        testFile = fileSystem.addFile("/test1/test2/test.txt", FileType.FILE);
+        testUser = new User(operatingSystem, "testu");
+        testGroup = new Group(operatingSystem, "testg");
+        testUser.addToGroup(testGroup, true);
+        operatingSystem.getUserManager().addUser(testUser);
+        operatingSystem.getUserManager().addGroup(testGroup);
+
+        testFile = fileSystem.addFile("/test1/test2/test.txt", FileType.FILE, testUser);
         testFile.setContent("Test-Content");
     }
 
@@ -78,6 +88,18 @@ public class FileRightsTest {
 
         rights.setRight(FileAccessor.OTHERS, FileRight.READ, false);
         Assert.assertEquals("Others write right is set correctly", false, rights.getRight(FileAccessor.OTHERS, FileRight.READ));
+    }
+
+    @Test
+    public void testHasRight() {
+
+        testFile.setRights(new FileRights("------------"));
+        testFile.getRights().setRight(FileAccessor.OWNER, FileRight.READ, true);
+        Assert.assertEquals("Owner has read right", true, FileRights.hasRight(testUser, testFile, FileRight.READ));
+
+        testFile.setRights(new FileRights("------------"));
+        testFile.getRights().setRight(FileAccessor.GROUP, FileRight.READ, true);
+        Assert.assertEquals("User in group has read right", true, FileRights.hasRight(testUser, testFile, FileRight.READ));
     }
 
 }

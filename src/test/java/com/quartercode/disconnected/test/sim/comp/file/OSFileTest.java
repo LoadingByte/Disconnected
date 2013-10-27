@@ -29,6 +29,7 @@ import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 public class OSFileTest {
@@ -51,7 +52,7 @@ public class OSFileTest {
         computer.addHardware(hardDrive);
         operatingSystem.getFileSystemManager().mount(fileSystem, 'C');
 
-        testFile = fileSystem.addFile("/test1/test2/test.txt", FileType.FILE);
+        testFile = fileSystem.addFile("/test1/test2/test.txt", FileType.FILE, new User(null, null));
         testFile.setContent("Test-Content");
     }
 
@@ -67,7 +68,7 @@ public class OSFileTest {
     public void testCreateFile() {
 
         char mountpoint = operatingSystem.getFileSystemManager().getMountpoint(fileSystem);
-        operatingSystem.getFileSystemManager().addFile(mountpoint + ":/test1/test2/test-global.txt", FileType.FILE);
+        operatingSystem.getFileSystemManager().addFile(mountpoint + ":/test1/test2/test-global.txt", FileType.FILE, new User(null, null));
         Assert.assertNotNull("File was created using global method", fileSystem.getFile("/test1/test2/test-global.txt"));
     }
 

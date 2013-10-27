@@ -85,6 +85,22 @@ public class UserManager implements InfoString {
     }
 
     /**
+     * Returns the superuser on the system.
+     * The superuser of a system can do everything without having the rights for doing it.
+     * 
+     * @return The superuser on the system.
+     */
+    public User getSuperuser() {
+
+        for (User user : users) {
+            if (user.isSuperuser()) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Registers a new user to the system.
      * Users are used for managing rights for individual persons.
      * 
@@ -92,6 +108,11 @@ public class UserManager implements InfoString {
      */
     public void addUser(User user) {
 
+        for (User existingUser : users) {
+            if (existingUser.getName().equals(user.getName())) {
+                return;
+            }
+        }
         users.add(user);
     }
 
@@ -103,7 +124,9 @@ public class UserManager implements InfoString {
      */
     public void removeUser(User user) {
 
-        users.remove(user);
+        if (!user.isSuperuser()) {
+            users.remove(user);
+        }
     }
 
     /**

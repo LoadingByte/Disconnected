@@ -22,6 +22,8 @@ import java.util.Arrays;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.commons.lang.Validate;
+import com.quartercode.disconnected.sim.comp.os.Group;
+import com.quartercode.disconnected.sim.comp.os.User;
 
 /**
  * File rights control the access to files by users.
@@ -72,12 +74,7 @@ public class FileRights {
          * The execute-right determinates if a user is allowed to execute a file (letter 'x').
          * It cannot be applied to directories.
          */
-        EXECUTE ('x'),
-        /**
-         * The execute-extended-right is equally to the setuid/setgid-flag on UNIX-systems.
-         * It allows to execute files as the owner or the group of the file.
-         */
-        EXECUTE_EXTENDED ('s');
+        EXECUTE ('x');
 
         private char letter;
 
@@ -98,6 +95,31 @@ public class FileRights {
 
     }
 
+    /**
+     * Returns if the given user has the given right on the given file.
+     * 
+     * @param user The user who may have the given right on the given file.
+     * @param file The file the given user may have access to.
+     * @param right The right the given user may have.
+     * @return True if the given user has the given right on the given file.
+     */
+    public static boolean hasRight(User user, File file, FileRight right) {
+
+        if (file.getRights().getRight(FileAccessor.OTHERS, right)) {
+            return true;
+        } else if (file.getRights().getRight(FileAccessor.OWNER, right) && file.getOwner().equals(user)) {
+            return true;
+        } else if (file.getRights().getRight(FileAccessor.GROUP, right)) {
+            for (Group group : user.getGroups()) {
+                if (user.getGroups().contains(group)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     private FileRight[] ownerRights;
     private FileRight[] groupRights;
     private FileRight[] othersRights;
@@ -110,6 +132,25 @@ public class FileRights {
 
     }
 
+    /**
+     * Creates a new file rights storage using the given file right arrays.
+     * Every array sets the rights for the self-explantory group of users.
+     * The arrays hold {@link FileRight} values. Examples for the format:
+     * 
+     * <pre>
+     * Right string:
+     * rwdxr--xr--x
+     * 
+     * Arrays:
+     * ownerRights[READ, WRITE, DELETE, EXECUTE]
+     * groupRights[READ, null, null, EXECUTE]
+     * othersRights[READ, null, null, EXECUTE]
+     * </pre>
+     * 
+     * @param ownerRights The array which defines the rights the file owner has.
+     * @param groupRights The array which defines the rights the file group has.
+     * @param othersRights The array which defines the rights everyone else has.
+     */
     public FileRights(FileRight[] ownerRights, FileRight[] groupRights, FileRight[] othersRights) {
 
         Validate.isTrue(ownerRights.length == 4, "Owner right array must contain 4 elements");
@@ -126,14 +167,14 @@ public class FileRights {
      * This is using the typcial UNIX-format with some changes. Examples:
      * 
      * <pre>
-     * rwdsr--xr--x
+     * rwdxr--xr--x
      * rwdxrwdx----
      * </pre>
      * 
      * You can split the string into 3 segments.
      * 
      * <pre>
-     * rwds | r--x | r--x
+     * rwdx | r--x | r--x
      * rwdx | rwdx | ----
      * </pre>
      * 
@@ -143,7 +184,6 @@ public class FileRights {
      * A "w" means that you can write content into the file or create new files inside a directory.
      * A "d" means that you can delete the file or directory (if it's empty).
      * A "x" means that you can execute the file.
-     * A "s" (replaces "x") meands that you can execute the file as the owner or the group of the file.
      * 
      * @param rights The right information to parse.
      */
@@ -191,12 +231,7 @@ public class FileRights {
      */
     public boolean getRight(FileAccessor accessor, FileRight right) {
 
-        for (FileRight setRight : getRightArray(accessor)) {
-            if (setRight != null && setRight == right) {
-                return true;
-            }
-        }
-        return false;
+        return getRightArray(accessor)[right.ordinal()] == right;
     }
 
     /**
@@ -209,20 +244,7 @@ public class FileRights {
      */
     public void setRight(FileAccessor accessor, FileRight right, boolean set) {
 
-        int index = 0;
-        if (right == FileRight.READ) {
-            index = 0;
-        } else if (right == FileRight.WRITE) {
-            index = 1;
-        } else if (right == FileRight.DELETE) {
-            index = 2;
-        } else if (right == FileRight.EXECUTE) {
-            index = 3;
-        } else if (right == FileRight.EXECUTE_EXTENDED) {
-            index = 3;
-        }
-
-        getRightArray(accessor)[index] = set ? right : null;
+        getRightArray(accessor)[right.ordinal()] = set ? right : null;
     }
 
     @Override
@@ -271,7 +293,11 @@ public class FileRights {
 
         String rightString = "";
         for (FileRight right : rights) {
-            rightString += right.getLetter();
+            if (right == null) {
+                rightString += '-';
+            } else {
+                rightString += right.getLetter();
+            }
         }
         return rightString;
     }
@@ -281,14 +307,14 @@ public class FileRights {
      * This is using the typcial UNIX-format with some changes. Examples:
      * 
      * <pre>
-     * rwdsr--xr--x
+     * rwdxr--xr--x
      * rwdxrwdx----
      * </pre>
      * 
      * You can split the string into 3 segments.
      * 
      * <pre>
-     * rwds | r--x | r--x
+     * rwdx | r--x | r--x
      * rwdx | rwdx | ----
      * </pre>
      * 
@@ -298,7 +324,6 @@ public class FileRights {
      * A "w" means that you can write content into the file or create new files inside a directory.
      * A "d" means that you can delete the file or directory (if it's empty).
      * A "x" means that you can execute the file.
-     * A "s" (replaces "x") meands that you can execute the file as the owner or the group of the file.
      */
     public static class FileRightsAdapter extends XmlAdapter<String, FileRights> {
 
@@ -318,7 +343,11 @@ public class FileRights {
         @Override
         public String marshal(FileRights v) {
 
-            return v.toString();
+            if (v != null) {
+                return v.toString();
+            } else {
+                return null;
+            }
         }
 
     }

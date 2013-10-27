@@ -24,9 +24,9 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.annotation.XmlList;
 import com.quartercode.disconnected.util.InfoString;
 
 /**
@@ -38,13 +38,20 @@ import com.quartercode.disconnected.util.InfoString;
 @XmlAccessorType (XmlAccessType.FIELD)
 public class User implements Comparable<User>, InfoString {
 
+    /**
+     * This is the name of the superuser on a system.
+     * The superuser of a system can do everything without having the rights for doing it.
+     * You can check if a user is the superuser by using {@link #isSuperuser()}.
+     */
+    public static final String SUPERUSER_NAME = "root";
+
     @XmlIDREF
     @XmlAttribute
-    private OperatingSystem host;
-    private String          name;
+    private OperatingSystem    host;
+    private String             name;
     @XmlIDREF
-    @XmlElement (name = "group")
-    private List<Group>     groups;
+    @XmlList
+    private List<Group>        groups;
 
     /**
      * Creates a new empty user object.
@@ -109,7 +116,7 @@ public class User implements Comparable<User>, InfoString {
      */
     public void addToGroup(Group group, boolean primary) {
 
-        if (!groups.contains(group)) {
+        if (!isSuperuser() && !groups.contains(group)) {
             groups.add(group);
 
             if (primary) {
@@ -127,7 +134,9 @@ public class User implements Comparable<User>, InfoString {
     public void removeFromGroup(Group group) throws IllegalStateException {
 
         if (!getPrimaryGroup().equals(group)) {
-            groups.remove(group);
+            if (!isSuperuser()) {
+                groups.remove(group);
+            }
         } else {
             throw new IllegalStateException("Can't remove group " + group.getName() + ": group is primary");
         }
@@ -157,10 +166,21 @@ public class User implements Comparable<User>, InfoString {
      */
     public void setPrimaryGroup(Group group) {
 
-        if (groups.contains(group)) {
+        if (!isSuperuser() && groups.contains(group)) {
             groups.remove(group);
             groups.add(0, group);
         }
+    }
+
+    /**
+     * Returns true if this user is the superuser.
+     * The superuser of a system can do everything without having the rights for doing it.
+     * 
+     * @return True if this user is the superuser.
+     */
+    public boolean isSuperuser() {
+
+        return name.equals(SUPERUSER_NAME);
     }
 
     /**

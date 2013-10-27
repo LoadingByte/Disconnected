@@ -28,26 +28,12 @@ import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.util.InfoString;
 
 @XmlAccessorType (XmlAccessType.FIELD)
-public class Group implements Comparable<User>, InfoString {
-
-    /**
-     * This enum declares different right overrides.
-     * Right overrides override different types of permissions (e.g. for creating a root-user).
-     */
-    public static enum RightOverride {
-
-        /**
-         * The root user is allowed to do everything.
-         * Every right check should pass root users directly.
-         */
-        ROOT;
-    }
+public class Group implements Comparable<Group>, InfoString {
 
     @XmlIDREF
     @XmlAttribute
     private OperatingSystem host;
     private String          name;
-    private RightOverride   rightOverride;
 
     /**
      * Creates a new empty group object.
@@ -70,20 +56,6 @@ public class Group implements Comparable<User>, InfoString {
     }
 
     /**
-     * Creates a new group and sets the host system the object is used for and his name and a {@link RightOverride}..
-     * 
-     * @param host The host operating system the group is used for.
-     * @param name The name the group has.
-     * @param rightOverride A type of overriding any type of permissions.
-     */
-    public Group(OperatingSystem host, String name, RightOverride rightOverride) {
-
-        this(host, name);
-
-        this.rightOverride = rightOverride;
-    }
-
-    /**
      * Returns the host operating system the group is used for.
      * 
      * @return The host operating system the group is used for.
@@ -102,17 +74,6 @@ public class Group implements Comparable<User>, InfoString {
     public String getName() {
 
         return name;
-    }
-
-    /**
-     * Returns the type of overriding any type of permissions for this user.
-     * This returns null if there's no right override defines.
-     * 
-     * @return The type of overriding any type of permissions for this user.
-     */
-    public RightOverride getRightOverride() {
-
-        return rightOverride;
     }
 
     /**
@@ -147,7 +108,7 @@ public class Group implements Comparable<User>, InfoString {
     }
 
     @Override
-    public int compareTo(User o) {
+    public int compareTo(Group o) {
 
         return name.compareTo(o.getName());
     }
@@ -187,7 +148,7 @@ public class Group implements Comparable<User>, InfoString {
     @Override
     public String toInfoString() {
 
-        return name + ", " + (rightOverride == null ? "" : "right override " + rightOverride.name() + ", ") + getUsers().size() + " members";
+        return name + ", " + getUsers().size() + " members";
     }
 
     @Override

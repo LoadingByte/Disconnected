@@ -223,13 +223,14 @@ public class FileSystemManager implements InfoString {
      * 
      * @param path The path the new file will be located under.
      * @param type The file type the new file should has.
+     * @param user The user who owns the new file.
      * @return The new file (or the existing one, if the file already exists).
      */
-    public File addFile(String path, FileType type) {
+    public File addFile(String path, FileType type, User user) {
 
         FileSystem fileSystem = getMounted(path);
         if (fileSystem != null) {
-            return fileSystem.addFile(path.split(":")[1], type);
+            return fileSystem.addFile(path.split(":")[1], type, user);
         } else {
             return null;
         }

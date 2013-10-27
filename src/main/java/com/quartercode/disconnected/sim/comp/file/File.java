@@ -25,9 +25,12 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang.Validate;
+import com.quartercode.disconnected.sim.comp.os.Group;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.util.size.SizeObject;
 import com.quartercode.disconnected.util.size.SizeUtil;
 
@@ -60,6 +63,9 @@ public class File implements SizeObject {
     @XmlAttribute
     private FileType         type;
     private FileRights       rights;
+    private User             owner;
+    private Group            group;
+
     @XmlElement
     private Object           content;
     @XmlElement (name = "file")
@@ -92,13 +98,17 @@ public class File implements SizeObject {
      * @param name The name the new file will have.
      * @param type The type the new file will have.
      * @param rights The file rights object which stores the UNIX-like file right attributes.
+     * @param owner The user who owns the file. This is important for the rights system.
+     * @param group The group which partly owns the file. This is important for the rights system.
      */
-    protected File(FileSystem host, String name, FileType type, FileRights rights) {
+    protected File(FileSystem host, String name, FileType type, FileRights rights, User owner, Group group) {
 
         this.host = host;
         this.name = name;
         this.type = type;
-        this.rights = rights;
+        setRights(rights);
+        setOwner(owner);
+        setGroup(group);
     }
 
     /**
@@ -213,7 +223,7 @@ public class File implements SizeObject {
      * 
      * @return The file rights storage.
      */
-    @XmlTransient
+    @XmlAttribute
     public FileRights getRights() {
 
         return rights;
@@ -227,7 +237,59 @@ public class File implements SizeObject {
      */
     public void setRights(FileRights rights) {
 
+        Validate.notNull(rights, "A file can't have no right attributes");
+
         this.rights = rights;
+    }
+
+    /**
+     * Returns the user who owns the file.
+     * This is important for the rights system.
+     * 
+     * @return The user who owns the file.
+     */
+    @XmlIDREF
+    @XmlAttribute
+    public User getOwner() {
+
+        return owner;
+    }
+
+    /**
+     * Changes the user who owns the file.
+     * This is important for the rights system.
+     * 
+     * @param owner The new owner of the file.
+     */
+    public void setOwner(User owner) {
+
+        Validate.notNull(owner, "A file can't have no owner");
+
+        this.owner = owner;
+    }
+
+    /**
+     * Returns the group which partly owns the file.
+     * This is important for the rights system.
+     * 
+     * @return The group which partly owns the file.
+     */
+    @XmlIDREF
+    @XmlAttribute
+    public Group getGroup() {
+
+        return group;
+    }
+
+    /**
+     * Changes the group who partly owns the file to a new one.
+     * This is important for the rights system.
+     * 
+     * @param group The new partly owning group of the file.
+     */
+    public void setGroup(Group group) {
+
+        this.group = group;
     }
 
     /**
