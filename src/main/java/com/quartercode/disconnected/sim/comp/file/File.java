@@ -28,9 +28,11 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang.Validate;
+import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.sim.comp.os.Group;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.os.User;
+import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.util.size.SizeObject;
 import com.quartercode.disconnected.util.size.SizeUtil;
 
@@ -305,6 +307,20 @@ public class File implements SizeObject {
     }
 
     /**
+     * Returns the content the file has (if this file is a content one).
+     * If this file isn't a content one, this will return null.
+     * 
+     * @param process The process which wants to read from this file.
+     * @return The content the file has (if this file is a content one).
+     * @throws NoFileRightException The given process hasn't the right to read from this file.
+     */
+    public Object read(Process process) throws NoFileRightException {
+
+        FileRights.checkRight(process, this, FileRight.READ);
+        return getContent();
+    }
+
+    /**
      * Changes the content to new one (if this file is a content one).
      * This throws an OutOfSpaceException if there isn't enough space on the host drive for the new content.
      * 
@@ -326,6 +342,21 @@ public class File implements SizeObject {
                 throw new OutOfSpaceException(host, size);
             }
         }
+    }
+
+    /**
+     * Changes the content to new one (if this file is a content one).
+     * This throws an OutOfSpaceException if there isn't enough space on the host drive for the new content.
+     * 
+     * @param process The process which wants to write to this file.
+     * @param content The new content to write into the file.
+     * @throws NoFileRightException The given process hasn't the right to write into this file.
+     * @throws OutOfSpaceException If there isn't enough space on the host drive for the new content.
+     */
+    public void write(Process process, Object content) throws NoFileRightException {
+
+        FileRights.checkRight(process, this, FileRight.WRITE);
+        setContent(content);
     }
 
     /**
@@ -438,6 +469,21 @@ public class File implements SizeObject {
     }
 
     /**
+     * Changes the name of the file to a new one.
+     * After the renaming, the file can be used like before.
+     * 
+     * @param process The process which wants to rename this file.
+     * @param name The new name for the file.
+     * @throws NoFileRightException The given process hasn't the rights to delete this file and write into the parent directory.
+     */
+    public void rename(Process process, String name) throws NoFileRightException {
+
+        FileRights.checkRight(process, this, FileRight.DELETE);
+        FileRights.checkRight(process, getParent(), FileRight.WRITE);
+        rename(name);
+    }
+
+    /**
      * Moves the file to a new location under the given path.
      * After the movement, the file can be used like before.
      * This throws an OutOfSpaceException if there isn't enough space on the new host drive for the file.
@@ -447,13 +493,37 @@ public class File implements SizeObject {
      */
     public void move(String path) {
 
+        try {
+            move(null, path);
+        }
+        catch (NoFileRightException e) {
+            // Wont ever happen
+        }
+    }
+
+    /**
+     * Moves the file to a new location under the given path.
+     * After the movement, the file can be used like before.
+     * This throws an OutOfSpaceException if there isn't enough space on the new host drive for the file.
+     * 
+     * @param process The process which wants to move this file.
+     * @param path The new location for the file.
+     * @throws NoFileRightException The given process hasn't the right to delete the file or write into a directory where the algorithm needs to write.
+     * @throws OutOfSpaceException If there isn't enough space on the new host drive for the file.
+     */
+    public void move(Process process, String path) throws NoFileRightException {
+
+        if (process != null) {
+            FileRights.checkRight(process, this, FileRight.DELETE);
+        }
+
         remove();
 
         if (path.contains(":")) {
             host = host.getHost().getOperatingSystem().getFileSystemManager().getMounted(path);
-            host.addFile(this, path.split(":")[1]);
+            host.addFile(process, this, path.split(":")[1]);
         } else {
-            host.addFile(this, path);
+            host.addFile(process, this, path);
         }
     }
 
@@ -467,9 +537,22 @@ public class File implements SizeObject {
     }
 
     /**
-     * Changes the current hosting media of this file to a new one.
+     * Removes this file from the file system.
+     * If this file is a directory, all child files will also be removed.
      * 
-     * @param host The new media which will host this file.
+     * @param process The process which wants to remove the file.
+     * @throws NoFileRightException The process hasn't the right to delete this file.
+     */
+    public void remove(Process process) throws NoFileRightException {
+
+        FileRights.checkRight(process, this, FileRight.DELETE);
+        remove();
+    }
+
+    /**
+     * Changes the current hosting file system of this file to a new one.
+     * 
+     * @param host The new file system which will host this file.
      */
     protected void changeHost(FileSystem host) {
 

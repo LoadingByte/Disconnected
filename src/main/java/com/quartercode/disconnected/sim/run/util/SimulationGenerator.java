@@ -26,6 +26,8 @@ import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
+import com.quartercode.disconnected.sim.comp.file.FileRights.FileAccessor;
+import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
@@ -200,17 +202,21 @@ public class SimulationGenerator {
 
         // Generate kernel file (temp)
         fileSystem.addFile("/system/boot/kernel", FileType.FILE, superuser);
+        fileSystem.getFile("/system/boot/kernel").getRights().setRight(FileAccessor.OWNER, FileRight.EXECUTE, true);
         fileSystem.getFile("/system/boot/kernel").setContent(new KernelProgram("Kernel", new Version("1.0.0"), null));
 
         // Generate session programs
         fileSystem.addFile("/system/bin/desktops.exe", FileType.FILE, superuser);
+        fileSystem.getFile("/system/bin/desktops.exe").getRights().setRight(FileAccessor.OWNER, FileRight.EXECUTE, true);
         fileSystem.getFile("/system/bin/desktops.exe").setContent(new DesktopSessionProgram("Desktop Session", new Version("1.0.0"), null));
 
         // Generate programs
         fileSystem.addFile("/opt/sysviewer/sysviewer.exe", FileType.FILE, user);
+        fileSystem.getFile("/opt/sysviewer/sysviewer.exe").getRights().setRight(FileAccessor.OWNER, FileRight.EXECUTE, true);
         fileSystem.getFile("/opt/sysviewer/sysviewer.exe").setContent(new SystemViewerProgram("System Viewer", new Version("1.0.0"), null));
 
         fileSystem.addFile("/opt/exploiter/exploiter.exe", FileType.FILE, user);
+        fileSystem.getFile("/opt/exploiter/exploiter.exe").getRights().setRight(FileAccessor.OWNER, FileRight.EXECUTE, true);
         fileSystem.getFile("/opt/exploiter/exploiter.exe").setContent(new ExploitProgram("Exploiter", new Version("1.0.0"), null));
     }
 

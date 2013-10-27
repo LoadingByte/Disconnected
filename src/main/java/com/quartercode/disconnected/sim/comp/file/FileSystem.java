@@ -24,7 +24,9 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
+import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.sim.comp.os.User;
+import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.util.InfoString;
 import com.quartercode.disconnected.util.size.SizeObject;
 
@@ -150,9 +152,33 @@ public class FileSystem implements SizeObject, InfoString {
      */
     public File addFile(String path, FileType type, User user) {
 
+        try {
+            return addFile(null, path, type, user);
+        }
+        catch (NoFileRightException e) {
+            // Wont ever happen
+            return null;
+        }
+    }
+
+    /**
+     * Creates a new file using the given path and type on this file system and returns it.
+     * If the file already exists, the existing file will be returned.
+     * A path is a collection of files seperated by a seperator.
+     * This will get the file location using a local file system path.
+     * 
+     * @param process The process which wants to add the file.
+     * @param path The path the new file will be located under.
+     * @param type The file type the new file should has.
+     * @param user The user who owns the new file.
+     * @return The new file (or the existing one, if the file already exists).
+     * @throws NoFileRightException The given process hasn't the right to write into a directory where the algorithm needs to write
+     */
+    public File addFile(Process process, String path, FileType type, User user) throws NoFileRightException {
+
         String[] parts = path.split(seperator);
         File file = new File(this, parts[parts.length - 1], type, new FileRights("rwd-r---r---"), user, user.getPrimaryGroup());
-        addFile(file, path);
+        addFile(process, file, path);
         return file;
     }
 
@@ -166,6 +192,26 @@ public class FileSystem implements SizeObject, InfoString {
      */
     protected void addFile(File file, String path) {
 
+        try {
+            addFile(null, file, path);
+        }
+        catch (NoFileRightException e) {
+            // Wont ever happen
+        }
+    }
+
+    /**
+     * Adds an existing file to the file system.
+     * If the given path doesn't exist, this creates a new one.
+     * 
+     * @param process The process which wants to add the given file.
+     * @param file The existing file object to add to the file system.
+     * @param path The path the file will be located under.
+     * @throws NoFileRightException The given process hasn't the right to write into a directory where the algorithm needs to write
+     * @throws IllegalStateException There's a non-directory file in the path.
+     */
+    protected void addFile(Process process, File file, String path) throws NoFileRightException {
+
         String[] parts = path.split(seperator);
 
         File current = rootFile;
@@ -177,11 +223,14 @@ public class FileSystem implements SizeObject, InfoString {
                         current.addChildFile(file);
                         file.setName(part);
                     } else {
+                        if (process != null) {
+                            FileRights.checkRight(process, current, FileRight.WRITE);
+                        }
                         File dir = new File(this, part, FileType.DIRECTORY, new FileRights("rwd-r---r---"), file.getOwner(), file.getGroup());
                         current.addChildFile(dir);
                     }
                 } else if (current.getChildFile(part).getType() != FileType.DIRECTORY) {
-                    throw new IllegalStateException("File path '" + path + " isn't valid: file '" + current.getChildFile(part).getLocalPath() + "' isn't a directory");
+                    throw new IllegalStateException("File path '" + path + " isn't valid: File '" + current.getChildFile(part).getLocalPath() + "' isn't a directory");
                 }
                 current = current.getChildFile(part);
             }

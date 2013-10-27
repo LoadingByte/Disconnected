@@ -22,8 +22,10 @@ import java.util.Arrays;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.commons.lang.Validate;
+import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.os.Group;
 import com.quartercode.disconnected.sim.comp.os.User;
+import com.quartercode.disconnected.sim.comp.program.Process;
 
 /**
  * File rights control the access to files by users.
@@ -105,11 +107,13 @@ public class FileRights {
      */
     public static boolean hasRight(User user, File file, FileRight right) {
 
-        if (file.getRights().getRight(FileAccessor.OTHERS, right)) {
+        if (user.isSuperuser()) {
             return true;
-        } else if (file.getRights().getRight(FileAccessor.OWNER, right) && file.getOwner().equals(user)) {
+        } else if (checkRight(file, FileAccessor.OTHERS, right)) {
             return true;
-        } else if (file.getRights().getRight(FileAccessor.GROUP, right)) {
+        } else if (checkRight(file, FileAccessor.OWNER, right) && file.getOwner().equals(user)) {
+            return true;
+        } else if (checkRight(file, FileAccessor.GROUP, right)) {
             for (Group group : user.getGroups()) {
                 if (user.getGroups().contains(group)) {
                     return true;
@@ -118,6 +122,50 @@ public class FileRights {
         }
 
         return false;
+    }
+
+    private static boolean checkRight(File file, FileAccessor accessor, FileRight right) {
+
+        if (file.getRights().getRight(accessor, right)) {
+            if (right == FileRight.DELETE && file.getType() == FileType.DIRECTORY) {
+                for (File child : file.getChildFiles()) {
+                    if (!checkRight(child, accessor, right)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Throws a {@link NoFileRightException} if the given process hasn't the given right on the given file.
+     * 
+     * @param process The process which may have the given right on the given file.
+     * @param file The file the given process may have access to.
+     * @param right The right the given process may have.
+     * @throws NoFileRightException The given process hasn't the given right on the given file.
+     */
+    public static void checkRight(Process process, File file, FileRight right) throws NoFileRightException {
+
+        if (!hasRight(process.getSession().getUser(), file, right)) {
+            throw new NoFileRightException(process, file, right);
+        }
+    }
+
+    /**
+     * Returns if the given user can change the right attributes of the given file.
+     * Every process has to check this for itself!
+     * 
+     * @param user The user who may can change the right attributes.
+     * @param file The file the given user may have access to.
+     * @return True if the given user can change the right attributes of the given file.
+     */
+    public static boolean canChangeRights(User user, File file) {
+
+        return file.getOwner().equals(user) || user.isSuperuser();
     }
 
     private FileRight[] ownerRights;
@@ -231,20 +279,31 @@ public class FileRights {
      */
     public boolean getRight(FileAccessor accessor, FileRight right) {
 
-        return getRightArray(accessor)[right.ordinal()] == right;
+        if (accessor != null) {
+            return getRightArray(accessor)[right.ordinal()] == right;
+        } else {
+            return false;
+        }
     }
 
     /**
      * Sets or unsets the given right for the given file accessor.
      * If a right is set, the given file accessor use functions related to the right.
+     * If you use null for the file accessor, you will change the right for every accessor type.
      * 
-     * @param accessor The accessor who wants to access the file.
+     * @param accessor The accessor who wants to access the file; null for all.
      * @param right The file right to set or unset.
      * @param set If the given right should be set (true) or unset (false).
      */
     public void setRight(FileAccessor accessor, FileRight right, boolean set) {
 
-        getRightArray(accessor)[right.ordinal()] = set ? right : null;
+        if (accessor == null) {
+            ownerRights[right.ordinal()] = set ? right : null;
+            groupRights[right.ordinal()] = set ? right : null;
+            othersRights[right.ordinal()] = set ? right : null;
+        } else {
+            getRightArray(accessor)[right.ordinal()] = set ? right : null;
+        }
     }
 
     @Override
