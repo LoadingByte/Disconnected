@@ -18,12 +18,15 @@
 
 package com.quartercode.disconnected.sim.comp.program;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlIDREF;
@@ -32,6 +35,7 @@ import com.quartercode.disconnected.sim.comp.net.Address;
 import com.quartercode.disconnected.sim.comp.net.Packet;
 import com.quartercode.disconnected.sim.comp.net.PacketListener;
 import com.quartercode.disconnected.sim.comp.os.Desktop.Window;
+import com.quartercode.disconnected.util.InfoString;
 
 /**
  * This abstract class defines a program executor which takes care of acutally running a program.
@@ -41,7 +45,13 @@ import com.quartercode.disconnected.sim.comp.os.Desktop.Window;
  * @see Process
  * @see PacketListener
  */
-public abstract class ProgramExecutor {
+public abstract class ProgramExecutor implements InfoString {
+
+    private static final Logger        LOGGER           = Logger.getLogger(ProgramExecutor.class.getName());
+
+    @XmlElementWrapper (name = "updateTasks")
+    @XmlElement (name = "task")
+    private final List<UpdateTask>     updateTasks      = new ArrayList<UpdateTask>();
 
     @XmlIDREF
     private Process                    host;
@@ -68,6 +78,30 @@ public abstract class ProgramExecutor {
     public ProgramExecutor(Process host) {
 
         this.host = host;
+
+        registerTask(new UpdateTask("update", 0, 1));
+    }
+
+    /**
+     * Registers the given update task so it will be scheduled.
+     * Every important parameter for scheduling (e.g. the delay) is set in the task object.
+     * 
+     * @param task The update task to register/schedule.
+     */
+    protected void registerTask(UpdateTask task) {
+
+        updateTasks.add(task);
+    }
+
+    /**
+     * Unregisters the given update task so it will be canceled.
+     * Canceled tasks wont elapse any more ticks.
+     * 
+     * @param task The update timer task to unregister/cancel.
+     */
+    protected void unregisterTask(UpdateTask task) {
+
+        updateTasks.remove(task);
     }
 
     /**
@@ -200,11 +234,104 @@ public abstract class ProgramExecutor {
     }
 
     /**
-     * Executes a tick update in the program executor.
+     * Elapses one tick on every update task and invokes the task's method if the timing condition is true.
+     * Every program is written using the tick system.
+     * The tick can change the state of the program, execute things related to the computer it's running on etc.
+     * Every state of an executor can be recovered loading JAXB-marked variables of the object.
+     */
+    public final void updateTasks() {
+
+        for (UpdateTask task : new ArrayList<UpdateTask>(updateTasks)) {
+            if (task.getElapsed() < 0) {
+                // Unregister cancelled tasks
+                unregisterTask(task);
+            } else {
+                // Elapse one tick.
+                task.elapse();
+
+                try {
+                    if (task.getPeriod() <= 0 && task.getElapsed() == task.getDelay()) {
+                        getClass().getMethod(task.getMethod()).invoke(this);
+                        unregisterTask(task);
+                    } else if (task.getPeriod() > 0 && (task.getElapsed() - task.getDelay()) % task.getPeriod() == 0) {
+                        getClass().getMethod(task.getMethod());
+                        getClass().getMethod(task.getMethod()).invoke(this);
+                    }
+                }
+                catch (SecurityException e) {
+                    LOGGER.log(Level.SEVERE, "Can't access method '" + task.getMethod() + "' in '" + getClass().getName() + "' for update task", e);
+                }
+                catch (NoSuchMethodException e) {
+                    LOGGER.log(Level.SEVERE, "Can't find method '" + task.getMethod() + "' in '" + getClass().getName() + "' for update task", e);
+                }
+                catch (IllegalAccessException e) {
+                    LOGGER.log(Level.SEVERE, "Can't access method '" + task.getMethod() + "' in '" + getClass().getName() + "' for update task", e);
+                }
+                catch (InvocationTargetException e) {
+                    LOGGER.log(Level.SEVERE, "Can't invoke method '" + task.getMethod() + "' in '" + getClass().getName() + "' for update task", e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Executes the default tick update in the program executor.
      * Every program is written using the tick system.
      * The tick can change the state of the program, execute things related to the computer it's running on etc.
      * Every state of an executor can be recovered loading JAXB-marked variables of the object.
      */
     public abstract void update();
+
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (packetListeners == null ? 0 : packetListeners.hashCode());
+        result = prime * result + (updateTasks == null ? 0 : updateTasks.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        ProgramExecutor other = (ProgramExecutor) obj;
+        if (packetListeners == null) {
+            if (other.packetListeners != null) {
+                return false;
+            }
+        } else if (!packetListeners.equals(other.packetListeners)) {
+            return false;
+        }
+        if (updateTasks == null) {
+            if (other.updateTasks != null) {
+                return false;
+            }
+        } else if (!updateTasks.equals(other.updateTasks)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toInfoString() {
+
+        return updateTasks.size() + " update tasks, " + remainingPackets.size() + " remaining packets on " + packetListeners.size() + " listeners";
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [" + toInfoString() + "]";
+    }
 
 }

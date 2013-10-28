@@ -78,7 +78,6 @@ public class SystemViewerProgram extends Program {
         return new ProgramExecutor(host) {
 
             private Window<SystemViewerFrame> mainWindow;
-            private int                       mainWindowUpdateElapsed = 0;
 
             @Override
             public void update() {
@@ -86,14 +85,9 @@ public class SystemViewerProgram extends Program {
                 if (mainWindow == null) {
                     mainWindow = new Window<SystemViewerFrame>(new SystemViewerFrame(), getName(), getName());
                     openWindow(mainWindow);
+                    registerTask(new UpdateTask("updateMainWindow", 0, Ticker.DEFAULT_TICKS_PER_SECOND));
                 } else if (mainWindow.isClosed()) {
                     getHost().interrupt(true);
-                } else {
-                    mainWindowUpdateElapsed++;
-                    if (mainWindowUpdateElapsed >= Ticker.DEFAULT_TICKS_PER_SECOND) {
-                        mainWindowUpdateElapsed = 0;
-                        updateMainWindow();
-                    }
                 }
 
                 if (getHost().getState() == ProcessState.INTERRUPTED) {
@@ -104,7 +98,8 @@ public class SystemViewerProgram extends Program {
                 }
             }
 
-            private void updateMainWindow() {
+            @SuppressWarnings ("unused")
+            public void updateMainWindow() {
 
                 TreeNode processRoot = mainWindow.getFrame().getRootProcessNode();
                 List<TreeNode> addedNodes = updateProcessNodes(processRoot, getHost().getHost().getProcessManager().getRootProcess());

@@ -42,7 +42,6 @@ import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
 import com.quartercode.disconnected.sim.run.TickAction;
 import com.quartercode.disconnected.sim.run.TickSimulator;
-import com.quartercode.disconnected.sim.run.TickTimer;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
 import com.quartercode.disconnected.util.LogExceptionHandler;
@@ -106,7 +105,6 @@ public class Main {
         // Initalize ticker
         LOGGER.info("Initalizing ticker");
         List<TickAction> tickActions = new ArrayList<TickAction>();
-        tickActions.add(new TickTimer());
         tickActions.add(new TickSimulator());
         Disconnected.setTicker(new Ticker(tickActions.toArray(new TickAction[tickActions.size()])));
 
