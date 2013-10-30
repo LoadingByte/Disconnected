@@ -155,6 +155,7 @@ public class Main {
 
         // Themes
         registry.registerTheme(Main.class.getResource("/ui/default/default.xml"));
+        registry.registerTheme(Main.class.getResource("/ui/shell/shell.xml"));
         registry.registerTheme(Main.class.getResource("/ui/desktop/desktop.xml"));
     }
 

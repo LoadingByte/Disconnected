@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE themes PUBLIC "-//www.matthiasmann.de//TWL-Theme//EN" "http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd">
+<themes>
+    <images>
+        <alias name="shell.background" ref="color" tint="#111111"/>
+    </images>
+
+    <theme name="shelloutput" ref="-defaults">
+        <param name="background"><image>shell.background</image></param>
+        <param name="fonts"><map>
+            <param name="default"><font>console.white</font></param>
+        </map></param>
+        <param name="images"><map>
+        </map></param>
+    </theme>
+
+    <theme name="shellinput" ref="editfield">
+        <param name="background"><image>shell.background</image></param>
+        <theme name="renderer" ref="-defaults">
+            <param name="font"><font>console.white</font></param>
+        </theme>
+    </theme>
+</themes>

@@ -53,7 +53,7 @@ public class DesktopWidget extends Widget {
 
         this.desktop = desktop;
 
-        setTheme("");
+        setTheme("desktop");
 
         windowArea = new DesktopArea();
         windowArea.setTheme("");
@@ -74,7 +74,8 @@ public class DesktopWidget extends Widget {
 
                 // TODO: Display launch menu
                 Process sessionProcess = DesktopWidget.this.desktop.getHost().getHost();
-                sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("C:/opt/sysviewer/sysviewer.exe"), null);
+                // sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("C:/opt/sysviewer/sysviewer.exe"), null);
+                sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("C:/opt/terminal/terminal.exe"), null);
             }
         });
         add(launchButton);
@@ -190,8 +191,6 @@ public class DesktopWidget extends Widget {
 
     @Override
     protected void afterAddToGUI(GUI gui) {
-
-        setTheme("desktop");
 
         for (Window<?> window : desktop.getWindows()) {
             callAddWindow(window);

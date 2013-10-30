@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlIDREF;
+import com.quartercode.disconnected.graphics.session.ShellWidget;
 import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram.ShellSession;
 
 /**
@@ -74,6 +75,14 @@ public class Shell {
         return Collections.unmodifiableList(output);
     }
 
+    private void printOutput(String line) {
+
+        if (output.size() == 50) {
+            output.remove(0);
+        }
+        output.add(line);
+    }
+
     /**
      * Runs the given command on the shell.
      * This will print the output of the command to the shell.
@@ -83,6 +92,11 @@ public class Shell {
     public void run(String command) {
 
         // TODO: Run command
+
+        printOutput("Input: " + command);
+        for (ShellWidget widget : host.getWidgets()) {
+            widget.update();
+        }
     }
 
 }

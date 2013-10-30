@@ -18,9 +18,20 @@
 
 package com.quartercode.disconnected.graphics.session;
 
+import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.sim.comp.session.Shell;
+import de.matthiasmann.twl.Alignment;
+import de.matthiasmann.twl.BoxLayout;
+import de.matthiasmann.twl.BoxLayout.Direction;
+import de.matthiasmann.twl.EditField;
+import de.matthiasmann.twl.EditField.Callback;
+import de.matthiasmann.twl.Event;
 import de.matthiasmann.twl.GUI;
+import de.matthiasmann.twl.ScrollPane;
+import de.matthiasmann.twl.ScrollPane.Fixed;
+import de.matthiasmann.twl.TextArea;
 import de.matthiasmann.twl.Widget;
+import de.matthiasmann.twl.textarea.HTMLTextAreaModel;
 
 /**
  * A shell widget can display the output of a shell.
@@ -30,7 +41,13 @@ import de.matthiasmann.twl.Widget;
  */
 public class ShellWidget extends Widget {
 
-    private Shell shell;
+    private Shell                   shell;
+
+    private final TextArea          output;
+    private final HTMLTextAreaModel outputModel;
+    private final EditField         input;
+    private final BoxLayout         layout;
+    private final ScrollPane        scrollPane;
 
     /**
      * Creates a new shell widget and sets it up.
@@ -42,6 +59,37 @@ public class ShellWidget extends Widget {
         this.shell = shell;
 
         setTheme("");
+
+        outputModel = new HTMLTextAreaModel();
+
+        output = new TextArea(outputModel);
+        output.setTheme("/shelloutput");
+
+        input = new EditField();
+        input.setTheme("/shellinput");
+        input.addCallback(new Callback() {
+
+            @Override
+            public void callback(int key) {
+
+                if (key == Event.KEY_RETURN) {
+                    ShellWidget.this.shell.run(input.getText());
+                    input.setText("");
+                }
+            }
+        });
+
+        layout = new BoxLayout(Direction.VERTICAL);
+        layout.setTheme("");
+        layout.setSpacing(0);
+        layout.setAlignment(Alignment.FILL);
+        layout.add(output);
+        layout.add(input);
+
+        scrollPane = new ScrollPane(layout);
+        scrollPane.setTheme("/scrollpane");
+        scrollPane.setFixed(Fixed.HORIZONTAL);
+        add(scrollPane);
     }
 
     /**
@@ -54,7 +102,36 @@ public class ShellWidget extends Widget {
         return shell;
     }
 
-    // Nothing here yet
+    /**
+     * Updates the text area content to the latest output of the set shell.
+     */
+    public void update() {
+
+        final StringBuilder output = new StringBuilder();
+        for (String line : shell.getOutput()) {
+            output.append(line).append("<br/>");
+        }
+
+        outputModel.setHtml(output.toString());
+        invalidateLayout();
+
+        Disconnected.getGraphicsManager().invoke(new Runnable() {
+
+            @Override
+            public void run() {
+
+                scrollPane.setScrollPositionY(scrollPane.getMaxScrollPosY());
+            }
+        });
+    }
+
+    @Override
+    protected void layout() {
+
+        input.setSize(getInnerWidth(), input.getMinHeight());
+        layout.adjustSize();
+        scrollPane.setSize(getInnerWidth(), getInnerHeight());
+    }
 
     /**
      * Returns true if the shell widget already stopped displaying the session's content and is closed.
@@ -72,9 +149,8 @@ public class ShellWidget extends Widget {
     public void close() {
 
         if (!isClosed()) {
-            // TODO: Close anything we display
-            shell = null;
             shell.getHost().closeWidget(this);
+            shell = null;
         }
     }
 

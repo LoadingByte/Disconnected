@@ -44,7 +44,9 @@ import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.sim.comp.program.ExploitProgram;
 import com.quartercode.disconnected.sim.comp.program.KernelProgram;
 import com.quartercode.disconnected.sim.comp.program.SystemViewerProgram;
+import com.quartercode.disconnected.sim.comp.program.TerminalProgram;
 import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram;
+import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
@@ -206,11 +208,19 @@ public class SimulationGenerator {
         fileSystem.getFile("/system/boot/kernel").setContent(new KernelProgram("Kernel", new Version("1.0.0"), null));
 
         // Generate session programs
+        fileSystem.addFile("/system/bin/lash.exe", FileType.FILE, superuser);
+        fileSystem.getFile("/system/bin/lash.exe").getRights().setRight(FileAccessor.OWNER, FileRight.EXECUTE, true);
+        fileSystem.getFile("/system/bin/lash.exe").setContent(new ShellSessionProgram("Load Again Shell", new Version("1.0.0"), null));
+
         fileSystem.addFile("/system/bin/desktops.exe", FileType.FILE, superuser);
         fileSystem.getFile("/system/bin/desktops.exe").getRights().setRight(FileAccessor.OWNER, FileRight.EXECUTE, true);
         fileSystem.getFile("/system/bin/desktops.exe").setContent(new DesktopSessionProgram("Desktops Window Manager", new Version("1.0.0"), null));
 
         // Generate programs
+        fileSystem.addFile("/opt/terminal/terminal.exe", FileType.FILE, user);
+        fileSystem.getFile("/opt/terminal/terminal.exe").getRights().setRight(FileAccessor.OWNER, FileRight.EXECUTE, true);
+        fileSystem.getFile("/opt/terminal/terminal.exe").setContent(new TerminalProgram("Lash Terminal", new Version("1.0.0"), null));
+
         fileSystem.addFile("/opt/sysviewer/sysviewer.exe", FileType.FILE, user);
         fileSystem.getFile("/opt/sysviewer/sysviewer.exe").getRights().setRight(FileAccessor.OWNER, FileRight.EXECUTE, true);
         fileSystem.getFile("/opt/sysviewer/sysviewer.exe").setContent(new SystemViewerProgram("System Viewer", new Version("1.0.0"), null));
