@@ -42,6 +42,14 @@ import de.matthiasmann.twl.ScrollPane.Fixed;
 public class TerminalProgram extends Program {
 
     /**
+     * Creates a new empty terminal program.
+     * This is only recommended for direct field access (e.g. for serialization).
+     */
+    protected TerminalProgram() {
+
+    }
+
+    /**
      * Creates a new terminal program and sets the name, the version and the vulnerabilities.
      * 
      * @param name The name the program has.

@@ -37,7 +37,9 @@ import com.quartercode.disconnected.sim.comp.hardware.RAM;
 import com.quartercode.disconnected.sim.comp.program.ExploitProgram;
 import com.quartercode.disconnected.sim.comp.program.KernelProgram;
 import com.quartercode.disconnected.sim.comp.program.SystemViewerProgram;
+import com.quartercode.disconnected.sim.comp.program.TerminalProgram;
 import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram;
+import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
@@ -141,8 +143,10 @@ public class Main {
         // Programs
         registry.registerClass(KernelProgram.class);
 
+        registry.registerClass(ShellSessionProgram.class);
         registry.registerClass(DesktopSessionProgram.class);
 
+        registry.registerClass(TerminalProgram.class);
         registry.registerClass(SystemViewerProgram.class);
         registry.registerClass(ExploitProgram.class);
 

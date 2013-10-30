@@ -21,7 +21,9 @@ package com.quartercode.disconnected.sim.comp.session;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import com.quartercode.disconnected.graphics.session.ShellWidget;
 import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram.ShellSession;
 
@@ -32,8 +34,9 @@ import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram.ShellSe
  */
 public class Shell {
 
-    @XmlIDREF
     private ShellSession       host;
+    @XmlElementWrapper (name = "output")
+    @XmlElement (name = "line")
     private final List<String> output = new ArrayList<String>();
 
     /**
@@ -97,6 +100,11 @@ public class Shell {
         for (ShellWidget widget : host.getWidgets()) {
             widget.update();
         }
+    }
+
+    public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
+
+        host = (ShellSession) parent;
     }
 
 }
