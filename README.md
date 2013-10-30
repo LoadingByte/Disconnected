@@ -46,8 +46,7 @@ Run
 
 If you downloaded a binaries package or built your own one, you have several options to run Disconnected:
 
-* If you're on Windows, you can execute `disconnected.exe`.
-* On every other system, you can try to execute `disconnected-<version>.jar` (e.g. with a double-click).
+* Try to execute `disconnected-<version>.jar` (e.g. with a double-click).
 * If that doesn't work, open a command prompt, navigate to the binaries folder and run:
 
         java -jar disconnected-<version>.jar

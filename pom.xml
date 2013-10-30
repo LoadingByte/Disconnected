@@ -173,35 +173,6 @@
                 </configuration>
             </plugin>
 
-            <!-- Generate launch shortcuts -->
-            <plugin>
-                <groupId>org.bluestemsoftware.open.maven.plugin</groupId>
-                <artifactId>launch4j-plugin</artifactId>
-                <version>1.5.0.0</version>
-                <executions>
-                    <execution>
-                        <id>generate-launch-shortcut-win</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>launch4j</goal>
-                        </goals>
-                        <configuration>
-                            <dontWrapJar>true</dontWrapJar>
-                            <headerType>gui</headerType>
-                            <jar>${finalName}.jar</jar>
-                            <outfile>${project.build.directory}/${project.artifactId}.exe</outfile>
-                            <icon>src/main/resources/images/icons/shortcut.ico</icon>
-                            <classPath>
-                                <mainClass>${main.class}</mainClass>
-                            </classPath>
-                            <jre>
-                                <minVersion>1.6.0</minVersion>
-                            </jre>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- Assemble packages -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
