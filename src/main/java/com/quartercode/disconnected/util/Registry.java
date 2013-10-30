@@ -42,6 +42,7 @@ public class Registry {
 
     /**
      * Returns all classes which are currently registered in the registry.
+     * Those classes are known object tree ones which are used by JAXB.
      * 
      * @return All classes which are currently registered in the registry.
      */
@@ -52,6 +53,7 @@ public class Registry {
 
     /**
      * Returns the registered classes which have the given type as a superclass.
+     * Those classes are known object tree ones which are used by JAXB.
      * 
      * @param type The type to use for the selection.
      * @return The registered classes which have the given type as a superclass.
@@ -70,8 +72,9 @@ public class Registry {
 
     /**
      * Registers a new class to the registry.
+     * Those classes are known object tree ones which are used by JAXB.
      * 
-     * @param c The new class to register to the registry.
+     * @param c The new class to register in the registry.
      */
     public void registerClass(Class<?> c) {
 
@@ -82,6 +85,7 @@ public class Registry {
 
     /**
      * Unregisters a class from the registry.
+     * Those classes are known object tree ones which are used by JAXB.
      * 
      * @param c The class to unregister from the registry.
      */

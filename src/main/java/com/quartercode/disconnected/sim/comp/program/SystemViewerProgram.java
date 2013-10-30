@@ -33,9 +33,8 @@ import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
 import com.quartercode.disconnected.sim.comp.session.Desktop.Window;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.util.size.ByteUnit;
-import de.matthiasmann.twl.Event;
-import de.matthiasmann.twl.Event.Type;
 import de.matthiasmann.twl.ScrollPane;
+import de.matthiasmann.twl.ScrollPane.Fixed;
 import de.matthiasmann.twl.TreeTable;
 
 /**
@@ -69,7 +68,7 @@ public class SystemViewerProgram extends Program {
     @Override
     public long getSize() {
 
-        return ByteUnit.BYTE.convert(20, ByteUnit.KILOBYTE);
+        return ByteUnit.BYTE.convert(500, ByteUnit.KILOBYTE);
     }
 
     @Override
@@ -184,7 +183,7 @@ public class SystemViewerProgram extends Program {
 
             ScrollPane scrollPane = new ScrollPane(processTreeWidget);
             scrollPane.setTheme("/scrollpane");
-
+            scrollPane.setFixed(Fixed.HORIZONTAL);
             add(scrollPane);
         }
 
@@ -206,20 +205,6 @@ public class SystemViewerProgram extends Program {
             setMinSize(500, 150);
 
             processTreeWidget.setPosition(getInnerX(), getInnerY());
-            layoutTableColumns();
-        }
-
-        @Override
-        protected boolean handleEvent(Event evt) {
-
-            if (evt.getType() == Type.MOUSE_DRAGGED) {
-                layoutTableColumns();
-            }
-            return super.handleEvent(evt);
-        }
-
-        private void layoutTableColumns() {
-
             setColumnWidth(processTreeWidget, 0, 0.5F);
             setColumnWidth(processTreeWidget, 1, 0.1F);
             setColumnWidth(processTreeWidget, 2, 0.2F);
