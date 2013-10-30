@@ -69,27 +69,27 @@
         <alias name="table.row.dropmarker" ref="none"/>
     </images>
 
-    <fontDef name="white" filename="font/font.fnt" default="true" color="#FFFFFF">
+    <fontDef name="white" filename="font/default.fnt" default="true" color="#FFFFFF">
         <fontParam if="error" color="#FF0000"/>
         <fontParam if="warning" color="#FFA400"/>
         <fontParam if="disabled" color="#808080"/>
         <fontParam if="textSelection" color="#0032FF"/>
     </fontDef>
 
-    <fontDef name="black" filename="font/font.fnt" color="#000000">
+    <fontDef name="black" filename="font/default.fnt" color="#000000">
         <fontParam if="error" color="#640000"/>
         <fontParam if="warning" color="#503200"/>
         <fontParam if="disabled" color="#262728"/>
         <fontParam if="textSelection" color="#000064"/>
     </fontDef>
 
-    <fontDef name="button.white" filename="font/font.fnt" color="#DBFFFF">
+    <fontDef name="button.white" filename="font/default.fnt" color="#DBFFFF">
         <fontParam if="disabled" color="gray"/>
         <fontParam if="pressed" color="#96FF96"/>
         <fontParam if="hover" color="#C7FFC7"/>
     </fontDef>
 
-    <fontDef name="button.black" filename="font/font.fnt" color="#001818">
+    <fontDef name="button.black" filename="font/default.fnt" color="#001818">
         <fontParam if="disabled" color="#282828"/>
         <fontParam if="pressed" color="#004B00"/>
         <fontParam if="hover" color="#006400"/>
@@ -120,8 +120,7 @@
         <param name="fadeInTime"><int>0</int></param>
     </theme>
 
-    <theme name="label" ref="-defaults">
-    </theme>
+    <theme name="label" ref="-defaults"/>
 
     <theme name="button" ref="-defaults">
         <param name="background"><image>button.background</image></param>
@@ -240,4 +239,3 @@
         </theme>
     </theme>
 </themes>
-

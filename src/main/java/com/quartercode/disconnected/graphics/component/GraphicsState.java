@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.graphics.component;
 
-import java.net.URL;
+import javax.naming.OperationNotSupportedException;
 import de.matthiasmann.twl.Widget;
 
 /**
@@ -39,7 +39,7 @@ public class GraphicsState extends Widget {
     @Override
     public void setVisible(boolean visible) {
 
-        throw new RuntimeException("The visibility of a graphics state can't be changed");
+        throw new RuntimeException(new OperationNotSupportedException("The visibility of a graphics state can't be changed"));
     }
 
 }

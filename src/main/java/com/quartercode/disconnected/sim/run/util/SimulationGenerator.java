@@ -208,7 +208,7 @@ public class SimulationGenerator {
         // Generate session programs
         fileSystem.addFile("/system/bin/desktops.exe", FileType.FILE, superuser);
         fileSystem.getFile("/system/bin/desktops.exe").getRights().setRight(FileAccessor.OWNER, FileRight.EXECUTE, true);
-        fileSystem.getFile("/system/bin/desktops.exe").setContent(new DesktopSessionProgram("Desktop Session", new Version("1.0.0"), null));
+        fileSystem.getFile("/system/bin/desktops.exe").setContent(new DesktopSessionProgram("Desktops Window Manager", new Version("1.0.0"), null));
 
         // Generate programs
         fileSystem.addFile("/opt/sysviewer/sysviewer.exe", FileType.FILE, user);

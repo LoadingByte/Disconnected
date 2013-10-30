@@ -28,7 +28,7 @@ import com.quartercode.disconnected.sim.comp.program.Process;
  */
 public class NoFileRightException extends Exception {
 
-    private static final long serialVersionUID = -6007501034573011904L;
+    private static final long serialVersionUID = -1309109849854511720L;
 
     private final Process     process;
     private final File        file;
