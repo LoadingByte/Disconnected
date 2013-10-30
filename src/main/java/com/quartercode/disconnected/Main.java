@@ -152,6 +152,10 @@ public class Main {
 
         // Interests
         registry.registerClass(DestroyInterest.class);
+
+        // Themes
+        registry.registerTheme(Main.class.getResource("/ui/default/default.xml"));
+        registry.registerTheme(Main.class.getResource("/ui/desktop/desktop.xml"));
     }
 
     /**

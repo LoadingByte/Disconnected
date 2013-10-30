@@ -29,26 +29,11 @@ import de.matthiasmann.twl.Widget;
  */
 public class GraphicsState extends Widget {
 
-    private final URL themeResource;
-
     /**
      * Creates a new empty state which defines what should be drawn.
-     * 
-     * @param themeResource The theme resource (file) as a resource url.
      */
-    public GraphicsState(URL themeResource) {
+    public GraphicsState() {
 
-        this.themeResource = themeResource;
-    }
-
-    /**
-     * Returns the theme resource (file) as a resource url.
-     * 
-     * @return The theme resource (file) as a resource url.
-     */
-    public URL getThemeResource() {
-
-        return themeResource;
     }
 
     @Override

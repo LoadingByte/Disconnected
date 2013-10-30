@@ -20,8 +20,10 @@ package com.quartercode.disconnected.graphics;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
@@ -54,7 +56,6 @@ public class UpdateThread extends Thread {
     private final RootWidget      root;
     private GUI                   gui;
     private LWJGLRenderer         renderer;
-    private ThemeManager          currentTheme;
 
     private final Queue<Runnable> toInvoke = new LinkedList<Runnable>();
 
@@ -99,16 +100,6 @@ public class UpdateThread extends Thread {
     }
 
     /**
-     * Returns the twl theme manager which manages the current theme.
-     * 
-     * @return The twl theme manager which manages the current theme.
-     */
-    public ThemeManager getCurrentTheme() {
-
-        return currentTheme;
-    }
-
-    /**
      * Invokes the given {@link Runnable} in the graphics update thread.
      * 
      * @param runnable The runnable to invoke in the update thread.
@@ -120,6 +111,8 @@ public class UpdateThread extends Thread {
 
     @Override
     public void run() {
+
+        ThemeManager theme = null;
 
         try {
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -143,17 +136,44 @@ public class UpdateThread extends Thread {
             gui.setSize();
             renderer.syncViewportSize();
 
+            PrintWriter themeFileWriter = null;
+            File themeFile = null;
+            try {
+                themeFile = File.createTempFile("disconnected-theme", ".xml");
+                themeFileWriter = new PrintWriter(themeFile);
+                themeFileWriter.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+                themeFileWriter.println("<!DOCTYPE themes PUBLIC \"-//www.matthiasmann.de//TWL-Theme//EN\"");
+                themeFileWriter.println("\"http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd\">");
+                themeFileWriter.println("<themes>");
+                for (URL themeURL : Disconnected.getRegistry().getThemes()) {
+                    themeFileWriter.println("<include filename=\"" + themeURL + "\"/>");
+                }
+                themeFileWriter.println("</themes>");
+                themeFileWriter.flush();
+                theme = ThemeManager.createThemeManager(themeFile.toURI().toURL(), renderer);
+            }
+            catch (IOException e) {
+                throw new IOException("Error while creating temporary theme file", e);
+            }
+            finally {
+                if (themeFileWriter != null) {
+                    themeFileWriter.close();
+                }
+                if (themeFile != null) {
+                    themeFile.delete();
+                }
+            }
+
+            gui.applyTheme(theme);
+
             GraphicsState lastState = null;
             while (!Display.isCloseRequested() && !interrupted()) {
                 if (lastState == null || !lastState.equals(root.getState())) {
                     if (lastState != null) {
-                        currentTheme.destroy();
                         root.removeChild(lastState);
                     }
                     lastState = root.getState();
                     if (lastState != null) {
-                        currentTheme = ThemeManager.createThemeManager(lastState.getThemeResource(), renderer);
-                        gui.applyTheme(currentTheme);
                         root.add(lastState);
                     }
                 }
@@ -180,8 +200,8 @@ public class UpdateThread extends Thread {
         }
 
         gui.destroy();
-        if (currentTheme != null) {
-            currentTheme.destroy();
+        if (theme != null) {
+            theme.destroy();
         }
         Display.destroy();
         System.exit(0);
