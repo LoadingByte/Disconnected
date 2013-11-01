@@ -27,6 +27,7 @@ import de.matthiasmann.twl.EditField;
 import de.matthiasmann.twl.EditField.Callback;
 import de.matthiasmann.twl.Event;
 import de.matthiasmann.twl.GUI;
+import de.matthiasmann.twl.Label;
 import de.matthiasmann.twl.ScrollPane;
 import de.matthiasmann.twl.ScrollPane.Fixed;
 import de.matthiasmann.twl.TextArea;
@@ -45,8 +46,10 @@ public class ShellWidget extends Widget {
 
     private final TextArea          output;
     private final HTMLTextAreaModel outputModel;
+    private final Label             prompt;
     private final EditField         input;
-    private final BoxLayout         layout;
+    private final BoxLayout         inputBar;
+    private final BoxLayout         shellLayout;
     private final ScrollPane        scrollPane;
 
     /**
@@ -63,10 +66,13 @@ public class ShellWidget extends Widget {
         outputModel = new HTMLTextAreaModel();
 
         output = new TextArea(outputModel);
-        output.setTheme("/shelloutput");
+        output.setTheme("output");
+
+        prompt = new Label(shell.getHost().getUser().getName() + "@unknown $");
+        prompt.setTheme("prompt");
 
         input = new EditField();
-        input.setTheme("/shellinput");
+        input.setTheme("input");
         input.addCallback(new Callback() {
 
             @Override
@@ -79,15 +85,21 @@ public class ShellWidget extends Widget {
             }
         });
 
-        layout = new BoxLayout(Direction.VERTICAL);
-        layout.setTheme("");
-        layout.setSpacing(0);
-        layout.setAlignment(Alignment.FILL);
-        layout.add(output);
-        layout.add(input);
+        inputBar = new BoxLayout(Direction.HORIZONTAL);
+        inputBar.setTheme("inputbar");
+        inputBar.setSpacing(5);
+        inputBar.add(prompt);
+        inputBar.add(input);
 
-        scrollPane = new ScrollPane(layout);
-        scrollPane.setTheme("/scrollpane");
+        shellLayout = new BoxLayout(Direction.VERTICAL);
+        shellLayout.setTheme("");
+        shellLayout.setSpacing(0);
+        shellLayout.setAlignment(Alignment.FILL);
+        shellLayout.add(output);
+        shellLayout.add(inputBar);
+
+        scrollPane = new ScrollPane(shellLayout);
+        scrollPane.setTheme("/shell");
         scrollPane.setFixed(Fixed.HORIZONTAL);
         add(scrollPane);
     }
@@ -128,8 +140,7 @@ public class ShellWidget extends Widget {
     @Override
     protected void layout() {
 
-        input.setSize(getInnerWidth(), input.getMinHeight());
-        layout.adjustSize();
+        input.setMinSize(getInnerWidth() - prompt.getWidth() - inputBar.getSpacing(), input.getMinHeight());
         scrollPane.setSize(getInnerWidth(), getInnerHeight());
     }
 

@@ -105,20 +105,6 @@
         <fontParam if="hover" color="#006400"/>
     </fontDef>
 
-    <fontDef name="console.white" filename="font/console.fnt" color="#FFFFFF">
-        <fontParam if="error" color="#FF0000"/>
-        <fontParam if="warning" color="#FFA400"/>
-        <fontParam if="disabled" color="#808080"/>
-        <fontParam if="textSelection" color="#0032FF"/>
-    </fontDef>
-
-    <fontDef name="console.black" filename="font/console.fnt" color="#000000">
-        <fontParam if="error" color="#640000"/>
-        <fontParam if="warning" color="#503200"/>
-        <fontParam if="disabled" color="#262728"/>
-        <fontParam if="textSelection" color="#000064"/>
-    </fontDef>
-
     <inputMapDef name="-defaultInputMap">
         <action name="selectAll">ctrl A</action>
         <action name="cut">ctrl X</action>
