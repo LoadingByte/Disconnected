@@ -33,6 +33,7 @@ import com.quartercode.disconnected.sim.comp.os.Group;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.sim.comp.program.Process;
+import com.quartercode.disconnected.util.InfoString;
 import com.quartercode.disconnected.util.size.SizeObject;
 import com.quartercode.disconnected.util.size.SizeUtil;
 
@@ -42,7 +43,7 @@ import com.quartercode.disconnected.util.size.SizeUtil;
  * 
  * @see FileSystem
  */
-public class File implements SizeObject {
+public class File implements SizeObject, InfoString {
 
     /**
      * The file type represents if a file is a content file or a directory.
@@ -567,7 +568,7 @@ public class File implements SizeObject {
 
     /**
      * Returns the unique serialization id for the file.
-     * The id is a combination of the host computer's id and the global path of the file.
+     * The id is a combination of the host file system's id and the local path of the file.
      * It should only be used by a serialization algorithm.
      * 
      * @return The unique serialization id for the file.
@@ -576,7 +577,7 @@ public class File implements SizeObject {
     @XmlID
     protected String getId() {
 
-        return host.getHost().getId() + "-" + getGlobalHostPath();
+        return host.getId() + "-" + getLocalPath();
     }
 
     public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
@@ -595,7 +596,10 @@ public class File implements SizeObject {
         int result = 1;
         result = prime * result + (children == null ? 0 : children.hashCode());
         result = prime * result + (content == null ? 0 : content.hashCode());
+        result = prime * result + (group == null ? 0 : group.hashCode());
         result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + (owner == null ? 0 : owner.hashCode());
+        result = prime * result + (rights == null ? 0 : rights.hashCode());
         result = prime * result + (type == null ? 0 : type.hashCode());
         return result;
     }
@@ -627,11 +631,32 @@ public class File implements SizeObject {
         } else if (!content.equals(other.content)) {
             return false;
         }
+        if (group == null) {
+            if (other.group != null) {
+                return false;
+            }
+        } else if (!group.equals(other.group)) {
+            return false;
+        }
         if (name == null) {
             if (other.name != null) {
                 return false;
             }
         } else if (!name.equals(other.name)) {
+            return false;
+        }
+        if (owner == null) {
+            if (other.owner != null) {
+                return false;
+            }
+        } else if (!owner.equals(other.owner)) {
+            return false;
+        }
+        if (rights == null) {
+            if (other.rights != null) {
+                return false;
+            }
+        } else if (!rights.equals(other.rights)) {
             return false;
         }
         if (type != other.type) {
@@ -641,13 +666,15 @@ public class File implements SizeObject {
     }
 
     @Override
+    public String toInfoString() {
+
+        return type.name().toLowerCase() + " " + name + ", " + rights.toString() + " (o " + owner.getName() + ", g " + group.getName() + "), " + children.size() + " child files";
+    }
+
+    @Override
     public String toString() {
 
-        List<String> childNames = new ArrayList<String>();
-        for (File child : children) {
-            childNames.add(child.getName());
-        }
-        return getClass().getName() + " [name=" + name + ", type=" + type + ", content=" + content + ", children=" + childNames + "]";
+        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }
