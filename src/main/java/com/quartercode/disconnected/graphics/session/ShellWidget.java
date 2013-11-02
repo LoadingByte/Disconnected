@@ -124,7 +124,8 @@ public class ShellWidget extends Widget {
             output.append(line).append("<br/>");
         }
         outputModel.setHtml(output.toString());
-        prompt.setText(shell.getHost().getUser().getName() + "@unknown $");
+        String currentDirectory = shell.getCurrentDirectory() == null ? "/" : shell.getCurrentDirectory().getGlobalPath(shell.getHost().getHost().getHost());
+        prompt.setText(shell.getHost().getUser().getName() + "@unknown " + currentDirectory + " $");
         invalidateLayout();
 
         Disconnected.getGraphicsManager().invoke(new Runnable() {

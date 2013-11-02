@@ -25,6 +25,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import com.quartercode.disconnected.graphics.session.ShellWidget;
+import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram.ShellSession;
 
 /**
@@ -35,6 +36,7 @@ import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram.ShellSe
 public class Shell {
 
     private ShellSession       host;
+    private File               currentDirectory;
     @XmlElementWrapper (name = "output")
     @XmlElement (name = "line")
     private final List<String> output = new ArrayList<String>();
@@ -48,13 +50,25 @@ public class Shell {
     }
 
     /**
-     * Creates a new shell.
+     * Creates a new shell in the root directory.
      * 
      * @param host The hosting shell session which uses this shell.
      */
     public Shell(ShellSession host) {
 
         this.host = host;
+    }
+
+    /**
+     * Creates a new shell in the given directory.
+     * 
+     * @param host The hosting shell session which uses this shell.
+     * @param currentDirectory The directory the shell will start in.
+     */
+    public Shell(ShellSession host, File currentDirectory) {
+
+        this.host = host;
+        this.currentDirectory = currentDirectory;
     }
 
     /**
@@ -65,6 +79,30 @@ public class Shell {
     public ShellSession getHost() {
 
         return host;
+    }
+
+    /**
+     * Returns the directory the shell is currently in.
+     * This directory is used for all relative paths used in the shell.
+     * The object is null if the shell is currently in the root directory.
+     * 
+     * @return The directory the shell is currently in.
+     */
+    public File getCurrentDirectory() {
+
+        return currentDirectory;
+    }
+
+    /**
+     * Changes the directory the shell is currently in.
+     * This directory is used for all relative paths used in the shell.
+     * The object is null if the shell is currently in the root directory.
+     * 
+     * @param currentDirectory The new directory the shell will be in after the change.
+     */
+    public void setCurrentDirectory(File currentDirectory) {
+
+        this.currentDirectory = currentDirectory;
     }
 
     /**
