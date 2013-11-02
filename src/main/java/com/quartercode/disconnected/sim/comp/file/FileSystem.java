@@ -39,16 +39,14 @@ import com.quartercode.disconnected.util.size.SizeObject;
  */
 public class FileSystem implements SizeObject, InfoString {
 
-    private final String seperator = "/";
-
     @XmlIDREF
     @XmlAttribute
-    private Computer     host;
+    private Computer host;
     @XmlElement
-    private long         size;
+    private long     size;
 
     @XmlElement (name = "file")
-    private File         rootFile;
+    private File     rootFile;
 
     /**
      * Creates a new empty file system.
@@ -70,16 +68,6 @@ public class FileSystem implements SizeObject, InfoString {
         this.size = size;
 
         rootFile = new File(this);
-    }
-
-    /**
-     * Returns the path seperator which seperates different files in a path string.
-     * 
-     * @return The path seperator which seperates different files in a path string.
-     */
-    public String getSeperator() {
-
-        return seperator;
     }
 
     /**
@@ -124,7 +112,7 @@ public class FileSystem implements SizeObject, InfoString {
      */
     public File getFile(String path) {
 
-        String[] parts = path.split(seperator);
+        String[] parts = path.split(File.SEPERATOR);
 
         File current = rootFile;
         for (String part : parts) {
@@ -176,7 +164,7 @@ public class FileSystem implements SizeObject, InfoString {
      */
     public File addFile(Process process, String path, FileType type, User user) throws NoFileRightException {
 
-        String[] parts = path.split(seperator);
+        String[] parts = path.split(File.SEPERATOR);
         File file = new File(this, parts[parts.length - 1], type, new FileRights("rwd-r---r---"), user, user.getPrimaryGroup());
         addFile(process, file, path);
         return file;
@@ -212,7 +200,7 @@ public class FileSystem implements SizeObject, InfoString {
      */
     protected void addFile(Process process, File file, String path) throws NoFileRightException {
 
-        String[] parts = path.split(seperator);
+        String[] parts = path.split(File.SEPERATOR);
 
         File current = rootFile;
         for (int counter = 0; counter < parts.length; counter++) {
@@ -287,7 +275,6 @@ public class FileSystem implements SizeObject, InfoString {
         final int prime = 31;
         int result = 1;
         result = prime * result + (rootFile == null ? 0 : rootFile.hashCode());
-        result = prime * result + (seperator == null ? 0 : seperator.hashCode());
         result = prime * result + (int) (size ^ size >>> 32);
         return result;
     }
@@ -310,13 +297,6 @@ public class FileSystem implements SizeObject, InfoString {
                 return false;
             }
         } else if (!rootFile.equals(other.rootFile)) {
-            return false;
-        }
-        if (seperator == null) {
-            if (other.seperator != null) {
-                return false;
-            }
-        } else if (!seperator.equals(other.seperator)) {
             return false;
         }
         if (size != other.size) {

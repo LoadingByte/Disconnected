@@ -47,16 +47,17 @@ public class FileSystemTest {
         HardDrive hardDrive = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
         fileSystem = hardDrive.getFileSystem();
         computer.addHardware(hardDrive);
-        operatingSystem.getFileSystemManager().mount(fileSystem, 'C');
+        operatingSystem.getFileSystemManager().setMountpoint(fileSystem, "test");
+        operatingSystem.getFileSystemManager().setMounted(fileSystem, true);
 
-        testFile = fileSystem.addFile("/test1/test2/test.txt", FileType.FILE, new User(null, null));
+        testFile = fileSystem.addFile("test1/test2/test.txt", FileType.FILE, new User(null, null));
         testFile.setContent("Test-Content");
     }
 
     @Test
     public void testGetFile() {
 
-        Assert.assertEquals("Returned file equals original", testFile, fileSystem.getFile("/test1/test2/test.txt"));
+        Assert.assertEquals("Returned file equals original", testFile, fileSystem.getFile("test1/test2/test.txt"));
     }
 
     @Test

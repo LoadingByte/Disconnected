@@ -82,7 +82,7 @@ public class TerminalProgram extends Program {
                     try {
                         Map<String, Object> arguments = new HashMap<String, Object>();
                         arguments.put("user", getHost().getSession().getUser());
-                        Process shellProcess = createProcess(getHost().getHost().getFileSystemManager().getFile("C:/system/bin/lash.exe"), arguments);
+                        Process shellProcess = createProcess(getHost().getHost().getFileSystemManager().getFile("/system/bin/lash.exe"), arguments);
                         shell = ((ShellSession) shellProcess.getExecutor()).getShell();
                     }
                     catch (NoFileRightException e) {

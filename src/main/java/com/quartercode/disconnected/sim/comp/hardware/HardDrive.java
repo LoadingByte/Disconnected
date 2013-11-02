@@ -32,7 +32,7 @@ import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSl
 /**
  * This class represents a hard drive of a computer.
  * A hard drive only has it's size stored (given in bytes).
- * The hard drive has a letter (e.g. "C") and stores files which can be accessed like regular files.
+ * The hard drive stores files which can be accessed like regular files.
  * 
  * @see Hardware
  * @see File

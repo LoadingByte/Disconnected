@@ -73,7 +73,7 @@ public class DesktopState extends GraphicsState {
         OperatingSystem os = simulation.getLocalPlayer().getComputer().getOperatingSystem();
         Map<String, Object> arguments = new HashMap<String, Object>();
         arguments.put("user", os.getUserManager().getUsers().get(0));
-        Process process = os.getProcessManager().getRootProcess().createChild(os.getFileSystemManager().getFile("C:/system/bin/desktops.exe"), arguments);
+        Process process = os.getProcessManager().getRootProcess().createChild(os.getFileSystemManager().getFile("/system/bin/desktops.exe"), arguments);
         desktopWidget = ((DesktopSession) process.getExecutor()).createWidget();
         add(desktopWidget);
     }

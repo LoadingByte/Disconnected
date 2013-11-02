@@ -26,8 +26,7 @@ import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
-import com.quartercode.disconnected.sim.comp.file.FileRights.FileAccessor;
-import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
+import com.quartercode.disconnected.sim.comp.file.FileRights;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
@@ -41,6 +40,7 @@ import com.quartercode.disconnected.sim.comp.net.IP;
 import com.quartercode.disconnected.sim.comp.os.Group;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.os.User;
+import com.quartercode.disconnected.sim.comp.os.UserManager;
 import com.quartercode.disconnected.sim.comp.program.ExploitProgram;
 import com.quartercode.disconnected.sim.comp.program.KernelProgram;
 import com.quartercode.disconnected.sim.comp.program.SystemViewerProgram;
@@ -144,6 +144,7 @@ public class SimulationGenerator {
             mainboradSlots.add(new MainboradSlot(CPU.class));
             mainboradSlots.add(new MainboradSlot(RAM.class));
             mainboradSlots.add(new MainboradSlot(HardDrive.class));
+            mainboradSlots.add(new MainboradSlot(HardDrive.class));
             mainboradSlots.add(new MainboradSlot(NetworkInterface.class));
             computer.addHardware(new Mainboard(computer, "MB XYZ 2000 Pro", new Version(1, 2, 5), null, mainboradSlots));
 
@@ -151,8 +152,10 @@ public class SimulationGenerator {
             hardware.add(new CPU(computer, "Intel Core i7-4950HQ", new Version(1, 0, 0), null, 8, 2400000000L));
             hardware.add(new RAM(computer, "EpicRAM 4194304", new Version(1, 0, 5), null, ByteUnit.BYTE.convert(4, ByteUnit.MEGABYTE), 1600000000L));
 
-            HardDrive hardDrive = new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
-            hardware.add(hardDrive);
+            HardDrive systemMedium = new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
+            hardware.add(systemMedium);
+            HardDrive userMedium = new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
+            hardware.add(userMedium);
 
             NetworkInterface networkInterface = new NetworkInterface(computer, "NI FiberScore Ultimate", new Version(1, 2, 0), null);
             generateIP(networkInterface, simulation);
@@ -183,43 +186,63 @@ public class SimulationGenerator {
             genuser.addToGroup(genpop, true);
             computer.getOperatingSystem().getUserManager().addUser(genuser);
 
-            fillFileSystem(hardDrive.getFileSystem(), genuser);
+            computer.getOperatingSystem().getFileSystemManager().setMountpoint(systemMedium.getFileSystem(), "system");
+            addSystemFiles(systemMedium.getFileSystem(), computer.getOperatingSystem().getUserManager());
+            computer.getOperatingSystem().getFileSystemManager().setMountpoint(userMedium.getFileSystem(), "user");
+            addUserFiles(userMedium.getFileSystem(), computer.getOperatingSystem().getUserManager());
         }
 
         return computers;
     }
 
-    // Temporary method for generating the kernel and some basic programs
-    private static void fillFileSystem(FileSystem fileSystem, User user) {
+    // Temporary method for generating the kernel and some system programs
+    private static void addSystemFiles(FileSystem fileSystem, UserManager userManager) {
 
-        User superuser = fileSystem.getHost().getOperatingSystem().getUserManager().getSuperuser();
+        User superuser = userManager.getSuperuser();
 
         // Generate kernel file (temp)
-        fileSystem.addFile("/system/boot/kernel", FileType.FILE, superuser);
-        fileSystem.getFile("/system/boot/kernel").getRights().setRight(FileAccessor.OWNER, FileRight.EXECUTE, true);
-        fileSystem.getFile("/system/boot/kernel").setContent(new KernelProgram("Kernel", new Version("1.0.0"), null));
+        fileSystem.addFile("boot/kernel", FileType.FILE, superuser);
+        fileSystem.getFile("boot/kernel").setRights(new FileRights("r--xr--xr--x"));
+        fileSystem.getFile("boot/kernel").setContent(new KernelProgram("Kernel", new Version("1.0.0"), null));
 
         // Generate session programs
-        fileSystem.addFile("/system/bin/lash.exe", FileType.FILE, superuser);
-        fileSystem.getFile("/system/bin/lash.exe").getRights().setRight(FileAccessor.OWNER, FileRight.EXECUTE, true);
-        fileSystem.getFile("/system/bin/lash.exe").setContent(new ShellSessionProgram("Load Again Shell", new Version("1.0.0"), null));
+        fileSystem.addFile("bin/lash.exe", FileType.FILE, superuser);
+        fileSystem.getFile("bin/lash.exe").setRights(new FileRights("r--xr--xr--x"));
+        fileSystem.getFile("bin/lash.exe").setContent(new ShellSessionProgram("Load Again Shell", new Version("1.0.0"), null));
 
-        fileSystem.addFile("/system/bin/desktops.exe", FileType.FILE, superuser);
-        fileSystem.getFile("/system/bin/desktops.exe").getRights().setRight(FileAccessor.OWNER, FileRight.EXECUTE, true);
-        fileSystem.getFile("/system/bin/desktops.exe").setContent(new DesktopSessionProgram("Desktops Window Manager", new Version("1.0.0"), null));
+        fileSystem.addFile("bin/desktops.exe", FileType.FILE, superuser);
+        fileSystem.getFile("bin/desktops.exe").setRights(new FileRights("r--xr--xr--x"));
+        fileSystem.getFile("bin/desktops.exe").setContent(new DesktopSessionProgram("Desktops Window Manager", new Version("1.0.0"), null));
 
-        // Generate programs
-        fileSystem.addFile("/opt/terminal/terminal.exe", FileType.FILE, user);
-        fileSystem.getFile("/opt/terminal/terminal.exe").getRights().setRight(FileAccessor.OWNER, FileRight.EXECUTE, true);
-        fileSystem.getFile("/opt/terminal/terminal.exe").setContent(new TerminalProgram("Lash Terminal", new Version("1.0.0"), null));
+        // Generate system programs
+        fileSystem.addFile("bin/terminal.exe", FileType.FILE, superuser);
+        fileSystem.getFile("bin/terminal.exe").setRights(new FileRights("r--xr--xr--x"));
+        fileSystem.getFile("bin/terminal.exe").setContent(new TerminalProgram("Lash Terminal", new Version("1.0.0"), null));
 
-        fileSystem.addFile("/opt/sysviewer/sysviewer.exe", FileType.FILE, user);
-        fileSystem.getFile("/opt/sysviewer/sysviewer.exe").getRights().setRight(FileAccessor.OWNER, FileRight.EXECUTE, true);
-        fileSystem.getFile("/opt/sysviewer/sysviewer.exe").setContent(new SystemViewerProgram("System Viewer", new Version("1.0.0"), null));
+        fileSystem.addFile("bin/sysviewer.exe", FileType.FILE, superuser);
+        fileSystem.getFile("bin/sysviewer.exe").setRights(new FileRights("r--xr--xr--x"));
+        fileSystem.getFile("bin/sysviewer.exe").setContent(new SystemViewerProgram("System Viewer", new Version("1.0.0"), null));
+    }
 
-        fileSystem.addFile("/opt/exploiter/exploiter.exe", FileType.FILE, user);
-        fileSystem.getFile("/opt/exploiter/exploiter.exe").getRights().setRight(FileAccessor.OWNER, FileRight.EXECUTE, true);
-        fileSystem.getFile("/opt/exploiter/exploiter.exe").setContent(new ExploitProgram("Exploiter", new Version("1.0.0"), null));
+    // Temporary method for generating some unnecessary programs and personal files
+    private static void addUserFiles(FileSystem fileSystem, UserManager userManager) {
+
+        User superuser = userManager.getSuperuser();
+
+        // Generate other programs
+        fileSystem.addFile("bin/exploiter.exe", FileType.FILE, superuser);
+        fileSystem.getFile("bin/exploiter.exe").setRights(new FileRights("r--xr--xr--x"));
+        fileSystem.getFile("bin/exploiter.exe").setContent(new ExploitProgram("Exploiter", new Version("1.0.0"), null));
+
+        // Generate home directories
+        fileSystem.addFile("homes", FileType.DIRECTORY, superuser);
+        fileSystem.getFile("homes").setRights(new FileRights("r---r---r---"));
+        for (User user : userManager.getUsers()) {
+            if (!user.equals(userManager.getSuperuser())) {
+                fileSystem.addFile("homes/" + user.getName(), FileType.DIRECTORY, user);
+                fileSystem.getFile("homes/" + user.getName()).setRights(new FileRights("rwdx--------"));
+            }
+        }
     }
 
     private static void generateIP(NetworkInterface host, Simulation simulation) {

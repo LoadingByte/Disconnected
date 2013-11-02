@@ -136,7 +136,7 @@ public class ProcessManager implements InfoString {
     public void setRunning(boolean running) {
 
         if (running) {
-            rootProcess = new Process(host, null, 0, host.getFileSystemManager().getFile("C:/system/boot/kernel"), null);
+            rootProcess = new Process(host, null, 0, host.getFileSystemManager().getFile("/system/boot/kernel"), null);
         } else {
             rootProcess.interrupt(true);
         }

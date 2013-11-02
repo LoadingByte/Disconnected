@@ -61,18 +61,23 @@ public class File implements SizeObject, InfoString {
 
     }
 
-    private FileSystem       host;
-    private String           name;
+    /**
+     * The path seperator which seperates different files in a path string.
+     */
+    public static final String SEPERATOR = "/";
+
+    private FileSystem         host;
+    private String             name;
     @XmlAttribute
-    private FileType         type;
-    private FileRights       rights;
-    private User             owner;
-    private Group            group;
+    private FileType           type;
+    private FileRights         rights;
+    private User               owner;
+    private Group              group;
 
     @XmlElement
-    private Object           content;
+    private Object             content;
     @XmlElement (name = "file")
-    private final List<File> children = new ArrayList<File>();
+    private final List<File>   children  = new ArrayList<File>();
 
     /**
      * Creates a new empty file.
@@ -155,7 +160,7 @@ public class File implements SizeObject, InfoString {
      */
     public String getGlobalPath(OperatingSystem operatingSystem) {
 
-        return operatingSystem.getFileSystemManager().getMountpoint(host) + ":" + getLocalPath();
+        return SEPERATOR + operatingSystem.getFileSystemManager().getMountpoint(host) + SEPERATOR + getLocalPath();
     }
 
     /**
@@ -181,17 +186,17 @@ public class File implements SizeObject, InfoString {
     public String getLocalPath() {
 
         if (equals(host.getRootFile())) {
-            return host.getSeperator();
+            return "";
         } else {
             List<File> path = new ArrayList<File>();
             host.getRootFile().generatePathSections(this, path);
 
             String pathString = "";
             for (File pathEntry : path) {
-                pathString += host.getSeperator() + pathEntry.getName();
+                pathString += SEPERATOR + pathEntry.getName();
             }
 
-            return pathString.isEmpty() ? null : pathString;
+            return pathString.isEmpty() ? null : pathString.substring(1);
         }
     }
 
@@ -455,7 +460,7 @@ public class File implements SizeObject, InfoString {
     public File getParent() {
 
         String path = getLocalPath();
-        return host.getFile(path.substring(0, path.lastIndexOf(host.getSeperator())));
+        return host.getFile(path.substring(0, path.lastIndexOf(SEPERATOR)));
     }
 
     /**
@@ -518,14 +523,14 @@ public class File implements SizeObject, InfoString {
             FileRights.checkRight(process, this, FileRight.DELETE);
         }
 
-        remove();
-
-        if (path.contains(":")) {
+        File oldParent = getParent();
+        if (path.startsWith(SEPERATOR)) {
             host = host.getHost().getOperatingSystem().getFileSystemManager().getMounted(path);
-            host.addFile(process, this, path.split(":")[1]);
+            host.addFile(process, this, path.substring(path.indexOf(SEPERATOR, 1)));
         } else {
             host.addFile(process, this, path);
         }
+        oldParent.removeChildFile(this);
     }
 
     /**

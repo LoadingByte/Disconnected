@@ -47,25 +47,26 @@ public class FileTest {
         HardDrive hardDrive = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
         fileSystem = hardDrive.getFileSystem();
         computer.addHardware(hardDrive);
-        operatingSystem.getFileSystemManager().mount(fileSystem, 'C');
+        operatingSystem.getFileSystemManager().setMountpoint(fileSystem, "test");
+        operatingSystem.getFileSystemManager().setMounted(fileSystem, true);
 
-        testFile = fileSystem.addFile("/test1/test2/test.txt", FileType.FILE, new User(null, null));
+        testFile = fileSystem.addFile("test1/test2/test.txt", FileType.FILE, new User(null, null));
         testFile.setContent("Test-Content");
     }
 
     @Test
     public void testGetLocalPath() {
 
-        Assert.assertEquals("Local path is correct", "/test1/test2/test.txt", testFile.getLocalPath());
+        Assert.assertEquals("Local path is correct", "test1/test2/test.txt", testFile.getLocalPath());
     }
 
     @Test
     public void testMove() {
 
-        testFile.move("/test1/test3/test.txt");
+        testFile.move("test1/test3/test.txt");
 
-        Assert.assertEquals("Moved file exists", testFile, fileSystem.getFile("/test1/test3/test.txt"));
-        Assert.assertEquals("Moved file has correct path", "/test1/test3/test.txt", testFile.getLocalPath());
+        Assert.assertEquals("Moved file exists", testFile, fileSystem.getFile("test1/test3/test.txt"));
+        Assert.assertEquals("Moved file has correct path", "test1/test3/test.txt", testFile.getLocalPath());
         Assert.assertEquals("Moved file has correct content", "Test-Content", testFile.getContent());
     }
 
@@ -74,8 +75,8 @@ public class FileTest {
 
         testFile.rename("test2.txt");
 
-        Assert.assertEquals("Renamed file exists", testFile, fileSystem.getFile("/test1/test2/test2.txt"));
-        Assert.assertEquals("Renamed file has correct path", "/test1/test2/test2.txt", testFile.getLocalPath());
+        Assert.assertEquals("Renamed file exists", testFile, fileSystem.getFile("test1/test2/test2.txt"));
+        Assert.assertEquals("Renamed file has correct path", "test1/test2/test2.txt", testFile.getLocalPath());
         Assert.assertEquals("Renamed file has correct content", "Test-Content", testFile.getContent());
     }
 
@@ -84,7 +85,7 @@ public class FileTest {
 
         testFile.remove();
 
-        Assert.assertEquals("Removed file no longer exists", null, fileSystem.getFile("/test1/test2/test1.txt"));
+        Assert.assertEquals("Removed file no longer exists", null, fileSystem.getFile("test1/test2/test1.txt"));
         Assert.assertEquals("Renamed file has null path", null, testFile.getLocalPath());
     }
 

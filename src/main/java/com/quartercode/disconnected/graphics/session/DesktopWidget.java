@@ -74,8 +74,8 @@ public class DesktopWidget extends Widget {
 
                 // TODO: Display launch menu
                 Process sessionProcess = DesktopWidget.this.desktop.getHost().getHost();
-                // sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("C:/opt/sysviewer/sysviewer.exe"), null);
-                sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("C:/opt/terminal/terminal.exe"), null);
+                // sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("/system/bin/sysviewer.exe"), null);
+                sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("/system/bin/terminal.exe"), null);
             }
         });
         add(launchButton);
