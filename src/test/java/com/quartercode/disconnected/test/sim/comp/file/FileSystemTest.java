@@ -39,7 +39,7 @@ public class FileSystemTest {
     @Before
     public void setUp() {
 
-        Computer computer = new Computer("0");
+        Computer computer = new Computer();
 
         OperatingSystem operatingSystem = new OperatingSystem(computer, "OperatingSystem", new Version(1, 0, 0), null);
         computer.setOperatingSystem(operatingSystem);

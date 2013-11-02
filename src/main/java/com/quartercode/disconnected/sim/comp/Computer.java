@@ -44,41 +44,29 @@ import com.quartercode.disconnected.sim.comp.program.Program;
  */
 public class Computer {
 
-    @XmlAttribute
-    @XmlID
-    private String               id;
-
     private Location             location;
     @XmlElement (name = "hardware")
     private final List<Hardware> hardware = new CopyOnWriteArrayList<Hardware>();
     private OperatingSystem      operatingSystem;
 
     /**
-     * Creates a new empty computer.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * Creates a new computer.
      */
-    protected Computer() {
+    public Computer() {
 
     }
 
     /**
-     * Creates a new computer and sets the final id.
+     * Returns the unique serialization id for the computer.
+     * The id is the identy hash code of the computer object.
      * 
-     * @param id The final id for the computer.
+     * @return The unique serialization id for the computer.
      */
-    public Computer(String id) {
-
-        this.id = id;
-    }
-
-    /**
-     * Returns the unique id the computer has.
-     * 
-     * @return The unique id the computer has.
-     */
+    @XmlID
+    @XmlAttribute
     public String getId() {
 
-        return id;
+        return Integer.toHexString(System.identityHashCode(this));
     }
 
     /**
@@ -190,7 +178,6 @@ public class Computer {
         final int prime = 31;
         int result = 1;
         result = prime * result + (hardware == null ? 0 : hardware.hashCode());
-        result = prime * result + (id == null ? 0 : id.hashCode());
         result = prime * result + (location == null ? 0 : location.hashCode());
         result = prime * result + (operatingSystem == null ? 0 : operatingSystem.hashCode());
         return result;
@@ -205,7 +192,7 @@ public class Computer {
         if (obj == null) {
             return false;
         }
-        if (! (obj instanceof Computer)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
         Computer other = (Computer) obj;
@@ -214,13 +201,6 @@ public class Computer {
                 return false;
             }
         } else if (!hardware.equals(other.hardware)) {
-            return false;
-        }
-        if (id == null) {
-            if (other.id != null) {
-                return false;
-            }
-        } else if (!id.equals(other.id)) {
             return false;
         }
         if (location == null) {
@@ -247,7 +227,7 @@ public class Computer {
         for (Hardware hardwarePart : hardware) {
             hardwareInfo.add(hardwarePart.toInfoString());
         }
-        return getClass().getName() + " [id=" + id + ", location=" + location + ", hardware=" + hardwareInfo + ", operatingSystem=" + operatingSystem.toInfoString() + "]";
+        return getClass().getName() + " [location=" + location + ", hardware=" + hardwareInfo + ", operatingSystem=" + operatingSystem.toInfoString() + "]";
     }
 
 }

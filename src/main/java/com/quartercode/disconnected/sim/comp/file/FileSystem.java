@@ -270,8 +270,7 @@ public class FileSystem implements SizeObject, InfoString {
 
     /**
      * Returns the unique serialization id for the file system.
-     * The id is a combination of the host computer's id and the mountpoint of the file system.
-     * You can only generate an id if the file system has been mounted.
+     * The id is the identy hash code of the fs object.
      * 
      * @return The unique serialization id for the file system.
      */
@@ -279,11 +278,7 @@ public class FileSystem implements SizeObject, InfoString {
     @XmlID
     protected String getId() {
 
-        if (host.getOperatingSystem().getFileSystemManager().getMounted().contains(this)) {
-            return host.getId() + "-" + host.getOperatingSystem().getFileSystemManager().getMountpoint(this);
-        } else {
-            return null;
-        }
+        return Integer.toHexString(System.identityHashCode(this));
     }
 
     @Override

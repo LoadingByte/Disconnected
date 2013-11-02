@@ -135,17 +135,8 @@ public class SimulationGenerator {
             }
         }
 
-        int counter = 0;
-        for (Computer computer : simulation.getComputers()) {
-            int id = Integer.parseInt(computer.getId());
-            if (id + 1 > counter) {
-                counter = id + 1;
-            }
-        }
-
         for (Location location : LocationGenerator.generateLocations(amount, ignoreLocations)) {
-            Computer computer = new Computer(String.valueOf(counter));
-            counter++;
+            Computer computer = new Computer();
             computer.setLocation(location);
             computers.add(computer);
 
@@ -179,6 +170,7 @@ public class SimulationGenerator {
                 if (useHardware != null) {
                     computer.addHardware(useHardware);
                     slot.setContent(useHardware);
+                    hardware.remove(useHardware);
                 }
             }
 

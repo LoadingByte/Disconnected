@@ -42,7 +42,7 @@ public class OSFileTest {
     @Before
     public void setUp() {
 
-        computer = new Computer("0");
+        computer = new Computer();
 
         operatingSystem = new OperatingSystem(computer, "OperatingSystem", new Version(1, 0, 0), null);
         computer.setOperatingSystem(operatingSystem);
