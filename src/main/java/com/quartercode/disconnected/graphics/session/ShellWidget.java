@@ -68,7 +68,7 @@ public class ShellWidget extends Widget {
         output = new TextArea(outputModel);
         output.setTheme("output");
 
-        prompt = new Label(shell.getHost().getUser().getName() + "@unknown $");
+        prompt = new Label();
         prompt.setTheme("prompt");
 
         input = new EditField();
@@ -123,8 +123,8 @@ public class ShellWidget extends Widget {
         for (String line : shell.getOutput()) {
             output.append(line).append("<br/>");
         }
-
         outputModel.setHtml(output.toString());
+        prompt.setText(shell.getHost().getUser().getName() + "@unknown $");
         invalidateLayout();
 
         Disconnected.getGraphicsManager().invoke(new Runnable() {

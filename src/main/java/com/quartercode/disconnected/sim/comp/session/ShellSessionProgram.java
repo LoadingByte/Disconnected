@@ -145,6 +145,7 @@ public class ShellSessionProgram extends SessionProgram {
         public ShellWidget createWidget() {
 
             ShellWidget widget = new ShellWidget(shell);
+            widget.update();
             widgets.add(widget);
             return widget;
         }
