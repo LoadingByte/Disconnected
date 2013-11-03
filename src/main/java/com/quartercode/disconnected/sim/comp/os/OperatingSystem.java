@@ -29,6 +29,7 @@ import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
 import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
+import com.quartercode.disconnected.sim.comp.session.Desktop;
 
 /**
  * This class stores information about an operating system.
@@ -55,8 +56,6 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     private FileSystemManager   fileSystemManager;
     private NetworkManager      networkManager;
 
-    private Desktop             desktop;
-
     /**
      * Creates a new empty operating system.
      * This is only recommended for direct field access (e.g. for serialization).
@@ -78,11 +77,11 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         super(host, name, version);
 
         this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
+
         processManager = new ProcessManager(this);
         userManager = new UserManager(this);
         fileSystemManager = new FileSystemManager(this);
         networkManager = new NetworkManager(this);
-        desktop = new Desktop(this);
     }
 
     @Override
@@ -129,17 +128,6 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     public NetworkManager getNetworkManager() {
 
         return networkManager;
-    }
-
-    /**
-     * Returns the desktop the os displays.
-     * The desktop displays windows which can be opened by programs.
-     * 
-     * @return The desktop the os displays.
-     */
-    public Desktop getDesktop() {
-
-        return desktop;
     }
 
     /**
@@ -228,7 +216,10 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     @Override
     public String toInfoString() {
 
-        return super.toInfoString() + ", " + vulnerabilities.size() + " vulns, " + processManager.toInfoString() + ", " + userManager.toInfoString() + ", " + fileSystemManager.toInfoString();
+        String info = super.toInfoString();
+        info += ", " + vulnerabilities.size() + " vulns, " + processManager.toInfoString();
+        info += ", " + userManager.toInfoString() + ", " + fileSystemManager.toInfoString();
+        return info;
     }
 
     @Override

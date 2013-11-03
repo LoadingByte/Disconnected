@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE themes PUBLIC "-//www.matthiasmann.de//TWL-Theme//EN" "http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd">
-<themes>
-    <!-- Dependencies -->
-    <include filename="ref-default.xml"/>
-
-    <!-- Referenced file -->
-    <include filename="desktop/desktop.xml"/>
-</themes>

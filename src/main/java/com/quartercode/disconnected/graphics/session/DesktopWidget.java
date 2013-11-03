@@ -16,11 +16,11 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.graphics.desktop;
+package com.quartercode.disconnected.graphics.session;
 
-import com.quartercode.disconnected.sim.comp.os.Desktop;
-import com.quartercode.disconnected.sim.comp.os.Desktop.Window;
-import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.program.Process;
+import com.quartercode.disconnected.sim.comp.session.Desktop;
+import com.quartercode.disconnected.sim.comp.session.Desktop.Window;
 import de.matthiasmann.twl.BoxLayout;
 import de.matthiasmann.twl.BoxLayout.Direction;
 import de.matthiasmann.twl.Button;
@@ -38,20 +38,22 @@ import de.matthiasmann.twl.Widget;
  */
 public class DesktopWidget extends Widget {
 
-    private final Desktop desktop;
+    private Desktop    desktop;
 
-    public DesktopArea    windowArea;
-    public BoxLayout      taskbar;
-    public Button         launchButton;
+    public DesktopArea windowArea;
+    public BoxLayout   taskbar;
+    public Button      launchButton;
 
     /**
      * Creates a new desktop widget and sets it up.
+     * 
+     * @param desktop The desktop to use for the widget.
      */
     public DesktopWidget(Desktop desktop) {
 
         this.desktop = desktop;
 
-        setTheme("");
+        setTheme("desktop");
 
         windowArea = new DesktopArea();
         windowArea.setTheme("");
@@ -71,8 +73,9 @@ public class DesktopWidget extends Widget {
             public void run() {
 
                 // TODO: Display launch menu
-                OperatingSystem os = DesktopWidget.this.desktop.getHost();
-                os.getProcessManager().getRootProcess().createChild(os.getFileSystemManager().getFile("C:/opt/sysviewer/sysviewer.exe"), null);
+                Process sessionProcess = DesktopWidget.this.desktop.getHost().getHost();
+                // sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("/system/bin/sysviewer.exe"), null);
+                sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("/system/bin/terminal.exe"), null);
             }
         });
         add(launchButton);
@@ -150,6 +153,30 @@ public class DesktopWidget extends Widget {
         taskbar.invalidateLayout();
     }
 
+    /**
+     * Returns true if the desktop widget already stopped displaying the session's content and is closed.
+     * 
+     * @return True if the desktop widget is already closed.
+     */
+    public boolean isClosed() {
+
+        return desktop == null;
+    }
+
+    /**
+     * Closes the desktop widget and stops displaying the session's content.
+     */
+    public void close() {
+
+        if (!isClosed()) {
+            for (Window<?> window : desktop.getWindows()) {
+                callRemoveWindow(window);
+            }
+            desktop = null;
+            desktop.getHost().closeWidget(this);
+        }
+    }
+
     @Override
     protected void layout() {
 
@@ -165,23 +192,15 @@ public class DesktopWidget extends Widget {
     @Override
     protected void afterAddToGUI(GUI gui) {
 
-        setTheme("desktop");
-
         for (Window<?> window : desktop.getWindows()) {
             callAddWindow(window);
         }
-
-        desktop.addPushReceiver(this);
     }
 
     @Override
     protected void beforeRemoveFromGUI(GUI gui) {
 
-        for (Window<?> window : desktop.getWindows()) {
-            callRemoveWindow(window);
-        }
-
-        desktop.removePushReceiver(this);
+        close();
     }
 
 }

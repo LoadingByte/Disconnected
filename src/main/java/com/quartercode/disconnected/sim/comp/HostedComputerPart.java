@@ -71,15 +71,16 @@ public class HostedComputerPart extends ComputerPart {
     }
 
     /**
-     * Generates an unique id which is used to reference to this computer part.
+     * Returns the unique serialization id for the hosted computer part.
+     * The id is the identy hash code of the hosted computer part object.
      * 
-     * @return An unique id which is used to reference to this computer part.
+     * @return The unique serialization id for the hosted computer part.
      */
     @XmlID
     @XmlAttribute
     public String getId() {
 
-        return host.getId() + "-" + host.getParts().indexOf(this);
+        return Integer.toHexString(System.identityHashCode(this));
     }
 
     protected void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {

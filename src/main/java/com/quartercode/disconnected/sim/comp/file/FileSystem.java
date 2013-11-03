@@ -24,6 +24,9 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
+import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
+import com.quartercode.disconnected.sim.comp.os.User;
+import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.util.InfoString;
 import com.quartercode.disconnected.util.size.SizeObject;
 
@@ -36,16 +39,14 @@ import com.quartercode.disconnected.util.size.SizeObject;
  */
 public class FileSystem implements SizeObject, InfoString {
 
-    private final String seperator = "/";
-
     @XmlIDREF
     @XmlAttribute
-    private Computer     host;
+    private Computer host;
     @XmlElement
-    private long         size;
+    private long     size;
 
     @XmlElement (name = "file")
-    private File         rootFile;
+    private File     rootFile;
 
     /**
      * Creates a new empty file system.
@@ -70,18 +71,8 @@ public class FileSystem implements SizeObject, InfoString {
     }
 
     /**
-     * Returns the path seperator which seperates different files in a path string.
-     * 
-     * @return The path seperator which seperates different files in a path string.
-     */
-    public String getSeperator() {
-
-        return seperator;
-    }
-
-    /**
      * Returns the computer this file system is hosted on.
-     * This will only return the sotring computer, not any accessing computers.
+     * This will only return the storing computer, not any accessing computers.
      * 
      * @return The computer this file system is hosted to.
      */
@@ -121,7 +112,7 @@ public class FileSystem implements SizeObject, InfoString {
      */
     public File getFile(String path) {
 
-        String[] parts = path.split(seperator);
+        String[] parts = path.split(File.SEPERATOR);
 
         File current = rootFile;
         for (String part : parts) {
@@ -144,13 +135,38 @@ public class FileSystem implements SizeObject, InfoString {
      * 
      * @param path The path the new file will be located under.
      * @param type The file type the new file should has.
+     * @param user The user who owns the new file.
      * @return The new file (or the existing one, if the file already exists).
      */
-    public File addFile(String path, FileType type) {
+    public File addFile(String path, FileType type, User user) {
 
-        String[] parts = path.split(seperator);
-        File file = new File(this, parts[parts.length - 1], type, new FileRights("rwd-r---r---"));
-        addFile(file, path);
+        try {
+            return addFile(null, path, type, user);
+        }
+        catch (NoFileRightException e) {
+            // Wont ever happen
+            return null;
+        }
+    }
+
+    /**
+     * Creates a new file using the given path and type on this file system and returns it.
+     * If the file already exists, the existing file will be returned.
+     * A path is a collection of files seperated by a seperator.
+     * This will get the file location using a local file system path.
+     * 
+     * @param process The process which wants to add the file.
+     * @param path The path the new file will be located under.
+     * @param type The file type the new file should has.
+     * @param user The user who owns the new file.
+     * @return The new file (or the existing one, if the file already exists).
+     * @throws NoFileRightException The given process hasn't the right to write into a directory where the algorithm needs to write
+     */
+    public File addFile(Process process, String path, FileType type, User user) throws NoFileRightException {
+
+        String[] parts = path.split(File.SEPERATOR);
+        File file = new File(this, parts[parts.length - 1], type, new FileRights("rwd-r---r---"), user, user.getPrimaryGroup());
+        addFile(process, file, path);
         return file;
     }
 
@@ -164,7 +180,27 @@ public class FileSystem implements SizeObject, InfoString {
      */
     protected void addFile(File file, String path) {
 
-        String[] parts = path.split(seperator);
+        try {
+            addFile(null, file, path);
+        }
+        catch (NoFileRightException e) {
+            // Wont ever happen
+        }
+    }
+
+    /**
+     * Adds an existing file to the file system.
+     * If the given path doesn't exist, this creates a new one.
+     * 
+     * @param process The process which wants to add the given file.
+     * @param file The existing file object to add to the file system.
+     * @param path The path the file will be located under.
+     * @throws NoFileRightException The given process hasn't the right to write into a directory where the algorithm needs to write
+     * @throws IllegalStateException There's a non-directory file in the path.
+     */
+    protected void addFile(Process process, File file, String path) throws NoFileRightException {
+
+        String[] parts = path.split(File.SEPERATOR);
 
         File current = rootFile;
         for (int counter = 0; counter < parts.length; counter++) {
@@ -175,7 +211,10 @@ public class FileSystem implements SizeObject, InfoString {
                         current.addChildFile(file);
                         file.setName(part);
                     } else {
-                        File dir = new File(this, part, FileType.DIRECTORY, new FileRights("rwd-r---r---"));
+                        if (process != null) {
+                            FileRights.checkRight(process, current, FileRight.WRITE);
+                        }
+                        File dir = new File(this, part, FileType.DIRECTORY, new FileRights("rwd-r---r---"), file.getOwner(), file.getGroup());
                         current.addChildFile(dir);
                     }
                 } else if (current.getChildFile(part).getType() != FileType.DIRECTORY) {
@@ -219,8 +258,7 @@ public class FileSystem implements SizeObject, InfoString {
 
     /**
      * Returns the unique serialization id for the file system.
-     * The id is a combination of the host computer's id and the mountpoint of the file system.
-     * You can only generate an id if the file system has been mounted.
+     * The id is the identy hash code of the fs object.
      * 
      * @return The unique serialization id for the file system.
      */
@@ -228,11 +266,7 @@ public class FileSystem implements SizeObject, InfoString {
     @XmlID
     protected String getId() {
 
-        if (host.getOperatingSystem().getFileSystemManager().getMounted().contains(this)) {
-            return host.getId() + "-" + host.getOperatingSystem().getFileSystemManager().getMountpoint(this);
-        } else {
-            return null;
-        }
+        return Integer.toHexString(System.identityHashCode(this));
     }
 
     @Override
@@ -241,7 +275,6 @@ public class FileSystem implements SizeObject, InfoString {
         final int prime = 31;
         int result = 1;
         result = prime * result + (rootFile == null ? 0 : rootFile.hashCode());
-        result = prime * result + (seperator == null ? 0 : seperator.hashCode());
         result = prime * result + (int) (size ^ size >>> 32);
         return result;
     }
@@ -264,13 +297,6 @@ public class FileSystem implements SizeObject, InfoString {
                 return false;
             }
         } else if (!rootFile.equals(other.rootFile)) {
-            return false;
-        }
-        if (seperator == null) {
-            if (other.seperator != null) {
-                return false;
-            }
-        } else if (!seperator.equals(other.seperator)) {
             return false;
         }
         if (size != other.size) {

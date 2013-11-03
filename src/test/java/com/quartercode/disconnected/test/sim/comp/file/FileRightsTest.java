@@ -30,18 +30,22 @@ import com.quartercode.disconnected.sim.comp.file.FileRights.FileAccessor;
 import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
+import com.quartercode.disconnected.sim.comp.os.Group;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 public class FileRightsTest {
 
     private FileSystem fileSystem;
     private File       testFile;
+    private User       testUser;
+    private Group      testGroup;
 
     @Before
     public void setUp() {
 
-        Computer computer = new Computer("0");
+        Computer computer = new Computer();
 
         OperatingSystem operatingSystem = new OperatingSystem(computer, "OperatingSystem", new Version(1, 0, 0), null);
         computer.setOperatingSystem(operatingSystem);
@@ -49,9 +53,16 @@ public class FileRightsTest {
         HardDrive hardDrive = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
         fileSystem = hardDrive.getFileSystem();
         computer.addHardware(hardDrive);
-        operatingSystem.getFileSystemManager().mount(fileSystem, 'C');
+        operatingSystem.getFileSystemManager().setMountpoint(fileSystem, "test");
+        operatingSystem.getFileSystemManager().setMounted(fileSystem, true);
 
-        testFile = fileSystem.addFile("/test1/test2/test.txt", FileType.FILE);
+        testUser = new User(operatingSystem, "testu");
+        testGroup = new Group(operatingSystem, "testg");
+        testUser.addToGroup(testGroup, true);
+        operatingSystem.getUserManager().addUser(testUser);
+        operatingSystem.getUserManager().addGroup(testGroup);
+
+        testFile = fileSystem.addFile("test1/test2/test.txt", FileType.FILE, testUser);
         testFile.setContent("Test-Content");
     }
 
@@ -78,6 +89,18 @@ public class FileRightsTest {
 
         rights.setRight(FileAccessor.OTHERS, FileRight.READ, false);
         Assert.assertEquals("Others write right is set correctly", false, rights.getRight(FileAccessor.OTHERS, FileRight.READ));
+    }
+
+    @Test
+    public void testHasRight() {
+
+        testFile.setRights(new FileRights("------------"));
+        testFile.getRights().setRight(FileAccessor.OWNER, FileRight.READ, true);
+        Assert.assertEquals("Owner has read right", true, FileRights.hasRight(testUser, testFile, FileRight.READ));
+
+        testFile.setRights(new FileRights("------------"));
+        testFile.getRights().setRight(FileAccessor.GROUP, FileRight.READ, true);
+        Assert.assertEquals("User in group has read right", true, FileRights.hasRight(testUser, testFile, FileRight.READ));
     }
 
 }

@@ -45,41 +45,29 @@ import com.quartercode.disconnected.util.InfoString;
  */
 public class Computer implements InfoString {
 
-    @XmlAttribute
-    @XmlID
-    private String               id;
-
     private Location             location;
     @XmlElement (name = "hardware")
     private final List<Hardware> hardware = new CopyOnWriteArrayList<Hardware>();
     private OperatingSystem      operatingSystem;
 
     /**
-     * Creates a new empty computer.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * Creates a new computer.
      */
-    protected Computer() {
+    public Computer() {
 
     }
 
     /**
-     * Creates a new computer and sets the final id.
+     * Returns the unique serialization id for the computer.
+     * The id is the identy hash code of the computer object.
      * 
-     * @param id The final id for the computer.
+     * @return The unique serialization id for the computer.
      */
-    public Computer(String id) {
-
-        this.id = id;
-    }
-
-    /**
-     * Returns the unique id the computer has.
-     * 
-     * @return The unique id the computer has.
-     */
+    @XmlID
+    @XmlAttribute
     public String getId() {
 
-        return id;
+        return Integer.toHexString(System.identityHashCode(this));
     }
 
     /**
@@ -191,7 +179,6 @@ public class Computer implements InfoString {
         final int prime = 31;
         int result = 1;
         result = prime * result + (hardware == null ? 0 : hardware.hashCode());
-        result = prime * result + (id == null ? 0 : id.hashCode());
         result = prime * result + (location == null ? 0 : location.hashCode());
         result = prime * result + (operatingSystem == null ? 0 : operatingSystem.hashCode());
         return result;
@@ -215,13 +202,6 @@ public class Computer implements InfoString {
                 return false;
             }
         } else if (!hardware.equals(other.hardware)) {
-            return false;
-        }
-        if (id == null) {
-            if (other.id != null) {
-                return false;
-            }
-        } else if (!id.equals(other.id)) {
             return false;
         }
         if (location == null) {
@@ -248,7 +228,7 @@ public class Computer implements InfoString {
         for (Hardware hardwarePart : hardware) {
             hardwareInfo += hardwarePart.toInfoString() + ", ";
         }
-        return "computer " + id + ", loc " + location.toInfoString() + ", " + hardwareInfo + operatingSystem.toInfoString();
+        return "loc " + location.toInfoString() + ", " + hardwareInfo + operatingSystem.toInfoString();
     }
 
     @Override

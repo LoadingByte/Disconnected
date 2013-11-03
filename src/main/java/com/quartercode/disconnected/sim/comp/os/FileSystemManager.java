@@ -27,7 +27,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlIDREF;
-import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
@@ -44,11 +43,11 @@ import com.quartercode.disconnected.util.InfoString;
  */
 public class FileSystemManager implements InfoString {
 
-    private OperatingSystem         host;
+    private OperatingSystem       host;
 
-    @XmlElementWrapper (name = "mountedFileSystems")
+    @XmlElementWrapper (name = "knownFileSystems")
     @XmlElement (name = "fileSystem")
-    private List<MountedFileSystem> mountedFileSystems;
+    private List<KnownFileSystem> knownFileSystems;
 
     /**
      * Creates a new empty file system manager.
@@ -67,7 +66,7 @@ public class FileSystemManager implements InfoString {
 
         this.host = host;
 
-        mountedFileSystems = new ArrayList<MountedFileSystem>();
+        knownFileSystems = new ArrayList<KnownFileSystem>();
     }
 
     /**
@@ -96,33 +95,34 @@ public class FileSystemManager implements InfoString {
     }
 
     /**
-     * Returns a list containing all mounted file systems which is sorted by the mountpoints.
-     * A file system can be mounted and associated with a mountpoint (e.g. "C").
-     * Only mounted file systems can be used.
+     * Returns a list containing all known file systems which is sorted by the mountpoints.
+     * A known file system can be mounted and associated with a set mountpoint (e.g. "system").
+     * Only known file systems can be mounted.
      * 
-     * @return A list containing all mounted file systems.
+     * @return A list containing all known file systems.
      */
-    public List<FileSystem> getMounted() {
+    public List<FileSystem> getKnown() {
 
-        Map<Character, FileSystem> bindings = new TreeMap<Character, FileSystem>();
-        for (MountedFileSystem mountedFileSystem : mountedFileSystems) {
-            bindings.put(mountedFileSystem.getMountpoint(), mountedFileSystem.getFileSystem());
+        Map<String, FileSystem> bindings = new TreeMap<String, FileSystem>();
+        for (KnownFileSystem fileSystem : knownFileSystems) {
+            bindings.put(fileSystem.getMountpoint(), fileSystem.getFileSystem());
         }
         return new ArrayList<FileSystem>(bindings.values());
     }
 
     /**
-     * Returns the mounted file system which uses the given mountpoint.
-     * If there is no file system using the given mountpoint, this will return null.
+     * Returns the known file system which is associated with the given mountpoint.
+     * A mountpoint is a simple string like "system".
+     * If there is no known file system associated with the given mountpoint, this will return null.
      * 
-     * @param mountpoint The mountpoint the returned file system needs to use.
-     * @return The mounted file system which is using the given mountpoint.
+     * @param mountpoint The mountpoint the returned file system is associated to.
+     * @return The known file system which is associated with the given mountpoint.
      */
-    public FileSystem getMounted(char mountpoint) {
+    public FileSystem getKnown(String mountpoint) {
 
-        for (MountedFileSystem mountedFileSystem : mountedFileSystems) {
-            if (mountedFileSystem.getMountpoint() == mountpoint) {
-                return mountedFileSystem.getFileSystem();
+        for (KnownFileSystem fileSystem : knownFileSystems) {
+            if (fileSystem.getMountpoint().equals(mountpoint)) {
+                return fileSystem.getFileSystem();
             }
         }
 
@@ -130,70 +130,136 @@ public class FileSystemManager implements InfoString {
     }
 
     /**
-     * Returns the mounted file system which holds the file which is stored under the given path.
-     * A file system can be mounted and associated with a mountpoint (e.g. "C"). Only mounted file systems can be used.
+     * Returns the known file system object which is associated with the given file system.
+     * 
+     * @param fileSystem The file system the returned object is associated to.
+     * @return The known file system object which is associated with the given file system.
+     */
+    protected KnownFileSystem getKnown(FileSystem fileSystem) {
+
+        for (KnownFileSystem knownFileSystem : knownFileSystems) {
+            if (knownFileSystem.getFileSystem().equals(fileSystem)) {
+                return knownFileSystem;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns a list containing all mounted file systems which is sorted by the mountpoints.
+     * A mounted file system is mounted and associated with a mountpoint (e.g. "system").
+     * Only mounted file systems can be used.
+     * 
+     * @return A list containing all mounted file systems.
+     */
+    public List<FileSystem> getMounted() {
+
+        Map<String, FileSystem> bindings = new TreeMap<String, FileSystem>();
+        for (KnownFileSystem fileSystem : knownFileSystems) {
+            if (fileSystem.isMounted()) {
+                bindings.put(fileSystem.getMountpoint(), fileSystem.getFileSystem());
+            }
+        }
+        return new ArrayList<FileSystem>(bindings.values());
+    }
+
+    /**
+     * Returns the mounted file system which could hold the file which is stored under the given path.
+     * A file system can be mounted and associated with a mountpoint (e.g. "system"). Only mounted file systems can be used.
      * A path is a collection of files seperated by a seperator. This requires a global os path.
-     * If there is no file system the file is stored on, this will return null.
+     * If there is no file system the file could be stored on, this will return null.
      * 
      * @param path The file represented by this path is stored on the returned file system.
      * @return The mounted file system which holds the file which is stored under the given path.
      */
     public FileSystem getMounted(String path) {
 
-        if (path.contains(":")) {
-            return getMounted(path.split(":")[0].charAt(0));
+        if (path.startsWith(File.SEPERATOR)) {
+            for (KnownFileSystem fileSystem : knownFileSystems) {
+                if (fileSystem.getMountpoint().equals(path.split(File.SEPERATOR)[1])) {
+                    return fileSystem.getFileSystem();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the mountpoint of the given file system.
+     * A file system can be mounted and associated with a mountpoint (e.g. "system").
+     * 
+     * @param fileSystem The file system which is associated with the returned mountpoint.
+     * @return The mountpoint of the given file system.
+     */
+    public String getMountpoint(FileSystem fileSystem) {
+
+        if (getKnown().contains(fileSystem)) {
+            return getKnown(fileSystem).getMountpoint();
         } else {
             return null;
         }
     }
 
     /**
-     * Returns the mountpoint of the given file system.
-     * A file system can be mounted and associated with a mountpoint (e.g. "C").
-     * Only mounted file systems can be used.
+     * Associates the given file system with the given mountpoint (e.g. "system").
+     * A file system can be mounted using such a mountpoint.
      * 
-     * @param fileSystem The file system which is associated with the returned mountpoint.
-     * @return The mountpoint of the given file system.
+     * @param fileSystem The file system to associate with a mountpoint.
+     * @param mountpoint The mountpoint to bind the given file system to.
      */
-    public char getMountpoint(FileSystem fileSystem) {
+    public void setMountpoint(FileSystem fileSystem, String mountpoint) {
 
-        for (MountedFileSystem mountedFileSystem : mountedFileSystems) {
-            if (mountedFileSystem.getFileSystem().equals(fileSystem)) {
-                return mountedFileSystem.getMountpoint();
+        if (getKnown().contains(fileSystem)) {
+            knownFileSystems.remove(getKnown(fileSystem));
+        }
+        if (mountpoint != null && getMounted(File.SEPERATOR + mountpoint) == null) {
+            knownFileSystems.add(new KnownFileSystem(fileSystem, mountpoint));
+        }
+    }
+
+    /**
+     * Returns true if the given file system is currently mounted.
+     * 
+     * @param fileSystem The file system to check.
+     * @return True if the given file system is currently mounted.
+     */
+    public boolean isMounted(FileSystem fileSystem) {
+
+        if (getKnown().contains(fileSystem)) {
+            return getKnown(fileSystem).isMounted();
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Tries to mount the given file system and binding it to the set mountpoint or unmount it.
+     * The mountpoint can be set by using {@link #setMountpoint(FileSystem, String)}.
+     * 
+     * @param fileSystem The file system to mount or into the os or unmount from it.
+     * @param mounted True if the given file system should be mounted, false if it should be unmounted.
+     * @throws MountException Something goes wrong while mounting or unmounting the file system.
+     */
+    public void setMounted(FileSystem fileSystem, boolean mounted) {
+
+        if (!getKnown().contains(fileSystem)) {
+            throw new MountException(fileSystem, true, "File system not known");
+        }
+
+        if (mounted) {
+            if (getKnown(fileSystem).isMounted()) {
+                throw new MountException(fileSystem, true, "File system already mounted");
+            } else {
+                getKnown(fileSystem).setMounted(true);
             }
-        }
-        return '-';
-    }
-
-    /**
-     * Tries to mount the given file system and binding it to the given mountpoint.
-     * 
-     * @param fileSystem The file system to mount to the os.
-     * @param mountpoint The mountpoint to bind the file system to.
-     * @throws MountException Somethign goes wrong while mounting the file system.
-     */
-    public void mount(FileSystem fileSystem, char mountpoint) {
-
-        Validate.notNull(mountpoint, "Mountpoint can't be null");
-        if (getMounted().contains(fileSystem)) {
-            throw new MountException(fileSystem, true, "File system already mounted");
         } else {
-            mountedFileSystems.add(new MountedFileSystem(fileSystem, mountpoint));
-        }
-    }
-
-    /**
-     * Tries to unmount the given file system from the computer.
-     * 
-     * @param fileSystem The file system to unmount from the os.
-     * @throws MountException Somethign goes wrong while unmounting the file system.
-     */
-    public void unmount(FileSystem fileSystem) {
-
-        if (!getMounted().contains(fileSystem)) {
-            throw new MountException(fileSystem, false, "File system not mounted");
-        } else {
-            mountedFileSystems.remove(fileSystem);
+            if (!getMounted().contains(fileSystem)) {
+                throw new MountException(fileSystem, false, "File system not mounted");
+            } else {
+                getKnown(fileSystem).setMounted(false);
+            }
         }
     }
 
@@ -209,7 +275,7 @@ public class FileSystemManager implements InfoString {
 
         FileSystem fileSystem = getMounted(path);
         if (fileSystem != null) {
-            return fileSystem.getFile(path.split(":")[1]);
+            return fileSystem.getFile(path.substring(path.indexOf(File.SEPERATOR, 1)));
         } else {
             return null;
         }
@@ -223,13 +289,14 @@ public class FileSystemManager implements InfoString {
      * 
      * @param path The path the new file will be located under.
      * @param type The file type the new file should has.
+     * @param user The user who owns the new file.
      * @return The new file (or the existing one, if the file already exists).
      */
-    public File addFile(String path, FileType type) {
+    public File addFile(String path, FileType type, User user) {
 
         FileSystem fileSystem = getMounted(path);
         if (fileSystem != null) {
-            return fileSystem.addFile(path.split(":")[1], type);
+            return fileSystem.addFile(path.substring(path.indexOf(File.SEPERATOR, 1)), type, user);
         } else {
             return null;
         }
@@ -243,12 +310,14 @@ public class FileSystemManager implements InfoString {
     public void setRunning(boolean running) {
 
         if (running) {
-            // Mount every avaiable file system (temp)
-            for (FileSystem fileSystem : getAvaiable()) {
-                mount(fileSystem, (char) ('C' + getMounted().size()));
+            // Mount every known file system (temp)
+            for (FileSystem fileSystem : getKnown()) {
+                setMounted(fileSystem, true);
             }
         } else {
-            mountedFileSystems.clear();
+            for (FileSystem mountedFileSystem : getMounted()) {
+                setMounted(mountedFileSystem, false);
+            }
         }
     }
 
@@ -262,7 +331,7 @@ public class FileSystemManager implements InfoString {
 
         final int prime = 31;
         int result = 1;
-        result = prime * result + (mountedFileSystems == null ? 0 : mountedFileSystems.hashCode());
+        result = prime * result + (knownFileSystems == null ? 0 : knownFileSystems.hashCode());
         return result;
     }
 
@@ -279,11 +348,11 @@ public class FileSystemManager implements InfoString {
             return false;
         }
         FileSystemManager other = (FileSystemManager) obj;
-        if (mountedFileSystems == null) {
-            if (other.mountedFileSystems != null) {
+        if (knownFileSystems == null) {
+            if (other.knownFileSystems != null) {
                 return false;
             }
-        } else if (!mountedFileSystems.equals(other.mountedFileSystems)) {
+        } else if (!knownFileSystems.equals(other.knownFileSystems)) {
             return false;
         }
         return true;
@@ -292,7 +361,7 @@ public class FileSystemManager implements InfoString {
     @Override
     public String toInfoString() {
 
-        return getMounted().size() + " mounted";
+        return getAvaiable().size() + " avaiable, " + getKnown().size() + "/" + getMounted().size() + " known ones mounted";
     }
 
     @Override
@@ -302,43 +371,47 @@ public class FileSystemManager implements InfoString {
     }
 
     /**
-     * The mounted file system represents a file system which is mounted into an os.
+     * The known file system represents a file system which can mounted into an os because it's mountpoint is known.
      * This is used in a datastructure of the os class to store the mountpoints of file systems.
+     * A mountpoint is a string like "system". To get the root file of a mounted fs with that mountpoint, you can use "system".
      * 
      * @see FileSystem
      */
-    protected static class MountedFileSystem implements InfoString {
+    protected static class KnownFileSystem implements InfoString {
 
         @XmlIDREF
         @XmlAttribute (name = "name")
         private FileSystem fileSystem;
         @XmlAttribute
-        private char       mountpoint;
+        private String     mountpoint;
+        @XmlAttribute
+        private boolean    mounted;
 
         /**
-         * Creates a new empty mounted file system representation object.
+         * Creates a new empty known file system representation object.
          * This is only recommended for direct field access (e.g. for serialization).
          */
-        public MountedFileSystem() {
+        public KnownFileSystem() {
 
         }
 
         /**
-         * Creates a new mounted file system representation object and sets the file system and the mountpoint.
+         * Creates a new known file system representation object and sets the file system and the mountpoint.
+         * A mountpoint is a string like "system".
          * 
          * @param fileSystem The file system which is represented by this ds object.
          * @param mountpoint The mountpoint the given file system is using.
          */
-        public MountedFileSystem(FileSystem fileSystem, char mountpoint) {
+        public KnownFileSystem(FileSystem fileSystem, String mountpoint) {
 
             this.fileSystem = fileSystem;
             this.mountpoint = mountpoint;
         }
 
         /**
-         * Returns the file system which is represented by this ds object.
+         * Returns the file system which is represented by this data structure object.
          * 
-         * @return The file system which is represented by this ds object.
+         * @return The file system which is represented by this data structure object.
          */
         public FileSystem getFileSystem() {
 
@@ -347,12 +420,34 @@ public class FileSystemManager implements InfoString {
 
         /**
          * Returns the mountpoint the represented file system is using.
+         * A mountpoint is a string like "system".
          * 
          * @return The mountpoint the represented file system is using.
          */
-        public char getMountpoint() {
+        public String getMountpoint() {
 
             return mountpoint;
+        }
+
+        /**
+         * Returns true if the known file system is actually mounted.
+         * You can mount known file systems using {@link FileSystemManager#setMounted(FileSystem, boolean)}.
+         * 
+         * @return True if the known file system is actually mounted.
+         */
+        public boolean isMounted() {
+
+            return mounted;
+        }
+
+        /**
+         * Sets if this known file system is currently mounted into the os.
+         * 
+         * @param mounted True if this file system is currently mounted.
+         */
+        protected void setMounted(boolean mounted) {
+
+            this.mounted = mounted;
         }
 
         @Override
@@ -361,7 +456,7 @@ public class FileSystemManager implements InfoString {
             final int prime = 31;
             int result = 1;
             result = prime * result + (fileSystem == null ? 0 : fileSystem.hashCode());
-            result = prime * result + mountpoint;
+            result = prime * result + (mountpoint == null ? 0 : mountpoint.hashCode());
             return result;
         }
 
@@ -377,7 +472,7 @@ public class FileSystemManager implements InfoString {
             if (getClass() != obj.getClass()) {
                 return false;
             }
-            MountedFileSystem other = (MountedFileSystem) obj;
+            KnownFileSystem other = (KnownFileSystem) obj;
             if (fileSystem == null) {
                 if (other.fileSystem != null) {
                     return false;
@@ -385,7 +480,11 @@ public class FileSystemManager implements InfoString {
             } else if (!fileSystem.equals(other.fileSystem)) {
                 return false;
             }
-            if (mountpoint != other.mountpoint) {
+            if (mountpoint == null) {
+                if (other.mountpoint != null) {
+                    return false;
+                }
+            } else if (!mountpoint.equals(other.mountpoint)) {
                 return false;
             }
             return true;
@@ -394,7 +493,7 @@ public class FileSystemManager implements InfoString {
         @Override
         public String toInfoString() {
 
-            return fileSystem.toInfoString() + ", mounted on " + mountpoint;
+            return fileSystem.toInfoString() + ", assigned to " + File.SEPERATOR + mountpoint;
         }
 
         @Override

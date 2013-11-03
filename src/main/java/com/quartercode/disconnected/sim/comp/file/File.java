@@ -25,9 +25,15 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang.Validate;
+import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
+import com.quartercode.disconnected.sim.comp.os.Group;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.os.User;
+import com.quartercode.disconnected.sim.comp.program.Process;
+import com.quartercode.disconnected.util.InfoString;
 import com.quartercode.disconnected.util.size.SizeObject;
 import com.quartercode.disconnected.util.size.SizeUtil;
 
@@ -37,7 +43,7 @@ import com.quartercode.disconnected.util.size.SizeUtil;
  * 
  * @see FileSystem
  */
-public class File implements SizeObject {
+public class File implements SizeObject, InfoString {
 
     /**
      * The file type represents if a file is a content file or a directory.
@@ -55,15 +61,23 @@ public class File implements SizeObject {
 
     }
 
-    private FileSystem       host;
-    private String           name;
+    /**
+     * The path seperator which seperates different files in a path string.
+     */
+    public static final String SEPERATOR = "/";
+
+    private FileSystem         host;
+    private String             name;
     @XmlAttribute
-    private FileType         type;
-    private FileRights       rights;
+    private FileType           type;
+    private FileRights         rights;
+    private User               owner;
+    private Group              group;
+
     @XmlElement
-    private Object           content;
+    private Object             content;
     @XmlElement (name = "file")
-    private final List<File> children = new ArrayList<File>();
+    private final List<File>   children  = new ArrayList<File>();
 
     /**
      * Creates a new empty file.
@@ -92,13 +106,17 @@ public class File implements SizeObject {
      * @param name The name the new file will have.
      * @param type The type the new file will have.
      * @param rights The file rights object which stores the UNIX-like file right attributes.
+     * @param owner The user who owns the file. This is important for the rights system.
+     * @param group The group which partly owns the file. This is important for the rights system.
      */
-    protected File(FileSystem host, String name, FileType type, FileRights rights) {
+    protected File(FileSystem host, String name, FileType type, FileRights rights, User owner, Group group) {
 
         this.host = host;
         this.name = name;
         this.type = type;
-        this.rights = rights;
+        setRights(rights);
+        setOwner(owner);
+        setGroup(group);
     }
 
     /**
@@ -142,7 +160,7 @@ public class File implements SizeObject {
      */
     public String getGlobalPath(OperatingSystem operatingSystem) {
 
-        return operatingSystem.getFileSystemManager().getMountpoint(host) + ":" + getLocalPath();
+        return SEPERATOR + operatingSystem.getFileSystemManager().getMountpoint(host) + SEPERATOR + getLocalPath();
     }
 
     /**
@@ -168,17 +186,17 @@ public class File implements SizeObject {
     public String getLocalPath() {
 
         if (equals(host.getRootFile())) {
-            return host.getSeperator();
+            return "";
         } else {
             List<File> path = new ArrayList<File>();
             host.getRootFile().generatePathSections(this, path);
 
             String pathString = "";
             for (File pathEntry : path) {
-                pathString += host.getSeperator() + pathEntry.getName();
+                pathString += SEPERATOR + pathEntry.getName();
             }
 
-            return pathString.isEmpty() ? null : pathString;
+            return pathString.isEmpty() ? null : pathString.substring(1);
         }
     }
 
@@ -213,7 +231,7 @@ public class File implements SizeObject {
      * 
      * @return The file rights storage.
      */
-    @XmlTransient
+    @XmlAttribute
     public FileRights getRights() {
 
         return rights;
@@ -227,7 +245,59 @@ public class File implements SizeObject {
      */
     public void setRights(FileRights rights) {
 
+        Validate.notNull(rights, "A file can't have no right attributes");
+
         this.rights = rights;
+    }
+
+    /**
+     * Returns the user who owns the file.
+     * This is important for the rights system.
+     * 
+     * @return The user who owns the file.
+     */
+    @XmlIDREF
+    @XmlAttribute
+    public User getOwner() {
+
+        return owner;
+    }
+
+    /**
+     * Changes the user who owns the file.
+     * This is important for the rights system.
+     * 
+     * @param owner The new owner of the file.
+     */
+    public void setOwner(User owner) {
+
+        Validate.notNull(owner, "A file can't have no owner");
+
+        this.owner = owner;
+    }
+
+    /**
+     * Returns the group which partly owns the file.
+     * This is important for the rights system.
+     * 
+     * @return The group which partly owns the file.
+     */
+    @XmlIDREF
+    @XmlAttribute
+    public Group getGroup() {
+
+        return group;
+    }
+
+    /**
+     * Changes the group who partly owns the file to a new one.
+     * This is important for the rights system.
+     * 
+     * @param group The new partly owning group of the file.
+     */
+    public void setGroup(Group group) {
+
+        this.group = group;
     }
 
     /**
@@ -240,6 +310,20 @@ public class File implements SizeObject {
     public Object getContent() {
 
         return type == FileType.FILE ? content : null;
+    }
+
+    /**
+     * Returns the content the file has (if this file is a content one).
+     * If this file isn't a content one, this will return null.
+     * 
+     * @param process The process which wants to read from this file.
+     * @return The content the file has (if this file is a content one).
+     * @throws NoFileRightException The given process hasn't the right to read from this file.
+     */
+    public Object read(Process process) throws NoFileRightException {
+
+        FileRights.checkRight(process, this, FileRight.READ);
+        return getContent();
     }
 
     /**
@@ -264,6 +348,21 @@ public class File implements SizeObject {
                 throw new OutOfSpaceException(host, size);
             }
         }
+    }
+
+    /**
+     * Changes the content to new one (if this file is a content one).
+     * This throws an OutOfSpaceException if there isn't enough space on the host drive for the new content.
+     * 
+     * @param process The process which wants to write to this file.
+     * @param content The new content to write into the file.
+     * @throws NoFileRightException The given process hasn't the right to write into this file.
+     * @throws OutOfSpaceException If there isn't enough space on the host drive for the new content.
+     */
+    public void write(Process process, Object content) throws NoFileRightException {
+
+        FileRights.checkRight(process, this, FileRight.WRITE);
+        setContent(content);
     }
 
     /**
@@ -361,7 +460,7 @@ public class File implements SizeObject {
     public File getParent() {
 
         String path = getLocalPath();
-        return host.getFile(path.substring(0, path.lastIndexOf(host.getSeperator())));
+        return host.getFile(path.substring(0, path.lastIndexOf(SEPERATOR)));
     }
 
     /**
@@ -376,6 +475,21 @@ public class File implements SizeObject {
     }
 
     /**
+     * Changes the name of the file to a new one.
+     * After the renaming, the file can be used like before.
+     * 
+     * @param process The process which wants to rename this file.
+     * @param name The new name for the file.
+     * @throws NoFileRightException The given process hasn't the rights to delete this file and write into the parent directory.
+     */
+    public void rename(Process process, String name) throws NoFileRightException {
+
+        FileRights.checkRight(process, this, FileRight.DELETE);
+        FileRights.checkRight(process, getParent(), FileRight.WRITE);
+        rename(name);
+    }
+
+    /**
      * Moves the file to a new location under the given path.
      * After the movement, the file can be used like before.
      * This throws an OutOfSpaceException if there isn't enough space on the new host drive for the file.
@@ -385,14 +499,38 @@ public class File implements SizeObject {
      */
     public void move(String path) {
 
-        remove();
-
-        if (path.contains(":")) {
-            host = host.getHost().getOperatingSystem().getFileSystemManager().getMounted(path);
-            host.addFile(this, path.split(":")[1]);
-        } else {
-            host.addFile(this, path);
+        try {
+            move(null, path);
         }
+        catch (NoFileRightException e) {
+            // Wont ever happen
+        }
+    }
+
+    /**
+     * Moves the file to a new location under the given path.
+     * After the movement, the file can be used like before.
+     * This throws an OutOfSpaceException if there isn't enough space on the new host drive for the file.
+     * 
+     * @param process The process which wants to move this file.
+     * @param path The new location for the file.
+     * @throws NoFileRightException The given process hasn't the right to delete the file or write into a directory where the algorithm needs to write.
+     * @throws OutOfSpaceException If there isn't enough space on the new host drive for the file.
+     */
+    public void move(Process process, String path) throws NoFileRightException {
+
+        if (process != null) {
+            FileRights.checkRight(process, this, FileRight.DELETE);
+        }
+
+        File oldParent = getParent();
+        if (path.startsWith(SEPERATOR)) {
+            host = host.getHost().getOperatingSystem().getFileSystemManager().getMounted(path);
+            host.addFile(process, this, path.substring(path.indexOf(SEPERATOR, 1)));
+        } else {
+            host.addFile(process, this, path);
+        }
+        oldParent.removeChildFile(this);
     }
 
     /**
@@ -402,6 +540,19 @@ public class File implements SizeObject {
     public void remove() {
 
         getParent().removeChildFile(this);
+    }
+
+    /**
+     * Removes this file from the file system.
+     * If this file is a directory, all child files will also be removed.
+     * 
+     * @param process The process which wants to remove the file.
+     * @throws NoFileRightException The process hasn't the right to delete this file.
+     */
+    public void remove(Process process) throws NoFileRightException {
+
+        FileRights.checkRight(process, this, FileRight.DELETE);
+        remove();
     }
 
     /**
@@ -422,7 +573,7 @@ public class File implements SizeObject {
 
     /**
      * Returns the unique serialization id for the file.
-     * The id is a combination of the host computer's id and the global path of the file.
+     * The id is a combination of the host file system's id and the local path of the file.
      * It should only be used by a serialization algorithm.
      * 
      * @return The unique serialization id for the file.
@@ -431,7 +582,7 @@ public class File implements SizeObject {
     @XmlID
     protected String getId() {
 
-        return host.getHost().getId() + "-" + getGlobalHostPath();
+        return host.getId() + "-" + getLocalPath();
     }
 
     protected void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
@@ -450,7 +601,10 @@ public class File implements SizeObject {
         int result = 1;
         result = prime * result + (children == null ? 0 : children.hashCode());
         result = prime * result + (content == null ? 0 : content.hashCode());
+        result = prime * result + (group == null ? 0 : group.hashCode());
         result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + (owner == null ? 0 : owner.hashCode());
+        result = prime * result + (rights == null ? 0 : rights.hashCode());
         result = prime * result + (type == null ? 0 : type.hashCode());
         return result;
     }
@@ -482,11 +636,32 @@ public class File implements SizeObject {
         } else if (!content.equals(other.content)) {
             return false;
         }
+        if (group == null) {
+            if (other.group != null) {
+                return false;
+            }
+        } else if (!group.equals(other.group)) {
+            return false;
+        }
         if (name == null) {
             if (other.name != null) {
                 return false;
             }
         } else if (!name.equals(other.name)) {
+            return false;
+        }
+        if (owner == null) {
+            if (other.owner != null) {
+                return false;
+            }
+        } else if (!owner.equals(other.owner)) {
+            return false;
+        }
+        if (rights == null) {
+            if (other.rights != null) {
+                return false;
+            }
+        } else if (!rights.equals(other.rights)) {
             return false;
         }
         if (type != other.type) {
@@ -496,13 +671,15 @@ public class File implements SizeObject {
     }
 
     @Override
+    public String toInfoString() {
+
+        return type.name().toLowerCase() + " " + name + ", " + rights.toString() + " (o " + owner.getName() + ", g " + group.getName() + "), " + children.size() + " child files";
+    }
+
+    @Override
     public String toString() {
 
-        List<String> childNames = new ArrayList<String>();
-        for (File child : children) {
-            childNames.add(child.getName());
-        }
-        return getClass().getName() + " [name=" + name + ", type=" + type + ", content=" + content + ", children=" + childNames + "]";
+        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }

@@ -5,6 +5,7 @@
 
     <images file="images/components.png">
         <!-- General -->
+        <area name="color" xywh="46,12,1,1"/>
         <area name="flatarea" border="3" xywh="36,16,9,9" splitx="L3,R3" splity="T3,B3"/>
 
         <!-- Tooltip -->
@@ -17,6 +18,15 @@
             <alias ref="button.background.normal" if="hover" tint="#00C800"/>
             <alias ref="button.background.normal" tint="#0196FF"/>
         </select>
+
+        <!-- Editfield -->
+        <alias name="editfield.background" ref="flatarea" tint="#0000FF"/>
+        <alias name="-editfield.cursor" ref="color" tint="#CCCCCC"/>
+        <animation name="editfield.cursor" timeSource="keyboardFocus">
+            <frame ref="-editfield.cursor" duration="500"/>
+            <frame ref="none" duration="500"/>
+        </animation>
+        <alias name="editfield.selection" ref="color" tint="#E000FEFF"/>
 
         <!-- Scrollbar Background -->
         <area name="scrollbar.background" tiled="true" xywh="2,26,16,16" tint="#0007FA"/>
@@ -69,27 +79,27 @@
         <alias name="table.row.dropmarker" ref="none"/>
     </images>
 
-    <fontDef name="white" filename="font/font.fnt" default="true" color="#FFFFFF">
+    <fontDef name="white" filename="font/default.fnt" default="true" color="#FFFFFF">
         <fontParam if="error" color="#FF0000"/>
         <fontParam if="warning" color="#FFA400"/>
         <fontParam if="disabled" color="#808080"/>
         <fontParam if="textSelection" color="#0032FF"/>
     </fontDef>
 
-    <fontDef name="black" filename="font/font.fnt" color="#000000">
+    <fontDef name="black" filename="font/default.fnt" color="#000000">
         <fontParam if="error" color="#640000"/>
         <fontParam if="warning" color="#503200"/>
         <fontParam if="disabled" color="#262728"/>
         <fontParam if="textSelection" color="#000064"/>
     </fontDef>
 
-    <fontDef name="button.white" filename="font/font.fnt" color="#DBFFFF">
+    <fontDef name="button.white" filename="font/default.fnt" color="#DBFFFF">
         <fontParam if="disabled" color="gray"/>
         <fontParam if="pressed" color="#96FF96"/>
         <fontParam if="hover" color="#C7FFC7"/>
     </fontDef>
 
-    <fontDef name="button.black" filename="font/font.fnt" color="#001818">
+    <fontDef name="button.black" filename="font/default.fnt" color="#001818">
         <fontParam if="disabled" color="#282828"/>
         <fontParam if="pressed" color="#004B00"/>
         <fontParam if="hover" color="#006400"/>
@@ -120,13 +130,22 @@
         <param name="fadeInTime"><int>0</int></param>
     </theme>
 
-    <theme name="label" ref="-defaults">
-    </theme>
+    <theme name="label" ref="-defaults"/>
 
     <theme name="button" ref="-defaults">
         <param name="background"><image>button.background</image></param>
         <param name="font"><font>button.white</font></param>
         <param name="border"><border>10,5</border></param>
+    </theme>
+
+    <theme name="editfield" ref="-defaults">
+        <param name="background"><image>editfield.background</image></param>
+        <param name="cursor"><image>editfield.cursor</image></param>
+        <param name="selection"><image>editfield.selection</image></param>
+        <param name="passwordChar"><int>0x25CF</int></param> 
+        <param name="columns"><int>5</int></param>
+        <theme name="renderer" ref="-defaults"/>
+        <param name="autocompletion-height"><int>150</int></param>
     </theme>
 
     <theme name="hscrollbar" ref="-defaults">
@@ -240,4 +259,3 @@
         </theme>
     </theme>
 </themes>
-

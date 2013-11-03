@@ -31,10 +31,15 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.file.File;
+import com.quartercode.disconnected.sim.comp.file.FileRights;
+import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
+import com.quartercode.disconnected.sim.comp.file.NoFileRightException;
 import com.quartercode.disconnected.sim.comp.net.Address;
 import com.quartercode.disconnected.sim.comp.net.Packet;
 import com.quartercode.disconnected.sim.comp.net.PacketListener;
-import com.quartercode.disconnected.sim.comp.os.Desktop.Window;
+import com.quartercode.disconnected.sim.comp.session.Desktop.Window;
+import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram.DesktopSession;
+import com.quartercode.disconnected.sim.comp.session.SessionProgram.Session;
 import com.quartercode.disconnected.util.InfoString;
 
 /**
@@ -109,7 +114,6 @@ public abstract class ProgramExecutor implements InfoString {
      * 
      * @return The host process which uses the created executor for running the program instance.
      */
-
     public Process getHost() {
 
         return host;
@@ -188,24 +192,34 @@ public abstract class ProgramExecutor implements InfoString {
     /**
      * Creates a new process using the program stored in the given file.
      * The new process will be a child of the process which hosts this executor.
+     * Returns null if the host process of this executor hasn't the rights to execute the file.
      * 
      * @param file The process launch file which contains the program for the process.
      * @param arguments The argument map which contains values for the defined parameters.
+     * @throws NoFileRightException The host process of this executor hasn't the rights to execute the file.
      * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
      */
-    protected Process createProcess(File file, Map<String, Object> arguments) {
+    protected Process createProcess(File file, Map<String, Object> arguments) throws NoFileRightException {
 
+        FileRights.checkRight(host, file, FileRight.EXECUTE);
         return host.createChild(file, arguments);
     }
 
     /**
      * Opens a new already created window on the host's desktop.
+     * Throws an exception if the host process isn't running under a desktop session.
      * 
      * @param window The window to open on the host's desktop.
+     * @throws IllegalStateException The host process isn't running under a desktop session.
      */
     protected void openWindow(Window<?> window) {
 
-        host.getHost().getDesktop().addWindow(window);
+        Session session = host.getSession();
+        if (session instanceof DesktopSession) {
+            ((DesktopSession) session).getDesktop().addWindow(window);
+        } else {
+            throw new IllegalStateException("The host process is running under " + session.toInfoString() + "; desktop session needed");
+        }
     }
 
     /**

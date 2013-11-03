@@ -30,6 +30,9 @@ import javax.xml.bind.annotation.XmlIDREF;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.os.User;
+import com.quartercode.disconnected.sim.comp.session.SessionProgram;
+import com.quartercode.disconnected.sim.comp.session.SessionProgram.Session;
 import com.quartercode.disconnected.util.InfoString;
 
 /**
@@ -259,7 +262,7 @@ public class Process implements InfoString {
 
     /**
      * Forces the process to stop the execution.
-     * This will act like {@link #suspend()}, apart from the fact that a stopped program wont ever be able to resume.
+     * This will act like {@link #suspend(boolean)}, apart from the fact that a stopped program wont ever be able to resume.
      * The forced stopping action should only be used if the further execution of the program must be stopped or if the interruption finished.
      * 
      * @param recursive True if the state change should affect the child processes.
@@ -311,11 +314,11 @@ public class Process implements InfoString {
 
     /**
      * Creates a new child process using the program stored in the given file using the given pid.
-     * The new process will be a child of this process.
+     * The new process will be a child of this process and will run under the same session.
      * 
      * @param file The process launch file which contains the program for the process.
      * @param arguments The argument map which contains values for the defined parameters.
-     * @param pid A unique process id the process has This is used to identify the process.
+     * @param pid A unique process id the process has. This is used to identify the process.
      * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
      */
     public Process createChild(File file, Map<String, Object> arguments, int pid) {
@@ -323,6 +326,34 @@ public class Process implements InfoString {
         Process process = new Process(host, this, pid, file, arguments);
         children.add(process);
         return process;
+    }
+
+    /**
+     * Resolves the session which started the process.
+     * The process is running with the rights of that session.
+     * 
+     * @return The session which started the process.
+     */
+    public Session getSession() {
+
+        if (parent == null) {
+            return null;
+        } else if (parent.getFile().getContent() instanceof SessionProgram) {
+            return (Session) parent.getExecutor();
+        } else {
+            return parent.getSession();
+        }
+    }
+
+    /**
+     * Resolves the user the process is running under.
+     * This uses the {@link #getSession()} method for resolving the session object.
+     * 
+     * @return The user the process is running under.
+     */
+    public User getUser() {
+
+        return getSession().getUser();
     }
 
     /**

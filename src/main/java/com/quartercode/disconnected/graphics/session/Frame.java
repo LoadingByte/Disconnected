@@ -16,12 +16,12 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.graphics.desktop;
+package com.quartercode.disconnected.graphics.session;
 
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.graphics.component.MultiactionButton;
-import com.quartercode.disconnected.sim.comp.os.Desktop;
-import com.quartercode.disconnected.sim.comp.os.Desktop.Window;
+import com.quartercode.disconnected.sim.comp.session.Desktop;
+import com.quartercode.disconnected.sim.comp.session.Desktop.Window;
 import de.matthiasmann.twl.ResizableFrame;
 import de.matthiasmann.twl.Widget;
 

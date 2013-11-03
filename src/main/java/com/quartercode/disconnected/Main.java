@@ -25,7 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import com.quartercode.disconnected.graphics.GraphicsManager;
-import com.quartercode.disconnected.graphics.desktop.DesktopState;
+import com.quartercode.disconnected.graphics.session.DesktopState;
 import com.quartercode.disconnected.profile.ProfileManager;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.Computer;
@@ -37,6 +37,9 @@ import com.quartercode.disconnected.sim.comp.hardware.RAM;
 import com.quartercode.disconnected.sim.comp.program.ExploitProgram;
 import com.quartercode.disconnected.sim.comp.program.KernelProgram;
 import com.quartercode.disconnected.sim.comp.program.SystemViewerProgram;
+import com.quartercode.disconnected.sim.comp.program.TerminalProgram;
+import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram;
+import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
@@ -137,6 +140,11 @@ public class Main {
 
         // Programs
         registry.registerClass(KernelProgram.class);
+
+        registry.registerClass(ShellSessionProgram.class);
+        registry.registerClass(DesktopSessionProgram.class);
+
+        registry.registerClass(TerminalProgram.class);
         registry.registerClass(SystemViewerProgram.class);
         registry.registerClass(ExploitProgram.class);
 
@@ -146,6 +154,11 @@ public class Main {
 
         // Interests
         registry.registerClass(DestroyInterest.class);
+
+        // Themes
+        registry.registerTheme(Main.class.getResource("/ui/default/default.xml"));
+        registry.registerTheme(Main.class.getResource("/ui/shell/shell.xml"));
+        registry.registerTheme(Main.class.getResource("/ui/desktop/desktop.xml"));
     }
 
     /**

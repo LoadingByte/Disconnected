@@ -28,6 +28,7 @@ import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 public class FileSystemTest {
@@ -38,7 +39,7 @@ public class FileSystemTest {
     @Before
     public void setUp() {
 
-        Computer computer = new Computer("0");
+        Computer computer = new Computer();
 
         OperatingSystem operatingSystem = new OperatingSystem(computer, "OperatingSystem", new Version(1, 0, 0), null);
         computer.setOperatingSystem(operatingSystem);
@@ -46,16 +47,17 @@ public class FileSystemTest {
         HardDrive hardDrive = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
         fileSystem = hardDrive.getFileSystem();
         computer.addHardware(hardDrive);
-        operatingSystem.getFileSystemManager().mount(fileSystem, 'C');
+        operatingSystem.getFileSystemManager().setMountpoint(fileSystem, "test");
+        operatingSystem.getFileSystemManager().setMounted(fileSystem, true);
 
-        testFile = fileSystem.addFile("/test1/test2/test.txt", FileType.FILE);
+        testFile = fileSystem.addFile("test1/test2/test.txt", FileType.FILE, new User(null, null));
         testFile.setContent("Test-Content");
     }
 
     @Test
     public void testGetFile() {
 
-        Assert.assertEquals("Returned file equals original", testFile, fileSystem.getFile("/test1/test2/test.txt"));
+        Assert.assertEquals("Returned file equals original", testFile, fileSystem.getFile("test1/test2/test.txt"));
     }
 
     @Test

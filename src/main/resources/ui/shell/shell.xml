@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE themes PUBLIC "-//www.matthiasmann.de//TWL-Theme//EN" "http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd">
+<themes>
+    <images>
+        <alias name="shell.background" ref="color" tint="#111111"/>
+    </images>
+
+    <fontDef name="console" filename="font/console.fnt" color="#FFFFFF"/>
+
+    <theme name="shelltextarea" ref="-defaults">
+        <param name="fonts"><map>
+            <param name="default"><font>console</font></param>
+        </map></param>
+        <param name="images"><map></map></param>
+    </theme>
+
+    <theme name="shell" ref="scrollpane">
+        <param name="background"><image>shell.background</image></param>
+        
+        <theme name="output" ref="shelltextarea">
+            <param name="fonts"><map>
+                <param name="default"><font>console</font></param>
+            </map></param>
+            <param name="images"><map></map></param>
+        </theme>
+
+        <theme name="inputbar" ref="-defaults">
+            <param name="background"><image>shell.background</image></param>
+            <param name="alignment"><enum type="alignment">FILL</enum></param>
+            <param name="spacing"><int>10</int></param>
+
+            <theme name="prompt" ref="label">
+                <param name="font"><fontDef filename="font/console.fnt" color="#00AA00"/></param>
+            </theme>
+
+            <theme name="input" ref="editfield">
+                <param name="background"><image>shell.background</image></param>
+                <theme name="renderer" ref="-defaults">
+                    <param name="font"><font>console</font></param>
+                </theme>
+            </theme>
+        </theme>
+    </theme>
+</themes>
