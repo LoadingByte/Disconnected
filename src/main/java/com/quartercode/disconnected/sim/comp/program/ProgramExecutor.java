@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.sim.comp.program;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -37,9 +38,6 @@ import com.quartercode.disconnected.sim.comp.file.NoFileRightException;
 import com.quartercode.disconnected.sim.comp.net.Address;
 import com.quartercode.disconnected.sim.comp.net.Packet;
 import com.quartercode.disconnected.sim.comp.net.PacketListener;
-import com.quartercode.disconnected.sim.comp.session.Desktop.Window;
-import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram.DesktopSession;
-import com.quartercode.disconnected.sim.comp.session.SessionProgram.Session;
 import com.quartercode.disconnected.util.InfoString;
 
 /**
@@ -76,7 +74,7 @@ public abstract class ProgramExecutor implements InfoString {
     }
 
     /**
-     * Creates a new empty program executor.
+     * Creates a new program executor.
      * 
      * @param host The host process which uses the created executor for running the program instance.
      */
@@ -197,29 +195,13 @@ public abstract class ProgramExecutor implements InfoString {
      * @param file The process launch file which contains the program for the process.
      * @param arguments The argument map which contains values for the defined parameters.
      * @throws NoFileRightException The host process of this executor hasn't the rights to execute the file.
+     * @throws WrongSessionTypeException The executor doesn't support the session it is running in.
      * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
      */
-    protected Process createProcess(File file, Map<String, Object> arguments) throws NoFileRightException {
+    protected Process createProcess(File file, Map<String, Object> arguments) throws NoFileRightException, WrongSessionTypeException {
 
         FileRights.checkRight(host, file, FileRight.EXECUTE);
         return host.createChild(file, arguments);
-    }
-
-    /**
-     * Opens a new already created window on the host's desktop.
-     * Throws an exception if the host process isn't running under a desktop session.
-     * 
-     * @param window The window to open on the host's desktop.
-     * @throws IllegalStateException The host process isn't running under a desktop session.
-     */
-    protected void openWindow(Window<?> window) {
-
-        Session session = host.getSession();
-        if (session instanceof DesktopSession) {
-            ((DesktopSession) session).getDesktop().addWindow(window);
-        } else {
-            throw new IllegalStateException("The host process is running under " + session.toInfoString() + "; desktop session needed");
-        }
     }
 
     /**
@@ -268,8 +250,9 @@ public abstract class ProgramExecutor implements InfoString {
                         getClass().getMethod(task.getMethod()).invoke(this);
                         unregisterTask(task);
                     } else if (task.getPeriod() > 0 && (task.getElapsed() - task.getDelay()) % task.getPeriod() == 0) {
-                        getClass().getMethod(task.getMethod());
-                        getClass().getMethod(task.getMethod()).invoke(this);
+                        Method method = getClass().getMethod(task.getMethod());
+                        method.setAccessible(true);
+                        method.invoke(this);
                     }
                 }
                 catch (SecurityException e) {

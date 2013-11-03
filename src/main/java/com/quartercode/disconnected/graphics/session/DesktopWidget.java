@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.graphics.session;
 
 import com.quartercode.disconnected.sim.comp.program.Process;
+import com.quartercode.disconnected.sim.comp.program.WrongSessionTypeException;
 import com.quartercode.disconnected.sim.comp.session.Desktop;
 import com.quartercode.disconnected.sim.comp.session.Desktop.Window;
 import de.matthiasmann.twl.BoxLayout;
@@ -73,9 +74,14 @@ public class DesktopWidget extends Widget {
             public void run() {
 
                 // TODO: Display launch menu
-                Process sessionProcess = DesktopWidget.this.desktop.getHost().getHost();
-                // sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("/system/bin/sysviewer.exe"), null);
-                sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("/system/bin/terminal.exe"), null);
+                try {
+                    Process sessionProcess = DesktopWidget.this.desktop.getHost().getHost();
+                    // sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("/system/bin/sysviewer.exe"), null);
+                    sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("/system/bin/terminal.exe"), null);
+                }
+                catch (WrongSessionTypeException e) {
+                    // Wont ever happen
+                }
             }
         });
         add(launchButton);

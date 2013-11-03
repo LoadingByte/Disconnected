@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.comp.program;
+package com.quartercode.disconnected.sim.comp.program.desktop;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,11 @@ import com.quartercode.disconnected.graphics.session.Frame;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
+import com.quartercode.disconnected.sim.comp.program.Program;
+import com.quartercode.disconnected.sim.comp.program.ProgramExecutor;
+import com.quartercode.disconnected.sim.comp.program.UpdateTask;
 import com.quartercode.disconnected.sim.comp.session.Desktop.Window;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.util.size.ByteUnit;
@@ -74,7 +78,7 @@ public class SystemViewerProgram extends Program {
     @Override
     protected ProgramExecutor createExecutorInstance(Process host, Map<String, Object> arguments) {
 
-        return new ProgramExecutor(host) {
+        return new DesktopProgramExecutor(host) {
 
             private Window<SystemViewerFrame> mainWindow;
 

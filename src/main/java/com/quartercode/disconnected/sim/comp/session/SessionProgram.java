@@ -131,6 +131,14 @@ public abstract class SessionProgram extends Program {
         public abstract boolean isSerializable();
 
         /**
+         * Returns true if the given executor type can be executed in this session.
+         * 
+         * @param executor The executor type to check.
+         * @return True if the given executor type can be executed in this session.
+         */
+        public abstract boolean accept(Class<? extends ProgramExecutor> executor);
+
+        /**
          * Closes the session.
          * You need to close sessions after usage, so the operating system can free the resources.
          * Sessions which are not serializable must also be closed before the simulation can be serialized.

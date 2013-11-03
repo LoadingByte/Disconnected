@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.comp.program;
+package com.quartercode.disconnected.sim.comp.program.desktop;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +26,11 @@ import com.quartercode.disconnected.graphics.session.ShellWidget;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.file.NoFileRightException;
+import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
+import com.quartercode.disconnected.sim.comp.program.Program;
+import com.quartercode.disconnected.sim.comp.program.ProgramExecutor;
+import com.quartercode.disconnected.sim.comp.program.WrongSessionTypeException;
 import com.quartercode.disconnected.sim.comp.session.Desktop.Window;
 import com.quartercode.disconnected.sim.comp.session.Shell;
 import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram.ShellSession;
@@ -70,7 +74,7 @@ public class TerminalProgram extends Program {
     @Override
     protected ProgramExecutor createExecutorInstance(Process host, Map<String, Object> arguments) {
 
-        return new ProgramExecutor(host) {
+        return new DesktopProgramExecutor(host) {
 
             private Shell                 shell;
             private Window<TerminalFrame> mainWindow;
@@ -86,6 +90,9 @@ public class TerminalProgram extends Program {
                         shell = ((ShellSession) shellProcess.getExecutor()).getShell();
                     }
                     catch (NoFileRightException e) {
+                        getHost().interrupt(true);
+                    }
+                    catch (WrongSessionTypeException e) {
                         getHost().interrupt(true);
                     }
                 }

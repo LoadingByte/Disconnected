@@ -28,6 +28,8 @@ import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.sim.comp.program.Process;
+import com.quartercode.disconnected.sim.comp.program.ProgramExecutor;
+import com.quartercode.disconnected.sim.comp.program.shell.ShellProgramExecutor;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 /**
@@ -115,6 +117,12 @@ public class ShellSessionProgram extends SessionProgram {
         public boolean isSerializable() {
 
             return getWidgets().size() == 0;
+        }
+
+        @Override
+        public boolean accept(Class<? extends ProgramExecutor> executor) {
+
+            return ShellProgramExecutor.class.isAssignableFrom(executor);
         }
 
         /**
