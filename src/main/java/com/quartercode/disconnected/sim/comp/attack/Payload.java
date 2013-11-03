@@ -21,6 +21,8 @@ package com.quartercode.disconnected.sim.comp.attack;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.util.InfoString;
 
@@ -32,8 +34,18 @@ import com.quartercode.disconnected.util.InfoString;
  */
 public class Payload implements InfoString {
 
-    private final OperatingSystem operatingSystem;
-    private final List<String>    scripts;
+    @XmlIDREF
+    private OperatingSystem operatingSystem;
+    @XmlElement (name = "script")
+    private List<String>    scripts;
+
+    /**
+     * Creates a new empty payload.
+     * This is only recommended for direct field access (e.g. for serialization).
+     */
+    protected Payload() {
+
+    }
 
     /**
      * Creates a new payload and sets the operating system the payload is written for and some scripts which define what happens while execution.
