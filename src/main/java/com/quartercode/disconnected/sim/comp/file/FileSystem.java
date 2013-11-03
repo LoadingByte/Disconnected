@@ -137,8 +137,9 @@ public class FileSystem implements SizeObject, InfoString {
      * @param type The file type the new file should has.
      * @param user The user who owns the new file.
      * @return The new file (or the existing one, if the file already exists).
+     * @throws OutOfSpaceException If there isn't enough space for the new file.
      */
-    public File addFile(String path, FileType type, User user) {
+    public File addFile(String path, FileType type, User user) throws OutOfSpaceException {
 
         try {
             return addFile(null, path, type, user);
@@ -161,8 +162,9 @@ public class FileSystem implements SizeObject, InfoString {
      * @param user The user who owns the new file.
      * @return The new file (or the existing one, if the file already exists).
      * @throws NoFileRightException The given process hasn't the right to write into a directory where the algorithm needs to write
+     * @throws OutOfSpaceException If there isn't enough space for the new file.
      */
-    public File addFile(Process process, String path, FileType type, User user) throws NoFileRightException {
+    public File addFile(Process process, String path, FileType type, User user) throws NoFileRightException, OutOfSpaceException {
 
         String[] parts = path.split(File.SEPERATOR);
         File file = new File(this, parts[parts.length - 1], type, new FileRights("rwd-r---r---"), user, user.getPrimaryGroup());
@@ -176,9 +178,10 @@ public class FileSystem implements SizeObject, InfoString {
      * 
      * @param file The existing file object to add to the file system.
      * @param path The path the file will be located under.
+     * @throws OutOfSpaceException If there isn't enough space for the new file.
      * @throws IllegalStateException There's a non-directory file in the path.
      */
-    protected void addFile(File file, String path) {
+    protected void addFile(File file, String path) throws OutOfSpaceException {
 
         try {
             addFile(null, file, path);
@@ -196,9 +199,10 @@ public class FileSystem implements SizeObject, InfoString {
      * @param file The existing file object to add to the file system.
      * @param path The path the file will be located under.
      * @throws NoFileRightException The given process hasn't the right to write into a directory where the algorithm needs to write
+     * @throws OutOfSpaceException If there isn't enough space for the new file.
      * @throws IllegalStateException There's a non-directory file in the path.
      */
-    protected void addFile(Process process, File file, String path) throws NoFileRightException {
+    protected void addFile(Process process, File file, String path) throws NoFileRightException, OutOfSpaceException {
 
         String[] parts = path.split(File.SEPERATOR);
 

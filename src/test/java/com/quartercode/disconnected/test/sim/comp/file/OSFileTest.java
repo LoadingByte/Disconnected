@@ -26,6 +26,8 @@ import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
+import com.quartercode.disconnected.sim.comp.file.MountException;
+import com.quartercode.disconnected.sim.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.os.User;
@@ -39,7 +41,7 @@ public class OSFileTest {
     private File            testFile;
 
     @Before
-    public void setUp() {
+    public void setUp() throws MountException, OutOfSpaceException {
 
         computer = new Computer();
 
@@ -64,7 +66,7 @@ public class OSFileTest {
     }
 
     @Test
-    public void testAddFile() {
+    public void testAddFile() throws OutOfSpaceException {
 
         String mountpoint = operatingSystem.getFileSystemManager().getMountpoint(fileSystem);
         operatingSystem.getFileSystemManager().addFile("/" + mountpoint + "/test1/test2/test-global.txt", FileType.FILE, new User(null, null));
@@ -79,7 +81,7 @@ public class OSFileTest {
     }
 
     @Test
-    public void testMove() {
+    public void testMove() throws MountException, OutOfSpaceException {
 
         HardDrive hardDrive = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
         computer.addHardware(hardDrive);

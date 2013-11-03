@@ -28,6 +28,7 @@ import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileRights;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
+import com.quartercode.disconnected.sim.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.Hardware;
@@ -186,17 +187,22 @@ public class SimulationGenerator {
             genuser.addToGroup(genpop, true);
             computer.getOperatingSystem().getUserManager().addUser(genuser);
 
-            computer.getOperatingSystem().getFileSystemManager().setMountpoint(systemMedium.getFileSystem(), "system");
-            addSystemFiles(systemMedium.getFileSystem(), computer.getOperatingSystem().getUserManager());
-            computer.getOperatingSystem().getFileSystemManager().setMountpoint(userMedium.getFileSystem(), "user");
-            addUserFiles(userMedium.getFileSystem(), computer.getOperatingSystem().getUserManager());
+            try {
+                computer.getOperatingSystem().getFileSystemManager().setMountpoint(systemMedium.getFileSystem(), "system");
+                addSystemFiles(systemMedium.getFileSystem(), computer.getOperatingSystem().getUserManager());
+                computer.getOperatingSystem().getFileSystemManager().setMountpoint(userMedium.getFileSystem(), "user");
+                addUserFiles(userMedium.getFileSystem(), computer.getOperatingSystem().getUserManager());
+            }
+            catch (OutOfSpaceException e) {
+                // Really shouldn't happen
+            }
         }
 
         return computers;
     }
 
     // Temporary method for generating the kernel and some system programs
-    private static void addSystemFiles(FileSystem fileSystem, UserManager userManager) {
+    private static void addSystemFiles(FileSystem fileSystem, UserManager userManager) throws OutOfSpaceException {
 
         User superuser = userManager.getSuperuser();
 
@@ -225,7 +231,7 @@ public class SimulationGenerator {
     }
 
     // Temporary method for generating some unnecessary programs and personal files
-    private static void addUserFiles(FileSystem fileSystem, UserManager userManager) {
+    private static void addUserFiles(FileSystem fileSystem, UserManager userManager) throws OutOfSpaceException {
 
         User superuser = userManager.getSuperuser();
 

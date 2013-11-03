@@ -26,7 +26,7 @@ import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
  * @see FileSystem
  * @see OperatingSystem
  */
-public class MountException extends RuntimeException {
+public class MountException extends Exception {
 
     private static final long serialVersionUID = 1957527882081049990L;
 

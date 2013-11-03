@@ -26,6 +26,8 @@ import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
+import com.quartercode.disconnected.sim.comp.file.MountException;
+import com.quartercode.disconnected.sim.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.os.User;
@@ -37,7 +39,7 @@ public class FileTest {
     private File       testFile;
 
     @Before
-    public void setUp() {
+    public void setUp() throws MountException, OutOfSpaceException {
 
         Computer computer = new Computer();
 
@@ -61,7 +63,7 @@ public class FileTest {
     }
 
     @Test
-    public void testMove() {
+    public void testMove() throws OutOfSpaceException {
 
         testFile.move("test1/test3/test.txt");
 

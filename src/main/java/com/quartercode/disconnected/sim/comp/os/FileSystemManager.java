@@ -32,6 +32,7 @@ import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.file.FileSystemProvider;
 import com.quartercode.disconnected.sim.comp.file.MountException;
+import com.quartercode.disconnected.sim.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.util.InfoString;
 
 /**
@@ -242,7 +243,7 @@ public class FileSystemManager implements InfoString {
      * @param mounted True if the given file system should be mounted, false if it should be unmounted.
      * @throws MountException Something goes wrong while mounting or unmounting the file system.
      */
-    public void setMounted(FileSystem fileSystem, boolean mounted) {
+    public void setMounted(FileSystem fileSystem, boolean mounted) throws MountException {
 
         if (!getKnown().contains(fileSystem)) {
             throw new MountException(fileSystem, true, "File system not known");
@@ -291,8 +292,9 @@ public class FileSystemManager implements InfoString {
      * @param type The file type the new file should has.
      * @param user The user who owns the new file.
      * @return The new file (or the existing one, if the file already exists).
+     * @throws OutOfSpaceException If there isn't enough space on the target file system for the new file.
      */
-    public File addFile(String path, FileType type, User user) {
+    public File addFile(String path, FileType type, User user) throws OutOfSpaceException {
 
         FileSystem fileSystem = getMounted(path);
         if (fileSystem != null) {
@@ -312,11 +314,21 @@ public class FileSystemManager implements InfoString {
         if (running) {
             // Mount every known file system (temp)
             for (FileSystem fileSystem : getKnown()) {
-                setMounted(fileSystem, true);
+                try {
+                    setMounted(fileSystem, true);
+                }
+                catch (MountException e) {
+                    // TODO: Notify the user
+                }
             }
         } else {
             for (FileSystem mountedFileSystem : getMounted()) {
-                setMounted(mountedFileSystem, false);
+                try {
+                    setMounted(mountedFileSystem, false);
+                }
+                catch (MountException e) {
+                    // TODO: Flush and force unmount
+                }
             }
         }
     }

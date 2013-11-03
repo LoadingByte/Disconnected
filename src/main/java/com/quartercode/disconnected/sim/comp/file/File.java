@@ -334,7 +334,7 @@ public class File implements SizeObject, InfoString {
      * @throws IllegalArgumentException Can't derive size type from given content.
      * @throws OutOfSpaceException If there isn't enough space on the host drive for the new content.
      */
-    public void setContent(Object content) {
+    public void setContent(Object content) throws OutOfSpaceException {
 
         if (type == FileType.FILE) {
             Validate.isTrue(SizeUtil.accept(content), "Size of type " + content.getClass().getName() + " can't be derived");
@@ -359,7 +359,7 @@ public class File implements SizeObject, InfoString {
      * @throws NoFileRightException The given process hasn't the right to write into this file.
      * @throws OutOfSpaceException If there isn't enough space on the host drive for the new content.
      */
-    public void write(Process process, Object content) throws NoFileRightException {
+    public void write(Process process, Object content) throws NoFileRightException, OutOfSpaceException {
 
         FileRights.checkRight(process, this, FileRight.WRITE);
         setContent(content);
@@ -426,7 +426,7 @@ public class File implements SizeObject, InfoString {
      * @param file The file to add to this directory.
      * @throws OutOfSpaceException If there isn't enough space on the host drive for the new file.
      */
-    protected void addChildFile(File file) {
+    protected void addChildFile(File file) throws OutOfSpaceException {
 
         if (children != null) {
             if (!children.contains(file)) {
@@ -497,7 +497,7 @@ public class File implements SizeObject, InfoString {
      * @param path The new location for the file.
      * @throws OutOfSpaceException If there isn't enough space on the new host drive for the file.
      */
-    public void move(String path) {
+    public void move(String path) throws OutOfSpaceException {
 
         try {
             move(null, path);
@@ -517,7 +517,7 @@ public class File implements SizeObject, InfoString {
      * @throws NoFileRightException The given process hasn't the right to delete the file or write into a directory where the algorithm needs to write.
      * @throws OutOfSpaceException If there isn't enough space on the new host drive for the file.
      */
-    public void move(Process process, String path) throws NoFileRightException {
+    public void move(Process process, String path) throws NoFileRightException, OutOfSpaceException {
 
         if (process != null) {
             FileRights.checkRight(process, this, FileRight.DELETE);

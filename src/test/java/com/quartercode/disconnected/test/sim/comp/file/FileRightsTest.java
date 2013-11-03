@@ -29,6 +29,8 @@ import com.quartercode.disconnected.sim.comp.file.FileRights;
 import com.quartercode.disconnected.sim.comp.file.FileRights.FileAccessor;
 import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
+import com.quartercode.disconnected.sim.comp.file.MountException;
+import com.quartercode.disconnected.sim.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.os.Group;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
@@ -43,7 +45,7 @@ public class FileRightsTest {
     private Group      testGroup;
 
     @Before
-    public void setUp() {
+    public void setUp() throws MountException, OutOfSpaceException {
 
         Computer computer = new Computer();
 
