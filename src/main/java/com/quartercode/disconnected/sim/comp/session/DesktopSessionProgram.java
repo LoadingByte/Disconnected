@@ -28,6 +28,7 @@ import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.sim.comp.program.desktop.DesktopProgramExecutor;
+import com.quartercode.disconnected.util.ResourceBundles;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 /**
@@ -50,15 +51,14 @@ public class DesktopSessionProgram extends SessionProgram {
 
     /**
      * Creates a new desktop session program for sessions with a graphical user interface (desktop).
-     * This also sets the name, the version and the vulnerabilities of the program.
+     * This also sets the version and the vulnerabilities of the program.
      * 
-     * @param name The name the session program has.
      * @param version The current version the session program has.
      * @param vulnerabilities The vulnerabilities the session program has.
      */
-    public DesktopSessionProgram(String name, Version version, List<Vulnerability> vulnerabilities) {
+    public DesktopSessionProgram(Version version, List<Vulnerability> vulnerabilities) {
 
-        super(name, version, vulnerabilities);
+        super(ResourceBundles.DESKTOP.getString("name"), version, vulnerabilities);
     }
 
     @Override

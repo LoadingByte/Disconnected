@@ -21,6 +21,7 @@ package com.quartercode.disconnected;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -79,6 +80,25 @@ public class Main {
 
         // Print information about the software
         LOGGER.info("Version " + Disconnected.getVersion());
+
+        // Set language from first argument (temp)
+        // TODO: Real CLI and config file
+        if (args.length >= 1) {
+            String[] localeParts = args[0].split("_");
+            String language = "";
+            String country = "";
+            String variant = "";
+            if (localeParts.length >= 1) {
+                language = localeParts[0];
+            }
+            if (localeParts.length >= 2) {
+                country = localeParts[1];
+            }
+            if (localeParts.length >= 3) {
+                variant = localeParts[2];
+            }
+            Locale.setDefault(new Locale(language, country, variant));
+        }
 
         // Initalize & fill registry
         LOGGER.info("Initalizing & filling class registry");

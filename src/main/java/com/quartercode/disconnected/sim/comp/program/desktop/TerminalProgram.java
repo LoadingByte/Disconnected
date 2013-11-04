@@ -34,6 +34,7 @@ import com.quartercode.disconnected.sim.comp.program.WrongSessionTypeException;
 import com.quartercode.disconnected.sim.comp.session.Desktop.Window;
 import com.quartercode.disconnected.sim.comp.session.Shell;
 import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram.ShellSession;
+import com.quartercode.disconnected.util.ResourceBundles;
 import com.quartercode.disconnected.util.size.ByteUnit;
 import de.matthiasmann.twl.ScrollPane;
 import de.matthiasmann.twl.ScrollPane.Fixed;
@@ -54,15 +55,14 @@ public class TerminalProgram extends Program {
     }
 
     /**
-     * Creates a new terminal program and sets the name, the version and the vulnerabilities.
+     * Creates a new terminal program and sets the version and the vulnerabilities.
      * 
-     * @param name The name the program has.
      * @param version The current version the program has.
      * @param vulnerabilities The vulnerabilities the program has.
      */
-    public TerminalProgram(String name, Version version, List<Vulnerability> vulnerabilities) {
+    public TerminalProgram(Version version, List<Vulnerability> vulnerabilities) {
 
-        super(name, version, vulnerabilities);
+        super(ResourceBundles.PROGRAM("terminal").getString("name"), version, vulnerabilities);
     }
 
     @Override

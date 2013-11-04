@@ -22,6 +22,7 @@ import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.WrongSessionTypeException;
 import com.quartercode.disconnected.sim.comp.session.Desktop;
 import com.quartercode.disconnected.sim.comp.session.Desktop.Window;
+import com.quartercode.disconnected.util.ResourceBundles;
 import de.matthiasmann.twl.BoxLayout;
 import de.matthiasmann.twl.BoxLayout.Direction;
 import de.matthiasmann.twl.Button;
@@ -67,7 +68,7 @@ public class DesktopWidget extends Widget {
 
         launchButton = new Button();
         launchButton.setTheme("launch-button");
-        launchButton.setText("Launch");
+        launchButton.setText(ResourceBundles.DESKTOP.getString("launch.button"));
         launchButton.addCallback(new Runnable() {
 
             @Override

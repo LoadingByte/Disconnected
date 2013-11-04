@@ -209,25 +209,25 @@ public class SimulationGenerator {
         // Generate kernel file (temp)
         fileSystem.addFile("boot/kernel", FileType.FILE, superuser);
         fileSystem.getFile("boot/kernel").setRights(new FileRights("r--xr--xr--x"));
-        fileSystem.getFile("boot/kernel").setContent(new KernelProgram("Kernel", new Version("1.0.0"), null));
+        fileSystem.getFile("boot/kernel").setContent(new KernelProgram(new Version("1.0.0"), null));
 
         // Generate session programs
         fileSystem.addFile("bin/lash.exe", FileType.FILE, superuser);
         fileSystem.getFile("bin/lash.exe").setRights(new FileRights("r--xr--xr--x"));
-        fileSystem.getFile("bin/lash.exe").setContent(new ShellSessionProgram("Load Again Shell", new Version("1.0.0"), null));
+        fileSystem.getFile("bin/lash.exe").setContent(new ShellSessionProgram(new Version("1.0.0"), null));
 
         fileSystem.addFile("bin/desktops.exe", FileType.FILE, superuser);
         fileSystem.getFile("bin/desktops.exe").setRights(new FileRights("r--xr--xr--x"));
-        fileSystem.getFile("bin/desktops.exe").setContent(new DesktopSessionProgram("Desktops Window Manager", new Version("1.0.0"), null));
+        fileSystem.getFile("bin/desktops.exe").setContent(new DesktopSessionProgram(new Version("1.0.0"), null));
 
         // Generate system programs
         fileSystem.addFile("bin/terminal.exe", FileType.FILE, superuser);
         fileSystem.getFile("bin/terminal.exe").setRights(new FileRights("r--xr--xr--x"));
-        fileSystem.getFile("bin/terminal.exe").setContent(new TerminalProgram("Lash Terminal", new Version("1.0.0"), null));
+        fileSystem.getFile("bin/terminal.exe").setContent(new TerminalProgram(new Version("1.0.0"), null));
 
         fileSystem.addFile("bin/sysviewer.exe", FileType.FILE, superuser);
         fileSystem.getFile("bin/sysviewer.exe").setRights(new FileRights("r--xr--xr--x"));
-        fileSystem.getFile("bin/sysviewer.exe").setContent(new SystemViewerProgram("System Viewer", new Version("1.0.0"), null));
+        fileSystem.getFile("bin/sysviewer.exe").setContent(new SystemViewerProgram(new Version("1.0.0"), null));
     }
 
     // Temporary method for generating some unnecessary programs and personal files

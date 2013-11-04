@@ -30,6 +30,7 @@ import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.sim.comp.program.shell.ShellProgramExecutor;
+import com.quartercode.disconnected.util.ResourceBundles;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 /**
@@ -53,15 +54,14 @@ public class ShellSessionProgram extends SessionProgram {
 
     /**
      * Creates a new shell session program for sessions with a text-based user interface (terminal).
-     * This also sets the name, the version and the vulnerabilities of the program.
+     * This also sets the version and the vulnerabilities of the program.
      * 
-     * @param name The name the session program has.
      * @param version The current version the session program has.
      * @param vulnerabilities The vulnerabilities the session program has.
      */
-    public ShellSessionProgram(String name, Version version, List<Vulnerability> vulnerabilities) {
+    public ShellSessionProgram(Version version, List<Vulnerability> vulnerabilities) {
 
-        super(name, version, vulnerabilities);
+        super(ResourceBundles.SHELL.getString("name"), version, vulnerabilities);
     }
 
     @Override

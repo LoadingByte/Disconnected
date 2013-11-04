@@ -36,6 +36,7 @@ import com.quartercode.disconnected.sim.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.sim.comp.program.UpdateTask;
 import com.quartercode.disconnected.sim.comp.session.Desktop.Window;
 import com.quartercode.disconnected.sim.run.Ticker;
+import com.quartercode.disconnected.util.ResourceBundles;
 import com.quartercode.disconnected.util.size.ByteUnit;
 import de.matthiasmann.twl.ScrollPane;
 import de.matthiasmann.twl.ScrollPane.Fixed;
@@ -58,15 +59,14 @@ public class SystemViewerProgram extends Program {
     }
 
     /**
-     * Creates a new system viewer program and sets the name, the version and the vulnerabilities.
+     * Creates a new system viewer program and sets the version and the vulnerabilities.
      * 
-     * @param name The name the program has.
      * @param version The current version the program has.
      * @param vulnerabilities The vulnerabilities the program has.
      */
-    public SystemViewerProgram(String name, Version version, List<Vulnerability> vulnerabilities) {
+    public SystemViewerProgram(Version version, List<Vulnerability> vulnerabilities) {
 
-        super(name, version, vulnerabilities);
+        super(ResourceBundles.PROGRAM("sysviewer").getString("name"), version, vulnerabilities);
     }
 
     @Override
@@ -162,7 +162,8 @@ public class SystemViewerProgram extends Program {
 
                 added.set(true);
                 String session = process.getSession() == null ? "" : process.getSession().getUser().getName();
-                return parent.addChild(process.getFile().getName(), process.getPid(), session, process.getState());
+                String stateDescription = ResourceBundles.PROGRAM("sysviewer").getString("processTable.status." + process.getState().name().toLowerCase());
+                return parent.addChild(process.getFile().getName(), process.getPid(), session, stateDescription);
             }
         };
     }
@@ -174,7 +175,11 @@ public class SystemViewerProgram extends Program {
 
         private SystemViewerFrame() {
 
-            processTree = new TreeModel("Process", "PID", "User", "Status");
+            String headerName = ResourceBundles.PROGRAM("sysviewer").getString("processTable.header.name");
+            String headerPid = ResourceBundles.PROGRAM("sysviewer").getString("processTable.header.pid");
+            String headerUser = ResourceBundles.PROGRAM("sysviewer").getString("processTable.header.user");
+            String headerStatus = ResourceBundles.PROGRAM("sysviewer").getString("processTable.header.status");
+            processTree = new TreeModel(headerName, headerPid, headerUser, headerStatus);
 
             processTreeWidget = new TreeTable(processTree);
             processTreeWidget.setTheme("/table");
@@ -204,6 +209,7 @@ public class SystemViewerProgram extends Program {
             setMinSize(500, 150);
 
             processTreeWidget.setPosition(getInnerX(), getInnerY());
+            processTreeWidget.adjustSize();
             setColumnWidth(processTreeWidget, 0, 0.5F);
             setColumnWidth(processTreeWidget, 1, 0.1F);
             setColumnWidth(processTreeWidget, 2, 0.2F);

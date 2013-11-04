@@ -27,6 +27,7 @@ import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
 import com.quartercode.disconnected.sim.run.Ticker;
+import com.quartercode.disconnected.util.ResourceBundles;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 /**
@@ -46,15 +47,14 @@ public class KernelProgram extends Program {
     }
 
     /**
-     * Creates a new kernel program and sets the name, the version and the vulnerabilities.
+     * Creates a new kernel program and sets the version and the vulnerabilities.
      * 
-     * @param name The name the program has.
      * @param version The current version the program has.
      * @param vulnerabilities The vulnerabilities the program has.
      */
-    public KernelProgram(String name, Version version, List<Vulnerability> vulnerabilities) {
+    public KernelProgram(Version version, List<Vulnerability> vulnerabilities) {
 
-        super(name, version, vulnerabilities);
+        super(ResourceBundles.KERNEL.getString("name"), version, vulnerabilities);
     }
 
     @Override
