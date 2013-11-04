@@ -234,9 +234,9 @@ public class SimulationGenerator {
         // Generate environment
         Environment environment = new Environment();
         environment.addVariable(new EnvironmentVariable("PATH", "/system/bin:/user/bin"));
-        fileSystem.addFile("config/environment.xml", FileType.FILE, superuser);
-        fileSystem.getFile("config/environment.xml").setRights(new FileRights("r---r---r---"));
-        fileSystem.getFile("config/environment.xml").setContent(environment);
+        fileSystem.addFile("config/environment.cfg", FileType.FILE, superuser);
+        fileSystem.getFile("config/environment.cfg").setRights(new FileRights("r---r---r---"));
+        fileSystem.getFile("config/environment.cfg").setContent(environment);
     }
 
     // Temporary method for generating some unnecessary programs and personal files

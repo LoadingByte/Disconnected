@@ -134,6 +134,12 @@ public class Environment implements SizeObject {
     }
 
     @Override
+    public Environment clone() {
+
+        return new Environment(toString());
+    }
+
+    @Override
     public int hashCode() {
 
         final int prime = 31;

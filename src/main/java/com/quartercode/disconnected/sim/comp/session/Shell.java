@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import com.quartercode.disconnected.graphics.session.ShellWidget;
 import com.quartercode.disconnected.sim.comp.file.File;
+import com.quartercode.disconnected.sim.comp.os.Environment;
 import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram.ShellSession;
 
 /**
@@ -36,6 +37,8 @@ import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram.ShellSe
 public class Shell {
 
     private ShellSession       host;
+
+    private Environment        environment;
     private File               currentDirectory;
     @XmlElementWrapper (name = "output")
     @XmlElement (name = "line")
@@ -47,6 +50,7 @@ public class Shell {
      */
     protected Shell() {
 
+        environment = ((Environment) host.getHost().getHost().getFileSystemManager().getFile("/system/config/environment.cfg").getContent()).clone();
     }
 
     /**
@@ -55,6 +59,8 @@ public class Shell {
      * @param host The hosting shell session which uses this shell.
      */
     public Shell(ShellSession host) {
+
+        this();
 
         this.host = host;
     }
