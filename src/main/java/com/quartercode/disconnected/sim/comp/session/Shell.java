@@ -24,6 +24,7 @@ import java.util.List;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.graphics.session.ShellWidget;
 import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.os.Environment;
@@ -38,6 +39,7 @@ public class Shell {
 
     private ShellSession       host;
 
+    @XmlElement
     private Environment        environment;
     private File               currentDirectory;
     @XmlElementWrapper (name = "output")
@@ -50,7 +52,6 @@ public class Shell {
      */
     protected Shell() {
 
-        environment = ((Environment) host.getHost().getHost().getFileSystemManager().getFile("/system/config/environment.cfg").getContent()).clone();
     }
 
     /**
@@ -60,9 +61,9 @@ public class Shell {
      */
     public Shell(ShellSession host) {
 
-        this();
-
         this.host = host;
+
+        environment = ((Environment) host.getHost().getHost().getFileSystemManager().getFile("/system/config/environment.cfg").getContent()).clone();
     }
 
     /**
@@ -94,6 +95,7 @@ public class Shell {
      * 
      * @return The directory the shell is currently in.
      */
+    @XmlIDREF
     public File getCurrentDirectory() {
 
         return currentDirectory;
