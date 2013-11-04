@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,14 +46,15 @@ public class Launcher {
     public static void main(String[] args) {
 
         String mainClass = Main.class.getName();
-        List<String> vmArguments = Arrays.asList("-Djava.library.path=lib/natives");
+        String[] vmArguments = { "-Djava.library.path=lib/natives" };
 
-        Launcher launcher = new Launcher(mainClass, vmArguments);
+        Launcher launcher = new Launcher(mainClass, vmArguments, args);
         launcher.launch();
     }
 
-    private String       mainClass;
-    private List<String> vmArguments;
+    private String   mainClass;
+    private String[] vmArguments;
+    private String[] programArguments;
 
     /**
      * Creates a new empty launcher.
@@ -74,15 +74,17 @@ public class Launcher {
     }
 
     /**
-     * Creates a new launcher and initalizes the main class and vm arguments.
+     * Creates a new launcher and initalizes the main class and vm and program arguments.
      * 
      * @param mainClass The main class which get called on launch.
-     * @param vmArguments The vm arguments which gets set on launch.
+     * @param vmArguments The vm arguments which are set on launch and read by the virtual machine.
+     * @param programArguments The program arguments which are set on launch and read by the executed program.
      */
-    public Launcher(String mainClass, List<String> vmArguments) {
+    public Launcher(String mainClass, String[] vmArguments, String[] programArguments) {
 
         this.mainClass = mainClass;
         this.vmArguments = vmArguments;
+        this.programArguments = programArguments;
     }
 
     /**
@@ -106,23 +108,47 @@ public class Launcher {
     }
 
     /**
-     * Returns the vm arguments which gets set on launch.
+     * Returns the vm arguments which are set on launch.
+     * VM arguments are read by the virtual machine and set things like the max heap size etc.
      * 
-     * @return The vm arguments which gets set on launch.
+     * @return The vm arguments which are set on launch.
      */
-    public List<String> getVmArguments() {
+    public String[] getVmArguments() {
 
-        return Collections.unmodifiableList(vmArguments);
+        return vmArguments;
     }
 
     /**
-     * Sets the vm arguments which gets set on launch.
+     * Sets the vm arguments which are set on launch.
+     * VM arguments are read by the virtual machine and set things like the max heap size etc.
      * 
-     * @param vmArguments The vm arguments which gets set on launch.
+     * @param vmArguments The vm arguments which are set on launch.
      */
-    public void setVmArguments(List<String> vmArguments) {
+    public void setVmArguments(String[] vmArguments) {
 
         this.vmArguments = vmArguments;
+    }
+
+    /**
+     * Returns the program arguments which are set on launch.
+     * Program arguments are read by the executed program. Every program handles them differently.
+     * 
+     * @return The program arguments which are set on launch.
+     */
+    public String[] getProgramArguments() {
+
+        return programArguments;
+    }
+
+    /**
+     * Sets the program arguments which are set on launch.
+     * Program arguments are read by the executed program. Every program handles them differently.
+     * 
+     * @param vmArguments The program arguments which are set on launch.
+     */
+    public void setProgramArguments(String[] programArguments) {
+
+        this.programArguments = programArguments;
     }
 
     /**
@@ -130,26 +156,31 @@ public class Launcher {
      */
     public void launch() {
 
-        LOGGER.info("Launching main class " + mainClass + " ...");
+        LOGGER.info("Launching main class " + mainClass);
 
         try {
             File file = new File(Launcher.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 
-            List<String> arguments = new ArrayList<String>();
-            arguments.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
-
-            if (vmArguments != null) {
-                LOGGER.info("VM Arguments: " + vmArguments);
+            List<String> command = new ArrayList<String>();
+            command.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
+            LOGGER.info("Java Binary: " + command.get(0));
+            if (vmArguments != null && vmArguments.length > 0) {
+                LOGGER.info("VM Arguments: " + Arrays.toString(vmArguments));
                 for (String vmArgument : vmArguments) {
-                    arguments.add(vmArgument);
+                    command.add(vmArgument);
+                }
+            }
+            command.add("-cp");
+            command.add(file.getAbsolutePath());
+            command.add(mainClass);
+            if (programArguments != null && programArguments.length > 0) {
+                LOGGER.info("Program Arguments: " + Arrays.toString(programArguments));
+                for (String programArgument : programArguments) {
+                    command.add(programArgument);
                 }
             }
 
-            arguments.add("-cp");
-            arguments.add(file.getAbsolutePath());
-            arguments.add(mainClass);
-
-            ProcessBuilder processBuilder = new ProcessBuilder(arguments);
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
 
