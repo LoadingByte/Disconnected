@@ -65,7 +65,7 @@ public class FileTest {
     @Test
     public void testMove() throws OutOfSpaceException {
 
-        testFile.move("test1/test3/test.txt");
+        testFile.move("../../test3/test.txt");
 
         Assert.assertEquals("Moved file exists", testFile, fileSystem.getFile("test1/test3/test.txt"));
         Assert.assertEquals("Moved file has correct path", "test1/test3/test.txt", testFile.getLocalPath());
@@ -89,6 +89,15 @@ public class FileTest {
 
         Assert.assertEquals("Removed file no longer exists", null, fileSystem.getFile("test1/test2/test1.txt"));
         Assert.assertEquals("Renamed file has null path", null, testFile.getLocalPath());
+    }
+
+    @Test
+    public void testResolvePath() {
+
+        Assert.assertEquals("Resolved path of relative one is correct", "/user/homes/test2/docs", File.resolvePath("/user/homes/test/", "../test2/docs/"));
+        Assert.assertEquals("Resolved path of relative one is correct", "/system/bin/kernel", File.resolvePath("/user/homes/test/", "../../../system/bin/kernel"));
+        Assert.assertEquals("Resolved path of relative one is correct", "/", File.resolvePath("/user/homes/test/", "../../../"));
+        Assert.assertEquals("Resolved path of absolute one is correct", "/system/bin/kernel", File.resolvePath("/user/homes/test/", "/system/bin/kernel"));
     }
 
 }

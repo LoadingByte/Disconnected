@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.sim.comp.file;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.Unmarshaller;
@@ -66,18 +67,69 @@ public class File implements SizeObject, InfoString {
      */
     public static final String SEPERATOR = "/";
 
-    private FileSystem         host;
-    private String             name;
+    /**
+     * Creates an absolute path out of the given one.
+     * The algorithm starts at the given start path and changes the path according to the "change" path.
+     * The "change" path also can be absolute. This will ignore the start path.
+     * 
+     * Here's an example:
+     * 
+     * <pre>
+     * Start:  /user/homes/test/
+     * Change: ../test2/docs
+     * Result: /user/home/test2/docs
+     * </pre>
+     * 
+     * @param start The absolute path the algorithm starts at.
+     * @param path The "change" path which defines where the start path should change (see above).
+     * @return The resolved absolute path.
+     */
+    public static String resolvePath(String start, String path) {
+
+        if (!start.startsWith(File.SEPERATOR)) {
+            throw new IllegalArgumentException("Start path must be absolute (it has to start with " + File.SEPERATOR + "): " + start);
+        } else {
+            List<String> current = new ArrayList<String>();
+            if (!path.startsWith(File.SEPERATOR)) {
+                current.addAll(Arrays.asList(start.split(File.SEPERATOR)));
+                // Remove first entry ([this]/...), it's empty
+                current.remove(0);
+            }
+
+            for (String pathChange : path.split(File.SEPERATOR)) {
+                if (!pathChange.equals(".") && !pathChange.isEmpty()) {
+                    if (pathChange.equals("..")) {
+                        current.remove(current.size() - 1);
+                    } else {
+                        current.add(pathChange);
+                    }
+                }
+            }
+
+            if (current.isEmpty()) {
+                return File.SEPERATOR;
+            } else {
+                String resolvedPath = "";
+                for (String part : current) {
+                    resolvedPath += File.SEPERATOR + part;
+                }
+                return resolvedPath;
+            }
+        }
+    }
+
+    private FileSystem       host;
+    private String           name;
     @XmlAttribute
-    private FileType           type;
-    private FileRights         rights;
-    private User               owner;
-    private Group              group;
+    private FileType         type;
+    private FileRights       rights;
+    private User             owner;
+    private Group            group;
 
     @XmlElement
-    private Object             content;
+    private Object           content;
     @XmlElement (name = "file")
-    private final List<File>   children  = new ArrayList<File>();
+    private final List<File> children = new ArrayList<File>();
 
     /**
      * Creates a new empty file.
@@ -524,12 +576,9 @@ public class File implements SizeObject, InfoString {
         }
 
         File oldParent = getParent();
-        if (path.startsWith(SEPERATOR)) {
-            host = host.getHost().getOperatingSystem().getFileSystemManager().getMounted(path);
-            host.addFile(process, this, path.substring(path.indexOf(SEPERATOR, 1)));
-        } else {
-            host.addFile(process, this, path);
-        }
+        path = File.resolvePath(getGlobalHostPath(), path);
+        host = host.getHost().getOperatingSystem().getFileSystemManager().getMounted(path);
+        host.addFile(process, this, path.substring(path.indexOf(SEPERATOR, 1)));
         oldParent.removeChildFile(this);
     }
 
