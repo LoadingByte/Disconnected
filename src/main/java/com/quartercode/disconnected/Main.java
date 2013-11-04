@@ -25,6 +25,12 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
 import com.quartercode.disconnected.graphics.GraphicsManager;
 import com.quartercode.disconnected.graphics.session.DesktopState;
 import com.quartercode.disconnected.profile.ProfileManager;
@@ -81,10 +87,27 @@ public class Main {
         // Print information about the software
         LOGGER.info("Version " + Disconnected.getVersion());
 
-        // Set language from first argument (temp)
-        // TODO: Real CLI and config file
-        if (args.length >= 1) {
-            String[] localeParts = args[0].split("_");
+        // Parse command line arguments
+        Options options = createCommandLineOptions();
+        CommandLine line = null;
+        try {
+            line = new PosixParser().parse(options, args, true);
+        }
+        catch (ParseException e) {
+            LOGGER.warning(e.getMessage());
+            new HelpFormatter().printHelp("java -jar disconnected-" + Disconnected.getVersion() + ".jar", options, true);
+        }
+
+        // Print help if necessary
+        if (line.hasOption("help")) {
+            LOGGER.info("Printing help and returning");
+            new HelpFormatter().printHelp("java -jar disconnected-" + Disconnected.getVersion() + ".jar", options, true);
+            return;
+        }
+
+        // Set locale if necessary
+        if (line.hasOption("locale")) {
+            String[] localeParts = line.getOptionValue("locale").split("_");
             String language = "";
             String country = "";
             String variant = "";
@@ -142,6 +165,15 @@ public class Main {
         LOGGER.info("DEBUG-ACTION: Starting test-game with current simulation");
         Disconnected.getTicker().setRunning(true);
         Disconnected.getGraphicsManager().setState(new DesktopState(simulation));
+    }
+
+    @SuppressWarnings ("static-access")
+    private static Options createCommandLineOptions() {
+
+        Options options = new Options();
+        options.addOption(OptionBuilder.withLongOpt("help").withDescription("Prints a help page").create("h"));
+        options.addOption(OptionBuilder.withLongOpt("locale").hasArg().withArgName("locale").withDescription("Sets the locale code to use (e.g. en or de_DE)").create("l"));
+        return options;
     }
 
     /**
