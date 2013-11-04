@@ -41,6 +41,7 @@ import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
 import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
+import com.quartercode.disconnected.sim.comp.os.Environment;
 import com.quartercode.disconnected.sim.comp.program.KernelProgram;
 import com.quartercode.disconnected.sim.comp.program.desktop.SystemViewerProgram;
 import com.quartercode.disconnected.sim.comp.program.desktop.TerminalProgram;
@@ -199,6 +200,9 @@ public class Main {
         registry.registerClass(TerminalProgram.class);
         registry.registerClass(SystemViewerProgram.class);
         registry.registerClass(ExploitProgram.class);
+
+        // Mixed computer stuff
+        registry.registerClass(Environment.class);
 
         // AI Controllers
         registry.registerClass(PlayerController.class);

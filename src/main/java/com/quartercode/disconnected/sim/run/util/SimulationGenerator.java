@@ -38,6 +38,8 @@ import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSl
 import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
 import com.quartercode.disconnected.sim.comp.net.IP;
+import com.quartercode.disconnected.sim.comp.os.Environment;
+import com.quartercode.disconnected.sim.comp.os.Environment.EnvironmentVariable;
 import com.quartercode.disconnected.sim.comp.os.Group;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.os.User;
@@ -228,6 +230,13 @@ public class SimulationGenerator {
         fileSystem.addFile("bin/sysviewer.exe", FileType.FILE, superuser);
         fileSystem.getFile("bin/sysviewer.exe").setRights(new FileRights("r--xr--xr--x"));
         fileSystem.getFile("bin/sysviewer.exe").setContent(new SystemViewerProgram(new Version("1.0.0"), null));
+
+        // Generate environment
+        Environment environment = new Environment();
+        environment.addVariable(new EnvironmentVariable("PATH", "/system/bin:/user/bin"));
+        fileSystem.addFile("config/environment.xml", FileType.FILE, superuser);
+        fileSystem.getFile("config/environment.xml").setRights(new FileRights("r---r---r---"));
+        fileSystem.getFile("config/environment.xml").setContent(environment);
     }
 
     // Temporary method for generating some unnecessary programs and personal files
