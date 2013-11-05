@@ -92,8 +92,10 @@ public class File implements SizeObject, InfoString {
             List<String> current = new ArrayList<String>();
             if (!path.startsWith(File.SEPERATOR)) {
                 current.addAll(Arrays.asList(start.split(File.SEPERATOR)));
-                // Remove first entry ([this]/...), it's empty
-                current.remove(0);
+                if (current.size() > 0) {
+                    // Remove first entry ([this]/...), it's empty
+                    current.remove(0);
+                }
             }
 
             for (String pathChange : path.split(File.SEPERATOR)) {

@@ -176,7 +176,7 @@ public class FileSystemManager implements InfoString {
      */
     public FileSystem getMounted(String path) {
 
-        if (path.startsWith(File.SEPERATOR)) {
+        if (path.startsWith(File.SEPERATOR) && path.split(File.SEPERATOR).length > 1) {
             for (KnownFileSystem fileSystem : knownFileSystems) {
                 if (fileSystem.getMountpoint().equals(path.split(File.SEPERATOR)[1])) {
                     return fileSystem.getFileSystem();
@@ -275,7 +275,7 @@ public class FileSystemManager implements InfoString {
     public File getFile(String path) {
 
         FileSystem fileSystem = getMounted(path);
-        if (fileSystem != null) {
+        if (fileSystem != null && path.lastIndexOf(File.SEPERATOR) > 0) {
             return fileSystem.getFile(path.substring(path.indexOf(File.SEPERATOR, 1)));
         } else {
             return null;
@@ -513,6 +513,7 @@ public class FileSystemManager implements InfoString {
 
             return getClass().getName() + " [" + toInfoString() + "]";
         }
+
     }
 
 }
