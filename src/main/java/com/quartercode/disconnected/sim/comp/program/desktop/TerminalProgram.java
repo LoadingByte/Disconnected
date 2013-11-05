@@ -21,6 +21,7 @@ package com.quartercode.disconnected.sim.comp.program.desktop;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import com.quartercode.disconnected.graphics.session.Frame;
 import com.quartercode.disconnected.graphics.session.ShellWidget;
 import com.quartercode.disconnected.sim.comp.Version;
@@ -69,6 +70,12 @@ public class TerminalProgram extends Program {
     public long getSize() {
 
         return ByteUnit.BYTE.convert(250, ByteUnit.KILOBYTE);
+    }
+
+    @Override
+    public ResourceBundle getResourceBundle() {
+
+        return ResourceBundles.PROGRAM("terminal");
     }
 
     @Override

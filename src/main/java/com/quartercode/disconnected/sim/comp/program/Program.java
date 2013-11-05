@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ResourceBundle;
 import javax.xml.bind.annotation.XmlElement;
 import com.quartercode.disconnected.sim.comp.ComputerPart;
 import com.quartercode.disconnected.sim.comp.Version;
@@ -112,6 +113,13 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
     protected void addParameters() {
 
     }
+
+    /**
+     * Returns the resource bundle the implementing program uses.
+     * 
+     * @return The resource bundle the implementing program uses.
+     */
+    public abstract ResourceBundle getResourceBundle();
 
     /**
      * Creates a new program executor instance for this program which takes care of acutally running a program.

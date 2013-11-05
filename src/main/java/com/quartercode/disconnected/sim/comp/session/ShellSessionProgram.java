@@ -21,6 +21,7 @@ package com.quartercode.disconnected.sim.comp.session;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import com.quartercode.disconnected.graphics.session.ShellWidget;
@@ -68,6 +69,12 @@ public class ShellSessionProgram extends SessionProgram {
     public long getSize() {
 
         return ByteUnit.BYTE.convert(50, ByteUnit.MEGABYTE);
+    }
+
+    @Override
+    public ResourceBundle getResourceBundle() {
+
+        return ResourceBundles.SHELL;
     }
 
     @Override

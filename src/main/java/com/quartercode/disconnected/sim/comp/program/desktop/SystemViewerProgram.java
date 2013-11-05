@@ -21,6 +21,7 @@ package com.quartercode.disconnected.sim.comp.program.desktop;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.graphics.component.TreeModel;
@@ -73,6 +74,12 @@ public class SystemViewerProgram extends Program {
     public long getSize() {
 
         return ByteUnit.BYTE.convert(500, ByteUnit.KILOBYTE);
+    }
+
+    @Override
+    public ResourceBundle getResourceBundle() {
+
+        return ResourceBundles.PROGRAM("sysviewer");
     }
 
     @Override
@@ -162,7 +169,7 @@ public class SystemViewerProgram extends Program {
 
                 added.set(true);
                 String session = process.getSession() == null ? "" : process.getSession().getUser().getName();
-                String stateDescription = ResourceBundles.PROGRAM("sysviewer").getString("processTable.status." + process.getState().name().toLowerCase());
+                String stateDescription = getResourceBundle().getString("processTable.status." + process.getState().name().toLowerCase());
                 return parent.addChild(process.getFile().getName(), process.getPid(), session, stateDescription);
             }
         };
@@ -175,10 +182,10 @@ public class SystemViewerProgram extends Program {
 
         private SystemViewerFrame() {
 
-            String headerName = ResourceBundles.PROGRAM("sysviewer").getString("processTable.header.name");
-            String headerPid = ResourceBundles.PROGRAM("sysviewer").getString("processTable.header.pid");
-            String headerUser = ResourceBundles.PROGRAM("sysviewer").getString("processTable.header.user");
-            String headerStatus = ResourceBundles.PROGRAM("sysviewer").getString("processTable.header.status");
+            String headerName = getResourceBundle().getString("processTable.header.name");
+            String headerPid = getResourceBundle().getString("processTable.header.pid");
+            String headerUser = getResourceBundle().getString("processTable.header.user");
+            String headerStatus = getResourceBundle().getString("processTable.header.status");
             processTree = new TreeModel(headerName, headerPid, headerUser, headerStatus);
 
             processTreeWidget = new TreeTable(processTree);

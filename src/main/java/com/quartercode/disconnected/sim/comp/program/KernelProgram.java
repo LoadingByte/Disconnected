@@ -20,6 +20,7 @@ package com.quartercode.disconnected.sim.comp.program;
 
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import com.quartercode.disconnected.sim.comp.Version;
@@ -61,6 +62,12 @@ public class KernelProgram extends Program {
     public long getSize() {
 
         return ByteUnit.BYTE.convert(10, ByteUnit.MEGABYTE);
+    }
+
+    @Override
+    public ResourceBundle getResourceBundle() {
+
+        return ResourceBundles.KERNEL;
     }
 
     @Override

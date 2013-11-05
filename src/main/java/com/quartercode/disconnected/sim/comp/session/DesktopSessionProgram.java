@@ -21,6 +21,7 @@ package com.quartercode.disconnected.sim.comp.session;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ResourceBundle;
 import com.quartercode.disconnected.graphics.session.DesktopWidget;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
@@ -65,6 +66,12 @@ public class DesktopSessionProgram extends SessionProgram {
     public long getSize() {
 
         return ByteUnit.BYTE.convert(500, ByteUnit.MEGABYTE);
+    }
+
+    @Override
+    public ResourceBundle getResourceBundle() {
+
+        return ResourceBundles.DESKTOP;
     }
 
     @Override
