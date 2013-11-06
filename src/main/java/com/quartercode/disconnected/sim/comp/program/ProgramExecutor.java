@@ -196,9 +196,9 @@ public abstract class ProgramExecutor implements InfoString {
      * @param arguments The argument map which contains values for the defined parameters.
      * @throws NoFileRightException The host process of this executor hasn't the rights to execute the file.
      * @throws WrongSessionTypeException The executor doesn't support the session it is running in.
-     * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
+     * @throws ArgumentException Some parameters/arguments are not set correctly.
      */
-    protected Process createProcess(File file, Map<String, Object> arguments) throws NoFileRightException, WrongSessionTypeException {
+    protected Process createProcess(File file, Map<String, Object> arguments) throws NoFileRightException, WrongSessionTypeException, ArgumentException {
 
         FileRights.checkRight(host, file, FileRight.EXECUTE);
         return host.createChild(file, arguments);

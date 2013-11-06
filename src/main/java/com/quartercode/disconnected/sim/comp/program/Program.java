@@ -20,16 +20,15 @@ package com.quartercode.disconnected.sim.comp.program;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import javax.xml.bind.annotation.XmlElement;
 import com.quartercode.disconnected.sim.comp.ComputerPart;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
+import com.quartercode.disconnected.sim.comp.program.ArgumentException.ArgumentExceptionType;
 import com.quartercode.disconnected.util.size.SizeObject;
 
 /**
@@ -46,8 +45,8 @@ import com.quartercode.disconnected.util.size.SizeObject;
 public abstract class Program extends ComputerPart implements SizeObject, Vulnerable {
 
     @XmlElement (name = "vulnerability")
-    private List<Vulnerability>         vulnerabilities = new ArrayList<Vulnerability>();
-    private final Map<String, Class<?>> parameters      = new HashMap<String, Class<?>>();
+    private List<Vulnerability>   vulnerabilities = new ArrayList<Vulnerability>();
+    private final List<Parameter> parameters      = new ArrayList<Parameter>();
 
     /**
      * Creates a new empty program.
@@ -81,29 +80,44 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
     }
 
     /**
-     * Returns a list of required execution parameters with their types an executor uses.
+     * Returns a list of possible/required execution parameters.
+     * For more detail on the parameters, see the {@link Parameter} class.
      * 
-     * @return A list of required execution parameters with their types an executor uses.
+     * @return A list of possible/required execution parameters.
      */
-    public Map<String, Class<?>> getParameters() {
+    public List<Parameter> getParameters() {
 
-        return Collections.unmodifiableMap(parameters);
+        return parameters;
     }
 
     /**
-     * Adds a new required execution parameter an executor uses.
-     * If the parameter already exists, this overwrites the old one.
-     * This adding method should only be used by subclasses.
+     * Returns the execution parameter with the given name (or null if there's no parameter with the given name).
+     * For more detail on the parameters, see the {@link Parameter} class.
      * 
-     * @param name The name for the new parameter.
-     * @param type The type an argument which represents the parameter must have.
+     * @param name The name the returned parameter has to have.
+     * @return The execution parameter with the given name
      */
-    protected void addParameter(String name, Class<?> type) {
+    public Parameter getParameter(String name) {
 
-        if (parameters.containsKey(name)) {
-            parameters.remove(name);
+        for (Parameter parameter : parameters) {
+            if (parameter.getName().equals(name)) {
+                return parameter;
+            }
         }
-        parameters.put(name, type);
+
+        return null;
+    }
+
+    /**
+     * Adds a new execution parameter an executor uses.
+     * This adding method should only be used by subclasses.
+     * For more detail on the parameters, see the {@link Parameter} class.
+     * 
+     * @param parameter The new parameter to add to the list.
+     */
+    protected void addParameter(Parameter parameter) {
+
+        parameters.add(parameter);
     }
 
     /**
@@ -128,13 +142,34 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
      * @param host The host process which uses the created executor for running the program instance.
      * @param arguments The argument map which contains values for the defined parameters.
      * @return A new program executor instance for this program which takes care of acutally running a program.
-     * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
+     * @throws ArgumentException Some parameters/arguments are not set correctly.
      */
-    public ProgramExecutor createExecutor(Process host, Map<String, Object> arguments) {
+    public ProgramExecutor createExecutor(Process host, Map<String, Object> arguments) throws ArgumentException {
 
-        for (Entry<String, Class<?>> parameter : parameters.entrySet()) {
-            if (arguments == null || !arguments.containsKey(parameter.getKey()) || !parameter.getValue().isAssignableFrom(arguments.get(parameter.getKey()).getClass())) {
-                throw new IllegalArgumentException("No or wrong argument type for parameter \"" + parameter.getKey() + "\" (type " + parameter.getValue().getName() + ")");
+        for (Parameter parameter : parameters) {
+            if (parameter.isSwitch()) {
+                // Put switch object if it's not set
+                if (!arguments.containsKey(parameter.getName()) || ! (arguments.get(parameter.getName()) instanceof Boolean)) {
+                    arguments.put(parameter.getName(), false);
+                }
+            } else if (parameter.isArgument()) {
+                // Throw exception if argument parameter is required, but not set
+                if (parameter.isRequired() && !arguments.containsKey(parameter.getName())) {
+                    throw new ArgumentException(this, arguments, parameter, ArgumentExceptionType.REQUIRED_NOT_SET);
+                }
+                // Throw exception if argument is required, but not set
+                else if (parameter.isArgumentRequired() && arguments.get(parameter.getName()) == null) {
+                    throw new ArgumentException(this, arguments, parameter, ArgumentExceptionType.ARGUMENT_REQUIRED_NOT_SET);
+                }
+                // Throw exception if argument has the wrong type
+                else if (arguments.get(parameter.getName()) != null && parameter.getType().getClass().isAssignableFrom(arguments.get(parameter.getName()).getClass())) {
+                    throw new ArgumentException(this, arguments, parameter, ArgumentExceptionType.WRONG_ARGUMENT_TYPE);
+                }
+            } else if (parameter.isRest()) {
+                // Throw exception if rest is required, but not set
+                if (parameter.isRequired() && (!arguments.containsKey(parameter.getName()) || ((String[]) arguments.get(parameter.getName())).length == 0)) {
+                    throw new ArgumentException(this, arguments, parameter, ArgumentExceptionType.REQUIRED_NOT_SET);
+                }
             }
         }
 
@@ -148,8 +183,9 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
      * @param host The host process which uses the created executor for running the program instance.
      * @param arguments The argument map which contains values for the defined parameters.
      * @return A new program executor instance for this program which takes care of acutally running a program.
+     * @throws ArgumentException Some parameters/arguments are not set correctly.
      */
-    protected abstract ProgramExecutor createExecutorInstance(Process host, Map<String, Object> arguments);
+    protected abstract ProgramExecutor createExecutorInstance(Process host, Map<String, Object> arguments) throws ArgumentException;
 
     @Override
     public int hashCode() {

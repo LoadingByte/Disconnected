@@ -107,9 +107,9 @@ public class Process implements InfoString {
      * @param file The process launch file which contains the program for the process.
      * @param arguments The argument map which contains values for the defined parameters.
      * @throws WrongSessionTypeException The executor doesn't support the session it is running in.
-     * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
+     * @throws ArgumentException Some parameters/arguments are not set correctly.
      */
-    public Process(OperatingSystem host, Process parent, int pid, File file, Map<String, Object> arguments) throws WrongSessionTypeException {
+    public Process(OperatingSystem host, Process parent, int pid, File file, Map<String, Object> arguments) throws WrongSessionTypeException, ArgumentException {
 
         Validate.isTrue(file.getContent() instanceof Program, "Process launch file must contain a program");
 
@@ -312,9 +312,9 @@ public class Process implements InfoString {
      * @param file The process launch file which contains the program for the process.
      * @param arguments The argument map which contains values for the defined parameters.
      * @throws WrongSessionTypeException The executor doesn't support the session it is running in.
-     * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
+     * @throws ArgumentException Some parameters/arguments are not set correctly.
      */
-    public Process createChild(File file, Map<String, Object> arguments) throws WrongSessionTypeException {
+    public Process createChild(File file, Map<String, Object> arguments) throws WrongSessionTypeException, ArgumentException {
 
         return createChild(file, arguments, host.getProcessManager().requestPid());
     }
@@ -327,9 +327,9 @@ public class Process implements InfoString {
      * @param arguments The argument map which contains values for the defined parameters.
      * @param pid A unique process id the process has. This is used to identify the process.
      * @throws WrongSessionTypeException The executor doesn't support the session it is running in.
-     * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
+     * @throws ArgumentException Some parameters/arguments are not set correctly.
      */
-    public Process createChild(File file, Map<String, Object> arguments, int pid) throws WrongSessionTypeException {
+    public Process createChild(File file, Map<String, Object> arguments, int pid) throws WrongSessionTypeException, ArgumentException {
 
         Process process = new Process(host, this, pid, file, arguments);
         children.add(process);

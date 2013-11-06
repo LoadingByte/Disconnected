@@ -23,6 +23,7 @@ import java.util.Map;
 import com.quartercode.disconnected.graphics.component.GraphicsState;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.program.ArgumentException;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.WrongSessionTypeException;
 import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram.DesktopSession;
@@ -74,12 +75,15 @@ public class DesktopState extends GraphicsState {
             // Open a new desktop session (temp)
             OperatingSystem os = simulation.getLocalPlayer().getComputer().getOperatingSystem();
             Map<String, Object> arguments = new HashMap<String, Object>();
-            arguments.put("user", os.getUserManager().getUsers().get(0));
+            arguments.put("user", os.getUserManager().getUsers().get(0).getName());
             Process process = os.getProcessManager().getRootProcess().createChild(os.getFileSystemManager().getFile("/system/bin/desktops.exe"), arguments);
             desktopWidget = ((DesktopSession) process.getExecutor()).createWidget();
             add(desktopWidget);
         }
         catch (WrongSessionTypeException e) {
+            // Wont ever happen
+        }
+        catch (ArgumentException e) {
             // Wont ever happen
         }
     }

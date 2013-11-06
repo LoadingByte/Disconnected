@@ -24,6 +24,10 @@ import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.os.User;
+import com.quartercode.disconnected.sim.comp.program.ArgumentException;
+import com.quartercode.disconnected.sim.comp.program.ArgumentException.ArgumentExceptionType;
+import com.quartercode.disconnected.sim.comp.program.Parameter;
+import com.quartercode.disconnected.sim.comp.program.Parameter.ArgumentType;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.Program;
 import com.quartercode.disconnected.sim.comp.program.ProgramExecutor;
@@ -61,13 +65,25 @@ public abstract class SessionProgram extends Program {
     @Override
     protected void addParameters() {
 
-        addParameter("user", User.class);
+        addParameter(Parameter.createArgument("user", "u", ArgumentType.STRING, false, true));
     }
 
     @Override
-    protected ProgramExecutor createExecutorInstance(Process host, Map<String, Object> arguments) {
+    protected ProgramExecutor createExecutorInstance(Process host, Map<String, Object> arguments) throws ArgumentException {
 
-        return openSession(host, (User) arguments.get("user"));
+        String username = (String) arguments.get("user");
+        User user = null;
+        for (User testUser : host.getHost().getUserManager().getUsers()) {
+            if (testUser.getName().equals(username)) {
+                user = testUser;
+            }
+        }
+
+        if (user == null) {
+            throw new ArgumentException(this, arguments, getParameter("user"), ArgumentExceptionType.WRONG_ARGUMENT_TYPE);
+        } else {
+            return openSession(host, user);
+        }
     }
 
     /**

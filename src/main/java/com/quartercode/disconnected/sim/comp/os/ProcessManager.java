@@ -23,6 +23,7 @@ import java.util.List;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import com.quartercode.disconnected.sim.comp.net.Address;
+import com.quartercode.disconnected.sim.comp.program.ArgumentException;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.WrongSessionTypeException;
 import com.quartercode.disconnected.util.InfoString;
@@ -141,6 +142,9 @@ public class ProcessManager implements InfoString {
                 rootProcess = new Process(host, null, 0, host.getFileSystemManager().getFile("/system/boot/kernel"), null);
             }
             catch (WrongSessionTypeException e) {
+                // Wont ever happen
+            }
+            catch (ArgumentException e) {
                 // Wont ever happen
             }
         } else {
