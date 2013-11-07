@@ -80,7 +80,7 @@ public abstract class SessionProgram extends Program {
         }
 
         if (user == null) {
-            throw new ArgumentException(this, arguments, getParameter("user"), ArgumentExceptionType.WRONG_ARGUMENT_TYPE);
+            throw new ArgumentException(getParameter("user"), ArgumentExceptionType.WRONG_ARGUMENT_TYPE);
         } else {
             return openSession(host, user);
         }

@@ -1,5 +1,24 @@
+/*
+ * This file is part of Disconnected.
+ * Copyright (c) 2013 QuarterCode <http://www.quartercode.com/>
+ *
+ * Disconnected is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Disconnected is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 package com.quartercode.disconnected.sim.comp.program;
+
+import com.quartercode.disconnected.sim.comp.program.ArgumentException.ArgumentExceptionType;
 
 /**
  * A parameter is a placeholder for an actual argument.
@@ -107,10 +126,11 @@ public class Parameter {
         STRING {
 
             @Override
-            public Object parse(String input) {
+            public Object parse(Parameter parameter, String argument) {
 
-                return input;
+                return argument;
             }
+
         },
         /**
          * A normal {@link Integer} number.
@@ -118,10 +138,16 @@ public class Parameter {
         INTEGER {
 
             @Override
-            public Object parse(String input) {
+            public Object parse(Parameter parameter, String argument) throws ArgumentException {
 
-                return Integer.parseInt(input);
+                try {
+                    return Integer.parseInt(argument);
+                }
+                catch (NumberFormatException e) {
+                    throw new ArgumentException(parameter, ArgumentExceptionType.WRONG_ARGUMENT_TYPE);
+                }
             }
+
         },
         /**
          * A normal {@link Double} number.
@@ -129,20 +155,28 @@ public class Parameter {
         DOUBLE {
 
             @Override
-            public Object parse(String input) {
+            public Object parse(Parameter parameter, String argument) throws ArgumentException {
 
-                return Double.parseDouble(input);
+                try {
+                    return Double.parseDouble(argument);
+                }
+                catch (NumberFormatException e) {
+                    throw new ArgumentException(parameter, ArgumentExceptionType.WRONG_ARGUMENT_TYPE);
+                }
             }
+
         };
 
         /**
          * Parses a given input string into a proper output object.
          * For example, a {@link ArgumentType#INTEGER} parses "123" into the primitive int 123.
          * 
-         * @param input The input string to parse.
+         * @param parameter The parameter which has the argument you want to parse.
+         * @param argument The input argument to parse.
          * @return The parsed proper output object.
+         * @throws ArgumentException Something goes wrong while parsing the given argument.
          */
-        public abstract Object parse(String input);
+        public abstract Object parse(Parameter parameter, String argument) throws ArgumentException;
 
     }
 

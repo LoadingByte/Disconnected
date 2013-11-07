@@ -18,15 +18,13 @@
 
 package com.quartercode.disconnected.sim.comp.program;
 
-import java.util.Map;
-
 /**
  * The argument exception can occur during the parsing of arguments.
  * For example, a required argument could not been set.
  */
 public class ArgumentException extends Exception {
 
-    private static final long serialVersionUID = 9068325487337975504L;
+    private static final long serialVersionUID = 1577607142852766455L;
 
     /**
      * This enumeration describes the different types of exceptions which can occur.
@@ -48,47 +46,21 @@ public class ArgumentException extends Exception {
 
     }
 
-    private final Program               program;
-    private final Map<String, Object>   arguments;
     private final Parameter             parameter;
     private final ArgumentExceptionType type;
 
     /**
      * Creates a new argument exception and initalizes the important values.
      * 
-     * @param program The program which was attempted to start while the exception occurred.
-     * @param arguments The arguments which were parsed so far.
      * @param parameter The parameter which triggered the exception.
      * @param type The type of argument error which occurred.
      */
-    public ArgumentException(Program program, Map<String, Object> arguments, Parameter parameter, ArgumentExceptionType type) {
+    public ArgumentException(Parameter parameter, ArgumentExceptionType type) {
 
         super("Argument exception with parameter " + parameter + " (" + type + ")");
 
-        this.program = program;
-        this.arguments = arguments;
         this.parameter = parameter;
         this.type = type;
-    }
-
-    /**
-     * Returns the program which was attempted to start while the exception occurred.
-     * 
-     * @return The program which was attempted to start while the exception occurred.
-     */
-    public Program getProgram() {
-
-        return program;
-    }
-
-    /**
-     * Returns the arguments which were parsed so far.
-     * 
-     * @return The arguments which were parsed so far.
-     */
-    public Map<String, Object> getArguments() {
-
-        return arguments;
     }
 
     /**

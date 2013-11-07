@@ -155,20 +155,20 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
             } else if (parameter.isArgument()) {
                 // Throw exception if argument parameter is required, but not set
                 if (parameter.isRequired() && !arguments.containsKey(parameter.getName())) {
-                    throw new ArgumentException(this, arguments, parameter, ArgumentExceptionType.REQUIRED_NOT_SET);
+                    throw new ArgumentException(parameter, ArgumentExceptionType.REQUIRED_NOT_SET);
                 }
                 // Throw exception if argument is required, but not set
                 else if (parameter.isArgumentRequired() && arguments.get(parameter.getName()) == null) {
-                    throw new ArgumentException(this, arguments, parameter, ArgumentExceptionType.ARGUMENT_REQUIRED_NOT_SET);
+                    throw new ArgumentException(parameter, ArgumentExceptionType.ARGUMENT_REQUIRED_NOT_SET);
                 }
                 // Throw exception if argument has the wrong type
                 else if (arguments.get(parameter.getName()) != null && parameter.getType().getClass().isAssignableFrom(arguments.get(parameter.getName()).getClass())) {
-                    throw new ArgumentException(this, arguments, parameter, ArgumentExceptionType.WRONG_ARGUMENT_TYPE);
+                    throw new ArgumentException(parameter, ArgumentExceptionType.WRONG_ARGUMENT_TYPE);
                 }
             } else if (parameter.isRest()) {
                 // Throw exception if rest is required, but not set
                 if (parameter.isRequired() && (!arguments.containsKey(parameter.getName()) || ((String[]) arguments.get(parameter.getName())).length == 0)) {
-                    throw new ArgumentException(this, arguments, parameter, ArgumentExceptionType.REQUIRED_NOT_SET);
+                    throw new ArgumentException(parameter, ArgumentExceptionType.REQUIRED_NOT_SET);
                 }
             }
         }
