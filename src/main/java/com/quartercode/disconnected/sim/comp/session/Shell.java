@@ -18,6 +18,9 @@
 
 package com.quartercode.disconnected.sim.comp.session;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,10 +28,24 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlIDREF;
+import org.apache.commons.cli.HelpFormatter;
 import com.quartercode.disconnected.graphics.session.ShellWidget;
 import com.quartercode.disconnected.sim.comp.file.File;
+import com.quartercode.disconnected.sim.comp.file.FileRights;
+import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
+import com.quartercode.disconnected.sim.comp.file.NoFileRightException;
 import com.quartercode.disconnected.sim.comp.os.Environment;
+import com.quartercode.disconnected.sim.comp.program.ArgumentException;
+import com.quartercode.disconnected.sim.comp.program.ArgumentException.MissingArgumentException;
+import com.quartercode.disconnected.sim.comp.program.ArgumentException.MissingParameterException;
+import com.quartercode.disconnected.sim.comp.program.ArgumentException.WrongArgumentTypeException;
+import com.quartercode.disconnected.sim.comp.program.Parameter;
+import com.quartercode.disconnected.sim.comp.program.Program;
+import com.quartercode.disconnected.sim.comp.program.WrongSessionTypeException;
+import com.quartercode.disconnected.sim.comp.session.ShellParser.CommandNotFoundException;
+import com.quartercode.disconnected.sim.comp.session.ShellParser.ParsedCommand;
 import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram.ShellSession;
+import com.quartercode.disconnected.util.ResourceBundles;
 
 /**
  * A shell can run commands and holds the latest output messages.
@@ -89,6 +106,16 @@ public class Shell {
     }
 
     /**
+     * Returns the environment the shell uses internally for parsing commands.
+     * 
+     * @return The environment the shell uses.
+     */
+    public Environment getEnvironment() {
+
+        return environment;
+    }
+
+    /**
      * Returns the directory the shell is currently in.
      * This directory is used for all relative paths used in the shell.
      * The object is null if the shell is currently in the root directory.
@@ -111,6 +138,10 @@ public class Shell {
     public void setCurrentDirectory(File currentDirectory) {
 
         this.currentDirectory = currentDirectory;
+
+        for (ShellWidget widget : host.getWidgets()) {
+            widget.update();
+        }
     }
 
     /**
@@ -124,12 +155,22 @@ public class Shell {
         return Collections.unmodifiableList(output);
     }
 
-    private void printOutput(String line) {
+    /**
+     * Prints a new line onto the shell output.
+     * This automatically updates all shell widgets so they display the current output.
+     * 
+     * @param line The new line to print onto the shell.
+     */
+    public void printLine(String line) {
 
         if (output.size() == 50) {
             output.remove(0);
         }
         output.add(line);
+
+        for (ShellWidget widget : host.getWidgets()) {
+            widget.update();
+        }
     }
 
     /**
@@ -140,11 +181,59 @@ public class Shell {
      */
     public void run(String command) {
 
-        // TODO: Run command
+        try {
+            ParsedCommand parsedCommand = ShellParser.parse(this, command);
 
-        printOutput("Input: " + command);
-        for (ShellWidget widget : host.getWidgets()) {
-            widget.update();
+            if (parsedCommand.getArguments().containsKey("help")) {
+                printHelp((Program) parsedCommand.getFile().getContent(), command.split(" ")[0]);
+            } else {
+                try {
+                    FileRights.checkRight(host.getHost(), parsedCommand.getFile(), FileRight.EXECUTE);
+                    host.getHost().createChild(parsedCommand.getFile(), parsedCommand.getArguments());
+                }
+                catch (NoFileRightException e) {
+                    printLine(MessageFormat.format(ResourceBundles.SHELL.getString("command.noRight"), parsedCommand.getFile().getGlobalHostPath()));
+                }
+                catch (WrongSessionTypeException e) {
+                    printLine(MessageFormat.format(ResourceBundles.SHELL.getString("command.wrongSessionType"), parsedCommand.getFile().getGlobalHostPath()));
+                }
+                catch (MissingParameterException e) {
+                    printLine(MessageFormat.format(ResourceBundles.SHELL.getString("command.parameter.missingParameter"), e.getParameter().getName()));
+                }
+                catch (MissingArgumentException e) {
+                    printLine(MessageFormat.format(ResourceBundles.SHELL.getString("command.parameter.missingArgument"), e.getParameter().getName()));
+                }
+            }
+        }
+        catch (CommandNotFoundException e) {
+            printLine(MessageFormat.format(ResourceBundles.SHELL.getString("command.notFound"), e.getCommand()));
+        }
+        catch (WrongArgumentTypeException e) {
+            printLine(MessageFormat.format(ResourceBundles.SHELL.getString("command.parameter.wrongArgumentType"), e.getParameter().getName(), e.getArgument()));
+        }
+        catch (ArgumentException e) {
+            throw new RuntimeException("Received unknown argument exception", e);
+        }
+    }
+
+    private void printHelp(Program program, String call) {
+
+        printLine(program.getResourceBundle().getString("description"));
+
+        String usage = call;
+        usage += " [" + ResourceBundles.SHELL.getString("options.help.options") + "]";
+        for (Parameter parameter : program.getParameters()) {
+            if (parameter.isRest()) {
+                usage += " [" + parameter.getName() + "]";
+                break;
+            }
+        }
+        printLine(ResourceBundles.SHELL.getString("options.help.usage") + " " + usage);
+
+        StringWriter stringWriter = new StringWriter();
+        new HelpFormatter().printOptions(new PrintWriter(stringWriter), HelpFormatter.DEFAULT_WIDTH, ShellParser.generateOptions(program), 4, HelpFormatter.DEFAULT_DESC_PAD);
+        for (String line : stringWriter.toString().split("\n")) {
+            printLine(line);
         }
     }
 
