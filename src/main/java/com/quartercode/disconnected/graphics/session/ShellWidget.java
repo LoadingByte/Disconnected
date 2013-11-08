@@ -121,7 +121,7 @@ public class ShellWidget extends Widget {
 
         final StringBuilder output = new StringBuilder();
         for (String line : shell.getOutput()) {
-            output.append(line).append("<br/>");
+            output.append(line.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("  ", "&nbsp;&nbsp;")).append("<br/>");
         }
         outputModel.setHtml(output.toString());
         String currentDirectory = shell.getCurrentDirectory() == null ? "/" : shell.getCurrentDirectory().getGlobalPath(shell.getHost().getHost().getHost());
