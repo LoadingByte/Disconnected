@@ -20,47 +20,24 @@ package com.quartercode.disconnected.sim.comp.program;
 
 /**
  * The argument exception can occur during the parsing of arguments.
- * For example, a required argument could not been set.
+ * For example, a required parameter could not been set.
  */
 public class ArgumentException extends Exception {
 
-    private static final long serialVersionUID = 1577607142852766455L;
+    private static final long serialVersionUID = 2473994665811595894L;
+
+    private final Parameter   parameter;
 
     /**
-     * This enumeration describes the different types of exceptions which can occur.
-     */
-    public static enum ArgumentExceptionType {
-
-        /**
-         * A required parameter is not set.
-         */
-        REQUIRED_NOT_SET,
-        /**
-         * The argument of an argument parameter which requires an argument is not set.
-         */
-        ARGUMENT_REQUIRED_NOT_SET,
-        /**
-         * An argument has the wrong type or can't be parsed.
-         */
-        WRONG_ARGUMENT_TYPE;
-
-    }
-
-    private final Parameter             parameter;
-    private final ArgumentExceptionType type;
-
-    /**
-     * Creates a new argument exception and initalizes the important values.
+     * Creates a new argument exception.
      * 
      * @param parameter The parameter which triggered the exception.
-     * @param type The type of argument error which occurred.
      */
-    public ArgumentException(Parameter parameter, ArgumentExceptionType type) {
+    protected ArgumentException(Parameter parameter) {
 
-        super("Argument exception with parameter " + parameter + " (" + type + ")");
+        super("Argument exception with parameter " + parameter.getName());
 
         this.parameter = parameter;
-        this.type = type;
     }
 
     /**
@@ -74,13 +51,111 @@ public class ArgumentException extends Exception {
     }
 
     /**
-     * Returns the type of argument error which occurred.
+     * The missing parameter exception occurs if there's a missing parameter.
+     * Example:
      * 
-     * @return The type of argument error which occurred.
+     * <pre>
+     * Note: -b is a required parameter.
+     * 
+     * test -a -b -c
+     * > Works
+     * 
+     * test -a -c
+     * > MissingParameterException: -b is missing
+     * </pre>
+     * 
+     * Of course, required parameters do only make sense in combination with arguments.
      */
-    public ArgumentExceptionType getType() {
+    public static class MissingParameterException extends ArgumentException {
 
-        return type;
+        private static final long serialVersionUID = 2138955512792779485L;
+
+        /**
+         * Creates a new missing parameter exception.
+         * 
+         * @param parameter The parameter which triggered the exception.
+         */
+        public MissingParameterException(Parameter parameter) {
+
+            super(parameter);
+        }
+
+    }
+
+    /**
+     * The missing argument exception occurs if there's a missing argument for a parameter.
+     * Example:
+     * 
+     * <pre>
+     * Note: &lt;arg&gt; for -a is a required argument.
+     * 
+     * test
+     * test -a something
+     * > Works
+     * 
+     * test -a
+     * > ArgumentRequiredException: &lt;arg&gt; for -a is missing
+     * </pre>
+     */
+    public static class MissingArgumentException extends ArgumentException {
+
+        private static final long serialVersionUID = -7408390821833517544L;
+
+        /**
+         * Creates a new missing argument exception.
+         * 
+         * @param parameter The parameter which triggered the exception.
+         */
+        public MissingArgumentException(Parameter parameter) {
+
+            super(parameter);
+        }
+
+    }
+
+    /**
+     * The wrong argument type exception occurs if an argument has the wrong type or can't be parsed.
+     * Example:
+     * 
+     * <pre>
+     * Note: -a awaits an integer.
+     * 
+     * test -a 12345
+     * > Works
+     * 
+     * test -a something
+     * > WrongArgumentTypeException: "something" is not an integer
+     * </pre>
+     */
+    public static class WrongArgumentTypeException extends ArgumentException {
+
+        private static final long serialVersionUID = 9039285869652712981L;
+
+        private final String      argument;
+
+        /**
+         * Creates a new wrong argument type exception.
+         * 
+         * @param parameter The parameter which triggered the exception.
+         * @param argument The argument which has the wrong type as a string.
+         */
+        public WrongArgumentTypeException(Parameter parameter, String argument) {
+
+            super(parameter);
+
+            this.argument = argument;
+        }
+
+        /**
+         * Returns the argument which has the wrong type as a string.
+         * 
+         * @return The argument which has the wrong type.
+         */
+        public String getArgument() {
+
+            return argument;
+        }
+
     }
 
 }

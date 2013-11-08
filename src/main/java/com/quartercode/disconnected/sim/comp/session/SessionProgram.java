@@ -25,7 +25,7 @@ import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.sim.comp.program.ArgumentException;
-import com.quartercode.disconnected.sim.comp.program.ArgumentException.ArgumentExceptionType;
+import com.quartercode.disconnected.sim.comp.program.ArgumentException.WrongArgumentTypeException;
 import com.quartercode.disconnected.sim.comp.program.Parameter;
 import com.quartercode.disconnected.sim.comp.program.Parameter.ArgumentType;
 import com.quartercode.disconnected.sim.comp.program.Process;
@@ -80,7 +80,7 @@ public abstract class SessionProgram extends Program {
         }
 
         if (user == null) {
-            throw new ArgumentException(getParameter("user"), ArgumentExceptionType.WRONG_ARGUMENT_TYPE);
+            throw new WrongArgumentTypeException(getParameter("user"), arguments.get("user").toString());
         } else {
             return openSession(host, user);
         }

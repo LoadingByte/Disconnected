@@ -20,6 +20,7 @@ package com.quartercode.disconnected.sim.comp.program;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -28,7 +29,9 @@ import com.quartercode.disconnected.sim.comp.ComputerPart;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
-import com.quartercode.disconnected.sim.comp.program.ArgumentException.ArgumentExceptionType;
+import com.quartercode.disconnected.sim.comp.program.ArgumentException.MissingArgumentException;
+import com.quartercode.disconnected.sim.comp.program.ArgumentException.MissingParameterException;
+import com.quartercode.disconnected.sim.comp.program.ArgumentException.WrongArgumentTypeException;
 import com.quartercode.disconnected.util.size.SizeObject;
 
 /**
@@ -146,6 +149,9 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
      */
     public ProgramExecutor createExecutor(Process host, Map<String, Object> arguments) throws ArgumentException {
 
+        // Create a new hash map with the contents of the old one (it will get modified)
+        arguments = arguments == null ? new HashMap<String, Object>() : new HashMap<String, Object>(arguments);
+
         for (Parameter parameter : parameters) {
             if (parameter.isSwitch()) {
                 // Put switch object if it's not set
@@ -155,20 +161,20 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
             } else if (parameter.isArgument()) {
                 // Throw exception if argument parameter is required, but not set
                 if (parameter.isRequired() && !arguments.containsKey(parameter.getName())) {
-                    throw new ArgumentException(parameter, ArgumentExceptionType.REQUIRED_NOT_SET);
+                    throw new MissingParameterException(parameter);
                 }
                 // Throw exception if argument is required, but not set
                 else if (parameter.isArgumentRequired() && arguments.get(parameter.getName()) == null) {
-                    throw new ArgumentException(parameter, ArgumentExceptionType.ARGUMENT_REQUIRED_NOT_SET);
+                    throw new MissingArgumentException(parameter);
                 }
                 // Throw exception if argument has the wrong type
-                else if (arguments.get(parameter.getName()) != null && parameter.getType().getClass().isAssignableFrom(arguments.get(parameter.getName()).getClass())) {
-                    throw new ArgumentException(parameter, ArgumentExceptionType.WRONG_ARGUMENT_TYPE);
+                else if (arguments.get(parameter.getName()) != null && !parameter.getType().getType().isAssignableFrom(arguments.get(parameter.getName()).getClass())) {
+                    throw new WrongArgumentTypeException(parameter, arguments.get(parameter.getName()).toString());
                 }
             } else if (parameter.isRest()) {
                 // Throw exception if rest is required, but not set
                 if (parameter.isRequired() && (!arguments.containsKey(parameter.getName()) || ((String[]) arguments.get(parameter.getName())).length == 0)) {
-                    throw new ArgumentException(parameter, ArgumentExceptionType.REQUIRED_NOT_SET);
+                    throw new MissingParameterException(parameter);
                 }
             }
         }
@@ -192,7 +198,6 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
 
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (parameters == null ? 0 : parameters.hashCode());
         result = prime * result + (vulnerabilities == null ? 0 : vulnerabilities.hashCode());
         return result;
     }
@@ -210,13 +215,6 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
             return false;
         }
         Program other = (Program) obj;
-        if (parameters == null) {
-            if (other.parameters != null) {
-                return false;
-            }
-        } else if (!parameters.equals(other.parameters)) {
-            return false;
-        }
         if (vulnerabilities == null) {
             if (other.vulnerabilities != null) {
                 return false;

@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.sim.comp.program;
 
-import com.quartercode.disconnected.sim.comp.program.ArgumentException.ArgumentExceptionType;
+import com.quartercode.disconnected.sim.comp.program.ArgumentException.WrongArgumentTypeException;
 
 /**
  * A parameter is a placeholder for an actual argument.
@@ -123,7 +123,7 @@ public class Parameter {
         /**
          * A normal {@link String}.
          */
-        STRING {
+        STRING (String.class) {
 
             @Override
             public Object parse(Parameter parameter, String argument) {
@@ -135,16 +135,16 @@ public class Parameter {
         /**
          * A normal {@link Integer} number.
          */
-        INTEGER {
+        INTEGER (Integer.class) {
 
             @Override
-            public Object parse(Parameter parameter, String argument) throws ArgumentException {
+            public Object parse(Parameter parameter, String argument) throws WrongArgumentTypeException {
 
                 try {
                     return Integer.parseInt(argument);
                 }
                 catch (NumberFormatException e) {
-                    throw new ArgumentException(parameter, ArgumentExceptionType.WRONG_ARGUMENT_TYPE);
+                    throw new WrongArgumentTypeException(parameter, argument);
                 }
             }
 
@@ -152,20 +152,37 @@ public class Parameter {
         /**
          * A normal {@link Double} number.
          */
-        DOUBLE {
+        DOUBLE (Double.class) {
 
             @Override
-            public Object parse(Parameter parameter, String argument) throws ArgumentException {
+            public Object parse(Parameter parameter, String argument) throws WrongArgumentTypeException {
 
                 try {
                     return Double.parseDouble(argument);
                 }
                 catch (NumberFormatException e) {
-                    throw new ArgumentException(parameter, ArgumentExceptionType.WRONG_ARGUMENT_TYPE);
+                    throw new WrongArgumentTypeException(parameter, argument);
                 }
             }
 
         };
+
+        private Class<?> type;
+
+        private ArgumentType(Class<?> type) {
+
+            this.type = type;
+        }
+
+        /**
+         * Returns the type the argument type parses objects to in {@link #parse(Parameter, String)}.
+         * 
+         * @return The type the argument type uses.
+         */
+        public Class<?> getType() {
+
+            return type;
+        }
 
         /**
          * Parses a given input string into a proper output object.
@@ -174,9 +191,9 @@ public class Parameter {
          * @param parameter The parameter which has the argument you want to parse.
          * @param argument The input argument to parse.
          * @return The parsed proper output object.
-         * @throws ArgumentException Something goes wrong while parsing the given argument.
+         * @throws WrongArgumentTypeException Something goes wrong while parsing the given argument.
          */
-        public abstract Object parse(Parameter parameter, String argument) throws ArgumentException;
+        public abstract Object parse(Parameter parameter, String argument) throws WrongArgumentTypeException;
 
     }
 
