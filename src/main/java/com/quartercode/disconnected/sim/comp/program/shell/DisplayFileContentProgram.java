@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.file.File;
+import com.quartercode.disconnected.sim.comp.file.NoFileRightException;
 import com.quartercode.disconnected.sim.comp.file.TextContent;
 import com.quartercode.disconnected.sim.comp.program.Parameter;
 import com.quartercode.disconnected.sim.comp.program.Process;
@@ -39,7 +40,7 @@ import com.quartercode.disconnected.util.ResourceBundles;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 /**
- * This program displays the content of text files on the shell.
+ * The display file content program displays the content of text files on the shell.
  * 
  * @see Shell
  */
@@ -47,7 +48,7 @@ import com.quartercode.disconnected.util.size.ByteUnit;
 public class DisplayFileContentProgram extends Program {
 
     /**
-     * Creates a new empty change directory program.
+     * Creates a new empty display file content program.
      * This is only recommended for direct field access (e.g. for serialization).
      */
     protected DisplayFileContentProgram() {
@@ -55,7 +56,7 @@ public class DisplayFileContentProgram extends Program {
     }
 
     /**
-     * Creates a new change directory program and sets the version and the vulnerabilities.
+     * Creates a new display file content program and sets the version and the vulnerabilities.
      * 
      * @param version The current version the program has.
      * @param vulnerabilities The vulnerabilities the program has.
@@ -119,7 +120,12 @@ public class DisplayFileContentProgram extends Program {
             } else if (! (file.getContent() instanceof TextContent)) {
                 shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "file.noText", path));
             } else {
-                shell.printMessage(new ShellMessage(this, ShellMessageType.INFO, "display", ((TextContent) file.getContent()).getTextContent()));
+                try {
+                    shell.printMessage(new ShellMessage(this, ShellMessageType.INFO, "display", ((TextContent) file.read(getHost())).getTextContent()));
+                }
+                catch (NoFileRightException e) {
+                    shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "file.noRights", path));
+                }
             }
 
             getHost().stop(false);

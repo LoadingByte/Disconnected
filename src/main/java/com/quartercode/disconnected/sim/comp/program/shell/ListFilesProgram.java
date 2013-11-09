@@ -43,7 +43,7 @@ import com.quartercode.disconnected.util.ResourceBundles;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 /**
- * The change directory program just changes the current directory of a shell session.
+ * The list files program just changes the current directory of a shell session.
  * 
  * @see Shell
  */
@@ -51,7 +51,7 @@ import com.quartercode.disconnected.util.size.ByteUnit;
 public class ListFilesProgram extends Program {
 
     /**
-     * Creates a new empty change directory program.
+     * Creates a new empty list files program.
      * This is only recommended for direct field access (e.g. for serialization).
      */
     protected ListFilesProgram() {
@@ -59,7 +59,7 @@ public class ListFilesProgram extends Program {
     }
 
     /**
-     * Creates a new change directory program and sets the version and the vulnerabilities.
+     * Creates a new list files program and sets the version and the vulnerabilities.
      * 
      * @param version The current version the program has.
      * @param vulnerabilities The vulnerabilities the program has.
