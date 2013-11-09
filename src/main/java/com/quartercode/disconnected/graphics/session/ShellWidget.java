@@ -83,6 +83,7 @@ public class ShellWidget extends Widget implements ShellUserInterface {
             public void callback(int key) {
 
                 if (key == Event.KEY_RETURN) {
+                    append("<span style=\"color: #00AA00;\">").append(prompt.getText()).append("</span> ").append(input.getText()).appendRender("<br/>");
                     ShellWidget.this.shell.run(input.getText());
                     input.setText("");
                 }
