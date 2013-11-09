@@ -164,7 +164,7 @@ public abstract class Program extends ComputerPart implements SizeObject, Vulner
                     throw new MissingParameterException(parameter);
                 }
                 // Throw exception if argument is required, but not set
-                else if (parameter.isArgumentRequired() && arguments.get(parameter.getName()) == null) {
+                else if (arguments.containsKey(parameter.getName()) && parameter.isArgumentRequired() && arguments.get(parameter.getName()) == null) {
                     throw new MissingArgumentException(parameter);
                 }
                 // Throw exception if argument has the wrong type
