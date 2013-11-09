@@ -21,6 +21,7 @@ package com.quartercode.disconnected.sim.comp.program.shell;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
@@ -90,6 +91,7 @@ public class ChangeDirectoryProgram extends Program {
 
     protected static class ChangeDirectoryProgramExecutor extends ShellProgramExecutor {
 
+        @XmlElement
         private String path;
 
         protected ChangeDirectoryProgramExecutor() {
@@ -129,6 +131,7 @@ public class ChangeDirectoryProgram extends Program {
                     shell.setCurrentDirectory(file);
                 }
             }
+
             getHost().stop(false);
         }
 
