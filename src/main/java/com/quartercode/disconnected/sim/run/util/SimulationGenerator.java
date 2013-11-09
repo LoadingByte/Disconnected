@@ -48,6 +48,7 @@ import com.quartercode.disconnected.sim.comp.program.KernelProgram;
 import com.quartercode.disconnected.sim.comp.program.desktop.SystemViewerProgram;
 import com.quartercode.disconnected.sim.comp.program.desktop.TerminalProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.ChangeDirectoryProgram;
+import com.quartercode.disconnected.sim.comp.program.shell.DisplayFileContentProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.ExploitProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.ListFilesProgram;
 import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram;
@@ -220,6 +221,8 @@ public class SimulationGenerator {
         // Generate system programs
         addFile(fileSystem, "bin/cd.exe", superuser, new FileRights("r--xr--xr--x"), new ChangeDirectoryProgram(new Version("1.0.0"), null));
         addFile(fileSystem, "bin/ls.exe", superuser, new FileRights("r--xr--xr--x"), new ListFilesProgram(new Version("1.0.0"), null));
+        addFile(fileSystem, "bin/cat.exe", superuser, new FileRights("r--xr--xr--x"), new DisplayFileContentProgram(new Version("1.0.0"), null));
+
         addFile(fileSystem, "bin/terminal.exe", superuser, new FileRights("r--xr--xr--x"), new TerminalProgram(new Version("1.0.0"), null));
         addFile(fileSystem, "bin/sysviewer.exe", superuser, new FileRights("r--xr--xr--x"), new SystemViewerProgram(new Version("1.0.0"), null));
 

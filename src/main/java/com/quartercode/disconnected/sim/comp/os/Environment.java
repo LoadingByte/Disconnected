@@ -22,9 +22,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import com.quartercode.disconnected.sim.comp.file.TextContent;
 import com.quartercode.disconnected.util.InfoString;
 import com.quartercode.disconnected.util.size.SizeObject;
 import com.quartercode.disconnected.util.size.SizeUtil;
@@ -35,7 +37,7 @@ import com.quartercode.disconnected.util.size.SizeUtil;
  * 
  * @see EnvironmentVariable
  */
-public class Environment implements SizeObject {
+public class Environment implements SizeObject, TextContent {
 
     @XmlValue
     @XmlJavaTypeAdapter (value = Environment.EnvironmentAdapter.class)
@@ -67,12 +69,7 @@ public class Environment implements SizeObject {
      */
     public Environment(String variables) {
 
-        for (String line : variables.split("\n")) {
-            String[] parts = line.split("=");
-            if (parts.length == 2) {
-                addVariable(new EnvironmentVariable(parts[0], parts[1]));
-            }
-        }
+        setTextContent(variables);
     }
 
     /**
@@ -135,6 +132,24 @@ public class Environment implements SizeObject {
     }
 
     @Override
+    @XmlTransient
+    public String getTextContent() {
+
+        return toString();
+    }
+
+    @Override
+    public void setTextContent(String content) {
+
+        for (String line : content.split("\n")) {
+            String[] parts = line.split("=");
+            if (parts.length == 2) {
+                addVariable(new EnvironmentVariable(parts[0], parts[1]));
+            }
+        }
+    }
+
+    @Override
     public Environment clone() {
 
         return new Environment(toString());
@@ -179,7 +194,7 @@ public class Environment implements SizeObject {
         for (EnvironmentVariable variable : variables) {
             content += variable.getName() + "=" + variable.getValue() + "\n";
         }
-        return content;
+        return content.substring(0, content.length() - 1);
     }
 
     /**
@@ -423,7 +438,7 @@ public class Environment implements SizeObject {
             for (EnvironmentVariable variable : v) {
                 environment.addVariable(variable);
             }
-            return environment.toString().substring(0, environment.toString().length() - 1);
+            return environment.toString();
         }
 
     }
