@@ -19,8 +19,7 @@
 package com.quartercode.disconnected.sim.comp.hardware;
 
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
@@ -32,11 +31,12 @@ import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSl
  * 
  * @see Hardware
  */
-@XmlAccessorType (XmlAccessType.FIELD)
 @NeedsMainboardSlot
 public class CPU extends Hardware {
 
+    @XmlElement
     private int  threads;
+    @XmlElement
     private long frequency;
 
     /**

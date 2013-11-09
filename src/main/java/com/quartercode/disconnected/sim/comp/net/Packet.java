@@ -21,8 +21,7 @@ package com.quartercode.disconnected.sim.comp.net;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import com.quartercode.disconnected.util.InfoString;
 import com.quartercode.disconnected.util.size.SizeObject;
 import com.quartercode.disconnected.util.size.SizeUtil;
@@ -31,13 +30,17 @@ import com.quartercode.disconnected.util.size.SizeUtil;
  * This class represents a packet which can be sent between network interfaces.
  * A packet contains a sender, a receiver (both represented by addresses) and a data map which holds the data which should be sent.
  */
-@XmlAccessorType (XmlAccessType.FIELD)
 public class Packet implements SizeObject, InfoString {
 
+    @XmlElement
     private Address      sender;
+    @XmlElement
     private Address      receiver;
+    @XmlElement
     private Object       data;
+    @XmlElement
     private List<String> target;
+    @XmlElement
     private int          targetIndex;
 
     /**

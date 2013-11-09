@@ -21,12 +21,12 @@ package com.quartercode.disconnected.sim.comp.os;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlList;
+import javax.xml.bind.annotation.XmlTransient;
 import com.quartercode.disconnected.util.InfoString;
 
 /**
@@ -35,7 +35,6 @@ import com.quartercode.disconnected.util.InfoString;
  * 
  * @see Group
  */
-@XmlAccessorType (XmlAccessType.FIELD)
 public class User implements Comparable<User>, InfoString {
 
     /**
@@ -48,6 +47,7 @@ public class User implements Comparable<User>, InfoString {
     @XmlIDREF
     @XmlAttribute
     private OperatingSystem    host;
+    @XmlElement
     private String             name;
     @XmlIDREF
     @XmlList
@@ -148,6 +148,7 @@ public class User implements Comparable<User>, InfoString {
      * 
      * @return The primary group of the user.
      */
+    @XmlTransient
     public Group getPrimaryGroup() {
 
         if (groups.size() > 0) {

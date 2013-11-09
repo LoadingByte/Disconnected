@@ -18,9 +18,8 @@
 
 package com.quartercode.disconnected.sim.comp.net;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import com.quartercode.disconnected.sim.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.util.InfoString;
 
@@ -31,11 +30,11 @@ import com.quartercode.disconnected.util.InfoString;
  * @see ProgramExecutor
  * @see Process
  */
-@XmlAccessorType (XmlAccessType.FIELD)
 public class PacketListener implements InfoString {
 
     @XmlAttribute
     private String  name;
+    @XmlElement
     private Address binding;
 
     /**

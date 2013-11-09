@@ -19,8 +19,7 @@
 package com.quartercode.disconnected.sim.comp.hardware;
 
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
@@ -38,10 +37,10 @@ import com.quartercode.disconnected.util.InfoString;
  * @see Hardware
  * @see File
  */
-@XmlAccessorType (XmlAccessType.FIELD)
 @NeedsMainboardSlot
 public class HardDrive extends Hardware implements FileSystemProvider, InfoString {
 
+    @XmlElement
     private FileSystem fileSystem;
 
     /**

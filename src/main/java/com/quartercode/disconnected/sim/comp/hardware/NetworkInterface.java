@@ -21,8 +21,6 @@ package com.quartercode.disconnected.sim.comp.hardware;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import com.quartercode.disconnected.sim.comp.Computer;
@@ -40,7 +38,6 @@ import com.quartercode.disconnected.sim.comp.net.Packet;
  * @see Hardware
  * @see Packet
  */
-@XmlAccessorType (XmlAccessType.FIELD)
 @NeedsMainboardSlot
 public class NetworkInterface extends Hardware {
 
@@ -75,6 +72,7 @@ public class NetworkInterface extends Hardware {
      * 
      * @return The ip this interface can be found under.
      */
+    @XmlElement
     public IP getIp() {
 
         return ip;

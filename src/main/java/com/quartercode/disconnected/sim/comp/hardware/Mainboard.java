@@ -24,8 +24,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlIDREF;
@@ -41,7 +39,6 @@ import com.quartercode.disconnected.sim.comp.Vulnerability;
  * @see ComputerPart
  * @see Hardware
  */
-@XmlAccessorType (XmlAccessType.FIELD)
 public class Mainboard extends Hardware {
 
     @XmlElement (name = "slot")
@@ -128,13 +125,10 @@ public class Mainboard extends Hardware {
      * @see Mainboard
      * @see Hardware
      */
-    @XmlAccessorType (XmlAccessType.FIELD)
     public static class MainboradSlot {
 
         @XmlAttribute
         private Class<? extends Hardware> type;
-        @XmlIDREF
-        @XmlAttribute
         private Hardware                  content;
 
         /**
@@ -181,6 +175,8 @@ public class Mainboard extends Hardware {
          * 
          * @return The content the slot currently holds.
          */
+        @XmlIDREF
+        @XmlAttribute
         public Hardware getContent() {
 
             return content;
