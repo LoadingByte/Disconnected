@@ -48,6 +48,7 @@ import com.quartercode.disconnected.sim.comp.program.desktop.TerminalProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.ChangeDirectoryProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.DisplayFileContentProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.ExploitProgram;
+import com.quartercode.disconnected.sim.comp.program.shell.FileRightsProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.ListFilesProgram;
 import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram;
 import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram;
@@ -202,6 +203,7 @@ public class Main {
 
         registry.registerClass(ChangeDirectoryProgram.class);
         registry.registerClass(ListFilesProgram.class);
+        registry.registerClass(FileRightsProgram.class);
         registry.registerClass(DisplayFileContentProgram.class);
         registry.registerClass(ExploitProgram.class);
 
