@@ -22,9 +22,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
+import com.quartercode.disconnected.sim.comp.SizeUtil;
+import com.quartercode.disconnected.sim.comp.SizeUtil.SizeObject;
 import com.quartercode.disconnected.util.InfoString;
-import com.quartercode.disconnected.util.size.SizeObject;
-import com.quartercode.disconnected.util.size.SizeUtil;
 
 /**
  * This class represents a packet which can be sent between network interfaces.

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import com.quartercode.disconnected.graphics.session.Frame;
 import com.quartercode.disconnected.graphics.session.ShellWidget;
+import com.quartercode.disconnected.sim.comp.ByteUnit;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.file.NoFileRightException;
@@ -35,7 +36,6 @@ import com.quartercode.disconnected.sim.comp.session.Desktop.Window;
 import com.quartercode.disconnected.sim.comp.session.Shell;
 import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram.ShellSession;
 import com.quartercode.disconnected.util.ResourceBundles;
-import com.quartercode.disconnected.util.size.ByteUnit;
 import de.matthiasmann.twl.ScrollPane;
 import de.matthiasmann.twl.ScrollPane.Fixed;
 

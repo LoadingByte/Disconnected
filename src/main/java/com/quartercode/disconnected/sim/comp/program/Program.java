@@ -26,10 +26,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import javax.xml.bind.annotation.XmlElement;
 import com.quartercode.disconnected.sim.comp.ComputerPart;
+import com.quartercode.disconnected.sim.comp.SizeUtil.SizeObject;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
-import com.quartercode.disconnected.util.size.SizeObject;
 
 /**
  * This class stores information about a program.

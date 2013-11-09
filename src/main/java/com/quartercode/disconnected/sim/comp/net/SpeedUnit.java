@@ -16,55 +16,57 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.util.size;
+package com.quartercode.disconnected.sim.comp.net;
+
+import com.quartercode.disconnected.sim.comp.ByteUnit;
 
 /**
- * A byte unit represents a unit for bytes. There are several stages like "kilo-", "mega-", "giga-" etc.
- * The byte unit uses powers of the base 1024.
- * The byte unit class is manly used to convert between the units.
+ * A speed unit represents a unit for the speed of a connection in bytes per second. There are several stages like "kilo-", "mega-", "giga-" etc.
+ * The speed unit uses powers of the base 1000.
+ * The speed unit class is manly used to convert between the units.
  * 
- * @see SpeedUnit
+ * @see ByteUnit
  */
-public enum ByteUnit {
+public enum SpeedUnit {
 
     /**
-     * A byte equals 1024^0 bytes (1 byte).
+     * A byte equals 1000^0 bytes (1 byte).
      */
     BYTE,
     /**
-     * A kilobyte equals 1024^1 bytes (1024 bytes).
+     * A kilobyte equals 1000^1 bytes (1000 bytes).
      */
     KILOBYTE,
     /**
-     * A megabyte equals 1024^2 bytes (1048576 bytes).
+     * A megabyte equals 1000^2 bytes (1000000 bytes).
      */
     MEGABYTE,
     /**
-     * A gigabyte equals 1024^3 bytes (1073741824 bytes).
+     * A gigabyte equals 1000^3 bytes (1000000000 bytes).
      */
     GIGABYTE,
     /**
-     * A terabyte equals 1024^4 bytes (1099511627776 bytes).
+     * A terabyte equals 1000^4 bytes (1000000000000 bytes).
      */
     TERABYTE,
     /**
-     * A petabyte equals 1024^5 bytes (1125899906842624 bytes).
+     * A petabyte equals 1000^5 bytes (1000000000000000 bytes).
      */
     PETABYTE;
 
     /**
      * Converts the given source amount which is set in the given source unit into this unit.
      * 
-     * @param source The source amount of bytes (set in the source unit).
+     * @param source The source amount of "speed" (set in the source unit).
      * @param sourceUnit The source unit which the source amount uses.
-     * @return The converted amount of bytes.
+     * @return The converted amount of "speed".
      */
-    public long convert(long source, ByteUnit sourceUnit) {
+    public long convert(long source, SpeedUnit sourceUnit) {
 
         // Convert to bytes
-        long bytes = (long) (source * Math.pow(1024, sourceUnit.ordinal()));
+        long speed = (long) (source * Math.pow(1000, sourceUnit.ordinal()));
         // Convert to target unit
-        return (long) (bytes / Math.pow(1024, ordinal()));
+        return (long) (speed / Math.pow(1000, ordinal()));
     }
 
 }

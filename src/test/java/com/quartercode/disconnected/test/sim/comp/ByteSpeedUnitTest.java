@@ -16,12 +16,12 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.test.util;
+package com.quartercode.disconnected.test.sim.comp;
 
 import org.junit.Assert;
 import org.junit.Test;
-import com.quartercode.disconnected.util.size.ByteUnit;
-import com.quartercode.disconnected.util.size.SpeedUnit;
+import com.quartercode.disconnected.sim.comp.ByteUnit;
+import com.quartercode.disconnected.sim.comp.net.SpeedUnit;
 
 public class ByteSpeedUnitTest {
 

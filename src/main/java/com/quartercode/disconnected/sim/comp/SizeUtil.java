@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.util.size;
+package com.quartercode.disconnected.sim.comp;
 
 /**
  * This utility calculates the size of certain objects in bytes (of course, it's a fictitious size).
@@ -70,6 +70,21 @@ public class SizeUtil {
     }
 
     private SizeUtil() {
+
+    }
+
+    /**
+     * This interface declares a method to derive the size of an object.
+     * The size usually is given as an amount of bytes.
+     */
+    public static interface SizeObject {
+
+        /**
+         * Returns the size of the implementing object in bytes.
+         * 
+         * @return The size of the implementing object in bytes.
+         */
+        public long getSize();
 
     }
 

@@ -23,12 +23,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.Computer;
+import com.quartercode.disconnected.sim.comp.SizeUtil.SizeObject;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.util.InfoString;
-import com.quartercode.disconnected.util.size.SizeObject;
 
 /**
  * This class represents a file system.

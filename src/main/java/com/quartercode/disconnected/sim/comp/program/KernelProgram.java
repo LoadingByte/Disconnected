@@ -22,13 +22,13 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
+import com.quartercode.disconnected.sim.comp.ByteUnit;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.util.ResourceBundles;
-import com.quartercode.disconnected.util.size.ByteUnit;
 
 /**
  * The main kernel which runs the central functions of an operating system.

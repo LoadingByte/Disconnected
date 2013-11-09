@@ -24,6 +24,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import com.quartercode.disconnected.graphics.session.ShellWidget;
+import com.quartercode.disconnected.sim.comp.ByteUnit;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.os.User;
@@ -31,7 +32,6 @@ import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.sim.comp.program.shell.ShellProgramExecutor;
 import com.quartercode.disconnected.util.ResourceBundles;
-import com.quartercode.disconnected.util.size.ByteUnit;
 
 /**
  * The shell session program is a session with text-based user interface (terminal).

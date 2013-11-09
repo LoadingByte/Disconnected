@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import com.quartercode.disconnected.graphics.session.DesktopWidget;
+import com.quartercode.disconnected.sim.comp.ByteUnit;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.os.User;
@@ -29,7 +30,6 @@ import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.sim.comp.program.desktop.DesktopProgramExecutor;
 import com.quartercode.disconnected.util.ResourceBundles;
-import com.quartercode.disconnected.util.size.ByteUnit;
 
 /**
  * The desktop session program is a session with a graphical user interface (desktop).

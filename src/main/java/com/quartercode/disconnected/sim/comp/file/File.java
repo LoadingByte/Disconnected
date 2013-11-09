@@ -28,14 +28,14 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang.Validate;
+import com.quartercode.disconnected.sim.comp.SizeUtil;
+import com.quartercode.disconnected.sim.comp.SizeUtil.SizeObject;
 import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.sim.comp.os.Group;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.util.InfoString;
-import com.quartercode.disconnected.util.size.SizeObject;
-import com.quartercode.disconnected.util.size.SizeUtil;
 
 /**
  * This class represents a file on a file system.

@@ -21,6 +21,7 @@ package com.quartercode.disconnected.test.sim.comp.file;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import com.quartercode.disconnected.sim.comp.ByteUnit;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.file.File;
@@ -35,7 +36,6 @@ import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.os.Group;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.os.User;
-import com.quartercode.disconnected.util.size.ByteUnit;
 
 public class FileRightsTest {
 

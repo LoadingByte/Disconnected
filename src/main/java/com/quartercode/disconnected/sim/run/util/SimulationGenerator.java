@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import com.quartercode.disconnected.sim.Location;
 import com.quartercode.disconnected.sim.Simulation;
+import com.quartercode.disconnected.sim.comp.ByteUnit;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
@@ -53,7 +54,6 @@ import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.util.LocationGenerator;
-import com.quartercode.disconnected.util.size.ByteUnit;
 
 /**
  * This utility class generates a simulation.
