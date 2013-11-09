@@ -34,7 +34,6 @@ import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.file.FileRights;
 import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.sim.comp.file.NoFileRightException;
-import com.quartercode.disconnected.sim.comp.os.Environment;
 import com.quartercode.disconnected.sim.comp.program.ArgumentException;
 import com.quartercode.disconnected.sim.comp.program.ArgumentException.MissingArgumentException;
 import com.quartercode.disconnected.sim.comp.program.ArgumentException.MissingParameterException;
@@ -56,8 +55,6 @@ public class Shell {
 
     private ShellSession       host;
 
-    @XmlElement
-    private Environment        environment;
     private File               currentDirectory;
     @XmlElementWrapper (name = "output")
     @XmlElement (name = "line")
@@ -79,8 +76,6 @@ public class Shell {
     public Shell(ShellSession host) {
 
         this.host = host;
-
-        environment = ((Environment) host.getHost().getHost().getFileSystemManager().getFile("/system/config/environment.cfg").getContent()).clone();
     }
 
     /**
@@ -103,16 +98,6 @@ public class Shell {
     public ShellSession getHost() {
 
         return host;
-    }
-
-    /**
-     * Returns the environment the shell uses internally for parsing commands.
-     * 
-     * @return The environment the shell uses.
-     */
-    public Environment getEnvironment() {
-
-        return environment;
     }
 
     /**

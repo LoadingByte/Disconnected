@@ -139,7 +139,8 @@ public class ProcessManager implements InfoString {
 
         if (running) {
             try {
-                rootProcess = new Process(host, null, 0, host.getFileSystemManager().getFile("/system/boot/kernel"), null);
+                Environment environment = ((Environment) host.getFileSystemManager().getFile("/system/config/environment.cfg").getContent()).clone();
+                rootProcess = new Process(host, null, 0, host.getFileSystemManager().getFile("/system/boot/kernel"), environment, null);
             }
             catch (WrongSessionTypeException e) {
                 // Wont ever happen

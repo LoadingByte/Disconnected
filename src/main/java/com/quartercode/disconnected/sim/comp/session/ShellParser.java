@@ -108,7 +108,7 @@ public class ShellParser {
         }
 
         // Search the file the launch command specifies
-        List<String> searchPaths = shell.getEnvironment().getVariable("PATH").getValueList();
+        List<String> searchPaths = shell.getHost().getHost().getEnvironment().getVariable("PATH").getValueList();
         searchPaths.add(shell.getCurrentDirectory() == null ? File.SEPERATOR : shell.getCurrentDirectory().getGlobalHostPath());
         File file = searchFile(searchPaths, launchCommand, shell.getHost().getHost().getHost().getFileSystemManager());
         if (file == null) {
