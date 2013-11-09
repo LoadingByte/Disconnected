@@ -673,7 +673,7 @@ public class File implements SizeObject, InfoString {
     @Override
     public String toInfoString() {
 
-        return type.name().toLowerCase() + " " + name + ", " + rights.toString() + " (o " + owner.getName() + ", g " + group.getName() + "), " + children.size() + " child files";
+        return type.toString().toLowerCase() + " " + name + ", " + rights.toString() + " (o " + owner.getName() + ", g " + group.getName() + "), " + children.size() + " child files";
     }
 
     @Override

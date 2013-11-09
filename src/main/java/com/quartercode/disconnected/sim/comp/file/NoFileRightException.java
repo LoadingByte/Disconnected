@@ -43,7 +43,7 @@ public class NoFileRightException extends Exception {
      */
     public NoFileRightException(Process process, File file, FileRight requiredRight) {
 
-        super("Error while accessing '" + file.getGlobalHostPath() + "': Executing process " + process.getPid() + " hasn't right '" + requiredRight.name().toLowerCase() + "'");
+        super("Error while accessing '" + file.getGlobalHostPath() + "': Executing process " + process.getPid() + " hasn't right '" + requiredRight.toString().toLowerCase() + "'");
 
         this.process = process;
         this.file = file;

@@ -162,7 +162,7 @@ public class SystemViewerProgram extends Program {
 
                 added.set(true);
                 String session = process.getSession() == null ? "" : process.getSession().getUser().getName();
-                String stateDescription = ResourceBundles.PROGRAM("sysviewer").getString("processTable.status." + process.getState().name().toLowerCase());
+                String stateDescription = ResourceBundles.PROGRAM("sysviewer").getString("processTable.status." + process.getState().toString().toLowerCase());
                 return parent.addChild(process.getFile().getName(), process.getPid(), session, stateDescription);
             }
         };

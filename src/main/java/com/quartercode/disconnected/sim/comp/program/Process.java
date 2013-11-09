@@ -445,7 +445,7 @@ public class Process implements InfoString {
     @Override
     public String toInfoString() {
 
-        return "pid " + pid + " on " + host.getId() + ", source " + file.getGlobalPath(host) + ", " + state.name().toLowerCase() + ", " + children.size() + " children";
+        return "pid " + pid + " on " + host.getId() + ", source " + file.getGlobalPath(host) + ", " + state.toString().toLowerCase() + ", " + children.size() + " children";
     }
 
     @Override
