@@ -181,7 +181,7 @@ public class IP {
     public static class IPDQNAdapter extends XmlAdapter<String, int[]> {
 
         /**
-         * Creates a new ip dotted quad notation adapter adapter.
+         * Creates a new ip dotted quad notation adapter.
          */
         public IPDQNAdapter() {
 

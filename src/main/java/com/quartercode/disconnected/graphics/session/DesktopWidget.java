@@ -76,6 +76,7 @@ public class DesktopWidget extends Widget {
 
                 // TODO: Display launch menu
                 try {
+                    // TODO: Check for execution rights
                     Process sessionProcess = DesktopWidget.this.desktop.getHost().getHost();
                     // sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("/system/bin/sysviewer.exe"), null);
                     sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("/system/bin/terminal.exe"), null);

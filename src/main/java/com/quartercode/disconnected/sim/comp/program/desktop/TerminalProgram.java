@@ -137,7 +137,7 @@ public class TerminalProgram extends Program {
 
             super.layout();
 
-            setMinSize(500, 300);
+            setMinSize(550, 300);
             shellWidget.setSize(getInnerWidth(), getInnerHeight());
         }
 
