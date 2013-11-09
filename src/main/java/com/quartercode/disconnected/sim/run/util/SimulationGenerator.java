@@ -210,38 +210,21 @@ public class SimulationGenerator {
         User superuser = userManager.getSuperuser();
 
         // Generate kernel file (temp)
-        fileSystem.addFile("boot/kernel", FileType.FILE, superuser);
-        fileSystem.getFile("boot/kernel").setRights(new FileRights("r--xr--xr--x"));
-        fileSystem.getFile("boot/kernel").setContent(new KernelProgram(new Version("1.0.0"), null));
+        addFile(fileSystem, "boot/kernel", superuser, new FileRights("r--xr--xr--x"), new KernelProgram(new Version("1.0.0"), null));
 
         // Generate session programs
-        fileSystem.addFile("bin/lash.exe", FileType.FILE, superuser);
-        fileSystem.getFile("bin/lash.exe").setRights(new FileRights("r--xr--xr--x"));
-        fileSystem.getFile("bin/lash.exe").setContent(new ShellSessionProgram(new Version("1.0.0"), null));
-
-        fileSystem.addFile("bin/desktops.exe", FileType.FILE, superuser);
-        fileSystem.getFile("bin/desktops.exe").setRights(new FileRights("r--xr--xr--x"));
-        fileSystem.getFile("bin/desktops.exe").setContent(new DesktopSessionProgram(new Version("1.0.0"), null));
+        addFile(fileSystem, "bin/lash.exe", superuser, new FileRights("r--xr--xr--x"), new ShellSessionProgram(new Version("1.0.0"), null));
+        addFile(fileSystem, "bin/desktops.exe", superuser, new FileRights("r--xr--xr--x"), new DesktopSessionProgram(new Version("1.0.0"), null));
 
         // Generate system programs
-        fileSystem.addFile("bin/cd.exe", FileType.FILE, superuser);
-        fileSystem.getFile("bin/cd.exe").setRights(new FileRights("r--xr--xr--x"));
-        fileSystem.getFile("bin/cd.exe").setContent(new ChangeDirectoryProgram(new Version("1.0.0"), null));
-
-        fileSystem.addFile("bin/terminal.exe", FileType.FILE, superuser);
-        fileSystem.getFile("bin/terminal.exe").setRights(new FileRights("r--xr--xr--x"));
-        fileSystem.getFile("bin/terminal.exe").setContent(new TerminalProgram(new Version("1.0.0"), null));
-
-        fileSystem.addFile("bin/sysviewer.exe", FileType.FILE, superuser);
-        fileSystem.getFile("bin/sysviewer.exe").setRights(new FileRights("r--xr--xr--x"));
-        fileSystem.getFile("bin/sysviewer.exe").setContent(new SystemViewerProgram(new Version("1.0.0"), null));
+        addFile(fileSystem, "bin/cd.exe", superuser, new FileRights("r--xr--xr--x"), new ChangeDirectoryProgram(new Version("1.0.0"), null));
+        addFile(fileSystem, "bin/terminal.exe", superuser, new FileRights("r--xr--xr--x"), new TerminalProgram(new Version("1.0.0"), null));
+        addFile(fileSystem, "bin/sysviewer.exe", superuser, new FileRights("r--xr--xr--x"), new SystemViewerProgram(new Version("1.0.0"), null));
 
         // Generate environment
         Environment environment = new Environment();
         environment.addVariable(new EnvironmentVariable("PATH", "/system/bin:/user/bin"));
-        fileSystem.addFile("config/environment.cfg", FileType.FILE, superuser);
-        fileSystem.getFile("config/environment.cfg").setRights(new FileRights("r---r---r---"));
-        fileSystem.getFile("config/environment.cfg").setContent(environment);
+        addFile(fileSystem, "config/environment.cfg", superuser, new FileRights("rw--r---r---"), environment);
     }
 
     // Temporary method for generating some unnecessary programs and personal files
@@ -250,9 +233,7 @@ public class SimulationGenerator {
         User superuser = userManager.getSuperuser();
 
         // Generate other programs
-        fileSystem.addFile("bin/exploiter.exe", FileType.FILE, superuser);
-        fileSystem.getFile("bin/exploiter.exe").setRights(new FileRights("r--xr--xr--x"));
-        fileSystem.getFile("bin/exploiter.exe").setContent(new ExploitProgram("Exploiter", new Version("1.0.0"), null));
+        addFile(fileSystem, "bin/exploiter.exe", superuser, new FileRights("r--xr--xr--x"), new ExploitProgram("Exploiter", new Version("1.0.0"), null));
 
         // Generate home directories
         fileSystem.addFile("homes", FileType.DIRECTORY, superuser);
@@ -263,6 +244,13 @@ public class SimulationGenerator {
                 fileSystem.getFile("homes/" + user.getName()).setRights(new FileRights("rwdx--------"));
             }
         }
+    }
+
+    private static void addFile(FileSystem fileSystem, String path, User user, FileRights rights, Object content) throws OutOfSpaceException {
+
+        fileSystem.addFile(path, FileType.FILE, user);
+        fileSystem.getFile(path).setRights(rights);
+        fileSystem.getFile(path).setContent(content);
     }
 
     private static void generateIP(NetworkInterface host, Simulation simulation) {
