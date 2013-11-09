@@ -126,7 +126,7 @@ public class ShellWidget extends Widget implements ShellUserInterface {
     @Override
     public void printMessage(ShellMessage message) {
 
-        String translatedMessage = message.translate().replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("  ", "&nbsp;&nbsp;").replaceAll("\n", "<br/>");
+        String translatedMessage = message.translate().replaceAll("  ", "&nbsp;&nbsp;").replaceAll("\n", "<br/>");
         append(translatedMessage).appendRender("<br/>");
     }
 
@@ -147,6 +147,7 @@ public class ShellWidget extends Widget implements ShellUserInterface {
             @Override
             public void run() {
 
+                scrollPane.validateLayout();
                 scrollPane.setScrollPositionY(scrollPane.getMaxScrollPosY());
             }
         });

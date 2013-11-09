@@ -111,7 +111,7 @@ public class ChangeDirectoryProgram extends Program {
             String start = shell.getCurrentDirectory() == null ? File.SEPERATOR : shell.getCurrentDirectory().getGlobalHostPath();
             String path = File.resolvePath(start, this.path);
             // TEMP TODO: Replace fs root workaround; new virtual file system
-            if (path.length() == 1) {
+            if (path.equals(File.SEPERATOR)) {
                 shell.setCurrentDirectory(null);
             } else {
                 File file = null;
