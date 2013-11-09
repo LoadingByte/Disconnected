@@ -18,8 +18,6 @@
 
 package com.quartercode.disconnected.sim.comp.session;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -110,7 +108,7 @@ public class ShellParser {
         }
 
         // Search the file the launch command specifies
-        List<String> searchPaths = new ArrayList<String>(Arrays.asList(shell.getEnvironment().getVariable("PATH").getValue().split(":")));
+        List<String> searchPaths = shell.getEnvironment().getVariable("PATH").getValueList();
         searchPaths.add(shell.getCurrentDirectory() == null ? File.SEPERATOR : shell.getCurrentDirectory().getGlobalHostPath());
         File file = searchFile(searchPaths, launchCommand, shell.getHost().getHost().getHost().getFileSystemManager());
         if (file == null) {

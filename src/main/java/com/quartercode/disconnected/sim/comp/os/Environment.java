@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.sim.comp.os;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlValue;
@@ -243,6 +244,86 @@ public class Environment implements SizeObject {
         public void setValue(String value) {
 
             this.value = value;
+        }
+
+        /**
+         * Returns a list of all subvalues which are set in this value.
+         * Example:
+         * 
+         * <pre>
+         * VAR=subvalue1:subvalue2:subvalue3
+         * > Returns [subvalue1, subvalue2, subvalue3]
+         * </pre>
+         * 
+         * Modifications in that list do not apply to the variable.
+         * 
+         * @return A list of all subvalues which are set in this value.
+         */
+        public List<String> getValueList() {
+
+            return new ArrayList<String>(Arrays.asList(value.split(":")));
+        }
+
+        /**
+         * Changes the value to a new value list containing subvalues.
+         * Example:
+         * 
+         * <pre>
+         * Set to [subvalue1, subvalue2, subvalue3]
+         * > Sets VAR=subvalue1:subvalue2:subvalue3
+         * </pre>
+         * 
+         * @param list The list with the new subvalues.
+         */
+        public void setValueList(List<String> list) {
+
+            value = "";
+            for (String listValue : list) {
+                value += ":" + listValue;
+            }
+            value = value.substring(1);
+        }
+
+        /**
+         * Adds a subvalue to the value list.
+         * Example:
+         * 
+         * <pre>
+         * VAR=subvalue1:subvalue2:subvalue3
+         * Add subvalue4
+         * > Sets VAR=subvalue1:subvalue2:subvalue3:subvalue4
+         * </pre>
+         * 
+         * @param value The subvalue to add to the value list.
+         */
+        public void addListValue(String value) {
+
+            List<String> values = getValueList();
+            if (!values.contains(value)) {
+                values.add(value);
+                setValueList(values);
+            }
+        }
+
+        /**
+         * Removes a subvalue from the value list.
+         * Example:
+         * 
+         * <pre>
+         * VAR=subvalue1:subvalue2:subvalue3
+         * Remove subvalue3
+         * > Sets VAR=subvalue1:subvalue2
+         * </pre>
+         * 
+         * @param value The subvalue to add to the value list.
+         */
+        public void removeListValue(String value) {
+
+            List<String> values = getValueList();
+            if (values.contains(value)) {
+                values.remove(value);
+                setValueList(values);
+            }
         }
 
         @Override
