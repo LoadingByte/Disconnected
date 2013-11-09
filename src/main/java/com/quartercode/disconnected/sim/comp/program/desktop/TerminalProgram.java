@@ -93,7 +93,7 @@ public class TerminalProgram extends Program {
                 if (shell == null) {
                     try {
                         Map<String, Object> arguments = new HashMap<String, Object>();
-                        arguments.put("user", getHost().getSession().getUser().getName());
+                        arguments.put("user", getHost().getUser().getName());
                         Process shellProcess = createProcess(getHost().getHost().getFileSystemManager().getFile("/system/bin/lash.exe"), arguments);
                         shell = ((ShellSession) shellProcess.getExecutor()).getShell();
                     }

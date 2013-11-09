@@ -192,7 +192,7 @@ public class Shell implements ShellMessageSender {
         }
 
         StringWriter stringWriter = new StringWriter();
-        new HelpFormatter().printOptions(new PrintWriter(stringWriter), HelpFormatter.DEFAULT_WIDTH, ShellParser.generateOptions(program), 4, HelpFormatter.DEFAULT_DESC_PAD);
+        new HelpFormatter().printOptions(new PrintWriter(stringWriter), 55, ShellParser.generateOptions(program), 4, HelpFormatter.DEFAULT_DESC_PAD);
         String options = stringWriter.toString().replaceAll("<", "&lt;").replaceAll(">", "&gt;");
         options = options.substring(0, options.length() - 1);
 

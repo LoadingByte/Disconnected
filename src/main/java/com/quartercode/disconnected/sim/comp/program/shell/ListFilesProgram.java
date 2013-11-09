@@ -151,7 +151,7 @@ public class ListFilesProgram extends Program {
                     for (File file : directory.getChildFiles()) {
                         if (file.getType() == FileType.DIRECTORY) {
                             list.add(file.getName(), new Color(0x6CE2FF));
-                        } else if (FileRights.hasRight(getHost().getSession().getUser(), file, FileRight.EXECUTE)) {
+                        } else if (FileRights.hasRight(getHost().getUser(), file, FileRight.EXECUTE)) {
                             list.add(file.getName(), new Color(0xfff600));
                         } else {
                             list.add(file.getName(), new Color(0x72FF00));
