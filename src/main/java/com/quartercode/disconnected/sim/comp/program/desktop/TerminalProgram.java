@@ -134,7 +134,7 @@ public class TerminalProgram extends Program {
 
         private TerminalFrame(Shell shell) {
 
-            shellWidget = shell.getHost().createWidget();
+            shellWidget = new ShellWidget(shell);
 
             ScrollPane scrollPane = new ScrollPane(shellWidget);
             scrollPane.setTheme("/scrollpane");

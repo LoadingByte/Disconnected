@@ -21,15 +21,10 @@ package com.quartercode.disconnected.sim.comp.session;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.cli.HelpFormatter;
-import com.quartercode.disconnected.graphics.session.ShellWidget;
 import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.file.FileRights;
 import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
@@ -41,6 +36,8 @@ import com.quartercode.disconnected.sim.comp.program.ArgumentException.WrongArgu
 import com.quartercode.disconnected.sim.comp.program.Parameter;
 import com.quartercode.disconnected.sim.comp.program.Program;
 import com.quartercode.disconnected.sim.comp.program.WrongSessionTypeException;
+import com.quartercode.disconnected.sim.comp.session.ShellMessage.ShellMessageSender;
+import com.quartercode.disconnected.sim.comp.session.ShellMessage.ShellMessageType;
 import com.quartercode.disconnected.sim.comp.session.ShellParser.CommandNotFoundException;
 import com.quartercode.disconnected.sim.comp.session.ShellParser.ParsedCommand;
 import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram.ShellSession;
@@ -51,14 +48,12 @@ import com.quartercode.disconnected.util.ResourceBundles;
  * 
  * @see ShellSession
  */
-public class Shell {
+public class Shell implements ShellMessageSender {
 
-    private ShellSession       host;
+    private ShellSession host;
 
-    private File               currentDirectory;
-    @XmlElementWrapper (name = "output")
-    @XmlElement (name = "line")
-    private final List<String> output = new ArrayList<String>();
+    @XmlIDREF
+    private File         currentDirectory;
 
     /**
      * Creates a new empty shell.
@@ -107,7 +102,7 @@ public class Shell {
      * 
      * @return The directory the shell is currently in.
      */
-    @XmlIDREF
+    @XmlTransient
     public File getCurrentDirectory() {
 
         return currentDirectory;
@@ -124,37 +119,21 @@ public class Shell {
 
         this.currentDirectory = currentDirectory;
 
-        for (ShellWidget widget : host.getWidgets()) {
-            widget.update();
+        for (ShellUserInterface userInterface : host.getUserInterfaces()) {
+            userInterface.updateCurrentDirectory(currentDirectory);
         }
     }
 
     /**
-     * Returns the last messages the shell printed out.
-     * Those messages wont get serialized.
+     * Prints a new message onto the shell output.
+     * This automatically updates all user interfaces so they can process the new message.
      * 
-     * @return The last messages the shell printed out.
+     * @param line The new message to print onto the shell.
      */
-    public List<String> getOutput() {
+    public void printMessage(ShellMessage message) {
 
-        return Collections.unmodifiableList(output);
-    }
-
-    /**
-     * Prints a new line onto the shell output.
-     * This automatically updates all shell widgets so they display the current output.
-     * 
-     * @param line The new line to print onto the shell.
-     */
-    public void printLine(String line) {
-
-        if (output.size() == 50) {
-            output.remove(0);
-        }
-        output.add(line);
-
-        for (ShellWidget widget : host.getWidgets()) {
-            widget.update();
+        for (ShellUserInterface userInterface : host.getUserInterfaces()) {
+            userInterface.printMessage(message);
         }
     }
 
@@ -177,24 +156,24 @@ public class Shell {
                     host.getHost().createChild(parsedCommand.getFile(), parsedCommand.getArguments());
                 }
                 catch (NoFileRightException e) {
-                    printLine(MessageFormat.format(ResourceBundles.SHELL.getString("command.noRight"), parsedCommand.getFile().getGlobalHostPath()));
+                    printMessage(new ShellMessage(this, ShellMessageType.ERROR, "command.noRight", parsedCommand.getFile().getGlobalHostPath()));
                 }
                 catch (WrongSessionTypeException e) {
-                    printLine(MessageFormat.format(ResourceBundles.SHELL.getString("command.wrongSessionType"), parsedCommand.getFile().getGlobalHostPath()));
+                    printMessage(new ShellMessage(this, ShellMessageType.ERROR, "command.wrongSessionType", parsedCommand.getFile().getGlobalHostPath()));
                 }
                 catch (MissingParameterException e) {
-                    printLine(MessageFormat.format(ResourceBundles.SHELL.getString("command.parameter.missingParameter"), e.getParameter().getName()));
+                    printMessage(new ShellMessage(this, ShellMessageType.ERROR, "command.parameter.missingParameter", e.getParameter().getName()));
                 }
                 catch (MissingArgumentException e) {
-                    printLine(MessageFormat.format(ResourceBundles.SHELL.getString("command.parameter.missingArgument"), e.getParameter().getName()));
+                    printMessage(new ShellMessage(this, ShellMessageType.ERROR, "command.parameter.missingArgument", e.getParameter().getName()));
                 }
             }
         }
         catch (CommandNotFoundException e) {
-            printLine(MessageFormat.format(ResourceBundles.SHELL.getString("command.notFound"), e.getCommand()));
+            printMessage(new ShellMessage(this, ShellMessageType.ERROR, "command.notFound", e.getCommand()));
         }
         catch (WrongArgumentTypeException e) {
-            printLine(MessageFormat.format(ResourceBundles.SHELL.getString("command.parameter.wrongArgumentType"), e.getParameter().getName(), e.getArgument()));
+            printMessage(new ShellMessage(this, ShellMessageType.ERROR, "command.parameter.wrongArgumentType", e.getParameter().getName(), e.getArgument()));
         }
         catch (ArgumentException e) {
             throw new RuntimeException("Received unknown argument exception", e);
@@ -203,23 +182,27 @@ public class Shell {
 
     private void printHelp(Program program, String call) {
 
-        printLine(program.getResourceBundle().getString("description"));
-
         String usage = call;
-        usage += " [" + ResourceBundles.SHELL.getString("options.help.options") + "]";
+        usage += " [" + ResourceBundles.SHELL.getString("help.message.options") + "]";
         for (Parameter parameter : program.getParameters()) {
             if (parameter.isRest()) {
                 usage += " [" + parameter.getName() + "]";
                 break;
             }
         }
-        printLine(ResourceBundles.SHELL.getString("options.help.usage") + " " + usage);
 
         StringWriter stringWriter = new StringWriter();
         new HelpFormatter().printOptions(new PrintWriter(stringWriter), HelpFormatter.DEFAULT_WIDTH, ShellParser.generateOptions(program), 4, HelpFormatter.DEFAULT_DESC_PAD);
-        for (String line : stringWriter.toString().split("\n")) {
-            printLine(line);
-        }
+        String options = stringWriter.toString();
+        options = options.substring(0, options.length() - 1);
+
+        printMessage(new ShellMessage(this, ShellMessageType.HELP, "message", program.getResourceBundle().getString("description"), usage, options));
+    }
+
+    @Override
+    public String translateShellMessage(ShellMessage message) {
+
+        return MessageFormat.format(ResourceBundles.SHELL.getString(message.toKey()), message.getVariables());
     }
 
     public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {

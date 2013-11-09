@@ -59,7 +59,7 @@ public class ShellParser {
     public static Options generateOptions(Program program) {
 
         Options options = new Options();
-        options.addOption(new Option("h", "help", false, ResourceBundles.SHELL.getString("options.help.description")));
+        options.addOption(new Option("h", "help", false, ResourceBundles.SHELL.getString("help.option.description")));
 
         for (Parameter parameter : program.getParameters()) {
             if (!parameter.isRest()) {

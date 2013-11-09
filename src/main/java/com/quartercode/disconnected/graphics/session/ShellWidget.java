@@ -19,7 +19,10 @@
 package com.quartercode.disconnected.graphics.session;
 
 import com.quartercode.disconnected.Disconnected;
+import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.session.Shell;
+import com.quartercode.disconnected.sim.comp.session.ShellMessage;
+import com.quartercode.disconnected.sim.comp.session.ShellUserInterface;
 import de.matthiasmann.twl.Alignment;
 import de.matthiasmann.twl.BoxLayout;
 import de.matthiasmann.twl.BoxLayout.Direction;
@@ -40,9 +43,10 @@ import de.matthiasmann.twl.textarea.HTMLTextAreaModel;
  * 
  * @see Shell
  */
-public class ShellWidget extends Widget {
+public class ShellWidget extends Widget implements ShellUserInterface {
 
     private Shell                   shell;
+    private final StringBuilder     outputBuilder = new StringBuilder();
 
     private final TextArea          output;
     private final HTMLTextAreaModel outputModel;
@@ -102,30 +106,39 @@ public class ShellWidget extends Widget {
         scrollPane.setTheme("/shell");
         scrollPane.setFixed(Fixed.HORIZONTAL);
         add(scrollPane);
+
+        shell.getHost().registerUserInterface(this);
     }
 
-    /**
-     * Returns the shell this widget is rendering.
-     * 
-     * @return The shell this widget is rendering.
-     */
+    @Override
     public Shell getShell() {
 
         return shell;
     }
 
-    /**
-     * Updates the text area content to the latest output of the set shell.
-     */
-    public void update() {
+    @Override
+    public boolean isSerializable() {
 
-        final StringBuilder output = new StringBuilder();
-        for (String line : shell.getOutput()) {
-            output.append(line.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("  ", "&nbsp;&nbsp;")).append("<br/>");
-        }
-        outputModel.setHtml(output.toString());
-        String currentDirectory = shell.getCurrentDirectory() == null ? "/" : shell.getCurrentDirectory().getGlobalPath(shell.getHost().getHost().getHost());
-        prompt.setText(shell.getHost().getUser().getName() + "@unknown " + currentDirectory + " $");
+        return false;
+    }
+
+    @Override
+    public void printMessage(ShellMessage message) {
+
+        String translatedMessage = message.translate().replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("  ", "&nbsp;&nbsp;").replaceAll("\n", "<br/>");
+        append(translatedMessage).appendRender("<br/>");
+    }
+
+    private ShellWidget append(String string) {
+
+        outputBuilder.append(string);
+        return this;
+    }
+
+    private ShellWidget appendRender(String string) {
+
+        append(string);
+        outputModel.setHtml(outputBuilder.toString());
         invalidateLayout();
 
         Disconnected.getGraphicsManager().invoke(new Runnable() {
@@ -136,6 +149,15 @@ public class ShellWidget extends Widget {
                 scrollPane.setScrollPositionY(scrollPane.getMaxScrollPosY());
             }
         });
+
+        return this;
+    }
+
+    @Override
+    public void updateCurrentDirectory(File currentDirectory) {
+
+        String dir = currentDirectory == null ? "/" : currentDirectory.getGlobalPath(shell.getHost().getHost().getHost());
+        prompt.setText(shell.getHost().getUser().getName() + "@unknown " + dir + " $");
     }
 
     @Override
@@ -158,10 +180,11 @@ public class ShellWidget extends Widget {
     /**
      * Closes the shell widget and stops displaying the session's content.
      */
+    @Override
     public void close() {
 
         if (!isClosed()) {
-            shell.getHost().closeWidget(this);
+            shell.getHost().unregisterUserInterface(this);
             shell = null;
         }
     }
