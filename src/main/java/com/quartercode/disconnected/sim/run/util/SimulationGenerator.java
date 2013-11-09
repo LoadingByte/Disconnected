@@ -47,6 +47,7 @@ import com.quartercode.disconnected.sim.comp.os.UserManager;
 import com.quartercode.disconnected.sim.comp.program.KernelProgram;
 import com.quartercode.disconnected.sim.comp.program.desktop.SystemViewerProgram;
 import com.quartercode.disconnected.sim.comp.program.desktop.TerminalProgram;
+import com.quartercode.disconnected.sim.comp.program.shell.ChangeDirectoryProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.ExploitProgram;
 import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram;
 import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram;
@@ -223,6 +224,10 @@ public class SimulationGenerator {
         fileSystem.getFile("bin/desktops.exe").setContent(new DesktopSessionProgram(new Version("1.0.0"), null));
 
         // Generate system programs
+        fileSystem.addFile("bin/cd.exe", FileType.FILE, superuser);
+        fileSystem.getFile("bin/cd.exe").setRights(new FileRights("r--xr--xr--x"));
+        fileSystem.getFile("bin/cd.exe").setContent(new ChangeDirectoryProgram(new Version("1.0.0"), null));
+
         fileSystem.addFile("bin/terminal.exe", FileType.FILE, superuser);
         fileSystem.getFile("bin/terminal.exe").setRights(new FileRights("r--xr--xr--x"));
         fileSystem.getFile("bin/terminal.exe").setContent(new TerminalProgram(new Version("1.0.0"), null));
