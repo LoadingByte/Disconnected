@@ -90,7 +90,7 @@ public class ListFilesProgram extends Program {
     @Override
     protected ProgramExecutor createExecutorInstance(Process host, Map<String, Object> arguments) {
 
-        return new ListFilesProgramExecutor(host, arguments.containsKey("path") ? ((String[]) arguments.get("path"))[0] : null);
+        return new ListFilesProgramExecutor(host, arguments);
     }
 
     protected static class ListFilesProgramExecutor extends ShellProgramExecutor {
@@ -102,11 +102,11 @@ public class ListFilesProgram extends Program {
 
         }
 
-        protected ListFilesProgramExecutor(Process host, String path) {
+        protected ListFilesProgramExecutor(Process host, Map<String, Object> arguments) {
 
             super(host);
 
-            this.path = path;
+            path = arguments.containsKey("path") ? ((String[]) arguments.get("path"))[0] : null;
         }
 
         @Override

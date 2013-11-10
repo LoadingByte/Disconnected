@@ -86,7 +86,7 @@ public class ChangeDirectoryProgram extends Program {
     @Override
     protected ProgramExecutor createExecutorInstance(Process host, Map<String, Object> arguments) {
 
-        return new ChangeDirectoryProgramExecutor(host, ((String[]) arguments.get("path"))[0]);
+        return new ChangeDirectoryProgramExecutor(host, arguments);
     }
 
     protected static class ChangeDirectoryProgramExecutor extends ShellProgramExecutor {
@@ -98,11 +98,11 @@ public class ChangeDirectoryProgram extends Program {
 
         }
 
-        protected ChangeDirectoryProgramExecutor(Process host, String path) {
+        protected ChangeDirectoryProgramExecutor(Process host, Map<String, Object> arguments) {
 
             super(host);
 
-            this.path = path;
+            path = ((String[]) arguments.get("path"))[0];
         }
 
         @Override

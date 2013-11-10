@@ -48,7 +48,7 @@ import com.quartercode.disconnected.util.size.ByteUnit;
  * 
  * @see Shell
  */
-@XmlSeeAlso ({ FileRightsProgram.FileRightsProgramProgramExecutor.class })
+@XmlSeeAlso ({ FileRightsProgram.FileRightsProgramExecutor.class })
 public class FileRightsProgram extends Program {
 
     /**
@@ -92,26 +92,26 @@ public class FileRightsProgram extends Program {
     @Override
     protected ProgramExecutor createExecutorInstance(Process host, Map<String, Object> arguments) {
 
-        return new FileRightsProgramProgramExecutor(host, ((String[]) arguments.get("path"))[0], (String) arguments.get("change"));
+        return new FileRightsProgramExecutor(host, arguments);
     }
 
-    protected static class FileRightsProgramProgramExecutor extends ShellProgramExecutor {
+    protected static class FileRightsProgramExecutor extends ShellProgramExecutor {
 
         @XmlElement
         private String path;
         @XmlElement
         private String changes;
 
-        protected FileRightsProgramProgramExecutor() {
+        protected FileRightsProgramExecutor() {
 
         }
 
-        protected FileRightsProgramProgramExecutor(Process host, String path, String changes) {
+        protected FileRightsProgramExecutor(Process host, Map<String, Object> arguments) {
 
             super(host);
 
-            this.path = path;
-            this.changes = changes;
+            path = ((String[]) arguments.get("path"))[0];
+            changes = (String) arguments.get("change");
         }
 
         @Override

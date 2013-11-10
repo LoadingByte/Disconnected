@@ -87,7 +87,7 @@ public class DisplayFileContentProgram extends Program {
     @Override
     protected ProgramExecutor createExecutorInstance(Process host, Map<String, Object> arguments) {
 
-        return new DisplayFileContentProgramExecutor(host, ((String[]) arguments.get("path"))[0]);
+        return new DisplayFileContentProgramExecutor(host, arguments);
     }
 
     protected static class DisplayFileContentProgramExecutor extends ShellProgramExecutor {
@@ -99,11 +99,11 @@ public class DisplayFileContentProgram extends Program {
 
         }
 
-        protected DisplayFileContentProgramExecutor(Process host, String path) {
+        protected DisplayFileContentProgramExecutor(Process host, Map<String, Object> arguments) {
 
             super(host);
 
-            this.path = path;
+            path = ((String[]) arguments.get("path"))[0];
         }
 
         @Override
