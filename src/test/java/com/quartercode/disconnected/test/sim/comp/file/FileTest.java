@@ -28,6 +28,7 @@ import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.file.MountException;
 import com.quartercode.disconnected.sim.comp.file.OutOfSpaceException;
+import com.quartercode.disconnected.sim.comp.file.StringContent;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.os.User;
@@ -53,7 +54,7 @@ public class FileTest {
         operatingSystem.getFileSystemManager().setMounted(fileSystem, true);
 
         testFile = fileSystem.addFile("test1/test2/test.txt", FileType.FILE, new User(null, null));
-        testFile.setContent("Test-Content");
+        testFile.setContent(new StringContent("Test-Content"));
     }
 
     @Test
@@ -69,7 +70,7 @@ public class FileTest {
 
         Assert.assertEquals("Moved file exists", testFile, fileSystem.getFile("test1/test3/test.txt"));
         Assert.assertEquals("Moved file has correct path", "test1/test3/test.txt", testFile.getLocalPath());
-        Assert.assertEquals("Moved file has correct content", "Test-Content", testFile.getContent());
+        Assert.assertEquals("Moved file has correct content", new StringContent("Test-Content"), testFile.getContent());
     }
 
     @Test
@@ -79,7 +80,7 @@ public class FileTest {
 
         Assert.assertEquals("Renamed file exists", testFile, fileSystem.getFile("test1/test2/test2.txt"));
         Assert.assertEquals("Renamed file has correct path", "test1/test2/test2.txt", testFile.getLocalPath());
-        Assert.assertEquals("Renamed file has correct content", "Test-Content", testFile.getContent());
+        Assert.assertEquals("Renamed file has correct content", new StringContent("Test-Content"), testFile.getContent());
     }
 
     @Test

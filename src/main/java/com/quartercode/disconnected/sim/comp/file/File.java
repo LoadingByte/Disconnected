@@ -36,13 +36,13 @@ import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.util.InfoString;
 import com.quartercode.disconnected.util.size.SizeObject;
-import com.quartercode.disconnected.util.size.SizeUtil;
 
 /**
  * This class represents a file on a file system.
  * Every file knows his path and has a content string. Every directory has a list of child files.
  * 
  * @see FileSystem
+ * @see FileContent
  */
 public class File implements SizeObject, InfoString {
 
@@ -361,9 +361,9 @@ public class File implements SizeObject, InfoString {
      * @return The content the file has (if this file is a content one).
      */
     @XmlTransient
-    public Object getContent() {
+    public FileContent getContent() {
 
-        return type == FileType.FILE ? content : null;
+        return type == FileType.FILE ? (FileContent) content : null;
     }
 
     /**
@@ -385,15 +385,12 @@ public class File implements SizeObject, InfoString {
      * This throws an OutOfSpaceException if there isn't enough space on the host drive for the new content.
      * 
      * @param content The new content to write into the file.
-     * @throws IllegalArgumentException Can't derive size type from given content.
      * @throws OutOfSpaceException If there isn't enough space on the host drive for the new content.
      */
-    public void setContent(Object content) throws OutOfSpaceException {
+    public void setContent(FileContent content) throws OutOfSpaceException {
 
         if (type == FileType.FILE) {
-            Validate.isTrue(SizeUtil.accept(content), "Size of type " + content.getClass().getName() + " can't be derived");
-
-            Object oldContent = this.content;
+            FileContent oldContent = (FileContent) this.content;
             this.content = content;
 
             if (host.getRootFile() != null && host.getFilled() > host.getFree()) {
@@ -413,7 +410,7 @@ public class File implements SizeObject, InfoString {
      * @throws NoFileRightException The given process hasn't the right to write into this file.
      * @throws OutOfSpaceException If there isn't enough space on the host drive for the new content.
      */
-    public void write(Process process, Object content) throws NoFileRightException, OutOfSpaceException {
+    public void write(Process process, FileContent content) throws NoFileRightException, OutOfSpaceException {
 
         FileRights.checkRight(process, this, FileRight.WRITE);
         setContent(content);
@@ -429,7 +426,7 @@ public class File implements SizeObject, InfoString {
     public long getSize() {
 
         if (type == FileType.FILE && content != null) {
-            return SizeUtil.getSize(content);
+            return ((FileContent) content).getSize();
         } else if (type == FileType.DIRECTORY && !children.isEmpty()) {
             long size = 0;
             for (File child : children) {

@@ -29,10 +29,10 @@ import com.quartercode.disconnected.sim.comp.ComputerPart;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
+import com.quartercode.disconnected.sim.comp.file.FileContent;
 import com.quartercode.disconnected.sim.comp.program.ArgumentException.MissingArgumentException;
 import com.quartercode.disconnected.sim.comp.program.ArgumentException.MissingParameterException;
 import com.quartercode.disconnected.sim.comp.program.ArgumentException.WrongArgumentTypeException;
-import com.quartercode.disconnected.util.size.SizeObject;
 
 /**
  * This class stores information about a program.
@@ -45,7 +45,7 @@ import com.quartercode.disconnected.util.size.SizeObject;
  * @see ProgramExecutor
  * @see Process
  */
-public abstract class Program extends ComputerPart implements SizeObject, Vulnerable {
+public abstract class Program extends ComputerPart implements FileContent, Vulnerable {
 
     @XmlElement (name = "vulnerability")
     private List<Vulnerability>   vulnerabilities = new ArrayList<Vulnerability>();

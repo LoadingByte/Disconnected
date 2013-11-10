@@ -36,6 +36,7 @@ import com.quartercode.disconnected.graphics.session.DesktopState;
 import com.quartercode.disconnected.profile.ProfileManager;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.Computer;
+import com.quartercode.disconnected.sim.comp.file.StringContent;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
@@ -189,6 +190,9 @@ public class Main {
      * @param registry The registry to fill.
      */
     public static void fillRegistry(Registry registry) {
+
+        // General
+        registry.registerClass(StringContent.class);
 
         // Hardware
         registry.registerClass(Mainboard.class);

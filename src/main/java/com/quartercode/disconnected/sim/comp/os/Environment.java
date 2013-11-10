@@ -22,11 +22,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import com.quartercode.disconnected.sim.comp.file.TextContent;
 import com.quartercode.disconnected.util.InfoString;
 import com.quartercode.disconnected.util.size.SizeObject;
 import com.quartercode.disconnected.util.size.SizeUtil;
@@ -37,7 +35,7 @@ import com.quartercode.disconnected.util.size.SizeUtil;
  * 
  * @see EnvironmentVariable
  */
-public class Environment implements SizeObject, TextContent {
+public class Environment implements SizeObject {
 
     @XmlValue
     @XmlJavaTypeAdapter (value = Environment.EnvironmentAdapter.class)
@@ -69,7 +67,12 @@ public class Environment implements SizeObject, TextContent {
      */
     public Environment(String variables) {
 
-        setTextContent(variables);
+        for (String line : variables.split("\n")) {
+            String[] parts = line.split("=");
+            if (parts.length == 2) {
+                addVariable(new EnvironmentVariable(parts[0], parts[1]));
+            }
+        }
     }
 
     /**
@@ -132,30 +135,6 @@ public class Environment implements SizeObject, TextContent {
     }
 
     @Override
-    @XmlTransient
-    public String getTextContent() {
-
-        return toString();
-    }
-
-    @Override
-    public void setTextContent(String content) {
-
-        for (String line : content.split("\n")) {
-            String[] parts = line.split("=");
-            if (parts.length == 2) {
-                addVariable(new EnvironmentVariable(parts[0], parts[1]));
-            }
-        }
-    }
-
-    @Override
-    public Environment clone() {
-
-        return new Environment(toString());
-    }
-
-    @Override
     public int hashCode() {
 
         final int prime = 31;
@@ -187,6 +166,23 @@ public class Environment implements SizeObject, TextContent {
         return true;
     }
 
+    /**
+     * Returns a string containing all variables in the environment.
+     * It uses the format:
+     * 
+     * <pre>
+     * VAR1=AValue\nVAR2=AnotherValue
+     * </pre>
+     * 
+     * The \n is equals to a new line:
+     * 
+     * <pre>
+     * VAR1=AValue
+     * VAR2=AnotherValue
+     * </pre>
+     * 
+     * @return A string containing all variables in the environment.
+     */
     @Override
     public String toString() {
 

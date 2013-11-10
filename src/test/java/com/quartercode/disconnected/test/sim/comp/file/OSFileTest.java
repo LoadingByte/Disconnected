@@ -28,6 +28,7 @@ import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.file.MountException;
 import com.quartercode.disconnected.sim.comp.file.OutOfSpaceException;
+import com.quartercode.disconnected.sim.comp.file.StringContent;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.os.User;
@@ -55,7 +56,7 @@ public class OSFileTest {
         operatingSystem.getFileSystemManager().setMounted(fileSystem, true);
 
         testFile = fileSystem.addFile("test1/test2/test.txt", FileType.FILE, new User(null, null));
-        testFile.setContent("Test-Content");
+        testFile.setContent(new StringContent("Test-Content"));
     }
 
     @Test
@@ -93,7 +94,7 @@ public class OSFileTest {
         testFile.move("/" + mountpoint + "/test1/test3/test.txt");
         Assert.assertEquals("Moved file exists", testFile, fileSystem2.getFile("test1/test3/test.txt"));
         Assert.assertEquals("Moved file has correct path", "/" + mountpoint + "/test1/test3/test.txt", testFile.getGlobalPath(operatingSystem));
-        Assert.assertEquals("Moved file has correct content", "Test-Content", testFile.getContent());
+        Assert.assertEquals("Moved file has correct content", new StringContent("Test-Content"), testFile.getContent());
     }
 
 }

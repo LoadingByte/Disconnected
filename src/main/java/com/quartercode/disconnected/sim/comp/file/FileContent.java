@@ -18,24 +18,14 @@
 
 package com.quartercode.disconnected.sim.comp.file;
 
+import com.quartercode.disconnected.util.size.SizeObject;
+
 /**
- * Classes which implement text content can be serialized to and deserialized from simple text.
- * This can be useful for editing text files etc.
+ * Classes which implement file content can be used as content object for a file.
+ * File content classes should be immutable because programs should use {@link File#write(Process, FileContent)} for that.
+ * 
+ * @see File
  */
-public interface TextContent {
-
-    /**
-     * Returns the content of the object as a simple text string.
-     * 
-     * @return The object as a simple string.
-     */
-    public String getTextContent();
-
-    /**
-     * Changes the content of the object so it matches the given text string.
-     * 
-     * @param content The string which describes the new content of the object.
-     */
-    public void setTextContent(String content);
+public interface FileContent extends SizeObject {
 
 }

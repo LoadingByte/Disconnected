@@ -235,7 +235,7 @@ public class SimulationGenerator {
         // Generate environment
         Environment environment = new Environment();
         environment.addVariable(new EnvironmentVariable("PATH", "/system/bin:/user/bin"));
-        addFile(fileSystem, "config/environment.cfg", superuser, new FileRights("rw--r---r---"), environment);
+        addFile(fileSystem, "config/environment.cfg", superuser, new FileRights("rw--r---r---"), new StringContent(environment.toString()));
     }
 
     // Temporary method for generating some unnecessary programs and personal files
@@ -257,7 +257,7 @@ public class SimulationGenerator {
         }
     }
 
-    private static void addFile(FileSystem fileSystem, String path, User user, FileRights rights, Object content) throws OutOfSpaceException {
+    private static void addFile(FileSystem fileSystem, String path, User user, FileRights rights, FileContent content) throws OutOfSpaceException {
 
         fileSystem.addFile(path, FileType.FILE, user);
         fileSystem.getFile(path).setRights(rights);
