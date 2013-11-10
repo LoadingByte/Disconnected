@@ -118,18 +118,28 @@ public class MakeFileProgram extends Program {
 
             String start = shell.getCurrentDirectory() == null ? File.SEPERATOR : shell.getCurrentDirectory().getGlobalHostPath();
             String path = File.resolvePath(start, this.path);
-            String parent = path.substring(0, path.lastIndexOf(File.SEPERATOR));
-            parent = parent.length() > 0 ? parent : File.SEPERATOR;
-            try {
-                if (getHost().getHost().getFileSystemManager().addFile(getHost(), path, type, getHost().getUser()) == null) {
-                    shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "parent.notFound", parent));
+            if (getHost().getHost().getFileSystemManager().getFile(path) != null) {
+                shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "file.exists", path));
+            } else {
+                String parent = path.substring(0, path.lastIndexOf(File.SEPERATOR));
+                parent = parent.length() > 0 ? parent : File.SEPERATOR;
+                try {
+                    if (getHost().getHost().getFileSystemManager().addFile(getHost(), path, type, getHost().getUser()) == null) {
+                        shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "parent.notFound", parent));
+                    }
                 }
-            }
-            catch (NoFileRightException e) {
-                shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "parent.noRights", parent));
-            }
-            catch (OutOfSpaceException e) {
-                shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "s.outOfSpace", path));
+                catch (NoFileRightException e) {
+                    shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "parent.noRights", parent));
+                }
+                catch (OutOfSpaceException e) {
+                    shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "fs.outOfSpace", path));
+                }
+                catch (IllegalStateException e) {
+                    int pathStart = e.getMessage().indexOf("valid: File '") + 13;
+                    int pathEnd = e.getMessage().indexOf("' isn't a directory");
+                    File errorFile = getHost().getHost().getFileSystemManager().getMounted(path).getFile(e.getMessage().substring(pathStart, pathEnd));
+                    shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "parent.noDirectory", errorFile.getGlobalPath(getHost().getHost())));
+                }
             }
 
             getHost().stop(false);
