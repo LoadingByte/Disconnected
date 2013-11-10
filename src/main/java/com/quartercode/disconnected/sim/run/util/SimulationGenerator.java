@@ -48,6 +48,7 @@ import com.quartercode.disconnected.sim.comp.program.KernelProgram;
 import com.quartercode.disconnected.sim.comp.program.desktop.SystemViewerProgram;
 import com.quartercode.disconnected.sim.comp.program.desktop.TerminalProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.ChangeDirectoryProgram;
+import com.quartercode.disconnected.sim.comp.program.shell.DeleteFileProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.DisplayFileContentProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.ExploitProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.FileRightsProgram;
@@ -226,6 +227,7 @@ public class SimulationGenerator {
         addFile(fileSystem, "bin/rights.exe", superuser, new FileRights("r--xr--xr--x"), new FileRightsProgram(new Version("1.0.0"), null));
         addFile(fileSystem, "bin/cat.exe", superuser, new FileRights("r--xr--xr--x"), new DisplayFileContentProgram(new Version("1.0.0"), null));
         addFile(fileSystem, "bin/mkfile.exe", superuser, new FileRights("r--xr--xr--x"), new MakeFileProgram(new Version("1.0.0"), null));
+        addFile(fileSystem, "bin/delfile.exe", superuser, new FileRights("r--xr--xr--x"), new DeleteFileProgram(new Version("1.0.0"), null));
 
         addFile(fileSystem, "bin/terminal.exe", superuser, new FileRights("r--xr--xr--x"), new TerminalProgram(new Version("1.0.0"), null));
         addFile(fileSystem, "bin/sysviewer.exe", superuser, new FileRights("r--xr--xr--x"), new SystemViewerProgram(new Version("1.0.0"), null));
