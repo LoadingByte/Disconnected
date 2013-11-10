@@ -149,7 +149,7 @@ public class FileRightsProgram extends Program {
                                 }
                             }
                         } else {
-                            shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "syntax", path));
+                            shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "syntax"));
                         }
                     } else {
                         shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "file.noRights", path));

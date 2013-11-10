@@ -49,7 +49,7 @@ import com.quartercode.disconnected.util.size.ByteUnit;
 public class MakeFileProgram extends Program {
 
     /**
-     * Creates a new empty file rights program.
+     * Creates a new empty make file program.
      * This is only recommended for direct field access (e.g. for serialization).
      */
     protected MakeFileProgram() {
@@ -57,7 +57,7 @@ public class MakeFileProgram extends Program {
     }
 
     /**
-     * Creates a new file rights program and sets the version and the vulnerabilities.
+     * Creates a new make file program and sets the version and the vulnerabilities.
      * 
      * @param version The current version the program has.
      * @param vulnerabilities The vulnerabilities the program has.

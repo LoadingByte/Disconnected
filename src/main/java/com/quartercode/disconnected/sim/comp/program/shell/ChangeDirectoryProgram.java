@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.file.File;
+import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.program.Parameter;
 import com.quartercode.disconnected.sim.comp.program.Process;
@@ -125,8 +126,11 @@ public class ChangeDirectoryProgram extends Program {
                 } else {
                     file = getHost().getHost().getFileSystemManager().getFile(path);
                 }
+
                 if (file == null) {
                     shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "directory.notFound", path));
+                } else if (! (file.getType() == FileType.DIRECTORY)) {
+                    shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "file.noDirectory", path));
                 } else {
                     shell.setCurrentDirectory(file);
                 }
