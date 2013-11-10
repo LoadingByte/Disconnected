@@ -50,6 +50,7 @@ import com.quartercode.disconnected.sim.comp.program.shell.DisplayFileContentPro
 import com.quartercode.disconnected.sim.comp.program.shell.ExploitProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.FileRightsProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.ListFilesProgram;
+import com.quartercode.disconnected.sim.comp.program.shell.MakeFileProgram;
 import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram;
 import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
@@ -205,6 +206,7 @@ public class Main {
         registry.registerClass(ListFilesProgram.class);
         registry.registerClass(FileRightsProgram.class);
         registry.registerClass(DisplayFileContentProgram.class);
+        registry.registerClass(MakeFileProgram.class);
 
         // TODO: Replace this "crap"
         registry.registerClass(ExploitProgram.class);

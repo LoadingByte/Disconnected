@@ -212,6 +212,9 @@ public class FileSystem implements SizeObject, InfoString {
             if (!part.isEmpty()) {
                 if (current.getChildFile(part) == null) {
                     if (counter == parts.length - 1) {
+                        if (process != null) {
+                            FileRights.checkRight(process, current, FileRight.WRITE);
+                        }
                         current.addChildFile(file);
                         file.setName(part);
                     } else {
