@@ -151,9 +151,6 @@ public class File implements SizeObject, InfoString {
         this.host = host;
         name = "root";
         type = FileType.DIRECTORY;
-        rights = new FileRights("rwd-r---r---");
-        // TODO: Replace workaround with real solution
-        owner = new User(null, User.SUPERUSER_NAME);
     }
 
     /**

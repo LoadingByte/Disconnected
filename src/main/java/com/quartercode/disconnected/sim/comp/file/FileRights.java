@@ -172,7 +172,10 @@ public class FileRights {
 
     private static boolean checkRight(File file, FileAccessor accessor, FileRight right) {
 
-        if (file.getRights().getRight(accessor, right)) {
+        // Only the superuser can write/delete/execute files in root directories of file systems
+        if (file.getRights() == null) {
+            return right == FileRight.READ ? true : false;
+        } else if (file.getRights().getRight(accessor, right)) {
             if (right == FileRight.DELETE && file.getType() == FileType.DIRECTORY) {
                 for (File child : file.getChildFiles()) {
                     if (!checkRight(child, accessor, right)) {
