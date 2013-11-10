@@ -190,13 +190,19 @@ public class Shell implements ShellMessageSender {
                 break;
             }
         }
+        usage = escape(usage);
 
         StringWriter stringWriter = new StringWriter();
         new HelpFormatter().printOptions(new PrintWriter(stringWriter), 55, ShellParser.generateOptions(program), 4, HelpFormatter.DEFAULT_DESC_PAD);
-        String options = stringWriter.toString().replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+        String options = escape(stringWriter.toString());
         options = options.substring(0, options.length() - 1);
 
-        printMessage(new ShellMessage(this, ShellMessageType.HELP, "message", program.getResourceBundle().getString("description"), usage, options));
+        printMessage(new ShellMessage(this, ShellMessageType.HELP, "message", escape(program.getResourceBundle().getString("description")), usage, options));
+    }
+
+    private String escape(String string) {
+
+        return string.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
     }
 
     @Override
