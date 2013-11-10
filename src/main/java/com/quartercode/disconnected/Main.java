@@ -205,6 +205,8 @@ public class Main {
         registry.registerClass(ListFilesProgram.class);
         registry.registerClass(FileRightsProgram.class);
         registry.registerClass(DisplayFileContentProgram.class);
+
+        // TODO: Replace this "crap"
         registry.registerClass(ExploitProgram.class);
 
         registry.registerClass(TerminalProgram.class);

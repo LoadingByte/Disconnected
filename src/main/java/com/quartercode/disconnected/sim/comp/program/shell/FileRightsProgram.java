@@ -121,7 +121,6 @@ public class FileRightsProgram extends Program {
 
             String start = shell.getCurrentDirectory() == null ? File.SEPERATOR : shell.getCurrentDirectory().getGlobalHostPath();
             String path = File.resolvePath(start, this.path);
-            // TEMP TODO: Replace fs root workaround; new virtual file system
             File file = getHost().getHost().getFileSystemManager().getFile(path);
             if (file == null) {
                 shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "file.notFound", path));

@@ -169,7 +169,7 @@ public class ShellList<E> extends ArrayList<E> {
             }
             printedList += ">" + entry.toString() + "</span>";
         }
-        return printedList.substring(3);
+        return printedList.length() > 3 ? printedList.substring(3) : "";
     }
 
 }
