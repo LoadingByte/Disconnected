@@ -85,8 +85,8 @@ public class FileRightsProgram extends Program {
     @Override
     protected void addParameters() {
 
-        addParameter(Parameter.createArgument("change", "c", ArgumentType.STRING, false, true));
         addParameter(Parameter.createRest("path", true));
+        addParameter(Parameter.createArgument("change", "c", ArgumentType.STRING, false, true));
     }
 
     @Override

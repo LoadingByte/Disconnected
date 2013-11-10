@@ -82,8 +82,8 @@ public class MakeFileProgram extends Program {
     @Override
     protected void addParameters() {
 
-        addParameter(Parameter.createSwitch("directory", "d"));
         addParameter(Parameter.createRest("path", true));
+        addParameter(Parameter.createSwitch("directory", "d"));
     }
 
     @Override
