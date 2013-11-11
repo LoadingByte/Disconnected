@@ -64,7 +64,7 @@ public class MakeFileProgram extends Program {
      */
     public MakeFileProgram(Version version, List<Vulnerability> vulnerabilities) {
 
-        super(ResourceBundles.PROGRAM("mkfile").getString("name"), version, vulnerabilities);
+        super(ResourceBundles.PROGRAM("fmk").getString("name"), version, vulnerabilities);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class MakeFileProgram extends Program {
     @Override
     public ResourceBundle getResourceBundle() {
 
-        return ResourceBundles.PROGRAM("mkfile");
+        return ResourceBundles.PROGRAM("fmk");
     }
 
     @Override

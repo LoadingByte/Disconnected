@@ -26,9 +26,11 @@ import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
+import com.quartercode.disconnected.sim.comp.file.FileContent;
 import com.quartercode.disconnected.sim.comp.file.FileRights;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.file.OutOfSpaceException;
+import com.quartercode.disconnected.sim.comp.file.StringContent;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.Hardware;
@@ -226,8 +228,8 @@ public class SimulationGenerator {
         addFile(fileSystem, "bin/ls.exe", superuser, new FileRights("r--xr--xr--x"), new ListFilesProgram(new Version("1.0.0"), null));
         addFile(fileSystem, "bin/rights.exe", superuser, new FileRights("r--xr--xr--x"), new FileRightsProgram(new Version("1.0.0"), null));
         addFile(fileSystem, "bin/cat.exe", superuser, new FileRights("r--xr--xr--x"), new DisplayFileContentProgram(new Version("1.0.0"), null));
-        addFile(fileSystem, "bin/mkfile.exe", superuser, new FileRights("r--xr--xr--x"), new MakeFileProgram(new Version("1.0.0"), null));
-        addFile(fileSystem, "bin/delfile.exe", superuser, new FileRights("r--xr--xr--x"), new DeleteFileProgram(new Version("1.0.0"), null));
+        addFile(fileSystem, "bin/fmk.exe", superuser, new FileRights("r--xr--xr--x"), new MakeFileProgram(new Version("1.0.0"), null));
+        addFile(fileSystem, "bin/fdel.exe", superuser, new FileRights("r--xr--xr--x"), new DeleteFileProgram(new Version("1.0.0"), null));
 
         addFile(fileSystem, "bin/terminal.exe", superuser, new FileRights("r--xr--xr--x"), new TerminalProgram(new Version("1.0.0"), null));
         addFile(fileSystem, "bin/sysviewer.exe", superuser, new FileRights("r--xr--xr--x"), new SystemViewerProgram(new Version("1.0.0"), null));

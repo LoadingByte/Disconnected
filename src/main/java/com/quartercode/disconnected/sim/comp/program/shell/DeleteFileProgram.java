@@ -62,7 +62,7 @@ public class DeleteFileProgram extends Program {
      */
     public DeleteFileProgram(Version version, List<Vulnerability> vulnerabilities) {
 
-        super(ResourceBundles.PROGRAM("delfile").getString("name"), version, vulnerabilities);
+        super(ResourceBundles.PROGRAM("fdel").getString("name"), version, vulnerabilities);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class DeleteFileProgram extends Program {
     @Override
     public ResourceBundle getResourceBundle() {
 
-        return ResourceBundles.PROGRAM("delfile");
+        return ResourceBundles.PROGRAM("fdel");
     }
 
     @Override
