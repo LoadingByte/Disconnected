@@ -222,7 +222,7 @@ public class FileSystem implements SizeObject, InfoString {
                         current.addChildFile(dir);
                     }
                 } else if (current.getChildFile(part).getType() != FileType.DIRECTORY) {
-                    throw new IllegalStateException("File path '" + path + " isn't valid: File '" + current.getChildFile(part).getLocalPath() + "' isn't a directory");
+                    throw new IllegalStateException("File path '" + path + "' isn't valid: File '" + current.getChildFile(part).getLocalPath() + "' isn't a directory");
                 }
                 current = current.getChildFile(part);
             }
