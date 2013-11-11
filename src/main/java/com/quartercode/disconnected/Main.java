@@ -36,15 +36,23 @@ import com.quartercode.disconnected.graphics.session.DesktopState;
 import com.quartercode.disconnected.profile.ProfileManager;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.Computer;
+import com.quartercode.disconnected.sim.comp.file.StringContent;
 import com.quartercode.disconnected.sim.comp.hardware.CPU;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
 import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
+import com.quartercode.disconnected.sim.comp.os.Environment;
 import com.quartercode.disconnected.sim.comp.program.KernelProgram;
 import com.quartercode.disconnected.sim.comp.program.desktop.SystemViewerProgram;
 import com.quartercode.disconnected.sim.comp.program.desktop.TerminalProgram;
+import com.quartercode.disconnected.sim.comp.program.shell.ChangeDirectoryProgram;
+import com.quartercode.disconnected.sim.comp.program.shell.DeleteFileProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.ExploitProgram;
+import com.quartercode.disconnected.sim.comp.program.shell.FileContentProgram;
+import com.quartercode.disconnected.sim.comp.program.shell.FileRightsProgram;
+import com.quartercode.disconnected.sim.comp.program.shell.ListFilesProgram;
+import com.quartercode.disconnected.sim.comp.program.shell.MakeFileProgram;
 import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram;
 import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
@@ -183,6 +191,9 @@ public class Main {
      */
     public static void fillRegistry(Registry registry) {
 
+        // General
+        registry.registerClass(StringContent.class);
+
         // Hardware
         registry.registerClass(Mainboard.class);
         registry.registerClass(CPU.class);
@@ -196,9 +207,21 @@ public class Main {
         registry.registerClass(ShellSessionProgram.class);
         registry.registerClass(DesktopSessionProgram.class);
 
+        registry.registerClass(ChangeDirectoryProgram.class);
+        registry.registerClass(ListFilesProgram.class);
+        registry.registerClass(FileRightsProgram.class);
+        registry.registerClass(FileContentProgram.class);
+        registry.registerClass(MakeFileProgram.class);
+        registry.registerClass(DeleteFileProgram.class);
+
+        // TODO: Replace this "crap"
+        registry.registerClass(ExploitProgram.class);
+
         registry.registerClass(TerminalProgram.class);
         registry.registerClass(SystemViewerProgram.class);
-        registry.registerClass(ExploitProgram.class);
+
+        // Mixed computer stuff
+        registry.registerClass(Environment.class);
 
         // AI Controllers
         registry.registerClass(PlayerController.class);

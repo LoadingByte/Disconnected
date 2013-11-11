@@ -29,6 +29,7 @@ import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.file.MountException;
 import com.quartercode.disconnected.sim.comp.file.OutOfSpaceException;
+import com.quartercode.disconnected.sim.comp.file.StringContent;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.os.User;
@@ -53,7 +54,7 @@ public class FileSystemTest {
         operatingSystem.getFileSystemManager().setMounted(fileSystem, true);
 
         testFile = fileSystem.addFile("test1/test2/test.txt", FileType.FILE, new User(null, null));
-        testFile.setContent("Test-Content");
+        testFile.setContent(new StringContent("Test-Content"));
     }
 
     @Test

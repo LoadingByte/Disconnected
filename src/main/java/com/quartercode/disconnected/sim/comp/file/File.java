@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.sim.comp.file;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.Unmarshaller;
@@ -28,7 +29,6 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang.Validate;
-import com.quartercode.disconnected.sim.comp.SizeUtil;
 import com.quartercode.disconnected.sim.comp.SizeUtil.SizeObject;
 import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.sim.comp.os.Group;
@@ -42,6 +42,7 @@ import com.quartercode.disconnected.util.InfoString;
  * Every file knows his path and has a content string. Every directory has a list of child files.
  * 
  * @see FileSystem
+ * @see FileContent
  */
 public class File implements SizeObject, InfoString {
 
@@ -66,18 +67,71 @@ public class File implements SizeObject, InfoString {
      */
     public static final String SEPERATOR = "/";
 
-    private FileSystem         host;
-    private String             name;
+    /**
+     * Creates an absolute path out of the given one.
+     * The algorithm starts at the given start path and changes the path according to the "change" path.
+     * The "change" path also can be absolute. This will ignore the start path.
+     * 
+     * Here's an example:
+     * 
+     * <pre>
+     * Start:  /user/homes/test/
+     * Change: ../test2/docs
+     * Result: /user/home/test2/docs
+     * </pre>
+     * 
+     * @param start The absolute path the algorithm starts at.
+     * @param path The "change" path which defines where the start path should change (see above).
+     * @return The resolved absolute path.
+     */
+    public static String resolvePath(String start, String path) {
+
+        if (!start.startsWith(File.SEPERATOR)) {
+            throw new IllegalArgumentException("Start path must be absolute (it has to start with " + File.SEPERATOR + "): " + start);
+        } else {
+            List<String> current = new ArrayList<String>();
+            if (!path.startsWith(File.SEPERATOR)) {
+                current.addAll(Arrays.asList(start.split(File.SEPERATOR)));
+                if (current.size() > 0) {
+                    // Remove first entry ([this]/...), it's empty
+                    current.remove(0);
+                }
+            }
+
+            for (String pathChange : path.split(File.SEPERATOR)) {
+                if (!pathChange.equals(".") && !pathChange.isEmpty()) {
+                    if (pathChange.equals("..")) {
+                        current.remove(current.size() - 1);
+                    } else {
+                        current.add(pathChange);
+                    }
+                }
+            }
+
+            if (current.isEmpty()) {
+                return File.SEPERATOR;
+            } else {
+                String resolvedPath = "";
+                for (String part : current) {
+                    resolvedPath += File.SEPERATOR + part;
+                }
+                return resolvedPath;
+            }
+        }
+    }
+
+    private FileSystem       host;
+    private String           name;
     @XmlAttribute
-    private FileType           type;
-    private FileRights         rights;
-    private User               owner;
-    private Group              group;
+    private FileType         type;
+    private FileRights       rights;
+    private User             owner;
+    private Group            group;
 
     @XmlElement
-    private Object             content;
+    private Object           content;
     @XmlElement (name = "file")
-    private final List<File>   children  = new ArrayList<File>();
+    private final List<File> children = new ArrayList<File>();
 
     /**
      * Creates a new empty file.
@@ -307,9 +361,9 @@ public class File implements SizeObject, InfoString {
      * @return The content the file has (if this file is a content one).
      */
     @XmlTransient
-    public Object getContent() {
+    public FileContent getContent() {
 
-        return type == FileType.FILE ? content : null;
+        return type == FileType.FILE ? (FileContent) content : null;
     }
 
     /**
@@ -331,15 +385,12 @@ public class File implements SizeObject, InfoString {
      * This throws an OutOfSpaceException if there isn't enough space on the host drive for the new content.
      * 
      * @param content The new content to write into the file.
-     * @throws IllegalArgumentException Can't derive size type from given content.
      * @throws OutOfSpaceException If there isn't enough space on the host drive for the new content.
      */
-    public void setContent(Object content) throws OutOfSpaceException {
+    public void setContent(FileContent content) throws OutOfSpaceException {
 
         if (type == FileType.FILE) {
-            Validate.isTrue(SizeUtil.accept(content), "Size of type " + content.getClass().getName() + " can't be derived");
-
-            Object oldContent = this.content;
+            FileContent oldContent = (FileContent) this.content;
             this.content = content;
 
             if (host.getRootFile() != null && host.getFilled() > host.getFree()) {
@@ -359,7 +410,7 @@ public class File implements SizeObject, InfoString {
      * @throws NoFileRightException The given process hasn't the right to write into this file.
      * @throws OutOfSpaceException If there isn't enough space on the host drive for the new content.
      */
-    public void write(Process process, Object content) throws NoFileRightException, OutOfSpaceException {
+    public void write(Process process, FileContent content) throws NoFileRightException, OutOfSpaceException {
 
         FileRights.checkRight(process, this, FileRight.WRITE);
         setContent(content);
@@ -375,7 +426,7 @@ public class File implements SizeObject, InfoString {
     public long getSize() {
 
         if (type == FileType.FILE && content != null) {
-            return SizeUtil.getSize(content);
+            return ((FileContent) content).getSize();
         } else if (type == FileType.DIRECTORY && !children.isEmpty()) {
             long size = 0;
             for (File child : children) {
@@ -524,12 +575,9 @@ public class File implements SizeObject, InfoString {
         }
 
         File oldParent = getParent();
-        if (path.startsWith(SEPERATOR)) {
-            host = host.getHost().getOperatingSystem().getFileSystemManager().getMounted(path);
-            host.addFile(process, this, path.substring(path.indexOf(SEPERATOR, 1)));
-        } else {
-            host.addFile(process, this, path);
-        }
+        path = File.resolvePath(getGlobalHostPath(), path);
+        host = host.getHost().getOperatingSystem().getFileSystemManager().getMounted(path);
+        host.addFile(process, this, path.substring(path.indexOf(SEPERATOR, 1)));
         oldParent.removeChildFile(this);
     }
 

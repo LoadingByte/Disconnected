@@ -32,6 +32,7 @@ import com.quartercode.disconnected.sim.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.file.MountException;
 import com.quartercode.disconnected.sim.comp.file.OutOfSpaceException;
+import com.quartercode.disconnected.sim.comp.file.StringContent;
 import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.os.Group;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
@@ -65,7 +66,7 @@ public class FileRightsTest {
         operatingSystem.getUserManager().addGroup(testGroup);
 
         testFile = fileSystem.addFile("test1/test2/test.txt", FileType.FILE, testUser);
-        testFile.setContent("Test-Content");
+        testFile.setContent(new StringContent("Test-Content"));
     }
 
     @Test

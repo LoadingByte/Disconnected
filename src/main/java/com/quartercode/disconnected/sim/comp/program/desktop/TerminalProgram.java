@@ -21,12 +21,14 @@ package com.quartercode.disconnected.sim.comp.program.desktop;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import com.quartercode.disconnected.graphics.session.Frame;
 import com.quartercode.disconnected.graphics.session.ShellWidget;
 import com.quartercode.disconnected.sim.comp.ByteUnit;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.file.NoFileRightException;
+import com.quartercode.disconnected.sim.comp.program.ArgumentException;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
 import com.quartercode.disconnected.sim.comp.program.Program;
@@ -72,6 +74,12 @@ public class TerminalProgram extends Program {
     }
 
     @Override
+    public ResourceBundle getResourceBundle() {
+
+        return ResourceBundles.PROGRAM("terminal");
+    }
+
+    @Override
     protected ProgramExecutor createExecutorInstance(Process host, Map<String, Object> arguments) {
 
         return new DesktopProgramExecutor(host) {
@@ -85,7 +93,7 @@ public class TerminalProgram extends Program {
                 if (shell == null) {
                     try {
                         Map<String, Object> arguments = new HashMap<String, Object>();
-                        arguments.put("user", getHost().getSession().getUser());
+                        arguments.put("user", getHost().getUser().getName());
                         Process shellProcess = createProcess(getHost().getHost().getFileSystemManager().getFile("/system/bin/lash.exe"), arguments);
                         shell = ((ShellSession) shellProcess.getExecutor()).getShell();
                     }
@@ -94,6 +102,9 @@ public class TerminalProgram extends Program {
                     }
                     catch (WrongSessionTypeException e) {
                         getHost().interrupt(true);
+                    }
+                    catch (ArgumentException e) {
+                        // Wont ever happen
                     }
                 }
 
@@ -123,7 +134,7 @@ public class TerminalProgram extends Program {
 
         private TerminalFrame(Shell shell) {
 
-            shellWidget = shell.getHost().createWidget();
+            shellWidget = new ShellWidget(shell);
 
             ScrollPane scrollPane = new ScrollPane(shellWidget);
             scrollPane.setTheme("/scrollpane");

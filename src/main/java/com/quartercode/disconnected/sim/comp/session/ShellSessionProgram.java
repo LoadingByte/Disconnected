@@ -19,11 +19,10 @@
 package com.quartercode.disconnected.sim.comp.session;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
-import com.quartercode.disconnected.graphics.session.ShellWidget;
 import com.quartercode.disconnected.sim.comp.ByteUnit;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
@@ -71,6 +70,12 @@ public class ShellSessionProgram extends SessionProgram {
     }
 
     @Override
+    public ResourceBundle getResourceBundle() {
+
+        return ResourceBundles.SHELL;
+    }
+
+    @Override
     protected Session openSession(Process host, User user) {
 
         return new ShellSession(host, user);
@@ -88,8 +93,8 @@ public class ShellSessionProgram extends SessionProgram {
     public static class ShellSession extends Session {
 
         @XmlElement
-        private Shell             shell;
-        private List<ShellWidget> widgets;
+        private Shell                    shell;
+        private List<ShellUserInterface> userInterfaces;
 
         /**
          * Creates a new empty shell session.
@@ -110,13 +115,19 @@ public class ShellSessionProgram extends SessionProgram {
             super(host, user);
 
             shell = new Shell(this);
-            widgets = new ArrayList<ShellWidget>();
+            userInterfaces = new ArrayList<ShellUserInterface>();
         }
 
         @Override
         public boolean isSerializable() {
 
-            return getWidgets().size() == 0;
+            for (ShellUserInterface userInterface : userInterfaces) {
+                if (!userInterface.isSerializable()) {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         @Override
@@ -136,48 +147,47 @@ public class ShellSessionProgram extends SessionProgram {
         }
 
         /**
-         * Returns a list containing all active shell widgets created by this session.
+         * Returns a list which contains all active user interfaces which use this session.
          * 
-         * @return A list with this session's shell widgets.
+         * @return All active user interfaces which use this session.
          */
-        public List<ShellWidget> getWidgets() {
+        public List<ShellUserInterface> getUserInterfaces() {
 
-            return Collections.unmodifiableList(widgets);
+            return userInterfaces;
         }
 
         /**
-         * Closes the given shell widgets which then stops displaying the session's content.
+         * Registers a new user interface to the shell session.
          * 
-         * @return A new shell widget for the graphics.
+         * @param userInterface The user interface to register.
          */
-        public ShellWidget createWidget() {
+        public void registerUserInterface(ShellUserInterface userInterface) {
 
-            ShellWidget widget = new ShellWidget(shell);
-            widget.update();
-            widgets.add(widget);
-            return widget;
+            if (!userInterfaces.contains(userInterface)) {
+                userInterfaces.add(userInterface);
+                userInterface.updateCurrentDirectory(shell.getCurrentDirectory());
+            }
         }
 
         /**
-         * Closes the given shell widgets which then stops displaying the session's content.
+         * Unregisters the given user interface from the shell session.
+         * Important: This only unregisters the interface and doesn't close it!
          * 
-         * @param widget The shell widget to close.
+         * @param userInterface The user interface to unregister.
          */
-        public void closeWidget(ShellWidget widget) {
+        public void unregisterUserInterface(ShellUserInterface userInterface) {
 
-            if (widgets.contains(widget)) {
-                widgets.remove(widget);
-                if (!widget.isClosed()) {
-                    widget.close();
-                }
+            if (userInterfaces.contains(userInterface)) {
+                userInterfaces.remove(userInterface);
             }
         }
 
         @Override
         public void close() {
 
-            for (ShellWidget widget : new ArrayList<ShellWidget>(widgets)) {
-                closeWidget(widget);
+            for (ShellUserInterface userInterface : new ArrayList<ShellUserInterface>(userInterfaces)) {
+                userInterface.close();
+                unregisterUserInterface(userInterface);
             }
         }
 

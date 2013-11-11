@@ -23,10 +23,12 @@ import java.util.Map;
 import com.quartercode.disconnected.graphics.component.GraphicsState;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
+import com.quartercode.disconnected.sim.comp.program.ArgumentException;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.WrongSessionTypeException;
 import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram.DesktopSession;
 import de.matthiasmann.twl.GUI;
+import de.matthiasmann.twl.Widget;
 
 /**
  * The desktop state renders the desktop of the local player to the graphics manager.
@@ -37,7 +39,7 @@ public class DesktopState extends GraphicsState {
 
     private final Simulation simulation;
 
-    private DesktopWidget    desktopWidget;
+    private Widget           widget;
 
     /**
      * Creates a new desktop state and sets it up.
@@ -64,22 +66,26 @@ public class DesktopState extends GraphicsState {
     @Override
     protected void layout() {
 
-        desktopWidget.setSize(getParent().getWidth(), getParent().getHeight());
+        widget.setSize(getParent().getWidth(), getParent().getHeight());
     }
 
     @Override
     protected void afterAddToGUI(GUI gui) {
 
         try {
+            // TODO: Boot the computer & listen for new session (shell or desktop).
             // Open a new desktop session (temp)
             OperatingSystem os = simulation.getLocalPlayer().getComputer().getOperatingSystem();
             Map<String, Object> arguments = new HashMap<String, Object>();
-            arguments.put("user", os.getUserManager().getUsers().get(0));
+            arguments.put("user", os.getUserManager().getUsers().get(0).getName());
             Process process = os.getProcessManager().getRootProcess().createChild(os.getFileSystemManager().getFile("/system/bin/desktops.exe"), arguments);
-            desktopWidget = ((DesktopSession) process.getExecutor()).createWidget();
-            add(desktopWidget);
+            widget = ((DesktopSession) process.getExecutor()).createWidget();
+            add(widget);
         }
         catch (WrongSessionTypeException e) {
+            // Wont ever happen
+        }
+        catch (ArgumentException e) {
             // Wont ever happen
         }
     }

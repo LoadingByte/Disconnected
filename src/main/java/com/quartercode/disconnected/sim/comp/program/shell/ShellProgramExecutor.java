@@ -18,10 +18,13 @@
 
 package com.quartercode.disconnected.sim.comp.program.shell;
 
+import java.text.MessageFormat;
 import com.quartercode.disconnected.sim.comp.net.PacketListener;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.Program;
 import com.quartercode.disconnected.sim.comp.program.ProgramExecutor;
+import com.quartercode.disconnected.sim.comp.session.ShellMessage;
+import com.quartercode.disconnected.sim.comp.session.ShellMessage.ShellMessageSender;
 
 /**
  * This abstract class defines a shell program executor which takes care of acutally running a program in a shell.
@@ -32,7 +35,7 @@ import com.quartercode.disconnected.sim.comp.program.ProgramExecutor;
  * @see Process
  * @see PacketListener
  */
-public abstract class ShellProgramExecutor extends ProgramExecutor {
+public abstract class ShellProgramExecutor extends ProgramExecutor implements ShellMessageSender {
 
     /**
      * Creates a new empty shell program executor.
@@ -50,6 +53,12 @@ public abstract class ShellProgramExecutor extends ProgramExecutor {
     public ShellProgramExecutor(Process host) {
 
         super(host);
+    }
+
+    @Override
+    public String translateShellMessage(ShellMessage message) {
+
+        return MessageFormat.format( ((Program) getHost().getFile().getContent()).getResourceBundle().getString(message.toKey()), message.getVariables());
     }
 
 }

@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.graphics.session;
 
+import com.quartercode.disconnected.sim.comp.program.ArgumentException;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.WrongSessionTypeException;
 import com.quartercode.disconnected.sim.comp.session.Desktop;
@@ -82,6 +83,9 @@ public class DesktopWidget extends Widget {
                     sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("/system/bin/terminal.exe"), null);
                 }
                 catch (WrongSessionTypeException e) {
+                    // Wont ever happen
+                }
+                catch (ArgumentException e) {
                     // Wont ever happen
                 }
             }

@@ -23,7 +23,6 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
-import com.quartercode.disconnected.sim.comp.os.Group;
 import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.sim.comp.program.Process;
 
@@ -42,15 +41,49 @@ public class FileRights {
         /**
          * The owner of the file is the user who created it (the owner can be changed).
          */
-        OWNER,
+        OWNER ('u'),
         /**
          * By default, this is the primary group of the creator of the file (the group can be changed).
          */
-        GROUP,
+        GROUP ('g'),
         /**
          * Everyone else (not owner or group).
          */
-        OTHERS;
+        OTHERS ('o');
+
+        /**
+         * Returns the file accessor which has the given letter assigned.
+         * 
+         * @param letter The letter which is assigned to the returned accessor.
+         * @return The file accessor which has the given letter assigned.
+         */
+        public static FileAccessor valueOf(char letter) {
+
+            for (FileAccessor accessor : values()) {
+                if (accessor.getLetter() == letter) {
+                    return accessor;
+                }
+            }
+
+            return null;
+        }
+
+        private char letter;
+
+        private FileAccessor(char letter) {
+
+            this.letter = letter;
+        }
+
+        /**
+         * Returns the letter which can be used as an acronym for the accessor.
+         * 
+         * @return The letter which can be used as an acronym for the accessor.
+         */
+        public char getLetter() {
+
+            return letter;
+        }
 
     }
 
@@ -77,6 +110,23 @@ public class FileRights {
          * It cannot be applied to directories.
          */
         EXECUTE ('x');
+
+        /**
+         * Returns the file right which has the given letter assigned.
+         * 
+         * @param letter The letter which is assigned to the returned right.
+         * @return The file right which has the given letter assigned.
+         */
+        public static FileRight valueOf(char letter) {
+
+            for (FileRight right : values()) {
+                if (right.getLetter() == letter) {
+                    return right;
+                }
+            }
+
+            return null;
+        }
 
         private char letter;
 
@@ -109,16 +159,12 @@ public class FileRights {
 
         if (user.isSuperuser()) {
             return true;
-        } else if (checkRight(file, FileAccessor.OTHERS, right)) {
-            return true;
         } else if (checkRight(file, FileAccessor.OWNER, right) && file.getOwner().equals(user)) {
             return true;
-        } else if (checkRight(file, FileAccessor.GROUP, right)) {
-            for (Group group : user.getGroups()) {
-                if (user.getGroups().contains(group)) {
-                    return true;
-                }
-            }
+        } else if (checkRight(file, FileAccessor.GROUP, right) && user.getGroups().contains(file.getGroup())) {
+            return true;
+        } else if (checkRight(file, FileAccessor.OTHERS, right)) {
+            return true;
         }
 
         return false;
@@ -126,7 +172,10 @@ public class FileRights {
 
     private static boolean checkRight(File file, FileAccessor accessor, FileRight right) {
 
-        if (file.getRights().getRight(accessor, right)) {
+        // Only the superuser can write/delete/execute files in root directories of file systems
+        if (file.getRights() == null) {
+            return right == FileRight.READ ? true : false;
+        } else if (file.getRights().getRight(accessor, right)) {
             if (right == FileRight.DELETE && file.getType() == FileType.DIRECTORY) {
                 for (File child : file.getChildFiles()) {
                     if (!checkRight(child, accessor, right)) {
@@ -248,11 +297,7 @@ public class FileRights {
 
         FileRight[] enumRights = new FileRight[4];
         for (int index = 0; index < rights.length; index++) {
-            for (FileRight enumRight : FileRight.values()) {
-                if (enumRight.getLetter() == rights[index]) {
-                    enumRights[index] = enumRight;
-                }
-            }
+            enumRights[index] = FileRight.valueOf(rights[index]);
         }
         return enumRights;
     }

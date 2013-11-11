@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.sim.comp.file.File;
+import com.quartercode.disconnected.sim.comp.os.Environment;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.os.User;
 import com.quartercode.disconnected.sim.comp.session.SessionProgram;
@@ -86,6 +87,8 @@ public class Process implements InfoString {
 
     @XmlElement
     private ProcessState        state    = ProcessState.RUNNING;
+    @XmlElement
+    private Environment         environment;
     @XmlElement (name = "process")
     private final List<Process> children = new ArrayList<Process>();
 
@@ -105,11 +108,12 @@ public class Process implements InfoString {
      * @param parent The parent process which created this process.
      * @param pid A unique process id the process has This is used to identify the process.
      * @param file The process launch file which contains the program for the process.
+     * @param environment The environment the process runs in.
      * @param arguments The argument map which contains values for the defined parameters.
      * @throws WrongSessionTypeException The executor doesn't support the session it is running in.
-     * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
+     * @throws ArgumentException Some parameters/arguments are not set correctly.
      */
-    public Process(OperatingSystem host, Process parent, int pid, File file, Map<String, Object> arguments) throws WrongSessionTypeException {
+    public Process(OperatingSystem host, Process parent, int pid, File file, Environment environment, Map<String, Object> arguments) throws WrongSessionTypeException, ArgumentException {
 
         Validate.isTrue(file.getContent() instanceof Program, "Process launch file must contain a program");
 
@@ -117,6 +121,7 @@ public class Process implements InfoString {
         this.parent = parent;
         this.pid = pid;
         this.file = file;
+        this.environment = environment;
 
         Program program = (Program) file.getContent();
         ProgramExecutor executor = program.createExecutor(this, arguments);
@@ -281,6 +286,17 @@ public class Process implements InfoString {
     }
 
     /**
+     * Returns the environment the process is running in.
+     * An environment object contains useful environment variables.
+     * 
+     * @return The environment the process is running in.
+     */
+    public Environment getEnvironment() {
+
+        return environment;
+    }
+
+    /**
      * Returns the child processes this process started.
      * 
      * @return The child processes this process started.
@@ -307,31 +323,31 @@ public class Process implements InfoString {
 
     /**
      * Creates a new child process using the program stored in the given file.
-     * The new process will be a child of this process.
+     * The new process will be a child of this process and will run under the same session using the same environment.
      * 
      * @param file The process launch file which contains the program for the process.
      * @param arguments The argument map which contains values for the defined parameters.
      * @throws WrongSessionTypeException The executor doesn't support the session it is running in.
-     * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
+     * @throws ArgumentException Some parameters/arguments are not set correctly.
      */
-    public Process createChild(File file, Map<String, Object> arguments) throws WrongSessionTypeException {
+    public Process createChild(File file, Map<String, Object> arguments) throws WrongSessionTypeException, ArgumentException {
 
         return createChild(file, arguments, host.getProcessManager().requestPid());
     }
 
     /**
      * Creates a new child process using the program stored in the given file using the given pid.
-     * The new process will be a child of this process and will run under the same session.
+     * The new process will be a child of this process and will run under the same session using the same environment.
      * 
      * @param file The process launch file which contains the program for the process.
      * @param arguments The argument map which contains values for the defined parameters.
      * @param pid A unique process id the process has. This is used to identify the process.
      * @throws WrongSessionTypeException The executor doesn't support the session it is running in.
-     * @throws IllegalArgumentException No or wrong argument type for a specific parameter.
+     * @throws ArgumentException Some parameters/arguments are not set correctly.
      */
-    public Process createChild(File file, Map<String, Object> arguments, int pid) throws WrongSessionTypeException {
+    public Process createChild(File file, Map<String, Object> arguments, int pid) throws WrongSessionTypeException, ArgumentException {
 
-        Process process = new Process(host, this, pid, file, arguments);
+        Process process = new Process(host, this, pid, file, environment, arguments);
         children.add(process);
         return process;
     }

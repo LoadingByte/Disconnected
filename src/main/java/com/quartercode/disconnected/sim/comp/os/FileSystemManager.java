@@ -32,7 +32,9 @@ import com.quartercode.disconnected.sim.comp.file.File.FileType;
 import com.quartercode.disconnected.sim.comp.file.FileSystem;
 import com.quartercode.disconnected.sim.comp.file.FileSystemProvider;
 import com.quartercode.disconnected.sim.comp.file.MountException;
+import com.quartercode.disconnected.sim.comp.file.NoFileRightException;
 import com.quartercode.disconnected.sim.comp.file.OutOfSpaceException;
+import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.util.InfoString;
 
 /**
@@ -176,7 +178,7 @@ public class FileSystemManager implements InfoString {
      */
     public FileSystem getMounted(String path) {
 
-        if (path.startsWith(File.SEPERATOR)) {
+        if (path.startsWith(File.SEPERATOR) && path.split(File.SEPERATOR).length > 1) {
             for (KnownFileSystem fileSystem : knownFileSystems) {
                 if (fileSystem.getMountpoint().equals(path.split(File.SEPERATOR)[1])) {
                     return fileSystem.getFileSystem();
@@ -275,7 +277,7 @@ public class FileSystemManager implements InfoString {
     public File getFile(String path) {
 
         FileSystem fileSystem = getMounted(path);
-        if (fileSystem != null) {
+        if (fileSystem != null && path.lastIndexOf(File.SEPERATOR) > 0) {
             return fileSystem.getFile(path.substring(path.indexOf(File.SEPERATOR, 1)));
         } else {
             return null;
@@ -299,6 +301,30 @@ public class FileSystemManager implements InfoString {
         FileSystem fileSystem = getMounted(path);
         if (fileSystem != null) {
             return fileSystem.addFile(path.substring(path.indexOf(File.SEPERATOR, 1)), type, user);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Creates a new file using the given path and type on the associated file system mounted on this computer and returns it.
+     * If the file already exists, the existing file will be returned.
+     * A path is a collection of files seperated by a seperator.
+     * This will create the file location using a global os path.
+     * 
+     * @param process The process which wants to add the file.
+     * @param path The path the new file will be located under.
+     * @param type The file type the new file should has.
+     * @param user The user who owns the new file.
+     * @return The new file (or the existing one, if the file already exists).
+     * @throws NoFileRightException The given process hasn't the right to write into a directory where the algorithm needs to write
+     * @throws OutOfSpaceException If there isn't enough space on the target file system for the new file.
+     */
+    public File addFile(Process process, String path, FileType type, User user) throws NoFileRightException, OutOfSpaceException {
+
+        FileSystem fileSystem = getMounted(path);
+        if (fileSystem != null) {
+            return fileSystem.addFile(process, path.substring(path.indexOf(File.SEPERATOR, 1)), type, user);
         } else {
             return null;
         }
@@ -513,6 +539,7 @@ public class FileSystemManager implements InfoString {
 
             return getClass().getName() + " [" + toInfoString() + "]";
         }
+
     }
 
 }
