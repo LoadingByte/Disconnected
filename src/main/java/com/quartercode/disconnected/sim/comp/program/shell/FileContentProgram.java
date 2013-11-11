@@ -18,6 +18,8 @@
 
 package com.quartercode.disconnected.sim.comp.program.shell;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -27,8 +29,10 @@ import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.file.NoFileRightException;
-import com.quartercode.disconnected.sim.comp.file.TextContent;
+import com.quartercode.disconnected.sim.comp.file.OutOfSpaceException;
+import com.quartercode.disconnected.sim.comp.file.StringContent;
 import com.quartercode.disconnected.sim.comp.program.Parameter;
+import com.quartercode.disconnected.sim.comp.program.Parameter.ArgumentType;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.Program;
 import com.quartercode.disconnected.sim.comp.program.ProgramExecutor;
@@ -40,18 +44,18 @@ import com.quartercode.disconnected.util.ResourceBundles;
 import com.quartercode.disconnected.util.size.ByteUnit;
 
 /**
- * The display file content program displays the content of text files on the shell.
+ * The file content program displays the content of text files or changes it.
  * 
  * @see Shell
  */
-@XmlSeeAlso ({ DisplayFileContentProgram.DisplayFileContentProgramExecutor.class })
-public class DisplayFileContentProgram extends Program {
+@XmlSeeAlso ({ FileContentProgram.DisplayFileContentProgramExecutor.class })
+public class FileContentProgram extends Program {
 
     /**
      * Creates a new empty display file content program.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    protected DisplayFileContentProgram() {
+    protected FileContentProgram() {
 
     }
 
@@ -61,9 +65,9 @@ public class DisplayFileContentProgram extends Program {
      * @param version The current version the program has.
      * @param vulnerabilities The vulnerabilities the program has.
      */
-    public DisplayFileContentProgram(Version version, List<Vulnerability> vulnerabilities) {
+    public FileContentProgram(Version version, List<Vulnerability> vulnerabilities) {
 
-        super(ResourceBundles.PROGRAM("cat").getString("name"), version, vulnerabilities);
+        super(ResourceBundles.PROGRAM("fc").getString("name"), version, vulnerabilities);
     }
 
     @Override
@@ -75,13 +79,16 @@ public class DisplayFileContentProgram extends Program {
     @Override
     public ResourceBundle getResourceBundle() {
 
-        return ResourceBundles.PROGRAM("cat");
+        return ResourceBundles.PROGRAM("fc");
     }
 
     @Override
     protected void addParameters() {
 
         addParameter(Parameter.createRest("path", true));
+        addParameter(Parameter.createSwitch("line-numbers", "n"));
+        addParameter(Parameter.createArgument("line", "l", ArgumentType.INTEGER, false, true));
+        addParameter(Parameter.createArgument("change", "c", ArgumentType.STRING, false, true));
     }
 
     @Override
@@ -93,7 +100,13 @@ public class DisplayFileContentProgram extends Program {
     protected static class DisplayFileContentProgramExecutor extends ShellProgramExecutor {
 
         @XmlElement
-        private String path;
+        private String  path;
+        @XmlElement
+        private boolean lineNumbers;
+        @XmlElement
+        private int     line;
+        @XmlElement
+        private String  newContent;
 
         protected DisplayFileContentProgramExecutor() {
 
@@ -104,6 +117,9 @@ public class DisplayFileContentProgram extends Program {
             super(host);
 
             path = ((String[]) arguments.get("path"))[0];
+            lineNumbers = (Boolean) arguments.get("line-numbers");
+            line = arguments.containsKey("line") ? (Integer) arguments.get("line") : -1;
+            newContent = arguments.containsKey("change") ? (String) arguments.get("change") : null;
         }
 
         @Override
@@ -116,20 +132,62 @@ public class DisplayFileContentProgram extends Program {
             File file = getHost().getHost().getFileSystemManager().getFile(path);
             if (file == null) {
                 shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "file.notFound", path));
-            } else if (! (file.getContent() instanceof TextContent)) {
+            } else if (! (file.getContent() instanceof StringContent)) {
                 shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "file.noText", path));
             } else {
                 try {
-                    shell.printMessage(new ShellMessage(this, ShellMessageType.INFO, "display", ((TextContent) file.read(getHost())).getTextContent()));
+                    if (newContent == null) {
+                        String content = ((StringContent) file.read(getHost())).toString();
+                        if (lineNumbers) {
+                            String[] lines = content.split("\n");
+                            content = "";
+                            for (int line = 0; line < lines.length; line++) {
+                                content += String.format("%-4s%s\n", line + 1, lines[line]);
+                            }
+                            content = content.substring(0, content.length() - 1);
+                        }
+
+                        if (line >= 0) {
+                            String[] lines = content.split("\n");
+                            if (line < lines.length) {
+                                content = lines[line - 1];
+                            }
+                        }
+                        shell.printMessage(new ShellMessage(this, ShellMessageType.INFO, "display", content));
+                    } else {
+                        String content = ((StringContent) file.read(getHost())).toString();
+                        if (line >= 0) {
+                            List<String> lines = new ArrayList<String>(Arrays.asList(content.split("\n")));
+                            if (line >= lines.size()) {
+                                for (int counter = lines.size(); counter < line; counter++) {
+                                    lines.add("");
+                                }
+                            }
+                            lines.set(line - 1, newContent);
+
+                            content = "";
+                            for (String line : lines) {
+                                content += line + "\n";
+                            }
+                            content = content.substring(0, content.length() - 1);
+                        } else {
+                            content = newContent;
+                        }
+
+                        file.write(getHost(), new StringContent(content));
+                    }
                 }
                 catch (NoFileRightException e) {
-                    shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "file.noRights", path));
+                    String right = e.getRequiredRight().toString().substring(0, 1) + e.getRequiredRight().toString().substring(1).toLowerCase();
+                    shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "file.no" + right + "Rights", path));
+                }
+                catch (OutOfSpaceException e) {
+                    shell.printMessage(new ShellMessage(this, ShellMessageType.ERROR, "fs.outOfSpace", path));
                 }
             }
 
             getHost().stop(false);
         }
-
     }
 
 }
