@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlList;
 import com.quartercode.disconnected.sim.comp.SizeUtil;
 import com.quartercode.disconnected.sim.comp.SizeUtil.SizeObject;
 import com.quartercode.disconnected.util.InfoString;
@@ -38,7 +39,7 @@ public class Packet implements SizeObject, InfoString {
     private Address      receiver;
     @XmlElement
     private Object       data;
-    @XmlElement
+    @XmlList
     private List<String> target;
     @XmlElement
     private int          targetIndex;

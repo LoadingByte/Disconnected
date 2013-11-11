@@ -29,7 +29,6 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.file.FileRights;
@@ -52,17 +51,14 @@ public abstract class ProgramExecutor implements InfoString {
 
     private static final Logger        LOGGER           = Logger.getLogger(ProgramExecutor.class.getName());
 
-    @XmlElementWrapper (name = "updateTasks")
-    @XmlElement (name = "task")
+    @XmlElement (name = "updateTask")
     private final List<UpdateTask>     updateTasks      = new ArrayList<UpdateTask>();
 
     @XmlIDREF
     private Process                    host;
-    @XmlElementWrapper (name = "packetListeners")
-    @XmlElement (name = "listener")
+    @XmlElement (name = "packetListener")
     private final List<PacketListener> packetListeners  = new ArrayList<PacketListener>();
-    @XmlElementWrapper (name = "remainingPackets")
-    @XmlElement (name = "packet")
+    @XmlElement (name = "remainingPacket")
     private final Queue<Packet>        remainingPackets = new LinkedList<Packet>();
 
     /**

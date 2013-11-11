@@ -22,7 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.Version;
 import com.quartercode.disconnected.sim.comp.Vulnerability;
@@ -42,8 +41,7 @@ import com.quartercode.disconnected.sim.comp.net.Packet;
 public class NetworkInterface extends Hardware {
 
     private IP                  ip;
-    @XmlElementWrapper (name = "remainingPackets")
-    @XmlElement (name = "packet")
+    @XmlElement (name = "remainingPacket")
     private final Queue<Packet> remainingPackets = new LinkedList<Packet>();
 
     /**

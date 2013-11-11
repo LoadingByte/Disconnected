@@ -25,7 +25,6 @@ import java.util.TreeMap;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.file.File;
 import com.quartercode.disconnected.sim.comp.file.File.FileType;
@@ -48,8 +47,7 @@ public class FileSystemManager implements InfoString {
 
     private OperatingSystem       host;
 
-    @XmlElementWrapper (name = "knownFileSystems")
-    @XmlElement (name = "fileSystem")
+    @XmlElement (name = "knownFileSystem")
     private List<KnownFileSystem> knownFileSystems;
 
     /**

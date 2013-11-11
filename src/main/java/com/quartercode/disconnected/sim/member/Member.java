@@ -44,7 +44,7 @@ public class Member implements InfoString {
     private String                name;
     private Computer              computer;
     private AIController          aiController;
-    @XmlElement
+    @XmlElement (name = "brainData")
     private final List<BrainData> brainData = new ArrayList<BrainData>();
 
     /**
