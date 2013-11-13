@@ -38,7 +38,7 @@ public class World {
      */
     public World() {
 
-        root = new RootObject();
+        root = new RootObject(this);
     }
 
     /**

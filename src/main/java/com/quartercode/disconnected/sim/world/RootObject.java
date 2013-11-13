@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.sim.world;
 
 /**
- * The root object of a world can house first level world objects in the children property.
+ * The root object of a world can house first level world objects.
  * 
  * @see WorldObject
  */
@@ -37,12 +37,24 @@ public class RootObject extends WorldObject {
                                                                                             }
 
                                                                                         };
+    private final World                                               world;
 
     /**
-     * Creates a new empty root objects.
+     * Creates a new root object which is used in the given world.
+     * 
+     * @param world The world the new object is used in.
      */
-    public RootObject() {
+    public RootObject(World world) {
 
+        super(null);
+
+        this.world = world;
+    }
+
+    @Override
+    public World getWorld() {
+
+        return world;
     }
 
 }

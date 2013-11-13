@@ -28,14 +28,38 @@ import java.util.List;
  */
 public class WorldObject {
 
+    private final WorldObject       parent;
     private final List<Property<?>> properties;
 
     /**
-     * Creates a new world object.
+     * Creates a new world object which has the given parent one.
+     * 
+     * @param parent The parent world object which has a {@link Property} which houses the new object.
      */
-    public WorldObject() {
+    public WorldObject(WorldObject parent) {
 
+        this.parent = parent;
         properties = new ArrayList<Property<?>>();
+    }
+
+    /**
+     * Returns The parent world object which has a {@link Property} which houses this object.
+     * 
+     * @return The parent object which houses this object.
+     */
+    public WorldObject getParent() {
+
+        return parent;
+    }
+
+    /**
+     * Resolves the {@link World} this world object is in.
+     * 
+     * @return The {@link World} this object is in.
+     */
+    public World getWorld() {
+
+        return parent == null ? null : parent.getWorld();
     }
 
     /**
