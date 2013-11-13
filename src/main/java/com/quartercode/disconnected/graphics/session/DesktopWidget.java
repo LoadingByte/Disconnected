@@ -41,11 +41,11 @@ import de.matthiasmann.twl.Widget;
  */
 public class DesktopWidget extends Widget {
 
-    private Desktop    desktop;
+    private Desktop           desktop;
 
-    public DesktopArea windowArea;
-    public BoxLayout   taskbar;
-    public Button      launchButton;
+    private final DesktopArea windowArea;
+    private final BoxLayout   taskbar;
+    private final Button      launchButton;
 
     /**
      * Creates a new desktop widget and sets it up.

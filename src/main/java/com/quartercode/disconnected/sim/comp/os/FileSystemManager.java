@@ -397,7 +397,7 @@ public class FileSystemManager implements InfoString {
     @Override
     public String toInfoString() {
 
-        return getAvaiable().size() + " avaiable, " + getKnown().size() + "/" + getMounted().size() + " known ones mounted";
+        return getAvaiable().size() + " avaiable fs, " + getKnown().size() + "/" + getMounted().size() + " known fs mounted";
     }
 
     @Override

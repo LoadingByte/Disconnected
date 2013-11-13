@@ -23,7 +23,7 @@ import java.util.Random;
 /**
  * This utility class can prepare probability values as well as generate results out of them.
  * The preparation calculates a valid probability value out of a pseudo one. For example, if your pseudo value is 1.5, you will get 1, in the case of -2 you will get 0.
- * The generation generates a random boolean result which is true if the probability is hitted. The distribution of the results is equally to the probability.
+ * The generation generates a random boolean result which is true if the probability is hit. The distribution of the results is equally to the probability.
  */
 public class ProbabilityUtil {
 
@@ -46,7 +46,7 @@ public class ProbabilityUtil {
     }
 
     /**
-     * Generates a random boolean result which is true if the probability is hitted using the given random number generator.
+     * Generates a random boolean result which is true if the probability is hit using the given random number generator.
      * The distribution of the results is equally to the probability.
      * 
      * @param probability The probability to use for generation.
@@ -59,7 +59,7 @@ public class ProbabilityUtil {
     }
 
     /**
-     * Generates a random boolean result which is true if the probability is hitted using the given random pool.
+     * Generates a random boolean result which is true if the probability is hit using the given random pool.
      * The distribution of the results is equally to the probability.
      * 
      * @param probability The probability to use for generation.
@@ -72,7 +72,7 @@ public class ProbabilityUtil {
     }
 
     /**
-     * Generates a random boolean result which is true if the probability is hitted using the public random pool.
+     * Generates a random boolean result which is true if the probability is hit using the given random number generator.
      * The probability will get prepared before calculation.
      * The distribution of the results is equally to the probability.
      * 
@@ -86,7 +86,7 @@ public class ProbabilityUtil {
     }
 
     /**
-     * Generates a random boolean result which is true if the probability is hitted using the public random pool.
+     * Generates a random boolean result which is true if the probability is hit using the given random pool.
      * The probability will get prepared before calculation.
      * The distribution of the results is equally to the probability.
      * 
