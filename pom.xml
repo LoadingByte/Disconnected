@@ -38,6 +38,15 @@
         <tag>HEAD</tag>
     </scm>
 
+    <developers>
+        <developer>
+            <name>LoadingByte</name>
+            <id>loadingbyte</id>
+            <email>loadingbyte@gmail.com</email>
+            <organization>QuarterCode</organization>
+        </developer>
+    </developers>
+
     <dependencies>
         <!-- Utility -->
         <dependency>
