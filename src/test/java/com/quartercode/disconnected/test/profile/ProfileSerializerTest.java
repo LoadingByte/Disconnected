@@ -33,6 +33,7 @@ import com.quartercode.disconnected.Main;
 import com.quartercode.disconnected.profile.ProfileSerializer;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
+import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.util.ResourceStore;
 
@@ -53,7 +54,7 @@ public class ProfileSerializerTest {
     @Before
     public void setUp() {
 
-        simulation = SimulationGenerator.generateSimulation(10, 2);
+        simulation = SimulationGenerator.generateSimulation(10, 2, new RandomPool(Simulation.RANDOM_POOL_SIZE));
     }
 
     @Test

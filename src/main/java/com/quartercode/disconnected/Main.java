@@ -63,6 +63,7 @@ import com.quartercode.disconnected.sim.run.TickSimulator;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
 import com.quartercode.disconnected.util.LogExceptionHandler;
+import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.util.ResourceStore;
 
@@ -164,7 +165,7 @@ public class Main {
 
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG-ACTION: Generating new simulation");
-        Simulation simulation = SimulationGenerator.generateSimulation(10, 2);
+        Simulation simulation = SimulationGenerator.generateSimulation(10, 2, new RandomPool(Simulation.RANDOM_POOL_SIZE));
         for (Computer computer : simulation.getComputers()) {
             computer.getOperatingSystem().setRunning(true);
         }

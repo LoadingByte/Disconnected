@@ -37,21 +37,23 @@ public class LocationGenerator {
      * Generates the given amount of locations on an earth map.
      * 
      * @param amount The amount of locations to generate.
+     * @param random The random pool to use for generating the random locations.
      * @return The generated locations.
      */
-    public static List<Location> generateLocations(int amount) {
+    public static List<Location> generateLocations(int amount, RandomPool random) {
 
-        return generateLocations(amount, null);
+        return generateLocations(amount, null, random);
     }
 
     /**
      * Generates the given amount of locations on an earth map, ignoring the given ignore locations.
      * 
      * @param amount The amount of locations to generate.
+     * @param ignore The method will definiteley not return any of these locations.
+     * @param random The random pool to use for generating the random locations.
      * @return The generated locations.
-     * @throws RuntimeException The map image can't be read.
      */
-    public static List<Location> generateLocations(int amount, List<Location> ignore) {
+    public static List<Location> generateLocations(int amount, List<Location> ignore, RandomPool random) {
 
         Validate.isTrue(amount > 0, "Generation amount must be > 0: ", amount);
 
@@ -65,7 +67,6 @@ public class LocationGenerator {
         int height = map.getHeight();
 
         List<Location> result = new ArrayList<Location>();
-        RandomPool random = new RandomPool(100);
         int blackRGB = Color.BLACK.getRGB();
         while (result.size() < amount) {
             int x = random.nextInt(width);

@@ -58,7 +58,7 @@ public class UserController extends AIController {
     public void update(Simulation simulation) {
 
         // Generate member interests against members of other groups
-        if (ProbabilityUtil.genPseudo(simulation.RANDOM.nextFloat() / 100F, simulation.RANDOM)) {
+        if (ProbabilityUtil.genPseudo(simulation.getRandom().nextFloat() / 100F, simulation.getRandom())) {
             if (getMember().getBrainData(Interest.class).size() < 5) {
                 MemberGroup group = simulation.getGroup(getMember());
                 targetLoop:
@@ -70,8 +70,8 @@ public class UserController extends AIController {
                             }
                         }
 
-                        if (ProbabilityUtil.genPseudo(simulation.RANDOM.nextFloat() + -group.getReputation(target).getValue() / 100F, simulation.RANDOM)) {
-                            float priority = simulation.RANDOM.nextFloat() - group.getReputation(target).getValue() / 40F;
+                        if (ProbabilityUtil.genPseudo(simulation.getRandom().nextFloat() + -group.getReputation(target).getValue() / 100F, simulation.getRandom())) {
+                            float priority = simulation.getRandom().nextFloat() - group.getReputation(target).getValue() / 40F;
                             if (priority > 1) {
                                 priority = 1;
                             }

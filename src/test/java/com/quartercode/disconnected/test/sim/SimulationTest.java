@@ -26,6 +26,7 @@ import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
+import com.quartercode.disconnected.util.RandomPool;
 
 public class SimulationTest {
 
@@ -34,7 +35,7 @@ public class SimulationTest {
     @Before
     public void setUp() {
 
-        simulation = SimulationGenerator.generateSimulation(10, 2);
+        simulation = SimulationGenerator.generateSimulation(10, 2, new RandomPool(Simulation.RANDOM_POOL_SIZE));
     }
 
     @Test

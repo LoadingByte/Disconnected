@@ -97,7 +97,7 @@ public class DestroyInterest extends Interest implements HasTarget {
         int currentReputation = simulation.getGroup(member).getReputation(member).getValue();
         float probability = getPriority() * (getReputationChange(simulation, member, simulation.getGroup(member)) * 20F) / ( (currentReputation == 0 ? 1 : currentReputation) * 100);
 
-        if (ProbabilityUtil.genPseudo(probability, simulation.RANDOM)) {
+        if (ProbabilityUtil.genPseudo(probability, simulation.getRandom())) {
             // Collect all vulnerabilities
             List<Vulnerability> vulnerabilities = new ArrayList<Vulnerability>();
             for (ComputerPart part : member.getComputer().getParts()) {

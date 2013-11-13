@@ -25,7 +25,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
@@ -46,27 +45,60 @@ import com.quartercode.disconnected.util.RandomPool;
 public class Simulation implements InfoString {
 
     /**
-     * This is a public random pool you can quickly access if you need random numbers for a specific simulation.
+     * The default size a random pool which is used for a simulation should have.
      */
-    @XmlTransient
-    public final RandomPool         RANDOM    = new RandomPool(1000);
+    public static final int         RANDOM_POOL_SIZE = 1000;
+
+    private RandomPool              random;
 
     @XmlElementWrapper (name = "members")
     @XmlElement (name = "member")
-    private final List<Member>      members   = new CopyOnWriteArrayList<Member>();
+    private final List<Member>      members          = new CopyOnWriteArrayList<Member>();
     private Member                  localPlayerCache;
     @XmlElementWrapper (name = "groups")
     @XmlElement (name = "group")
-    private final List<MemberGroup> groups    = new CopyOnWriteArrayList<MemberGroup>();
+    private final List<MemberGroup> groups           = new CopyOnWriteArrayList<MemberGroup>();
     @XmlElementWrapper (name = "computers")
     @XmlElement (name = "computer")
-    private final List<Computer>    computers = new CopyOnWriteArrayList<Computer>();
+    private final List<Computer>    computers        = new CopyOnWriteArrayList<Computer>();
 
     /**
      * Creates a new empty simulation.
+     * This is only recommended for direct field access (e.g. for serialization).
      */
-    public Simulation() {
+    protected Simulation() {
 
+    }
+
+    /**
+     * Creates a new empty simulation using the given random pool.
+     * 
+     * @param random The random pool to use for generating anything inside the simulation.
+     */
+    public Simulation(RandomPool random) {
+
+        this.random = random;
+    }
+
+    /**
+     * Returns the random pool to use for generating anything inside the simulation.
+     * 
+     * @return The random pool for the simulation.
+     */
+    public RandomPool getRandom() {
+
+        return random;
+    }
+
+    /**
+     * Changes the random pool which is used for generating anything inside the simulation.
+     * This shouldn't be used on a running simulation.
+     * 
+     * @param random The new random pool.
+     */
+    public void setRandom(RandomPool random) {
+
+        this.random = random;
     }
 
     /**

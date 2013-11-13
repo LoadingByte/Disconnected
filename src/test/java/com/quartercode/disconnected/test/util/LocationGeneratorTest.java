@@ -23,13 +23,14 @@ import org.junit.Assert;
 import org.junit.Test;
 import com.quartercode.disconnected.sim.Location;
 import com.quartercode.disconnected.util.LocationGenerator;
+import com.quartercode.disconnected.util.RandomPool;
 
 public class LocationGeneratorTest {
 
     @Test
     public void testGenerateLocations() {
 
-        List<Location> locations = LocationGenerator.generateLocations(100);
+        List<Location> locations = LocationGenerator.generateLocations(100, new RandomPool(1));
         for (Location location : locations) {
             for (Location location2 : locations) {
                 if (location != location2 && location.equals(location2)) {

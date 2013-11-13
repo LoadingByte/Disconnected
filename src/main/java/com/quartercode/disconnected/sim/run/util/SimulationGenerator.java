@@ -64,6 +64,7 @@ import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.util.LocationGenerator;
+import com.quartercode.disconnected.util.RandomPool;
 
 /**
  * This utility class generates a simulation.
@@ -77,11 +78,12 @@ public class SimulationGenerator {
      * 
      * @param computers The amount of computers the generator should generate.
      * @param groups The amount of groups the generator should generate.
+     * @param random The random pool to use for the new simulation.
      * @return The generated simulation object.
      */
-    public static Simulation generateSimulation(int computers, int groups) {
+    public static Simulation generateSimulation(int computers, int groups, RandomPool random) {
 
-        Simulation simulation = new Simulation();
+        Simulation simulation = new Simulation(random);
 
         // Assemble basic objects
         for (Computer computer : generateComputers(simulation, computers)) {
@@ -105,9 +107,9 @@ public class SimulationGenerator {
         for (MemberGroup group : simulation.getGroups()) {
             for (Member member : simulation.getMembers()) {
                 if (group.getMembers().contains(member)) {
-                    group.getReputation(member).addValue(simulation.RANDOM.nextInt(10));
+                    group.getReputation(member).addValue(simulation.getRandom().nextInt(10));
                 } else {
-                    group.getReputation(member).subtractValue(simulation.RANDOM.nextInt(12));
+                    group.getReputation(member).subtractValue(simulation.getRandom().nextInt(12));
                 }
             }
         }
@@ -118,7 +120,7 @@ public class SimulationGenerator {
     /**
      * Generates the given amount of computers randomly.
      * 
-     * @param simulation The simulation to use for generating metadata (like ids).
+     * @param simulation The simulation to use for generating some data.
      * @param amount The amount of computers the generator should generate.
      * @return The generated list of computers.
      */
@@ -130,7 +132,7 @@ public class SimulationGenerator {
     /**
      * Generates the given amount of computers randomly ignoring the locations of the given computers.
      * 
-     * @param simulation The simulation to use for generating metadata (like ids).
+     * @param simulation The simulation to use for generating some data.
      * @param amount The amount of computers the generator should generate.
      * @param ignore The locations of those computers will be ignored.
      * @return The generated list of computers.
@@ -146,7 +148,7 @@ public class SimulationGenerator {
             }
         }
 
-        for (Location location : LocationGenerator.generateLocations(amount, ignoreLocations)) {
+        for (Location location : LocationGenerator.generateLocations(amount, ignoreLocations, simulation.getRandom())) {
             Computer computer = new Computer();
             computer.setLocation(location);
             computers.add(computer);
@@ -272,7 +274,7 @@ public class SimulationGenerator {
         while (true) {
             int[] parts = new int[4];
             for (int counter = 0; counter < parts.length; counter++) {
-                parts[counter] = simulation.RANDOM.nextInt(255) + 1;
+                parts[counter] = simulation.getRandom().nextInt(255) + 1;
             }
             for (Computer computer : simulation.getComputers()) {
                 for (NetworkInterface testInterface : computer.getHardware(NetworkInterface.class)) {
@@ -349,7 +351,7 @@ public class SimulationGenerator {
         List<Member> members = generateMembers(simulation, computers.size());
 
         for (int counter = 0; counter < members.size(); counter++) {
-            groups.get(simulation.RANDOM.nextInt(groups.size())).addMember(members.get(counter));
+            groups.get(simulation.getRandom().nextInt(groups.size())).addMember(members.get(counter));
             members.get(counter).setComputer(computers.get(counter));
         }
 
