@@ -20,8 +20,6 @@ package com.quartercode.disconnected;
 
 import com.quartercode.disconnected.graphics.GraphicsManager;
 import com.quartercode.disconnected.profile.ProfileManager;
-import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.run.TickSimulator;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.util.ResourceStore;
@@ -36,8 +34,6 @@ public class Disconnected {
     private static ProfileManager  profileManager;
     private static Ticker          ticker;
     private static GraphicsManager graphicsManager;
-
-    private static Simulation      simulation;
 
     /**
      * Returns the title of the product.
@@ -167,31 +163,6 @@ public class Disconnected {
     protected static void setGraphicsManager(GraphicsManager graphicsManager) {
 
         Disconnected.graphicsManager = graphicsManager;
-    }
-
-    /**
-     * Returns the current active simulation.
-     * 
-     * @return The current active simulation.
-     */
-    public static Simulation getSimulation() {
-
-        return simulation;
-    }
-
-    /**
-     * Sets the current active simulation to a new one.
-     * The action will take place in the next tick.
-     * 
-     * @param simulation The new simulation.
-     */
-    public static void setSimulation(Simulation simulation) {
-
-        Disconnected.simulation = simulation;
-
-        if (ticker != null) {
-            ticker.getAction(TickSimulator.class).setSimulation(simulation);
-        }
     }
 
     private Disconnected() {

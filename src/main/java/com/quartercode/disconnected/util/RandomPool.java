@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.util;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,9 +33,11 @@ import java.util.Random;
  * 
  * @see Random
  */
-public class RandomPool {
+public class RandomPool implements Serializable {
 
-    private final List<Random> randoms = new ArrayList<Random>();
+    private static final long  serialVersionUID = 4448882577260750865L;
+
+    private final List<Random> randoms          = new ArrayList<Random>();
     private int                currentIndex;
 
     /**

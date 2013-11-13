@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import com.quartercode.disconnected.graphics.GraphicsManager;
 import com.quartercode.disconnected.graphics.session.DesktopState;
+import com.quartercode.disconnected.profile.Profile;
 import com.quartercode.disconnected.profile.ProfileManager;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.Computer;
@@ -148,9 +150,9 @@ public class Main {
             return;
         }
 
-        // Initalize profile manager and load stored profiles (TODO: Add code for loading).
+        // Initalize profile manager and load stored profiles
         LOGGER.info("Initalizing profile manager");
-        Disconnected.setProfileManager(new ProfileManager());
+        Disconnected.setProfileManager(new ProfileManager(new File("profiles")));
 
         // Initalize graphics manager and start it
         LOGGER.info("Initalizing & starting graphics manager");
@@ -169,11 +171,20 @@ public class Main {
         for (Computer computer : simulation.getComputers()) {
             computer.getOperatingSystem().setRunning(true);
         }
-        Disconnected.setSimulation(simulation);
+        Profile profile = new Profile("test", simulation);
+        Disconnected.getProfileManager().addProfile(profile);
+        try {
+            Disconnected.getProfileManager().setActive(profile);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            // Wont ever happen (we created a new profile)
+        }
+
         // DEBUG: Start "game" with current simulation
         LOGGER.info("DEBUG-ACTION: Starting test-game with current simulation");
         Disconnected.getTicker().setRunning(true);
-        Disconnected.getGraphicsManager().setState(new DesktopState(simulation));
+        Disconnected.getGraphicsManager().setState(new DesktopState(profile.getSimulation()));
     }
 
     @SuppressWarnings ("static-access")
