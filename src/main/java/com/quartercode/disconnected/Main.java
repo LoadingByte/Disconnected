@@ -50,7 +50,6 @@ import com.quartercode.disconnected.sim.comp.program.desktop.SystemViewerProgram
 import com.quartercode.disconnected.sim.comp.program.desktop.TerminalProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.ChangeDirectoryProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.DeleteFileProgram;
-import com.quartercode.disconnected.sim.comp.program.shell.ExploitProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.FileContentProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.FileRightsProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.ListFilesProgram;
@@ -225,9 +224,6 @@ public class Main {
         registry.registerClass(FileContentProgram.class);
         registry.registerClass(MakeFileProgram.class);
         registry.registerClass(DeleteFileProgram.class);
-
-        // TODO: Replace this "crap"
-        registry.registerClass(ExploitProgram.class);
 
         registry.registerClass(TerminalProgram.class);
         registry.registerClass(SystemViewerProgram.class);

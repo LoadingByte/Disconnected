@@ -52,7 +52,6 @@ import com.quartercode.disconnected.sim.comp.program.desktop.SystemViewerProgram
 import com.quartercode.disconnected.sim.comp.program.desktop.TerminalProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.ChangeDirectoryProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.DeleteFileProgram;
-import com.quartercode.disconnected.sim.comp.program.shell.ExploitProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.FileContentProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.FileRightsProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.ListFilesProgram;
@@ -248,7 +247,7 @@ public class SimulationGenerator {
         User superuser = userManager.getSuperuser();
 
         // Generate other programs
-        addFile(fileSystem, "bin/exploiter.exe", superuser, new FileRights("r--xr--xr--x"), new ExploitProgram("Exploiter", new Version("1.0.0"), null));
+        // Nothing here yet
 
         // Generate home directories
         fileSystem.addFile("homes", FileType.DIRECTORY, superuser);
