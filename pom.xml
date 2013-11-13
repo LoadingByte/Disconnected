@@ -15,7 +15,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <finalName>${project.artifactId}-${project.version}</finalName>
-        <main.class>com.quartercode.disconnected.launch.Launcher</main.class>
+        <main.class>com.quartercode.disconnected.launch.LauncherMain</main.class>
     </properties>
 
     <organization>

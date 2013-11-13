@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.quartercode.disconnected.Main;
 import com.quartercode.disconnected.util.StreamGobbler;
 
 /**
@@ -37,24 +36,10 @@ public class Launcher {
 
     private static final Logger LOGGER = Logger.getLogger(Launcher.class.getName());
 
-    /**
-     * The main method which creates and calls a new launcher.
-     * This is not part of the utility.
-     * 
-     * @param args The command line arguments.
-     */
-    public static void main(String[] args) {
-
-        String mainClass = Main.class.getName();
-        String[] vmArguments = { "-Djava.library.path=lib/natives" };
-
-        Launcher launcher = new Launcher(mainClass, vmArguments, args);
-        launcher.launch();
-    }
-
-    private String   mainClass;
-    private String[] vmArguments;
-    private String[] programArguments;
+    private String              mainClass;
+    private String[]            vmArguments;
+    private String[]            programArguments;
+    private File                directory;
 
     /**
      * Creates a new empty launcher.
@@ -71,6 +56,7 @@ public class Launcher {
     public Launcher(String mainClass) {
 
         this.mainClass = mainClass;
+        directory = new File(".");
     }
 
     /**
@@ -79,12 +65,14 @@ public class Launcher {
      * @param mainClass The main class which get called on launch.
      * @param vmArguments The vm arguments which are set on launch and read by the virtual machine.
      * @param programArguments The program arguments which are set on launch and read by the executed program.
+     * @param directory The directory the new process will be launched in.
      */
-    public Launcher(String mainClass, String[] vmArguments, String[] programArguments) {
+    public Launcher(String mainClass, String[] vmArguments, String[] programArguments, File directory) {
 
         this.mainClass = mainClass;
         this.vmArguments = vmArguments;
         this.programArguments = programArguments;
+        this.directory = directory;
     }
 
     /**
@@ -152,6 +140,26 @@ public class Launcher {
     }
 
     /**
+     * Returns the directory the new process will be launched in.
+     * 
+     * @return The working directory for the new process.
+     */
+    public File getDirectory() {
+
+        return directory;
+    }
+
+    /**
+     * Changes the directory the new process will be launched in.
+     * 
+     * @param directory The new working directory for the new process.
+     */
+    public void setDirectory(File directory) {
+
+        this.directory = directory;
+    }
+
+    /**
      * Launches the given main class using a new vm with the given vm arguments.
      */
     public void launch() {
@@ -181,6 +189,7 @@ public class Launcher {
             }
 
             ProcessBuilder processBuilder = new ProcessBuilder(command);
+            processBuilder.directory(directory);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
 
