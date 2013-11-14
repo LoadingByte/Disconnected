@@ -44,7 +44,6 @@ import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
 import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
-import com.quartercode.disconnected.sim.comp.os.Environment;
 import com.quartercode.disconnected.sim.comp.program.KernelProgram;
 import com.quartercode.disconnected.sim.comp.program.desktop.SystemViewerProgram;
 import com.quartercode.disconnected.sim.comp.program.desktop.TerminalProgram;
@@ -202,9 +201,6 @@ public class Main {
      */
     public static void fillRegistry(Registry registry) {
 
-        // General
-        registry.registerClass(StringContent.class);
-
         // Hardware
         registry.registerClass(Mainboard.class);
         registry.registerClass(CPU.class);
@@ -229,7 +225,7 @@ public class Main {
         registry.registerClass(SystemViewerProgram.class);
 
         // Mixed computer stuff
-        registry.registerClass(Environment.class);
+        registry.registerClass(StringContent.class);
 
         // AI Controllers
         registry.registerClass(PlayerController.class);

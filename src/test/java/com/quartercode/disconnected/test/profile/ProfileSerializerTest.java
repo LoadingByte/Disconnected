@@ -63,7 +63,7 @@ public class ProfileSerializerTest {
         StringWriter serialized = new StringWriter();
         WriterOutputStream outputStream = new WriterOutputStream(serialized);
         ProfileSerializer.serializeSimulation(outputStream, simulation);
-        outputStream.close();
+        outputStream.flush();
 
         Simulation copy = ProfileSerializer.deserializeSimulation(new ReaderInputStream(new StringReader(serialized.toString())));
         Assert.assertEquals("Simulation equals serialized-deserialized copy", simulation, copy);

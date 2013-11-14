@@ -91,22 +91,6 @@ public class ProfileSerializer {
         ZipInputStream zipInputStream = new ZipInputStream(inputStream);
         ZipEntry zipEntry = null;
         while ( (zipEntry = zipInputStream.getNextEntry()) != null) {
-            // File newFile = new File(outputFolder + File.separator + fileName);
-            //
-            // // create all non exists folders
-            // // else you will hit FileNotFoundException for compressed folder
-            // new File(newFile.getParent()).mkdirs();
-            //
-            // FileOutputStream fos = new FileOutputStream(newFile);
-            //
-            // int len;
-            // while ( (len = zInputStream.read(buffer)) > 0) {
-            // fos.write(buffer, 0, len);
-            // }
-            //
-            // fos.close();
-            // zipEntry = zInputStream.getNextEntry();
-
             if (zipEntry.getName().equals("simulation.xml")) {
                 data[0] = deserializeSimulation(zipInputStream);
             } else if (zipEntry.getName().equals("random.ser")) {
