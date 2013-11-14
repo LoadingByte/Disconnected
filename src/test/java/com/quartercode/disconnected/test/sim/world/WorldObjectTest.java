@@ -23,33 +23,57 @@ import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.sim.world.ObjectProperty;
 import com.quartercode.disconnected.sim.world.PropertyDefinition;
+import com.quartercode.disconnected.sim.world.World;
 import com.quartercode.disconnected.sim.world.WorldObject;
 
 public class WorldObjectTest {
 
-    private static final PropertyDefinition<ObjectProperty<String>> STRING_PROPERTY = new PropertyDefinition<ObjectProperty<String>>("string") {
+    private static final PropertyDefinition<ObjectProperty<WorldObject>> TEST_OBJECT_PROPERTY;
+    private static final PropertyDefinition<ObjectProperty<String>>      STRING_PROPERTY;
 
-                                                                                        @Override
-                                                                                        public ObjectProperty<String> createProperty(WorldObject parent) {
+    static {
 
-                                                                                            return new ObjectProperty<String>(getName(), parent);
-                                                                                        };
+        TEST_OBJECT_PROPERTY = new PropertyDefinition<ObjectProperty<WorldObject>>("testObject") {
 
-                                                                                    };
+            @Override
+            public ObjectProperty<WorldObject> createProperty(WorldObject parent) {
 
-    private WorldObject                                             worldObject;
+                return new ObjectProperty<WorldObject>(getName(), parent);
+            }
+
+        };
+
+        STRING_PROPERTY = new PropertyDefinition<ObjectProperty<String>>("string") {
+
+            @Override
+            public ObjectProperty<String> createProperty(WorldObject parent) {
+
+                return new ObjectProperty<String>(getName(), parent);
+            };
+
+        };
+
+    }
+
+    private World                                                        world;
+    private WorldObject                                                  worldObject;
 
     @Before
     public void setUp() {
 
-        worldObject = new WorldObject();
+        world = new World();
+
+        worldObject = new WorldObject(world.getRoot());
+        world.getRoot().get(TEST_OBJECT_PROPERTY).set(worldObject);
     }
 
     @Test
     public void testGet() {
 
-        worldObject.get(STRING_PROPERTY).setValue("Test");
-        Assert.assertEquals("Content of string property is correct", "Test", worldObject.get(STRING_PROPERTY).getValue());
+        worldObject.get(STRING_PROPERTY).set("Test");
+        Assert.assertEquals("Content of string property is correct", "Test", worldObject.get(STRING_PROPERTY).get());
+    }
+
     }
 
 }

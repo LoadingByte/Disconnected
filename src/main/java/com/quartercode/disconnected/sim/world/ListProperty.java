@@ -21,15 +21,25 @@ package com.quartercode.disconnected.sim.world;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * A list property stores a list which can be modified through some modification interfaces.
  * 
  * @param <T> The type of elements which can be put inside the list property.
  */
-public class ListProperty<T> extends Property<List<T>> {
+public class ListProperty<T> extends Property {
 
+    @XmlElement
     private List<T> list;
+
+    /**
+     * Creates a new empty list property.
+     * This is only recommended for direct field access (e.g. for serialization).
+     */
+    protected ListProperty() {
+
+    }
 
     /**
      * Creates a new list property with the given name and parent object.
@@ -90,18 +100,6 @@ public class ListProperty<T> extends Property<List<T>> {
     public void remove(T element) {
 
         list.remove(element);
-    }
-
-    @Override
-    protected List<T> getValue() {
-
-        return list;
-    }
-
-    @Override
-    protected void setValue(List<T> value) {
-
-        list = value;
     }
 
 }

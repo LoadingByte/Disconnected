@@ -18,6 +18,10 @@
 
 package com.quartercode.disconnected.sim.world;
 
+import javax.xml.bind.Unmarshaller;
+import com.quartercode.disconnected.sim.comp.Computer;
+import com.quartercode.disconnected.sim.member.Member;
+
 /**
  * The root object of a world can house first level world objects.
  * 
@@ -26,18 +30,49 @@ package com.quartercode.disconnected.sim.world;
 public class RootObject extends WorldObject {
 
     /**
-     * A property which can house first level world objects in the root object.
+     * The members property stores a list of {@link Member}s.
      */
-    public static final PropertyDefinition<ListProperty<WorldObject>> CHILDREN_PROPERTY = new PropertyDefinition<ListProperty<WorldObject>>("children") {
+    public static final PropertyDefinition<ListProperty<Member>>   MEMBERS_PROPERTY;
 
-                                                                                            @Override
-                                                                                            public ListProperty<WorldObject> createProperty(WorldObject parent) {
+    /**
+     * The computers property stores a list of {@link Computer}s.
+     */
+    public static final PropertyDefinition<ListProperty<Computer>> COMPUTERS_PROPERTY;
 
-                                                                                                return new ListProperty<WorldObject>(getName(), parent);
-                                                                                            }
+    static {
 
-                                                                                        };
-    private final World                                               world;
+        MEMBERS_PROPERTY = new PropertyDefinition<ListProperty<Member>>("members") {
+
+            @Override
+            public ListProperty<Member> createProperty(WorldObject parent) {
+
+                return new ListProperty<Member>(getName(), parent);
+            }
+
+        };
+
+        COMPUTERS_PROPERTY = new PropertyDefinition<ListProperty<Computer>>("computers") {
+
+            @Override
+            public ListProperty<Computer> createProperty(WorldObject parent) {
+
+                return new ListProperty<Computer>(getName(), parent);
+            }
+
+        };
+
+    }
+
+    private World                                                  world;
+
+    /**
+     * Creates a new empty root object.
+     * This is only recommended for direct field access (e.g. for serialization).
+     */
+    protected RootObject() {
+
+        super();
+    }
 
     /**
      * Creates a new root object which is used in the given world.
@@ -55,6 +90,14 @@ public class RootObject extends WorldObject {
     public World getWorld() {
 
         return world;
+    }
+
+    @Override
+    protected void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
+
+        if (parent instanceof World) {
+            world = (World) parent;
+        }
     }
 
 }

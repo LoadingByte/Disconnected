@@ -25,7 +25,7 @@ package com.quartercode.disconnected.sim.world;
  * @param <P> The type the defined property will have.
  * @see Property
  */
-public abstract class PropertyDefinition<P extends Property<?>> {
+public abstract class PropertyDefinition<P extends Property> {
 
     private final String name;
 

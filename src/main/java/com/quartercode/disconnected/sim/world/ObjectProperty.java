@@ -18,14 +18,25 @@
 
 package com.quartercode.disconnected.sim.world;
 
+import javax.xml.bind.annotation.XmlElement;
+
 /**
  * An object property is a simple property which stores a simple object.
  * 
  * @param <T> The type of object which can be stored inside the object property.
  */
-public class ObjectProperty<T> extends Property<T> {
+public class ObjectProperty<T> extends Property {
 
+    @XmlElement
     private T value;
+
+    /**
+     * Creates a new empty object property.
+     * This is only recommended for direct field access (e.g. for serialization).
+     */
+    protected ObjectProperty() {
+
+    }
 
     /**
      * Creates a new object property with the given name and parent object.
@@ -43,8 +54,7 @@ public class ObjectProperty<T> extends Property<T> {
      * 
      * @return The stored value.
      */
-    @Override
-    public T getValue() {
+    public T get() {
 
         return value;
     }
@@ -54,8 +64,7 @@ public class ObjectProperty<T> extends Property<T> {
      * 
      * @param value The new stored value.
      */
-    @Override
-    public void setValue(T value) {
+    public void set(T value) {
 
         this.value = value;
     }

@@ -18,19 +18,29 @@
 
 package com.quartercode.disconnected.sim.world;
 
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAttribute;
+import com.quartercode.disconnected.util.InfoString;
 
 /**
  * A property is used to store an object variable of a class and handle modifications.
  * For accessing properties, you can used {@link PropertyDefinition} constants.
  * 
- * @param <I> The type of object the property stores internally.
  * @see WorldObject
  */
-public abstract class Property<I> {
+public abstract class Property implements InfoString {
 
-    private final String      name;
-    private final WorldObject parent;
+    @XmlAttribute
+    private String      name;
+    private WorldObject parent;
+
+    /**
+     * Creates a new empty property.
+     * This is only recommended for direct field access (e.g. for serialization).
+     */
+    protected Property() {
+
+    }
 
     /**
      * Creates a new property with the given name and parent object.
@@ -66,20 +76,60 @@ public abstract class Property<I> {
     }
 
     /**
-     * Returns the object the property stores internally.
-     * This should not be used for accessing the property externally.
+     * Resolves the world object which has this property during umarshalling.
      * 
-     * @return The object the property stores internally.
+     * @param unmarshaller The unmarshaller which unmarshals this property.
+     * @param parent The object which was unmarshalled as the parent one from the xml structure.
      */
-    @XmlElement
-    protected abstract I getValue();
+    protected void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
 
-    /**
-     * Changes the object the property stores internally.
-     * This should not be used for accessing the property externally.
-     * 
-     * @param value The new object the property will store.
-     */
-    protected abstract void setValue(I value);
+        if (parent instanceof WorldObject) {
+            this.parent = (WorldObject) parent;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (name == null ? 0 : name.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Property other = (Property) obj;
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toInfoString() {
+
+        return getClass().getSimpleName() + " " + name;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [" + toInfoString() + "]";
+    }
 
 }

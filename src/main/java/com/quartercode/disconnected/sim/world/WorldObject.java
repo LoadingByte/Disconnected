@@ -20,16 +20,28 @@ package com.quartercode.disconnected.sim.world;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlElement;
+import com.quartercode.disconnected.util.InfoString;
 
 /**
  * A world object is an object inside a world.
  * It can have different {@link Property} objects which are used for setting the state of the object.
  * Those {@link Property} objects are be defined by {@link PropertyDefinition} constants which should be located in the actual subclass.
  */
-public class WorldObject {
+public class WorldObject implements InfoString {
 
-    private final WorldObject       parent;
-    private final List<Property<?>> properties;
+    private WorldObject    parent;
+    @XmlElement (name = "property")
+    private List<Property> properties;
+
+    /**
+     * Creates a new empty world object.
+     * This is only recommended for direct field access (e.g. for serialization).
+     */
+    protected WorldObject() {
+
+    }
 
     /**
      * Creates a new world object which has the given parent one.
@@ -39,7 +51,7 @@ public class WorldObject {
     public WorldObject(WorldObject parent) {
 
         this.parent = parent;
-        properties = new ArrayList<Property<?>>();
+        properties = new ArrayList<Property>();
     }
 
     /**
@@ -70,9 +82,9 @@ public class WorldObject {
      * @return The found or created {@link Property}.
      */
     @SuppressWarnings ("unchecked")
-    public <P extends Property<?>> P get(PropertyDefinition<P> definition) {
+    public <P extends Property> P get(PropertyDefinition<P> definition) {
 
-        for (Property<?> property : properties) {
+        for (Property property : properties) {
             if (property.getName().equals(definition.getName())) {
                 return (P) property;
             }
@@ -81,6 +93,69 @@ public class WorldObject {
         P property = definition.createProperty(this);
         properties.add(property);
         return property;
+    }
+
+    /**
+     * Resolves the parent object which has a property which holds this objects during umarshalling.
+     * 
+     * @param unmarshaller The unmarshaller which unmarshals this objects.
+     * @param parent The object which was unmarshalled as the parent one from the xml structure.
+     */
+    protected void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
+
+        if (parent instanceof Property) {
+            this.parent = ((Property) parent).getParent();
+        }
+    }
+
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (properties == null ? 0 : properties.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        WorldObject other = (WorldObject) obj;
+        if (properties == null) {
+            if (other.properties != null) {
+                return false;
+            }
+        } else if (!properties.equals(other.properties)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toInfoString() {
+
+        String propertyString = "";
+        for (Property property : properties) {
+            propertyString += ", " + property.toInfoString();
+        }
+        propertyString = propertyString.substring(2);
+
+        return "properties: " + propertyString;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }
