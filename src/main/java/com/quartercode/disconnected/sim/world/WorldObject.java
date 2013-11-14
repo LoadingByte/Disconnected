@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.sim.world;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
@@ -93,6 +94,17 @@ public class WorldObject implements InfoString {
         P property = definition.createProperty(this);
         properties.add(property);
         return property;
+    }
+
+    /**
+     * Returns an unmodifiable list containing all properties the world object has.
+     * This method should only be used if you really need all those properties. If you don't, use {@link #get(PropertyDefinition)}.
+     * 
+     * @return All properties of the world object.
+     */
+    public List<Property> getProperties() {
+
+        return Collections.unmodifiableList(properties);
     }
 
     /**
