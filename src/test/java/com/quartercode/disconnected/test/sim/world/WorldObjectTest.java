@@ -74,6 +74,10 @@ public class WorldObjectTest {
         Assert.assertEquals("Content of string property is correct", "Test", worldObject.get(STRING_PROPERTY).get());
     }
 
+    @Test
+    public void testGetWorld() {
+
+        Assert.assertEquals("World the world object resolves is correct", world, worldObject.getWorld());
     }
 
 }
