@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlElement;
 public class ObjectProperty<T> extends Property {
 
     @XmlElement
-    private T value;
+    private T object;
 
     /**
      * Creates a new empty object property.
@@ -50,23 +50,23 @@ public class ObjectProperty<T> extends Property {
     }
 
     /**
-     * Returns the value which is stored inside the object property.
+     * Returns the object which is stored inside the object property.
      * 
-     * @return The stored value.
+     * @return The stored object.
      */
     public T get() {
 
-        return value;
+        return object;
     }
 
     /**
-     * Changes the value which is stored inside the object property.
+     * Changes the object which is stored inside the object property.
      * 
-     * @param value The new stored value.
+     * @param value The new stored object.
      */
     public void set(T value) {
 
-        this.value = value;
+        this.object = value;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class ObjectProperty<T> extends Property {
 
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (value == null ? 0 : value.hashCode());
+        result = prime * result + (object == null ? 0 : object.hashCode());
         return result;
     }
 
@@ -91,11 +91,11 @@ public class ObjectProperty<T> extends Property {
             return false;
         }
         ObjectProperty<?> other = (ObjectProperty<?>) obj;
-        if (value == null) {
-            if (other.value != null) {
+        if (object == null) {
+            if (other.object != null) {
                 return false;
             }
-        } else if (!value.equals(other.value)) {
+        } else if (!object.equals(other.object)) {
             return false;
         }
         return true;
@@ -104,7 +104,7 @@ public class ObjectProperty<T> extends Property {
     @Override
     public String toInfoString() {
 
-        return super.toInfoString() + ", value " + value;
+        return super.toInfoString() + ", object " + object;
     }
 
 }
