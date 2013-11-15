@@ -20,6 +20,7 @@ package com.quartercode.disconnected.sim.world;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import com.quartercode.disconnected.util.InfoString;
 
 /**
  * A world is a space which contains {@link WorldObject}s.
@@ -28,7 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @see RootObject
  */
 @XmlRootElement (namespace = "http://quartercode.com/")
-public class World {
+public class World implements InfoString {
 
     @XmlElement
     private final RootObject root;
@@ -81,6 +82,18 @@ public class World {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String toInfoString() {
+
+        return "root: " + root.toInfoString();
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }

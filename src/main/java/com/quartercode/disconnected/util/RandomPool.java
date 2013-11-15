@@ -33,7 +33,7 @@ import java.util.Random;
  * 
  * @see Random
  */
-public class RandomPool implements Serializable {
+public class RandomPool implements Serializable, InfoString {
 
     private static final long  serialVersionUID = 4448882577260750865L;
 
@@ -242,6 +242,45 @@ public class RandomPool implements Serializable {
     public double nextGaussian() {
 
         return nextRandom().nextGaussian();
+    }
+
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ( (randoms == null) ? 0 : randoms.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        RandomPool other = (RandomPool) obj;
+        if (randoms == null) {
+            if (other.randoms != null)
+                return false;
+        } else if (!randoms.equals(other.randoms))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toInfoString() {
+
+        return "pool with " + randoms.size() + " randoms";
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }
