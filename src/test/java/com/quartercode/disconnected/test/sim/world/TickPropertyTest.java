@@ -76,7 +76,7 @@ public class TickPropertyTest {
 
         final AtomicBoolean invoked1 = new AtomicBoolean();
         final AtomicBoolean invoked2 = new AtomicBoolean();
-        worldObject.get(TICK_PROPERTY).registerTask(new UpdateTask(new Runnable() {
+        worldObject.get(TICK_PROPERTY).add(new UpdateTask(new Runnable() {
 
             @Override
             public void run() {
@@ -84,7 +84,7 @@ public class TickPropertyTest {
                 invoked1.set(true);
             }
         }, 2));
-        worldObject.get(TICK_PROPERTY).registerTask(new UpdateTask(new Runnable() {
+        worldObject.get(TICK_PROPERTY).add(new UpdateTask(new Runnable() {
 
             @Override
             public void run() {
@@ -104,7 +104,7 @@ public class TickPropertyTest {
     public void testPeriod() {
 
         final AtomicInteger counter = new AtomicInteger();
-        worldObject.get(TICK_PROPERTY).registerTask(new UpdateTask(new Runnable() {
+        worldObject.get(TICK_PROPERTY).add(new UpdateTask(new Runnable() {
 
             @Override
             public void run() {

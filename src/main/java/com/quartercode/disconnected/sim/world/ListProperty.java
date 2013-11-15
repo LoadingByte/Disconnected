@@ -58,7 +58,7 @@ public class ListProperty<T> extends Property {
      * 
      * @return An unmodifiable instance of the {@link List} the property stores.
      */
-    public List<T> getList() {
+    public List<T> get() {
 
         return Collections.unmodifiableList(list);
     }

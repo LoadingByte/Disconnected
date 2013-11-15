@@ -29,6 +29,8 @@ import com.quartercode.disconnected.util.ObjectInstanceAdapter;
 
 /**
  * A tick property handles and invokes update tasks and is used to create tick updates.
+ * 
+ * @see UpdateTask
  */
 public class TickProperty extends Property {
 
@@ -60,7 +62,7 @@ public class TickProperty extends Property {
      * 
      * @param task The {@link UpdateTask} to schedule.
      */
-    public void registerTask(UpdateTask task) {
+    public void add(UpdateTask task) {
 
         if (task.property != null) {
             throw new IllegalStateException("Can only add unused tasks");
@@ -76,7 +78,7 @@ public class TickProperty extends Property {
      * 
      * @param task The {@link UpdateTask} to cancel.
      */
-    protected void unregisterTask(UpdateTask task) {
+    protected void remove(UpdateTask task) {
 
         updateTasks.remove(task);
         task.property = null;
@@ -91,14 +93,14 @@ public class TickProperty extends Property {
         for (UpdateTask task : new ArrayList<UpdateTask>(updateTasks)) {
             if (task.getElapsed() < 0) {
                 // Unregister cancelled tasks
-                unregisterTask(task);
+                remove(task);
             } else {
                 // Elapse one tick.
-                task.elapsed++;
+                task.elapse();
 
                 if (task.getPeriod() <= 0 && task.getElapsed() >= task.getDelay()) {
                     task.getRunnable().run();
-                    unregisterTask(task);
+                    remove(task);
                 } else if (task.getPeriod() > 0 && (task.getElapsed() - task.getDelay()) % task.getPeriod() == 0) {
                     task.getRunnable().run();
                 }
@@ -148,6 +150,8 @@ public class TickProperty extends Property {
      * This class represents an update task which may be invoked by a {@link TickProperty}.
      * Update tasks elapse a given amount of ticks and then invoke itself.
      * Such tasks should store any information as {@link Property} objects in the parent {@link WorldObject}s.
+     * 
+     * @see Runnable
      */
     public static class UpdateTask implements InfoString {
 
@@ -264,6 +268,11 @@ public class TickProperty extends Property {
         public void cancel() {
 
             elapsed = -1;
+        }
+
+        private void elapse() {
+
+            elapsed++;
         }
 
         /**
