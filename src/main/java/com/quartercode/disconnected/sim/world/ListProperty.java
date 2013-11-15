@@ -19,19 +19,21 @@
 package com.quartercode.disconnected.sim.world;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import javax.xml.bind.annotation.XmlElement;
 
 /**
- * A list property stores a list which can be modified through some modification interfaces.
+ * A list property stores a list which can be modified using the typical {@link List} methods.
  * 
- * @param <T> The type of elements which can be put inside the list property.
+ * @param <E> The type of elements which can be put inside the list property.
  */
-public class ListProperty<T> extends Property {
+public class ListProperty<E> extends Property implements List<E> {
 
     @XmlElement
-    private List<T> list;
+    private List<E> list;
 
     /**
      * Creates a new empty list property.
@@ -50,17 +52,14 @@ public class ListProperty<T> extends Property {
     public ListProperty(String name, WorldObject parent) {
 
         super(name, parent);
+
+        list = new ArrayList<E>();
     }
 
-    /**
-     * Returns an unmodifiable instance of the {@link List} the property stores.
-     * You can't change the structure of the list, but you can modify the objects which are stored in it.
-     * 
-     * @return An unmodifiable instance of the {@link List} the property stores.
-     */
-    public List<T> get() {
+    @Override
+    public E get(int index) {
 
-        return Collections.unmodifiableList(list);
+        return list.get(index);
     }
 
     /**
@@ -69,37 +68,148 @@ public class ListProperty<T> extends Property {
      * @param type The type the returned elements have as a superclass.
      * @return Elements which have the given type as a superclass.
      */
-    public <E> List<E> getElements(Class<E> type) {
+    public <T> List<T> get(Class<T> type) {
 
-        List<E> elements = new ArrayList<E>();
-        for (T element : list) {
+        List<T> elements = new ArrayList<T>();
+        for (E element : list) {
             if (type.isAssignableFrom(type.getClass())) {
                 elements.add(type.cast(element));
             }
         }
+
         return elements;
     }
 
-    /**
-     * Adds the given element to the list.
-     * The element has to be of the generic type T.
-     * 
-     * @param element The element to add to the list.
-     */
-    public void add(T element) {
+    @Override
+    public boolean isEmpty() {
 
-        list.add(element);
+        return list.isEmpty();
     }
 
-    /**
-     * Removes the given element from the list (if the element is inside the list).
-     * The element has to be of the generic type T.
-     * 
-     * @param element The element to remove from the list.
-     */
-    public void remove(T element) {
+    @Override
+    public boolean contains(Object o) {
 
-        list.remove(element);
+        return list.contains(list);
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+
+        return list.containsAll(c);
+    }
+
+    @Override
+    public int indexOf(Object o) {
+
+        return list.indexOf(o);
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+
+        return list.lastIndexOf(o);
+    }
+
+    @Override
+    public int size() {
+
+        return list.size();
+    }
+
+    @Override
+    public boolean add(E e) {
+
+        return list.add(e);
+    }
+
+    @Override
+    public void add(int index, E element) {
+
+        list.add(index, element);
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends E> c) {
+
+        return list.addAll(c);
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends E> c) {
+
+        return list.addAll(index, c);
+    }
+
+    @Override
+    public E set(int index, E element) {
+
+        return list.set(index, element);
+    }
+
+    @Override
+    public boolean remove(Object o) {
+
+        return list.remove(o);
+    }
+
+    @Override
+    public E remove(int index) {
+
+        return list.remove(index);
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+
+        return list.removeAll(c);
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+
+        return list.retainAll(c);
+    }
+
+    @Override
+    public void clear() {
+
+        list.clear();
+    }
+
+    @Override
+    public List<E> subList(int fromIndex, int toIndex) {
+
+        return list.subList(fromIndex, toIndex);
+    }
+
+    @Override
+    public Object[] toArray() {
+
+        return list.toArray();
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+
+        return list.toArray(a);
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+
+        return list.iterator();
+    }
+
+    @Override
+    public ListIterator<E> listIterator() {
+
+        return list.listIterator();
+    }
+
+    @Override
+    public ListIterator<E> listIterator(int index) {
+
+        return list.listIterator(index);
     }
 
     @Override
@@ -138,6 +248,12 @@ public class ListProperty<T> extends Property {
     public String toInfoString() {
 
         return super.toInfoString() + " with " + list.size() + " entries";
+    }
+
+    @Override
+    public String toString() {
+
+        return list.toString();
     }
 
 }
