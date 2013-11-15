@@ -249,25 +249,30 @@ public class RandomPool implements Serializable, InfoString {
 
         final int prime = 31;
         int result = 1;
-        result = prime * result + ( (randoms == null) ? 0 : randoms.hashCode());
+        result = prime * result + (randoms == null ? 0 : randoms.hashCode());
         return result;
     }
 
     @Override
     public boolean equals(Object obj) {
 
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         RandomPool other = (RandomPool) obj;
         if (randoms == null) {
-            if (other.randoms != null)
+            if (other.randoms != null) {
                 return false;
-        } else if (!randoms.equals(other.randoms))
+            }
+        } else if (!randoms.equals(other.randoms)) {
             return false;
+        }
         return true;
     }
 
