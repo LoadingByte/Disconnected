@@ -32,6 +32,7 @@ import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.action.Action;
 import com.quartercode.disconnected.sim.member.action.ExploitAction;
+import com.quartercode.disconnected.sim.world.RootObject;
 import com.quartercode.disconnected.util.ProbabilityUtil;
 
 /**
@@ -94,8 +95,9 @@ public class DestroyInterest extends Interest implements HasTarget {
     public Action getAction(Simulation simulation, Member member) {
 
         // Calculate probability for executing the action
-        int currentReputation = simulation.getGroup(member).getReputation(member).getValue();
-        float probability = getPriority() * (getReputationChange(simulation, member, simulation.getGroup(member)) * 20F) / ( (currentReputation == 0 ? 1 : currentReputation) * 100);
+        MemberGroup group = simulation.getWorld().getRoot().get(RootObject.MEMBER_GROUPS_PROPERTY).get(member);
+        int currentReputation = group.getReputation(member).getValue();
+        float probability = getPriority() * (getReputationChange(simulation, member, group) * 20F) / ( (currentReputation == 0 ? 1 : currentReputation) * 100);
 
         if (ProbabilityUtil.genPseudo(probability, simulation.getRandom())) {
             // Collect all vulnerabilities

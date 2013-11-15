@@ -31,15 +31,15 @@ import org.junit.Test;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.Main;
 import com.quartercode.disconnected.profile.ProfileSerializer;
-import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
+import com.quartercode.disconnected.sim.world.World;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.util.ResourceStore;
 
 public class ProfileSerializerTest {
 
-    private Simulation simulation;
+    private World world;
 
     @BeforeClass
     public static void setUpBeforeClass() throws IOException {
@@ -54,7 +54,7 @@ public class ProfileSerializerTest {
     @Before
     public void setUp() {
 
-        simulation = SimulationGenerator.generateSimulation(10, 2, new RandomPool(Simulation.RANDOM_POOL_SIZE));
+        world = SimulationGenerator.generateWorld(10, 2, null, new RandomPool(100));
     }
 
     @Test
@@ -62,11 +62,13 @@ public class ProfileSerializerTest {
 
         StringWriter serialized = new StringWriter();
         WriterOutputStream outputStream = new WriterOutputStream(serialized);
-        ProfileSerializer.serializeSimulation(outputStream, simulation);
+        ProfileSerializer.serializeWorld(outputStream, world);
         outputStream.close();
 
-        Simulation copy = ProfileSerializer.deserializeSimulation(new ReaderInputStream(new StringReader(serialized.toString())));
-        Assert.assertEquals("Simulation equals serialized-deserialized copy", simulation, copy);
+        System.out.println(serialized);
+
+        World copy = ProfileSerializer.deserializeWorld(new ReaderInputStream(new StringReader(serialized.toString())));
+        Assert.assertEquals("World equals serialized and deserialized copy", world, copy);
     }
 
 }

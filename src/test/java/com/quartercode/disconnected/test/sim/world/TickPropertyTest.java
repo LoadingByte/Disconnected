@@ -65,7 +65,7 @@ public class TickPropertyTest {
     @Before
     public void setUp() {
 
-        world = new World();
+        world = new World(null);
 
         worldObject = new WorldObject(world.getRoot());
         world.getRoot().get(TEST_OBJECT_PROPERTY).set(worldObject);

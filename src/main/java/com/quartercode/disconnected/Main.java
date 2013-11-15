@@ -56,6 +56,8 @@ import com.quartercode.disconnected.sim.comp.program.shell.ListFilesProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.MakeFileProgram;
 import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram;
 import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram;
+import com.quartercode.disconnected.sim.member.Member;
+import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
@@ -63,6 +65,11 @@ import com.quartercode.disconnected.sim.run.TickAction;
 import com.quartercode.disconnected.sim.run.TickSimulator;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
+import com.quartercode.disconnected.sim.world.ListProperty;
+import com.quartercode.disconnected.sim.world.ObjectProperty;
+import com.quartercode.disconnected.sim.world.RootObject;
+import com.quartercode.disconnected.sim.world.RootObject.MemberGroupListProperty;
+import com.quartercode.disconnected.sim.world.RootObject.MemberListProperty;
 import com.quartercode.disconnected.util.LogExceptionHandler;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.Registry;
@@ -167,7 +174,7 @@ public class Main {
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG-ACTION: Generating new simulation");
         Simulation simulation = SimulationGenerator.generateSimulation(10, 2, new RandomPool(Simulation.RANDOM_POOL_SIZE));
-        for (Computer computer : simulation.getComputers()) {
+        for (Computer computer : simulation.getWorld().getRoot().get(RootObject.COMPUTERS_PROPERTY)) {
             computer.getOperatingSystem().setRunning(true);
         }
         Profile profile = new Profile("test", simulation);
@@ -202,7 +209,35 @@ public class Main {
      */
     public static void fillRegistry(Registry registry) {
 
-        // General
+        // ----- General -----
+
+        // Properties
+        registry.registerClass(ObjectProperty.class);
+        registry.registerClass(ListProperty.class);
+
+        // Custom Properties
+        registry.registerClass(MemberListProperty.class);
+        registry.registerClass(MemberGroupListProperty.class);
+
+        // ----- General End -----
+
+        // ----- Members -----
+
+        // Mixed member stuff
+        registry.registerClass(Member.class);
+        registry.registerClass(MemberGroup.class);
+
+        // AI Controllers
+        registry.registerClass(PlayerController.class);
+        registry.registerClass(UserController.class);
+
+        // Interests
+        registry.registerClass(DestroyInterest.class);
+
+        // ----- Members End -----
+
+        // Mixed computer stuff
+        registry.registerClass(Environment.class);
         registry.registerClass(StringContent.class);
 
         // Hardware
@@ -227,16 +262,6 @@ public class Main {
 
         registry.registerClass(TerminalProgram.class);
         registry.registerClass(SystemViewerProgram.class);
-
-        // Mixed computer stuff
-        registry.registerClass(Environment.class);
-
-        // AI Controllers
-        registry.registerClass(PlayerController.class);
-        registry.registerClass(UserController.class);
-
-        // Interests
-        registry.registerClass(DestroyInterest.class);
 
         // Themes
         registry.registerTheme(Main.class.getResource("/ui/default/default.xml"));

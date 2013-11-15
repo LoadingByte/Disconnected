@@ -29,7 +29,6 @@ import javax.xml.bind.JAXBException;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.run.TickSimulator;
-import com.quartercode.disconnected.util.RandomPool;
 
 /**
  * This class manages different progiles which store simulations and random objects.
@@ -171,10 +170,12 @@ public class ProfileManager {
             FileInputStream inputStream = null;
             try {
                 inputStream = new FileInputStream(profileFile);
-                Object[] data = ProfileSerializer.deserializeProfileData(inputStream);
-                Simulation simulation = (Simulation) data[0];
-                simulation.setRandom((RandomPool) data[1]);
-                profile.setSimulation(simulation);
+                Simulation simulation = ProfileSerializer.deserializeSimulation(inputStream);
+                if (simulation == null) {
+                    profile.setSimulation(simulation);
+                } else {
+                    // TODO: React on deserialization fail
+                }
             }
             finally {
                 inputStream.close();

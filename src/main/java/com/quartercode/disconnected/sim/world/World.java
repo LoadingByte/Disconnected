@@ -20,6 +20,7 @@ package com.quartercode.disconnected.sim.world;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.util.InfoString;
 
 /**
@@ -31,15 +32,36 @@ import com.quartercode.disconnected.util.InfoString;
 @XmlRootElement (namespace = "http://quartercode.com/")
 public class World implements InfoString {
 
+    private Simulation simulation;
     @XmlElement
-    private final RootObject root;
+    private RootObject root;
 
     /**
-     * Creates a new empty world with a new {@link RootObject}.
+     * Creates a new empty world.
+     * This is only recommended for direct field access (e.g. for serialization).
      */
-    public World() {
+    protected World() {
+
+    }
+
+    /**
+     * Creates a new world with a new {@link RootObject} which is placed in the given {@link Simulation}.
+     * 
+     * @param simulation The {@link Simulation} the new world is placed in.
+     */
+    public World(Simulation simulation) {
 
         root = new RootObject(this);
+    }
+
+    /**
+     * Returns the {@link Simulation} the world is placed in.
+     * 
+     * @return The world's {@link Simulation}.
+     */
+    public Simulation getSimulation() {
+
+        return simulation;
     }
 
     /**

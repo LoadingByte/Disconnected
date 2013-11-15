@@ -19,7 +19,6 @@
 package com.quartercode.disconnected.sim.run.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import com.quartercode.disconnected.sim.Location;
 import com.quartercode.disconnected.sim.Simulation;
@@ -40,7 +39,6 @@ import com.quartercode.disconnected.sim.comp.hardware.Mainboard.MainboradSlot;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard.NeedsMainboardSlot;
 import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.hardware.RAM;
-import com.quartercode.disconnected.sim.comp.net.IP;
 import com.quartercode.disconnected.sim.comp.os.Environment;
 import com.quartercode.disconnected.sim.comp.os.Environment.EnvironmentVariable;
 import com.quartercode.disconnected.sim.comp.os.Group;
@@ -60,83 +58,104 @@ import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram;
 import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram;
 import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
+import com.quartercode.disconnected.sim.member.Reputation;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.sim.member.ai.UserController;
+import com.quartercode.disconnected.sim.world.RootObject;
+import com.quartercode.disconnected.sim.world.World;
 import com.quartercode.disconnected.util.LocationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
 
 /**
- * This utility class generates a simulation.
- * It's assembling all basic simulation objects (members, groups and computers) and generating basic reputations for all members.
- * The utility can also generate some parts without creating a whole simulation.
+ * This utility class generates a {@link Simulation}s and {@link World}s.
+ * It's assembling all basic {@link World} objects ({@link Member}s, {@link MemberGroup}s and {@link Computer}s) and generating basic {@link Reputation}s.
+ * The utility can also generate some parts without creating a whole {@link World}.
  */
 public class SimulationGenerator {
 
     /**
-     * Generates a new simulation.
+     * Generates a new {@link Simulation} with the given settings.
+     * This basically uses {@link #generateWorld(int, int, Simulation, RandomPool)} for creating a new world.
      * 
-     * @param computers The amount of computers the generator should generate.
-     * @param groups The amount of groups the generator should generate.
-     * @param random The random pool to use for the new simulation.
-     * @return The generated simulation object.
+     * @param computers The amount of {@link Computer}s the generator should generate.
+     * @param groups The amount of {@link MemberGroup}s generator should generate.
+     * @param random The {@link RandomPool} to use for the new {@link Simulation}.
+     * @return The generated {@link Simulation} object.
      */
     public static Simulation generateSimulation(int computers, int groups, RandomPool random) {
 
         Simulation simulation = new Simulation(random);
-
-        // Assemble basic objects
-        for (Computer computer : generateComputers(simulation, computers)) {
-            simulation.addComputer(computer);
-        }
-        for (MemberGroup memberGroup : generateMemberGroups(simulation, groups)) {
-            simulation.addGroup(memberGroup);
-        }
-        for (Member member : generateMembers(simulation, simulation.getComputers(), simulation.getGroups())) {
-            simulation.addMember(member);
-        }
-
-        // Add local player
-        Member localPlayer = new Member("player");
-        localPlayer.setComputer(generateComputers(simulation, 1, simulation.getComputers()).get(0));
-        simulation.addComputer(localPlayer.getComputer());
-        localPlayer.setAiController(new PlayerController(localPlayer, true));
-        simulation.addMember(localPlayer);
-
-        // Generate reputations
-        for (MemberGroup group : simulation.getGroups()) {
-            for (Member member : simulation.getMembers()) {
-                if (group.getMembers().contains(member)) {
-                    group.getReputation(member).addValue(simulation.getRandom().nextInt(10));
-                } else {
-                    group.getReputation(member).subtractValue(simulation.getRandom().nextInt(12));
-                }
-            }
-        }
-
+        simulation.setWorld(generateWorld(computers, groups, simulation, random));
         return simulation;
     }
 
     /**
-     * Generates the given amount of computers randomly.
+     * Generates a new {@link World} with the given settings for the given {@link Simulation}.
+     * If you don't want to use the {@link World} in a simulation, you can set it to null.
      * 
-     * @param simulation The simulation to use for generating some data.
-     * @param amount The amount of computers the generator should generate.
-     * @return The generated list of computers.
+     * @param computers The amount of {@link Computer}s the generator should generate.
+     * @param groups The amount of {@link MemberGroup}s generator should generate.
+     * @param simulation The {@link Simulation} the new {@link World} is generated for. This can be null.
+     * @param random The {@link RandomPool} which is used for generating the {@link World}.
+     * @return The generated {@link World} object.
      */
-    public static List<Computer> generateComputers(Simulation simulation, int amount) {
+    public static World generateWorld(int computers, int groups, Simulation simulation, RandomPool random) {
 
-        return generateComputers(simulation, amount, null);
+        World world = new World(simulation);
+
+        // Assemble basic objects
+        for (Computer computer : generateComputers(computers, random)) {
+            world.getRoot().get(RootObject.COMPUTERS_PROPERTY).add(computer);
+        }
+        for (MemberGroup memberGroup : generateMemberGroups(groups, random)) {
+            world.getRoot().get(RootObject.MEMBER_GROUPS_PROPERTY).add(memberGroup);
+        }
+        for (Member member : generateMembers(world.getRoot().get(RootObject.COMPUTERS_PROPERTY), world.getRoot().get(RootObject.MEMBER_GROUPS_PROPERTY), random)) {
+            world.getRoot().get(RootObject.MEMBERS_PROPERTY).add(member);
+        }
+
+        // Add local player
+        Member localPlayer = new Member("player");
+        localPlayer.setComputer(generateComputers(1, world.getRoot().get(RootObject.COMPUTERS_PROPERTY), random).get(0));
+        world.getRoot().get(RootObject.COMPUTERS_PROPERTY).add(localPlayer.getComputer());
+        localPlayer.setAiController(new PlayerController(localPlayer, true));
+        world.getRoot().get(RootObject.MEMBERS_PROPERTY).add(localPlayer);
+
+        // Generate reputations
+        for (MemberGroup group : world.getRoot().get(RootObject.MEMBER_GROUPS_PROPERTY)) {
+            for (Member member : world.getRoot().get(RootObject.MEMBERS_PROPERTY)) {
+                if (group.getMembers().contains(member)) {
+                    group.getReputation(member).addValue(random.nextInt(10));
+                } else {
+                    group.getReputation(member).subtractValue(random.nextInt(12));
+                }
+            }
+        }
+
+        return world;
     }
 
     /**
-     * Generates the given amount of computers randomly ignoring the locations of the given computers.
+     * Generates the given amount of {@link Computer}s randomly.
      * 
-     * @param simulation The simulation to use for generating some data.
-     * @param amount The amount of computers the generator should generate.
-     * @param ignore The locations of those computers will be ignored.
-     * @return The generated list of computers.
+     * @param amount The amount of {@link Computer}s the generator should generate.
+     * @param random The {@link RandomPool} which is used for generating the {@link Computer}s.
+     * @return The generated list of {@link Computer}s.
      */
-    public static List<Computer> generateComputers(Simulation simulation, int amount, List<Computer> ignore) {
+    public static List<Computer> generateComputers(int amount, RandomPool random) {
+
+        return generateComputers(amount, null, random);
+    }
+
+    /**
+     * Generates the given amount of {@link Computer} randomly ignoring the {@link Location}s of the given {@link Computer}s.
+     * 
+     * @param amount The amount of {@link Computer}s the generator should generate.
+     * @param ignore There wont be any {@link Computer}s with one of those {@link Location}s.
+     * @param random The {@link RandomPool} which is used for generating the {@link Computer}s.
+     * @return The generated list of {@link Computer}s.
+     */
+    public static List<Computer> generateComputers(int amount, List<Computer> ignore, RandomPool random) {
 
         List<Computer> computers = new ArrayList<Computer>();
 
@@ -147,7 +166,7 @@ public class SimulationGenerator {
             }
         }
 
-        for (Location location : LocationGenerator.generateLocations(amount, ignoreLocations, simulation.getRandom())) {
+        for (Location location : LocationGenerator.generateLocations(amount, ignoreLocations, random)) {
             Computer computer = new Computer();
             computer.setLocation(location);
             computers.add(computer);
@@ -163,15 +182,12 @@ public class SimulationGenerator {
             List<Hardware> hardware = new ArrayList<Hardware>();
             hardware.add(new CPU(computer, "Intel Core i7-4950HQ", new Version(1, 0, 0), null, 8, 2400000000L));
             hardware.add(new RAM(computer, "EpicRAM 4194304", new Version(1, 0, 5), null, ByteUnit.BYTE.convert(4, ByteUnit.MEGABYTE), 1600000000L));
+            hardware.add(new NetworkInterface(computer, "NI FiberScore Ultimate", new Version(1, 2, 0), null));
 
             HardDrive systemMedium = new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
             hardware.add(systemMedium);
             HardDrive userMedium = new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
             hardware.add(userMedium);
-
-            NetworkInterface networkInterface = new NetworkInterface(computer, "NI FiberScore Ultimate", new Version(1, 2, 0), null);
-            generateIP(networkInterface, simulation);
-            hardware.add(networkInterface);
 
             for (MainboradSlot slot : computer.getHardware(Mainboard.class).get(0).getSlots()) {
                 Hardware useHardware = null;
@@ -267,34 +283,14 @@ public class SimulationGenerator {
         fileSystem.getFile(path).setContent(content);
     }
 
-    private static void generateIP(NetworkInterface host, Simulation simulation) {
-
-        gen:
-        while (true) {
-            int[] parts = new int[4];
-            for (int counter = 0; counter < parts.length; counter++) {
-                parts[counter] = simulation.getRandom().nextInt(255) + 1;
-            }
-            for (Computer computer : simulation.getComputers()) {
-                for (NetworkInterface testInterface : computer.getHardware(NetworkInterface.class)) {
-                    if (Arrays.equals(testInterface.getIp().getParts(), parts)) {
-                        continue gen;
-                    }
-                }
-            }
-            host.setIp(new IP(host, parts));
-            break;
-        }
-    }
-
     /**
-     * Generates the given amount of member groups randomly.
+     * Generates the given amount of {@link MemberGroup}s randomly.
      * 
-     * @param simulation The simulation to use for generating metadata (like ids).
-     * @param amount The amount of member groups the generator should generate.
-     * @return The generated list of member groups.
+     * @param amount The amount of {@link MemberGroup}s the generator should generate.
+     * @param random The {@link RandomPool} which is used for generating the {@link MemberGroup}s.
+     * @return The generated list of {@link MemberGroup}s.
      */
-    public static List<MemberGroup> generateMemberGroups(Simulation simulation, int amount) {
+    public static List<MemberGroup> generateMemberGroups(int amount, RandomPool random) {
 
         List<MemberGroup> groups = new ArrayList<MemberGroup>();
 
@@ -306,28 +302,18 @@ public class SimulationGenerator {
     }
 
     /**
-     * Generates the given amount of members randomly.
+     * Generates the given amount of {@link Member}s randomly.
      * 
-     * @param simulation The simulation to use for generating metadata (like ids).
-     * @param amount The amount of members the generator should generate.
-     * @return The generated list of members.
+     * @param amount The amount of {@link Member}s the generator should generate.
+     * @param random The {@link RandomPool} which is used for generating the {@link Member}s.
+     * @return The generated list of {@link Member}s.
      */
-    public static List<Member> generateMembers(Simulation simulation, int amount) {
+    public static List<Member> generateMembers(int amount, RandomPool random) {
 
         List<Member> members = new ArrayList<Member>();
 
-        int idDelta = 0;
-        for (Member member : simulation.getMembers()) {
-            if (member.getName().startsWith("member-")) {
-                int id = Integer.parseInt(member.getName().replace("member-", ""));
-                if (id + 1 > idDelta) {
-                    idDelta = id + 1;
-                }
-            }
-        }
-
         for (int counter = 0; counter < amount; counter++) {
-            Member member = new Member("member-" + (idDelta + counter));
+            Member member = new Member("member-" + random.nextInt());
             members.add(member);
             member.setAiController(new UserController(member));
         }
@@ -336,21 +322,21 @@ public class SimulationGenerator {
     }
 
     /**
-     * Generates a list of members randomly using the given computers and groups.
-     * The generated amount of members is euqally to the amount of given computers.
-     * Also, every generated member gets randomly sorted into one of the given member groups.
+     * Generates a list of {@link Member}s randomly using the given {@link Computer}s and {@link MemberGroup}s.
+     * The generated amount of {@link Member}s is equally to the amount of given {@link Computer}s.
+     * Also, every generated {@link Member} is randomly sorted into one of the given {@link MemberGroup}s.
      * 
-     * @param simulation The simulation to use for generating metadata (like ids).
-     * @param computers The computers to use for generating the members.
-     * @param groups The groups to sort the members in.
-     * @return The generated list of members.
+     * @param computers The {@link Computer}s to use for generating the {@link Member}s.
+     * @param groups The {@link MemberGroup}s the {@link Member}s are randomly sorted into.
+     * @param random The {@link RandomPool} which is used for generating the {@link Member}s and doing the sorting.
+     * @return The generated list of {@link Member}s.
      */
-    public static List<Member> generateMembers(Simulation simulation, List<Computer> computers, List<MemberGroup> groups) {
+    public static List<Member> generateMembers(List<Computer> computers, List<MemberGroup> groups, RandomPool random) {
 
-        List<Member> members = generateMembers(simulation, computers.size());
+        List<Member> members = generateMembers(computers.size(), random);
 
         for (int counter = 0; counter < members.size(); counter++) {
-            groups.get(simulation.getRandom().nextInt(groups.size())).addMember(members.get(counter));
+            groups.get(random.nextInt(groups.size())).addMember(members.get(counter));
             members.get(counter).setComputer(computers.get(counter));
         }
 

@@ -26,6 +26,7 @@ import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
+import com.quartercode.disconnected.sim.world.RootObject;
 import com.quartercode.disconnected.util.RandomPool;
 
 public class SimulationTest {
@@ -48,15 +49,15 @@ public class SimulationTest {
     public void testGetMembersByController() {
 
         Member localPlayer = null;
-        for (Member member : simulation.getMembersByController(PlayerController.class)) {
+        for (Member member : simulation.getWorld().getRoot().get(RootObject.MEMBERS_PROPERTY).getByController(PlayerController.class)) {
             if ( ((PlayerController) member.getAiController()).isLocal()) {
                 localPlayer = member;
                 break;
             }
         }
 
-        simulation.getMembersByController(UserController.class);
-        Assert.assertEquals("Local player equals", localPlayer, simulation.getLocalPlayer());
+        simulation.getWorld().getRoot().get(RootObject.MEMBERS_PROPERTY).getByController(UserController.class);
+        Assert.assertEquals("Local player equals", localPlayer, simulation.getWorld().getRoot().get(RootObject.MEMBERS_PROPERTY).getLocalPlayer());
     }
 
 }

@@ -27,6 +27,7 @@ import com.quartercode.disconnected.sim.comp.program.ArgumentException;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.WrongSessionTypeException;
 import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram.DesktopSession;
+import com.quartercode.disconnected.sim.world.RootObject;
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.Widget;
 
@@ -75,7 +76,7 @@ public class DesktopState extends GraphicsState {
         try {
             // TODO: Boot the computer & listen for new session (shell or desktop).
             // Open a new desktop session (temp)
-            OperatingSystem os = simulation.getLocalPlayer().getComputer().getOperatingSystem();
+            OperatingSystem os = simulation.getWorld().getRoot().get(RootObject.MEMBERS_PROPERTY).getLocalPlayer().getComputer().getOperatingSystem();
             Map<String, Object> arguments = new HashMap<String, Object>();
             arguments.put("user", os.getUserManager().getUsers().get(0).getName());
             Process process = os.getProcessManager().getRootProcess().createChild(os.getFileSystemManager().getFile("/system/bin/desktops.exe"), arguments);
