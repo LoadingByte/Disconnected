@@ -21,10 +21,10 @@ package com.quartercode.disconnected.test.sim.world;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.sim.world.ObjectProperty;
-import com.quartercode.disconnected.sim.world.PropertyDefinition;
-import com.quartercode.disconnected.sim.world.World;
-import com.quartercode.disconnected.sim.world.WorldObject;
+import com.quartercode.disconnected.world.ObjectProperty;
+import com.quartercode.disconnected.world.PropertyDefinition;
+import com.quartercode.disconnected.world.World;
+import com.quartercode.disconnected.world.WorldObject;
 
 public class WorldObjectTest {
 

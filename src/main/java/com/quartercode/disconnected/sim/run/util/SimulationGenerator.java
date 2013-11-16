@@ -61,10 +61,10 @@ import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.Reputation;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.sim.member.ai.UserController;
-import com.quartercode.disconnected.sim.world.RootObject;
-import com.quartercode.disconnected.sim.world.World;
 import com.quartercode.disconnected.util.LocationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
+import com.quartercode.disconnected.world.RootObject;
+import com.quartercode.disconnected.world.World;
 
 /**
  * This utility class generates a {@link Simulation}s and {@link World}s.

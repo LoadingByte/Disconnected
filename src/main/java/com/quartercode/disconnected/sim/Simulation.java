@@ -20,9 +20,9 @@ package com.quartercode.disconnected.sim;
 
 import com.quartercode.disconnected.sim.run.TickSimulator;
 import com.quartercode.disconnected.sim.run.Ticker;
-import com.quartercode.disconnected.sim.world.World;
 import com.quartercode.disconnected.util.InfoString;
 import com.quartercode.disconnected.util.RandomPool;
+import com.quartercode.disconnected.world.World;
 
 /**
  * This class represents a simulation which stores information about the simulated {@link World} and a generic {@link RandomPool}.

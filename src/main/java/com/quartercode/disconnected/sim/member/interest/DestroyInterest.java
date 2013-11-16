@@ -32,8 +32,8 @@ import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.action.Action;
 import com.quartercode.disconnected.sim.member.action.ExploitAction;
-import com.quartercode.disconnected.sim.world.RootObject;
 import com.quartercode.disconnected.util.ProbabilityUtil;
+import com.quartercode.disconnected.world.RootObject;
 
 /**
  * This is a simple destroy interest which has a computer as target.

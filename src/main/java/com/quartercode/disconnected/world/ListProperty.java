@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.world;
+package com.quartercode.disconnected.world;
 
 import java.util.ArrayList;
 import java.util.Collection;

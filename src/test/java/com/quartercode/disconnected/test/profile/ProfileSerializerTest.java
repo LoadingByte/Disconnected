@@ -32,10 +32,10 @@ import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.Main;
 import com.quartercode.disconnected.profile.ProfileSerializer;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
-import com.quartercode.disconnected.sim.world.World;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.util.ResourceStore;
+import com.quartercode.disconnected.world.World;
 
 public class ProfileSerializerTest {
 

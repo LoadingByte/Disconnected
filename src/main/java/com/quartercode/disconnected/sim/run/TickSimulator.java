@@ -25,7 +25,7 @@ import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.sim.comp.net.Packet;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
-import com.quartercode.disconnected.sim.world.RootObject;
+import com.quartercode.disconnected.world.RootObject;
 
 /**
  * This class implements the root tick update mechanisms for the entire simulation.

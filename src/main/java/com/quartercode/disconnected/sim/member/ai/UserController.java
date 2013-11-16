@@ -26,8 +26,8 @@ import com.quartercode.disconnected.sim.member.action.Action;
 import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
 import com.quartercode.disconnected.sim.member.interest.HasTarget;
 import com.quartercode.disconnected.sim.member.interest.Interest;
-import com.quartercode.disconnected.sim.world.RootObject;
 import com.quartercode.disconnected.util.ProbabilityUtil;
+import com.quartercode.disconnected.world.RootObject;
 
 /**
  * The user controller simulates a typical computer user.

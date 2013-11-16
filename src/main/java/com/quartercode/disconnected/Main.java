@@ -65,15 +65,15 @@ import com.quartercode.disconnected.sim.run.TickAction;
 import com.quartercode.disconnected.sim.run.TickSimulator;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
-import com.quartercode.disconnected.sim.world.ListProperty;
-import com.quartercode.disconnected.sim.world.ObjectProperty;
-import com.quartercode.disconnected.sim.world.RootObject;
-import com.quartercode.disconnected.sim.world.RootObject.MemberGroupListProperty;
-import com.quartercode.disconnected.sim.world.RootObject.MemberListProperty;
 import com.quartercode.disconnected.util.LogExceptionHandler;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.util.ResourceStore;
+import com.quartercode.disconnected.world.ListProperty;
+import com.quartercode.disconnected.world.ObjectProperty;
+import com.quartercode.disconnected.world.RootObject;
+import com.quartercode.disconnected.world.RootObject.MemberGroupListProperty;
+import com.quartercode.disconnected.world.RootObject.MemberListProperty;
 
 /**
  * The main class which initalizes the whole game.
