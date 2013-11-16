@@ -47,6 +47,8 @@ import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.util.ResourceStore;
 import com.quartercode.disconnected.world.ListProperty;
 import com.quartercode.disconnected.world.ObjectProperty;
+import com.quartercode.disconnected.world.ObjectReferenceProperty;
+import com.quartercode.disconnected.world.TickProperty;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.file.StringContent;
 import com.quartercode.disconnected.world.comp.hardware.CPU;
@@ -214,7 +216,9 @@ public class Main {
 
         // Properties
         registry.registerClass(ObjectProperty.class);
+        registry.registerClass(ObjectReferenceProperty.class);
         registry.registerClass(ListProperty.class);
+        registry.registerClass(TickProperty.class);
 
         // Custom Properties
         registry.registerClass(MemberListProperty.class);
