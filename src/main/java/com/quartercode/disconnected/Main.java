@@ -66,6 +66,7 @@ import com.quartercode.disconnected.world.comp.program.shell.ListFilesProgram;
 import com.quartercode.disconnected.world.comp.program.shell.MakeFileProgram;
 import com.quartercode.disconnected.world.comp.session.DesktopSessionProgram;
 import com.quartercode.disconnected.world.comp.session.ShellSessionProgram;
+import com.quartercode.disconnected.world.general.Location;
 import com.quartercode.disconnected.world.general.RootObject;
 import com.quartercode.disconnected.world.general.RootObject.MemberGroupListProperty;
 import com.quartercode.disconnected.world.general.RootObject.MemberListProperty;
@@ -175,7 +176,7 @@ public class Main {
         LOGGER.info("DEBUG-ACTION: Generating new simulation");
         Simulation simulation = SimulationGenerator.generateSimulation(10, 2, new RandomPool(Simulation.RANDOM_POOL_SIZE));
         for (Computer computer : simulation.getWorld().getRoot().get(RootObject.COMPUTERS)) {
-            computer.getOperatingSystem().setRunning(true);
+            computer.get(Computer.OS).get().setRunning(true);
         }
         Profile profile = new Profile("test", simulation);
         Disconnected.getProfileManager().addProfile(profile);
@@ -218,6 +219,9 @@ public class Main {
         // Custom Properties
         registry.registerClass(MemberListProperty.class);
         registry.registerClass(MemberGroupListProperty.class);
+
+        // Other
+        registry.registerClass(Location.class);
 
         // ----- General End -----
 

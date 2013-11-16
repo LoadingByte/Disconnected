@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.util.InfoString;
+import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.File.FileType;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
@@ -89,7 +90,7 @@ public class FileSystemManager implements InfoString {
     public List<FileSystem> getAvaiable() {
 
         List<FileSystem> fileSystems = new ArrayList<FileSystem>();
-        for (FileSystemProvider provider : host.getHost().getHardware(FileSystemProvider.class)) {
+        for (FileSystemProvider provider : host.getHost().get(Computer.HARDWARE).get(FileSystemProvider.class)) {
             fileSystems.add(provider.getFileSystem());
         }
         return fileSystems;

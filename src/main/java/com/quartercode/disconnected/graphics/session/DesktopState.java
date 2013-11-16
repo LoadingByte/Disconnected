@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import com.quartercode.disconnected.graphics.component.GraphicsState;
 import com.quartercode.disconnected.sim.Simulation;
+import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.program.ArgumentException;
 import com.quartercode.disconnected.world.comp.program.Process;
@@ -76,7 +77,7 @@ public class DesktopState extends GraphicsState {
         try {
             // TODO: Boot the computer & listen for new session (shell or desktop).
             // Open a new desktop session (temp)
-            OperatingSystem os = simulation.getWorld().getRoot().get(RootObject.MEMBERS).getLocalPlayer().getComputer().getOperatingSystem();
+            OperatingSystem os = simulation.getWorld().getRoot().get(RootObject.MEMBERS).getLocalPlayer().getComputer().get(Computer.OS).get();
             Map<String, Object> arguments = new HashMap<String, Object>();
             arguments.put("user", os.getUserManager().getUsers().get(0).getName());
             Process process = os.getProcessManager().getRootProcess().createChild(os.getFileSystemManager().getFile("/system/bin/desktops.exe"), arguments);

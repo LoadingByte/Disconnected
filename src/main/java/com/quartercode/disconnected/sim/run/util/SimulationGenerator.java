@@ -104,10 +104,10 @@ public class SimulationGenerator {
         World world = new World(simulation);
 
         // Assemble basic objects
-        for (Computer computer : generateComputers(computers, random)) {
+        for (Computer computer : generateComputers(world, computers, random)) {
             world.getRoot().get(RootObject.COMPUTERS).add(computer);
         }
-        for (MemberGroup memberGroup : generateMemberGroups(groups, random)) {
+        for (MemberGroup memberGroup : generateMemberGroups(world, groups, random)) {
             world.getRoot().get(RootObject.GROUPS).add(memberGroup);
         }
         for (Member member : generateMembers(world.getRoot().get(RootObject.COMPUTERS), world.getRoot().get(RootObject.GROUPS), random)) {
@@ -116,7 +116,7 @@ public class SimulationGenerator {
 
         // Add local player
         Member localPlayer = new Member("player");
-        localPlayer.setComputer(generateComputers(1, world.getRoot().get(RootObject.COMPUTERS), random).get(0));
+        localPlayer.setComputer(generateComputers(world, 1, world.getRoot().get(RootObject.COMPUTERS), random).get(0));
         world.getRoot().get(RootObject.COMPUTERS).add(localPlayer.getComputer());
         localPlayer.setAiController(new PlayerController(localPlayer, true));
         world.getRoot().get(RootObject.MEMBERS).add(localPlayer);
@@ -138,37 +138,39 @@ public class SimulationGenerator {
     /**
      * Generates the given amount of {@link Computer}s randomly.
      * 
+     * @param world The {@link World} the new {@link Computer}s will be in.
      * @param amount The amount of {@link Computer}s the generator should generate.
      * @param random The {@link RandomPool} which is used for generating the {@link Computer}s.
      * @return The generated list of {@link Computer}s.
      */
-    public static List<Computer> generateComputers(int amount, RandomPool random) {
+    public static List<Computer> generateComputers(World world, int amount, RandomPool random) {
 
-        return generateComputers(amount, null, random);
+        return generateComputers(world, amount, null, random);
     }
 
     /**
      * Generates the given amount of {@link Computer} randomly ignoring the {@link Location}s of the given {@link Computer}s.
      * 
+     * @param world The {@link World} the new {@link Computer}s will be in.
      * @param amount The amount of {@link Computer}s the generator should generate.
      * @param ignore There wont be any {@link Computer}s with one of those {@link Location}s.
      * @param random The {@link RandomPool} which is used for generating the {@link Computer}s.
      * @return The generated list of {@link Computer}s.
      */
-    public static List<Computer> generateComputers(int amount, List<Computer> ignore, RandomPool random) {
+    public static List<Computer> generateComputers(World world, int amount, List<Computer> ignore, RandomPool random) {
 
         List<Computer> computers = new ArrayList<Computer>();
 
         List<Location> ignoreLocations = new ArrayList<Location>();
         if (ignore != null) {
             for (Computer computer : ignore) {
-                ignoreLocations.add(computer.getLocation());
+                ignoreLocations.add(computer.get(Computer.LOCATION).get());
             }
         }
 
         for (Location location : LocationGenerator.generateLocations(amount, ignoreLocations, random)) {
-            Computer computer = new Computer();
-            computer.setLocation(location);
+            Computer computer = new Computer(world.getRoot());
+            computer.get(Computer.LOCATION).set(location);
             computers.add(computer);
 
             List<MainboradSlot> mainboradSlots = new ArrayList<MainboradSlot>();
@@ -177,7 +179,7 @@ public class SimulationGenerator {
             mainboradSlots.add(new MainboradSlot(HardDrive.class));
             mainboradSlots.add(new MainboradSlot(HardDrive.class));
             mainboradSlots.add(new MainboradSlot(NetworkInterface.class));
-            computer.addHardware(new Mainboard(computer, "MB XYZ 2000 Pro", new Version(1, 2, 5), null, mainboradSlots));
+            computer.get(Computer.HARDWARE).add(new Mainboard(computer, "MB XYZ 2000 Pro", new Version(1, 2, 5), null, mainboradSlots));
 
             List<Hardware> hardware = new ArrayList<Hardware>();
             hardware.add(new CPU(computer, "Intel Core i7-4950HQ", new Version(1, 0, 0), null, 8, 2400000000L));
@@ -189,7 +191,7 @@ public class SimulationGenerator {
             HardDrive userMedium = new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
             hardware.add(userMedium);
 
-            for (MainboradSlot slot : computer.getHardware(Mainboard.class).get(0).getSlots()) {
+            for (MainboradSlot slot : computer.get(Computer.HARDWARE).get(Mainboard.class).get(0).getSlots()) {
                 Hardware useHardware = null;
                 for (Hardware testHardware : hardware) {
                     if (testHardware.getClass().isAnnotationPresent(NeedsMainboardSlot.class) && slot.accept(testHardware)) {
@@ -199,26 +201,26 @@ public class SimulationGenerator {
                 }
 
                 if (useHardware != null) {
-                    computer.addHardware(useHardware);
+                    computer.get(Computer.HARDWARE).add(useHardware);
                     slot.setContent(useHardware);
                     hardware.remove(useHardware);
                 }
             }
 
-            computer.setOperatingSystem(new OperatingSystem(computer, "Frames", new Version(3, 7, 65), null));
-            computer.getOperatingSystem().getUserManager().addUser(new User(computer.getOperatingSystem(), User.SUPERUSER_NAME));
+            computer.get(Computer.OS).set(new OperatingSystem(computer, "Frames", new Version(3, 7, 65), null));
+            computer.get(Computer.OS).get().getUserManager().addUser(new User(computer.get(Computer.OS).get(), User.SUPERUSER_NAME));
 
-            Group genpop = new Group(computer.getOperatingSystem(), "genpop");
-            computer.getOperatingSystem().getUserManager().addGroup(genpop);
-            User genuser = new User(computer.getOperatingSystem(), "genuser");
+            Group genpop = new Group(computer.get(Computer.OS).get(), "genpop");
+            computer.get(Computer.OS).get().getUserManager().addGroup(genpop);
+            User genuser = new User(computer.get(Computer.OS).get(), "genuser");
             genuser.addToGroup(genpop, true);
-            computer.getOperatingSystem().getUserManager().addUser(genuser);
+            computer.get(Computer.OS).get().getUserManager().addUser(genuser);
 
             try {
-                computer.getOperatingSystem().getFileSystemManager().setMountpoint(systemMedium.getFileSystem(), "system");
-                addSystemFiles(systemMedium.getFileSystem(), computer.getOperatingSystem().getUserManager());
-                computer.getOperatingSystem().getFileSystemManager().setMountpoint(userMedium.getFileSystem(), "user");
-                addUserFiles(userMedium.getFileSystem(), computer.getOperatingSystem().getUserManager());
+                computer.get(Computer.OS).get().getFileSystemManager().setMountpoint(systemMedium.getFileSystem(), "system");
+                addSystemFiles(systemMedium.getFileSystem(), computer.get(Computer.OS).get().getUserManager());
+                computer.get(Computer.OS).get().getFileSystemManager().setMountpoint(userMedium.getFileSystem(), "user");
+                addUserFiles(userMedium.getFileSystem(), computer.get(Computer.OS).get().getUserManager());
             }
             catch (OutOfSpaceException e) {
                 // Really shouldn't happen
@@ -286,11 +288,12 @@ public class SimulationGenerator {
     /**
      * Generates the given amount of {@link MemberGroup}s randomly.
      * 
+     * @param world The {@link World} the new {@link MemberGroup}s will be in.
      * @param amount The amount of {@link MemberGroup}s the generator should generate.
      * @param random The {@link RandomPool} which is used for generating the {@link MemberGroup}s.
      * @return The generated list of {@link MemberGroup}s.
      */
-    public static List<MemberGroup> generateMemberGroups(int amount, RandomPool random) {
+    public static List<MemberGroup> generateMemberGroups(World world, int amount, RandomPool random) {
 
         List<MemberGroup> groups = new ArrayList<MemberGroup>();
 
@@ -304,11 +307,12 @@ public class SimulationGenerator {
     /**
      * Generates the given amount of {@link Member}s randomly.
      * 
+     * @param world The {@link World} the new {@link Member}s will be in.
      * @param amount The amount of {@link Member}s the generator should generate.
      * @param random The {@link RandomPool} which is used for generating the {@link Member}s.
      * @return The generated list of {@link Member}s.
      */
-    public static List<Member> generateMembers(int amount, RandomPool random) {
+    public static List<Member> generateMembers(World world, int amount, RandomPool random) {
 
         List<Member> members = new ArrayList<Member>();
 
@@ -333,7 +337,7 @@ public class SimulationGenerator {
      */
     public static List<Member> generateMembers(List<Computer> computers, List<MemberGroup> groups, RandomPool random) {
 
-        List<Member> members = generateMembers(computers.size(), random);
+        List<Member> members = generateMembers(computers.get(0).getWorld(), computers.size(), random);
 
         for (int counter = 0; counter < members.size(); counter++) {
             groups.get(random.nextInt(groups.size())).addMember(members.get(counter));

@@ -44,14 +44,14 @@ public class OSFileTest {
     @Before
     public void setUp() throws MountException, OutOfSpaceException {
 
-        computer = new Computer();
+        computer = new Computer(null);
 
         operatingSystem = new OperatingSystem(computer, "OperatingSystem", new Version(1, 0, 0), null);
-        computer.setOperatingSystem(operatingSystem);
+        computer.get(Computer.OS).set(operatingSystem);
 
         HardDrive hardDrive = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
         fileSystem = hardDrive.getFileSystem();
-        computer.addHardware(hardDrive);
+        computer.get(Computer.HARDWARE).add(hardDrive);
         operatingSystem.getFileSystemManager().setMountpoint(fileSystem, "test");
         operatingSystem.getFileSystemManager().setMounted(fileSystem, true);
 
@@ -85,7 +85,7 @@ public class OSFileTest {
     public void testMove() throws MountException, OutOfSpaceException {
 
         HardDrive hardDrive = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
-        computer.addHardware(hardDrive);
+        computer.get(Computer.HARDWARE).add(hardDrive);
         FileSystem fileSystem2 = hardDrive.getFileSystem();
         operatingSystem.getFileSystemManager().setMountpoint(fileSystem2, "test2");
         operatingSystem.getFileSystemManager().setMounted(fileSystem2, true);

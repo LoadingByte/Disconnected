@@ -18,217 +18,102 @@
 
 package com.quartercode.disconnected.world.comp;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
-import com.quartercode.disconnected.util.InfoString;
+import com.quartercode.disconnected.world.ListProperty;
+import com.quartercode.disconnected.world.ObjectProperty;
+import com.quartercode.disconnected.world.Property;
+import com.quartercode.disconnected.world.PropertyDefinition;
+import com.quartercode.disconnected.world.WorldObject;
 import com.quartercode.disconnected.world.comp.hardware.Hardware;
-import com.quartercode.disconnected.world.comp.hardware.Mainboard;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.world.comp.program.Program;
 import com.quartercode.disconnected.world.general.Location;
 
 /**
- * This class stores information about a computer, like the mainboard, other hardware, programs etc.
+ * This class stores information about a computer, like the {@link Location} or the {@link Hardware} parts.
  * 
  * @see Location
- * 
- * @see ComputerPart
- * @see Mainboard
  * @see Hardware
- * @see OperatingSystem
- * @see Program
  */
-public class Computer implements InfoString {
+public class Computer extends WorldObject {
 
-    private Location             location;
-    @XmlElement (name = "hardware")
-    private final List<Hardware> hardware = new CopyOnWriteArrayList<Hardware>();
-    private OperatingSystem      operatingSystem;
+    // ----- Property Definitions -----
 
     /**
-     * Creates a new computer.
+     * The {@link Location} where the computer actually is.
      */
-    public Computer() {
-
-    }
+    public static final PropertyDefinition<ObjectProperty<Location>>        LOCATION;
 
     /**
-     * Returns the unique serialization id for the computer.
-     * The id is the identy hash code of the computer object.
-     * 
-     * @return The unique serialization id for the computer.
+     * The {@link Hardware} parts the computer contains.
      */
-    @XmlID
-    @XmlAttribute
-    public String getId() {
-
-        return Integer.toHexString(System.identityHashCode(this));
-    }
+    public static final PropertyDefinition<ListProperty<Hardware>>          HARDWARE;
 
     /**
-     * Returns the location of the computer.
-     * 
-     * @return The location of the computer.
+     * The {@link OperatingSystem} which is running on the computer.
      */
-    public Location getLocation() {
+    public static final PropertyDefinition<ObjectProperty<OperatingSystem>> OS;
 
-        return location;
-    }
+    static {
 
-    /**
-     * Sets the location of the computer to a new one.
-     * 
-     * @param location The new location of the computer.
-     */
-    public void setLocation(Location location) {
+        LOCATION = new PropertyDefinition<ObjectProperty<Location>>("location") {
 
-        this.location = location;
-    }
+            @Override
+            public ObjectProperty<Location> createProperty(WorldObject parent) {
 
-    /**
-     * Returns the hardware the computer contains.
-     * 
-     * @return The hardware the computer contains.
-     */
-    public List<Hardware> getHardware() {
-
-        return Collections.unmodifiableList(hardware);
-    }
-
-    /**
-     * Returns the hardware parts in the computer which have the given type as a superclass.
-     * 
-     * @param type The type to use for the selection.
-     * @return The hardware parts in the computer which have the given type as a superclass.
-     */
-    public <T> List<T> getHardware(Class<T> type) {
-
-        List<T> hardware = new ArrayList<T>();
-        for (Hardware hardwarePart : this.hardware) {
-            if (type.isAssignableFrom(hardwarePart.getClass())) {
-                hardware.add(type.cast(hardwarePart));
+                return new ObjectProperty<Location>(getName(), parent);
             }
-        }
-        return hardware;
-    }
 
-    /**
-     * Adds a hardware part to the computer.
-     * 
-     * @param hardware The hardware part to add to the computer.
-     */
-    public void addHardware(Hardware hardware) {
+        };
 
-        this.hardware.add(hardware);
-    }
+        HARDWARE = new PropertyDefinition<ListProperty<Hardware>>("hardware") {
 
-    /**
-     * Removes a hardware part from the computer.
-     * 
-     * @param hardware The hardware part to from from the computer.
-     */
-    public void removeHardware(Hardware hardware) {
+            @Override
+            public ListProperty<Hardware> createProperty(WorldObject parent) {
 
-        this.hardware.remove(hardware);
-    }
-
-    /**
-     * Returns the opertating system which is installed on the computer.
-     * 
-     * @return The opertating system which is installed on the computer.
-     */
-    public OperatingSystem getOperatingSystem() {
-
-        return operatingSystem;
-    }
-
-    /**
-     * Sets the opertating system which is installed on the computer to a new one.
-     * 
-     * @param operatingSystem The new opertating system which is installed on the computer.
-     */
-    public void setOperatingSystem(OperatingSystem operatingSystem) {
-
-        this.operatingSystem = operatingSystem;
-    }
-
-    /**
-     * Returns all computer parts this computer currently contains.
-     * This collects the objects from every sublist and creates a new list out of them.
-     * 
-     * @return All computer parts this computer currently contains.
-     */
-    public List<ComputerPart> getParts() {
-
-        List<ComputerPart> parts = new ArrayList<ComputerPart>();
-
-        parts.addAll(hardware);
-        parts.add(operatingSystem);
-
-        return parts;
-    }
-
-    @Override
-    public int hashCode() {
-
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (hardware == null ? 0 : hardware.hashCode());
-        result = prime * result + (location == null ? 0 : location.hashCode());
-        result = prime * result + (operatingSystem == null ? 0 : operatingSystem.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        Computer other = (Computer) obj;
-        if (hardware == null) {
-            if (other.hardware != null) {
-                return false;
+                return new ListProperty<Hardware>(getName(), parent);
             }
-        } else if (!hardware.equals(other.hardware)) {
-            return false;
-        }
-        if (location == null) {
-            if (other.location != null) {
-                return false;
+
+        };
+
+        OS = new PropertyDefinition<ObjectProperty<OperatingSystem>>("operatingSystem") {
+
+            @Override
+            public ObjectProperty<OperatingSystem> createProperty(WorldObject parent) {
+
+                return new ObjectProperty<OperatingSystem>(getName(), parent);
             }
-        } else if (!location.equals(other.location)) {
-            return false;
-        }
-        if (operatingSystem == null) {
-            if (other.operatingSystem != null) {
-                return false;
-            }
-        } else if (!operatingSystem.equals(other.operatingSystem)) {
-            return false;
-        }
-        return true;
+
+        };
+
+    }
+
+    // ----- Property Definitions End -----
+
+    /**
+     * Creates a new empty computer.
+     * This is only recommended for direct field access (e.g. for serialization).
+     */
+    protected Computer() {
+
+    }
+
+    /**
+     * Creates a new computer which has the given parent object.
+     * 
+     * @param parent The parent {@link WorldObject} which has a {@link Property} which houses the new object.
+     */
+    public Computer(WorldObject parent) {
+
+        super(parent);
     }
 
     @Override
     public String toInfoString() {
 
         String hardwareInfo = "";
-        for (Hardware hardwarePart : hardware) {
+        for (Hardware hardwarePart : get(HARDWARE)) {
             hardwareInfo += hardwarePart.toInfoString() + ", ";
         }
-        return "loc " + location.toInfoString() + ", " + hardwareInfo + operatingSystem.toInfoString();
+        return "loc " + get(LOCATION).toInfoString() + ", " + hardwareInfo + get(OS).toInfoString();
     }
 
     @Override

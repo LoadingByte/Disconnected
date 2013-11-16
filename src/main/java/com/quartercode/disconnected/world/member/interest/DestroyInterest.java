@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.util.ProbabilityUtil;
+import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.ComputerPart;
 import com.quartercode.disconnected.world.comp.Vulnerability;
 import com.quartercode.disconnected.world.comp.Vulnerability.Vulnerable;
@@ -102,7 +103,10 @@ public class DestroyInterest extends Interest implements HasTarget {
         if (ProbabilityUtil.genPseudo(probability, simulation.getRandom())) {
             // Collect all vulnerabilities
             List<Vulnerability> vulnerabilities = new ArrayList<Vulnerability>();
-            for (ComputerPart part : member.getComputer().getParts()) {
+            List<ComputerPart> parts = new ArrayList<ComputerPart>();
+            parts.addAll(member.getComputer().get(Computer.HARDWARE));
+            parts.add(member.getComputer().get(Computer.OS).get());
+            for (ComputerPart part : parts) {
                 if (part instanceof Vulnerable) {
                     vulnerabilities.addAll( ((Vulnerable) part).getVulnerabilities());
                 }
@@ -119,7 +123,7 @@ public class DestroyInterest extends Interest implements HasTarget {
                 scripts.add("simulation.removeComputer(member.getComputer())");
 
                 // Use the first avaiable operating system as execution environment
-                Payload payload = new Payload(member.getComputer().getOperatingSystem(), scripts);
+                Payload payload = new Payload(member.getComputer().get(Computer.OS).get(), scripts);
 
                 return new ExploitAction(this, target, exploit, payload);
             }

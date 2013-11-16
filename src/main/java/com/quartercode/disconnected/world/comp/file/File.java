@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.util.InfoString;
+import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.SizeUtil.SizeObject;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.world.comp.os.Group;
@@ -227,7 +228,7 @@ public class File implements SizeObject, InfoString {
      */
     public String getGlobalHostPath() {
 
-        return getGlobalPath(host.getHost().getOperatingSystem());
+        return getGlobalPath(host.getHost().get(Computer.OS).get());
     }
 
     /**
@@ -576,7 +577,7 @@ public class File implements SizeObject, InfoString {
 
         File oldParent = getParent();
         path = File.resolvePath(getGlobalHostPath(), path);
-        host = host.getHost().getOperatingSystem().getFileSystemManager().getMounted(path);
+        host = host.getHost().get(Computer.OS).get().getFileSystemManager().getMounted(path);
         host.addFile(process, this, path.substring(path.indexOf(SEPERATOR, 1)));
         oldParent.removeChildFile(this);
     }

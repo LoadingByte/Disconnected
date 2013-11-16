@@ -21,6 +21,7 @@ package com.quartercode.disconnected.world.comp;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlID;
+import com.quartercode.disconnected.world.Property;
 import com.quartercode.disconnected.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 
@@ -85,7 +86,7 @@ public class HostedComputerPart extends ComputerPart {
 
     protected void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
 
-        host = (Computer) parent;
+        host = (Computer) ((Property) parent).getParent();
     }
 
     @Override

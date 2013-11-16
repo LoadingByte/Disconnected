@@ -118,7 +118,7 @@ public class NetworkInterface extends Hardware {
      */
     public void receivePacket(Packet packet) {
 
-        getHost().getOperatingSystem().getNetworkManager().handlePacket(packet);
+        getHost().get(Computer.OS).get().getNetworkManager().handlePacket(packet);
     }
 
     @Override
