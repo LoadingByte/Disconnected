@@ -19,9 +19,7 @@
 package com.quartercode.disconnected.sim.run;
 
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.world.Property;
 import com.quartercode.disconnected.world.Updateable;
-import com.quartercode.disconnected.world.WorldObject;
 
 /**
  * This class implements the root tick update mechanisms for the entire simulation.
@@ -178,19 +176,15 @@ public class TickSimulator implements TickAction {
         }
     }
 
-    private void updateWorldObject(WorldObject worldObject) {
+    private void updateWorldObject(Object object) {
 
-        for (Property property : worldObject.getProperties()) {
-            if (property instanceof Updateable) {
-                ((Updateable) property).update();
-            }
+        if (object instanceof Updateable) {
+            ((Updateable) object).update();
+        }
 
-            if (property instanceof Iterable) {
-                for (Object child : (Iterable<?>) property) {
-                    if (child instanceof WorldObject) {
-                        updateWorldObject(worldObject);
-                    }
-                }
+        if (object instanceof Iterable) {
+            for (Object child : (Iterable<?>) object) {
+                updateWorldObject(child);
             }
         }
     }

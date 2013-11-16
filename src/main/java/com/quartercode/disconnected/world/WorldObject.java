@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.world;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -32,7 +32,7 @@ import com.quartercode.disconnected.util.InfoString;
  * It can have different {@link Property} objects which are used for setting the state of the object.
  * Those {@link Property} objects are be defined by {@link PropertyDefinition} constants which should be located in the actual subclass.
  */
-public class WorldObject implements InfoString {
+public class WorldObject implements Iterable<Property>, InfoString {
 
     private WorldObject    parent;
     @XmlElement (name = "property")
@@ -98,15 +98,10 @@ public class WorldObject implements InfoString {
         return property;
     }
 
-    /**
-     * Returns an unmodifiable list containing all properties the world object has.
-     * This method should only be used if you really need all those properties. If you don't, use {@link #get(PropertyDefinition)}.
-     * 
-     * @return All properties of the world object.
-     */
-    public List<Property> getProperties() {
+    @Override
+    public Iterator<Property> iterator() {
 
-        return Collections.unmodifiableList(properties);
+        return properties.iterator();
     }
 
     /**
