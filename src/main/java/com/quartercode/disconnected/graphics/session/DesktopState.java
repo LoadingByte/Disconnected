@@ -27,7 +27,7 @@ import com.quartercode.disconnected.sim.comp.program.ArgumentException;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.program.WrongSessionTypeException;
 import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram.DesktopSession;
-import com.quartercode.disconnected.world.RootObject;
+import com.quartercode.disconnected.world.general.RootObject;
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.Widget;
 

@@ -27,7 +27,7 @@ import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
-import com.quartercode.disconnected.world.RootObject;
+import com.quartercode.disconnected.world.general.RootObject;
 
 public class SimulationTest {
 

@@ -71,9 +71,9 @@ import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.util.ResourceStore;
 import com.quartercode.disconnected.world.ListProperty;
 import com.quartercode.disconnected.world.ObjectProperty;
-import com.quartercode.disconnected.world.RootObject;
-import com.quartercode.disconnected.world.RootObject.MemberGroupListProperty;
-import com.quartercode.disconnected.world.RootObject.MemberListProperty;
+import com.quartercode.disconnected.world.general.RootObject;
+import com.quartercode.disconnected.world.general.RootObject.MemberGroupListProperty;
+import com.quartercode.disconnected.world.general.RootObject.MemberListProperty;
 
 /**
  * The main class which initalizes the whole game.

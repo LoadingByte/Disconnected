@@ -40,8 +40,8 @@ import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.sim.comp.program.Process;
 import com.quartercode.disconnected.sim.comp.session.SessionProgram.Session;
 import com.quartercode.disconnected.util.RandomPool;
-import com.quartercode.disconnected.world.RootObject;
 import com.quartercode.disconnected.world.World;
+import com.quartercode.disconnected.world.general.RootObject;
 
 /**
  * This utility class loads a saves stored {@link Profile}s for serializing {@link Simulation}s.

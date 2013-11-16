@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.world;
+package com.quartercode.disconnected.world.general;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +26,10 @@ import com.quartercode.disconnected.sim.member.Member;
 import com.quartercode.disconnected.sim.member.MemberGroup;
 import com.quartercode.disconnected.sim.member.ai.AIController;
 import com.quartercode.disconnected.sim.member.ai.PlayerController;
+import com.quartercode.disconnected.world.ListProperty;
+import com.quartercode.disconnected.world.PropertyDefinition;
+import com.quartercode.disconnected.world.World;
+import com.quartercode.disconnected.world.WorldObject;
 
 /**
  * The root object of a world can house first level world objects.

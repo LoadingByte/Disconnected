@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.util.InfoString;
+import com.quartercode.disconnected.world.general.RootObject;
 
 /**
  * A world is a space which contains {@link WorldObject}s.
