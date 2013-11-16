@@ -174,7 +174,7 @@ public class Main {
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG-ACTION: Generating new simulation");
         Simulation simulation = SimulationGenerator.generateSimulation(10, 2, new RandomPool(Simulation.RANDOM_POOL_SIZE));
-        for (Computer computer : simulation.getWorld().getRoot().get(RootObject.COMPUTERS_PROPERTY)) {
+        for (Computer computer : simulation.getWorld().getRoot().get(RootObject.COMPUTERS)) {
             computer.getOperatingSystem().setRunning(true);
         }
         Profile profile = new Profile("test", simulation);

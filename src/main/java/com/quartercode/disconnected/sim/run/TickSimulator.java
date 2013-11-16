@@ -81,7 +81,7 @@ public class TickSimulator implements TickAction {
 
         if (simulation != null) {
             // Execute process ticks
-            for (Computer computer : simulation.getWorld().getRoot().get(RootObject.COMPUTERS_PROPERTY)) {
+            for (Computer computer : simulation.getWorld().getRoot().get(RootObject.COMPUTERS)) {
                 if (computer.getOperatingSystem().isRunning()) {
                     for (Process process : new ArrayList<Process>(computer.getOperatingSystem().getProcessManager().getAllProcesses())) {
                         if (process.getState() == ProcessState.RUNNING || process.getState() == ProcessState.INTERRUPTED) {
@@ -94,7 +94,7 @@ public class TickSimulator implements TickAction {
             }
 
             // Send remaining packets from network interfaces
-            for (Computer computer : simulation.getWorld().getRoot().get(RootObject.COMPUTERS_PROPERTY)) {
+            for (Computer computer : simulation.getWorld().getRoot().get(RootObject.COMPUTERS)) {
                 for (NetworkInterface networkInterface : computer.getHardware(NetworkInterface.class)) {
                     Packet packet = null;
                     while ( (packet = networkInterface.nextDeliveryPacket(true)) != null) {

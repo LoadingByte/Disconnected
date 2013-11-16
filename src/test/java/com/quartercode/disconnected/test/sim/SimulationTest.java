@@ -49,15 +49,15 @@ public class SimulationTest {
     public void testGetMembersByController() {
 
         Member localPlayer = null;
-        for (Member member : simulation.getWorld().getRoot().get(RootObject.MEMBERS_PROPERTY).getByController(PlayerController.class)) {
+        for (Member member : simulation.getWorld().getRoot().get(RootObject.MEMBERS).getByController(PlayerController.class)) {
             if ( ((PlayerController) member.getAiController()).isLocal()) {
                 localPlayer = member;
                 break;
             }
         }
 
-        simulation.getWorld().getRoot().get(RootObject.MEMBERS_PROPERTY).getByController(UserController.class);
-        Assert.assertEquals("Local player equals", localPlayer, simulation.getWorld().getRoot().get(RootObject.MEMBERS_PROPERTY).getLocalPlayer());
+        simulation.getWorld().getRoot().get(RootObject.MEMBERS).getByController(UserController.class);
+        Assert.assertEquals("Local player equals", localPlayer, simulation.getWorld().getRoot().get(RootObject.MEMBERS).getLocalPlayer());
     }
 
 }

@@ -145,7 +145,7 @@ public class ProfileSerializer {
      */
     public static void serializeWorld(OutputStream outputStream, World world) throws JAXBException {
 
-        for (Computer computer : world.getRoot().get(RootObject.COMPUTERS_PROPERTY)) {
+        for (Computer computer : world.getRoot().get(RootObject.COMPUTERS)) {
             if (computer.getOperatingSystem().getProcessManager().getRootProcess() != null) {
                 for (Process process : computer.getOperatingSystem().getProcessManager().getAllProcesses()) {
                     if (process.getExecutor() instanceof Session && ! ((Session) process.getExecutor()).isSerializable()) {

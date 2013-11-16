@@ -105,25 +105,25 @@ public class SimulationGenerator {
 
         // Assemble basic objects
         for (Computer computer : generateComputers(computers, random)) {
-            world.getRoot().get(RootObject.COMPUTERS_PROPERTY).add(computer);
+            world.getRoot().get(RootObject.COMPUTERS).add(computer);
         }
         for (MemberGroup memberGroup : generateMemberGroups(groups, random)) {
-            world.getRoot().get(RootObject.MEMBER_GROUPS_PROPERTY).add(memberGroup);
+            world.getRoot().get(RootObject.GROUPS).add(memberGroup);
         }
-        for (Member member : generateMembers(world.getRoot().get(RootObject.COMPUTERS_PROPERTY), world.getRoot().get(RootObject.MEMBER_GROUPS_PROPERTY), random)) {
-            world.getRoot().get(RootObject.MEMBERS_PROPERTY).add(member);
+        for (Member member : generateMembers(world.getRoot().get(RootObject.COMPUTERS), world.getRoot().get(RootObject.GROUPS), random)) {
+            world.getRoot().get(RootObject.MEMBERS).add(member);
         }
 
         // Add local player
         Member localPlayer = new Member("player");
-        localPlayer.setComputer(generateComputers(1, world.getRoot().get(RootObject.COMPUTERS_PROPERTY), random).get(0));
-        world.getRoot().get(RootObject.COMPUTERS_PROPERTY).add(localPlayer.getComputer());
+        localPlayer.setComputer(generateComputers(1, world.getRoot().get(RootObject.COMPUTERS), random).get(0));
+        world.getRoot().get(RootObject.COMPUTERS).add(localPlayer.getComputer());
         localPlayer.setAiController(new PlayerController(localPlayer, true));
-        world.getRoot().get(RootObject.MEMBERS_PROPERTY).add(localPlayer);
+        world.getRoot().get(RootObject.MEMBERS).add(localPlayer);
 
         // Generate reputations
-        for (MemberGroup group : world.getRoot().get(RootObject.MEMBER_GROUPS_PROPERTY)) {
-            for (Member member : world.getRoot().get(RootObject.MEMBERS_PROPERTY)) {
+        for (MemberGroup group : world.getRoot().get(RootObject.GROUPS)) {
+            for (Member member : world.getRoot().get(RootObject.MEMBERS)) {
                 if (group.getMembers().contains(member)) {
                     group.getReputation(member).addValue(random.nextInt(10));
                 } else {

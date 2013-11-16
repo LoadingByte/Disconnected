@@ -32,8 +32,9 @@ import com.quartercode.disconnected.world.member.ai.AIController;
 import com.quartercode.disconnected.world.member.ai.PlayerController;
 
 /**
- * The root object of a world can house first level world objects.
+ * The root object of a {@link World} can house first level {@link WorldObject}s.
  * 
+ * @see World
  * @see WorldObject
  */
 public class RootObject extends WorldObject {
@@ -41,23 +42,23 @@ public class RootObject extends WorldObject {
     // ----- Property Definitions -----
 
     /**
-     * The members property stores a list of {@link Member}s.
+     * The {@link Member}s which are present in the {@link World}.
      */
-    public static final PropertyDefinition<MemberListProperty>      MEMBERS_PROPERTY;
+    public static final PropertyDefinition<MemberListProperty>      MEMBERS;
 
     /**
-     * The member groups property stores a list of {@link MemberGroup}s.
+     * The {@link MemberGroup}s which are present in the {@link World}.
      */
-    public static final PropertyDefinition<MemberGroupListProperty> MEMBER_GROUPS_PROPERTY;
+    public static final PropertyDefinition<MemberGroupListProperty> GROUPS;
 
     /**
-     * The computers property stores a list of {@link Computer}s.
+     * The {@link Computer}s which are present in the {@link World}.
      */
-    public static final PropertyDefinition<ListProperty<Computer>>  COMPUTERS_PROPERTY;
+    public static final PropertyDefinition<ListProperty<Computer>>  COMPUTERS;
 
     static {
 
-        MEMBERS_PROPERTY = new PropertyDefinition<MemberListProperty>("members") {
+        MEMBERS = new PropertyDefinition<MemberListProperty>("members") {
 
             @Override
             public MemberListProperty createProperty(WorldObject parent) {
@@ -67,7 +68,7 @@ public class RootObject extends WorldObject {
 
         };
 
-        MEMBER_GROUPS_PROPERTY = new PropertyDefinition<MemberGroupListProperty>("memberGroups") {
+        GROUPS = new PropertyDefinition<MemberGroupListProperty>("memberGroups") {
 
             @Override
             public MemberGroupListProperty createProperty(WorldObject parent) {
@@ -77,7 +78,7 @@ public class RootObject extends WorldObject {
 
         };
 
-        COMPUTERS_PROPERTY = new PropertyDefinition<ListProperty<Computer>>("computers") {
+        COMPUTERS = new PropertyDefinition<ListProperty<Computer>>("computers") {
 
             @Override
             public ListProperty<Computer> createProperty(WorldObject parent) {
@@ -238,9 +239,9 @@ public class RootObject extends WorldObject {
     }
 
     /**
-     * Creates a new root object which is used in the given world.
+     * Creates a new root object which is used in the given {@link World}.
      * 
-     * @param world The world the new object is used in.
+     * @param world The {@link World} the new object is used in.
      */
     public RootObject(World world) {
 

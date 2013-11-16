@@ -95,7 +95,7 @@ public class DestroyInterest extends Interest implements HasTarget {
     public Action getAction(Simulation simulation, Member member) {
 
         // Calculate probability for executing the action
-        MemberGroup group = simulation.getWorld().getRoot().get(RootObject.MEMBER_GROUPS_PROPERTY).get(member);
+        MemberGroup group = simulation.getWorld().getRoot().get(RootObject.GROUPS).get(member);
         int currentReputation = group.getReputation(member).getValue();
         float probability = getPriority() * (getReputationChange(simulation, member, group) * 20F) / ( (currentReputation == 0 ? 1 : currentReputation) * 100);
 

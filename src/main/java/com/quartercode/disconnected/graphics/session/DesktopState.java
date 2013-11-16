@@ -76,7 +76,7 @@ public class DesktopState extends GraphicsState {
         try {
             // TODO: Boot the computer & listen for new session (shell or desktop).
             // Open a new desktop session (temp)
-            OperatingSystem os = simulation.getWorld().getRoot().get(RootObject.MEMBERS_PROPERTY).getLocalPlayer().getComputer().getOperatingSystem();
+            OperatingSystem os = simulation.getWorld().getRoot().get(RootObject.MEMBERS).getLocalPlayer().getComputer().getOperatingSystem();
             Map<String, Object> arguments = new HashMap<String, Object>();
             arguments.put("user", os.getUserManager().getUsers().get(0).getName());
             Process process = os.getProcessManager().getRootProcess().createChild(os.getFileSystemManager().getFile("/system/bin/desktops.exe"), arguments);

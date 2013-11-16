@@ -61,10 +61,10 @@ public class UserController extends AIController {
         // Generate member interests against members of other groups
         if (ProbabilityUtil.genPseudo(simulation.getRandom().nextFloat() / 100F, simulation.getRandom())) {
             if (getMember().getBrainData(Interest.class).size() < 5) {
-                MemberGroup group = simulation.getWorld().getRoot().get(RootObject.MEMBER_GROUPS_PROPERTY).get(getMember());
+                MemberGroup group = simulation.getWorld().getRoot().get(RootObject.GROUPS).get(getMember());
                 targetLoop:
-                for (Member target : simulation.getWorld().getRoot().get(RootObject.MEMBERS_PROPERTY)) {
-                    if (!simulation.getWorld().getRoot().get(RootObject.MEMBER_GROUPS_PROPERTY).get(target).equals(group)) {
+                for (Member target : simulation.getWorld().getRoot().get(RootObject.MEMBERS)) {
+                    if (!simulation.getWorld().getRoot().get(RootObject.GROUPS).get(target).equals(group)) {
                         for (Interest interest : getMember().getBrainData(Interest.class)) {
                             if (interest instanceof HasTarget && ((HasTarget) interest).getTarget().equals(target)) {
                                 continue targetLoop;
@@ -86,7 +86,7 @@ public class UserController extends AIController {
 
         // Execute member interests
         for (Interest interest : new ArrayList<Interest>(getMember().getBrainData(Interest.class))) {
-            if (interest instanceof HasTarget && !simulation.getWorld().getRoot().get(RootObject.MEMBERS_PROPERTY).contains( ((HasTarget) interest).getTarget())) {
+            if (interest instanceof HasTarget && !simulation.getWorld().getRoot().get(RootObject.MEMBERS).contains( ((HasTarget) interest).getTarget())) {
                 continue;
             } else {
                 Action action = interest.getAction(simulation, getMember());
