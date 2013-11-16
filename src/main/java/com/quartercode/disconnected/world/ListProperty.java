@@ -72,7 +72,7 @@ public class ListProperty<E> extends Property implements List<E> {
 
         List<T> elements = new ArrayList<T>();
         for (E element : list) {
-            if (type.isAssignableFrom(type.getClass())) {
+            if (type.isAssignableFrom(element.getClass())) {
                 elements.add(type.cast(element));
             }
         }
