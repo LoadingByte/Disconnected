@@ -22,7 +22,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlID;
 import com.quartercode.disconnected.util.InfoString;
 
 /**
@@ -105,6 +107,19 @@ public class WorldObject implements InfoString {
     public List<Property> getProperties() {
 
         return Collections.unmodifiableList(properties);
+    }
+
+    /**
+     * Returns the unique serialization id for the world object.
+     * The id is just the identy hash code ({@link System#identityHashCode(Object)}) of the object as a hexadecimal string.
+     * 
+     * @return The unique serialization id for the world object.
+     */
+    @XmlID
+    @XmlAttribute
+    public String getId() {
+
+        return Integer.toHexString(System.identityHashCode(this));
     }
 
     /**
