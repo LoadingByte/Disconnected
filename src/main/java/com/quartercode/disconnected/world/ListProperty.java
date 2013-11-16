@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.world;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -63,16 +64,17 @@ public class ListProperty<E> extends Property implements List<E> {
     }
 
     /**
-     * Returns the elements of the list property which have the given type as a superclass.
+     * Returns the elements of the list property which have the given type as a superclass or annotation.
      * 
-     * @param type The type the returned elements have as a superclass.
-     * @return Elements which have the given type as a superclass.
+     * @param type The type the returned elements have as a superclass or annotation.
+     * @return Elements which have the given type as a superclass or annotation.
      */
+    @SuppressWarnings ("unchecked")
     public <T> List<T> get(Class<T> type) {
 
         List<T> elements = new ArrayList<T>();
         for (E element : list) {
-            if (type.isAssignableFrom(element.getClass())) {
+            if (type.isAnnotation() && element.getClass().isAnnotationPresent((Class<? extends Annotation>) type) || type.isAssignableFrom(element.getClass())) {
                 elements.add(type.cast(element));
             }
         }
