@@ -18,6 +18,9 @@
 
 package com.quartercode.disconnected.world;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlValue;
@@ -28,7 +31,7 @@ import javax.xml.bind.annotation.XmlValue;
  * 
  * @param <T> The type of object which can be referenced inside the object property. The class has to have an {@link XmlID} annotation.
  */
-public class ObjectReferenceProperty<T> extends Property {
+public class ObjectReferenceProperty<T> extends Property implements Iterable<T> {
 
     @XmlValue
     @XmlIDREF
@@ -74,6 +77,14 @@ public class ObjectReferenceProperty<T> extends Property {
     }
 
     @Override
+    public Iterator<T> iterator() {
+
+        List<T> children = new ArrayList<T>();
+        children.add(reference);
+        return children.iterator();
+    }
+
+    @Override
     public int hashCode() {
 
         final int prime = 31;
@@ -108,7 +119,7 @@ public class ObjectReferenceProperty<T> extends Property {
     @Override
     public String toInfoString() {
 
-        return super.toInfoString() + ", value " + reference;
+        return super.toInfoString() + ", object " + reference;
     }
 
 }

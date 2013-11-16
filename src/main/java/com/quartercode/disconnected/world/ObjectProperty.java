@@ -18,6 +18,9 @@
 
 package com.quartercode.disconnected.world;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 
 /**
@@ -25,7 +28,7 @@ import javax.xml.bind.annotation.XmlElement;
  * 
  * @param <T> The type of object which can be stored inside the object property.
  */
-public class ObjectProperty<T> extends Property {
+public class ObjectProperty<T> extends Property implements Iterable<T> {
 
     @XmlElement
     private T object;
@@ -67,6 +70,14 @@ public class ObjectProperty<T> extends Property {
     public void set(T value) {
 
         this.object = value;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+
+        List<T> children = new ArrayList<T>();
+        children.add(object);
+        return children.iterator();
     }
 
     @Override

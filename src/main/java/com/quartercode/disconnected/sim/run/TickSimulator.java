@@ -18,14 +18,10 @@
 
 package com.quartercode.disconnected.sim.run;
 
-import java.util.ArrayList;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.world.comp.Computer;
-import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
-import com.quartercode.disconnected.world.comp.net.Packet;
-import com.quartercode.disconnected.world.comp.program.Process;
-import com.quartercode.disconnected.world.comp.program.Process.ProcessState;
-import com.quartercode.disconnected.world.general.RootObject;
+import com.quartercode.disconnected.world.Property;
+import com.quartercode.disconnected.world.Updateable;
+import com.quartercode.disconnected.world.WorldObject;
 
 /**
  * This class implements the root tick update mechanisms for the entire simulation.
@@ -80,30 +76,33 @@ public class TickSimulator implements TickAction {
     public void update() {
 
         if (simulation != null) {
-            // Execute process ticks
-            for (Computer computer : simulation.getWorld().getRoot().get(RootObject.COMPUTERS)) {
-                if (computer.get(Computer.OS).get().isRunning()) {
-                    for (Process process : new ArrayList<Process>(computer.get(Computer.OS).get().getProcessManager().getAllProcesses())) {
-                        if (process.getState() == ProcessState.RUNNING || process.getState() == ProcessState.INTERRUPTED) {
-                            process.getExecutor().updateTasks();
-                        } else if (process.isCompletelyStopped()) {
-                            process.getParent().unregisterChild(process);
-                        }
-                    }
-                }
-            }
-
-            // Send remaining packets from network interfaces
-            for (Computer computer : simulation.getWorld().getRoot().get(RootObject.COMPUTERS)) {
-                for (NetworkInterface networkInterface : computer.get(Computer.HARDWARE).get(NetworkInterface.class)) {
-                    Packet packet = null;
-                    while ( (packet = networkInterface.nextDeliveryPacket(true)) != null) {
-                        packet.getReceiver().getIp().getHost().receivePacket(packet);
-                    }
-                }
-            }
+            // Execute world object ticks
+            updateWorldObject(simulation.getWorld().getRoot());
 
             // TEMPDIS
+            // // Execute process ticks
+            // for (Computer computer : simulation.getWorld().getRoot().get(RootObject.COMPUTERS)) {
+            // if (computer.get(Computer.OS).get().isRunning()) {
+            // for (Process process : new ArrayList<Process>(computer.get(Computer.OS).get().getProcessManager().getAllProcesses())) {
+            // if (process.getState() == ProcessState.RUNNING || process.getState() == ProcessState.INTERRUPTED) {
+            // process.getExecutor().updateTasks();
+            // } else if (process.isCompletelyStopped()) {
+            // process.getParent().unregisterChild(process);
+            // }
+            // }
+            // }
+            // }
+            //
+            // // Send remaining packets from network interfaces
+            // for (Computer computer : simulation.getWorld().getRoot().get(RootObject.COMPUTERS)) {
+            // for (NetworkInterface networkInterface : computer.get(Computer.HARDWARE).get(NetworkInterface.class)) {
+            // Packet packet = null;
+            // while ( (packet = networkInterface.nextDeliveryPacket(true)) != null) {
+            // packet.getReceiver().getIp().getHost().receivePacket(packet);
+            // }
+            // }
+            // }
+            //
             // // Generate new members and computers
             // int newComputers = simulation.RANDOM.nextInt(ProbabilityUtil.gen(0.008F, simulation.RANDOM) ? 50 : 8) - 5;
             // if (newComputers > 0) {
@@ -176,6 +175,23 @@ public class TickSimulator implements TickAction {
             // member.getAiController().update(simulation);
             // }
             // }
+        }
+    }
+
+    private void updateWorldObject(WorldObject worldObject) {
+
+        for (Property property : worldObject.getProperties()) {
+            if (property instanceof Updateable) {
+                ((Updateable) property).update();
+            }
+
+            if (property instanceof Iterable) {
+                for (Object child : (Iterable<?>) property) {
+                    if (child instanceof WorldObject) {
+                        updateWorldObject(worldObject);
+                    }
+                }
+            }
         }
     }
 

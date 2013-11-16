@@ -32,7 +32,7 @@ import com.quartercode.disconnected.util.ObjectInstanceAdapter;
  * 
  * @see UpdateTask
  */
-public class TickProperty extends Property {
+public class TickProperty extends Property implements Updateable {
 
     @XmlElement (name = "updateTask")
     private final List<UpdateTask> updateTasks = new ArrayList<UpdateTask>();
@@ -88,6 +88,7 @@ public class TickProperty extends Property {
      * Elapses one tick on every {@link UpdateTask} and invokes the task if the timing condition is true.
      * The tasks should store any information as {@link Property} objects in the parent {@link WorldObject}s.
      */
+    @Override
     public final void update() {
 
         for (UpdateTask task : new ArrayList<UpdateTask>(updateTasks)) {
