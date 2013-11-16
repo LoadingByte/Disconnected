@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlElement;
  */
 public class ListProperty<E> extends Property implements List<E> {
 
-    @XmlElement
+    @XmlElement (name = "element")
     private List<E> list;
 
     /**
