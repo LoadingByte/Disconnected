@@ -30,7 +30,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.Main;
-import com.quartercode.disconnected.profile.ProfileSerializer;
+import com.quartercode.disconnected.sim.profile.ProfileSerializer;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.Registry;

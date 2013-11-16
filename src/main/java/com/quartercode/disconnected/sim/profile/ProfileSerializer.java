@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.profile;
+package com.quartercode.disconnected.sim.profile;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
