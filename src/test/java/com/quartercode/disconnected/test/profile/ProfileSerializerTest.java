@@ -65,8 +65,6 @@ public class ProfileSerializerTest {
         ProfileSerializer.serializeWorld(outputStream, world);
         outputStream.close();
 
-        System.out.println(serialized);
-
         World copy = ProfileSerializer.deserializeWorld(new ReaderInputStream(new StringReader(serialized.toString())));
         Assert.assertEquals("World equals serialized and deserialized copy", world, copy);
     }

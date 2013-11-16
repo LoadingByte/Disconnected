@@ -227,7 +227,7 @@ public class Parameter {
     /**
      * Returns true if this parameter is an argument parameter.
      * An argument parameter has an argument value which may has to be set.
-     * See {@link #createArgument(String, String, Class, boolean, boolean)} for more detail.
+     * See {@link #createArgument(String, String, ArgumentType, boolean, boolean)} for more detail.
      * 
      * @return True if this parameter is an argument parameter.
      */
@@ -239,7 +239,7 @@ public class Parameter {
     /**
      * Returns true if this parameter is the rest parameter.
      * The rest parameter represents an array of unparsed arguments.
-     * See {@link #createRest(boolean)} for more detail.
+     * See {@link #createRest(String, boolean)} for more detail.
      * 
      * @return True if this parameter is the rest parameter.
      */
@@ -262,7 +262,7 @@ public class Parameter {
     /**
      * Returns the short form to use for using this parameter (usage: -n).
      * The short form is only set if this parameter is a switch ({@link #isSwitch()}) or an argument parameter ({@link #isArgument()}).
-     * It is also only set if you used {@link #createSwitch(String, String)} or {@link #createArgument(String, String, Class, boolean, boolean)}.
+     * It is also only set if you used {@link #createSwitch(String, String)} or {@link #createArgument(String, String, ArgumentType, boolean, boolean)}.
      * 
      * @return The short form to use for using this parameter.
      */

@@ -128,7 +128,7 @@ public class Shell implements ShellMessageSender {
      * Prints a new message onto the shell output.
      * This automatically updates all user interfaces so they can process the new message.
      * 
-     * @param line The new message to print onto the shell.
+     * @param message The new message to print onto the shell.
      */
     public void printMessage(ShellMessage message) {
 
