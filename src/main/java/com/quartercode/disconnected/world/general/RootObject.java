@@ -22,14 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.Unmarshaller;
 import com.quartercode.disconnected.sim.comp.Computer;
-import com.quartercode.disconnected.sim.member.Member;
-import com.quartercode.disconnected.sim.member.MemberGroup;
-import com.quartercode.disconnected.sim.member.ai.AIController;
-import com.quartercode.disconnected.sim.member.ai.PlayerController;
 import com.quartercode.disconnected.world.ListProperty;
 import com.quartercode.disconnected.world.PropertyDefinition;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.WorldObject;
+import com.quartercode.disconnected.world.member.Member;
+import com.quartercode.disconnected.world.member.MemberGroup;
+import com.quartercode.disconnected.world.member.ai.AIController;
+import com.quartercode.disconnected.world.member.ai.PlayerController;
 
 /**
  * The root object of a world can house first level world objects.

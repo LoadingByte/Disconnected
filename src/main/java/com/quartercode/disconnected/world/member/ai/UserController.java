@@ -16,18 +16,18 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.member.ai;
+package com.quartercode.disconnected.world.member.ai;
 
 import java.util.ArrayList;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.member.Member;
-import com.quartercode.disconnected.sim.member.MemberGroup;
-import com.quartercode.disconnected.sim.member.action.Action;
-import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
-import com.quartercode.disconnected.sim.member.interest.HasTarget;
-import com.quartercode.disconnected.sim.member.interest.Interest;
 import com.quartercode.disconnected.util.ProbabilityUtil;
 import com.quartercode.disconnected.world.general.RootObject;
+import com.quartercode.disconnected.world.member.Member;
+import com.quartercode.disconnected.world.member.MemberGroup;
+import com.quartercode.disconnected.world.member.action.Action;
+import com.quartercode.disconnected.world.member.interest.DestroyInterest;
+import com.quartercode.disconnected.world.member.interest.HasTarget;
+import com.quartercode.disconnected.world.member.interest.Interest;
 
 /**
  * The user controller simulates a typical computer user.

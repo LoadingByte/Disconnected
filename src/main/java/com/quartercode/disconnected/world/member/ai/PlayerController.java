@@ -16,11 +16,11 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.member.ai;
+package com.quartercode.disconnected.world.member.ai;
 
 import javax.xml.bind.annotation.XmlElement;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.member.Member;
+import com.quartercode.disconnected.world.member.Member;
 
 /**
  * The player controller represents a human player playing the game.

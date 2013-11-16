@@ -16,23 +16,25 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.member.interest;
+package com.quartercode.disconnected.world.member;
 
-import com.quartercode.disconnected.sim.member.Member;
+import com.quartercode.disconnected.world.member.interest.Interest;
 
 /**
- * This class defines methods for an interest which has a member as target.
- * This could also be used for defining computer targets (every computer is controlled by a member).
+ * Brain data is a very abstract implementation of data the brain could store.
+ * It's used by members to store interests, knowledge sets and a lot more.
+ * This is implemented as an abstract class for supporting JAXB serialization.
  * 
+ * @see Member
  * @see Interest
  */
-public interface HasTarget {
+public abstract class BrainData {
 
     /**
-     * Returns the member the interest has as target.
-     * 
-     * @return The member the interest has as target.
+     * Creates a new empty brain data entry.
      */
-    public Member getTarget();
+    public BrainData() {
+
+    }
 
 }

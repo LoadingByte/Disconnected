@@ -25,7 +25,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.member.Member;
+import com.quartercode.disconnected.world.member.Member;
 
 /**
  * This utility class executes scripts which change certain parameters of a computer or deliver data

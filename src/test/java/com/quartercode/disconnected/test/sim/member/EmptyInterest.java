@@ -19,10 +19,10 @@
 package com.quartercode.disconnected.test.sim.member;
 
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.member.Member;
-import com.quartercode.disconnected.sim.member.MemberGroup;
-import com.quartercode.disconnected.sim.member.action.Action;
-import com.quartercode.disconnected.sim.member.interest.Interest;
+import com.quartercode.disconnected.world.member.Member;
+import com.quartercode.disconnected.world.member.MemberGroup;
+import com.quartercode.disconnected.world.member.action.Action;
+import com.quartercode.disconnected.world.member.interest.Interest;
 
 public class EmptyInterest extends Interest {
 

@@ -16,27 +16,23 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.member.knowledge;
+package com.quartercode.disconnected.world.member.interest;
 
-import com.quartercode.disconnected.sim.member.BrainData;
-import com.quartercode.disconnected.sim.member.Member;
+import com.quartercode.disconnected.world.member.Member;
 
 /**
- * This abstract class represents a knowledge entry of a member.
- * Knowledge is the foundation for simulating a learning process for members.
- * The object can contain information how to do something (e.g. using an Exploit), some data the member remembered etc.
+ * This class defines methods for an interest which has a member as target.
+ * This could also be used for defining computer targets (every computer is controlled by a member).
  * 
- * @see Member
+ * @see Interest
  */
-public abstract class Knowledge extends BrainData {
-
-    // TODO: Implement abstract superclass and subclasses
+public interface HasTarget {
 
     /**
-     * Creates a new empty knowledge entry.
+     * Returns the member the interest has as target.
+     * 
+     * @return The member the interest has as target.
      */
-    public Knowledge() {
-
-    }
+    public Member getTarget();
 
 }

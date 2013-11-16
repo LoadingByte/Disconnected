@@ -16,11 +16,11 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.member.interest;
+package com.quartercode.disconnected.world.member.interest;
 
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.member.Member;
-import com.quartercode.disconnected.sim.member.MemberGroup;
+import com.quartercode.disconnected.world.member.Member;
+import com.quartercode.disconnected.world.member.MemberGroup;
 
 /**
  * This interface defines a class which is able to provide possible reputation changes.

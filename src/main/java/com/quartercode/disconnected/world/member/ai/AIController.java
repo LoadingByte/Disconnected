@@ -16,11 +16,11 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.member.ai;
+package com.quartercode.disconnected.world.member.ai;
 
 import javax.xml.bind.Unmarshaller;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.member.Member;
+import com.quartercode.disconnected.world.member.Member;
 
 /**
  * An ai controller executes tick updates for a member type.

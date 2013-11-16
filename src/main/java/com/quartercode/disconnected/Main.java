@@ -56,11 +56,6 @@ import com.quartercode.disconnected.sim.comp.program.shell.ListFilesProgram;
 import com.quartercode.disconnected.sim.comp.program.shell.MakeFileProgram;
 import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram;
 import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram;
-import com.quartercode.disconnected.sim.member.Member;
-import com.quartercode.disconnected.sim.member.MemberGroup;
-import com.quartercode.disconnected.sim.member.ai.PlayerController;
-import com.quartercode.disconnected.sim.member.ai.UserController;
-import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
 import com.quartercode.disconnected.sim.run.TickAction;
 import com.quartercode.disconnected.sim.run.TickSimulator;
 import com.quartercode.disconnected.sim.run.Ticker;
@@ -74,6 +69,11 @@ import com.quartercode.disconnected.world.ObjectProperty;
 import com.quartercode.disconnected.world.general.RootObject;
 import com.quartercode.disconnected.world.general.RootObject.MemberGroupListProperty;
 import com.quartercode.disconnected.world.general.RootObject.MemberListProperty;
+import com.quartercode.disconnected.world.member.Member;
+import com.quartercode.disconnected.world.member.MemberGroup;
+import com.quartercode.disconnected.world.member.ai.PlayerController;
+import com.quartercode.disconnected.world.member.ai.UserController;
+import com.quartercode.disconnected.world.member.interest.DestroyInterest;
 
 /**
  * The main class which initalizes the whole game.

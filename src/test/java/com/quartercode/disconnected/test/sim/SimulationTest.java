@@ -22,12 +22,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.member.Member;
-import com.quartercode.disconnected.sim.member.ai.PlayerController;
-import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.general.RootObject;
+import com.quartercode.disconnected.world.member.Member;
+import com.quartercode.disconnected.world.member.ai.PlayerController;
+import com.quartercode.disconnected.world.member.ai.UserController;
 
 public class SimulationTest {
 

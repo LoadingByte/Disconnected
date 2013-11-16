@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.member;
+package com.quartercode.disconnected.world.member;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,8 +25,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.sim.comp.Computer;
-import com.quartercode.disconnected.sim.member.ai.AIController;
 import com.quartercode.disconnected.util.InfoString;
+import com.quartercode.disconnected.world.member.ai.AIController;
 
 /**
  * This class represents a member of a simulation (someone who has a brain containing specific interests and knowledge entries).

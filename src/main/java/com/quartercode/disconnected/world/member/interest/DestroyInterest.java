@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.member.interest;
+package com.quartercode.disconnected.world.member.interest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,12 +28,12 @@ import com.quartercode.disconnected.sim.comp.Vulnerability;
 import com.quartercode.disconnected.sim.comp.Vulnerability.Vulnerable;
 import com.quartercode.disconnected.sim.comp.attack.Exploit;
 import com.quartercode.disconnected.sim.comp.attack.Payload;
-import com.quartercode.disconnected.sim.member.Member;
-import com.quartercode.disconnected.sim.member.MemberGroup;
-import com.quartercode.disconnected.sim.member.action.Action;
-import com.quartercode.disconnected.sim.member.action.ExploitAction;
 import com.quartercode.disconnected.util.ProbabilityUtil;
 import com.quartercode.disconnected.world.general.RootObject;
+import com.quartercode.disconnected.world.member.Member;
+import com.quartercode.disconnected.world.member.MemberGroup;
+import com.quartercode.disconnected.world.member.action.Action;
+import com.quartercode.disconnected.world.member.action.ExploitAction;
 
 /**
  * This is a simple destroy interest which has a computer as target.

@@ -16,12 +16,12 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.member.action;
+package com.quartercode.disconnected.world.member.action;
 
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.member.Member;
-import com.quartercode.disconnected.sim.member.interest.Interest;
-import com.quartercode.disconnected.sim.member.interest.ReputationChangeProvider;
+import com.quartercode.disconnected.world.member.Member;
+import com.quartercode.disconnected.world.member.interest.Interest;
+import com.quartercode.disconnected.world.member.interest.ReputationChangeProvider;
 
 /**
  * This abstract class defines an action which a member of a simulation can execute.

@@ -16,14 +16,14 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.member;
+package com.quartercode.disconnected.world.member;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlIDREF;
-import com.quartercode.disconnected.sim.member.interest.Interest;
+import com.quartercode.disconnected.world.member.interest.Interest;
 
 /**
  * This class represents a group of members which may have interests of the same type.

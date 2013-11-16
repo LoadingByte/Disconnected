@@ -16,24 +16,26 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.member;
+package com.quartercode.disconnected.world.member.knowledge;
 
-import com.quartercode.disconnected.sim.member.interest.Interest;
+import com.quartercode.disconnected.world.member.BrainData;
+import com.quartercode.disconnected.world.member.Member;
 
 /**
- * Brain data is a very abstract implementation of data the brain could store.
- * It's used by members to store interests, knowledge sets and a lot more.
- * This is implemented as an abstract class for supporting JAXB serialization.
+ * This abstract class represents a knowledge entry of a member.
+ * Knowledge is the foundation for simulating a learning process for members.
+ * The object can contain information how to do something (e.g. using an Exploit), some data the member remembered etc.
  * 
  * @see Member
- * @see Interest
  */
-public abstract class BrainData {
+public abstract class Knowledge extends BrainData {
+
+    // TODO: Implement abstract superclass and subclasses
 
     /**
-     * Creates a new empty brain data entry.
+     * Creates a new empty knowledge entry.
      */
-    public BrainData() {
+    public Knowledge() {
 
     }
 

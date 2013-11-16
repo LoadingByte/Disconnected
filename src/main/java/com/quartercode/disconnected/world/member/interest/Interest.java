@@ -16,15 +16,15 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.member.interest;
+package com.quartercode.disconnected.world.member.interest;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.member.BrainData;
-import com.quartercode.disconnected.sim.member.Member;
-import com.quartercode.disconnected.sim.member.MemberGroup;
-import com.quartercode.disconnected.sim.member.action.Action;
+import com.quartercode.disconnected.world.member.BrainData;
+import com.quartercode.disconnected.world.member.Member;
+import com.quartercode.disconnected.world.member.MemberGroup;
+import com.quartercode.disconnected.world.member.action.Action;
 
 /**
  * This abstract class represents an interest of a member or a global one from a member group.

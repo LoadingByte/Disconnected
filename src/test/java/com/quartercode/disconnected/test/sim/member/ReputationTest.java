@@ -21,7 +21,7 @@ package com.quartercode.disconnected.test.sim.member;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.sim.member.Reputation;
+import com.quartercode.disconnected.world.member.Reputation;
 
 public class ReputationTest {
 
