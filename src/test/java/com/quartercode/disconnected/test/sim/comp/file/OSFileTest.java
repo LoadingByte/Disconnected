@@ -21,18 +21,18 @@ package com.quartercode.disconnected.test.sim.comp.file;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.sim.comp.ByteUnit;
-import com.quartercode.disconnected.sim.comp.Computer;
-import com.quartercode.disconnected.sim.comp.Version;
-import com.quartercode.disconnected.sim.comp.file.File;
-import com.quartercode.disconnected.sim.comp.file.File.FileType;
-import com.quartercode.disconnected.sim.comp.file.FileSystem;
-import com.quartercode.disconnected.sim.comp.file.MountException;
-import com.quartercode.disconnected.sim.comp.file.OutOfSpaceException;
-import com.quartercode.disconnected.sim.comp.file.StringContent;
-import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
-import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
-import com.quartercode.disconnected.sim.comp.os.User;
+import com.quartercode.disconnected.world.comp.ByteUnit;
+import com.quartercode.disconnected.world.comp.Computer;
+import com.quartercode.disconnected.world.comp.Version;
+import com.quartercode.disconnected.world.comp.file.File;
+import com.quartercode.disconnected.world.comp.file.File.FileType;
+import com.quartercode.disconnected.world.comp.file.FileSystem;
+import com.quartercode.disconnected.world.comp.file.MountException;
+import com.quartercode.disconnected.world.comp.file.OutOfSpaceException;
+import com.quartercode.disconnected.world.comp.file.StringContent;
+import com.quartercode.disconnected.world.comp.hardware.HardDrive;
+import com.quartercode.disconnected.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.world.comp.os.User;
 
 public class OSFileTest {
 

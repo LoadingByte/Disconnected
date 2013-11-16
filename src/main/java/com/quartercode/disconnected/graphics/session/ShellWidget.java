@@ -19,10 +19,10 @@
 package com.quartercode.disconnected.graphics.session;
 
 import com.quartercode.disconnected.Disconnected;
-import com.quartercode.disconnected.sim.comp.file.File;
-import com.quartercode.disconnected.sim.comp.session.Shell;
-import com.quartercode.disconnected.sim.comp.session.ShellMessage;
-import com.quartercode.disconnected.sim.comp.session.ShellUserInterface;
+import com.quartercode.disconnected.world.comp.file.File;
+import com.quartercode.disconnected.world.comp.session.Shell;
+import com.quartercode.disconnected.world.comp.session.ShellMessage;
+import com.quartercode.disconnected.world.comp.session.ShellUserInterface;
 import de.matthiasmann.twl.Alignment;
 import de.matthiasmann.twl.BoxLayout;
 import de.matthiasmann.twl.BoxLayout.Direction;

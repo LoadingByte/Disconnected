@@ -24,8 +24,8 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
-import com.quartercode.disconnected.sim.comp.Computer;
 import com.quartercode.disconnected.util.InfoString;
+import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.member.ai.AIController;
 
 /**

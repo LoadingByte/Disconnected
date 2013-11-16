@@ -36,11 +36,11 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.comp.Computer;
-import com.quartercode.disconnected.sim.comp.program.Process;
-import com.quartercode.disconnected.sim.comp.session.SessionProgram.Session;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.World;
+import com.quartercode.disconnected.world.comp.Computer;
+import com.quartercode.disconnected.world.comp.program.Process;
+import com.quartercode.disconnected.world.comp.session.SessionProgram.Session;
 import com.quartercode.disconnected.world.general.RootObject;
 
 /**

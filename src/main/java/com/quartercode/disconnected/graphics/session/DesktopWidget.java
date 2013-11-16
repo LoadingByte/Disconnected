@@ -18,12 +18,12 @@
 
 package com.quartercode.disconnected.graphics.session;
 
-import com.quartercode.disconnected.sim.comp.program.ArgumentException;
-import com.quartercode.disconnected.sim.comp.program.Process;
-import com.quartercode.disconnected.sim.comp.program.WrongSessionTypeException;
-import com.quartercode.disconnected.sim.comp.session.Desktop;
-import com.quartercode.disconnected.sim.comp.session.Desktop.Window;
 import com.quartercode.disconnected.util.ResourceBundles;
+import com.quartercode.disconnected.world.comp.program.ArgumentException;
+import com.quartercode.disconnected.world.comp.program.Process;
+import com.quartercode.disconnected.world.comp.program.WrongSessionTypeException;
+import com.quartercode.disconnected.world.comp.session.Desktop;
+import com.quartercode.disconnected.world.comp.session.Desktop.Window;
 import de.matthiasmann.twl.BoxLayout;
 import de.matthiasmann.twl.BoxLayout.Direction;
 import de.matthiasmann.twl.Button;

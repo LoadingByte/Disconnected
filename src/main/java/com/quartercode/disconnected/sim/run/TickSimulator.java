@@ -20,11 +20,11 @@ package com.quartercode.disconnected.sim.run;
 
 import java.util.ArrayList;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.comp.Computer;
-import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
-import com.quartercode.disconnected.sim.comp.net.Packet;
-import com.quartercode.disconnected.sim.comp.program.Process;
-import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
+import com.quartercode.disconnected.world.comp.Computer;
+import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
+import com.quartercode.disconnected.world.comp.net.Packet;
+import com.quartercode.disconnected.world.comp.program.Process;
+import com.quartercode.disconnected.world.comp.program.Process.ProcessState;
 import com.quartercode.disconnected.world.general.RootObject;
 
 /**
