@@ -25,12 +25,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
-import com.quartercode.disconnected.sim.Location;
 import com.quartercode.disconnected.sim.comp.hardware.Hardware;
 import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
 import com.quartercode.disconnected.sim.comp.os.OperatingSystem;
 import com.quartercode.disconnected.sim.comp.program.Program;
 import com.quartercode.disconnected.util.InfoString;
+import com.quartercode.disconnected.world.general.Location;
 
 /**
  * This class stores information about a computer, like the mainboard, other hardware, programs etc.

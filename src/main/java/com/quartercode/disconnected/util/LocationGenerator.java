@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.Disconnected;
-import com.quartercode.disconnected.sim.Location;
+import com.quartercode.disconnected.world.general.Location;
 
 /**
  * This utility class generates random locations on an earth map.

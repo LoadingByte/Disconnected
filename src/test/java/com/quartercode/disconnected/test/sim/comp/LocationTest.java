@@ -21,7 +21,7 @@ package com.quartercode.disconnected.test.sim.comp;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.sim.Location;
+import com.quartercode.disconnected.world.general.Location;
 
 public class LocationTest {
 

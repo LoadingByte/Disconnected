@@ -20,7 +20,6 @@ package com.quartercode.disconnected.sim.run.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.quartercode.disconnected.sim.Location;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.comp.ByteUnit;
 import com.quartercode.disconnected.sim.comp.Computer;
@@ -64,6 +63,7 @@ import com.quartercode.disconnected.sim.member.ai.UserController;
 import com.quartercode.disconnected.util.LocationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.World;
+import com.quartercode.disconnected.world.general.Location;
 import com.quartercode.disconnected.world.general.RootObject;
 
 /**
