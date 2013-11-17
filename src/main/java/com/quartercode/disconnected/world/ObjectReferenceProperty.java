@@ -48,8 +48,8 @@ public class ObjectReferenceProperty<T> extends Property implements Iterable<T> 
     /**
      * Creates a new object reference property with the given name and parent object.
      * 
-     * @param name The name the new object property will have.
-     * @param parent The parent object which has the new object property.
+     * @param name The name the new property will have.
+     * @param parent The parent object which has the new property.
      */
     public ObjectReferenceProperty(String name, WorldObject parent) {
 

@@ -48,8 +48,8 @@ public class TickProperty extends Property implements Updateable {
     /**
      * Creates a new tick property with the given name and parent object.
      * 
-     * @param name The name the new tick property will have.
-     * @param parent The parent object which has the new tick property.
+     * @param name The name the new property will have.
+     * @param parent The parent object which has the new property.
      */
     public TickProperty(String name, WorldObject parent) {
 

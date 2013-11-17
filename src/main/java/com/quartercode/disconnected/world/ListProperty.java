@@ -47,8 +47,8 @@ public class ListProperty<E> extends Property implements List<E> {
     /**
      * Creates a new list property with the given name and parent object.
      * 
-     * @param name The name the new list property will have.
-     * @param parent The parent object which has the new list property.
+     * @param name The name the new property will have.
+     * @param parent The parent object which has the new property.
      */
     public ListProperty(String name, WorldObject parent) {
 

@@ -112,8 +112,8 @@ public class RootObject extends WorldObject {
         /**
          * Creates a new member list property with the given name and parent object.
          * 
-         * @param name The name the new list property will have.
-         * @param parent The parent object which has the new list property.
+         * @param name The name the new property will have.
+         * @param parent The parent object which has the new property.
          */
         public MemberListProperty(String name, WorldObject parent) {
 
@@ -197,8 +197,8 @@ public class RootObject extends WorldObject {
         /**
          * Creates a new member group list property with the given name and parent object.
          * 
-         * @param name The name the new list property will have.
-         * @param parent The parent object which has the new list property.
+         * @param name The name the new property will have.
+         * @param parent The parent object which has the new property.
          */
         public MemberGroupListProperty(String name, WorldObject parent) {
 
