@@ -18,21 +18,20 @@
 
 package com.quartercode.disconnected.world.comp;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.bind.annotation.XmlAttribute;
 import org.apache.commons.lang.Validate;
 
 /**
- * This class represents the version of a computer part.
- * The version contains a major version (changed on rewriting), minor version (feature changes) and a patch level (fixes).
- * 
- * @see ComputerPart
+ * This class represents a simple version.
+ * A version contains a major version, minor version and a patch level.
  */
-@XmlJavaTypeAdapter (Version.VersionAdapter.class)
 public class Version {
 
+    @XmlAttribute
     private int major;
+    @XmlAttribute
     private int minor;
+    @XmlAttribute
     private int patchLevel;
 
     /**
@@ -45,8 +44,8 @@ public class Version {
     /**
      * Creates a new version object and sets the values to the given ones.
      * 
-     * @param major The major version which should only be changed after a complete rewrite.
-     * @param minor The minor version which is changed when features change.
+     * @param major The major version which is changed after very large changes.
+     * @param minor The minor version which is changed if there are new features.
      * @param patchLevel The patch level which is changed after fixes.
      */
     public Version(int major, int minor, int patchLevel) {
@@ -73,9 +72,9 @@ public class Version {
     }
 
     /**
-     * Returns the major version which should only be changed after a complete rewrite.
+     * Returns the major version which is changed after very large changes.
      * 
-     * @return The major version which should only be changed after a complete rewrite.
+     * @return The major version.
      */
     public int getMajor() {
 
@@ -83,17 +82,9 @@ public class Version {
     }
 
     /**
-     * Increments the major version which should only be changed after a complete rewrite by one.
-     */
-    public void incrementMajor() {
-
-        major++;
-    }
-
-    /**
-     * Returns the minor version which is changed when features change.
+     * Returns the minor version which is changed if there are new features.
      * 
-     * @return The minor version which is changed when features change.
+     * @return The minor version.
      */
     public int getMinor() {
 
@@ -101,29 +92,13 @@ public class Version {
     }
 
     /**
-     * Increments the minor version which is changed when features change by one.
-     */
-    public void incrementMinor() {
-
-        minor++;
-    }
-
-    /**
-     * Returns The patch level which is changed after fixes.
+     * Returns the patch level which is changed after fixes.
      * 
-     * @return the patch level which is changed after fixes.
+     * @return The patch level.
      */
     public int getPatchLevel() {
 
         return patchLevel;
-    }
-
-    /**
-     * Increments the patch level which is changed after fixes by one.
-     */
-    public void incrementPatchLevel() {
-
-        patchLevel++;
     }
 
     @Override
@@ -166,33 +141,6 @@ public class Version {
     public String toString() {
 
         return major + "." + minor + "." + patchLevel;
-    }
-
-    /**
-     * This version adapter is for storing a version object as a simple string.
-     * This is using the format MAJOR.MINOR.PATCHLEVEL (e.g. 1.2.5).
-     */
-    public static class VersionAdapter extends XmlAdapter<String, Version> {
-
-        /**
-         * Creates a new version adapter.
-         */
-        public VersionAdapter() {
-
-        }
-
-        @Override
-        public Version unmarshal(String v) {
-
-            return new Version(v);
-        }
-
-        @Override
-        public String marshal(Version v) {
-
-            return v.toString();
-        }
-
     }
 
 }
