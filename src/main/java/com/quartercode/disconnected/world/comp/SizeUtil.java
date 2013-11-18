@@ -19,32 +19,20 @@
 package com.quartercode.disconnected.world.comp;
 
 /**
- * This utility calculates the size of certain objects in bytes (of course, it's a fictitious size).
+ * This utility calculates the size of certain objects in bytes (of course, it's a fictional size).
  * 
  * @see SizeObject
  */
 public class SizeUtil {
 
     /**
-     * Returns true if the size of the given object can be derived using this utility.
-     * 
-     * @param object The object to check.
-     * @return True if the size of the given object can be derived using this utility.
-     */
-    public static boolean accept(Object object) {
-
-        return object == null || object instanceof SizeObject || object instanceof String || object instanceof Boolean || object instanceof Number || object instanceof Iterable;
-    }
-
-    /**
-     * Returns the size of an object in bytes (of course, it's a fictitious size).
+     * Returns the size of an object in bytes (of course, it's a fictional size).
      * If the object is a {@link SizeObject}. the size can be derived using {@link SizeObject#getSize()}.
      * In the case of a string, the size is equally to the length * 256. A boolean always has a size of 1, a number needs a byte for every digit.
      * If the object is an {@link Iterable}, every entry of the collection will add to the size.
      * 
      * @param object The object to calculate the size of.
      * @return The size of the object in bytes (of course, it's a fictitious size).
-     * @throws IllegalArgumentException The given object isn't a {@link SizeObject}, string, boolean or number.
      */
     public static long getSize(Object object) {
 
@@ -65,7 +53,7 @@ public class SizeUtil {
             }
             return size;
         } else {
-            throw new IllegalArgumentException("Type " + object.getClass().getName() + " isn't a SizeObject, string, boolean or number");
+            return 0;
         }
     }
 
@@ -80,9 +68,9 @@ public class SizeUtil {
     public static interface SizeObject {
 
         /**
-         * Returns the size of the implementing object in bytes.
+         * Returns the size of the object in bytes.
          * 
-         * @return The size of the implementing object in bytes.
+         * @return The size of the object.
          */
         public long getSize();
 
