@@ -99,27 +99,11 @@ public class Computer extends WorldObject {
     /**
      * Creates a new computer which has the given parent object.
      * 
-     * @param parent The parent {@link WorldObject} which has a {@link Property} which houses the new object.
+     * @param parent The parent {@link WorldObject} which has a {@link Property} which houses the new computer.
      */
     public Computer(WorldObject parent) {
 
         super(parent);
-    }
-
-    @Override
-    public String toInfoString() {
-
-        String hardwareInfo = "";
-        for (Hardware hardwarePart : get(HARDWARE)) {
-            hardwareInfo += hardwarePart.toInfoString() + ", ";
-        }
-        return "loc " + get(LOCATION).toInfoString() + ", " + hardwareInfo + get(OS).toInfoString();
-    }
-
-    @Override
-    public String toString() {
-
-        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }

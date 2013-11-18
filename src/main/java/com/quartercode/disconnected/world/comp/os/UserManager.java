@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlElement;
 import com.quartercode.disconnected.util.InfoString;
 
 /**
- * The user manager is a subclass the {@link OperatingSystem} uses for holding and modifing users and groups.
+ * The user manager is a subclass the {@link OperatingSystem} uses for holding and modifying users and groups.
  * This class only gets used by the {@link OperatingSystem}.
  * 
  * @see User

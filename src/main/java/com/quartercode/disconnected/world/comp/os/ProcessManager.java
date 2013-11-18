@@ -30,7 +30,7 @@ import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.WrongSessionTypeException;
 
 /**
- * The process manager is a subclass the {@link OperatingSystem} uses for holding and modifing processes.
+ * The process manager is a subclass the {@link OperatingSystem} uses for holding and modifying processes.
  * This class only gets used by the {@link OperatingSystem}.
  * 
  * @see Process

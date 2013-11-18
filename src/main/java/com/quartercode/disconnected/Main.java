@@ -52,6 +52,7 @@ import com.quartercode.disconnected.world.ObjectReferenceProperty;
 import com.quartercode.disconnected.world.QueueProperty;
 import com.quartercode.disconnected.world.TickProperty;
 import com.quartercode.disconnected.world.comp.Computer;
+import com.quartercode.disconnected.world.comp.Version;
 import com.quartercode.disconnected.world.comp.file.StringContent;
 import com.quartercode.disconnected.world.comp.hardware.CPU;
 import com.quartercode.disconnected.world.comp.hardware.HardDrive;
@@ -248,7 +249,10 @@ public class Main {
 
         // ----- Members End -----
 
+        // ----- Computers -----
+
         // Mixed computer stuff
+        registry.registerClass(Version.class);
         registry.registerClass(Environment.class);
         registry.registerClass(StringContent.class);
 
@@ -275,10 +279,15 @@ public class Main {
         registry.registerClass(TerminalProgram.class);
         registry.registerClass(SystemViewerProgram.class);
 
-        // Themes
+        // ----- Computers End -----
+
+        // ----- Themes -----
+
         registry.registerTheme(Main.class.getResource("/ui/default/default.xml"));
         registry.registerTheme(Main.class.getResource("/ui/shell/shell.xml"));
         registry.registerTheme(Main.class.getResource("/ui/desktop/desktop.xml"));
+
+        // ----- Themes End -----
     }
 
     /**

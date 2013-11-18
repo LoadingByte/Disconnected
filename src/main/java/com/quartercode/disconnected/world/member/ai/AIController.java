@@ -64,7 +64,7 @@ public abstract class AIController {
      */
     public abstract void update(Simulation simulation);
 
-    public void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
+    protected void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
 
         member = (Member) parent;
     }
