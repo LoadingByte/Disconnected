@@ -441,16 +441,20 @@ public class FileRights {
         @Override
         public FileRights unmarshal(String v) {
 
-            return new FileRights(v);
+            if (v == null) {
+                return null;
+            } else {
+                return new FileRights(v);
+            }
         }
 
         @Override
         public String marshal(FileRights v) {
 
-            if (v != null) {
-                return v.toString();
-            } else {
+            if (v == null) {
                 return null;
+            } else {
+                return v.toString();
             }
         }
 

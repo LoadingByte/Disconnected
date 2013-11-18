@@ -190,13 +190,21 @@ public class IP {
         @Override
         public int[] unmarshal(String v) {
 
-            return new IP(null, v).getParts();
+            if (v == null) {
+                return null;
+            } else {
+                return new IP(null, v).getParts();
+            }
         }
 
         @Override
         public String marshal(int[] v) {
 
-            return new IP(null, v).getDottedQuadNotation();
+            if (v == null) {
+                return null;
+            } else {
+                return new IP(null, v).getDottedQuadNotation();
+            }
         }
 
     }

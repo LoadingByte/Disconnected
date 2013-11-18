@@ -424,17 +424,25 @@ public class Environment implements SizeObject {
         @Override
         public List<EnvironmentVariable> unmarshal(String v) {
 
-            return new Environment(v).getVariables();
+            if (v == null) {
+                return null;
+            } else {
+                return new Environment(v).getVariables();
+            }
         }
 
         @Override
         public String marshal(List<EnvironmentVariable> v) {
 
-            Environment environment = new Environment();
-            for (EnvironmentVariable variable : v) {
-                environment.addVariable(variable);
+            if (v == null) {
+                return null;
+            } else {
+                Environment environment = new Environment();
+                for (EnvironmentVariable variable : v) {
+                    environment.addVariable(variable);
+                }
+                return environment.toString();
             }
-            return environment.toString();
         }
 
     }

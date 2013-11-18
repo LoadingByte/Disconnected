@@ -28,17 +28,32 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  */
 public class ObjectInstanceAdapter<C> extends XmlAdapter<Class<? extends C>, C> {
 
+    /**
+     * Creates a new object instance adapter.
+     */
+    public ObjectInstanceAdapter() {
+
+    }
+
     @Override
     public C unmarshal(Class<? extends C> v) throws InstantiationException, IllegalAccessException {
 
-        return v.newInstance();
+        if (v == null) {
+            return null;
+        } else {
+            return v.newInstance();
+        }
     }
 
     @SuppressWarnings ("unchecked")
     @Override
     public Class<? extends C> marshal(C v) {
 
-        return (Class<? extends C>) v.getClass();
+        if (v == null) {
+            return null;
+        } else {
+            return (Class<? extends C>) v.getClass();
+        }
     }
 
 }
