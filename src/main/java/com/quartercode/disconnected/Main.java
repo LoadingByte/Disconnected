@@ -42,6 +42,7 @@ import com.quartercode.disconnected.sim.run.TickSimulator;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
 import com.quartercode.disconnected.util.LogExceptionHandler;
+import com.quartercode.disconnected.util.ObjectAdapter;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.util.ResourceStore;
@@ -227,6 +228,7 @@ public class Main {
         registry.registerClass(MemberGroupListProperty.class);
 
         // Other
+        registry.registerClass(ObjectAdapter.ClassElement.class);
         registry.registerClass(Location.class);
 
         // ----- General End -----

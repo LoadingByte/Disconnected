@@ -21,9 +21,9 @@ package com.quartercode.disconnected.world;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
-import javax.xml.bind.annotation.XmlValue;
 
 /**
  * An object reference property is a property which references a simple object without defining it.
@@ -33,7 +33,7 @@ import javax.xml.bind.annotation.XmlValue;
  */
 public class ObjectReferenceProperty<T> extends Property implements Iterable<T> {
 
-    @XmlValue
+    @XmlElement
     @XmlIDREF
     private T reference;
 

@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import com.quartercode.disconnected.util.ObjectAdapter;
 
 /**
  * An object property is a simple property which stores a simple object.
@@ -31,6 +33,7 @@ import javax.xml.bind.annotation.XmlElement;
 public class ObjectProperty<T> extends Property implements Iterable<T> {
 
     @XmlElement
+    @XmlJavaTypeAdapter (ObjectAdapter.class)
     private T object;
 
     /**
