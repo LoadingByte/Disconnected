@@ -67,13 +67,13 @@ public class DefaultFeatureHolder implements FeatureHolder, InfoString {
     }
 
     /**
-     * Returns a list of all persistent features of the default feature holder.
+     * Returns a list of all {@link Persistent} {@link Feature}s of the default feature holder.
      * This uses an object list since JAXB can't handle interfaces.
      * 
-     * @return All persistent features of the default feature holder.
+     * @return All {@link Persistent} {@link Feature}s of the default feature holder.
      */
     @XmlElement (name = "features")
-    protected List<Object> getPersistentFeatures() {
+    public List<Object> getPersistentFeatures() {
 
         List<Object> persistentFeatures = new ArrayList<Object>();
         for (Feature feature : features) {
@@ -86,12 +86,12 @@ public class DefaultFeatureHolder implements FeatureHolder, InfoString {
     }
 
     /**
-     * Adds the given list of persistent features to the default feature holder.
+     * Adds the given list of {@link Persistent} {@link Feature}s to the default feature holder.
      * This uses an object list since JAXB can't handle interfaces.
      * 
-     * @param persistentFeatures The persistent features to add.
+     * @param persistentFeatures The {@link Persistent} {@link Feature}s to add.
      */
-    protected void setPersistentFeatures(List<Object> persistentFeatures) {
+    public void setPersistentFeatures(List<Object> persistentFeatures) {
 
         for (Object persistentFeature : persistentFeatures) {
             if (persistentFeature instanceof Feature) {
