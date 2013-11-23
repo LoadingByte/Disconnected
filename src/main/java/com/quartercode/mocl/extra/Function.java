@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.mocl.func;
+package com.quartercode.mocl.extra;
 
 import java.util.List;
 import com.quartercode.mocl.base.Feature;

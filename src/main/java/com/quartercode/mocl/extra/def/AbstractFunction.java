@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.mocl.func.def;
+package com.quartercode.mocl.extra.def;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,11 +26,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import com.quartercode.mocl.base.FeatureHolder;
 import com.quartercode.mocl.base.def.AbstractFeature;
-import com.quartercode.mocl.func.Execution;
-import com.quartercode.mocl.func.Execution.ExecutionPolicy;
-import com.quartercode.mocl.func.Function;
-import com.quartercode.mocl.func.FunctionExecutor;
-import com.quartercode.mocl.func.Prioritized;
+import com.quartercode.mocl.extra.Execution;
+import com.quartercode.mocl.extra.Function;
+import com.quartercode.mocl.extra.FunctionExecutor;
+import com.quartercode.mocl.extra.Prioritized;
+import com.quartercode.mocl.extra.Execution.ExecutionPolicy;
 
 /**
  * An abstract function makes a method (also called a function) avaiable.

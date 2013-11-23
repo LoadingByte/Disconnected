@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.mocl.func.def;
+package com.quartercode.mocl.extra.def;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,9 +25,9 @@ import java.util.Map;
 import com.quartercode.mocl.base.Feature;
 import com.quartercode.mocl.base.FeatureHolder;
 import com.quartercode.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.mocl.func.Function;
-import com.quartercode.mocl.func.FunctionDefinition;
-import com.quartercode.mocl.func.FunctionExecutor;
+import com.quartercode.mocl.extra.Function;
+import com.quartercode.mocl.extra.FunctionDefinition;
+import com.quartercode.mocl.extra.FunctionExecutor;
 
 /**
  * An abstract function definition is used to get a {@link Function} from a {@link FeatureHolder}.

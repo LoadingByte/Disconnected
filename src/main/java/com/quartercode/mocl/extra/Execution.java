@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.mocl.func;
+package com.quartercode.mocl.extra;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -24,18 +24,38 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * {@link FunctionExecutor}s which have this annotation define their priority.
- * The priority is used for determinating which {@link FunctionExecutor} sets the rules.
+ * {@link FunctionExecutor}s which have this annotation define if other executors should be executed.
+ * The algorithm checks the {@link FunctionExecutor} with the highest priority first and then goes down.
+ * If any {@link FunctionExecutor} in the line denies the execution of other {@link FunctionExecutor}s, the algorithm stops.
  * 
  * @see FunctionExecutor
+ * @see Prioritized
  */
 @Target (ElementType.TYPE)
 @Retention (RetentionPolicy.RUNTIME)
-public @interface Prioritized {
+public @interface Execution {
 
     /**
      * The actual priority the {@link FunctionExecutor} has.
      */
-    int value ();
+    ExecutionPolicy value ();
+
+    /**
+     * Defines the different ways the execution algorithm can take when checking a {@link FunctionExecutor}.
+     * 
+     * @see Execution
+     */
+    public static enum ExecutionPolicy {
+
+        /**
+         * Only execute the checked {@link FunctionExecutor} and then stop.
+         */
+        THIS,
+        /**
+         * Also execute the other {@link FunctionExecutor}s (if they want to do so).
+         */
+        OTHERS;
+
+    }
 
 }

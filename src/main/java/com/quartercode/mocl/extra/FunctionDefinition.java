@@ -16,14 +16,14 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.mocl.func;
+package com.quartercode.mocl.extra;
 
 import com.quartercode.mocl.base.FeatureDefinition;
 import com.quartercode.mocl.base.FeatureHolder;
 
 /**
  * A function definition is used to get a {@link Function} from a {@link FeatureHolder}.
- * The function definition also stores some {@link FunctionExecutor}s which are used for the {@link Function} object-
+ * The function definition also stores some {@link FunctionExecutor}s which are used for the {@link Function} object.
  * 
  * @param <R> The type of the return value of the defined {@link Function}.
  * @see Function

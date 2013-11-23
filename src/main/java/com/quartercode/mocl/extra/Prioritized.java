@@ -16,25 +16,26 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.mocl.func;
+package com.quartercode.mocl.extra;
 
-import com.quartercode.mocl.base.FeatureHolder;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * A function executor can be invoked with a {@link FeatureHolder} and some arguments.
- * It returns a value of a specified type. For no return value, you can use {@link Void}.
+ * {@link FunctionExecutor}s which have this annotation define their priority.
+ * The priority is used for determinating which {@link FunctionExecutor} sets the rules.
  * 
- * @param <R> The type of the return value of the defined function.
+ * @see FunctionExecutor
  */
-public interface FunctionExecutor<R> {
+@Target (ElementType.TYPE)
+@Retention (RetentionPolicy.RUNTIME)
+public @interface Prioritized {
 
     /**
-     * Invokes the defined function in the given {@link FeatureHolder} with the given arguments.
-     * 
-     * @param holder The {@link FeatureHolder} the function is invoked on.
-     * @param arguments Some arguments for the function.
-     * @return The value the invoked function returns. Can be null.
+     * The actual priority the {@link FunctionExecutor} has.
      */
-    public R invoke(FeatureHolder holder, Object... arguments);
+    int value ();
 
 }
