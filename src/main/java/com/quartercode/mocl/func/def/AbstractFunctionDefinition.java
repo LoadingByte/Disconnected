@@ -39,7 +39,7 @@ import com.quartercode.mocl.func.FunctionExecutor;
  * @see FunctionDefinition
  * @see Function
  */
-public abstract class AbstractFunctionDefinition<F extends Function<R>, R> extends AbstractFeatureDefinition<F> implements FunctionDefinition<F, R> {
+public abstract class AbstractFunctionDefinition<R> extends AbstractFeatureDefinition<Function<R>> implements FunctionDefinition<R> {
 
     private final Map<String, FunctionExecutor<R>> executors = new HashMap<String, FunctionExecutor<R>>();
 
@@ -66,7 +66,7 @@ public abstract class AbstractFunctionDefinition<F extends Function<R>, R> exten
     }
 
     @Override
-    public F create(FeatureHolder holder) {
+    public Function<R> create(FeatureHolder holder) {
 
         return create(holder, new ArrayList<FunctionExecutor<R>>(executors.values()));
     }
@@ -79,6 +79,6 @@ public abstract class AbstractFunctionDefinition<F extends Function<R>, R> exten
      * @param executors The {@link FunctionExecutor}s which should be used in the new {@link Function}.
      * @return The created {@link Function}.
      */
-    protected abstract F create(FeatureHolder holder, List<FunctionExecutor<R>> executors);
+    protected abstract Function<R> create(FeatureHolder holder, List<FunctionExecutor<R>> executors);
 
 }

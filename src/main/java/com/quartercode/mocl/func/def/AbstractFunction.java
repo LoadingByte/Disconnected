@@ -27,10 +27,10 @@ import java.util.TreeMap;
 import com.quartercode.mocl.base.FeatureHolder;
 import com.quartercode.mocl.base.def.AbstractFeature;
 import com.quartercode.mocl.func.Execution;
+import com.quartercode.mocl.func.Execution.ExecutionPolicy;
 import com.quartercode.mocl.func.Function;
 import com.quartercode.mocl.func.FunctionExecutor;
 import com.quartercode.mocl.func.Prioritized;
-import com.quartercode.mocl.func.Execution.ExecutionPolicy;
 
 /**
  * An abstract function makes a method (also called a function) avaiable.

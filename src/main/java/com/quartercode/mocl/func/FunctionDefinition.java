@@ -29,7 +29,7 @@ import com.quartercode.mocl.base.FeatureHolder;
  * @see Function
  * @see FunctionExecutor
  */
-public interface FunctionDefinition<F extends Function<R>, R> extends FeatureDefinition<F> {
+public interface FunctionDefinition<R> extends FeatureDefinition<Function<R>> {
 
     /**
      * Registers a new {@link FunctionExecutor} under the given name to the definition.
