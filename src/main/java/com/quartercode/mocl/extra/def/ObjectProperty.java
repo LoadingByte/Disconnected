@@ -24,57 +24,50 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.quartercode.disconnected.util.ObjectAdapter;
-import com.quartercode.mocl.base.Feature;
 import com.quartercode.mocl.base.FeatureHolder;
 import com.quartercode.mocl.base.def.AbstractFeature;
 import com.quartercode.mocl.extra.Persistent;
+import com.quartercode.mocl.extra.Property;
 
 /**
- * A property is a simple {@link Feature} which stores an object.
+ * An object property is a simple {@link Property} which stores an object.
  * 
- * @param <T> The type of object which can be stored inside the property.
+ * @param <T> The type of object which can be stored inside the object property.
+ * @see Property
  */
 @Persistent
-public class Property<T> extends AbstractFeature implements Iterable<T> {
+public class ObjectProperty<T> extends AbstractFeature implements Property<T> {
 
     @XmlElement
     @XmlJavaTypeAdapter (ObjectAdapter.class)
     private T object;
 
     /**
-     * Creates a new empty property.
+     * Creates a new empty object property.
      * This is only recommended for direct field access (e.g. for serialization).
      */
-    protected Property() {
+    protected ObjectProperty() {
 
     }
 
     /**
-     * Creates a new property with the given name and {@link FeatureHolder}.
+     * Creates a new object property with the given name and {@link FeatureHolder}.
      * 
-     * @param name The name of the property.
-     * @param holder The feature holder which has and uses the new property.
+     * @param name The name of the object property.
+     * @param holder The feature holder which has and uses the new object property.
      */
-    public Property(String name, FeatureHolder holder) {
+    public ObjectProperty(String name, FeatureHolder holder) {
 
         super(name, holder);
     }
 
-    /**
-     * Returns the object which is stored inside the property.
-     * 
-     * @return The stored object.
-     */
+    @Override
     public T get() {
 
         return object;
     }
 
-    /**
-     * Changes the object which is stored inside the property.
-     * 
-     * @param value The new stored object.
-     */
+    @Override
     public void set(T value) {
 
         this.object = value;
@@ -109,7 +102,7 @@ public class Property<T> extends AbstractFeature implements Iterable<T> {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        Property<?> other = (Property<?>) obj;
+        ObjectProperty<?> other = (ObjectProperty<?>) obj;
         if (object == null) {
             if (other.object != null) {
                 return false;

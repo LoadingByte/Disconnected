@@ -25,19 +25,20 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.quartercode.disconnected.util.ObjectAdapter;
-import com.quartercode.mocl.base.Feature;
 import com.quartercode.mocl.base.FeatureHolder;
 import com.quartercode.mocl.base.def.AbstractFeature;
 import com.quartercode.mocl.extra.Persistent;
+import com.quartercode.mocl.extra.Property;
 
 /**
- * A reference property is a simple {@link Feature} which stores an object.
+ * A reference property is a simple {@link Property} which stores an object.
  * During serialization, there is only an id reference serialized. That means that the referenced object has to have an {@link XmlID} annotation.
  * 
  * @param <T> The type of object which can be stored inside the reference property.
+ * @see Property
  */
 @Persistent
-public class ReferenceProperty<T> extends AbstractFeature implements Iterable<T> {
+public class ReferenceProperty<T> extends AbstractFeature implements Property<T> {
 
     @XmlElement
     @XmlJavaTypeAdapter (ObjectAdapter.class)
@@ -62,21 +63,13 @@ public class ReferenceProperty<T> extends AbstractFeature implements Iterable<T>
         super(name, holder);
     }
 
-    /**
-     * Returns the object which is stored inside the reference property.
-     * 
-     * @return The stored object.
-     */
+    @Override
     public T get() {
 
         return reference;
     }
 
-    /**
-     * Changes the object which is stored inside the reference property.
-     * 
-     * @param value The new stored object.
-     */
+    @Override
     public void set(T value) {
 
         this.reference = value;
