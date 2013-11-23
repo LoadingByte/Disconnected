@@ -18,6 +18,9 @@
 
 package com.quartercode.mocl.extra.def;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.quartercode.disconnected.util.ObjectAdapter;
@@ -32,7 +35,7 @@ import com.quartercode.mocl.extra.Persistent;
  * @param <T> The type of object which can be stored inside the property.
  */
 @Persistent
-public class Property<T> extends AbstractFeature {
+public class Property<T> extends AbstractFeature implements Iterable<T> {
 
     @XmlElement
     @XmlJavaTypeAdapter (ObjectAdapter.class)
@@ -75,6 +78,14 @@ public class Property<T> extends AbstractFeature {
     public void set(T value) {
 
         this.object = value;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+
+        List<T> list = new ArrayList<T>();
+        list.add(object);
+        return list.iterator();
     }
 
     @Override

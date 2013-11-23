@@ -18,6 +18,9 @@
 
 package com.quartercode.mocl.extra.def;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -34,7 +37,7 @@ import com.quartercode.mocl.extra.Persistent;
  * @param <T> The type of object which can be stored inside the reference property.
  */
 @Persistent
-public class ReferenceProperty<T> extends AbstractFeature {
+public class ReferenceProperty<T> extends AbstractFeature implements Iterable<T> {
 
     @XmlElement
     @XmlJavaTypeAdapter (ObjectAdapter.class)
@@ -77,6 +80,14 @@ public class ReferenceProperty<T> extends AbstractFeature {
     public void set(T value) {
 
         this.reference = value;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+
+        List<T> list = new ArrayList<T>();
+        list.add(reference);
+        return list.iterator();
     }
 
     @Override
