@@ -75,7 +75,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
     @Override
     public R invoke(Object... arguments) {
 
-        Map<Integer, FunctionExecutor<R>> sortedExecutors = new TreeMap<Integer, FunctionExecutor<R>>(new Comparator<Integer>() {
+        Map<Integer, List<FunctionExecutor<R>>> sortedExecutors = new TreeMap<Integer, List<FunctionExecutor<R>>>(new Comparator<Integer>() {
 
             @Override
             public int compare(Integer o1, Integer o2) {
@@ -89,25 +89,30 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         for (FunctionExecutor<R> executor : executors) {
             int priority = 0;
             if (executor.getClass().isAnnotationPresent(Prioritized.class)) {
-                executor.getClass().getAnnotation(Prioritized.class).value();
+                priority = executor.getClass().getAnnotation(Prioritized.class).value();
             }
-            sortedExecutors.put(priority, executor);
+            if (!sortedExecutors.containsKey(priority)) {
+                sortedExecutors.put(priority, new ArrayList<FunctionExecutor<R>>());
+            }
+            sortedExecutors.get(priority).add(executor);
         }
 
         // Invoke the executors and store
         R returnValue = null;
         boolean executedFirst = false;
-        for (FunctionExecutor<R> executor : sortedExecutors.values()) {
-            if (!executedFirst) {
-                returnValue = executor.invoke(getHolder(), arguments);
-                executedFirst = true;
-            } else {
-                executor.invoke(getHolder(), arguments);
-            }
+        for (List<FunctionExecutor<R>> priorityGroup : sortedExecutors.values()) {
+            for (FunctionExecutor<R> executor : priorityGroup) {
+                if (!executedFirst) {
+                    returnValue = executor.invoke(getHolder(), arguments);
+                    executedFirst = true;
+                } else {
+                    executor.invoke(getHolder(), arguments);
+                }
 
-            // Stop the execution of the other executors if the current one wants that
-            if (executor.getClass().isAnnotationPresent(Execution.class) && executor.getClass().getAnnotation(Execution.class).value() != ExecutionPolicy.OTHERS) {
-                break;
+                // Stop the execution of the other executors if the current one wants that
+                if (executor.getClass().isAnnotationPresent(Execution.class) && executor.getClass().getAnnotation(Execution.class).value() != ExecutionPolicy.OTHERS) {
+                    break;
+                }
             }
         }
 
