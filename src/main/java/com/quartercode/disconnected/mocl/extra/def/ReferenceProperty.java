@@ -63,6 +63,20 @@ public class ReferenceProperty<T> extends AbstractFeature implements Property<T>
         super(name, holder);
     }
 
+    /**
+     * Creates a new reference property with the given name and {@link FeatureHolder}, and sets the initial value.
+     * 
+     * @param name The name of the reference property.
+     * @param holder The feature holder which has and uses the new reference property.
+     * @param initialValue The value the new object property has directly after creation.
+     */
+    public ReferenceProperty(String name, FeatureHolder holder, T initialValue) {
+
+        super(name, holder);
+
+        set(initialValue);
+    }
+
     @Override
     public T get() {
 

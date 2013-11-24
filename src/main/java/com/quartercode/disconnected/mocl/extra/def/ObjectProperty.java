@@ -61,6 +61,20 @@ public class ObjectProperty<T> extends AbstractFeature implements Property<T> {
         super(name, holder);
     }
 
+    /**
+     * Creates a new object property with the given name and {@link FeatureHolder}, and sets the initial value.
+     * 
+     * @param name The name of the object property.
+     * @param holder The feature holder which has and uses the new object property.
+     * @param initialValue The value the new object property has directly after creation.
+     */
+    public ObjectProperty(String name, FeatureHolder holder, T initialValue) {
+
+        super(name, holder);
+
+        set(initialValue);
+    }
+
     @Override
     public T get() {
 
