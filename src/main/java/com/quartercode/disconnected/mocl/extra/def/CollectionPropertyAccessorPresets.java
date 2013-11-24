@@ -41,7 +41,7 @@ import com.quartercode.disconnected.mocl.extra.Property;
  * @see Collection
  * @see FunctionDefinition
  */
-public class CollectionAccessorPresets {
+public class CollectionPropertyAccessorPresets {
 
     /**
      * Creates a new getter {@link FunctionDefinition} for the given {@link Collection} {@link Property} definition.
@@ -237,7 +237,7 @@ public class CollectionAccessorPresets {
     }
 
     /**
-     * Criterium matchers are used for limiting the output of {@link CollectionAccessorPresets#createGet(String, FeatureDefinition, CriteriumMatcher)}.
+     * Criterium matchers are used for limiting the output of {@link CollectionPropertyAccessorPresets#createGet(String, FeatureDefinition, CriteriumMatcher)}.
      * 
      * @param <E> The type of elements the matcher checks.
      */
@@ -273,7 +273,7 @@ public class CollectionAccessorPresets {
 
     }
 
-    private CollectionAccessorPresets() {
+    private CollectionPropertyAccessorPresets() {
 
     }
 
