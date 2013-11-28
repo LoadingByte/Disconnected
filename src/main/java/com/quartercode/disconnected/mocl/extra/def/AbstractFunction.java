@@ -80,7 +80,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
             @Override
             public int compare(Integer o1, Integer o2) {
 
-                return o1 - o2;
+                return o2 - o1;
             }
 
         });
@@ -101,6 +101,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         R returnValue = null;
         boolean executedFirst = false;
         for (List<FunctionExecutor<R>> priorityGroup : sortedExecutors.values()) {
+        invokeExecutors:
             for (FunctionExecutor<R> executor : priorityGroup) {
                 if (!executedFirst) {
                     returnValue = executor.invoke(getHolder(), arguments);
@@ -111,7 +112,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
 
                 // Stop the execution of the other executors if the current one wants that
                 if (executor.getClass().isAnnotationPresent(Execution.class) && executor.getClass().getAnnotation(Execution.class).value() != ExecutionPolicy.OTHERS) {
-                    break;
+                    break invokeExecutors;
                 }
             }
         }
