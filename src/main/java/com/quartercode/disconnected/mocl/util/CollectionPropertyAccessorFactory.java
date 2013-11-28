@@ -16,44 +16,42 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.mocl.extra.def;
+package com.quartercode.disconnected.mocl.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.extra.Function;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Property;
 
 /**
- * A utility class for creating {@link FunctionDefinition}s which can access simple {@link Collection} {@link Property}s.
+ * A utility class for creating {@link FunctionExecutor}s which can access simple {@link Collection} {@link Property}s.
  * 
  * @see Property
  * @see Collection
- * @see FunctionDefinition
+ * @see FunctionExecutor
  */
-public class CollectionPropertyAccessorPresets {
+public class CollectionPropertyAccessorFactory {
 
     /**
-     * Creates a new getter {@link FunctionDefinition} for the given {@link Collection} {@link Property} definition.
+     * Creates a new getter {@link FunctionExecutor} for the given {@link Collection} {@link Property} definition.
      * A getter function returns an unmodifiable instance of the {@link Collection} stored by a {@link Property}.
      * 
-     * @param name The name of the new {@link FunctionDefinition}.
      * @param propertyDefinition The {@link FeatureDefinition} of the {@link Collection} {@link Property} to access.
-     * @return The created {@link FunctionDefinition}.
+     * @return The created {@link FunctionExecutor}.
      */
-    public static <C extends Collection<E>, E> FunctionDefinition<C> createGet(String name, final FeatureDefinition<? extends Property<? extends C>> propertyDefinition) {
+    public static <C extends Collection<E>, E> FunctionExecutor<C> createGet(final FeatureDefinition<? extends Property<? extends C>> propertyDefinition) {
 
-        return createGet(name, propertyDefinition, new CriteriumMatcher<E>() {
+        return createGet(propertyDefinition, new CriteriumMatcher<E>() {
 
             @Override
             public boolean matches(E element, Object... arguments) {
@@ -65,28 +63,17 @@ public class CollectionPropertyAccessorPresets {
     }
 
     /**
-     * Creates a new getter {@link FunctionDefinition} for the given {@link Collection} {@link Property} definition with the given {@link CriteriumMatcher}.
+     * Creates a new getter {@link FunctionExecutor} for the given {@link Collection} {@link Property} definition with the given {@link CriteriumMatcher}.
      * A getter function returns an unmodifiable instance of the {@link Collection} stored by a {@link Property}.
      * The {@link CriteriumMatcher} only lets certain elements through into the return collection.
      * 
-     * @param name The name of the new {@link FunctionDefinition}.
      * @param propertyDefinition The {@link FeatureDefinition} of the {@link Collection} {@link Property} to access.
      * @param matcher The {@link CriteriumMatcher} for checking if certain elements should be returned.
-     * @return The created {@link FunctionDefinition}.
+     * @return The created {@link FunctionExecutor}.
      */
-    public static <C extends Collection<E>, E> FunctionDefinition<C> createGet(String name, final FeatureDefinition<? extends Property<? extends C>> propertyDefinition, final CriteriumMatcher<E> matcher) {
+    public static <C extends Collection<E>, E> FunctionExecutor<C> createGet(final FeatureDefinition<? extends Property<? extends C>> propertyDefinition, final CriteriumMatcher<E> matcher) {
 
-        FunctionDefinition<C> definition = new AbstractFunctionDefinition<C>(name) {
-
-            @Override
-            protected Function<C> create(FeatureHolder holder, List<FunctionExecutor<C>> executors) {
-
-                return new AbstractFunction<C>(getName(), holder, executors);
-            }
-
-        };
-
-        definition.addExecutor("default", new FunctionExecutor<C>() {
+        return new FunctionExecutor<C>() {
 
             @SuppressWarnings ("unchecked")
             @Override
@@ -112,33 +99,20 @@ public class CollectionPropertyAccessorPresets {
                 }
             }
 
-        });
-
-        return definition;
+        };
     }
 
     /**
-     * Creates a new single getter {@link FunctionDefinition} for the given {@link Collection} {@link Property} definition with the given {@link CriteriumMatcher}.
+     * Creates a new single getter {@link FunctionExecutor} for the given {@link Collection} {@link Property} definition with the given {@link CriteriumMatcher}.
      * A single getter function returns the first element of the {@link Collection} stored by a {@link Property} recognized by a {@link CriteriumMatcher}.
      * 
-     * @param name The name of the new {@link FunctionDefinition}.
      * @param propertyDefinition The {@link FeatureDefinition} of the {@link Collection} {@link Property} to access.
      * @param matcher The {@link CriteriumMatcher} for checking the elements.
-     * @return The created {@link FunctionDefinition}.
+     * @return The created {@link FunctionExecutor}.
      */
-    public static <E> FunctionDefinition<E> createGetSingle(String name, final FeatureDefinition<? extends Property<? extends Collection<E>>> propertyDefinition, final CriteriumMatcher<E> matcher) {
+    public static <E> FunctionExecutor<E> createGetSingle(final FeatureDefinition<? extends Property<? extends Collection<E>>> propertyDefinition, final CriteriumMatcher<E> matcher) {
 
-        FunctionDefinition<E> definition = new AbstractFunctionDefinition<E>(name) {
-
-            @Override
-            protected Function<E> create(FeatureHolder holder, List<FunctionExecutor<E>> executors) {
-
-                return new AbstractFunction<E>(getName(), holder, executors);
-            }
-
-        };
-
-        definition.addExecutor("default", new FunctionExecutor<E>() {
+        return new FunctionExecutor<E>() {
 
             @Override
             public E invoke(FeatureHolder holder, Object... arguments) {
@@ -152,39 +126,19 @@ public class CollectionPropertyAccessorPresets {
                 return null;
             }
 
-        });
-
-        return definition;
-    }
-
-    private static FunctionDefinition<Void> createModifier(String name, FunctionExecutor<Void> executor) {
-
-        FunctionDefinition<Void> definition = new AbstractFunctionDefinition<Void>(name) {
-
-            @Override
-            protected Function<Void> create(FeatureHolder holder, List<FunctionExecutor<Void>> executors) {
-
-                return new AbstractFunction<Void>(getName(), holder, executors);
-            }
-
         };
-
-        definition.addExecutor("default", executor);
-
-        return definition;
     }
 
     /**
-     * Creates a new adder {@link FunctionDefinition} for the given {@link Collection} {@link Property} definition.
+     * Creates a new adder {@link FunctionExecutor} for the given {@link Collection} {@link Property} definition.
      * An adder function adds values to the {@link Collection} of a {@link Property}.
      * 
-     * @param name The name of the new {@link FunctionDefinition}.
      * @param propertyDefinition The {@link FeatureDefinition} of the {@link Collection} {@link Property} to access.
-     * @return The created {@link FunctionDefinition}.
+     * @return The created {@link FunctionExecutor}.
      */
-    public static <E> FunctionDefinition<Void> createAdd(String name, final FeatureDefinition<? extends Property<? extends Collection<E>>> propertyDefinition) {
+    public static <E> FunctionExecutor<Void> createAdd(final FeatureDefinition<? extends Property<? extends Collection<E>>> propertyDefinition) {
 
-        return createModifier(name, new FunctionExecutor<Void>() {
+        return new FunctionExecutor<Void>() {
 
             @SuppressWarnings ("unchecked")
             @Override
@@ -196,48 +150,88 @@ public class CollectionPropertyAccessorPresets {
                     }
                 }
                 catch (ClassCastException e) {
-                    throw new IllegalArgumentException("Wrong arguments: 'T value'");
+                    String type = e.getMessage().substring(e.getMessage().indexOf(" cannot be cast to ") + 19, e.getMessage().length());
+                    throw new IllegalArgumentException("Wrong arguments: '" + type + " value' required");
                 }
 
                 return null;
             }
 
-        });
+        };
     }
 
     /**
-     * Creates a new remover {@link FunctionDefinition} for the given {@link Collection} {@link Property} definition.
+     * Creates a new remover {@link FunctionExecutor} for the given {@link Collection} {@link Property} definition.
      * A remover function removes values from the {@link Collection} of a {@link Property}.
      * 
-     * @param name The name of the new {@link FunctionDefinition}.
      * @param propertyDefinition The {@link FeatureDefinition} of the {@link Collection} {@link Property} to access.
-     * @return The created {@link FunctionDefinition}.
+     * @return The created {@link FunctionExecutor}.
      */
-    public static <E> FunctionDefinition<Void> createRemove(String name, final FeatureDefinition<? extends Property<? extends Collection<E>>> propertyDefinition) {
+    public static <E> FunctionExecutor<Void> createRemove(final FeatureDefinition<? extends Property<? extends Collection<E>>> propertyDefinition) {
 
-        return createModifier(name, new FunctionExecutor<Void>() {
+        return new FunctionExecutor<Void>() {
 
-            @SuppressWarnings ("unchecked")
             @Override
             public Void invoke(FeatureHolder holder, Object... arguments) {
 
                 try {
                     for (Object value : arguments) {
-                        holder.get(propertyDefinition).get().remove((E) value);
+                        holder.get(propertyDefinition).get().remove(value);
                     }
                 }
                 catch (ClassCastException e) {
-                    throw new IllegalArgumentException("Wrong arguments: 'T value'");
+                    String type = e.getMessage().substring(e.getMessage().indexOf(" cannot be cast to ") + 19, e.getMessage().length());
+                    throw new IllegalArgumentException("Wrong arguments: '" + type + " value' required");
                 }
 
                 return null;
             }
 
-        });
+        };
     }
 
     /**
-     * Criterium matchers are used for limiting the output of {@link CollectionPropertyAccessorPresets#createGet(String, FeatureDefinition, CriteriumMatcher)}.
+     * Creates a new peeker {@link FunctionExecutor} for the given {@link Queue} {@link Property} definition.
+     * A peeker function looks up and returns the head element of a {@link Queue}.
+     * 
+     * @param propertyDefinition The {@link FeatureDefinition} of the {@link Queue} {@link Property} to access.
+     * @return The created {@link FunctionExecutor}.
+     */
+    public static <E> FunctionExecutor<E> createPeek(final FeatureDefinition<? extends Property<? extends Queue<E>>> propertyDefinition) {
+
+        return new FunctionExecutor<E>() {
+
+            @Override
+            public E invoke(FeatureHolder holder, Object... arguments) {
+
+                return holder.get(propertyDefinition).get().peek();
+            }
+
+        };
+    }
+
+    /**
+     * Creates a new poller {@link FunctionExecutor} for the given {@link Queue} {@link Property} definition.
+     * A poller function looks up, removes, and returns the head element of a {@link Queue}.
+     * 
+     * @param propertyDefinition The {@link FeatureDefinition} of the {@link Queue} {@link Property} to access.
+     * @return The created {@link FunctionExecutor}.
+     */
+    public static <E> FunctionExecutor<E> createPoll(final FeatureDefinition<? extends Property<? extends Queue<E>>> propertyDefinition) {
+
+        return new FunctionExecutor<E>() {
+
+            @Override
+            public E invoke(FeatureHolder holder, Object... arguments) {
+
+                return holder.get(propertyDefinition).get().poll();
+            }
+
+        };
+    }
+
+    /**
+     * Criterium matchers are used for limiting the output of {@link CollectionPropertyAccessorFactory#createGet(String, FeatureDefinition, CriteriumMatcher)}.
      * 
      * @param <E> The type of elements the matcher checks.
      */
@@ -265,15 +259,15 @@ public class CollectionPropertyAccessorPresets {
         @Override
         public boolean matches(E element, Object... arguments) {
 
-            Validate.isTrue(arguments.length == 1, "Wrong arguments: 'Class matchClass'");
-            Validate.isTrue(arguments[0] instanceof Class, "Wrong arguments: 'Class matchClass'");
+            Validate.isTrue(arguments.length == 1, "Wrong arguments: 'java.lang.Class matchClass' required");
+            Validate.isTrue(arguments[0] instanceof Class, "Wrong arguments: 'java.lang.Class matchClass' required");
 
             return ((Class<?>) arguments[0]).isAssignableFrom(element.getClass());
         }
 
     }
 
-    private CollectionPropertyAccessorPresets() {
+    private CollectionPropertyAccessorFactory() {
 
     }
 
