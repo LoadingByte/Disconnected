@@ -20,15 +20,17 @@ package com.quartercode.disconnected.test.mocl.extra.def;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.extra.Execution;
+import com.quartercode.disconnected.mocl.extra.Execution.ExecutionPolicy;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
-import com.quartercode.disconnected.mocl.extra.Execution.ExecutionPolicy;
 import com.quartercode.disconnected.mocl.extra.def.AbstractFunction;
 
 public class AbstractFunctionTest {
@@ -52,7 +54,7 @@ public class AbstractFunctionTest {
 
         };
 
-        List<FunctionExecutor<Object>> executors = new ArrayList<FunctionExecutor<Object>>();
+        Set<FunctionExecutor<Object>> executors = new HashSet<FunctionExecutor<Object>>();
         executors.add(executor);
         function = new AbstractFunction<Object>("testFunction", null, executors);
 
@@ -69,7 +71,7 @@ public class AbstractFunctionTest {
     @Test
     public void testInvokePriority() {
 
-        List<FunctionExecutor<Object>> executors = new ArrayList<FunctionExecutor<Object>>();
+        Set<FunctionExecutor<Object>> executors = new HashSet<FunctionExecutor<Object>>();
         executors.add(new FunctionExecutor1<Object>());
         executors.add(new FunctionExecutor2<Object>());
         executors.add(new FunctionExecutor3<Object>());

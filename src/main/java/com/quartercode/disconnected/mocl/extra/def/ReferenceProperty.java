@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.mocl.extra.def;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -92,9 +92,9 @@ public class ReferenceProperty<T> extends AbstractFeature implements Property<T>
     @Override
     public Iterator<T> iterator() {
 
-        List<T> list = new ArrayList<T>();
-        list.add(reference);
-        return list.iterator();
+        Set<T> set = new HashSet<T>();
+        set.add(reference);
+        return set.iterator();
     }
 
     @Override

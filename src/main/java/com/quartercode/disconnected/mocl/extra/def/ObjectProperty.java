@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.mocl.extra.def;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
@@ -90,9 +90,9 @@ public class ObjectProperty<T> extends AbstractFeature implements Property<T> {
     @Override
     public Iterator<T> iterator() {
 
-        List<T> list = new ArrayList<T>();
-        list.add(object);
-        return list.iterator();
+        Set<T> set = new HashSet<T>();
+        set.add(object);
+        return set.iterator();
     }
 
     @Override

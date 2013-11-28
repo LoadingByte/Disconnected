@@ -18,31 +18,31 @@
 
 package com.quartercode.disconnected.mocl.extra.def;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeature;
 import com.quartercode.disconnected.mocl.extra.Execution;
+import com.quartercode.disconnected.mocl.extra.Execution.ExecutionPolicy;
 import com.quartercode.disconnected.mocl.extra.Function;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
-import com.quartercode.disconnected.mocl.extra.Execution.ExecutionPolicy;
 
 /**
  * An abstract function makes a method (also called a function) avaiable.
  * Functions are executed by different {@link FunctionExecutor}s. That makes the function concept expandable.
- * The function object itself stores a list of those {@link FunctionExecutor}s.
+ * The function object itself stores a set of those {@link FunctionExecutor}s.
  * 
  * @param <R> The type of the return value of the defined abstract function.
  * @see FunctionExecutor
  */
 public class AbstractFunction<R> extends AbstractFeature implements Function<R> {
 
-    private List<FunctionExecutor<R>> executors = new ArrayList<FunctionExecutor<R>>();
+    private Set<FunctionExecutor<R>> executors = new HashSet<FunctionExecutor<R>>();
 
     /**
      * Creates a new empty abstract function.
@@ -59,7 +59,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
      * @param holder The {@link FeatureHolder} which has and uses the new abstract function.
      * @param executors The {@link FunctionExecutor}s which will be executing the function calls.
      */
-    public AbstractFunction(String name, FeatureHolder holder, List<FunctionExecutor<R>> executors) {
+    public AbstractFunction(String name, FeatureHolder holder, Set<FunctionExecutor<R>> executors) {
 
         super(name, holder);
 
@@ -67,15 +67,15 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
     }
 
     @Override
-    public List<FunctionExecutor<R>> getExecutors() {
+    public Set<FunctionExecutor<R>> getExecutors() {
 
-        return Collections.unmodifiableList(executors);
+        return Collections.unmodifiableSet(executors);
     }
 
     @Override
     public R invoke(Object... arguments) {
 
-        Map<Integer, List<FunctionExecutor<R>>> sortedExecutors = new TreeMap<Integer, List<FunctionExecutor<R>>>(new Comparator<Integer>() {
+        Map<Integer, Set<FunctionExecutor<R>>> sortedExecutors = new TreeMap<Integer, Set<FunctionExecutor<R>>>(new Comparator<Integer>() {
 
             @Override
             public int compare(Integer o1, Integer o2) {
@@ -92,7 +92,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
                 priority = executor.getClass().getAnnotation(Prioritized.class).value();
             }
             if (!sortedExecutors.containsKey(priority)) {
-                sortedExecutors.put(priority, new ArrayList<FunctionExecutor<R>>());
+                sortedExecutors.put(priority, new HashSet<FunctionExecutor<R>>());
             }
             sortedExecutors.get(priority).add(executor);
         }
@@ -100,8 +100,8 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         // Invoke the executors and store
         R returnValue = null;
         boolean executedFirst = false;
-        for (List<FunctionExecutor<R>> priorityGroup : sortedExecutors.values()) {
         invokeExecutors:
+        for (Set<FunctionExecutor<R>> priorityGroup : sortedExecutors.values()) {
             for (FunctionExecutor<R> executor : priorityGroup) {
                 if (!executedFirst) {
                     returnValue = executor.invoke(getHolder(), arguments);

@@ -18,24 +18,24 @@
 
 package com.quartercode.disconnected.mocl.extra;
 
-import java.util.List;
+import java.util.Set;
 import com.quartercode.disconnected.mocl.base.Feature;
 
 /**
  * A function makes a method (also called a function) avaiable.
  * Functions are executed by different {@link FunctionExecutor}s. That makes the function concept expandable.
- * The function object itself stores a list of those {@link FunctionExecutor}s.
+ * The function object itself stores a set of those {@link FunctionExecutor}s.
  * 
  * @param <R> The type of the return value of the defined function.
  */
 public interface Function<R> extends Feature {
 
     /**
-     * Returns a list of all {@link FunctionExecutor}s which are used by the function. {@link FunctionExecutor}s are used for actually handling a function call.
+     * Returns a set of all {@link FunctionExecutor}s which are used by the function. {@link FunctionExecutor}s are used for actually handling a function call.
      * 
      * @return All {@link FunctionExecutor}s which are used by the function.
      */
-    public List<FunctionExecutor<R>> getExecutors();
+    public Set<FunctionExecutor<R>> getExecutors();
 
     /**
      * Invokes the defined function with the given arguments on all {@link FunctionExecutor}s.

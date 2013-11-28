@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.mocl.base.def;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
@@ -42,7 +42,7 @@ import com.quartercode.disconnected.util.InfoString;
  */
 public class DefaultFeatureHolder implements FeatureHolder, InfoString {
 
-    private final List<Feature> features = new ArrayList<Feature>();
+    private final Set<Feature> features = new HashSet<Feature>();
 
     /**
      * Creates a new default feature holder.
@@ -67,15 +67,15 @@ public class DefaultFeatureHolder implements FeatureHolder, InfoString {
     }
 
     /**
-     * Returns a list of all {@link Persistent} {@link Feature}s of the default feature holder.
-     * This uses an object list since JAXB can't handle interfaces.
+     * Returns a set of all {@link Persistent} {@link Feature}s of the default feature holder.
+     * This uses an object set since JAXB can't handle interfaces.
      * 
      * @return All {@link Persistent} {@link Feature}s of the default feature holder.
      */
     @XmlElement (name = "features")
-    public List<Object> getPersistentFeatures() {
+    public Set<Object> getPersistentFeatures() {
 
-        List<Object> persistentFeatures = new ArrayList<Object>();
+        Set<Object> persistentFeatures = new HashSet<Object>();
         for (Feature feature : features) {
             if (feature.getClass().isAnnotationPresent(Persistent.class)) {
                 persistentFeatures.add(feature);
@@ -86,12 +86,12 @@ public class DefaultFeatureHolder implements FeatureHolder, InfoString {
     }
 
     /**
-     * Adds the given list of {@link Persistent} {@link Feature}s to the default feature holder.
-     * This uses an object list since JAXB can't handle interfaces.
+     * Adds the given set of {@link Persistent} {@link Feature}s to the default feature holder.
+     * This uses an object set since JAXB can't handle interfaces.
      * 
      * @param persistentFeatures The {@link Persistent} {@link Feature}s to add.
      */
-    public void setPersistentFeatures(List<Object> persistentFeatures) {
+    public void setPersistentFeatures(Set<Object> persistentFeatures) {
 
         for (Object persistentFeature : persistentFeatures) {
             if (persistentFeature instanceof Feature) {

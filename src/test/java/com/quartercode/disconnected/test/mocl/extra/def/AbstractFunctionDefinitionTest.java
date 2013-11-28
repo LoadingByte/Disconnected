@@ -20,6 +20,7 @@ package com.quartercode.disconnected.test.mocl.extra.def;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class AbstractFunctionDefinitionTest {
         functionDefinition = new AbstractFunctionDefinition<Void>("testFunctionDefinition") {
 
             @Override
-            protected Function<Void> create(FeatureHolder holder, List<FunctionExecutor<Void>> executors) {
+            protected Function<Void> create(FeatureHolder holder, Set<FunctionExecutor<Void>> executors) {
 
                 return new AbstractFunction<Void>(getName(), holder, executors);
             }

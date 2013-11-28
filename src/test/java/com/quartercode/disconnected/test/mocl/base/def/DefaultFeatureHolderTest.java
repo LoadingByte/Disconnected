@@ -18,8 +18,8 @@
 
 package com.quartercode.disconnected.test.mocl.base.def;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -90,11 +90,11 @@ public class DefaultFeatureHolderTest {
     @Test
     public void testSetPersistentFeatures() {
 
-        List<Object> features = new ArrayList<Object>();
+        Set<Object> features = new HashSet<Object>();
         features.add(new AbstractFeature("testFeature", featureHolder));
         featureHolder.setPersistentFeatures(features);
 
-        List<Object> actualFeatures = new ArrayList<Object>();
+        Set<Object> actualFeatures = new HashSet<Object>();
         for (Object feature : featureHolder) {
             actualFeatures.add(feature);
         }

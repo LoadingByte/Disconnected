@@ -18,10 +18,10 @@
 
 package com.quartercode.disconnected.mocl.extra.def;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import com.quartercode.disconnected.mocl.base.Feature;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
@@ -68,7 +68,7 @@ public abstract class AbstractFunctionDefinition<R> extends AbstractFeatureDefin
     @Override
     public Function<R> create(FeatureHolder holder) {
 
-        return create(holder, new ArrayList<FunctionExecutor<R>>(executors.values()));
+        return create(holder, new HashSet<FunctionExecutor<R>>(executors.values()));
     }
 
     /**
@@ -79,6 +79,6 @@ public abstract class AbstractFunctionDefinition<R> extends AbstractFeatureDefin
      * @param executors The {@link FunctionExecutor}s which should be used in the new {@link Function}.
      * @return The created {@link Function}.
      */
-    protected abstract Function<R> create(FeatureHolder holder, List<FunctionExecutor<R>> executors);
+    protected abstract Function<R> create(FeatureHolder holder, Set<FunctionExecutor<R>> executors);
 
 }
