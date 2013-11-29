@@ -42,4 +42,12 @@ public interface ChildFeatureHolder<P extends FeatureHolder> extends FeatureHold
      */
     public P getParent();
 
+    /**
+     * Changes the parent {@link FeatureHolder} which is storing this default child feature holder.
+     * Should only be used if the parent {@link FeatureHolder} actually changes.
+     * 
+     * @param parent The new parent {@link FeatureHolder}.
+     */
+    public void setParent(P parent);
+
 }

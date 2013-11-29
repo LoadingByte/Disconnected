@@ -58,15 +58,16 @@ public class DefaultChildFeatureHolder<P extends FeatureHolder> extends DefaultF
         this.parent = parent;
     }
 
-    /**
-     * Returns The parent {@link FeatureHolder} which is storing this default child feature holder.
-     * 
-     * @return The parent {@link FeatureHolder}.
-     */
     @Override
     public P getParent() {
 
         return parent;
+    }
+
+    @Override
+    public void setParent(P parent) {
+
+        this.parent = parent;
     }
 
     /**
