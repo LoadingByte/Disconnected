@@ -11,7 +11,7 @@ package com.quartercode.disconnected.mocl.extra;
  */
 public class FunctionExecutionException extends StopExecutionException {
 
-    private static final long serialVersionUID = -6644948686243835336L;
+    private static final long serialVersionUID = -5515825410776845247L;
 
     /**
      * Creates a new function execution exception with the given wrapped {@link Throwable}.
@@ -21,6 +21,17 @@ public class FunctionExecutionException extends StopExecutionException {
     public FunctionExecutionException(Throwable wrapped) {
 
         super(wrapped);
+    }
+
+    /**
+     * Creates a new function execution exception with the given wrapped {@link Throwable} and an explanation.
+     * 
+     * @param message A message which describes why the exception occurres.
+     * @param wrapped The {@link Throwable} the exception wraps around.
+     */
+    public FunctionExecutionException(String message, Throwable wrapped) {
+
+        super(message, wrapped);
     }
 
 }
