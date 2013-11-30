@@ -18,12 +18,15 @@
 
 package com.quartercode.disconnected.mocl.extra.def;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeature;
 import com.quartercode.disconnected.mocl.extra.Function;
@@ -41,6 +44,8 @@ import com.quartercode.disconnected.mocl.extra.StopExecutionException;
  * @see FunctionExecutor
  */
 public class AbstractFunction<R> extends AbstractFeature implements Function<R> {
+
+    private static final Logger      LOGGER    = Logger.getLogger(AbstractFeature.class.getName());
 
     private Set<FunctionExecutor<R>> executors = new HashSet<FunctionExecutor<R>>();
 
@@ -80,11 +85,22 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         // Sort the executors by priority
         for (FunctionExecutor<R> executor : executors) {
             int priority = 0;
-            if (executor.getClass().isAnnotationPresent(Prioritized.class)) {
-                priority = executor.getClass().getAnnotation(Prioritized.class).value();
+
+            // Read custom priority
+            try {
+                Method invoke = executor.getClass().getMethod("invoke", FeatureHolder.class, Object[].class);
+                if (invoke.isAnnotationPresent(Prioritized.class)) {
+                    priority = invoke.getAnnotation(Prioritized.class).value();
+                }
             }
+            catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Programmer's fault: Can't find invoke() method (should be defined by interface)", e);
+            }
+
             if (!sortedExecutors.containsKey(priority)) {
                 sortedExecutors.put(priority, new HashSet<FunctionExecutor<R>>());
+            } else {
+                LOGGER.warning("Function executor '" + executor.getClass().getName() + "' has the same priority as " + sortedExecutors.get(priority));
             }
             sortedExecutors.get(priority).add(executor);
         }

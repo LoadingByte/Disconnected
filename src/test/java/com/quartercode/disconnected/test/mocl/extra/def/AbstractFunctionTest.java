@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Assert;
 import org.junit.Test;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
@@ -70,58 +71,52 @@ public class AbstractFunctionTest {
     public void testInvokePriority() throws FunctionExecutionException {
 
         Set<FunctionExecutor<Object>> executors = new HashSet<FunctionExecutor<Object>>();
-        executors.add(new FunctionExecutor1<Object>());
-        executors.add(new FunctionExecutor2<Object>());
-        executors.add(new FunctionExecutor3<Object>());
+
+        final AtomicBoolean invokedFunctionExecutor1 = new AtomicBoolean();
+        executors.add(new FunctionExecutor<Object>() {
+
+            @Override
+            @Prioritized (3)
+            public Object invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                invokedFunctionExecutor1.set(true);
+                return null;
+            }
+
+        });
+
+        final AtomicBoolean invokedFunctionExecutor2 = new AtomicBoolean();
+        executors.add(new FunctionExecutor<Object>() {
+
+            @Override
+            @Prioritized (2)
+            public Object invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                invokedFunctionExecutor2.set(true);
+                throw new StopExecutionException("Test");
+            }
+
+        });
+
+        final AtomicBoolean invokedFunctionExecutor3 = new AtomicBoolean();
+        executors.add(new FunctionExecutor<Object>() {
+
+            @Override
+            @Prioritized (1)
+            public Object invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                invokedFunctionExecutor3.set(true);
+                return null;
+            }
+
+        });
+
         function = new AbstractFunction<Object>("testFunction", null, executors);
         function.invoke();
 
-        Assert.assertTrue("Executor 1 wasn't invoked", invokedFunctionExecutor1);
-        Assert.assertTrue("Executor 2 wasn't invoked", invokedFunctionExecutor2);
-        Assert.assertFalse("Executor 3 was invoked", invokedFunctionExecutor3);
-    }
-
-    private boolean invokedFunctionExecutor1;
-
-    @Prioritized (3)
-    private class FunctionExecutor1<R> implements FunctionExecutor<R> {
-
-        @Override
-        public R invoke(FeatureHolder holder, Object... arguments) {
-
-            invokedFunctionExecutor1 = true;
-            return null;
-        }
-
-    }
-
-    private boolean invokedFunctionExecutor2;
-
-    @Prioritized (2)
-    @Execution (ExecutionPolicy.THIS)
-    private class FunctionExecutor2<R> implements FunctionExecutor<R> {
-
-        @Override
-        public R invoke(FeatureHolder holder, Object... arguments) {
-
-            invokedFunctionExecutor2 = true;
-            return null;
-        }
-
-    }
-
-    private boolean invokedFunctionExecutor3;
-
-    @Prioritized (1)
-    private class FunctionExecutor3<R> implements FunctionExecutor<R> {
-
-        @Override
-        public R invoke(FeatureHolder holder, Object... arguments) {
-
-            invokedFunctionExecutor3 = true;
-            return null;
-        }
-
+        Assert.assertTrue("Executor 1 wasn't invoked", invokedFunctionExecutor1.get());
+        Assert.assertTrue("Executor 2 wasn't invoked", invokedFunctionExecutor2.get());
+        Assert.assertFalse("Executor 3 was invoked", invokedFunctionExecutor3.get());
     }
 
 }
