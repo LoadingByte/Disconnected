@@ -84,9 +84,9 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
 
         // Sort the executors by priority
         for (FunctionExecutor<R> executor : executors) {
-            int priority = 0;
+            int priority = Prioritized.DEFAULT;
 
-            // Read custom priority
+            // Read custom priorities
             try {
                 Method invoke = executor.getClass().getMethod("invoke", FeatureHolder.class, Object[].class);
                 if (invoke.isAnnotationPresent(Prioritized.class)) {

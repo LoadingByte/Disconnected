@@ -36,73 +36,78 @@ import com.quartercode.disconnected.mocl.base.FeatureHolder;
 public @interface Prioritized {
 
     /**
+     * The default priority for every {@link FunctionExecutor} which doesn't have the annotation.
+     */
+    public static final int DEFAULT      = 1000000;
+
+    /**
      * The priority to use for checks.
      * Checks are executors which throw a {@link StopExecutionException} if something is incorrect.
      */
-    public static final int CHECK        = 100;
+    public static final int CHECK        = DEFAULT + 10000000;
 
     /**
      * The priority to use for the least important overwrites.
      * Overwrites are executors which replace the functionality of the default executor.
      * They normally throw a {@link StopExecutionException} after invokation.
      */
-    public static final int OVERWRITE_1  = 200;
+    public static final int OVERWRITE_1  = DEFAULT + 20000000;
 
     /**
      * The priority to use for very low overwrites.
      * Overwrites are executors which replace the functionality of the default executor.
      * They normally throw a {@link StopExecutionException} after invokation.
      */
-    public static final int OVERWRITE_2  = 300;
+    public static final int OVERWRITE_2  = DEFAULT + 21000000;
 
     /**
      * The priority to use for low overwrites.
      * Overwrites are executors which replace the functionality of the default executor.
      * They normally throw a {@link StopExecutionException} after invokation.
      */
-    public static final int OVERWRITE_3  = 400;
+    public static final int OVERWRITE_3  = DEFAULT + 22000000;
 
     /**
      * The priority to use for somewhat important overwrites.
      * Overwrites are executors which replace the functionality of the default executor.
      * They normally throw a {@link StopExecutionException} after invokation.
      */
-    public static final int OVERWRITE_4  = 500;
+    public static final int OVERWRITE_4  = DEFAULT + 23000000;
 
     /**
      * The priority to use for a bit more important overwrites.
      * Overwrites are executors which replace the functionality of the default executor.
      * They normally throw a {@link StopExecutionException} after invokation.
      */
-    public static final int OVERWRITE_5  = 600;
+    public static final int OVERWRITE_5  = DEFAULT + 24000000;
 
     /**
      * The priority to use for more important overwrites.
      * Overwrites are executors which replace the functionality of the default executor.
      * They normally throw a {@link StopExecutionException} after invokation.
      */
-    public static final int OVERWRITE_6  = 700;
+    public static final int OVERWRITE_6  = DEFAULT + 25000000;
 
     /**
      * The priority to use for important overwrites.
      * Overwrites are executors which replace the functionality of the default executor.
      * They normally throw a {@link StopExecutionException} after invokation.
      */
-    public static final int OVERWRITE_7  = 800;
+    public static final int OVERWRITE_7  = DEFAULT + 26000000;
 
     /**
      * The priority to use for actually important overwrites.
      * Overwrites are executors which replace the functionality of the default executor.
      * They normally throw a {@link StopExecutionException} after invokation.
      */
-    public static final int OVERWRITE_8  = 900;
+    public static final int OVERWRITE_8  = DEFAULT + 27000000;
 
     /**
      * The priority to use for very important overwrites.
      * Overwrites are executors which replace the functionality of the default executor.
      * They normally throw a {@link StopExecutionException} after invokation.
      */
-    public static final int OVERWRITE_9  = 1000;
+    public static final int OVERWRITE_9  = DEFAULT + 28000000;
 
     /**
      * The priority to use for really important overwrites.
@@ -110,7 +115,7 @@ public @interface Prioritized {
      * Overwrites are executors which replace the functionality of the default executor.
      * They normally throw a {@link StopExecutionException} after invokation.
      */
-    public static final int OVERWRITE_10 = 1100;
+    public static final int OVERWRITE_10 = DEFAULT + 29000000;
 
     /**
      * The actual priority the {@link FunctionExecutor} has.
