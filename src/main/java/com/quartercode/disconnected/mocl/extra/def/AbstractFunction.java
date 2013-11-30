@@ -19,9 +19,11 @@
 package com.quartercode.disconnected.mocl.extra.def;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -37,11 +39,12 @@ import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 
 /**
  * An abstract function makes a method (also called a function) avaiable.
- * Functions are executed by different {@link FunctionExecutor}s. That makes the function concept expandable.
+ * Functions are executed by different {@link FunctionExecutor}s. That makes the function concept flexible.
  * The function object itself stores a set of those {@link FunctionExecutor}s.
  * 
- * @param <R> The type of the return value of the defined abstract function.
+ * @param <R> The type of the return value of the used {@link FunctionExecutor}s. The function returns a {@link List} with these values.
  * @see FunctionExecutor
+ * @see Function
  */
 public class AbstractFunction<R> extends AbstractFeature implements Function<R> {
 
@@ -70,7 +73,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
     }
 
     @Override
-    public R invoke(Object... arguments) throws FunctionExecutionException {
+    public List<R> invoke(Object... arguments) throws FunctionExecutionException {
 
         Map<Integer, Set<FunctionExecutor<R>>> sortedExecutors = new TreeMap<Integer, Set<FunctionExecutor<R>>>(new Comparator<Integer>() {
 
@@ -106,18 +109,12 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         }
 
         // Invoke the executors
-        R returnValue = null;
-        boolean executedFirst = false;
+        List<R> returnValues = new ArrayList<R>();
         invokeExecutors:
         for (Set<FunctionExecutor<R>> priorityGroup : sortedExecutors.values()) {
             for (FunctionExecutor<R> executor : priorityGroup) {
                 try {
-                    if (!executedFirst) {
-                        returnValue = executor.invoke(getHolder(), arguments);
-                        executedFirst = true;
-                    } else {
-                        executor.invoke(getHolder(), arguments);
-                    }
+                    returnValues.add(executor.invoke(getHolder(), arguments));
                 }
                 catch (StopExecutionException e) {
                     if (e.getCause() == null) {
@@ -133,7 +130,18 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
             }
         }
 
-        return returnValue;
+        return returnValues;
+    }
+
+    @Override
+    public R invokeRF(Object... arguments) throws FunctionExecutionException {
+
+        List<R> returnValues = invoke(arguments);
+        if (returnValues.size() > 0) {
+            return returnValues.get(0);
+        } else {
+            return null;
+        }
     }
 
     @Override
