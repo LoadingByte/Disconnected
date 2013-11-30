@@ -25,7 +25,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeature;
+import com.quartercode.disconnected.mocl.extra.Persistent;
+import com.quartercode.disconnected.mocl.extra.Property;
 import com.quartercode.disconnected.mocl.extra.Updateable;
 import com.quartercode.disconnected.util.InfoString;
 import com.quartercode.disconnected.util.ObjectInstanceAdapter;
@@ -36,7 +37,8 @@ import com.quartercode.disconnected.util.ObjectInstanceAdapter;
  * 
  * @see UpdateTask
  */
-public class TickFeature extends AbstractFeature implements Updateable {
+@Persistent
+public class TickFeature extends AbstractPersistentFeature implements Updateable {
 
     @XmlElement (name = "updateTask")
     private final List<UpdateTask> updateTasks = new ArrayList<UpdateTask>();

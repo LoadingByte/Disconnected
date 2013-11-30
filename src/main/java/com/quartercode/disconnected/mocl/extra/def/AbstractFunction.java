@@ -45,14 +45,6 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
     private Set<FunctionExecutor<R>> executors = new HashSet<FunctionExecutor<R>>();
 
     /**
-     * Creates a new empty abstract function.
-     * This is only recommended for direct field access (e.g. for serialization).
-     */
-    protected AbstractFunction() {
-
-    }
-
-    /**
      * Creates a new abstract function with the given name, parent {@link FeatureHolder} and {@link FunctionExecutor}s.
      * 
      * @param name The name of the abstract function.

@@ -33,16 +33,8 @@ import com.quartercode.disconnected.util.InfoString;
 public class AbstractFeature implements Feature, InfoString {
 
     @XmlAttribute
-    private String        name;
+    private final String  name;
     private FeatureHolder holder;
-
-    /**
-     * Creates a new empty abstract feature.
-     * This is only recommended for direct field access (e.g. for serialization).
-     */
-    protected AbstractFeature() {
-
-    }
 
     /**
      * Creates a new abstract feature with the given name and {@link FeatureHolder}.
@@ -66,6 +58,16 @@ public class AbstractFeature implements Feature, InfoString {
     public FeatureHolder getHolder() {
 
         return holder;
+    }
+
+    /**
+     * Changes the parent {@link FeatureHolder} which uses this feature.
+     * 
+     * @param holder
+     */
+    protected void setHolder(FeatureHolder holder) {
+
+        this.holder = holder;
     }
 
     @Override

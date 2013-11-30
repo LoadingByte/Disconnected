@@ -24,7 +24,6 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeature;
 import com.quartercode.disconnected.mocl.extra.Persistent;
 import com.quartercode.disconnected.mocl.extra.Property;
 import com.quartercode.disconnected.util.ObjectAdapter;
@@ -36,7 +35,7 @@ import com.quartercode.disconnected.util.ObjectAdapter;
  * @see Property
  */
 @Persistent
-public class ObjectProperty<T> extends AbstractFeature implements Property<T> {
+public class ObjectProperty<T> extends AbstractPersistentFeature implements Property<T> {
 
     @XmlElement
     @XmlJavaTypeAdapter (ObjectAdapter.class)
