@@ -41,21 +41,10 @@ public class DefaultChildFeatureHolder<P extends FeatureHolder> extends DefaultF
     private P parent;
 
     /**
-     * Creates a new empty default child feature holder.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * Creates a new default child feature holder.
      */
-    protected DefaultChildFeatureHolder() {
+    public DefaultChildFeatureHolder() {
 
-    }
-
-    /**
-     * Creates a new default child feature holder which has the given parent {@link FeatureHolder}.
-     * 
-     * @param parent The parent {@link FeatureHolder} which is storing this default child feature holder.
-     */
-    public DefaultChildFeatureHolder(P parent) {
-
-        this.parent = parent;
     }
 
     @Override
