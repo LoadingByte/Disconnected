@@ -26,11 +26,11 @@ import java.util.Set;
 import java.util.TreeMap;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeature;
-import com.quartercode.disconnected.mocl.extra.Execution;
-import com.quartercode.disconnected.mocl.extra.Execution.ExecutionPolicy;
 import com.quartercode.disconnected.mocl.extra.Function;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 
 /**
  * An abstract function makes a method (also called a function) avaiable.
@@ -65,7 +65,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
     }
 
     @Override
-    public R invoke(Object... arguments) {
+    public R invoke(Object... arguments) throws FunctionExecutionException {
 
         Map<Integer, Set<FunctionExecutor<R>>> sortedExecutors = new TreeMap<Integer, Set<FunctionExecutor<R>>>(new Comparator<Integer>() {
 
@@ -89,22 +89,30 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
             sortedExecutors.get(priority).add(executor);
         }
 
-        // Invoke the executors and store
+        // Invoke the executors
         R returnValue = null;
         boolean executedFirst = false;
         invokeExecutors:
         for (Set<FunctionExecutor<R>> priorityGroup : sortedExecutors.values()) {
             for (FunctionExecutor<R> executor : priorityGroup) {
-                if (!executedFirst) {
-                    returnValue = executor.invoke(getHolder(), arguments);
-                    executedFirst = true;
-                } else {
-                    executor.invoke(getHolder(), arguments);
+                try {
+                    if (!executedFirst) {
+                        returnValue = executor.invoke(getHolder(), arguments);
+                        executedFirst = true;
+                    } else {
+                        executor.invoke(getHolder(), arguments);
+                    }
                 }
-
-                // Stop the execution of the other executors if the current one wants that
-                if (executor.getClass().isAnnotationPresent(Execution.class) && executor.getClass().getAnnotation(Execution.class).value() != ExecutionPolicy.OTHERS) {
-                    break invokeExecutors;
+                catch (StopExecutionException e) {
+                    if (e.getCause() == null) {
+                        break invokeExecutors;
+                    } else {
+                        if (e.getMessage() == null) {
+                            throw new FunctionExecutionException(e.getCause());
+                        } else {
+                            throw new FunctionExecutionException(e.getMessage(), e.getCause());
+                        }
+                    }
                 }
             }
         }

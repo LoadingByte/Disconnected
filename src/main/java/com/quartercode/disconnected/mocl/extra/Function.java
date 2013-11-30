@@ -42,7 +42,8 @@ public interface Function<R> extends Feature {
      * 
      * @param arguments Some arguments for the function.
      * @return The value the invoked function returns. Can be null.
+     * @throws FunctionExecutionException Something goes wrong during the invokation of a {@link FunctionExecutor}.
      */
-    public R invoke(Object... arguments);
+    public R invoke(Object... arguments) throws FunctionExecutionException;
 
 }

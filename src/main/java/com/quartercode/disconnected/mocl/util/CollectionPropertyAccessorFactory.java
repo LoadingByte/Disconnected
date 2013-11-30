@@ -32,6 +32,7 @@ import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Property;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 
 /**
  * A utility class for creating {@link FunctionExecutor}s which can access simple {@link Collection} {@link Property}s.
@@ -54,7 +55,7 @@ public class CollectionPropertyAccessorFactory {
         return createGet(propertyDefinition, new CriteriumMatcher<E>() {
 
             @Override
-            public boolean matches(E element, Object... arguments) {
+            public boolean matches(E element, Object... arguments) throws StopExecutionException {
 
                 return true;
             }
@@ -77,7 +78,7 @@ public class CollectionPropertyAccessorFactory {
 
             @SuppressWarnings ("unchecked")
             @Override
-            public C invoke(FeatureHolder holder, Object... arguments) {
+            public C invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 C originalCollection = holder.get(propertyDefinition).get();
 
@@ -115,7 +116,7 @@ public class CollectionPropertyAccessorFactory {
         return new FunctionExecutor<E>() {
 
             @Override
-            public E invoke(FeatureHolder holder, Object... arguments) {
+            public E invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 for (E element : holder.get(propertyDefinition).get()) {
                     if (matcher.matches(element)) {
@@ -142,7 +143,7 @@ public class CollectionPropertyAccessorFactory {
 
             @SuppressWarnings ("unchecked")
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 try {
                     for (Object value : arguments) {
@@ -172,7 +173,7 @@ public class CollectionPropertyAccessorFactory {
         return new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 try {
                     for (Object value : arguments) {
@@ -202,7 +203,7 @@ public class CollectionPropertyAccessorFactory {
         return new FunctionExecutor<E>() {
 
             @Override
-            public E invoke(FeatureHolder holder, Object... arguments) {
+            public E invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 return holder.get(propertyDefinition).get().peek();
             }
@@ -222,7 +223,7 @@ public class CollectionPropertyAccessorFactory {
         return new FunctionExecutor<E>() {
 
             @Override
-            public E invoke(FeatureHolder holder, Object... arguments) {
+            public E invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 return holder.get(propertyDefinition).get().poll();
             }
@@ -243,8 +244,9 @@ public class CollectionPropertyAccessorFactory {
          * @param element The element to check.
          * @param arguments The arguments which were passed during invokation.
          * @return True if the given element matches, false if not.
+         * @throws StopExecutionException The execution of the current invokation queue should stop.
          */
-        public boolean matches(E element, Object... arguments);
+        public boolean matches(E element, Object... arguments) throws StopExecutionException;
 
     }
 
@@ -257,7 +259,7 @@ public class CollectionPropertyAccessorFactory {
     public static class ClassMatcher<E> implements CriteriumMatcher<E> {
 
         @Override
-        public boolean matches(E element, Object... arguments) {
+        public boolean matches(E element, Object... arguments) throws StopExecutionException {
 
             Validate.isTrue(arguments.length == 1, "Wrong arguments: 'java.lang.Class matchClass' required");
             Validate.isTrue(arguments[0] instanceof Class, "Wrong arguments: 'java.lang.Class matchClass' required");

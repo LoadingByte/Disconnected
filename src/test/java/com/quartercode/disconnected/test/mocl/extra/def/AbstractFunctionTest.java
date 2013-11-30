@@ -24,13 +24,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.extra.Execution;
-import com.quartercode.disconnected.mocl.extra.Execution.ExecutionPolicy;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.AbstractFunction;
 
 public class AbstractFunctionTest {
@@ -38,15 +37,14 @@ public class AbstractFunctionTest {
     private AbstractFunction<Object> function;
 
     @Test
-    @Ignore
-    public void testInvoke() {
+    public void testInvoke() throws FunctionExecutionException {
 
         final List<Object> actualArguments = new ArrayList<Object>();
         final Object returnValue = "ReturnValue";
         FunctionExecutor<Object> executor = new FunctionExecutor<Object>() {
 
             @Override
-            public Object invoke(FeatureHolder holder, Object... arguments) {
+            public Object invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 actualArguments.addAll(Arrays.asList(arguments));
                 return returnValue;
@@ -69,7 +67,7 @@ public class AbstractFunctionTest {
     }
 
     @Test
-    public void testInvokePriority() {
+    public void testInvokePriority() throws FunctionExecutionException {
 
         Set<FunctionExecutor<Object>> executors = new HashSet<FunctionExecutor<Object>>();
         executors.add(new FunctionExecutor1<Object>());

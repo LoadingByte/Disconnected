@@ -27,6 +27,7 @@ import org.junit.Test;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.extra.Function;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.AbstractFunction;
 import com.quartercode.disconnected.mocl.extra.def.AbstractFunctionDefinition;
 
@@ -54,7 +55,7 @@ public class AbstractFunctionDefinitionTest {
         FunctionExecutor<Void> executor = new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 return null;
             }

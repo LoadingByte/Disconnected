@@ -23,6 +23,7 @@ import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Property;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 
 /**
  * A utility class for creating {@link FunctionExecutor}s which can access simple {@link Property}s (like getters or setters).
@@ -44,7 +45,7 @@ public class PropertyAccessorFactory {
         return new FunctionExecutor<T>() {
 
             @Override
-            public T invoke(FeatureHolder holder, Object... arguments) {
+            public T invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 return holder.get(propertyDefinition).get();
             }
@@ -65,7 +66,7 @@ public class PropertyAccessorFactory {
 
             @SuppressWarnings ("unchecked")
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 Validate.isTrue(arguments.length == 1, "Wrong arguments: '? value' required");
 
