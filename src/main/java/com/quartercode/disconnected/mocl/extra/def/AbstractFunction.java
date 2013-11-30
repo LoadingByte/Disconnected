@@ -102,8 +102,6 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
 
             if (!sortedExecutors.containsKey(priority)) {
                 sortedExecutors.put(priority, new HashSet<FunctionExecutor<R>>());
-            } else {
-                LOGGER.warning("Function executor '" + executor.getClass().getName() + "' has the same priority as " + sortedExecutors.get(priority));
             }
             sortedExecutors.get(priority).add(executor);
         }
@@ -117,6 +115,17 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
                     returnValues.add(executor.invoke(getHolder(), arguments));
                 }
                 catch (StopExecutionException e) {
+                    if (priorityGroup.size() > 1) {
+                        String otherExecutors = "";
+                        for (FunctionExecutor<R> otherExecutor : priorityGroup) {
+                            if (!otherExecutor.equals(executor)) {
+                                otherExecutors += ", '" + otherExecutor.getClass().getName() + "'";
+                            }
+                        }
+                        otherExecutors = otherExecutors.substring(2);
+                        LOGGER.warning("Function executor '" + executor.getClass().getName() + "' stopped while having the same priority as the executors " + otherExecutors);
+                    }
+
                     if (e.getCause() == null) {
                         break invokeExecutors;
                     } else {
