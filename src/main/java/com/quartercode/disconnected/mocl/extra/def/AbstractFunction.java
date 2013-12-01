@@ -82,7 +82,18 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
     }
 
     @Override
-    public List<R> invoke(Object... arguments) throws FunctionExecutionException {
+    public R invoke(Object... arguments) throws FunctionExecutionException {
+
+        List<R> returnValues = invokeRA(arguments);
+        if (returnValues.size() > 0) {
+            return returnValues.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public List<R> invokeRA(Object... arguments) throws FunctionExecutionException {
 
         Map<Integer, Set<FunctionExecutor<R>>> sortedExecutors = new TreeMap<Integer, Set<FunctionExecutor<R>>>(new Comparator<Integer>() {
 
@@ -149,17 +160,6 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         }
 
         return returnValues;
-    }
-
-    @Override
-    public R invokeRF(Object... arguments) throws FunctionExecutionException {
-
-        List<R> returnValues = invoke(arguments);
-        if (returnValues.size() > 0) {
-            return returnValues.get(0);
-        } else {
-            return null;
-        }
     }
 
     @Override

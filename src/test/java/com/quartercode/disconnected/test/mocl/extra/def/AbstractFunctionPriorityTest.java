@@ -82,7 +82,7 @@ public class AbstractFunctionPriorityTest {
         Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<Object>>> executorMap = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<Object>>>();
         executorMap.put(FeatureHolder.class, executors);
         AbstractFunction<Object> function = new AbstractFunction<Object>("testFunction", new DefaultFeatureHolder(), executorMap);
-        function.invokeRF();
+        function.invoke();
 
         Assert.assertTrue("Executor 1 wasn't invoked", invokedFunctionExecutor1.get());
         Assert.assertTrue("Executor 2 wasn't invoked", invokedFunctionExecutor2.get());

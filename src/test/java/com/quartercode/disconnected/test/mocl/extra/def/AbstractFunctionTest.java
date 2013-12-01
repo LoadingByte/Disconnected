@@ -62,7 +62,7 @@ public class AbstractFunctionTest {
         arguments.add("Test");
         arguments.add(String.class);
         arguments.add(new Object[] { "Test", 12345, true });
-        Object actualReturnValue = function.invokeRF(arguments.toArray(new Object[arguments.size()]));
+        Object actualReturnValue = function.invoke(arguments.toArray(new Object[arguments.size()]));
 
         Assert.assertEquals("Received arguments", arguments, actualArguments);
         Assert.assertEquals("Received return value", returnValue, actualReturnValue);

@@ -97,7 +97,7 @@ public class AbstractFunctionInheritanceTest {
         }
 
         AbstractFunction<Void> function = new AbstractFunction<Void>("testFunction", variant.newInstance(), executorMap);
-        function.invokeRF();
+        function.invoke();
 
         Assert.assertTrue("Invokation pattern doesn't equal", Arrays.equals(expectedInvokations, actualInvokations));
     }

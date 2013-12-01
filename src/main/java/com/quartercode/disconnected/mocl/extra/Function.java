@@ -41,23 +41,24 @@ public interface Function<R> extends Feature {
 
     /**
      * Invokes the defined function with the given arguments on all {@link FunctionExecutor}s.
-     * This returns the values the {@link FunctionExecutor}s return in invokation order.
-     * If you want the value of the executor with the highest priority, use the index 0 or {@link #invokeRF(Object...)}.
-     * 
-     * @param arguments Some arguments for the {@link FunctionExecutor}s.
-     * @return The values the invoked {@link FunctionExecutor}s return. Also contains null values.
-     * @throws FunctionExecutionException Something goes wrong during the invokation of a {@link FunctionExecutor}.
-     */
-    public List<R> invoke(Object... arguments) throws FunctionExecutionException;
-
-    /**
-     * Invokes the defined function with the given arguments on all {@link FunctionExecutor}s.
      * This returns the return value of the {@link FunctionExecutor}s with the highest priority.
+     * If you want the return values of all executors, use {@link #invokeRA(Object...)}.
      * 
      * @param arguments Some arguments for the {@link FunctionExecutor}s.
      * @return The value the {@link FunctionExecutor}s with the highest priority returns. May be null.
      * @throws FunctionExecutionException Something goes wrong during the invokation of a {@link FunctionExecutor}.
      */
-    public R invokeRF(Object... arguments) throws FunctionExecutionException;
+    public R invoke(Object... arguments) throws FunctionExecutionException;
+
+    /**
+     * Invokes the defined function with the given arguments on all {@link FunctionExecutor}s.
+     * This returns the values the {@link FunctionExecutor}s return in invokation order.
+     * If you want the value of the executor with the highest priority, use the index 0 or {@link #invoke(Object...)}.
+     * 
+     * @param arguments Some arguments for the {@link FunctionExecutor}s.
+     * @return The values the invoked {@link FunctionExecutor}s return. Also contains null values.
+     * @throws FunctionExecutionException Something goes wrong during the invokation of a {@link FunctionExecutor}.
+     */
+    public List<R> invokeRA(Object... arguments) throws FunctionExecutionException;
 
 }
