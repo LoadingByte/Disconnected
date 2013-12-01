@@ -20,13 +20,16 @@ package com.quartercode.disconnected.test.mocl.extra.def;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Assert;
 import org.junit.Test;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
@@ -34,8 +37,6 @@ import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.AbstractFunction;
 
 public class AbstractFunctionTest {
-
-    private AbstractFunction<Object> function;
 
     @Test
     public void testInvoke() throws FunctionExecutionException {
@@ -53,9 +54,11 @@ public class AbstractFunctionTest {
 
         };
 
+        Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<Object>>> executorMap = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<Object>>>();
         Set<FunctionExecutor<Object>> executors = new HashSet<FunctionExecutor<Object>>();
         executors.add(executor);
-        function = new AbstractFunction<Object>("testFunction", null, executors);
+        executorMap.put(FeatureHolder.class, executors);
+        AbstractFunction<Object> function = new AbstractFunction<Object>("testFunction", new DefaultFeatureHolder(), executorMap);
 
         List<Object> arguments = new ArrayList<Object>();
         arguments.add("Test");

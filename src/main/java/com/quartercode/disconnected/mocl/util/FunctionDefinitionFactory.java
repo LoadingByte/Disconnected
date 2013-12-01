@@ -1,6 +1,7 @@
 
 package com.quartercode.disconnected.mocl.util;
 
+import java.util.Map;
 import java.util.Set;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.extra.Function;
@@ -28,7 +29,7 @@ public class FunctionDefinitionFactory {
         return new AbstractFunctionDefinition<R>(name) {
 
             @Override
-            protected Function<R> create(FeatureHolder holder, Set<FunctionExecutor<R>> executors) {
+            protected Function<R> create(FeatureHolder holder, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors) {
 
                 return new AbstractFunction<R>(getName(), holder, executors);
             }
@@ -37,24 +38,26 @@ public class FunctionDefinitionFactory {
     }
 
     /**
-     * Creates a new {@link FunctionDefinition} and adds the given default {@link FunctionExecutor}.
+     * Creates a new {@link FunctionDefinition} and adds the given default {@link FunctionExecutor} for the given default variant.
      * 
      * @param name The name of the new {@link FunctionDefinition}.
+     * @param defaultVariation The class which defines the {@link FunctionDefinition} constant. The default executor is added here.
      * @param defaultExecutor The default {@link FunctionExecutor} to add to the definition.
      * @return The new {@link FunctionDefinition}.
      */
-    public static <R> FunctionDefinition<R> create(String name, FunctionExecutor<R> defaultExecutor) {
+    public static <R> FunctionDefinition<R> create(String name, Class<? extends FeatureHolder> defaultVariation, FunctionExecutor<R> defaultExecutor) {
 
         FunctionDefinition<R> definition = new AbstractFunctionDefinition<R>(name) {
 
             @Override
-            protected Function<R> create(FeatureHolder holder, Set<FunctionExecutor<R>> executors) {
+            protected Function<R> create(FeatureHolder holder, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors) {
 
                 return new AbstractFunction<R>(getName(), holder, executors);
             }
 
         };
-        definition.addExecutor("default", defaultExecutor);
+
+        definition.addExecutor(defaultVariation, "default", defaultExecutor);
 
         return definition;
     }

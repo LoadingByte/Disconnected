@@ -32,20 +32,22 @@ import com.quartercode.disconnected.mocl.base.FeatureHolder;
 public interface FunctionDefinition<R> extends FeatureDefinition<Function<R>> {
 
     /**
-     * Registers a new {@link FunctionExecutor} under the given name to the definition.
+     * Registers a new {@link FunctionExecutor} under the given variant and name to the definition.
      * Registered {@link FunctionExecutor} should transfer to created {@link Function}s.
      * 
+     * @param variant The class the {@link FunctionExecutor} is used for. It will also be used for every subclass of this class.
      * @param name The name of the {@link FunctionExecutor} to register. You can use that name to unregister the {@link FunctionExecutor} through {@link #removeExecutor(String)}.
      * @param executor The actual {@link FunctionExecutor} object to register.
      */
-    public void addExecutor(String name, FunctionExecutor<R> executor);
+    public void addExecutor(Class<? extends FeatureHolder> variant, String name, FunctionExecutor<R> executor);
 
     /**
-     * Unregisters an {@link FunctionExecutor} which is registered under the given name from the definition.
+     * Unregisters an {@link FunctionExecutor} which is registered under the given variant and name from the definition.
      * The unregistered {@link FunctionExecutor} wont transfer into new {@link Function}s, but it will stay in the ones which are already created.
      * 
+     * @param variant The class the {@link FunctionExecutor} for removal is used for.
      * @param name The name the {@link FunctionExecutor} to unregister has. You used that name for {@link #addExecutor(String, Object)}.
      */
-    public void removeExecutor(String name);
+    public void removeExecutor(Class<? extends FeatureHolder> variant, String name);
 
 }

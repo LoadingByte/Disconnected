@@ -18,13 +18,14 @@
 
 package com.quartercode.disconnected.test.mocl.extra.def;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
 import com.quartercode.disconnected.mocl.extra.Function;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.StopExecutionException;
@@ -41,7 +42,7 @@ public class AbstractFunctionDefinitionTest {
         functionDefinition = new AbstractFunctionDefinition<Void>("testFunctionDefinition") {
 
             @Override
-            protected Function<Void> create(FeatureHolder holder, Set<FunctionExecutor<Void>> executors) {
+            protected Function<Void> create(FeatureHolder holder, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<Void>>> executors) {
 
                 return new AbstractFunction<Void>(getName(), holder, executors);
             }
@@ -61,10 +62,10 @@ public class AbstractFunctionDefinitionTest {
             }
 
         };
-        functionDefinition.addExecutor("default", executor);
-        Function<Void> function = functionDefinition.create(null);
+        functionDefinition.addExecutor(FeatureHolder.class, "default", executor);
+        Function<Void> function = functionDefinition.create(new DefaultFeatureHolder());
 
-        List<FunctionExecutor<Void>> expectedExecutors = new ArrayList<FunctionExecutor<Void>>();
+        Set<FunctionExecutor<Void>> expectedExecutors = new HashSet<FunctionExecutor<Void>>();
         expectedExecutors.add(executor);
         Assert.assertEquals("Function object's executors", expectedExecutors, function.getExecutors());
     }

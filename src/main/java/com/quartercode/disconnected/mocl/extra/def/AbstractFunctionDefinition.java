@@ -41,7 +41,7 @@ import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
  */
 public abstract class AbstractFunctionDefinition<R> extends AbstractFeatureDefinition<Function<R>> implements FunctionDefinition<R> {
 
-    private final Map<String, FunctionExecutor<R>> executors = new HashMap<String, FunctionExecutor<R>>();
+    private final Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>>();
 
     /**
      * Creates a new abstract function definition for defining a {@link Function} with the given name.
@@ -54,21 +54,31 @@ public abstract class AbstractFunctionDefinition<R> extends AbstractFeatureDefin
     }
 
     @Override
-    public void addExecutor(String name, FunctionExecutor<R> executor) {
+    public void addExecutor(Class<? extends FeatureHolder> variant, String name, FunctionExecutor<R> executor) {
 
-        executors.put(name, executor);
+        if (!executors.containsKey(variant)) {
+            executors.put(variant, new HashSet<FunctionExecutor<R>>());
+        }
+
+        executors.get(variant).add(executor);
     }
 
     @Override
-    public void removeExecutor(String name) {
+    public void removeExecutor(Class<? extends FeatureHolder> variant, String name) {
 
-        executors.remove(name);
+        if (executors.containsKey(variant)) {
+            executors.get(variant).remove(name);
+
+            if (executors.get(variant).isEmpty()) {
+                executors.remove(variant);
+            }
+        }
     }
 
     @Override
     public Function<R> create(FeatureHolder holder) {
 
-        return create(holder, new HashSet<FunctionExecutor<R>>(executors.values()));
+        return create(holder, new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>>(executors));
     }
 
     /**
@@ -76,9 +86,9 @@ public abstract class AbstractFunctionDefinition<R> extends AbstractFeatureDefin
      * The holder is a {@link FeatureHolder} which can have different {@link Feature}s.
      * 
      * @param holder The {@link FeatureHolder} which holds the new {@link Function}.
-     * @param executors The {@link FunctionExecutor}s which should be used in the new {@link Function}.
+     * @param executors The {@link FunctionExecutor}s which should be used in the new {@link Function} for the different variants.
      * @return The created {@link Function}.
      */
-    protected abstract Function<R> create(FeatureHolder holder, Set<FunctionExecutor<R>> executors);
+    protected abstract Function<R> create(FeatureHolder holder, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors);
 
 }

@@ -20,11 +20,12 @@ package com.quartercode.disconnected.mocl.extra.def;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -48,18 +49,18 @@ import com.quartercode.disconnected.mocl.extra.StopExecutionException;
  */
 public class AbstractFunction<R> extends AbstractFeature implements Function<R> {
 
-    private static final Logger      LOGGER    = Logger.getLogger(AbstractFeature.class.getName());
+    private static final Logger                                           LOGGER    = Logger.getLogger(AbstractFeature.class.getName());
 
-    private Set<FunctionExecutor<R>> executors = new HashSet<FunctionExecutor<R>>();
+    private Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>>();
 
     /**
      * Creates a new abstract function with the given name, parent {@link FeatureHolder} and {@link FunctionExecutor}s.
      * 
      * @param name The name of the abstract function.
      * @param holder The {@link FeatureHolder} which has and uses the new abstract function.
-     * @param executors The {@link FunctionExecutor}s which will be executing the function calls.
+     * @param executors The {@link FunctionExecutor}s which will be executing the function calls for the different variants.
      */
-    public AbstractFunction(String name, FeatureHolder holder, Set<FunctionExecutor<R>> executors) {
+    public AbstractFunction(String name, FeatureHolder holder, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors) {
 
         super(name, holder);
 
@@ -69,7 +70,15 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
     @Override
     public Set<FunctionExecutor<R>> getExecutors() {
 
-        return Collections.unmodifiableSet(executors);
+        Set<FunctionExecutor<R>> actualExecutors = new HashSet<FunctionExecutor<R>>();
+
+        for (Entry<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> variant : executors.entrySet()) {
+            if (variant.getKey().isAssignableFrom(getHolder().getClass())) {
+                actualExecutors.addAll(variant.getValue());
+            }
+        }
+
+        return actualExecutors;
     }
 
     @Override
@@ -86,7 +95,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         });
 
         // Sort the executors by priority
-        for (FunctionExecutor<R> executor : executors) {
+        for (FunctionExecutor<R> executor : getExecutors()) {
             int priority = Prioritized.DEFAULT;
 
             // Read custom priorities
