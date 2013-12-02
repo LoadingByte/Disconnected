@@ -261,8 +261,8 @@ public class CollectionPropertyAccessorFactory {
         @Override
         public boolean matches(E element, Object... arguments) throws StopExecutionException {
 
-            Validate.isTrue(arguments.length == 1, "Wrong arguments: 'java.lang.Class matchClass' required");
-            Validate.isTrue(arguments[0] instanceof Class, "Wrong arguments: 'java.lang.Class matchClass' required");
+            Validate.isTrue(arguments.length == 1, "Wrong arguments: 'Class<?> matchClass' required");
+            Validate.isTrue(arguments[0] instanceof Class, "Wrong arguments: 'Class<?> matchClass' required");
 
             return ((Class<?>) arguments[0]).isAssignableFrom(element.getClass());
         }
