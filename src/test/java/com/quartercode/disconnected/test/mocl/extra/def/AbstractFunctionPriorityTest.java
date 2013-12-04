@@ -38,14 +38,14 @@ public class AbstractFunctionPriorityTest {
     @Test
     public void testInvoke() throws FunctionExecutionException {
 
-        Set<FunctionExecutor<Object>> executors = new HashSet<FunctionExecutor<Object>>();
+        Set<FunctionExecutor<Void>> executors = new HashSet<FunctionExecutor<Void>>();
 
         final AtomicBoolean invokedFunctionExecutor1 = new AtomicBoolean();
-        executors.add(new FunctionExecutor<Object>() {
+        executors.add(new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (3)
-            public Object invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 invokedFunctionExecutor1.set(true);
                 return null;
@@ -54,11 +54,11 @@ public class AbstractFunctionPriorityTest {
         });
 
         final AtomicBoolean invokedFunctionExecutor2 = new AtomicBoolean();
-        executors.add(new FunctionExecutor<Object>() {
+        executors.add(new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (2)
-            public Object invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 invokedFunctionExecutor2.set(true);
                 throw new StopExecutionException("Test");
@@ -67,11 +67,11 @@ public class AbstractFunctionPriorityTest {
         });
 
         final AtomicBoolean invokedFunctionExecutor3 = new AtomicBoolean();
-        executors.add(new FunctionExecutor<Object>() {
+        executors.add(new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (1)
-            public Object invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 invokedFunctionExecutor3.set(true);
                 return null;
@@ -79,9 +79,9 @@ public class AbstractFunctionPriorityTest {
 
         });
 
-        Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<Object>>> executorMap = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<Object>>>();
+        Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<Void>>> executorMap = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<Void>>>();
         executorMap.put(FeatureHolder.class, executors);
-        AbstractFunction<Object> function = new AbstractFunction<Object>("testFunction", new DefaultFeatureHolder(), executorMap);
+        AbstractFunction<Void> function = new AbstractFunction<Void>("testFunction", new DefaultFeatureHolder(), executorMap);
         function.invoke();
 
         Assert.assertTrue("Executor 1 wasn't invoked", invokedFunctionExecutor1.get());
