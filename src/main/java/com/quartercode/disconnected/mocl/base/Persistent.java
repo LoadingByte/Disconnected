@@ -16,13 +16,12 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.mocl.extra;
+package com.quartercode.disconnected.mocl.base;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import com.quartercode.disconnected.mocl.base.Feature;
 
 /**
  * {@link Feature}s which have this annotation are persistent and can be serialized.

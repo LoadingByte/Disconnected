@@ -24,7 +24,8 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.extra.Persistent;
+import com.quartercode.disconnected.mocl.base.Persistent;
+import com.quartercode.disconnected.mocl.base.def.AbstractPersistentFeature;
 import com.quartercode.disconnected.mocl.extra.Property;
 import com.quartercode.disconnected.util.ObjectAdapter;
 

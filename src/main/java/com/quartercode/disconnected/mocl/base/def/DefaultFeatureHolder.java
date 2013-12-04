@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlID;
 import com.quartercode.disconnected.mocl.base.Feature;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.extra.Persistent;
+import com.quartercode.disconnected.mocl.base.Persistent;
 
 /**
  * A default feature holder is a class which is modifiable through {@link Feature}s.

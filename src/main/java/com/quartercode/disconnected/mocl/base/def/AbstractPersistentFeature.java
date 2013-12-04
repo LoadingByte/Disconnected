@@ -1,11 +1,10 @@
 
-package com.quartercode.disconnected.mocl.extra.def;
+package com.quartercode.disconnected.mocl.base.def;
 
 import javax.xml.bind.Unmarshaller;
 import com.quartercode.disconnected.mocl.base.Feature;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeature;
-import com.quartercode.disconnected.mocl.extra.Persistent;
+import com.quartercode.disconnected.mocl.base.Persistent;
 
 /**
  * The abstract persistent feature is a {@link Feature} which can be serialized using JAXB.
