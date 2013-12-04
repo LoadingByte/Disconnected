@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,7 +50,7 @@ import com.quartercode.disconnected.mocl.extra.StopExecutionException;
  */
 public class AbstractFunction<R> extends AbstractFeature implements Function<R> {
 
-    private static final Logger                                           LOGGER    = Logger.getLogger(AbstractFeature.class.getName());
+    private static final Logger                                           LOGGER    = Logger.getLogger(AbstractFunction.class.getName());
 
     private Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>>();
 
@@ -81,6 +82,17 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         return actualExecutors;
     }
 
+    /**
+     * Collects the {@link FunctionExecutor}s which can be invoked through {@link #invoke(Object...)} or {@link #invokeRA(Object...)}.
+     * This can be overriden to modify which {@link FunctionExecutor}s should be invoked.
+     * 
+     * @return The {@link FunctionExecutor}s which can be invoked.
+     */
+    protected Set<FunctionExecutor<R>> getExecutableExecutors() {
+
+        return getExecutors();
+    }
+
     @Override
     public R invoke(Object... arguments) throws FunctionExecutionException {
 
@@ -95,7 +107,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
     @Override
     public List<R> invokeRA(Object... arguments) throws FunctionExecutionException {
 
-        Map<Integer, Set<FunctionExecutor<R>>> sortedExecutors = new TreeMap<Integer, Set<FunctionExecutor<R>>>(new Comparator<Integer>() {
+        SortedMap<Integer, Set<FunctionExecutor<R>>> sortedExecutors = new TreeMap<Integer, Set<FunctionExecutor<R>>>(new Comparator<Integer>() {
 
             @Override
             public int compare(Integer o1, Integer o2) {
@@ -106,7 +118,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         });
 
         // Sort the executors by priority
-        for (FunctionExecutor<R> executor : getExecutors()) {
+        for (FunctionExecutor<R> executor : getExecutableExecutors()) {
             int priority = Prioritized.DEFAULT;
 
             // Read custom priorities
