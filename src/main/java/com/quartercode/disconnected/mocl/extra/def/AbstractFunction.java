@@ -134,26 +134,31 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
                 try {
                     returnValues.add(executor.invoke(getHolder(), arguments));
                 }
-                catch (StopExecutionException e) {
-                    if (priorityGroup.size() > 1) {
-                        String otherExecutors = "";
-                        for (FunctionExecutor<R> otherExecutor : priorityGroup) {
-                            if (!otherExecutor.equals(executor)) {
-                                otherExecutors += ", '" + otherExecutor.getClass().getName() + "'";
+                catch (Exception e) {
+                    // Allow StopExecutionException and IllegalArgumentException (argument validation)
+                    if (e instanceof StopExecutionException || e instanceof IllegalArgumentException) {
+                        if (priorityGroup.size() > 1) {
+                            String otherExecutors = "";
+                            for (FunctionExecutor<R> otherExecutor : priorityGroup) {
+                                if (!otherExecutor.equals(executor)) {
+                                    otherExecutors += ", '" + otherExecutor.getClass().getName() + "'";
+                                }
+                            }
+                            otherExecutors = otherExecutors.substring(2);
+                            LOGGER.warning("Function executor '" + executor.getClass().getName() + "' stopped while having the same priority as the executors " + otherExecutors);
+                        }
+
+                        if (e.getCause() == null) {
+                            break invokeExecutors;
+                        } else {
+                            if (e.getMessage() == null) {
+                                throw new FunctionExecutionException(e.getCause());
+                            } else {
+                                throw new FunctionExecutionException(e.getMessage(), e.getCause());
                             }
                         }
-                        otherExecutors = otherExecutors.substring(2);
-                        LOGGER.warning("Function executor '" + executor.getClass().getName() + "' stopped while having the same priority as the executors " + otherExecutors);
-                    }
-
-                    if (e.getCause() == null) {
-                        break invokeExecutors;
                     } else {
-                        if (e.getMessage() == null) {
-                            throw new FunctionExecutionException(e.getCause());
-                        } else {
-                            throw new FunctionExecutionException(e.getMessage(), e.getCause());
-                        }
+                        LOGGER.log(Level.SEVERE, "Function executor '" + executor.getClass().getName() + "' threw an unexpected exception", e);
                     }
                 }
             }
