@@ -28,7 +28,6 @@ import com.quartercode.disconnected.mocl.base.Feature;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.extra.Persistent;
-import com.quartercode.disconnected.util.InfoString;
 
 /**
  * A default feature holder is a class which is modifiable through {@link Feature}s.
@@ -40,7 +39,7 @@ import com.quartercode.disconnected.util.InfoString;
  * @see Feature
  * @see FeatureDefinition
  */
-public class DefaultFeatureHolder implements FeatureHolder, InfoString {
+public class DefaultFeatureHolder implements FeatureHolder {
 
     private final Set<Feature> features = new HashSet<Feature>();
 
@@ -152,21 +151,15 @@ public class DefaultFeatureHolder implements FeatureHolder, InfoString {
     }
 
     @Override
-    public String toInfoString() {
+    public String toString() {
 
         String featureString = "";
         for (Feature feature : features) {
-            featureString += ", " + (feature instanceof InfoString ? ((InfoString) feature).toInfoString() : feature.toString());
+            featureString += ", " + feature.getName();
         }
         featureString = featureString.substring(2);
 
-        return featureString;
-    }
-
-    @Override
-    public String toString() {
-
-        return getClass().getName() + " [" + toInfoString() + "]";
+        return getClass().getName() + " [features=" + featureString + "]";
     }
 
 }

@@ -127,9 +127,9 @@ public class ObjectProperty<T> extends AbstractPersistentFeature implements Prop
     }
 
     @Override
-    public String toInfoString() {
+    public String toString() {
 
-        return super.toInfoString() + ", object " + object;
+        return getClass().getName() + " [name=" + getName() + ", object=" + object + "]";
     }
 
 }

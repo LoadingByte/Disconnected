@@ -129,9 +129,9 @@ public class ReferenceProperty<T> extends AbstractPersistentFeature implements P
     }
 
     @Override
-    public String toInfoString() {
+    public String toString() {
 
-        return super.toInfoString() + ", referencing " + reference;
+        return getClass().getName() + " [name=" + getName() + ", reference=" + reference + "]";
     }
 
 }

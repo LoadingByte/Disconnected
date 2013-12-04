@@ -28,7 +28,6 @@ import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.extra.Persistent;
 import com.quartercode.disconnected.mocl.extra.Property;
 import com.quartercode.disconnected.mocl.extra.Updateable;
-import com.quartercode.disconnected.util.InfoString;
 import com.quartercode.disconnected.util.ObjectInstanceAdapter;
 
 /**
@@ -148,9 +147,9 @@ public class TickFeature extends AbstractPersistentFeature implements Updateable
     }
 
     @Override
-    public String toInfoString() {
+    public String toString() {
 
-        return super.toInfoString() + " with " + updateTasks.size() + " tasks running";
+        return getClass().getName() + " [name=" + getName() + ", " + updateTasks.size() + " update tasks]";
     }
 
     /**
@@ -160,7 +159,7 @@ public class TickFeature extends AbstractPersistentFeature implements Updateable
      * 
      * @see Runnable
      */
-    public static class UpdateTask implements InfoString {
+    public static class UpdateTask {
 
         private TickFeature feature;
 
@@ -333,15 +332,9 @@ public class TickFeature extends AbstractPersistentFeature implements Updateable
         }
 
         @Override
-        public String toInfoString() {
-
-            return "delay of " + delay + " ticks" + (period > 0 ? " with loop every " + period + " ticks" : "") + ", " + elapsed + " elapsed";
-        }
-
-        @Override
         public String toString() {
 
-            return getClass().getName() + " [" + toInfoString() + "]";
+            return getClass().getName() + " [delay=" + delay + ", " + (period > 0 ? "period=" + period + ", " : "") + "elapsed=" + elapsed + "]";
         }
 
     }

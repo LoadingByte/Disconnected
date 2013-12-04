@@ -21,7 +21,6 @@ package com.quartercode.disconnected.mocl.base.def;
 import com.quartercode.disconnected.mocl.base.Feature;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.util.InfoString;
 
 /**
  * An abstract feature definition is used to get a {@link Feature} from a {@link FeatureHolder}.
@@ -33,7 +32,7 @@ import com.quartercode.disconnected.util.InfoString;
  * @see FeatureDefinition
  * @see Feature
  */
-public abstract class AbstractFeatureDefinition<F extends Feature> implements FeatureDefinition<F>, InfoString {
+public abstract class AbstractFeatureDefinition<F extends Feature> implements FeatureDefinition<F> {
 
     private final String name;
 
@@ -86,15 +85,9 @@ public abstract class AbstractFeatureDefinition<F extends Feature> implements Fe
     }
 
     @Override
-    public String toInfoString() {
-
-        return "def " + name;
-    }
-
-    @Override
     public String toString() {
 
-        return getClass().getName() + " [" + toInfoString() + "]";
+        return getClass().getName() + " [name=" + name + "]";
     }
 
 }

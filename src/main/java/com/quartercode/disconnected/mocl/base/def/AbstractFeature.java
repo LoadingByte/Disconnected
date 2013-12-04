@@ -21,7 +21,6 @@ package com.quartercode.disconnected.mocl.base.def;
 import javax.xml.bind.annotation.XmlAttribute;
 import com.quartercode.disconnected.mocl.base.Feature;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.util.InfoString;
 
 /**
  * An abstract feature is a part of a {@link FeatureHolder} and is used for creating modifiable classes.
@@ -30,7 +29,7 @@ import com.quartercode.disconnected.util.InfoString;
  * 
  * @see Feature
  */
-public class AbstractFeature implements Feature, InfoString {
+public class AbstractFeature implements Feature {
 
     @XmlAttribute
     private final String  name;
@@ -103,15 +102,9 @@ public class AbstractFeature implements Feature, InfoString {
     }
 
     @Override
-    public String toInfoString() {
-
-        return getName();
-    }
-
-    @Override
     public String toString() {
 
-        return getClass().getName() + " [" + toInfoString() + "]";
+        return getClass().getName() + " [name=" + name + "]";
     }
 
 }

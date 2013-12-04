@@ -163,9 +163,9 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
     }
 
     @Override
-    public String toInfoString() {
+    public String toString() {
 
-        return super.toInfoString() + ", " + executors.size() + " executors";
+        return getClass().getName() + " [name=" + getName() + ", " + executors.size() + " executors]";
     }
 
 }
