@@ -84,7 +84,7 @@ public class CollectionPropertyAccessorFactory {
 
                 Collection<E> collection = new ArrayList<E>();
                 for (E element : originalCollection) {
-                    if (matcher.matches(element)) {
+                    if (matcher.matches(element, arguments)) {
                         collection.add(element);
                     }
                 }
@@ -119,7 +119,7 @@ public class CollectionPropertyAccessorFactory {
             public E invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 for (E element : holder.get(propertyDefinition).get()) {
-                    if (matcher.matches(element)) {
+                    if (matcher.matches(element, arguments)) {
                         return element;
                     }
                 }

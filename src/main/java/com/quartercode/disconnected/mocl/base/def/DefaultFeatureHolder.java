@@ -183,7 +183,7 @@ public class DefaultFeatureHolder implements FeatureHolder, LockableClass {
         for (Feature feature : features) {
             featureString += ", " + feature.getName();
         }
-        featureString = featureString.substring(2);
+        featureString = "{" + (featureString.isEmpty() ? "" : featureString.substring(2)) + "}";
 
         return getClass().getName() + " [features=" + featureString + "]";
     }
