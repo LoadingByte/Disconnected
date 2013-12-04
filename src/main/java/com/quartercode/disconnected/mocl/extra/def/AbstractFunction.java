@@ -36,6 +36,8 @@ import com.quartercode.disconnected.mocl.base.def.AbstractFeature;
 import com.quartercode.disconnected.mocl.extra.Function;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
+import com.quartercode.disconnected.mocl.extra.Lockable;
+import com.quartercode.disconnected.mocl.extra.LockableClass;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
 import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 
@@ -47,12 +49,14 @@ import com.quartercode.disconnected.mocl.extra.StopExecutionException;
  * @param <R> The type of the return value of the used {@link FunctionExecutor}s. The function returns a {@link List} with these values.
  * @see FunctionExecutor
  * @see Function
+ * @see LockableClass
  */
-public class AbstractFunction<R> extends AbstractFeature implements Function<R> {
+public class AbstractFunction<R> extends AbstractFeature implements Function<R>, LockableClass {
 
     private static final Logger                                           LOGGER    = Logger.getLogger(AbstractFunction.class.getName());
 
     private Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>>();
+    private boolean                                                       locked;
 
     /**
      * Creates a new abstract function with the given name, parent {@link FeatureHolder} and {@link FunctionExecutor}s.
@@ -66,6 +70,19 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         super(name, holder);
 
         this.executors = executors;
+        setLocked(true);
+    }
+
+    @Override
+    public boolean isLocked() {
+
+        return locked;
+    }
+
+    @Override
+    public void setLocked(boolean locked) {
+
+        this.locked = locked;
     }
 
     @Override
@@ -90,7 +107,23 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
      */
     protected Set<FunctionExecutor<R>> getExecutableExecutors() {
 
-        return getExecutors();
+        Set<FunctionExecutor<R>> executors = getExecutors();
+
+        if (locked) {
+            for (FunctionExecutor<R> executor : new HashSet<FunctionExecutor<R>>(executors)) {
+                try {
+                    Method invoke = executor.getClass().getMethod("invoke", FeatureHolder.class, Object[].class);
+                    if (invoke.isAnnotationPresent(Lockable.class)) {
+                        executors.remove(executor);
+                    }
+                }
+                catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Programmer's fault: Can't find invoke() method (should be defined by interface)", e);
+                }
+            }
+        }
+
+        return executors;
     }
 
     @Override
@@ -182,7 +215,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
     @Override
     public String toString() {
 
-        return getClass().getName() + " [name=" + getName() + ", " + executors.size() + " executors]";
+        return getClass().getName() + " [name=" + getName() + ", " + getExecutableExecutors().size() + "/" + getExecutors().size() + " executors, locked=" + locked + "]";
     }
 
 }

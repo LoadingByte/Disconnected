@@ -28,6 +28,7 @@ import com.quartercode.disconnected.mocl.base.Feature;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.Persistent;
+import com.quartercode.disconnected.mocl.extra.LockableClass;
 
 /**
  * A default feature holder is a class which is modifiable through {@link Feature}s.
@@ -38,16 +39,37 @@ import com.quartercode.disconnected.mocl.base.Persistent;
  * @see FeatureHolder
  * @see Feature
  * @see FeatureDefinition
+ * @see LockableClass
  */
-public class DefaultFeatureHolder implements FeatureHolder {
+public class DefaultFeatureHolder implements FeatureHolder, LockableClass {
 
     private final Set<Feature> features = new HashSet<Feature>();
+    private boolean            locked;
 
     /**
      * Creates a new default feature holder.
      */
     public DefaultFeatureHolder() {
 
+        setLocked(true);
+    }
+
+    @Override
+    public boolean isLocked() {
+
+        return locked;
+    }
+
+    @Override
+    public void setLocked(boolean locked) {
+
+        this.locked = locked;
+
+        for (Feature feature : this) {
+            if (feature instanceof LockableClass) {
+                ((LockableClass) feature).setLocked(locked);
+            }
+        }
     }
 
     @SuppressWarnings ("unchecked")
@@ -60,7 +82,11 @@ public class DefaultFeatureHolder implements FeatureHolder {
             }
         }
 
+        boolean locked = isLocked();
         F feature = definition.create(this);
+        if (feature instanceof LockableClass) {
+            ((LockableClass) feature).setLocked(locked);
+        }
         features.add(feature);
         return feature;
     }
