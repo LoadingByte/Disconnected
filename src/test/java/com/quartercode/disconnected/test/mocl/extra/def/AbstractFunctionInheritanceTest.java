@@ -102,11 +102,11 @@ public class AbstractFunctionInheritanceTest {
         Assert.assertTrue("Invokation pattern doesn't equal", Arrays.equals(expectedInvokations, actualInvokations));
     }
 
-    public static class Parent extends DefaultFeatureHolder {
+    private static class Parent extends DefaultFeatureHolder {
 
     }
 
-    public static class Child extends Parent {
+    private static class Child extends Parent {
 
     }
 

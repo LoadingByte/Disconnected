@@ -86,7 +86,7 @@ public class ReferenceProperty<T> extends AbstractPersistentFeature implements P
     @Override
     public void set(T value) {
 
-        this.reference = value;
+        reference = value;
     }
 
     @Override

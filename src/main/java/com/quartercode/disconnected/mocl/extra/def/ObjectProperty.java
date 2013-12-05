@@ -84,7 +84,7 @@ public class ObjectProperty<T> extends AbstractPersistentFeature implements Prop
     @Override
     public void set(T value) {
 
-        this.object = value;
+        object = value;
     }
 
     @Override
