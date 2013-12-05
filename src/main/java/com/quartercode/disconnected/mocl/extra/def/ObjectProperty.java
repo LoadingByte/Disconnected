@@ -99,7 +99,7 @@ public class ObjectProperty<T> extends AbstractPersistentFeature implements Prop
     public int hashCode() {
 
         final int prime = 31;
-        int result = 1;
+        int result = super.hashCode();
         result = prime * result + (object == null ? 0 : object.hashCode());
         return result;
     }
@@ -110,7 +110,7 @@ public class ObjectProperty<T> extends AbstractPersistentFeature implements Prop
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (!super.equals(obj)) {
             return false;
         }
         if (getClass() != obj.getClass()) {
