@@ -21,6 +21,7 @@ package com.quartercode.disconnected.mocl.util;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.extra.ChildFeatureHolder;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Property;
 import com.quartercode.disconnected.mocl.extra.StopExecutionException;
@@ -71,7 +72,17 @@ public class PropertyAccessorFactory {
                 Validate.isTrue(arguments.length == 1, "Wrong arguments: '? value' required");
 
                 try {
+                    // Set the parent of the old object to null
+                    if (holder.get(propertyDefinition).get() instanceof ChildFeatureHolder) {
+                        ((ChildFeatureHolder<FeatureHolder>) holder.get(propertyDefinition).get()).setParent(null);
+                    }
+
                     holder.get(propertyDefinition).set((T) arguments[0]);
+
+                    // Set the parent of the new object the new holder
+                    if (arguments[0] instanceof ChildFeatureHolder) {
+                        ((ChildFeatureHolder<FeatureHolder>) arguments[0]).setParent(holder);
+                    }
                 }
                 catch (ClassCastException e) {
                     String type = e.getMessage().substring(e.getMessage().indexOf(" cannot be cast to ") + 19, e.getMessage().length());

@@ -30,6 +30,7 @@ import java.util.TreeSet;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.extra.ChildFeatureHolder;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Property;
 import com.quartercode.disconnected.mocl.extra.StopExecutionException;
@@ -132,7 +133,7 @@ public class CollectionPropertyAccessorFactory {
 
     /**
      * Creates a new adder {@link FunctionExecutor} for the given {@link Collection} {@link Property} definition.
-     * An adder function adds values to the {@link Collection} of a {@link Property}.
+     * An adder function adds elements to the {@link Collection} of a {@link Property}.
      * 
      * @param propertyDefinition The {@link FeatureDefinition} of the {@link Collection} {@link Property} to access.
      * @return The created {@link FunctionExecutor}.
@@ -146,13 +147,18 @@ public class CollectionPropertyAccessorFactory {
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 try {
-                    for (Object value : arguments) {
-                        holder.get(propertyDefinition).get().add((E) value);
+                    for (Object element : arguments) {
+                        boolean changed = holder.get(propertyDefinition).get().add((E) element);
+
+                        // Set the parent of the added element the new holder
+                        if (changed && element instanceof ChildFeatureHolder) {
+                            ((ChildFeatureHolder<FeatureHolder>) element).setParent(holder);
+                        }
                     }
                 }
                 catch (ClassCastException e) {
                     String type = e.getMessage().substring(e.getMessage().indexOf(" cannot be cast to ") + 19, e.getMessage().length());
-                    throw new IllegalArgumentException("Wrong arguments: '" + type + " value' required");
+                    throw new IllegalArgumentException("Wrong arguments: '" + type + "... elements' required");
                 }
 
                 return null;
@@ -163,7 +169,7 @@ public class CollectionPropertyAccessorFactory {
 
     /**
      * Creates a new remover {@link FunctionExecutor} for the given {@link Collection} {@link Property} definition.
-     * A remover function removes values from the {@link Collection} of a {@link Property}.
+     * A remover function removes elements from the {@link Collection} of a {@link Property}.
      * 
      * @param propertyDefinition The {@link FeatureDefinition} of the {@link Collection} {@link Property} to access.
      * @return The created {@link FunctionExecutor}.
@@ -172,17 +178,23 @@ public class CollectionPropertyAccessorFactory {
 
         return new FunctionExecutor<Void>() {
 
+            @SuppressWarnings ("unchecked")
             @Override
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 try {
-                    for (Object value : arguments) {
-                        holder.get(propertyDefinition).get().remove(value);
+                    for (Object element : arguments) {
+                        boolean changed = holder.get(propertyDefinition).get().remove(element);
+
+                        // Set the parent of the removed element to null
+                        if (changed && element instanceof ChildFeatureHolder) {
+                            ((ChildFeatureHolder<FeatureHolder>) element).setParent(null);
+                        }
                     }
                 }
                 catch (ClassCastException e) {
                     String type = e.getMessage().substring(e.getMessage().indexOf(" cannot be cast to ") + 19, e.getMessage().length());
-                    throw new IllegalArgumentException("Wrong arguments: '" + type + " value' required");
+                    throw new IllegalArgumentException("Wrong arguments: '" + type + "... elements' required");
                 }
 
                 return null;
@@ -222,10 +234,18 @@ public class CollectionPropertyAccessorFactory {
 
         return new FunctionExecutor<E>() {
 
+            @SuppressWarnings ("unchecked")
             @Override
             public E invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
-                return holder.get(propertyDefinition).get().poll();
+                E element = holder.get(propertyDefinition).get().poll();
+
+                // Set the parent of the removed (polled) element to null
+                if (element != null && element instanceof ChildFeatureHolder) {
+                    ((ChildFeatureHolder<FeatureHolder>) element).setParent(null);
+                }
+
+                return element;
             }
 
         };
