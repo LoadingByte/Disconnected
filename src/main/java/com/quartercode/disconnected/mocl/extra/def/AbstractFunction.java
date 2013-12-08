@@ -140,6 +140,11 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
     @Override
     public List<R> invokeRA(Object... arguments) throws FunctionExecutionException {
 
+        Set<FunctionExecutor<R>> executors = getExecutableExecutors();
+        if (executors.isEmpty()) {
+            LOGGER.warning("No executable executors found for function '" + getName() + "' in holder class '" + getHolder().getClass().getName() + "'" + (locked ? ". Locked?" : ""));
+        }
+
         SortedMap<Integer, Set<FunctionExecutor<R>>> sortedExecutors = new TreeMap<Integer, Set<FunctionExecutor<R>>>(new Comparator<Integer>() {
 
             @Override
