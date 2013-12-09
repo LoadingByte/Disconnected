@@ -201,11 +201,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
                         if (e.getCause() == null) {
                             break invokeExecutors;
                         } else {
-                            if (e.getMessage() == null) {
-                                throw new FunctionExecutionException(e.getCause());
-                            } else {
-                                throw new FunctionExecutionException(e.getMessage(), e.getCause());
-                            }
+                            throw new FunctionExecutionException(e.getCause());
                         }
                     } else {
                         LOGGER.log(Level.SEVERE, "Function executor '" + executor.getClass().getName() + "' threw an unexpected exception", e);
