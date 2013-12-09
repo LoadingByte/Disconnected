@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.mocl.extra;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
@@ -32,6 +33,29 @@ import com.quartercode.disconnected.mocl.base.FeatureHolder;
  * @see FunctionExecutor
  */
 public interface FunctionDefinition<R> extends FeatureDefinition<Function<R>> {
+
+    /**
+     * Returns a list of all parameters which are used by the function definition.
+     * See {@link #setParameter(int, Class)} for further explanation.
+     * 
+     * @return All parameters which are used by the function definition.
+     */
+    public List<Class<?>> getParameters();
+
+    /**
+     * Sets a function parameter which is required in the {@link Function#invoke(Object...)} method.
+     * Such a parameter is comparable with a normal method parameter.
+     * This method could be created using the calls:
+     * 
+     * <pre>
+     * setParameter(0, Integer.class);
+     * setParameter(1, Class.class);
+     * </pre>
+     * 
+     * @param index The index of the parameter (0 is the first one, 1 the second one etc.).
+     * @param type The type the argument for the parameter must have. null removes the parameter.
+     */
+    public void setParameter(int index, Class<?> type);
 
     /**
      * Returns a map of all {@link FunctionExecutor}s which are used by the function definition with their variants.

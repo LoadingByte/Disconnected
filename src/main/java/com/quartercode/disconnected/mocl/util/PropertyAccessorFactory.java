@@ -18,7 +18,6 @@
 
 package com.quartercode.disconnected.mocl.util;
 
-import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.extra.ChildFeatureHolder;
@@ -69,24 +68,16 @@ public class PropertyAccessorFactory {
             @Override
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
-                Validate.isTrue(arguments.length == 1, "Wrong arguments: '? value' required");
-
-                try {
-                    // Set the parent of the old object to null
-                    if (holder.get(propertyDefinition).get() instanceof ChildFeatureHolder) {
-                        ((ChildFeatureHolder<FeatureHolder>) holder.get(propertyDefinition).get()).setParent(null);
-                    }
-
-                    holder.get(propertyDefinition).set((T) arguments[0]);
-
-                    // Set the parent of the new object the new holder
-                    if (arguments[0] instanceof ChildFeatureHolder) {
-                        ((ChildFeatureHolder<FeatureHolder>) arguments[0]).setParent(holder);
-                    }
+                // Set the parent of the old object to null
+                if (holder.get(propertyDefinition).get() instanceof ChildFeatureHolder) {
+                    ((ChildFeatureHolder<FeatureHolder>) holder.get(propertyDefinition).get()).setParent(null);
                 }
-                catch (ClassCastException e) {
-                    String type = e.getMessage().substring(e.getMessage().indexOf(" cannot be cast to ") + 19, e.getMessage().length());
-                    throw new IllegalArgumentException("Wrong arguments: '" + type + " value' required");
+
+                holder.get(propertyDefinition).set((T) arguments[0]);
+
+                // Set the parent of the new object the new holder
+                if (arguments[0] instanceof ChildFeatureHolder) {
+                    ((ChildFeatureHolder<FeatureHolder>) arguments[0]).setParent(holder);
                 }
 
                 return null;

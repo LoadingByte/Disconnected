@@ -18,10 +18,14 @@
 
 package com.quartercode.disconnected.mocl.extra.def;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.mocl.base.Feature;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
@@ -41,16 +45,43 @@ import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
  */
 public abstract class AbstractFunctionDefinition<R> extends AbstractFeatureDefinition<Function<R>> implements FunctionDefinition<R> {
 
-    private final Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>>();
+    private final List<Class<?>>                                                parameters = new ArrayList<Class<?>>();
+    private final Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors  = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>>();
 
     /**
-     * Creates a new abstract function definition for defining a {@link Function} with the given name.
+     * Creates a new abstract function definition for defining a {@link Function} with the given name and parameters.
+     * Of course, the parameters can be changed later on using {@link #setParameter(int, Class)}.
      * 
      * @param name The name of the defined {@link Function}.
+     * @param parameters The parameters for the defined function. See {@link #setParameter(int, Class)} for further explanation.
      */
-    public AbstractFunctionDefinition(String name) {
+    public AbstractFunctionDefinition(String name, Class<?>... parameters) {
 
         super(name);
+
+        for (int index = 0; index < parameters.length; index++) {
+            setParameter(index, parameters[index]);
+        }
+    }
+
+    @Override
+    public List<Class<?>> getParameters() {
+
+        return Collections.unmodifiableList(parameters);
+    }
+
+    @Override
+    public void setParameter(int index, Class<?> type) {
+
+        while (parameters.size() <= index) {
+            parameters.add(null);
+        }
+
+        parameters.set(index, type);
+
+        while (parameters.get(parameters.size() - 1) == null) {
+            parameters.remove(parameters.size() - 1);
+        }
     }
 
     @Override
@@ -84,7 +115,11 @@ public abstract class AbstractFunctionDefinition<R> extends AbstractFeatureDefin
     @Override
     public Function<R> create(FeatureHolder holder) {
 
-        return create(holder, new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>>(executors));
+        for (Class<?> parameter : parameters) {
+            Validate.isTrue(parameter != null, "Null parameters are not allowed");
+        }
+
+        return create(holder, parameters, new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>>(executors));
     }
 
     /**
@@ -95,6 +130,6 @@ public abstract class AbstractFunctionDefinition<R> extends AbstractFeatureDefin
      * @param executors The {@link FunctionExecutor}s which should be used in the new {@link Function} for the different variants.
      * @return The created {@link Function}.
      */
-    protected abstract Function<R> create(FeatureHolder holder, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors);
+    protected abstract Function<R> create(FeatureHolder holder, List<Class<?>> parameters, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors);
 
 }

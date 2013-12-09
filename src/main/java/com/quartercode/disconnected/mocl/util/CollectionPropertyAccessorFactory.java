@@ -27,7 +27,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.extra.ChildFeatureHolder;
@@ -146,19 +145,13 @@ public class CollectionPropertyAccessorFactory {
             @Override
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
-                try {
-                    for (Object element : arguments) {
-                        boolean changed = holder.get(propertyDefinition).get().add((E) element);
+                for (Object element : arguments) {
+                    boolean changed = holder.get(propertyDefinition).get().add((E) element);
 
-                        // Set the parent of the added element the new holder
-                        if (changed && element instanceof ChildFeatureHolder) {
-                            ((ChildFeatureHolder<FeatureHolder>) element).setParent(holder);
-                        }
+                    // Set the parent of the added element the new holder
+                    if (changed && element instanceof ChildFeatureHolder) {
+                        ((ChildFeatureHolder<FeatureHolder>) element).setParent(holder);
                     }
-                }
-                catch (ClassCastException e) {
-                    String type = e.getMessage().substring(e.getMessage().indexOf(" cannot be cast to ") + 19, e.getMessage().length());
-                    throw new IllegalArgumentException("Wrong arguments: '" + type + "... elements' required");
                 }
 
                 return null;
@@ -182,19 +175,13 @@ public class CollectionPropertyAccessorFactory {
             @Override
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
-                try {
-                    for (Object element : arguments) {
-                        boolean changed = holder.get(propertyDefinition).get().remove(element);
+                for (Object element : arguments) {
+                    boolean changed = holder.get(propertyDefinition).get().remove(element);
 
-                        // Set the parent of the removed element to null
-                        if (changed && element instanceof ChildFeatureHolder) {
-                            ((ChildFeatureHolder<FeatureHolder>) element).setParent(null);
-                        }
+                    // Set the parent of the removed element to null
+                    if (changed && element instanceof ChildFeatureHolder) {
+                        ((ChildFeatureHolder<FeatureHolder>) element).setParent(null);
                     }
-                }
-                catch (ClassCastException e) {
-                    String type = e.getMessage().substring(e.getMessage().indexOf(" cannot be cast to ") + 19, e.getMessage().length());
-                    throw new IllegalArgumentException("Wrong arguments: '" + type + "... elements' required");
                 }
 
                 return null;
@@ -271,7 +258,7 @@ public class CollectionPropertyAccessorFactory {
     }
 
     /**
-     * The class matcher checks if the elements are either either the same as or a superclass or superinterface of a given {@link Class}.
+     * The class matcher checks if the elements are either either the same as or a superclass or superinterface of a given {@link Class} (index 0).
      * 
      * @param <E> The type of elements the class matcher checks.
      * @see CriteriumMatcher
@@ -280,9 +267,6 @@ public class CollectionPropertyAccessorFactory {
 
         @Override
         public boolean matches(E element, Object... arguments) throws StopExecutionException {
-
-            Validate.isTrue(arguments.length == 1, "Wrong arguments: 'Class<?> matchClass' required");
-            Validate.isTrue(arguments[0] instanceof Class, "Wrong arguments: 'Class<?> matchClass' required");
 
             return ((Class<?>) arguments[0]).isAssignableFrom(element.getClass());
         }

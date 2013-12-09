@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.mocl.util;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
@@ -35,41 +36,45 @@ import com.quartercode.disconnected.mocl.extra.def.AbstractFunctionDefinition;
 public class FunctionDefinitionFactory {
 
     /**
-     * Creates a new {@link FunctionDefinition} which accepts {@link FunctionExecutor}s with the given return type.
+     * Creates a new {@link FunctionDefinition} with the given parameters which accepts {@link FunctionExecutor}s with the given return type.
+     * Of course, the parameters can be changed later on using {@link FunctionDefinition#setParameter(int, Class)}.
      * 
      * @param name The name of the new {@link FunctionDefinition}.
      * @param returnType The type of the objects {@link Function}s created by the definition return.
+     * @param parameters The parameters for the defined function. See {@link FunctionDefinition#setParameter(int, Class)} for further explanation.
      * @return The new {@link FunctionDefinition}.
      */
-    public static <R> FunctionDefinition<R> create(String name, Class<R> returnType) {
+    public static <R> FunctionDefinition<R> create(String name, Class<R> returnType, Class<?>... parameters) {
 
         return new AbstractFunctionDefinition<R>(name) {
 
             @Override
-            protected Function<R> create(FeatureHolder holder, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors) {
+            protected Function<R> create(FeatureHolder holder, List<Class<?>> parameters, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors) {
 
-                return new AbstractFunction<R>(getName(), holder, executors);
+                return new AbstractFunction<R>(getName(), holder, parameters, executors);
             }
 
         };
     }
 
     /**
-     * Creates a new {@link FunctionDefinition} and adds the given default {@link FunctionExecutor} for the given default variant.
+     * Creates a new {@link FunctionDefinition} with the given parameters and adds the given default {@link FunctionExecutor} for the given default variant.
+     * Of course, the parameters can be changed later on using {@link FunctionDefinition#setParameter(int, Class)}.
      * 
      * @param name The name of the new {@link FunctionDefinition}.
      * @param defaultVariation The class which defines the {@link FunctionDefinition} constant. The default executor is added here.
      * @param defaultExecutor The default {@link FunctionExecutor} to add to the definition.
+     * @param parameters The parameters for the defined function. See {@link FunctionDefinition#setParameter(int, Class)} for further explanation.
      * @return The new {@link FunctionDefinition}.
      */
-    public static <R> FunctionDefinition<R> create(String name, Class<? extends FeatureHolder> defaultVariation, FunctionExecutor<R> defaultExecutor) {
+    public static <R> FunctionDefinition<R> create(String name, Class<? extends FeatureHolder> defaultVariation, FunctionExecutor<R> defaultExecutor, Class<?>... parameters) {
 
-        FunctionDefinition<R> definition = new AbstractFunctionDefinition<R>(name) {
+        FunctionDefinition<R> definition = new AbstractFunctionDefinition<R>(name, parameters) {
 
             @Override
-            protected Function<R> create(FeatureHolder holder, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors) {
+            protected Function<R> create(FeatureHolder holder, List<Class<?>> parameters, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors) {
 
-                return new AbstractFunction<R>(getName(), holder, executors);
+                return new AbstractFunction<R>(getName(), holder, parameters, executors);
             }
 
         };

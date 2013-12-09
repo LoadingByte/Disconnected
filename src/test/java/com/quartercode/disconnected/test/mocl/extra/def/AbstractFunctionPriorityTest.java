@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.test.mocl.extra.def;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -81,7 +82,7 @@ public class AbstractFunctionPriorityTest {
 
         Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<Void>>> executorMap = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<Void>>>();
         executorMap.put(FeatureHolder.class, executors);
-        AbstractFunction<Void> function = new AbstractFunction<Void>("testFunction", new DefaultFeatureHolder(), executorMap);
+        AbstractFunction<Void> function = new AbstractFunction<Void>("testFunction", new DefaultFeatureHolder(), new ArrayList<Class<?>>(), executorMap);
         function.invoke();
 
         Assert.assertTrue("Executor 1 wasn't invoked", invokedFunctionExecutor1.get());

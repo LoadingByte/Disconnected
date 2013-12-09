@@ -20,8 +20,8 @@ package com.quartercode.disconnected.mocl.extra.def;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +31,11 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeature;
 import com.quartercode.disconnected.mocl.extra.Function;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Lockable;
@@ -53,22 +55,28 @@ import com.quartercode.disconnected.mocl.extra.StopExecutionException;
  */
 public class AbstractFunction<R> extends AbstractFeature implements Function<R>, LockableClass {
 
-    private static final Logger                                           LOGGER    = Logger.getLogger(AbstractFunction.class.getName());
+    private static final Logger                                                 LOGGER = Logger.getLogger(AbstractFunction.class.getName());
 
-    private Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>>();
-    private boolean                                                       locked;
+    private final List<Class<?>>                                                parameters;
+    private final Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors;
+    private boolean                                                             locked;
 
     /**
-     * Creates a new abstract function with the given name, parent {@link FeatureHolder} and {@link FunctionExecutor}s.
+     * Creates a new abstract function with the given name, parent {@link FeatureHolder}, parameters and {@link FunctionExecutor}s.
      * 
      * @param name The name of the abstract function.
      * @param holder The {@link FeatureHolder} which has and uses the new abstract function.
+     * @param parameters The argument types an {@link #invoke(Object...)} call must have (see {@link FunctionDefinition#setParameter(int, Class)} for further explanation).
      * @param executors The {@link FunctionExecutor}s which will be executing the function calls for the different variants.
      */
-    public AbstractFunction(String name, FeatureHolder holder, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors) {
+    public AbstractFunction(String name, FeatureHolder holder, List<Class<?>> parameters, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors) {
 
         super(name, holder);
 
+        for (Class<?> parameter : parameters) {
+            Validate.isTrue(parameter != null, "Null parameters are not allowed");
+        }
+        this.parameters = parameters;
         this.executors = executors;
         setLocked(true);
     }
@@ -83,6 +91,12 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
     public void setLocked(boolean locked) {
 
         this.locked = locked;
+    }
+
+    @Override
+    public List<Class<?>> getParameters() {
+
+        return Collections.unmodifiableList(parameters);
     }
 
     @Override
@@ -140,11 +154,39 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
     @Override
     public List<R> invokeRA(Object... arguments) throws FunctionExecutionException {
 
+        // Argument validation
+        try {
+            String errorString = "";
+            for (Class<?> parameter : parameters) {
+                errorString += ", " + parameter.getSimpleName();
+            }
+            errorString = "Wrong arguments: '" + (errorString.isEmpty() ? "" : errorString.substring(2)) + "' required";
+
+            for (int index = 0; index < parameters.size(); index++) {
+                if (!parameters.get(index).isAssignableFrom(arguments[index].getClass())) {
+                    if (parameters.get(index).isArray()) {
+                        for (int varargIndex = index; varargIndex < arguments.length; varargIndex++) {
+                            Validate.isTrue(parameters.get(index).getComponentType().isAssignableFrom(arguments[varargIndex].getClass()), errorString);
+                        }
+                    } else {
+                        throw new IllegalArgumentException(errorString);
+                    }
+                }
+            }
+        }
+        catch (IllegalArgumentException e) {
+            throw new FunctionExecutionException(e);
+        }
+
+        // Check if there are any executable executors
         Set<FunctionExecutor<R>> executors = getExecutableExecutors();
         if (executors.isEmpty()) {
             LOGGER.warning("No executable executors found for function '" + getName() + "' in holder class '" + getHolder().getClass().getName() + "'" + (locked ? ". Locked?" : ""));
+            // Would not do anything -> Don't run unnecessary stuff
+            return null;
         }
 
+        // Sort the executors by priority
         SortedMap<Integer, Set<FunctionExecutor<R>>> sortedExecutors = new TreeMap<Integer, Set<FunctionExecutor<R>>>(new Comparator<Integer>() {
 
             @Override
@@ -154,8 +196,6 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
             }
 
         });
-
-        // Sort the executors by priority
         for (FunctionExecutor<R> executor : getExecutableExecutors()) {
             int priority = Prioritized.DEFAULT;
 

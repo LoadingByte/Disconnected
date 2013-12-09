@@ -56,7 +56,7 @@ public class AbstractFunctionTest {
         Set<FunctionExecutor<Object>> executors = new HashSet<FunctionExecutor<Object>>();
         executors.add(executor);
         executorMap.put(FeatureHolder.class, executors);
-        AbstractFunction<Object> function = new AbstractFunction<Object>("testFunction", new DefaultFeatureHolder(), executorMap);
+        AbstractFunction<Object> function = new AbstractFunction<Object>("testFunction", new DefaultFeatureHolder(), new ArrayList<Class<?>>(), executorMap);
 
         List<Object> arguments = new ArrayList<Object>();
         arguments.add("Test");

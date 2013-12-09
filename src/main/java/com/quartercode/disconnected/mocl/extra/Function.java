@@ -33,7 +33,16 @@ import com.quartercode.disconnected.mocl.base.Feature;
 public interface Function<R> extends Feature {
 
     /**
-     * Returns a set of all {@link FunctionExecutor}s which are used by the function. {@link FunctionExecutor}s are used for actually handling a function call.
+     * Returns a list of all parameters which are used by the {@link FunctionExecutor}s.
+     * See {@link FunctionDefinition#setParameter(int, Class)} for further explanation.
+     * 
+     * @return All parameters which are used by the function.
+     */
+    public List<Class<?>> getParameters();
+
+    /**
+     * Returns a set of all {@link FunctionExecutor}s which are used by the function.
+     * They are used for actually handling a function call.
      * 
      * @return All {@link FunctionExecutor}s which are used by the function.
      */

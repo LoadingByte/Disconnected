@@ -35,69 +35,75 @@ import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.Lockable;
 import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.AbstractFunction;
 
 @RunWith (Parameterized.class)
-public class AbstractFunctionLockableTest {
+public class AbstractFunctionParameterTest {
 
     @Parameters
     public static Collection<Object[]> data() {
 
         List<Object[]> data = new ArrayList<Object[]>();
 
-        data.add(new Object[] { new boolean[] { true, true }, false });
-        data.add(new Object[] { new boolean[] { true, false }, true });
+        data.add(new Object[] { new Class<?>[] {}, new Object[] { 0 }, true });
+
+        data.add(new Object[] { new Class<?>[] { String.class }, new Object[] { "" }, true });
+        data.add(new Object[] { new Class<?>[] { String.class }, new Object[] { 0 }, false });
+
+        data.add(new Object[] { new Class<?>[] { String.class, Integer.class }, new Object[] { "", 0 }, true });
+        data.add(new Object[] { new Class<?>[] { String.class, Integer.class }, new Object[] { "", "" }, false });
+
+        data.add(new Object[] { new Class<?>[] { Integer[].class }, new Object[] { 0 }, true });
+        data.add(new Object[] { new Class<?>[] { Integer[].class }, new Object[] { 0, 1, 2 }, true });
+        data.add(new Object[] { new Class<?>[] { Integer[].class }, new Object[] { "" }, false });
+        data.add(new Object[] { new Class<?>[] { Integer[].class }, new Object[] { "", "" }, false });
+        data.add(new Object[] { new Class<?>[] { String.class, Integer[].class }, new Object[] { "", 0, 1, 2 }, true });
+        data.add(new Object[] { new Class<?>[] { String.class, Integer[].class }, new Object[] { "", "", 0, 1, 2 }, false });
+
+        data.add(new Object[] { new Class<?>[] { Integer[].class }, new Object[] { new Integer[] { 0, 1, 2 } }, true });
 
         return data;
     }
 
-    private final boolean[] expectedInvokations;
-    private final boolean   locked;
+    private final Class<?>[] parameters;
+    private final Object[]   arguments;
+    private final boolean    works;
 
-    public AbstractFunctionLockableTest(boolean[] expectedInvokations, boolean locked) {
+    public AbstractFunctionParameterTest(Class<?>[] parameters, Object[] arguments, boolean works) {
 
-        this.expectedInvokations = expectedInvokations;
-        this.locked = locked;
+        this.parameters = parameters;
+        this.arguments = arguments;
+        this.works = works;
     }
 
     @Test
     public void testInvoke() throws InstantiationException, IllegalAccessException, FunctionExecutionException {
 
-        final boolean[] actualInvokations = new boolean[2];
         Set<FunctionExecutor<Void>> executors = new HashSet<FunctionExecutor<Void>>();
-
         executors.add(new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
-                actualInvokations[0] = true;
                 return null;
             }
 
         });
-
-        executors.add(new FunctionExecutor<Void>() {
-
-            @Override
-            @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
-
-                actualInvokations[1] = true;
-                return null;
-            }
-
-        });
-
         Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<Void>>> executorMap = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<Void>>>();
         executorMap.put(FeatureHolder.class, executors);
-        AbstractFunction<Void> function = new AbstractFunction<Void>("testFunction", new DefaultFeatureHolder(), new ArrayList<Class<?>>(), executorMap);
-        function.setLocked(locked);
-        function.invoke();
 
-        Assert.assertTrue("Invokation pattern doesn't equal", Arrays.equals(expectedInvokations, actualInvokations));
+        boolean actuallyWorks;
+        try {
+            AbstractFunction<Void> function = new AbstractFunction<Void>("testFunction", new DefaultFeatureHolder(), Arrays.asList(parameters), executorMap);
+            function.invoke(arguments);
+            actuallyWorks = true;
+        }
+        catch (FunctionExecutionException e) {
+            actuallyWorks = false;
+        }
+
+        Assert.assertTrue("Function call " + (works ? "doesn't work" : "works"), actuallyWorks == works);
     }
 
 }
