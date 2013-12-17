@@ -40,6 +40,7 @@ import com.quartercode.disconnected.util.ObjectInstanceAdapter;
 @Persistent
 public class TickFeature extends AbstractPersistentFeature implements Updateable {
 
+    private boolean                enabled     = true;
     @XmlElement (name = "updateTask")
     private final List<UpdateTask> updateTasks = new ArrayList<UpdateTask>();
 
@@ -60,6 +61,28 @@ public class TickFeature extends AbstractPersistentFeature implements Updateable
     public TickFeature(String name, FeatureHolder parent) {
 
         super(name, parent);
+    }
+
+    /**
+     * Returns true if the tick on the tick feature is activated.
+     * Disabled tick features don't hand over tick updates to {@link UpdateTask}s.
+     * 
+     * @return The enabled state of the tick feature.
+     */
+    public boolean isEnabled() {
+
+        return enabled;
+    }
+
+    /**
+     * Changes the state of the tick feature to enabled (true) or disabled (false).
+     * Disabled tick features don't hand over tick updates to {@link UpdateTask}s.
+     * 
+     * @param enabled True if the tick feature is enabled, false if not.
+     */
+    public void setEnabled(boolean enabled) {
+
+        this.enabled = enabled;
     }
 
     /**
@@ -97,19 +120,21 @@ public class TickFeature extends AbstractPersistentFeature implements Updateable
     @Override
     public final void update() {
 
-        for (UpdateTask task : new ArrayList<UpdateTask>(updateTasks)) {
-            if (task.getElapsed() < 0) {
-                // Unregister cancelled tasks
-                remove(task);
-            } else {
-                // Elapse one tick.
-                task.elapse();
-
-                if (task.getPeriod() <= 0 && task.getElapsed() >= task.getDelay()) {
-                    task.getRunnable().run();
+        if (enabled) {
+            for (UpdateTask task : new ArrayList<UpdateTask>(updateTasks)) {
+                if (task.getElapsed() < 0) {
+                    // Unregister cancelled tasks
                     remove(task);
-                } else if (task.getPeriod() > 0 && (task.getElapsed() - task.getDelay()) % task.getPeriod() == 0) {
-                    task.getRunnable().run();
+                } else {
+                    // Elapse one tick.
+                    task.elapse();
+
+                    if (task.getPeriod() <= 0 && task.getElapsed() >= task.getDelay()) {
+                        task.getRunnable().run();
+                        remove(task);
+                    } else if (task.getPeriod() > 0 && (task.getElapsed() - task.getDelay()) % task.getPeriod() == 0) {
+                        task.getRunnable().run();
+                    }
                 }
             }
         }
