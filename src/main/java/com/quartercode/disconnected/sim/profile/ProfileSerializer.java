@@ -38,10 +38,7 @@ import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.World;
-import com.quartercode.disconnected.world.comp.Computer;
-import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.session.SessionProgram.Session;
-import com.quartercode.disconnected.world.general.RootObject;
 
 /**
  * This utility class loads a saves stored {@link Profile}s for serializing {@link Simulation}s.
@@ -144,16 +141,6 @@ public class ProfileSerializer {
      * @throws JAXBException An exception occurred while serializing the xml document.
      */
     public static void serializeWorld(OutputStream outputStream, World world) throws JAXBException {
-
-        for (Computer computer : world.getRoot().get(RootObject.COMPUTERS)) {
-            if (computer.get(Computer.OS).get().getProcessManager().getRootProcess() != null) {
-                for (Process process : computer.get(Computer.OS).get().getProcessManager().getAllProcesses()) {
-                    if (process.getExecutor() instanceof Session && ! ((Session) process.getExecutor()).isSerializable()) {
-                        throw new IllegalStateException("Can't serialize: There are open sessions which aren't serializable");
-                    }
-                }
-            }
-        }
 
         Marshaller marshaller = createWorldContext().createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
