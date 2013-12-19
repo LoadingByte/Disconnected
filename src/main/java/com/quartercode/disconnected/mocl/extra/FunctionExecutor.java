@@ -29,11 +29,11 @@ import com.quartercode.disconnected.mocl.base.FeatureHolder;
 public interface FunctionExecutor<R> {
 
     /**
-     * Invokes the defined function in the given {@link FeatureHolder} with the given arguments.
+     * Invokes the defined function executor in the given {@link FeatureHolder} with the given arguments.
      * 
-     * @param holder The {@link FeatureHolder} the function is invoked on.
-     * @param arguments Some arguments for the function.
-     * @return The value the invoked function returns. Can be null.
+     * @param holder The {@link FeatureHolder} the function executor is invoked in.
+     * @param arguments Some arguments for the function executor.
+     * @return The value the invoked function executor returns. Can be null.
      * @throws StopExecutionException The execution of the invokation queue should stop.
      */
     public R invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException;
