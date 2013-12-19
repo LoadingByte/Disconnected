@@ -85,12 +85,6 @@ public abstract class AbstractFunctionDefinition<R> extends AbstractFeatureDefin
     }
 
     @Override
-    public Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> getExecutors() {
-
-        return Collections.unmodifiableMap(executors);
-    }
-
-    @Override
     public void addExecutor(Class<? extends FeatureHolder> variant, String name, FunctionExecutor<R> executor) {
 
         if (!executors.containsKey(variant)) {

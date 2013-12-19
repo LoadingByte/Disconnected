@@ -19,8 +19,6 @@
 package com.quartercode.disconnected.mocl.extra;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 
@@ -56,14 +54,6 @@ public interface FunctionDefinition<R> extends FeatureDefinition<Function<R>> {
      * @param type The type the argument for the parameter must have. null removes the parameter.
      */
     public void setParameter(int index, Class<?> type);
-
-    /**
-     * Returns a map of all {@link FunctionExecutor}s which are used by the function definition with their variants.
-     * They are used for actually handling a function call.
-     * 
-     * @return All {@link FunctionExecutor}s which are used by the function.
-     */
-    public Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> getExecutors();
 
     /**
      * Registers a new {@link FunctionExecutor} under the given variant and name to the definition.
