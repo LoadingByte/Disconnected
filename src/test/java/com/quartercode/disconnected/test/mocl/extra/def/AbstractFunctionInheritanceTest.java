@@ -104,9 +104,18 @@ public class AbstractFunctionInheritanceTest {
 
     private static class Parent extends DefaultFeatureHolder {
 
+        public Parent() {
+
+        }
+
     }
 
     private static class Child extends Parent {
+
+        @SuppressWarnings ("unused")
+        public Child() {
+
+        }
 
     }
 

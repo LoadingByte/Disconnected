@@ -26,7 +26,7 @@ import com.quartercode.disconnected.mocl.base.FeatureHolder;
 
 /**
  * {@link FunctionExecutor}s which have this annotation define their priority.
- * The priority is used for determinating which {@link FunctionExecutor} sets the rules.
+ * The priority is used for determinating the order in which the avaiable {@link FunctionExecutor}s are invoked.
  * This should be annotated at the actual {@link FunctionExecutor#invoke(FeatureHolder, Object...)} method.
  * 
  * @see FunctionExecutor
