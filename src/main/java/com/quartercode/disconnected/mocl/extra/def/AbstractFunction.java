@@ -55,11 +55,11 @@ import com.quartercode.disconnected.mocl.extra.StopExecutionException;
  */
 public class AbstractFunction<R> extends AbstractFeature implements Function<R>, LockableClass {
 
-    private static final Logger                                                 LOGGER = Logger.getLogger(AbstractFunction.class.getName());
+    private static final Logger            LOGGER = Logger.getLogger(AbstractFunction.class.getName());
 
-    private final List<Class<?>>                                                parameters;
-    private final Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors;
-    private boolean                                                             locked;
+    private final List<Class<?>>           parameters;
+    private final Set<FunctionExecutor<R>> executors;
+    private boolean                        locked;
 
     /**
      * Creates a new abstract function with the given name, parent {@link FeatureHolder}, parameters and {@link FunctionExecutor}s.
@@ -77,7 +77,14 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
             Validate.isTrue(parameter != null, "Null parameters are not allowed");
         }
         this.parameters = parameters;
-        this.executors = executors;
+
+        this.executors = new HashSet<FunctionExecutor<R>>();
+        for (Entry<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> variant : executors.entrySet()) {
+            if (variant.getKey().isAssignableFrom(getHolder().getClass())) {
+                this.executors.addAll(variant.getValue());
+            }
+        }
+
         setLocked(true);
     }
 
@@ -102,15 +109,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
     @Override
     public Set<FunctionExecutor<R>> getExecutors() {
 
-        Set<FunctionExecutor<R>> actualExecutors = new HashSet<FunctionExecutor<R>>();
-
-        for (Entry<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> variant : executors.entrySet()) {
-            if (variant.getKey().isAssignableFrom(getHolder().getClass())) {
-                actualExecutors.addAll(variant.getValue());
-            }
-        }
-
-        return actualExecutors;
+        return executors;
     }
 
     /**
