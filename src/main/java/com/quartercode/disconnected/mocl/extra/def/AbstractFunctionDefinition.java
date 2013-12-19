@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.mocl.base.Feature;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
@@ -45,8 +46,8 @@ import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
  */
 public abstract class AbstractFunctionDefinition<R> extends AbstractFeatureDefinition<Function<R>> implements FunctionDefinition<R> {
 
-    private final List<Class<?>>                                                parameters = new ArrayList<Class<?>>();
-    private final Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors  = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>>();
+    private final List<Class<?>>                                                        parameters = new ArrayList<Class<?>>();
+    private final Map<Class<? extends FeatureHolder>, Map<String, FunctionExecutor<R>>> executors  = new HashMap<Class<? extends FeatureHolder>, Map<String, FunctionExecutor<R>>>();
 
     /**
      * Creates a new abstract function definition for defining a {@link Function} with the given name and parameters.
@@ -88,10 +89,10 @@ public abstract class AbstractFunctionDefinition<R> extends AbstractFeatureDefin
     public void addExecutor(Class<? extends FeatureHolder> variant, String name, FunctionExecutor<R> executor) {
 
         if (!executors.containsKey(variant)) {
-            executors.put(variant, new HashSet<FunctionExecutor<R>>());
+            executors.put(variant, new HashMap<String, FunctionExecutor<R>>());
         }
 
-        executors.get(variant).add(executor);
+        executors.get(variant).put(name, executor);
     }
 
     @Override
@@ -113,7 +114,14 @@ public abstract class AbstractFunctionDefinition<R> extends AbstractFeatureDefin
             Validate.isTrue(parameter != null, "Null parameters are not allowed");
         }
 
-        return create(holder, parameters, new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>>(executors));
+        Set<FunctionExecutor<R>> actualExecutors = new HashSet<FunctionExecutor<R>>();
+        for (Entry<Class<? extends FeatureHolder>, Map<String, FunctionExecutor<R>>> variant : executors.entrySet()) {
+            if (variant.getKey().isAssignableFrom(holder.getClass())) {
+                actualExecutors.addAll(variant.getValue().values());
+            }
+        }
+
+        return create(holder, parameters, actualExecutors);
     }
 
     /**
@@ -121,9 +129,9 @@ public abstract class AbstractFunctionDefinition<R> extends AbstractFeatureDefin
      * The holder is a {@link FeatureHolder} which can have different {@link Feature}s.
      * 
      * @param holder The {@link FeatureHolder} which holds the new {@link Function}.
-     * @param executors The {@link FunctionExecutor}s which should be used in the new {@link Function} for the different variants.
+     * @param executors The {@link FunctionExecutor}s which should be used in the new {@link Function}s.
      * @return The created {@link Function}.
      */
-    protected abstract Function<R> create(FeatureHolder holder, List<Class<?>> parameters, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors);
+    protected abstract Function<R> create(FeatureHolder holder, List<Class<?>> parameters, Set<FunctionExecutor<R>> executors);
 
 }

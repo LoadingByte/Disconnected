@@ -20,10 +20,8 @@ package com.quartercode.disconnected.test.mocl.extra.def;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,9 +37,10 @@ public class AbstractFunctionTest {
     @Test
     public void testInvoke() throws FunctionExecutionException {
 
+        Set<FunctionExecutor<Object>> executors = new HashSet<FunctionExecutor<Object>>();
         final List<Object> actualArguments = new ArrayList<Object>();
         final Object returnValue = "ReturnValue";
-        FunctionExecutor<Object> executor = new FunctionExecutor<Object>() {
+        executors.add(new FunctionExecutor<Object>() {
 
             @Override
             public Object invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
@@ -50,13 +49,9 @@ public class AbstractFunctionTest {
                 return returnValue;
             }
 
-        };
+        });
 
-        Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<Object>>> executorMap = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<Object>>>();
-        Set<FunctionExecutor<Object>> executors = new HashSet<FunctionExecutor<Object>>();
-        executors.add(executor);
-        executorMap.put(FeatureHolder.class, executors);
-        AbstractFunction<Object> function = new AbstractFunction<Object>("testFunction", new DefaultFeatureHolder(), new ArrayList<Class<?>>(), executorMap);
+        AbstractFunction<Object> function = new AbstractFunction<Object>("testFunction", new DefaultFeatureHolder(), new ArrayList<Class<?>>(), executors);
 
         List<Object> arguments = new ArrayList<Object>();
         arguments.add("Test");

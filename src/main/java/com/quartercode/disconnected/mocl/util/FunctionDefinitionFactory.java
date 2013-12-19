@@ -19,7 +19,6 @@
 package com.quartercode.disconnected.mocl.util;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.extra.Function;
@@ -49,7 +48,7 @@ public class FunctionDefinitionFactory {
         return new AbstractFunctionDefinition<R>(name) {
 
             @Override
-            protected Function<R> create(FeatureHolder holder, List<Class<?>> parameters, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors) {
+            protected Function<R> create(FeatureHolder holder, List<Class<?>> parameters, Set<FunctionExecutor<R>> executors) {
 
                 return new AbstractFunction<R>(getName(), holder, parameters, executors);
             }
@@ -72,7 +71,7 @@ public class FunctionDefinitionFactory {
         FunctionDefinition<R> definition = new AbstractFunctionDefinition<R>(name, parameters) {
 
             @Override
-            protected Function<R> create(FeatureHolder holder, List<Class<?>> parameters, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors) {
+            protected Function<R> create(FeatureHolder holder, List<Class<?>> parameters, Set<FunctionExecutor<R>> executors) {
 
                 return new AbstractFunction<R>(getName(), holder, parameters, executors);
             }

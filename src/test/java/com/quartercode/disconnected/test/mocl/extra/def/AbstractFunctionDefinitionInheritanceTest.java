@@ -21,25 +21,25 @@ package com.quartercode.disconnected.test.mocl.extra.def;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
+import com.quartercode.disconnected.mocl.extra.Function;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.AbstractFunction;
+import com.quartercode.disconnected.mocl.extra.def.AbstractFunctionDefinition;
 
 @RunWith (Parameterized.class)
-public class AbstractFunctionInheritanceTest {
+public class AbstractFunctionDefinitionInheritanceTest {
 
     @Parameters
     public static Collection<Object[]> data() {
@@ -55,10 +55,26 @@ public class AbstractFunctionInheritanceTest {
     private final Object[][]                     executors;
     private final Class<? extends FeatureHolder> variant;
 
-    public AbstractFunctionInheritanceTest(Object[][] executors, Class<? extends FeatureHolder> variant) {
+    private AbstractFunctionDefinition<Void>     functionDefinition;
+
+    public AbstractFunctionDefinitionInheritanceTest(Object[][] executors, Class<? extends FeatureHolder> variant) {
 
         this.executors = executors;
         this.variant = variant;
+    }
+
+    @Before
+    public void setUp() {
+
+        functionDefinition = new AbstractFunctionDefinition<Void>("testFunctionDefinition") {
+
+            @Override
+            protected Function<Void> create(FeatureHolder holder, List<Class<?>> parameters, Set<FunctionExecutor<Void>> executors) {
+
+                return new AbstractFunction<Void>(getName(), holder, parameters, executors);
+            }
+
+        };
     }
 
     private FunctionExecutor<Void> createTestExecutor(final boolean[] invokationArray, final int index) {
@@ -77,9 +93,8 @@ public class AbstractFunctionInheritanceTest {
 
     @SuppressWarnings ("unchecked")
     @Test
-    public void testInvoke() throws InstantiationException, IllegalAccessException, FunctionExecutionException {
+    public void testCreateFeatureHolder() throws InstantiationException, IllegalAccessException, FunctionExecutionException {
 
-        Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<Void>>> executorMap = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<Void>>>();
         boolean[] expectedInvokations = new boolean[executors.length];
         boolean[] actualInvokations = new boolean[executors.length];
 
@@ -88,15 +103,12 @@ public class AbstractFunctionInheritanceTest {
             expectedInvokations[index] = (Boolean) entry[1];
 
             Class<? extends FeatureHolder> variant = (Class<? extends FeatureHolder>) entry[0];
-            if (!executorMap.containsKey(variant)) {
-                executorMap.put(variant, new HashSet<FunctionExecutor<Void>>());
-            }
-            executorMap.get(variant).add(createTestExecutor(actualInvokations, index));
+            functionDefinition.addExecutor(variant, "executor" + index, createTestExecutor(actualInvokations, index));
 
             index++;
         }
 
-        AbstractFunction<Void> function = new AbstractFunction<Void>("testFunction", variant.newInstance(), new ArrayList<Class<?>>(), executorMap);
+        Function<Void> function = functionDefinition.create(variant.newInstance());
         function.invoke();
 
         Assert.assertTrue("Invokation pattern doesn't equal", Arrays.equals(expectedInvokations, actualInvokations));

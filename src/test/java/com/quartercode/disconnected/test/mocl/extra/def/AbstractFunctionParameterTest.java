@@ -21,10 +21,8 @@ package com.quartercode.disconnected.test.mocl.extra.def;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
@@ -90,12 +88,10 @@ public class AbstractFunctionParameterTest {
             }
 
         });
-        Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<Void>>> executorMap = new HashMap<Class<? extends FeatureHolder>, Set<FunctionExecutor<Void>>>();
-        executorMap.put(FeatureHolder.class, executors);
 
         boolean actuallyWorks;
         try {
-            AbstractFunction<Void> function = new AbstractFunction<Void>("testFunction", new DefaultFeatureHolder(), Arrays.asList(parameters), executorMap);
+            AbstractFunction<Void> function = new AbstractFunction<Void>("testFunction", new DefaultFeatureHolder(), Arrays.asList(parameters), executors);
             function.invoke(arguments);
             actuallyWorks = true;
         }

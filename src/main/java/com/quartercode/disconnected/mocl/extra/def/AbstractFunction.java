@@ -24,8 +24,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -69,7 +67,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
      * @param parameters The argument types an {@link #invoke(Object...)} call must have (see {@link FunctionDefinition#setParameter(int, Class)} for further explanation).
      * @param executors The {@link FunctionExecutor}s which will be executing the function calls for the different variants.
      */
-    public AbstractFunction(String name, FeatureHolder holder, List<Class<?>> parameters, Map<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> executors) {
+    public AbstractFunction(String name, FeatureHolder holder, List<Class<?>> parameters, Set<FunctionExecutor<R>> executors) {
 
         super(name, holder);
 
@@ -77,14 +75,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
             Validate.isTrue(parameter != null, "Null parameters are not allowed");
         }
         this.parameters = parameters;
-
-        this.executors = new HashSet<FunctionExecutor<R>>();
-        for (Entry<Class<? extends FeatureHolder>, Set<FunctionExecutor<R>>> variant : executors.entrySet()) {
-            if (variant.getKey().isAssignableFrom(getHolder().getClass())) {
-                this.executors.addAll(variant.getValue());
-            }
-        }
-
+        this.executors = executors;
         setLocked(true);
     }
 
