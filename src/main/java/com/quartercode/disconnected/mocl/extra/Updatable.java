@@ -26,7 +26,7 @@ import com.quartercode.disconnected.mocl.base.Feature;
  * 
  * @see Feature
  */
-public interface Updateable {
+public interface Updatable {
 
     /**
      * Executes a tick update in the {@link Feature}.
