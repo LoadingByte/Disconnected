@@ -21,11 +21,9 @@ package com.quartercode.disconnected.mocl.extra.def;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.mocl.base.Feature;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
@@ -114,10 +112,10 @@ public abstract class AbstractFunctionDefinition<R> extends AbstractFeatureDefin
             Validate.isTrue(parameter != null, "Null parameters are not allowed");
         }
 
-        Set<FunctionExecutor<R>> actualExecutors = new HashSet<FunctionExecutor<R>>();
+        Map<String, FunctionExecutor<R>> actualExecutors = new HashMap<String, FunctionExecutor<R>>();
         for (Entry<Class<? extends FeatureHolder>, Map<String, FunctionExecutor<R>>> variant : executors.entrySet()) {
             if (variant.getKey().isAssignableFrom(holder.getClass())) {
-                actualExecutors.addAll(variant.getValue().values());
+                actualExecutors.putAll(variant.getValue());
             }
         }
 
@@ -132,6 +130,6 @@ public abstract class AbstractFunctionDefinition<R> extends AbstractFeatureDefin
      * @param executors The {@link FunctionExecutor}s which should be used in the new {@link Function}s.
      * @return The created {@link Function}.
      */
-    protected abstract Function<R> create(FeatureHolder holder, List<Class<?>> parameters, Set<FunctionExecutor<R>> executors);
+    protected abstract Function<R> create(FeatureHolder holder, List<Class<?>> parameters, Map<String, FunctionExecutor<R>> executors);
 
 }

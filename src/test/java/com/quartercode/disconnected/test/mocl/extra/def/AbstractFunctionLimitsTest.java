@@ -20,9 +20,9 @@ package com.quartercode.disconnected.test.mocl.extra.def;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Assert;
 import org.junit.Test;
@@ -159,8 +159,8 @@ public class AbstractFunctionLimitsTest {
     @Test
     public void testInvoke() throws InstantiationException, IllegalAccessException, FunctionExecutionException {
 
-        Set<FunctionExecutor<Void>> executors = new HashSet<FunctionExecutor<Void>>();
-        executors.add(executor);
+        Map<String, FunctionExecutor<Void>> executors = new HashMap<String, FunctionExecutor<Void>>();
+        executors.put("default", executor);
         AbstractFunction<Void> function = new AbstractFunction<Void>("testFunction", new DefaultFeatureHolder(), new ArrayList<Class<?>>(), executors);
 
         for (int counter = 0; counter < invokations; counter++) {

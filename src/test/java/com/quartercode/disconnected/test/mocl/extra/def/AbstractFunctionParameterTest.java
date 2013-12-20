@@ -21,9 +21,9 @@ package com.quartercode.disconnected.test.mocl.extra.def;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -78,8 +78,8 @@ public class AbstractFunctionParameterTest {
     @Test
     public void testInvoke() throws InstantiationException, IllegalAccessException, FunctionExecutionException {
 
-        Set<FunctionExecutor<Void>> executors = new HashSet<FunctionExecutor<Void>>();
-        executors.add(new FunctionExecutor<Void>() {
+        Map<String, FunctionExecutor<Void>> executors = new HashMap<String, FunctionExecutor<Void>>();
+        executors.put("default", new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {

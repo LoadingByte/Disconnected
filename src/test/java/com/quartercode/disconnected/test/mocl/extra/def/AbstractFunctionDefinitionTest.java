@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,7 +45,7 @@ public class AbstractFunctionDefinitionTest {
         functionDefinition = new AbstractFunctionDefinition<Void>("testFunctionDefinition") {
 
             @Override
-            protected Function<Void> create(FeatureHolder holder, List<Class<?>> parameters, Set<FunctionExecutor<Void>> executors) {
+            protected Function<Void> create(FeatureHolder holder, List<Class<?>> parameters, Map<String, FunctionExecutor<Void>> executors) {
 
                 return new AbstractFunction<Void>(getName(), holder, parameters, executors);
             }
@@ -85,7 +86,7 @@ public class AbstractFunctionDefinitionTest {
         Set<FunctionExecutor<Void>> expectedExecutors = new HashSet<FunctionExecutor<Void>>();
         expectedExecutors.add(executor);
         Assert.assertEquals("Function object's parameters", expectedParameters, function.getParameters());
-        Assert.assertEquals("Function object's executors", expectedExecutors, function.getExecutors());
+        Assert.assertEquals("Function object's executors", expectedExecutors, new HashSet<FunctionExecutor<Void>>(function.getExecutors().values()));
     }
 
 }

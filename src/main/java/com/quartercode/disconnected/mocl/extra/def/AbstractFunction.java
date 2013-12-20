@@ -22,8 +22,11 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -55,12 +58,12 @@ import com.quartercode.disconnected.mocl.extra.StopExecutionException;
  */
 public class AbstractFunction<R> extends AbstractFeature implements Function<R>, LockableClass {
 
-    private static final Logger                     LOGGER = Logger.getLogger(AbstractFunction.class.getName());
+    private static final Logger                             LOGGER = Logger.getLogger(AbstractFunction.class.getName());
 
-    private final List<Class<?>>                    parameters;
-    private final Set<FunctionExecutorContainer<R>> executors;
-    private boolean                                 locked;
-    private int                                     timesInvoked;
+    private final List<Class<?>>                            parameters;
+    private final Map<String, FunctionExecutorContainer<R>> executors;
+    private boolean                                         locked;
+    private int                                             timesInvoked;
 
     /**
      * Creates a new abstract function with the given name, parent {@link FeatureHolder}, parameters and {@link FunctionExecutor}s.
@@ -68,9 +71,9 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
      * @param name The name of the abstract function.
      * @param holder The {@link FeatureHolder} which has and uses the new abstract function.
      * @param parameters The argument types an {@link #invoke(Object...)} call must have (see {@link FunctionDefinition#setParameter(int, Class)} for further explanation).
-     * @param executors The {@link FunctionExecutor}s which will be executing the function calls for the different variants.
+     * @param executors The {@link FunctionExecutor}s which will be executing the function calls for this particular function.
      */
-    public AbstractFunction(String name, FeatureHolder holder, List<Class<?>> parameters, Set<FunctionExecutor<R>> executors) {
+    public AbstractFunction(String name, FeatureHolder holder, List<Class<?>> parameters, Map<String, FunctionExecutor<R>> executors) {
 
         super(name, holder);
 
@@ -79,9 +82,9 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
         }
         this.parameters = parameters;
 
-        this.executors = new HashSet<FunctionExecutorContainer<R>>();
-        for (FunctionExecutor<R> executor : executors) {
-            this.executors.add(new FunctionExecutorContainer<R>(executor));
+        this.executors = new HashMap<String, FunctionExecutorContainer<R>>();
+        for (Entry<String, FunctionExecutor<R>> executor : executors.entrySet()) {
+            this.executors.put(executor.getKey(), new FunctionExecutorContainer<R>(executor.getValue()));
         }
 
         setLocked(true);
@@ -116,11 +119,11 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
     }
 
     @Override
-    public Set<FunctionExecutor<R>> getExecutors() {
+    public Map<String, FunctionExecutor<R>> getExecutors() {
 
-        Set<FunctionExecutor<R>> executors = new HashSet<FunctionExecutor<R>>();
-        for (FunctionExecutorContainer<R> executor : this.executors) {
-            executors.add(executor.getExecutor());
+        Map<String, FunctionExecutor<R>> executors = new HashMap<String, FunctionExecutor<R>>();
+        for (Entry<String, FunctionExecutorContainer<R>> executor : this.executors.entrySet()) {
+            executors.put(executor.getKey(), executor.getValue().getExecutor());
         }
         return executors;
     }
@@ -133,23 +136,24 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
      */
     protected Set<FunctionExecutorContainer<R>> getExecutableExecutors() {
 
-        Set<FunctionExecutorContainer<R>> executors = new HashSet<FunctionExecutorContainer<R>>(this.executors);
+        Map<String, FunctionExecutorContainer<R>> executors = new HashMap<String, FunctionExecutorContainer<R>>(this.executors);
 
-        for (FunctionExecutorContainer<R> executor : new HashSet<FunctionExecutorContainer<R>>(executors)) {
+        for (Entry<String, FunctionExecutorContainer<R>> entry : new HashMap<String, FunctionExecutorContainer<R>>(executors).entrySet()) {
+            FunctionExecutorContainer<R> executor = entry.getValue();
             try {
                 Method invoke = executor.getExecutor().getClass().getMethod("invoke", FeatureHolder.class, Object[].class);
                 if (locked && invoke.isAnnotationPresent(Lockable.class)) {
-                    executors.remove(executor);
+                    executors.remove(entry.getKey());
                 } else if (invoke.isAnnotationPresent(Limit.class) && executor.getTimesInvoked() + 1 > invoke.getAnnotation(Limit.class).value()) {
-                    executors.remove(executor);
+                    executors.remove(entry.getKey());
                 } else if (invoke.isAnnotationPresent(Delay.class)) {
                     Delay annotation = invoke.getAnnotation(Delay.class);
                     // Start invokation count at 0 for the first invokation
                     int invokation = timesInvoked - 1;
                     if (invokation < annotation.firstDelay()) {
-                        executors.remove(executor);
+                        executors.remove(entry.getKey());
                     } else if (annotation.delay() > 0 && (invokation - annotation.firstDelay()) % (annotation.delay() + 1) != 0) {
-                        executors.remove(executor);
+                        executors.remove(entry.getKey());
                     }
                 }
             }
@@ -158,7 +162,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
             }
         }
 
-        return executors;
+        return new HashSet<FunctionExecutorContainer<R>>(executors.values());
     }
 
     @Override
@@ -223,7 +227,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
 
             // Read custom priorities
             try {
-                Method invoke = executor.getClass().getMethod("invoke", FeatureHolder.class, Object[].class);
+                Method invoke = executor.getExecutor().getClass().getMethod("invoke", FeatureHolder.class, Object[].class);
                 if (invoke.isAnnotationPresent(Prioritized.class)) {
                     priority = invoke.getAnnotation(Prioritized.class).value();
                 }

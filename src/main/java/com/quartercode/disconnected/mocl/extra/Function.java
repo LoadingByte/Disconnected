@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.mocl.extra;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import com.quartercode.disconnected.mocl.base.Feature;
 
 /**
@@ -46,7 +46,7 @@ public interface Function<R> extends Feature {
      * 
      * @return All {@link FunctionExecutor}s which are used by the function.
      */
-    public Set<FunctionExecutor<R>> getExecutors();
+    public Map<String, FunctionExecutor<R>> getExecutors();
 
     /**
      * Invokes the defined function with the given arguments on all {@link FunctionExecutor}s.

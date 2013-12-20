@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,7 +69,7 @@ public class AbstractFunctionDefinitionInheritanceTest {
         functionDefinition = new AbstractFunctionDefinition<Void>("testFunctionDefinition") {
 
             @Override
-            protected Function<Void> create(FeatureHolder holder, List<Class<?>> parameters, Set<FunctionExecutor<Void>> executors) {
+            protected Function<Void> create(FeatureHolder holder, List<Class<?>> parameters, Map<String, FunctionExecutor<Void>> executors) {
 
                 return new AbstractFunction<Void>(getName(), holder, parameters, executors);
             }

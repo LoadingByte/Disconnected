@@ -19,8 +19,8 @@
 package com.quartercode.disconnected.test.mocl.extra.def;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,10 +37,10 @@ public class AbstractFunctionPriorityTest {
     @Test
     public void testInvoke() throws FunctionExecutionException {
 
-        Set<FunctionExecutor<Void>> executors = new HashSet<FunctionExecutor<Void>>();
+        Map<String, FunctionExecutor<Void>> executors = new HashMap<String, FunctionExecutor<Void>>();
 
         final AtomicBoolean invokedFunctionExecutor1 = new AtomicBoolean();
-        executors.add(new FunctionExecutor<Void>() {
+        executors.put("1", new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (3)
@@ -53,7 +53,7 @@ public class AbstractFunctionPriorityTest {
         });
 
         final AtomicBoolean invokedFunctionExecutor2 = new AtomicBoolean();
-        executors.add(new FunctionExecutor<Void>() {
+        executors.put("2", new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (2)
@@ -66,7 +66,7 @@ public class AbstractFunctionPriorityTest {
         });
 
         final AtomicBoolean invokedFunctionExecutor3 = new AtomicBoolean();
-        executors.add(new FunctionExecutor<Void>() {
+        executors.put("3", new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (1)

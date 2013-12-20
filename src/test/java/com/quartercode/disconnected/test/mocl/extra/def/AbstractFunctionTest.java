@@ -20,9 +20,9 @@ package com.quartercode.disconnected.test.mocl.extra.def;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
@@ -37,10 +37,10 @@ public class AbstractFunctionTest {
     @Test
     public void testInvoke() throws FunctionExecutionException {
 
-        Set<FunctionExecutor<Object>> executors = new HashSet<FunctionExecutor<Object>>();
+        Map<String, FunctionExecutor<Object>> executors = new HashMap<String, FunctionExecutor<Object>>();
         final List<Object> actualArguments = new ArrayList<Object>();
         final Object returnValue = "ReturnValue";
-        executors.add(new FunctionExecutor<Object>() {
+        executors.put("default", new FunctionExecutor<Object>() {
 
             @Override
             public Object invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
