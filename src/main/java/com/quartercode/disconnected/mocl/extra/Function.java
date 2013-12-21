@@ -89,7 +89,7 @@ public interface Function<R> extends Feature, LockableClass {
      * @see FunctionExecutor
      * @see Function
      */
-    public static interface FunctionExecutorContainer<R> extends Named {
+    public static interface FunctionExecutorContainer<R> extends Named, LockableClass {
 
         /**
          * Returns the actual {@link FunctionExecutor} which is stored in the container

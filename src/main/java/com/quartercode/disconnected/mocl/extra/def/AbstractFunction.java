@@ -148,7 +148,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         for (DefaultFunctionExecutorContainer<R> executor : new HashSet<DefaultFunctionExecutorContainer<R>>(executors)) {
             try {
                 Method invoke = executor.getExecutor().getClass().getMethod("invoke", FeatureHolder.class, Object[].class);
-                if (locked && invoke.isAnnotationPresent(Lockable.class)) {
+                if (executor.isLocked() || locked && invoke.isAnnotationPresent(Lockable.class)) {
                     executors.remove(executor);
                 } else if (invoke.isAnnotationPresent(Limit.class) && executor.getTimesInvoked() + 1 > invoke.getAnnotation(Limit.class).value()) {
                     executors.remove(executor);
@@ -301,6 +301,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
 
         private final String              name;
         private final FunctionExecutor<R> executor;
+        private boolean                   locked       = false;
         private int                       timesInvoked = 0;
 
         /**
@@ -353,6 +354,18 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
             timesInvoked = 0;
         }
 
+        @Override
+        public boolean isLocked() {
+
+            return locked;
+        }
+
+        @Override
+        public void setLocked(boolean locked) {
+
+            this.locked = locked;
+        }
+
         /**
          * Invokes the stored {@link FunctionExecutor} in the given {@link FeatureHolder} with the given arguments.
          * Also increases the amount of times the {@link FunctionExecutor} was invoked. You can get the value with {@link #getTimesInvoked()}.
@@ -365,8 +378,12 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         @Override
         public R invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
-            timesInvoked++;
-            return executor.invoke(holder, arguments);
+            if (!locked) {
+                timesInvoked++;
+                return executor.invoke(holder, arguments);
+            } else {
+                return null;
+            }
         }
 
         @Override
@@ -404,7 +421,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         @Override
         public String toString() {
 
-            return getClass().getName() + " [executor=" + executor + ", timesInvoked=" + timesInvoked + "]";
+            return getClass().getName() + " [name=" + name + ", executor=" + executor + ", locked=" + locked + ", timesInvoked=" + timesInvoked + "]";
         }
 
     }
