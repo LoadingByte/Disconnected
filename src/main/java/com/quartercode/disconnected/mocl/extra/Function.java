@@ -19,8 +19,10 @@
 package com.quartercode.disconnected.mocl.extra;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import com.quartercode.disconnected.mocl.base.Feature;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.Named;
 
 /**
  * A function makes a method (also called a function) avaiable.
@@ -29,8 +31,9 @@ import com.quartercode.disconnected.mocl.base.Feature;
  * 
  * @param <R> The type of the return values of the used {@link FunctionExecutor}s. The function returns a {@link List} with these values.
  * @see FunctionExecutor
+ * @see FunctionExecutorContainer
  */
-public interface Function<R> extends Feature {
+public interface Function<R> extends Feature, LockableClass {
 
     /**
      * Returns a list of all parameters which are used by the {@link FunctionExecutor}s.
@@ -41,44 +44,20 @@ public interface Function<R> extends Feature {
     public List<Class<?>> getParameters();
 
     /**
-     * Returns a set of all {@link FunctionExecutor}s which are used by the function.
-     * They are used for actually handling a function call.
+     * Returns a {@link Set} of all {@link FunctionExecutorContainer}s which are used by the function.
+     * They store {@link FunctionExecutor}s which are used for actually handling a function call.
      * 
-     * @return All {@link FunctionExecutor}s which are used by the function.
+     * @return All {@link FunctionExecutorContainer}s which are used by the function.
      */
-    public Map<String, FunctionExecutor<R>> getExecutors();
+    public Set<FunctionExecutorContainer<R>> getExecutors();
 
     /**
-     * Returns the {@link FunctionExecutor} which is used by the function and has the given name.
+     * Returns the {@link FunctionExecutorContainer} which is used by the function and has the given name.
      * 
-     * @param name The name the returned {@link FunctionExecutor} must have.
-     * @return The {@link FunctionExecutor} which has the given name.
+     * @param name The name the returned {@link FunctionExecutorContainer} must have.
+     * @return The {@link FunctionExecutorContainer} which has the given name.
      */
-    public FunctionExecutor<R> getExecutor(String name);
-
-    /**
-     * Returns the name of the given {@link FunctionExecutor} which is used by the function.
-     * 
-     * @param executor The {@link FunctionExecutor} whose name should be returned.
-     * @return The name of the given {@link FunctionExecutor}.
-     */
-    public String getExecutorName(FunctionExecutor<R> executor);
-
-    /**
-     * Sets the internal limit counter for the {@link FunctionExecutor} with the given name to 0.
-     * That allows to use {@link FunctionExecutor}s which are already over their {@link Limit}.
-     * 
-     * @param executor The name of the {@link FunctionExecutor} whose limit counter should be resetted.
-     */
-    public void resetLimit(String executor);
-
-    /**
-     * Sets the internal limit counter for the given {@link FunctionExecutor} to 0.
-     * That allows to use {@link FunctionExecutor}s which are already over their {@link Limit}.
-     * 
-     * @param executor The {@link FunctionExecutor} whose limit counter should be resetted.
-     */
-    public void resetLimit(FunctionExecutor<R> executor);
+    public FunctionExecutorContainer<R> getExecutor(String name);
 
     /**
      * Invokes the defined function with the given arguments on all {@link FunctionExecutor}s.
@@ -101,5 +80,40 @@ public interface Function<R> extends Feature {
      * @throws FunctionExecutionException Something goes wrong during the invokation of a {@link FunctionExecutor}.
      */
     public List<R> invokeRA(Object... arguments) throws FunctionExecutionException;
+
+    /**
+     * The function executor container wraps around {@link FunctionExecutor}s for storing data values along with them.
+     * The data isn't stored in the actual {@link FunctionExecutor} object because it should only do the execution and nothing else.
+     * 
+     * @param <R> The type of the value the stored {@link FunctionExecutor} returns.
+     * @see FunctionExecutor
+     * @see Function
+     */
+    public static interface FunctionExecutorContainer<R> extends Named {
+
+        /**
+         * Returns the actual {@link FunctionExecutor} which is stored in the container
+         * 
+         * @return The stored {@link FunctionExecutor}.
+         */
+        public FunctionExecutor<R> getExecutor();
+
+        /**
+         * Sets the internal limit counter for the function executor container to 0.
+         * That allows to use {@link FunctionExecutor}s which are already over their {@link Limit}.
+         */
+        public void resetLimit();
+
+        /**
+         * Invokes the stored {@link FunctionExecutor} inside the given {@link FeatureHolder} with the given arguments.
+         * 
+         * @param holder The {@link FeatureHolder} the stored {@link FunctionExecutor} is invoked in.
+         * @param arguments Some arguments for the stored {@link FunctionExecutor}.
+         * @return The value the invoked {@link FunctionExecutor} returns. Can be null.
+         * @throws StopExecutionException The execution of the invokation queue should stop.
+         */
+        public R invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException;
+
+    }
 
 }

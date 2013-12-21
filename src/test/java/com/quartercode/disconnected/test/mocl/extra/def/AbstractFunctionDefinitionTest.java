@@ -30,6 +30,7 @@ import org.junit.Test;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
 import com.quartercode.disconnected.mocl.extra.Function;
+import com.quartercode.disconnected.mocl.extra.Function.FunctionExecutorContainer;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.AbstractFunction;
@@ -85,8 +86,12 @@ public class AbstractFunctionDefinitionTest {
         expectedParameters.add(String.class);
         Set<FunctionExecutor<Void>> expectedExecutors = new HashSet<FunctionExecutor<Void>>();
         expectedExecutors.add(executor);
+        Set<FunctionExecutor<Void>> actualExecutors = new HashSet<FunctionExecutor<Void>>();
+        for (FunctionExecutorContainer<Void> container : function.getExecutors()) {
+            actualExecutors.add(container.getExecutor());
+        }
         Assert.assertEquals("Function object's parameters", expectedParameters, function.getParameters());
-        Assert.assertEquals("Function object's executors", expectedExecutors, new HashSet<FunctionExecutor<Void>>(function.getExecutors().values()));
+        Assert.assertEquals("Function object's executors", expectedExecutors, actualExecutors);
     }
 
 }

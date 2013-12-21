@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -56,14 +55,14 @@ import com.quartercode.disconnected.mocl.extra.StopExecutionException;
  * @see Function
  * @see LockableClass
  */
-public class AbstractFunction<R> extends AbstractFeature implements Function<R>, LockableClass {
+public class AbstractFunction<R> extends AbstractFeature implements Function<R> {
 
-    private static final Logger                     LOGGER = Logger.getLogger(AbstractFunction.class.getName());
+    private static final Logger                            LOGGER = Logger.getLogger(AbstractFunction.class.getName());
 
-    private final List<Class<?>>                    parameters;
-    private final Set<FunctionExecutorContainer<R>> executors;
-    private boolean                                 locked;
-    private int                                     timesInvoked;
+    private final List<Class<?>>                           parameters;
+    private final Set<DefaultFunctionExecutorContainer<R>> executors;
+    private boolean                                        locked;
+    private int                                            timesInvoked;
 
     /**
      * Creates a new abstract function with the given name, parent {@link FeatureHolder}, parameters and {@link FunctionExecutor}s.
@@ -82,9 +81,9 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
         }
         this.parameters = parameters;
 
-        this.executors = new HashSet<FunctionExecutorContainer<R>>();
+        this.executors = new HashSet<DefaultFunctionExecutorContainer<R>>();
         for (Entry<String, FunctionExecutor<R>> executor : executors.entrySet()) {
-            this.executors.add(new FunctionExecutorContainer<R>(executor.getKey(), executor.getValue()));
+            this.executors.add(new DefaultFunctionExecutorContainer<R>(executor.getKey(), executor.getValue()));
         }
 
         setLocked(true);
@@ -119,33 +118,17 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
     }
 
     @Override
-    public Map<String, FunctionExecutor<R>> getExecutors() {
+    public Set<FunctionExecutorContainer<R>> getExecutors() {
 
-        Map<String, FunctionExecutor<R>> executors = new HashMap<String, FunctionExecutor<R>>();
-        for (FunctionExecutorContainer<R> executor : this.executors) {
-            executors.put(executor.getName(), executor.getExecutor());
-        }
-        return executors;
+        return Collections.unmodifiableSet(new HashSet<FunctionExecutorContainer<R>>(this.executors));
     }
 
     @Override
-    public FunctionExecutor<R> getExecutor(String name) {
+    public FunctionExecutorContainer<R> getExecutor(String name) {
 
-        for (FunctionExecutorContainer<R> executorContainer : executors) {
-            if (executorContainer.getName().equals(name)) {
-                return executorContainer.getExecutor();
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    public String getExecutorName(FunctionExecutor<R> executor) {
-
-        for (FunctionExecutorContainer<R> executorContainer : executors) {
-            if (executorContainer.getExecutor().equals(executor)) {
-                return executorContainer.getName();
+        for (FunctionExecutorContainer<R> executor : executors) {
+            if (executor.getName().equals(name)) {
+                return executor;
             }
         }
 
@@ -160,9 +143,9 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
      */
     protected Set<FunctionExecutorContainer<R>> getExecutableExecutors() {
 
-        Set<FunctionExecutorContainer<R>> executors = new HashSet<FunctionExecutorContainer<R>>(this.executors);
+        Set<DefaultFunctionExecutorContainer<R>> executors = new HashSet<DefaultFunctionExecutorContainer<R>>(this.executors);
 
-        for (FunctionExecutorContainer<R> executor : new HashSet<FunctionExecutorContainer<R>>(executors)) {
+        for (DefaultFunctionExecutorContainer<R> executor : new HashSet<DefaultFunctionExecutorContainer<R>>(executors)) {
             try {
                 Method invoke = executor.getExecutor().getClass().getMethod("invoke", FeatureHolder.class, Object[].class);
                 if (locked && invoke.isAnnotationPresent(Lockable.class)) {
@@ -186,23 +169,6 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
         }
 
         return new HashSet<FunctionExecutorContainer<R>>(executors);
-    }
-
-    @Override
-    public void resetLimit(String executor) {
-
-        resetLimit(getExecutor(executor));
-    }
-
-    @Override
-    public void resetLimit(FunctionExecutor<R> executor) {
-
-        for (FunctionExecutorContainer<R> executorContainer : executors) {
-            if (executorContainer.getExecutor().equals(executor)) {
-                executorContainer.resetTimesInvoked();
-                break;
-            }
-        }
     }
 
     @Override
@@ -326,34 +292,35 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
     }
 
     /**
-     * A function executor container stores a {@link FunctionExecutor} along with some additional information.
-     * It is used to keep track of that information without using complex map structures.
+     * The default implementation of the {@link FunctionExecutorContainer} for storing data values along with a {@link FunctionExecutor}.
+     * The data isn't stored in the actual {@link FunctionExecutor} object because it should only do the execution and nothing else.
      * 
-     * @param <R> The type of the return value of the stored {@link FunctionExecutor}.
+     * @param <R> The type of the value the stored {@link FunctionExecutor} returns.
      */
-    protected static class FunctionExecutorContainer<R> {
+    public static class DefaultFunctionExecutorContainer<R> implements FunctionExecutorContainer<R> {
 
         private final String              name;
         private final FunctionExecutor<R> executor;
         private int                       timesInvoked = 0;
 
         /**
-         * Creates a new function executor container and fills in the {@link FunctionExecutor} to store and its name.
+         * Creates a new default function executor container and fills in the {@link FunctionExecutor} to store and its name.
          * 
          * @param name The name of the {@link FunctionExecutor} to store.
          * @param executor The {@link FunctionExecutor} which is stored by the container
          */
-        public FunctionExecutorContainer(String name, FunctionExecutor<R> executor) {
+        public DefaultFunctionExecutorContainer(String name, FunctionExecutor<R> executor) {
 
             this.name = name;
             this.executor = executor;
         }
 
         /**
-         * Returns the name of the {@link FunctionExecutor} which is stored in the container.
+         * Returns the name of the {@link FunctionExecutor} which is stored by the container.
          * 
          * @return The name of the stored {@link FunctionExecutor}.
          */
+        @Override
         public String getName() {
 
             return name;
@@ -364,6 +331,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
          * 
          * @return The stored {@link FunctionExecutor}.
          */
+        @Override
         public FunctionExecutor<R> getExecutor() {
 
             return executor;
@@ -379,11 +347,8 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
             return timesInvoked;
         }
 
-        /**
-         * Sets the amount of times the stored {@link FunctionExecutor} was invoked through {@link #invoke(FeatureHolder, Object...)} to 0.
-         * That allows to use {@link FunctionExecutor}s which are already over their {@link Limit}.
-         */
-        public void resetTimesInvoked() {
+        @Override
+        public void resetLimit() {
 
             timesInvoked = 0;
         }
@@ -397,6 +362,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
          * @return The value the invoked {@link FunctionExecutor} returns. Can be null.
          * @throws StopExecutionException The execution of the invokation queue should stop.
          */
+        @Override
         public R invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
             timesInvoked++;
@@ -424,7 +390,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
             if (getClass() != obj.getClass()) {
                 return false;
             }
-            FunctionExecutorContainer<?> other = (FunctionExecutorContainer<?>) obj;
+            DefaultFunctionExecutorContainer<?> other = (DefaultFunctionExecutorContainer<?>) obj;
             if (name == null) {
                 if (other.name != null) {
                     return false;
