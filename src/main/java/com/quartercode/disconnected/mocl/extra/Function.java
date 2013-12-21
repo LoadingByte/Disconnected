@@ -49,6 +49,38 @@ public interface Function<R> extends Feature {
     public Map<String, FunctionExecutor<R>> getExecutors();
 
     /**
+     * Returns the {@link FunctionExecutor} which is used by the function and has the given name.
+     * 
+     * @param name The name the returned {@link FunctionExecutor} must have.
+     * @return The {@link FunctionExecutor} which has the given name.
+     */
+    public FunctionExecutor<R> getExecutor(String name);
+
+    /**
+     * Returns the name of the given {@link FunctionExecutor} which is used by the function.
+     * 
+     * @param executor The {@link FunctionExecutor} whose name should be returned.
+     * @return The name of the given {@link FunctionExecutor}.
+     */
+    public String getExecutorName(FunctionExecutor<R> executor);
+
+    /**
+     * Sets the internal limit counter for the {@link FunctionExecutor} with the given name to 0.
+     * That allows to use {@link FunctionExecutor}s which are already over their {@link Limit}.
+     * 
+     * @param executor The name of the {@link FunctionExecutor} whose limit counter should be resetted.
+     */
+    public void resetLimit(String executor);
+
+    /**
+     * Sets the internal limit counter for the given {@link FunctionExecutor} to 0.
+     * That allows to use {@link FunctionExecutor}s which are already over their {@link Limit}.
+     * 
+     * @param executor The {@link FunctionExecutor} whose limit counter should be resetted.
+     */
+    public void resetLimit(FunctionExecutor<R> executor);
+
+    /**
      * Invokes the defined function with the given arguments on all {@link FunctionExecutor}s.
      * This returns the return value of the {@link FunctionExecutor}s with the highest priority.
      * If you want the return values of all executors, use {@link #invokeRA(Object...)}.

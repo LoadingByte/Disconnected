@@ -58,12 +58,12 @@ import com.quartercode.disconnected.mocl.extra.StopExecutionException;
  */
 public class AbstractFunction<R> extends AbstractFeature implements Function<R>, LockableClass {
 
-    private static final Logger                             LOGGER = Logger.getLogger(AbstractFunction.class.getName());
+    private static final Logger                     LOGGER = Logger.getLogger(AbstractFunction.class.getName());
 
-    private final List<Class<?>>                            parameters;
-    private final Map<String, FunctionExecutorContainer<R>> executors;
-    private boolean                                         locked;
-    private int                                             timesInvoked;
+    private final List<Class<?>>                    parameters;
+    private final Set<FunctionExecutorContainer<R>> executors;
+    private boolean                                 locked;
+    private int                                     timesInvoked;
 
     /**
      * Creates a new abstract function with the given name, parent {@link FeatureHolder}, parameters and {@link FunctionExecutor}s.
@@ -82,9 +82,9 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
         }
         this.parameters = parameters;
 
-        this.executors = new HashMap<String, FunctionExecutorContainer<R>>();
+        this.executors = new HashSet<FunctionExecutorContainer<R>>();
         for (Entry<String, FunctionExecutor<R>> executor : executors.entrySet()) {
-            this.executors.put(executor.getKey(), new FunctionExecutorContainer<R>(executor.getValue()));
+            this.executors.add(new FunctionExecutorContainer<R>(executor.getKey(), executor.getValue()));
         }
 
         setLocked(true);
@@ -122,10 +122,34 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
     public Map<String, FunctionExecutor<R>> getExecutors() {
 
         Map<String, FunctionExecutor<R>> executors = new HashMap<String, FunctionExecutor<R>>();
-        for (Entry<String, FunctionExecutorContainer<R>> executor : this.executors.entrySet()) {
-            executors.put(executor.getKey(), executor.getValue().getExecutor());
+        for (FunctionExecutorContainer<R> executor : this.executors) {
+            executors.put(executor.getName(), executor.getExecutor());
         }
         return executors;
+    }
+
+    @Override
+    public FunctionExecutor<R> getExecutor(String name) {
+
+        for (FunctionExecutorContainer<R> executorContainer : executors) {
+            if (executorContainer.getName().equals(name)) {
+                return executorContainer.getExecutor();
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public String getExecutorName(FunctionExecutor<R> executor) {
+
+        for (FunctionExecutorContainer<R> executorContainer : executors) {
+            if (executorContainer.getExecutor().equals(executor)) {
+                return executorContainer.getName();
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -136,24 +160,23 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
      */
     protected Set<FunctionExecutorContainer<R>> getExecutableExecutors() {
 
-        Map<String, FunctionExecutorContainer<R>> executors = new HashMap<String, FunctionExecutorContainer<R>>(this.executors);
+        Set<FunctionExecutorContainer<R>> executors = new HashSet<FunctionExecutorContainer<R>>(this.executors);
 
-        for (Entry<String, FunctionExecutorContainer<R>> entry : new HashMap<String, FunctionExecutorContainer<R>>(executors).entrySet()) {
-            FunctionExecutorContainer<R> executor = entry.getValue();
+        for (FunctionExecutorContainer<R> executor : new HashSet<FunctionExecutorContainer<R>>(executors)) {
             try {
                 Method invoke = executor.getExecutor().getClass().getMethod("invoke", FeatureHolder.class, Object[].class);
                 if (locked && invoke.isAnnotationPresent(Lockable.class)) {
-                    executors.remove(entry.getKey());
+                    executors.remove(executor);
                 } else if (invoke.isAnnotationPresent(Limit.class) && executor.getTimesInvoked() + 1 > invoke.getAnnotation(Limit.class).value()) {
-                    executors.remove(entry.getKey());
+                    executors.remove(executor);
                 } else if (invoke.isAnnotationPresent(Delay.class)) {
                     Delay annotation = invoke.getAnnotation(Delay.class);
                     // Start invokation count at 0 for the first invokation
                     int invokation = timesInvoked - 1;
                     if (invokation < annotation.firstDelay()) {
-                        executors.remove(entry.getKey());
+                        executors.remove(executor);
                     } else if (annotation.delay() > 0 && (invokation - annotation.firstDelay()) % (annotation.delay() + 1) != 0) {
-                        executors.remove(entry.getKey());
+                        executors.remove(executor);
                     }
                 }
             }
@@ -162,7 +185,24 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
             }
         }
 
-        return new HashSet<FunctionExecutorContainer<R>>(executors.values());
+        return new HashSet<FunctionExecutorContainer<R>>(executors);
+    }
+
+    @Override
+    public void resetLimit(String executor) {
+
+        resetLimit(getExecutor(executor));
+    }
+
+    @Override
+    public void resetLimit(FunctionExecutor<R> executor) {
+
+        for (FunctionExecutorContainer<R> executorContainer : executors) {
+            if (executorContainer.getExecutor().equals(executor)) {
+                executorContainer.resetTimesInvoked();
+                break;
+            }
+        }
     }
 
     @Override
@@ -293,21 +333,34 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
      */
     protected static class FunctionExecutorContainer<R> {
 
+        private final String              name;
         private final FunctionExecutor<R> executor;
         private int                       timesInvoked = 0;
 
         /**
-         * Creates a new function executor container and fills in the {@link FunctionExecutor} to store.
+         * Creates a new function executor container and fills in the {@link FunctionExecutor} to store and its name.
          * 
+         * @param name The name of the {@link FunctionExecutor} to store.
          * @param executor The {@link FunctionExecutor} which is stored by the container
          */
-        public FunctionExecutorContainer(FunctionExecutor<R> executor) {
+        public FunctionExecutorContainer(String name, FunctionExecutor<R> executor) {
 
+            this.name = name;
             this.executor = executor;
         }
 
         /**
-         * Returns the {@link FunctionExecutor} which is stored by the container
+         * Returns the name of the {@link FunctionExecutor} which is stored in the container.
+         * 
+         * @return The name of the stored {@link FunctionExecutor}.
+         */
+        public String getName() {
+
+            return name;
+        }
+
+        /**
+         * Returns the actual {@link FunctionExecutor} which is stored by the container
          * 
          * @return The stored {@link FunctionExecutor}.
          */
@@ -324,6 +377,15 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
         public int getTimesInvoked() {
 
             return timesInvoked;
+        }
+
+        /**
+         * Sets the amount of times the stored {@link FunctionExecutor} was invoked through {@link #invoke(FeatureHolder, Object...)} to 0.
+         * That allows to use {@link FunctionExecutor}s which are already over their {@link Limit}.
+         */
+        public void resetTimesInvoked() {
+
+            timesInvoked = 0;
         }
 
         /**
@@ -346,7 +408,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
 
             final int prime = 31;
             int result = 1;
-            result = prime * result + (executor == null ? 0 : executor.hashCode());
+            result = prime * result + (name == null ? 0 : name.hashCode());
             return result;
         }
 
@@ -363,11 +425,11 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R>,
                 return false;
             }
             FunctionExecutorContainer<?> other = (FunctionExecutorContainer<?>) obj;
-            if (executor == null) {
-                if (other.executor != null) {
+            if (name == null) {
+                if (other.name != null) {
                     return false;
                 }
-            } else if (!executor.equals(other.executor)) {
+            } else if (!name.equals(other.name)) {
                 return false;
             }
             return true;
