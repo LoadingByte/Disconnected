@@ -99,10 +99,10 @@ public interface Function<R> extends Feature, LockableClass {
         public FunctionExecutor<R> getExecutor();
 
         /**
-         * Sets the internal limit counter for the function executor container to 0.
+         * Sets the internal invokation counter for the function executor container to 0.
          * That allows to use {@link FunctionExecutor}s which are already over their {@link Limit}.
          */
-        public void resetLimit();
+        public void resetInvokationCounter();
 
         /**
          * Invokes the stored {@link FunctionExecutor} inside the given {@link FeatureHolder} with the given arguments.

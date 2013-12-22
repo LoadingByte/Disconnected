@@ -62,7 +62,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
     private final List<Class<?>>                           parameters;
     private final Set<DefaultFunctionExecutorContainer<R>> executors;
     private boolean                                        locked;
-    private int                                            timesInvoked;
+    private int                                            invokationCounter;
 
     /**
      * Creates a new abstract function with the given name, parent {@link FeatureHolder}, parameters and {@link FunctionExecutor}s.
@@ -106,9 +106,9 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
      * 
      * @return The amount of times the function was invoked.
      */
-    public int getTimesInvoked() {
+    public int getInvokationCounter() {
 
-        return timesInvoked;
+        return invokationCounter;
     }
 
     @Override
@@ -150,12 +150,12 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
                 Method invoke = executor.getExecutor().getClass().getMethod("invoke", FeatureHolder.class, Object[].class);
                 if (executor.isLocked() || locked && invoke.isAnnotationPresent(Lockable.class)) {
                     executors.remove(executor);
-                } else if (invoke.isAnnotationPresent(Limit.class) && executor.getTimesInvoked() + 1 > invoke.getAnnotation(Limit.class).value()) {
+                } else if (invoke.isAnnotationPresent(Limit.class) && executor.getInvokationCounter() + 1 > invoke.getAnnotation(Limit.class).value()) {
                     executors.remove(executor);
                 } else if (invoke.isAnnotationPresent(Delay.class)) {
                     Delay annotation = invoke.getAnnotation(Delay.class);
                     // Start invokation count at 0 for the first invokation
-                    int invokation = timesInvoked - 1;
+                    int invokation = invokationCounter - 1;
                     if (invokation < annotation.firstDelay()) {
                         executors.remove(executor);
                     } else if (annotation.delay() > 0 && (invokation - annotation.firstDelay()) % (annotation.delay() + 1) != 0) {
@@ -185,7 +185,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
     @Override
     public List<R> invokeRA(Object... arguments) throws FunctionExecutionException {
 
-        timesInvoked++;
+        invokationCounter++;
 
         // Argument validation
         try {
@@ -301,8 +301,8 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
 
         private final String              name;
         private final FunctionExecutor<R> executor;
-        private boolean                   locked       = false;
-        private int                       timesInvoked = 0;
+        private boolean                   locked            = false;
+        private int                       invokationCounter = 0;
 
         /**
          * Creates a new default function executor container and fills in the {@link FunctionExecutor} to store and its name.
@@ -343,15 +343,15 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
          * 
          * @return The amount of times the {@link FunctionExecutor} was invoked.
          */
-        public int getTimesInvoked() {
+        public int getInvokationCounter() {
 
-            return timesInvoked;
+            return invokationCounter;
         }
 
         @Override
-        public void resetLimit() {
+        public void resetInvokationCounter() {
 
-            timesInvoked = 0;
+            invokationCounter = 0;
         }
 
         @Override
@@ -368,7 +368,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
 
         /**
          * Invokes the stored {@link FunctionExecutor} in the given {@link FeatureHolder} with the given arguments.
-         * Also increases the amount of times the {@link FunctionExecutor} was invoked. You can get the value with {@link #getTimesInvoked()}.
+         * Also increases the amount of times the {@link FunctionExecutor} was invoked. You can retrieve the value with {@link #getInvokationCounter()}.
          * 
          * @param holder The {@link FeatureHolder} the stored {@link FunctionExecutor} is invoked in.
          * @param arguments Some arguments for the stored {@link FunctionExecutor}.
@@ -379,7 +379,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         public R invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
             if (!locked) {
-                timesInvoked++;
+                invokationCounter++;
                 return executor.invoke(holder, arguments);
             } else {
                 return null;
@@ -421,7 +421,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         @Override
         public String toString() {
 
-            return getClass().getName() + " [name=" + name + ", executor=" + executor + ", locked=" + locked + ", timesInvoked=" + timesInvoked + "]";
+            return getClass().getName() + " [name=" + name + ", executor=" + executor + ", locked=" + locked + ", invokationCounter=" + invokationCounter + "]";
         }
 
     }
