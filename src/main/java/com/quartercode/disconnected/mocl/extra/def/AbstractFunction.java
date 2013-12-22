@@ -18,10 +18,13 @@
 
 package com.quartercode.disconnected.mocl.extra.def;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -146,25 +149,33 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         Set<DefaultFunctionExecutorContainer<R>> executors = new HashSet<DefaultFunctionExecutorContainer<R>>(this.executors);
 
         for (DefaultFunctionExecutorContainer<R> executor : new HashSet<DefaultFunctionExecutorContainer<R>>(executors)) {
+            // Lockable
             try {
-                Method invoke = executor.getExecutor().getClass().getMethod("invoke", FeatureHolder.class, Object[].class);
-                if (executor.isLocked() || locked && invoke.isAnnotationPresent(Lockable.class)) {
+                Method invokeMethod = executor.getExecutor().getClass().getMethod("invoke", FeatureHolder.class, Object[].class);
+                if (executor.isLocked() || locked && invokeMethod.isAnnotationPresent(Lockable.class)) {
                     executors.remove(executor);
-                } else if (invoke.isAnnotationPresent(Limit.class) && executor.getInvokationCounter() + 1 > invoke.getAnnotation(Limit.class).value()) {
-                    executors.remove(executor);
-                } else if (invoke.isAnnotationPresent(Delay.class)) {
-                    Delay annotation = invoke.getAnnotation(Delay.class);
-                    // Start invokation count at 0 for the first invokation
-                    int invokation = invokationCounter - 1;
-                    if (invokation < annotation.firstDelay()) {
-                        executors.remove(executor);
-                    } else if (annotation.delay() > 0 && (invokation - annotation.firstDelay()) % (annotation.delay() + 1) != 0) {
-                        executors.remove(executor);
-                    }
                 }
             }
-            catch (Exception e) {
+            catch (NoSuchMethodException e) {
                 LOGGER.log(Level.SEVERE, "Programmer's fault: Can't find invoke() method (should be defined by interface)", e);
+            }
+
+            // Limit
+            if (executor.getValue(Limit.class, "value") != null && executor.getInvokationCounter() + 1 > (Integer) executor.getValue(Limit.class, "value")) {
+                executors.remove(executor);
+                continue;
+            }
+
+            // Delay
+            int invokation = invokationCounter - 1;
+            int firstDelay = (Integer) executor.getValue(Delay.class, "firstDelay");
+            int delay = (Integer) executor.getValue(Delay.class, "delay");
+            if (invokation < firstDelay) {
+                executors.remove(executor);
+                continue;
+            } else if (delay > 0 && (invokation - firstDelay) % (delay + 1) != 0) {
+                executors.remove(executor);
+                continue;
             }
         }
 
@@ -233,12 +244,12 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
 
             // Read custom priorities
             try {
-                Method invoke = executor.getExecutor().getClass().getMethod("invoke", FeatureHolder.class, Object[].class);
-                if (invoke.isAnnotationPresent(Prioritized.class)) {
-                    priority = invoke.getAnnotation(Prioritized.class).value();
+                Method invokeMethod = executor.getExecutor().getClass().getMethod("invoke", FeatureHolder.class, Object[].class);
+                if (invokeMethod.isAnnotationPresent(Prioritized.class)) {
+                    priority = invokeMethod.getAnnotation(Prioritized.class).value();
                 }
             }
-            catch (Exception e) {
+            catch (NoSuchMethodException e) {
                 LOGGER.log(Level.SEVERE, "Programmer's fault: Can't find invoke() method (should be defined by interface)", e);
             }
 
@@ -299,10 +310,13 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
      */
     public static class DefaultFunctionExecutorContainer<R> implements FunctionExecutorContainer<R> {
 
+        private static final Logger       LOGGER            = Logger.getLogger(DefaultFunctionExecutorContainer.class.getName());
+
         private final String              name;
         private final FunctionExecutor<R> executor;
-        private boolean                   locked            = false;
+        private final Map<Method, Object> annotationValues  = new HashMap<Method, Object>();
         private int                       invokationCounter = 0;
+        private boolean                   locked            = false;
 
         /**
          * Creates a new default function executor container and fills in the {@link FunctionExecutor} to store and its name.
@@ -326,6 +340,58 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
         public FunctionExecutor<R> getExecutor() {
 
             return executor;
+        }
+
+        @Override
+        public <A extends Annotation> Object getValue(Class<A> type, String name) {
+
+            try {
+                Method valueMethod = type.getMethod(name);
+
+                if (!annotationValues.containsKey(valueMethod)) {
+                    // Fill in annotation value
+                    try {
+                        A annotation = executor.getClass().getMethod("invoke", FeatureHolder.class, Object[].class).getAnnotation(type);
+                        if (annotation != null) {
+                            Object value = valueMethod.invoke(annotation);
+                            annotationValues.put(valueMethod, value);
+                            return value;
+                        }
+                    }
+                    catch (NoSuchMethodException e) {
+                        LOGGER.log(Level.SEVERE, "Programmer's fault: Can't find invoke() method (should be defined by interface)", e);
+                    }
+                    catch (IllegalAccessException e) {
+                        LOGGER.log(Level.SEVERE, "No access to annotation method because it's not public; What the ... ?", e);
+                    }
+                    catch (InvocationTargetException e) {
+                        LOGGER.log(Level.SEVERE, "Can't invoke annotation method", e);
+                    }
+
+                    // Fill in default value
+                    Object value = valueMethod.getDefaultValue();
+                    annotationValues.put(valueMethod, value);
+                    return value;
+                }
+
+                // Return stored value
+                return annotationValues.get(valueMethod);
+            }
+            catch (NoSuchMethodException e) {
+                LOGGER.log(Level.WARNING, "Tried to access not existing annotation method for getting annotation value", e);
+                return null;
+            }
+        }
+
+        @Override
+        public <A extends Annotation> void setValue(Class<A> type, String name, Object value) {
+
+            try {
+                annotationValues.put(type.getMethod(name), value);
+            }
+            catch (NoSuchMethodException e) {
+                LOGGER.log(Level.WARNING, "Tried to access not existing annotation method for setting annotation value", e);
+            }
         }
 
         /**

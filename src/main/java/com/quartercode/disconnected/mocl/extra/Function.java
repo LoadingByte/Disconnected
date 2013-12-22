@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.mocl.extra;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Set;
 import com.quartercode.disconnected.mocl.base.Feature;
@@ -105,6 +106,27 @@ public interface Function<R> extends Feature, LockableClass {
          * @return The stored {@link FunctionExecutor}.
          */
         public FunctionExecutor<R> getExecutor();
+
+        /**
+         * Returns a value of the given {@link Annotation} type at the stored {@link FunctionExecutor}.
+         * Using this, you can read the values of every annotation at the {@link FunctionExecutor} (for example {@link Limit#value()})
+         * 
+         * @param type The {@link Annotation} type whose value should be retrieved (could be {@link Limit}).
+         * @param name The name of the value stored in the {@link Annotation} which should be retrieved (could be "value" for {@link Limit#value()}).
+         * @return The value stored in the defined variable (could be 7 for {@link Limit#value()}).
+         */
+        public <A extends Annotation> Object getValue(Class<A> type, String name);
+
+        /**
+         * Sets a value of the given {@link Annotation} type at the stored {@link FunctionExecutor} to the given one.
+         * That allows to modify {@link Annotation} values at runtime.
+         * You can compare that with reflection.
+         * 
+         * @param type The {@link Annotation} type whose value should be changed (could be {@link Limit}).
+         * @param name The name of the value stored in the {@link Annotation} which should be changed (could be "value" for {@link Limit#value()}).
+         * @param value The new value for the defined variable (could be 7 for {@link Limit#value()}).
+         */
+        public <A extends Annotation> void setValue(Class<A> type, String name, Object value);
 
         /**
          * Sets the internal invokation counter for the function executor container to 0.
