@@ -316,22 +316,12 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
             this.executor = executor;
         }
 
-        /**
-         * Returns the name of the {@link FunctionExecutor} which is stored by the container.
-         * 
-         * @return The name of the stored {@link FunctionExecutor}.
-         */
         @Override
         public String getName() {
 
             return name;
         }
 
-        /**
-         * Returns the actual {@link FunctionExecutor} which is stored by the container
-         * 
-         * @return The stored {@link FunctionExecutor}.
-         */
         @Override
         public FunctionExecutor<R> getExecutor() {
 

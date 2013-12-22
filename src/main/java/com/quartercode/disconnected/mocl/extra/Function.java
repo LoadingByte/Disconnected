@@ -92,6 +92,14 @@ public interface Function<R> extends Feature, LockableClass {
     public static interface FunctionExecutorContainer<R> extends Named, LockableClass {
 
         /**
+         * Returns the name of the {@link FunctionExecutor} which is stored by the container.
+         * 
+         * @return The name of the stored {@link FunctionExecutor}.
+         */
+        @Override
+        public String getName();
+
+        /**
          * Returns the actual {@link FunctionExecutor} which is stored in the container
          * 
          * @return The stored {@link FunctionExecutor}.
@@ -103,6 +111,26 @@ public interface Function<R> extends Feature, LockableClass {
          * That allows to use {@link FunctionExecutor}s which are already over their {@link Limit}.
          */
         public void resetInvokationCounter();
+
+        /**
+         * Returns if the stored {@link FunctionExecutor} is locked.
+         * The {@link FunctionExecutor} doesn't need to be {@link Lockable} for this to work.
+         * The check algorithm ignores the {@link Lockable} annotation and locks every {@link FunctionExecutor}.
+         * 
+         * @return True if the stored {@link FunctionExecutor} is locked, false if not.
+         */
+        @Override
+        public boolean isLocked();
+
+        /**
+         * Changes if the stored {@link FunctionExecutor} is locked.
+         * The {@link FunctionExecutor} doesn't need to be {@link Lockable} for this to work.
+         * The check algorithm ignores the {@link Lockable} annotation and locks every {@link FunctionExecutor}.
+         * 
+         * @param locked True if the stored {@link FunctionExecutor} should be locked, false if not.
+         */
+        @Override
+        public void setLocked(boolean locked);
 
         /**
          * Invokes the stored {@link FunctionExecutor} inside the given {@link FeatureHolder} with the given arguments.
