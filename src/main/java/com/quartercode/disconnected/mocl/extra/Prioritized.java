@@ -47,6 +47,12 @@ public @interface Prioritized {
     public static final int CHECK        = DEFAULT + 10000000;
 
     /**
+     * The priority to use for things which should be executed before checks are invoked.
+     * Checks are executors which throw a {@link StopExecutionException} if something is incorrect.
+     */
+    public static final int BEFORE_CHECK = DEFAULT + 11000000;
+
+    /**
      * The priority to use for the least important overwrites.
      * Overwrites are executors which replace the functionality of the default executor.
      * They normally throw a {@link StopExecutionException} after invokation.
