@@ -19,14 +19,12 @@
 package com.quartercode.disconnected.mocl.extra;
 
 import com.quartercode.disconnected.mocl.base.Feature;
-import com.quartercode.disconnected.mocl.base.Persistent;
 
 /**
  * A property is a simple {@link Feature} which stores an object.
  * 
  * @param <T> The type of object which can be stored inside the property.
  */
-@Persistent
 public interface Property<T> extends Feature, Iterable<T> {
 
     /**

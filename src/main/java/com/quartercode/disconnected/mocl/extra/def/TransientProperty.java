@@ -21,52 +21,39 @@ package com.quartercode.disconnected.mocl.extra.def;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.Persistent;
-import com.quartercode.disconnected.mocl.base.def.AbstractPersistentFeature;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeature;
 import com.quartercode.disconnected.mocl.extra.Property;
-import com.quartercode.disconnected.util.ObjectAdapter;
 
 /**
- * An object property is a simple {@link Property} which stores an object.
+ * A transient property is a simple {@link Property} which stores an object and can't be serialized by JAXB.
  * 
- * @param <T> The type of object which can be stored inside the object property.
+ * @param <T> The type of object which can be stored inside the transient property.
  * @see Property
  */
-@Persistent
-public class ObjectProperty<T> extends AbstractPersistentFeature implements Property<T> {
+public class TransientProperty<T> extends AbstractFeature implements Property<T> {
 
     private T object;
 
     /**
-     * Creates a new empty object property.
-     * This is only recommended for direct field access (e.g. for serialization).
-     */
-    protected ObjectProperty() {
-
-    }
-
-    /**
-     * Creates a new object property with the given name and {@link FeatureHolder}.
+     * Creates a new transient property with the given name and {@link FeatureHolder}.
      * 
-     * @param name The name of the object property.
-     * @param holder The feature holder which has and uses the new object property.
+     * @param name The name of the transient property.
+     * @param holder The feature holder which has and uses the new transient property.
      */
-    public ObjectProperty(String name, FeatureHolder holder) {
+    public TransientProperty(String name, FeatureHolder holder) {
 
         super(name, holder);
     }
 
     /**
-     * Creates a new object property with the given name and {@link FeatureHolder}, and sets the initial value.
+     * Creates a new transient property with the given name and {@link FeatureHolder}, and sets the initial value.
      * 
-     * @param name The name of the object property.
-     * @param holder The feature holder which has and uses the new object property.
-     * @param initialValue The value the new object property has directly after creation.
+     * @param name The name of the transient property.
+     * @param holder The feature holder which has and uses the new transient property.
+     * @param initialValue The value the new transient property has directly after creation.
      */
-    public ObjectProperty(String name, FeatureHolder holder, T initialValue) {
+    public TransientProperty(String name, FeatureHolder holder, T initialValue) {
 
         super(name, holder);
 
@@ -74,8 +61,6 @@ public class ObjectProperty<T> extends AbstractPersistentFeature implements Prop
     }
 
     @Override
-    @XmlElement
-    @XmlJavaTypeAdapter (ObjectAdapter.class)
     public T get() {
 
         return object;
@@ -116,7 +101,7 @@ public class ObjectProperty<T> extends AbstractPersistentFeature implements Prop
         if (getClass() != obj.getClass()) {
             return false;
         }
-        ObjectProperty<?> other = (ObjectProperty<?>) obj;
+        TransientProperty<?> other = (TransientProperty<?>) obj;
         if (object == null) {
             if (other.object != null) {
                 return false;

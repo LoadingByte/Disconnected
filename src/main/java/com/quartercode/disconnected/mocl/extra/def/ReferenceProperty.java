@@ -21,14 +21,12 @@ package com.quartercode.disconnected.mocl.extra.def;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.Persistent;
 import com.quartercode.disconnected.mocl.base.def.AbstractPersistentFeature;
 import com.quartercode.disconnected.mocl.extra.Property;
-import com.quartercode.disconnected.util.ObjectAdapter;
 
 /**
  * A reference property is a simple {@link Property} which stores an object.
@@ -40,8 +38,6 @@ import com.quartercode.disconnected.util.ObjectAdapter;
 @Persistent
 public class ReferenceProperty<T> extends AbstractPersistentFeature implements Property<T> {
 
-    @XmlElement
-    @XmlJavaTypeAdapter (ObjectAdapter.class)
     private T reference;
 
     /**
@@ -77,6 +73,7 @@ public class ReferenceProperty<T> extends AbstractPersistentFeature implements P
         set(initialValue);
     }
 
+    @XmlIDREF
     @Override
     public T get() {
 
