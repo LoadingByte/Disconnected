@@ -72,8 +72,8 @@ public class DefaultFeatureHolder implements FeatureHolder, LockableClass {
         }
     }
 
-    @SuppressWarnings ("unchecked")
     @Override
+    @SuppressWarnings ("unchecked")
     public <F extends Feature> F get(FeatureDefinition<F> definition) {
 
         for (Feature feature : features) {

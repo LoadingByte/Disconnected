@@ -64,8 +64,8 @@ public class PropertyAccessorFactory {
 
         return new FunctionExecutor<Void>() {
 
-            @SuppressWarnings ("unchecked")
             @Override
+            @SuppressWarnings ("unchecked")
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 // Set the parent of the old object to null

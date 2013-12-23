@@ -76,8 +76,8 @@ public class CollectionPropertyAccessorFactory {
 
         return new FunctionExecutor<C>() {
 
-            @SuppressWarnings ("unchecked")
             @Override
+            @SuppressWarnings ("unchecked")
             public C invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 C originalCollection = holder.get(propertyDefinition).get();
@@ -141,8 +141,8 @@ public class CollectionPropertyAccessorFactory {
 
         return new FunctionExecutor<Void>() {
 
-            @SuppressWarnings ("unchecked")
             @Override
+            @SuppressWarnings ("unchecked")
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 for (Object element : arguments) {
@@ -171,8 +171,8 @@ public class CollectionPropertyAccessorFactory {
 
         return new FunctionExecutor<Void>() {
 
-            @SuppressWarnings ("unchecked")
             @Override
+            @SuppressWarnings ("unchecked")
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 for (Object element : arguments) {
@@ -221,8 +221,8 @@ public class CollectionPropertyAccessorFactory {
 
         return new FunctionExecutor<E>() {
 
-            @SuppressWarnings ("unchecked")
             @Override
+            @SuppressWarnings ("unchecked")
             public E invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 E element = holder.get(propertyDefinition).get().poll();

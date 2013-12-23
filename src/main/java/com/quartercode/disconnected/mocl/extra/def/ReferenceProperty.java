@@ -73,8 +73,8 @@ public class ReferenceProperty<T> extends AbstractPersistentFeature implements P
         set(initialValue);
     }
 
-    @XmlIDREF
     @Override
+    @XmlIDREF
     public T get() {
 
         return reference;
