@@ -19,15 +19,15 @@
 package com.quartercode.disconnected.world.comp.os;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
-import com.quartercode.disconnected.util.InfoString;
-import com.quartercode.disconnected.world.comp.file.StringContent;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
+import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.net.Address;
-import com.quartercode.disconnected.world.comp.program.ArgumentException;
 import com.quartercode.disconnected.world.comp.program.Process;
-import com.quartercode.disconnected.world.comp.program.WrongSessionTypeException;
+import com.quartercode.disconnected.world.comp.program.RootProcess;
 
 /**
  * The process manager is a subclass the {@link OperatingSystem} uses for holding and modifying processes.
@@ -36,12 +36,12 @@ import com.quartercode.disconnected.world.comp.program.WrongSessionTypeException
  * @see Process
  * @see OperatingSystem
  */
-public class ProcessManager implements InfoString {
+public class ProcessManager {
 
     private OperatingSystem host;
 
     @XmlElement (name = "process")
-    private Process         rootProcess;
+    private RootProcess     rootProcess;
 
     /**
      * Creates a new empty process manager.
@@ -77,7 +77,7 @@ public class ProcessManager implements InfoString {
      * 
      * @return The root process with the pid 0.
      */
-    public Process getRootProcess() {
+    public RootProcess getRootProcess() {
 
         return rootProcess;
     }
@@ -86,12 +86,13 @@ public class ProcessManager implements InfoString {
      * Returns a list of all current running processes.
      * 
      * @return A list of all current running processes.
+     * @throws FunctionExecutionException Something goes wrong while resolving some data.
      */
-    public List<Process> getAllProcesses() {
+    public List<Process<?>> getAllProcesses() throws FunctionExecutionException {
 
-        List<Process> processes = new ArrayList<Process>();
+        List<Process<?>> processes = new ArrayList<Process<?>>();
         processes.add(rootProcess);
-        processes.addAll(rootProcess.getAllChildren());
+        processes.addAll(rootProcess.get(Process.GET_ALL_CHILDREN).invoke());
         return processes;
     }
 
@@ -101,56 +102,44 @@ public class ProcessManager implements InfoString {
      * 
      * @param binding The address to inspect.
      * @return The process which binds itself to the given address.
+     * @throws FunctionExecutionException Something goes wrong while resolving some data.
      */
-    public Process getProcess(Address binding) {
+    public Process<?> getProcess(Address binding) throws FunctionExecutionException {
 
-        for (Process process : getAllProcesses()) {
-            if (process.getExecutor().getPacketListener(binding) != null) {
-                return process;
-            }
-        }
+        // TODO: Reimplement this when the new network system is created
+        // for (Process<?> process : getAllProcesses()) {
+        // if (process.get(Process.GET_EXECUTOR).invoke().getPacketListener(binding) != null) {
+        // return process;
+        // }
+        // }
 
         return null;
-    }
-
-    /**
-     * Calculates and returns a new pid for a new process.
-     * 
-     * @return The calculated pid.
-     */
-    public synchronized int requestPid() {
-
-        List<Integer> pids = new ArrayList<Integer>();
-        for (Process process : getAllProcesses()) {
-            pids.add(process.getPid());
-        }
-        int pid = 0;
-        while (pids.contains(pid)) {
-            pid++;
-        }
-        return pid;
     }
 
     /**
      * Changes the running state of the process manager.
      * 
      * @param running True if the process manager is running, false if not.
+     * @throws FunctionExecutionException Something goes wrong while interrupting the root process on shutdown.
      */
-    public void setRunning(boolean running) {
+    public void setRunning(boolean running) throws FunctionExecutionException {
 
         if (running) {
             try {
-                Environment environment = new Environment( ((StringContent) host.getFileSystemManager().getFile("/system/config/environment.cfg").getContent()).toString());
-                rootProcess = new Process(host, null, 0, host.getFileSystemManager().getFile("/system/boot/kernel"), environment, null);
+                Environment environment = new Environment(host.getFileSystemManager().getFile("/system/etc/environment.cfg").get(ContentFile.GET_CONTENT).toString());
+                rootProcess = new RootProcess();
+                rootProcess.setParent(host);
+                rootProcess.setLocked(false);
+                rootProcess.get(Process.SET_SOURCE).invoke(host.getFileSystemManager().getFile("/system/boot/kernel"));
+                rootProcess.get(Process.SET_ENVIRONMENT).invoke(environment);
+                rootProcess.get(Process.LAUNCH).invoke(new HashMap<String, Object>());
+                rootProcess.setLocked(true);
             }
-            catch (WrongSessionTypeException e) {
-                // Wont ever happen
-            }
-            catch (ArgumentException e) {
-                // Wont ever happen
+            catch (FunctionExecutionException e) {
+                // Won't ever happen
             }
         } else {
-            rootProcess.interrupt(true);
+            rootProcess.get(Process.INTERRUPT).invoke(true);
         }
     }
 
@@ -192,15 +181,15 @@ public class ProcessManager implements InfoString {
     }
 
     @Override
-    public String toInfoString() {
-
-        return getAllProcesses().size() + " processes";
-    }
-
-    @Override
     public String toString() {
 
-        return getClass().getName() + " [" + toInfoString() + "]";
+        try {
+            return getClass().getName() + " [" + getAllProcesses().size() + " processes]";
+        }
+        catch (FunctionExecutionException e) {
+            // Ignore
+            return null;
+        }
     }
 
 }

@@ -26,25 +26,26 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlIDREF;
-import com.quartercode.disconnected.util.InfoString;
+import com.quartercode.disconnected.mocl.base.Feature;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.file.File;
-import com.quartercode.disconnected.world.comp.file.File.FileType;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
-import com.quartercode.disconnected.world.comp.file.FileSystemProvider;
 import com.quartercode.disconnected.world.comp.file.MountException;
 import com.quartercode.disconnected.world.comp.file.NoFileRightException;
 import com.quartercode.disconnected.world.comp.file.OutOfSpaceException;
+import com.quartercode.disconnected.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.world.comp.program.Process;
 
 /**
- * The file system manager is a subclass the {@link OperatingSystem} uses for holding and modifing file systems.
+ * The file system manager is a subclass the {@link OperatingSystem} uses for holding and modifying file systems.
  * This class only gets used by the {@link OperatingSystem}.
  * 
  * @see FileSystem
  * @see OperatingSystem
  */
-public class FileSystemManager implements InfoString {
+// TODO: Replace FileSystemManager with deamon process
+public class FileSystemManager {
 
     private OperatingSystem       host;
 
@@ -86,13 +87,23 @@ public class FileSystemManager implements InfoString {
      * This uses different resources to collect the file systems.
      * 
      * @return A list containing all avaiable file systems which are connected to this computer.
+     * @throws FunctionExecutionException Something goes wrong while retrieving the avaiable {@link Hardware} parts.
      */
-    public List<FileSystem> getAvaiable() {
+    public List<FileSystem> getAvaiable() throws FunctionExecutionException {
 
         List<FileSystem> fileSystems = new ArrayList<FileSystem>();
-        for (FileSystemProvider provider : host.getHost().get(Computer.HARDWARE).get(FileSystemProvider.class)) {
-            fileSystems.add(provider.getFileSystem());
+        for (Hardware hardware : host.getParent().get(Computer.GET_HARDWARE).invoke()) {
+            for (Feature feature : hardware) {
+                if (feature instanceof Iterable) {
+                    for (Object child : (Iterable<?>) feature) {
+                        if (child instanceof FileSystem) {
+                            fileSystems.add((FileSystem) child);
+                        }
+                    }
+                }
+            }
         }
+
         return fileSystems;
     }
 
@@ -272,12 +283,13 @@ public class FileSystemManager implements InfoString {
      * 
      * @param path The path the returned file is stored under.
      * @return The file which is stored on a mounted file system under the given path.
+     * @throws FunctionExecutionException Something goes wrong while the {@link FileSystem} retrieves the requested {@link File}.
      */
-    public File getFile(String path) {
+    public File<?> getFile(String path) throws FunctionExecutionException {
 
         FileSystem fileSystem = getMounted(path);
         if (fileSystem != null && path.lastIndexOf(File.SEPERATOR) > 0) {
-            return fileSystem.getFile(path.substring(path.indexOf(File.SEPERATOR, 1)));
+            return fileSystem.get(FileSystem.GET_FILE).invoke(path.substring(path.indexOf(File.SEPERATOR, 1)));
         } else {
             return null;
         }
@@ -294,14 +306,13 @@ public class FileSystemManager implements InfoString {
      * @param user The user who owns the new file.
      * @return The new file (or the existing one, if the file already exists).
      * @throws OutOfSpaceException If there isn't enough space on the target file system for the new file.
+     * @throws FunctionExecutionException Something goes wrong while the {@link FileSystem} adds the {@link File}.
      */
-    public File addFile(String path, FileType type, User user) throws OutOfSpaceException {
+    public void addFile(String path, File<?> file) throws OutOfSpaceException, FunctionExecutionException {
 
         FileSystem fileSystem = getMounted(path);
         if (fileSystem != null) {
-            return fileSystem.addFile(path.substring(path.indexOf(File.SEPERATOR, 1)), type, user);
-        } else {
-            return null;
+            fileSystem.get(FileSystem.ADD_FILE).invoke(file, path.substring(path.indexOf(File.SEPERATOR, 1)));
         }
     }
 
@@ -318,15 +329,12 @@ public class FileSystemManager implements InfoString {
      * @return The new file (or the existing one, if the file already exists).
      * @throws NoFileRightException The given process hasn't the right to write into a directory where the algorithm needs to write
      * @throws OutOfSpaceException If there isn't enough space on the target file system for the new file.
+     * @throws FunctionExecutionException Something goes wrong while the {@link FileSystem} adds the {@link File}.
      */
-    public File addFile(Process process, String path, FileType type, User user) throws NoFileRightException, OutOfSpaceException {
+    public void addFile(Process<?> process, String path, File<?> file) throws NoFileRightException, OutOfSpaceException, FunctionExecutionException {
 
-        FileSystem fileSystem = getMounted(path);
-        if (fileSystem != null) {
-            return fileSystem.addFile(process, path.substring(path.indexOf(File.SEPERATOR, 1)), type, user);
-        } else {
-            return null;
-        }
+        // TODO: Make this support rights (using FileEventHandlers on the ADD_FILE function)
+        addFile(path, file);
     }
 
     /**
@@ -396,15 +404,15 @@ public class FileSystemManager implements InfoString {
     }
 
     @Override
-    public String toInfoString() {
-
-        return getAvaiable().size() + " avaiable fs, " + getKnown().size() + "/" + getMounted().size() + " known fs mounted";
-    }
-
-    @Override
     public String toString() {
 
-        return getClass().getName() + " [" + toInfoString() + "]";
+        try {
+            return getClass().getName() + " [" + getAvaiable().size() + " avaiable, " + getMounted().size() + "/" + getKnown().size() + " mounted]";
+        }
+        catch (FunctionExecutionException e) {
+            // Ignore
+            return null;
+        }
     }
 
     /**
@@ -414,7 +422,7 @@ public class FileSystemManager implements InfoString {
      * 
      * @see FileSystem
      */
-    protected static class KnownFileSystem implements InfoString {
+    protected static class KnownFileSystem {
 
         @XmlIDREF
         @XmlAttribute (name = "name")
@@ -528,15 +536,9 @@ public class FileSystemManager implements InfoString {
         }
 
         @Override
-        public String toInfoString() {
-
-            return fileSystem.toInfoString() + ", assigned to " + File.SEPERATOR + mountpoint;
-        }
-
-        @Override
         public String toString() {
 
-            return getClass().getName() + " [" + toInfoString() + "]";
+            return getClass().getName() + " [mountpoint=" + mountpoint + ", mounted=" + mounted + "]";
         }
 
     }

@@ -18,82 +18,232 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
+import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.Computer;
-import com.quartercode.disconnected.world.comp.HostedComputerPart;
 import com.quartercode.disconnected.world.comp.Version;
 import com.quartercode.disconnected.world.comp.Vulnerability;
-import com.quartercode.disconnected.world.comp.Vulnerability.Vulnerable;
+import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.Process.ProcessState;
-import com.quartercode.disconnected.world.comp.session.Desktop;
 
 /**
  * This class stores information about an operating system.
- * This also contains a list of all vulnerabilities this operating system has.
  * 
- * @see HostedComputerPart
- * @see Desktop
- * @see Vulnerability
  * @see ProcessManager
  * @see UserManager
  * @see FileSystemManager
  * @see NetworkManager
  */
-public class OperatingSystem extends HostedComputerPart implements Vulnerable {
+// TODO: Replace OperatingSystem with root process and managers with process deamons -> Everything will be done using processes
+public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
-    @XmlElement (name = "vulnerability")
-    private List<Vulnerability> vulnerabilities = new ArrayList<Vulnerability>();
-
-    @XmlElement
-    private ProcessManager      processManager;
-    @XmlElement
-    private UserManager         userManager;
-    @XmlElement
-    private FileSystemManager   fileSystemManager;
-    private NetworkManager      networkManager;
+    // ----- Properties -----
 
     /**
-     * Creates a new empty operating system.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * The name of the operating system.
      */
-    protected OperatingSystem() {
+    protected static final FeatureDefinition<ObjectProperty<String>>             NAME;
+
+    /**
+     * The {@link Version} of the operating system.
+     */
+    protected static final FeatureDefinition<ObjectProperty<Version>>            VERSION;
+
+    /**
+     * The {@link Vulnerability}s the operating system has.
+     */
+    protected static final FeatureDefinition<ObjectProperty<Set<Vulnerability>>> VULNERABILITIES;
+
+    static {
+
+        NAME = new AbstractFeatureDefinition<ObjectProperty<String>>("name") {
+
+            @Override
+            public ObjectProperty<String> create(FeatureHolder holder) {
+
+                return new ObjectProperty<String>(getName(), holder);
+            }
+
+        };
+
+        VERSION = new AbstractFeatureDefinition<ObjectProperty<Version>>("version") {
+
+            @Override
+            public ObjectProperty<Version> create(FeatureHolder holder) {
+
+                return new ObjectProperty<Version>(getName(), holder);
+            }
+
+        };
+
+        VULNERABILITIES = new AbstractFeatureDefinition<ObjectProperty<Set<Vulnerability>>>("vulnerabilities") {
+
+            @Override
+            public ObjectProperty<Set<Vulnerability>> create(FeatureHolder holder) {
+
+                return new ObjectProperty<Set<Vulnerability>>(getName(), holder, new HashSet<Vulnerability>());
+            }
+
+        };
 
     }
 
+    // ----- Properties End -----
+
+    // ----- Functions -----
+
     /**
-     * Creates a new operating system and sets the host computer, the name, the version, the vulnerabilities and the times the os needs for switching on/off.
-     * 
-     * @param host The host computer this part is built in.
-     * @param name The name the operating system has.
-     * @param version The current version the operating system has.
-     * @param vulnerabilities The vulnerabilities the operating system has.
+     * Returns the name of the operating system.
      */
-    public OperatingSystem(Computer host, String name, Version version, List<Vulnerability> vulnerabilities) {
+    public static final FunctionDefinition<String>                               GET_NAME;
 
-        super(host, name, version);
+    /**
+     * Changes the name of the operating system.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link String}</td>
+     * <td>name</td>
+     * <td>The new name for the operating system.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                 SET_NAME;
 
-        this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
+    /**
+     * Returns the {@link Version} of the operating system.
+     */
+    public static final FunctionDefinition<Version>                              GET_VERSION;
 
+    /**
+     * Changes the {@link Version} of the operating system.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Version}</td>
+     * <td>version</td>
+     * <td>The new {@link Version} for the operating system.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                 SET_VERSION;
+
+    /**
+     * Returns the {@link Vulnerability}s the operating system has.
+     */
+    public static final FunctionDefinition<Set<Vulnerability>>                   GET_VULNERABILITIES;
+
+    /**
+     * Adds {@link Vulnerability}s to the operating system.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0...</td>
+     * <td>{@link Vulnerability}...</td>
+     * <td>vulnerabilities</td>
+     * <td>The {@link Vulnerability}s to add to the operating system.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                 ADD_VULNERABILITIES;
+
+    /**
+     * Removes {@link Vulnerability}s from the operating system.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0...</td>
+     * <td>{@link Vulnerability}...</td>
+     * <td>vulnerabilities</td>
+     * <td>The {@link Vulnerability}s to remove from the operating system.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                 REMOVE_VULNERABILITIES;
+
+    static {
+
+        GET_NAME = FunctionDefinitionFactory.create("getName", OperatingSystem.class, PropertyAccessorFactory.createGet(NAME));
+        SET_NAME = FunctionDefinitionFactory.create("setName", OperatingSystem.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(NAME)), String.class);
+
+        GET_VERSION = FunctionDefinitionFactory.create("getVersion", OperatingSystem.class, PropertyAccessorFactory.createGet(VERSION));
+        SET_VERSION = FunctionDefinitionFactory.create("setVersion", OperatingSystem.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(VERSION)), Version.class);
+
+        GET_VULNERABILITIES = FunctionDefinitionFactory.create("getVulnerabilities", OperatingSystem.class, CollectionPropertyAccessorFactory.createGet(VULNERABILITIES));
+        ADD_VULNERABILITIES = FunctionDefinitionFactory.create("addVulnerabilities", OperatingSystem.class, new LockableFEWrapper<Void>(CollectionPropertyAccessorFactory.createAdd(VULNERABILITIES)), Vulnerability[].class);
+        REMOVE_VULNERABILITIES = FunctionDefinitionFactory.create("removeVulnerabilities", OperatingSystem.class, new LockableFEWrapper<Void>(CollectionPropertyAccessorFactory.createRemove(VULNERABILITIES)), Vulnerability[].class);
+
+    }
+
+    // ----- Functions End -----
+
+    /**
+     * Creates a new operating system.
+     */
+    public OperatingSystem() {
+
+        // ----- Temporary -----
         processManager = new ProcessManager(this);
         userManager = new UserManager(this);
         fileSystemManager = new FileSystemManager(this);
         networkManager = new NetworkManager(this);
+        // ----- Temporary End -----
     }
 
-    @Override
-    public List<Vulnerability> getVulnerabilities() {
+    // TODO: Remove
+    // ----- Temporary -----
 
-        return Collections.unmodifiableList(vulnerabilities);
-    }
+    @XmlElement
+    private final ProcessManager    processManager;
+    @XmlElement
+    private final UserManager       userManager;
+    @XmlElement
+    private final FileSystemManager fileSystemManager;
+    private final NetworkManager    networkManager;
 
     /**
-     * Returns the process manager which is used for holding and modifing processes.
+     * Returns the process manager which is used for holding and modifying processes.
      * 
-     * @return The process manager which is used for holding and modifing processes.
+     * @return The process manager which is used for holding and modifying processes.
      */
     public ProcessManager getProcessManager() {
 
@@ -101,9 +251,9 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     }
 
     /**
-     * Returns the user manager which is used for holding and modifing users and groups.
+     * Returns the user manager which is used for holding and modifying users and groups.
      * 
-     * @return The user manager which is used for holding and modifing users and groups.
+     * @return The user manager which is used for holding and modifying users and groups.
      */
     public UserManager getUserManager() {
 
@@ -111,9 +261,9 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
     }
 
     /**
-     * Returns the file system manager which is used for holding and modifing file systems.
+     * Returns the file system manager which is used for holding and modifying file systems.
      * 
-     * @return The file system manager which is used for holding and modifing file systems.
+     * @return The file system manager which is used for holding and modifying file systems.
      */
     public FileSystemManager getFileSystemManager() {
 
@@ -134,19 +284,21 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
      * Returns if the operating system is running.
      * 
      * @return True if the operating system is running, false if not.
+     * @throws FunctionExecutionException Can't access the state information for the root {@link Process}.
      */
     @XmlTransient
-    public boolean isRunning() {
+    public boolean isRunning() throws FunctionExecutionException {
 
-        return processManager.getRootProcess() != null && processManager.getRootProcess().getState() != ProcessState.STOPPED;
+        return processManager.getRootProcess() != null && processManager.getRootProcess().get(Process.GET_STATE).invoke() != ProcessState.STOPPED;
     }
 
     /**
      * Changes the running state of the operating system.
      * 
      * @param running True if the operating system is running, false if not.
+     * @throws FunctionExecutionException Something goes wrong while enabling or disabling some child managers.
      */
-    public void setRunning(boolean running) {
+    public void setRunning(boolean running) throws FunctionExecutionException {
 
         if (running) {
             fileSystemManager.setRunning(true);
@@ -157,6 +309,8 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         }
     }
 
+    // ----- Temporary End -----
+
     @Override
     public int hashCode() {
 
@@ -165,7 +319,6 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         result = prime * result + (fileSystemManager == null ? 0 : fileSystemManager.hashCode());
         result = prime * result + (processManager == null ? 0 : processManager.hashCode());
         result = prime * result + (userManager == null ? 0 : userManager.hashCode());
-        result = prime * result + (vulnerabilities == null ? 0 : vulnerabilities.hashCode());
         return result;
     }
 
@@ -203,29 +356,7 @@ public class OperatingSystem extends HostedComputerPart implements Vulnerable {
         } else if (!userManager.equals(other.userManager)) {
             return false;
         }
-        if (vulnerabilities == null) {
-            if (other.vulnerabilities != null) {
-                return false;
-            }
-        } else if (!vulnerabilities.equals(other.vulnerabilities)) {
-            return false;
-        }
         return true;
-    }
-
-    @Override
-    public String toInfoString() {
-
-        String info = super.toInfoString();
-        info += ", " + vulnerabilities.size() + " vulns, " + processManager.toInfoString();
-        info += ", " + userManager.toInfoString() + ", " + fileSystemManager.toInfoString();
-        return info;
-    }
-
-    @Override
-    public String toString() {
-
-        return getClass().getName() + "[" + toInfoString() + "]";
     }
 
 }
