@@ -18,24 +18,301 @@
 
 package com.quartercode.disconnected.world;
 
-import javax.xml.bind.annotation.XmlElement;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
+import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.util.InfoString;
-import com.quartercode.disconnected.world.general.RootObject;
+import com.quartercode.disconnected.world.comp.Computer;
+import com.quartercode.disconnected.world.member.Member;
+import com.quartercode.disconnected.world.member.MemberGroup;
 
 /**
- * A world is a space which contains {@link WorldObject}s.
- * There is one {@link RootObject} which contains first level {@link WorldObject}s.
- * 
- * @see RootObject
+ * A world is a space which contains {@link DefaultFeatureHolder}s.
+ * The actual world class contains first level {@link DefaultFeatureHolder}s.
  */
 @XmlRootElement (namespace = "http://quartercode.com/")
-public class World implements InfoString {
+public class World extends DefaultFeatureHolder {
 
-    private Simulation simulation;
-    @XmlElement
-    private RootObject root;
+    // ----- Properties -----
+
+    /**
+     * The {@link Member}s who are present in the world.
+     */
+    protected static final FeatureDefinition<ObjectProperty<List<Member>>>      MEMBERS;
+
+    /**
+     * The {@link MemberGroup}s which are present in the world.
+     */
+    protected static final FeatureDefinition<ObjectProperty<List<MemberGroup>>> GROUPS;
+
+    /**
+     * The {@link Computer}s which are present in the world.
+     */
+    protected static final FeatureDefinition<ObjectProperty<List<Computer>>>    COMPUTERS;
+
+    static {
+
+        MEMBERS = new AbstractFeatureDefinition<ObjectProperty<List<Member>>>("members") {
+
+            @Override
+            public ObjectProperty<List<Member>> create(FeatureHolder holder) {
+
+                return new ObjectProperty<List<Member>>(getName(), holder, new ArrayList<Member>());
+            }
+
+        };
+
+        GROUPS = new AbstractFeatureDefinition<ObjectProperty<List<MemberGroup>>>("memberGroups") {
+
+            @Override
+            public ObjectProperty<List<MemberGroup>> create(FeatureHolder holder) {
+
+                return new ObjectProperty<List<MemberGroup>>(getName(), holder, new ArrayList<MemberGroup>());
+            }
+
+        };
+
+        COMPUTERS = new AbstractFeatureDefinition<ObjectProperty<List<Computer>>>("computers") {
+
+            @Override
+            public ObjectProperty<List<Computer>> create(FeatureHolder holder) {
+
+                return new ObjectProperty<List<Computer>>(getName(), holder, new ArrayList<Computer>());
+            }
+
+        };
+
+    }
+
+    // ----- Properties End -----
+
+    // ----- Functions -----
+
+    /**
+     * Returns the {@link Member}s who are present in the world.
+     * The returned list is an unmodifiable one.
+     */
+    public static final FunctionDefinition<List<Member>>                        GET_MEMBERS;
+
+    /**
+     * Returns the {@link Member} who has the given name.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link String}</td>
+     * <td>name</td>
+     * <td>The name of the {@link Member} to return.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Member>                              GET_MEMBER_BY_NAME;
+
+    /**
+     * Adds {@link Member}s to the world.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0...</td>
+     * <td>{@link Member}...</td>
+     * <td>members</td>
+     * <td>The {@link Member}s to add to the world.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                ADD_MEMBERS;
+
+    /**
+     * Removes {@link Member}s from the world.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0...</td>
+     * <td>{@link Member}...</td>
+     * <td>members</td>
+     * <td>The {@link Member}s to remove from the world.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                REMOVE_MEMBERS;
+
+    /**
+     * Returns the {@link MemberGroup}s which are present in the world.
+     * The returned list is an unmodifiable one.
+     */
+    public static final FunctionDefinition<List<MemberGroup>>                   GET_GROUPS;
+
+    /**
+     * Returns the {@link MemberGroup} the given {@link Member} is in.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Member}</td>
+     * <td>member</td>
+     * <td>The {@link Member} who is in the {@link MemberGroup} to return.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<MemberGroup>                         GET_GROUP_BY_MEMBER;
+
+    /**
+     * Adds {@link MemberGroup}s to the world.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0...</td>
+     * <td>{@link MemberGroup}...</td>
+     * <td>groups</td>
+     * <td>The {@link MemberGroup}s to add to the world.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                ADD_GROUPS;
+
+    /**
+     * Removes {@link MemberGroup}s from the world.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0...</td>
+     * <td>{@link MemberGroup}...</td>
+     * <td>groups</td>
+     * <td>The {@link MemberGroup}s to remove from the world.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                REMOVE_GROUPS;
+
+    /**
+     * Returns the {@link Computer}s which are present in the world.
+     * The returned list is an unmodifiable one.
+     */
+    public static final FunctionDefinition<List<Computer>>                      GET_COMPUTERS;
+
+    /**
+     * Adds {@link Computer}s to the world.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0...</td>
+     * <td>{@link Computer}...</td>
+     * <td>groups</td>
+     * <td>The {@link Computer}s to add to the world.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                ADD_COMPUTERS;
+
+    /**
+     * Removes {@link Computer}s from the world.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0...</td>
+     * <td>{@link Computer}...</td>
+     * <td>groups</td>
+     * <td>The {@link Computer}s to remove from the world.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                REMOVE_COMPUTERS;
+
+    static {
+
+        GET_MEMBERS = FunctionDefinitionFactory.create("getMembers", World.class, CollectionPropertyAccessorFactory.createGet(MEMBERS));
+        GET_MEMBER_BY_NAME = FunctionDefinitionFactory.create("getMemberByName", World.class, CollectionPropertyAccessorFactory.createGetSingle(MEMBERS, new CriteriumMatcher<Member>() {
+
+            @Override
+            public boolean matches(Member element, Object... arguments) throws StopExecutionException {
+
+                return element.getName().equals(arguments[0]);
+            }
+
+        }), String.class);
+        ADD_MEMBERS = FunctionDefinitionFactory.create("addMembers", World.class, CollectionPropertyAccessorFactory.createAdd(MEMBERS), Member[].class);
+        REMOVE_MEMBERS = FunctionDefinitionFactory.create("removeMembers", World.class, CollectionPropertyAccessorFactory.createRemove(MEMBERS), Member[].class);
+
+        GET_GROUPS = FunctionDefinitionFactory.create("getGroups", World.class, CollectionPropertyAccessorFactory.createGet(GROUPS));
+        GET_GROUP_BY_MEMBER = FunctionDefinitionFactory.create("getGroupByMember", World.class, CollectionPropertyAccessorFactory.createGetSingle(GROUPS, new CriteriumMatcher<MemberGroup>() {
+
+            @Override
+            public boolean matches(MemberGroup element, Object... arguments) throws StopExecutionException {
+
+                return element.getMembers().contains(arguments[0]);
+            }
+
+        }), Member.class);
+        ADD_GROUPS = FunctionDefinitionFactory.create("addGroups", World.class, CollectionPropertyAccessorFactory.createAdd(GROUPS), MemberGroup[].class);
+        REMOVE_GROUPS = FunctionDefinitionFactory.create("removeGroups", World.class, CollectionPropertyAccessorFactory.createRemove(GROUPS), MemberGroup[].class);
+
+        GET_COMPUTERS = FunctionDefinitionFactory.create("getComputers", World.class, CollectionPropertyAccessorFactory.createGet(COMPUTERS));
+        ADD_COMPUTERS = FunctionDefinitionFactory.create("addComputers", World.class, CollectionPropertyAccessorFactory.createAdd(COMPUTERS), Computer[].class);
+        REMOVE_COMPUTERS = FunctionDefinitionFactory.create("removeComputers", World.class, CollectionPropertyAccessorFactory.createRemove(COMPUTERS), Computer[].class);
+
+    }
+
+    // ----- Functions End -----
+
+    private Simulation                                                          simulation;
 
     /**
      * Creates a new empty world.
@@ -46,13 +323,13 @@ public class World implements InfoString {
     }
 
     /**
-     * Creates a new world with a new {@link RootObject} which is placed in the given {@link Simulation}.
+     * Creates a new world which is placed in the given {@link Simulation}.
      * 
      * @param simulation The {@link Simulation} the new world is placed in.
      */
     public World(Simulation simulation) {
 
-        root = new RootObject(this);
+        this.simulation = simulation;
     }
 
     /**
@@ -63,60 +340,6 @@ public class World implements InfoString {
     public Simulation getSimulation() {
 
         return simulation;
-    }
-
-    /**
-     * Returns the {@link RootObject} which houses first level {@link WorldObject}s.
-     * 
-     * @return The {@link RootObject} of the world.
-     */
-    public RootObject getRoot() {
-
-        return root;
-    }
-
-    @Override
-    public int hashCode() {
-
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (root == null ? 0 : root.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        World other = (World) obj;
-        if (root == null) {
-            if (other.root != null) {
-                return false;
-            }
-        } else if (!root.equals(other.root)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toInfoString() {
-
-        return "root: " + root.toInfoString();
-    }
-
-    @Override
-    public String toString() {
-
-        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }
