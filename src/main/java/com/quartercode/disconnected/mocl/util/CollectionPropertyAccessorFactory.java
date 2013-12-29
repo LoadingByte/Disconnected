@@ -257,22 +257,6 @@ public class CollectionPropertyAccessorFactory {
 
     }
 
-    /**
-     * The class matcher checks if the elements are either either the same as or a superclass or superinterface of a given {@link Class} (index 0).
-     * 
-     * @param <E> The type of elements the class matcher checks.
-     * @see CriteriumMatcher
-     */
-    public static class ClassMatcher<E> implements CriteriumMatcher<E> {
-
-        @Override
-        public boolean matches(E element, Object... arguments) throws StopExecutionException {
-
-            return ((Class<?>) arguments[0]).isAssignableFrom(element.getClass());
-        }
-
-    }
-
     private CollectionPropertyAccessorFactory() {
 
     }
