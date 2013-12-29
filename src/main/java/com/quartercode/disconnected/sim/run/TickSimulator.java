@@ -18,15 +18,25 @@
 
 package com.quartercode.disconnected.sim.run;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import com.quartercode.disconnected.mocl.extra.Function;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.world.Updateable;
 
 /**
  * This class implements the root tick update mechanisms for the entire simulation.
  */
 public class TickSimulator implements TickAction {
 
-    private Simulation simulation;
+    private static final Logger LOGGER               = Logger.getLogger(TickSimulator.class.getName());
+
+    /**
+     * {@link Function}s whose names contain this string are automatically invoked by the tick simulator.
+     */
+    public static final String  UPDATE_FUNCTION_NAME = "tickUpdate";
+
+    private Simulation          simulation;
 
     /**
      * Creates a new empty tick simulator.
@@ -74,8 +84,13 @@ public class TickSimulator implements TickAction {
     public void update() {
 
         if (simulation != null) {
-            // Execute world object ticks
-            updateWorldObject(simulation.getWorld().getRoot());
+            try {
+                // Execute world object ticks
+                updateObject(simulation.getWorld());
+            }
+            catch (FunctionExecutionException e) {
+                LOGGER.log(Level.SEVERE, "Unexcpected function execution exception during world tick update", e);
+            }
 
             // TEMPDIS
             // // Execute process ticks
@@ -176,15 +191,15 @@ public class TickSimulator implements TickAction {
         }
     }
 
-    private void updateWorldObject(Object object) {
+    private void updateObject(Object object) throws FunctionExecutionException {
 
-        if (object instanceof Updateable) {
-            ((Updateable) object).update();
+        if (object instanceof Function && ((Function<?>) object).getName().contains(UPDATE_FUNCTION_NAME)) {
+            ((Function<?>) object).invoke();
         }
 
         if (object instanceof Iterable) {
             for (Object child : (Iterable<?>) object) {
-                updateWorldObject(child);
+                updateObject(child);
             }
         }
     }
