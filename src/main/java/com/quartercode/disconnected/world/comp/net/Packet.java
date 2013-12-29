@@ -18,205 +18,179 @@
 
 package com.quartercode.disconnected.world.comp.net;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlList;
-import com.quartercode.disconnected.util.InfoString;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.SizeUtil;
-import com.quartercode.disconnected.world.comp.SizeUtil.SizeObject;
+import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 
 /**
  * This class represents a packet which can be sent between network interfaces.
- * A packet contains a sender, a receiver (both represented by addresses) and a data map which holds the data which should be sent.
+ * A packet contains a sender, a receiver (both represented by addresses) and a data payload {@link Object} which should be sent.
  */
-public class Packet implements SizeObject, InfoString {
+public class Packet extends DefaultFeatureHolder implements DerivableSize {
 
-    @XmlElement
-    private Address      sender;
-    @XmlElement
-    private Address      receiver;
-    @XmlElement
-    private Object       data;
-    @XmlList
-    private List<String> target;
-    @XmlElement
-    private int          targetIndex;
+    // ----- Properties -----
 
     /**
-     * Creates a new empty packet.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * The network {@link Address} which sends the packet.
      */
-    protected Packet() {
+    protected static final FeatureDefinition<ObjectProperty<Address>> SENDER;
+
+    /**
+     * The network {@link Address} which should receive the packet.
+     */
+    protected static final FeatureDefinition<ObjectProperty<Address>> RECEIVER;
+
+    /**
+     * The data payload {@link Object} which should be sent.
+     * The payload can't be modified after construction.
+     */
+    protected static final FeatureDefinition<ObjectProperty<Object>>  DATA;
+
+    static {
+
+        SENDER = new AbstractFeatureDefinition<ObjectProperty<Address>>("sender") {
+
+            @Override
+            public ObjectProperty<Address> create(FeatureHolder holder) {
+
+                return new ObjectProperty<Address>(getName(), holder);
+            }
+
+        };
+
+        RECEIVER = new AbstractFeatureDefinition<ObjectProperty<Address>>("receiver") {
+
+            @Override
+            public ObjectProperty<Address> create(FeatureHolder holder) {
+
+                return new ObjectProperty<Address>(getName(), holder);
+            }
+
+        };
+
+        DATA = new AbstractFeatureDefinition<ObjectProperty<Object>>("data") {
+
+            @Override
+            public ObjectProperty<Object> create(FeatureHolder holder) {
+
+                return new ObjectProperty<Object>(getName(), holder);
+            }
+
+        };
 
     }
 
+    // ----- Properties End -----
+
+    // ----- Functions -----
+
     /**
-     * Creates a new packet and sets the addresses and the data payload. Also sets the target array.
+     * Returns the network {@link Address} which sends the packet.
+     */
+    public static final FunctionDefinition<Address>                   GET_SENDER;
+
+    /**
+     * Changes the network {@link Address} which sends the packet.
      * 
-     * @param sender The address which is sending the packet.
-     * @param receiver The address which will receive the packet.
-     * @param data The data payload object which should be sent.
-     * @param target The target array which is used by the receiver to resolve the purpose of the packet.
-     * @throws IllegalArgumentException Can't derive size type from one of the given data values.
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Address}</td>
+     * <td>sender</td>
+     * <td>The new sending network {@link Address}.</td>
+     * </tr>
+     * </table>
      */
-    public Packet(Address sender, Address receiver, Object data, String... target) {
-
-        this.sender = sender;
-        this.receiver = receiver;
-        this.data = data;
-        this.target = Arrays.asList(target);
-    }
+    public static final FunctionDefinition<Void>                      SET_SENDER;
 
     /**
-     * Returns the address which is sending the packet.
+     * Returns the network {@link Address} which should receive the packet.
+     */
+    public static final FunctionDefinition<Address>                   GET_RECEIVER;
+
+    /**
+     * Changes the network {@link Address} which should receive the packet.
      * 
-     * @return The address which is sending the packet.
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Address}</td>
+     * <td>receiver</td>
+     * <td>The new receiving network {@link Address}.</td>
+     * </tr>
+     * </table>
      */
-    public Address getSender() {
-
-        return sender;
-    }
+    public static final FunctionDefinition<Void>                      SET_RECEIVER;
 
     /**
-     * Returns the address which will receive the packet.
-     * 
-     * @return The address which will receive the packet.
+     * Returns the data payload {@link Object} which should be sent.
+     * The payload can't be modified after construction.
      */
-    public Address getReceiver() {
-
-        return receiver;
-    }
+    public static final FunctionDefinition<Object>                    GET_DATA;
 
     /**
-     * Returns the data payload object which should be sent.
+     * Changes the data payload {@link Object} which should be sent.
      * The payload can't be modified after construction.
      * 
-     * @return The data payload object which should be sent.
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Object}</td>
+     * <td>data</td>
+     * <td>The new data payload {@link Object}.</td>
+     * </tr>
+     * </table>
      */
-    public Object getData() {
+    public static final FunctionDefinition<Void>                      SET_DATA;
 
-        return data;
+    static {
+
+        GET_SENDER = FunctionDefinitionFactory.create("getSender", Packet.class, PropertyAccessorFactory.createGet(SENDER));
+        SET_SENDER = FunctionDefinitionFactory.create("setSender", Packet.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(SENDER)), Address.class);
+
+        GET_RECEIVER = FunctionDefinitionFactory.create("getReceiver", Packet.class, PropertyAccessorFactory.createGet(RECEIVER));
+        SET_RECEIVER = FunctionDefinitionFactory.create("setReceiver", Packet.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(RECEIVER)), Address.class);
+
+        GET_DATA = FunctionDefinitionFactory.create("getData", Packet.class, PropertyAccessorFactory.createGet(DATA));
+        SET_DATA = FunctionDefinitionFactory.create("setData", Packet.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(DATA)), Object.class);
+
+        GET_SIZE.addExecutor(Packet.class, "data", SizeUtil.createGetSize(DATA));
+
     }
+
+    // ----- Functions End -----
 
     /**
-     * Returns the whole target array (or list) which is used by the receiver to resolve the purpose of the packet.
-     * 
-     * @return The target array which is used by the receiver to resolve the purpose of the packet.
+     * Creates a new packet.
      */
-    public List<String> getTarget() {
+    public Packet() {
 
-        return Collections.unmodifiableList(target);
-    }
-
-    /**
-     * Returns the next target string from the target array and optional increments the index for the next request.
-     * Returns null if there's no element with the current index.
-     * 
-     * @param increment True if the target index should be incremented. This will return the next target string on the next request.
-     * @return The next target string from the target array.
-     */
-    public String nextTarget(boolean increment) {
-
-        if (targetIndex < target.size()) {
-            int requestIndex = targetIndex;
-            if (increment) {
-                targetIndex++;
-            }
-            return target.get(requestIndex);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Resets the target index which is used by {@link #nextTarget(boolean)} for storing the last target string.
-     */
-    public void resetTargetIndex() {
-
-        targetIndex = 0;
-    }
-
-    /**
-     * Returns the size this packet has in bytes.
-     * Every char in every key is equal to one byte.
-     * 
-     * @return The size this packet has in bytes.
-     */
-    @Override
-    public long getSize() {
-
-        long size = SizeUtil.getSize(data) + SizeUtil.getSize(target);
-        return size;
-    }
-
-    @Override
-    public int hashCode() {
-
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (data == null ? 0 : data.hashCode());
-        result = prime * result + (receiver == null ? 0 : receiver.hashCode());
-        result = prime * result + (sender == null ? 0 : sender.hashCode());
-        result = prime * result + (target == null ? 0 : target.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (! (obj instanceof Packet)) {
-            return false;
-        }
-        Packet other = (Packet) obj;
-        if (data == null) {
-            if (other.data != null) {
-                return false;
-            }
-        } else if (!data.equals(other.data)) {
-            return false;
-        }
-        if (receiver == null) {
-            if (other.receiver != null) {
-                return false;
-            }
-        } else if (!receiver.equals(other.receiver)) {
-            return false;
-        }
-        if (sender == null) {
-            if (other.sender != null) {
-                return false;
-            }
-        } else if (!sender.equals(other.sender)) {
-            return false;
-        }
-        if (target == null) {
-            if (other.target != null) {
-                return false;
-            }
-        } else if (!target.equals(other.target)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toInfoString() {
-
-        return sender.toInfoString() + " to " + receiver.toInfoString() + ", payload " + data + " with first target " + target.get(0);
-    }
-
-    @Override
-    public String toString() {
-
-        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }

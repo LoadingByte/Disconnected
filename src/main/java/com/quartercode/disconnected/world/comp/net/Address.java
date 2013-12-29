@@ -18,10 +18,20 @@
 
 package com.quartercode.disconnected.world.comp.net;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlIDREF;
 import org.apache.commons.lang.Validate;
-import com.quartercode.disconnected.util.InfoString;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
+import com.quartercode.disconnected.mocl.extra.Lockable;
+import com.quartercode.disconnected.mocl.extra.Prioritized;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
+import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
 
 /**
@@ -31,103 +41,227 @@ import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
  * @see IP
  * @see NetworkInterface
  */
-public class Address implements InfoString {
+public class Address extends DefaultFeatureHolder {
 
-    @XmlIDREF
-    @XmlAttribute
-    private IP  ip;
-    @XmlAttribute
-    private int port;
+    // ----- Properties -----
 
     /**
-     * Creates a new empty address.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * The target {@link IP} which represents the network interface which holds the service.
      */
-    protected Address() {
+    protected static final FeatureDefinition<ObjectProperty<IP>>      IP;
+
+    /**
+     * The target port which specifies the service.
+     */
+    protected static final FeatureDefinition<ObjectProperty<Integer>> PORT;
+
+    static {
+
+        IP = new AbstractFeatureDefinition<ObjectProperty<IP>>("ip") {
+
+            @Override
+            public ObjectProperty<IP> create(FeatureHolder holder) {
+
+                return new ObjectProperty<IP>(getName(), holder);
+            }
+
+        };
+
+        PORT = new AbstractFeatureDefinition<ObjectProperty<Integer>>("port") {
+
+            @Override
+            public ObjectProperty<Integer> create(FeatureHolder holder) {
+
+                return new ObjectProperty<Integer>(getName(), holder);
+            }
+
+        };
 
     }
 
+    // ----- Properties End -----
+
+    // ----- Functions -----
+
     /**
-     * Creates a new address and sets the target ip and the target port.
-     * The port must be in range 0 <= port <= 65535.
+     * Returns the target {@link IP} which represents the network interface which holds the service.
+     * The returned object shouldn't be changed in any way. You can use {@link #SET_IP} for that purpose.
+     */
+    public static final FunctionDefinition<IP>                        GET_IP;
+
+    /**
+     * Changes the target {@link IP} which represents the network interface which holds the service.
      * 
-     * @param ip The target ip which represents the network interface which holds the service.
-     * @param port The target port which specifies the service.
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link IP}</td>
+     * <td>ip</td>
+     * <td>The new target {@link IP}.</td>
+     * </tr>
+     * </table>
      */
-    public Address(IP ip, int port) {
-
-        Validate.isTrue(port >= 0 || port <= 65535, "The port must be in range 0 <= port <= 65535 (e.g. 8080): ", port);
-
-        this.ip = ip;
-        this.port = port;
-    }
-
-    /**
-     * Returns the target ip which represents the network interface which holds the service.
-     * 
-     * @return The target ip which represents the network interface which holds the service.
-     */
-    public IP getIp() {
-
-        return ip;
-    }
+    public static final FunctionDefinition<Void>                      SET_IP;
 
     /**
      * Returns the target port which specifies the service.
-     * 
-     * @return The target port which specifies the service.
      */
-    public int getPort() {
+    public static final FunctionDefinition<Integer>                   GET_PORT;
 
-        return port;
-    }
+    /**
+     * Changes the target port which specifies the service.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Integer}</td>
+     * <td>port</td>
+     * <td>The new target port.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                      SET_PORT;
 
-    @Override
-    public int hashCode() {
+    /**
+     * Changes the stored ip and port to the ones stored by the given address object.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Address}</td>
+     * <td>address</td>
+     * <td>The address object whose stored data should be copied into this address object.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                      FROM_OBJECT;
 
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (ip == null ? 0 : ip.hashCode());
-        result = prime * result + port;
-        return result;
-    }
+    /**
+     * Changes the stored address to the one set by the given string.
+     * The string is using the format IP:PORT (e.g. 127.0.0.1:8080).
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link String}</td>
+     * <td>address</td>
+     * <td>The new address given in the "IP:PORT" notation.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                      FROM_STRING;
 
-    @Override
-    public boolean equals(Object obj) {
+    /**
+     * Returns the stored address as a string.
+     * The string is using the format IP:PORT (e.g. 127.0.0.1:8080).
+     */
+    public static final FunctionDefinition<String>                    TO_STRING;
 
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (! (obj instanceof Address)) {
-            return false;
-        }
-        Address other = (Address) obj;
-        if (ip == null) {
-            if (other.ip != null) {
-                return false;
+    static {
+
+        GET_IP = FunctionDefinitionFactory.create("getIp", Address.class, PropertyAccessorFactory.createGet(IP));
+        SET_IP = FunctionDefinitionFactory.create("setIp", Address.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(IP)), IP.class);
+
+        GET_PORT = FunctionDefinitionFactory.create("getPort", Address.class, PropertyAccessorFactory.createGet(PORT));
+        SET_PORT = FunctionDefinitionFactory.create("setPort", Address.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(PORT)), Integer.class);
+        SET_PORT.addExecutor(IP.class, "checkRange", new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.CHECK)
+            @Lockable
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                int port = (Integer) arguments[0];
+                Validate.isTrue(port >= 0 || port <= 65535, "The port must be in range 0 <= port <= 65535 (e.g. 8080): ", port);
+
+                return null;
             }
-        } else if (!ip.equals(other.ip)) {
-            return false;
-        }
-        if (port != other.port) {
-            return false;
-        }
-        return true;
+
+        });
+
+        FROM_OBJECT = FunctionDefinitionFactory.create("fromObject", Address.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Lockable
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                String ipString = ((Address) arguments[0]).get(IP).get().get(com.quartercode.disconnected.world.comp.net.IP.TO_STRING).invoke();
+                IP ip = new IP();
+                ip.setLocked(false);
+                ip.get(com.quartercode.disconnected.world.comp.net.IP.FROM_STRING).invoke(ipString);
+                ip.setLocked(true);
+                holder.get(SET_IP).invoke(ip);
+                holder.get(SET_PORT).invoke( ((Address) arguments[0]).get(PORT).get());
+
+                return null;
+            }
+
+        }, Address.class);
+
+        FROM_STRING = FunctionDefinitionFactory.create("fromString", Address.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Lockable
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                String[] parts = ((String) arguments[0]).split(":");
+                Validate.isTrue(parts.length == 2, "Address must have the format IP:PORT: ", arguments[0]);
+                IP ip = new IP();
+                ip.setLocked(false);
+                ip.get(com.quartercode.disconnected.world.comp.net.IP.FROM_STRING).invoke(parts[0]);
+                ip.setLocked(true);
+                holder.get(SET_IP).invoke(ip);
+                holder.get(SET_PORT).invoke(Integer.parseInt(parts[1]));
+
+                return null;
+            }
+
+        }, String.class);
+
+        TO_STRING = FunctionDefinitionFactory.create("toString", Address.class, new FunctionExecutor<String>() {
+
+            @Override
+            public String invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                return holder.get(GET_IP).invoke().get(com.quartercode.disconnected.world.comp.net.IP.TO_STRING).invoke() + ":" + holder.get(GET_PORT).invoke();
+            }
+
+        });
+
     }
 
-    @Override
-    public String toInfoString() {
+    // ----- Functions End -----
 
-        return ip + ":" + port;
-    }
+    /**
+     * Creates a new empty address.
+     * You should fill it using {@link #SET_IP} and {@link #SET_PORT} after creation.
+     */
+    public Address() {
 
-    @Override
-    public String toString() {
-
-        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }

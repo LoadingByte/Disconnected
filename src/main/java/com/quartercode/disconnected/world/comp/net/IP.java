@@ -20,192 +20,207 @@ package com.quartercode.disconnected.world.comp.net;
 
 import java.net.InetAddress;
 import java.util.Arrays;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlIDREF;
-import javax.xml.bind.annotation.XmlValue;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.commons.lang.Validate;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
+import com.quartercode.disconnected.mocl.extra.Lockable;
+import com.quartercode.disconnected.mocl.extra.Prioritized;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
+import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
 
 /**
  * This class represents an ip address which is used to define the "location of a computer in the internet".
- * For an exact breakdown of ip addresses, use the javadoc for {@link InetAddress}. This is just a simplified variant.
+ * For an exact breakdown of ip addresses, use the javadoc of {@link InetAddress}.
  * 
  * @see NetworkInterface
  * @see Address
  */
-public class IP {
+public class IP extends DefaultFeatureHolder {
 
-    @XmlIDREF
-    @XmlAttribute
-    private NetworkInterface host;
-    @XmlID
-    @XmlJavaTypeAdapter (IPDQNAdapter.class)
-    @XmlValue
-    private int[]            parts = new int[4];
+    // ----- Properties -----
+
+    /**
+     * The 4 numbers to use for the ip (must be in range 0 <= number <= 255).
+     */
+    protected static final FeatureDefinition<ObjectProperty<Integer[]>> PARTS;
+
+    static {
+
+        PARTS = new AbstractFeatureDefinition<ObjectProperty<Integer[]>>("parts") {
+
+            @Override
+            public ObjectProperty<Integer[]> create(FeatureHolder holder) {
+
+                return new ObjectProperty<Integer[]>(getName(), holder, new Integer[4]);
+            }
+
+        };
+
+    }
+
+    // ----- Properties End -----
+
+    // ----- Functions -----
+
+    /**
+     * Returns the 4 numbers to use for the ip (must be in range 0 <= number <= 255).
+     * The returned array shouldn't be changed in any way. You can use {@link #SET_PARTS} for that purpose.
+     */
+    public static final FunctionDefinition<Integer[]>                   GET_PARTS;
+
+    /**
+     * Changes the 4 numbers to use for the ip (must be in range 0 <= number <= 255).
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Integer}[]</td>
+     * <td>parts</td>
+     * <td>The new 4 numbers to use for the ip (must be in range 0 <= number <= 255).</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                        SET_PARTS;
+
+    /**
+     * Changes the stored ip to the one stored by the given ip object.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link IP}</td>
+     * <td>ip</td>
+     * <td>The ip object whose stored ip should be copied into this ip object.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                        FROM_OBJECT;
+
+    /**
+     * Changes the stored ip to the one set by the given dotted quad notation string.
+     * The string is using the format XXXX.XXXX.XXXX.XXXX (e.g. 127.0.0.1).
+     * Each number (they are seperated by dots) represents a quad in the dotted quad notation and must be in range 0 <= number <= 255.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link String}</td>
+     * <td>ip</td>
+     * <td>The new ip given in the dotted quad notation.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                        FROM_STRING;
+
+    /**
+     * Returns the stored ip in the dotted quad notation.
+     * The string is using the format XXXX.XXXX.XXXX.XXXX (e.g. 127.0.0.1).
+     * Each number (they are seperated by dots) represents a quad in the dotted quad notation and must be in range 0 <= number <= 255.
+     */
+    public static final FunctionDefinition<String>                      TO_STRING;
+
+    static {
+
+        GET_PARTS = FunctionDefinitionFactory.create("getParts", IP.class, PropertyAccessorFactory.createGet(PARTS));
+        SET_PARTS = FunctionDefinitionFactory.create("setParts", IP.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(PARTS)), Integer[].class);
+        SET_PARTS.addExecutor(IP.class, "checkQuadRange", new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.CHECK)
+            @Lockable
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                Integer[] parts = (Integer[]) arguments[0];
+                Validate.isTrue(parts.length == 4, "The ip must have 4 parts (e.g. [127, 0, 0, 1]): ", Arrays.toString(parts));
+                for (int part : parts) {
+                    Validate.isTrue(part >= 0 || part <= 255, "Every ip part must be in range 0 <= part <= 255 (e.g. [127, 0, 0, 1]): ", Arrays.toString(parts));
+                }
+
+                return null;
+            }
+
+        });
+
+        FROM_OBJECT = FunctionDefinitionFactory.create("fromObject", IP.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Lockable
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                holder.get(PARTS).set(Arrays.copyOf( ((IP) arguments[0]).get(PARTS).get(), 4));
+
+                return null;
+            }
+
+        }, IP.class);
+
+        FROM_STRING = FunctionDefinitionFactory.create("fromString", IP.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Lockable
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                int[] parts = new int[4];
+                String[] stringParts = ((String) arguments[0]).split("\\.");
+                for (int counter = 0; counter < parts.length; counter++) {
+                    parts[counter] = Integer.parseInt(stringParts[counter]);
+                }
+                holder.get(SET_PARTS).invoke(parts);
+
+                return null;
+            }
+
+        }, String.class);
+
+        TO_STRING = FunctionDefinitionFactory.create("toString", IP.class, new FunctionExecutor<String>() {
+
+            @Override
+            public String invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                String parts = "";
+                for (int part : holder.get(GET_PARTS).invoke()) {
+                    parts += "." + part;
+                }
+                return parts.substring(1);
+            }
+
+        });
+
+    }
+
+    // ----- Functions End -----
 
     /**
      * Creates a new empty ip.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * You should fill it using {@link #SET_PARTS} after creation.
      */
-    protected IP() {
-
-    }
-
-    /**
-     * Creates a new ip address using an array of 4 numbers.
-     * Each number represents a quad in the dotted quad notation and must be in range 0 <= number <= 255.
-     * 
-     * @param host The host network interface which holds this ip.
-     * @param parts The 4 numbers to use for the ip (must be in range 0 <= number <= 255).
-     */
-    public IP(NetworkInterface host, int[] parts) {
-
-        Validate.isTrue(parts.length == 4, "The ip must have 4 parts (e.g. [127, 0, 0, 1]): ", Arrays.toString(parts));
-        for (int part : parts) {
-            Validate.isTrue(part >= 0 || part <= 255, "Every ip part must be in range 0 <= part <= 255 (e.g. [127, 0, 0, 1]): ", Arrays.toString(parts));
-        }
-
-        this.host = host;
-        this.parts = parts;
-    }
-
-    /**
-     * Creates a new ip address out of a string in dotted quad notation.
-     * This is using the format XXXX.XXXX.XXXX.XXXX (e.g. 127.0.0.1).
-     * Each number (they are seperated by dots) represents a quad in the dotted quad notation and must be in range 0 <= number <= 255.
-     * 
-     * @param host The host network interface which holds this ip.
-     * @param dottedQuadNotation The content of the ip address as a string in dotted quad notation.
-     */
-    public IP(NetworkInterface host, String dottedQuadNotation) {
-
-        String[] stringParts = dottedQuadNotation.split("\\.");
-        Validate.isTrue(stringParts.length == 4, "The ip string must be splitted in 4 parts, seperated by dots (e.g. 127.0.0.1): ", dottedQuadNotation);
-
-        this.host = host;
-        for (int counter = 0; counter < parts.length; counter++) {
-            int part = Integer.parseInt(stringParts[counter]);
-            Validate.isTrue(part >= 0 || part <= 255, "Every ip part must be in range 0 <= part <= 255 (e.g. 127.0.0.1): ", dottedQuadNotation);
-            parts[counter] = part;
-        }
-    }
-
-    /**
-     * Returns the host network interface which holds this ip.
-     * 
-     * @return The host network interface which holds this ip.
-     */
-    public NetworkInterface getHost() {
-
-        return host;
-    }
-
-    /**
-     * Returns the sequence number the network interface this ip provides uses.
-     * The sequence number is used for three-way-handshakes etc.
-     * 
-     * @return The sequence number the network interface this ip provides uses.
-     */
-    public int getSequenceNumber() {
-
-        return Integer.parseInt(host.getHost().getId());
-    }
-
-    /**
-     * Returns the 4 numbers to use for the ip (in range 0 <= number <= 255).
-     * 
-     * @return The 4 numbers to use for the ip (in range 0 <= number <= 255).
-     */
-    public int[] getParts() {
-
-        return parts;
-    }
-
-    /**
-     * Returns the content of the ip address as a string in dotted quad notation.
-     * 
-     * @return The content of the ip address as a string in dotted quad notation.
-     */
-    public String getDottedQuadNotation() {
-
-        return parts[0] + "." + parts[1] + "." + parts[2] + "." + parts[3];
-    }
-
-    protected void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
-
-        host = (NetworkInterface) parent;
-    }
-
-    @Override
-    public int hashCode() {
-
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.hashCode(parts);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        IP other = (IP) obj;
-        if (!Arrays.equals(parts, other.parts)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-
-        return getDottedQuadNotation();
-    }
-
-    /**
-     * This ip dotted quad notation adapter is for storing ip quads as a simple string in dotted quad notation.
-     * It is using the format XXXX.XXXX.XXXX.XXXX (e.g. 127.0.0.1).
-     */
-    public static class IPDQNAdapter extends XmlAdapter<String, int[]> {
-
-        /**
-         * Creates a new ip dotted quad notation adapter.
-         */
-        public IPDQNAdapter() {
-
-        }
-
-        @Override
-        public int[] unmarshal(String v) {
-
-            if (v == null) {
-                return null;
-            } else {
-                return new IP(null, v).getParts();
-            }
-        }
-
-        @Override
-        public String marshal(int[] v) {
-
-            if (v == null) {
-                return null;
-            } else {
-                return new IP(null, v).getDottedQuadNotation();
-            }
-        }
+    public IP() {
 
     }
 
