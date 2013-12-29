@@ -18,313 +18,343 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlIDREF;
-import com.quartercode.disconnected.util.InfoString;
-import com.quartercode.disconnected.world.comp.file.File;
-import com.quartercode.disconnected.world.comp.file.FileRights;
-import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
-import com.quartercode.disconnected.world.comp.file.NoFileRightException;
-import com.quartercode.disconnected.world.comp.net.Address;
-import com.quartercode.disconnected.world.comp.net.Packet;
-import com.quartercode.disconnected.world.comp.net.PacketListener;
+import java.util.ResourceBundle;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
+import com.quartercode.disconnected.mocl.extra.Prioritized;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
+import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.sim.run.TickSimulator;
+import com.quartercode.disconnected.world.WorldChildFeatureHolder;
+import com.quartercode.disconnected.world.comp.program.ArgumentException.MissingArgumentException;
+import com.quartercode.disconnected.world.comp.program.ArgumentException.MissingParameterException;
+import com.quartercode.disconnected.world.comp.program.ArgumentException.WrongArgumentTypeException;
+import com.quartercode.disconnected.world.comp.program.event.ProcessEvent;
 
 /**
  * This abstract class defines a program executor which takes care of acutally running a program.
- * The executor class is set in the program.
+ * The executor class is set in the {@link Program}.
  * 
  * @see Program
  * @see Process
  * @see PacketListener
  */
-public abstract class ProgramExecutor implements InfoString {
+public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>> {
 
-    private static final Logger        LOGGER           = Logger.getLogger(ProgramExecutor.class.getName());
-
-    @XmlElement (name = "updateTask")
-    private final List<UpdateTask>     updateTasks      = new ArrayList<UpdateTask>();
-
-    @XmlIDREF
-    private Process                    host;
-    @XmlElement (name = "packetListener")
-    private final List<PacketListener> packetListeners  = new ArrayList<PacketListener>();
-    @XmlElement (name = "remainingPacket")
-    private final Queue<Packet>        remainingPackets = new LinkedList<Packet>();
+    // ----- Properties -----
 
     /**
-     * Creates a new empty program executor.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * The initial arguments the program executor needs to operate.
+     * They should be used from inside the {@link #UPDATE} method.
+     * The arguments are validated against the {@link Parameter}s provided by {@link #GET_PARAMETERS} by {@link #SET_ARGUMENTS}.
      */
-    protected ProgramExecutor() {
+    protected static final FeatureDefinition<ObjectProperty<Map<String, Object>>> ARGUMENTS;
+
+    /**
+     * The {@link ProcessEvent} which were received by the executing {@link Process} recently.
+     */
+    protected static final FeatureDefinition<ObjectProperty<Queue<ProcessEvent>>> EVENTS;
+
+    static {
+
+        ARGUMENTS = new AbstractFeatureDefinition<ObjectProperty<Map<String, Object>>>("arguments") {
+
+            @Override
+            public ObjectProperty<Map<String, Object>> create(FeatureHolder holder) {
+
+                return new ObjectProperty<Map<String, Object>>(getName(), holder);
+            }
+
+        };
+
+        EVENTS = new AbstractFeatureDefinition<ObjectProperty<Queue<ProcessEvent>>>("events") {
+
+            @Override
+            public ObjectProperty<Queue<ProcessEvent>> create(FeatureHolder holder) {
+
+                return new ObjectProperty<Queue<ProcessEvent>>(getName(), holder, new LinkedList<ProcessEvent>());
+            }
+
+        };
 
     }
+
+    // ----- Properties End -----
+
+    // ----- Functions -----
+
+    /**
+     * Returns the possible or required execution {@link Parameter}s.
+     * The function should be implemented by the actual program class.
+     * For more detail on the parameters, see the {@link Parameter} class.
+     */
+    public static final FunctionDefinition<List<Parameter>>                       GET_PARAMETERS;
+
+    /**
+     * Returns the execution {@link Parameter} with the given name (or null if there's no such {@link Parameter}).
+     * For more detail on the parameters, see the {@link Parameter} class.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link String}</td>
+     * <td>name</td>
+     * <td>The name of the returned {@link Parameter}.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Parameter>                             GET_PARAMETER_BY_NAME;
+
+    /**
+     * Returns the {@link ResourceBundle} the program uses.
+     * This should be implemented by the actual child program class.
+     */
+    protected static final FunctionDefinition<ResourceBundle>                     GET_RESOURCE_BUNDLE;
+
+    /**
+     * Returns the initial arguments the program executor needs to operate.
+     * They should be used from inside the {@link #UPDATE} method.
+     * The arguments are validated against the {@link Parameter}s provided by {@link #GET_PARAMETERS} by {@link #SET_ARGUMENTS}.
+     */
+    public static final FunctionDefinition<Map<String, Object>>                   GET_ARGUMENTS;
+
+    /**
+     * Changes the initial arguments the program executor needs to operate.
+     * They should be used from inside the {@link #UPDATE} method.
+     * The arguments are validated against the {@link Parameter}s provided by {@link #GET_PARAMETERS} by this function.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Map}&lt;{@link String}, {@link Object}&gt;</td>
+     * <td>arguments</td>
+     * <td>The initial arguments the program executor needs to operate.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                  SET_ARGUMENTS;
+
+    /**
+     * Lets the program executor receive some {@link ProcessEvent} which were catched by the executing {@link Process}.
+     * The new {@link ProcessEvent}s are added to a {@link Queue} which can be accessed using the poll function {@link #NEXT_EVENT}.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0...</td>
+     * <td>{@link ProcessEvent}...</td>
+     * <td>events</td>
+     * <td>The new {@link ProcessEvent} the program executor just received.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                  RECEIVE_EVENTS;
+
+    /**
+     * Returns the next received {@link ProcessEvent} from the {@link Queue} which matches the criteria of the given {@link ProcessEventMatcher}.
+     * Every returned {@link ProcessEvent} will also be removed from the {@link Queue}.
+     * Example:
+     * 
+     * <pre>
+     * Format: Type[Identifier]
+     * Queue:  A[1], A[2], B[3], A[4], B[5], B[6]
+     * 
+     * NEXT_EVENT (matcher for A) returns A[1]
+     * => A[2], B[3], A[4], B[5], B[6]
+     * 
+     * NEXT_EVENT (matcher for B) returns B[3]
+     * => A[2], A[4], B[5], B[6]
+     * 
+     * NEXT_EVENT (matcher for A) returns A[2]
+     * => A[4], B[5], B[6]
+     * </pre>
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link ProcessEventMatcher}</td>
+     * <td>matcher</td>
+     * <td>The {@link ProcessEventMatcher} to check for the {@link ProcessEvent} which should be returned.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<ProcessEvent>                          NEXT_EVENT;
+
+    /**
+     * Executes a tick update in the program executor.
+     * Every program is written using the tick system.
+     * You can add {@link FunctionExecutor}s to the definition which actually execute a program tick.
+     */
+    public static final FunctionDefinition<Void>                                  UPDATE;
+
+    static {
+
+        GET_PARAMETERS = FunctionDefinitionFactory.create("getParameters", ProgramExecutor.<List<Parameter>> castClass(List.class));
+        GET_PARAMETER_BY_NAME = FunctionDefinitionFactory.create("getParameterByName", ProgramExecutor.class, new FunctionExecutor<Parameter>() {
+
+            @Override
+            public Parameter invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                for (List<Parameter> parameterList : holder.get(GET_PARAMETERS).invokeRA()) {
+                    for (Parameter parameter : parameterList) {
+                        if (parameter.getName().equals(arguments[0])) {
+                            return parameter;
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+        });
+
+        GET_RESOURCE_BUNDLE = FunctionDefinitionFactory.create("getResourceBundle", ResourceBundle.class);
+
+        GET_ARGUMENTS = FunctionDefinitionFactory.create("getArguments", ProgramExecutor.class, PropertyAccessorFactory.createGet(ARGUMENTS));
+        SET_ARGUMENTS = FunctionDefinitionFactory.create("setArguments", ProgramExecutor.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(ARGUMENTS)), Map.class);
+        SET_ARGUMENTS.addExecutor(ProgramExecutor.class, "checkArgumentsAgainstParameters", new FunctionExecutor<Void>() {
+
+            @Override
+            @SuppressWarnings ("unchecked")
+            @Prioritized (Prioritized.CHECK)
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                // Create a new hash map with the contents of the old one (it will get modified)
+                Map<String, Object> programArguments = arguments[0] == null ? new HashMap<String, Object>() : new HashMap<String, Object>((Map<String, Object>) arguments[0]);
+
+                List<Parameter> parameters = new ArrayList<Parameter>();
+                for (List<Parameter> parameterList : holder.get(GET_PARAMETERS).invokeRA()) {
+                    parameters.addAll(parameterList);
+                }
+
+                try {
+                    for (Parameter parameter : parameters) {
+                        if (parameter.isSwitch()) {
+                            // Put switch object if it's not set
+                            if (!programArguments.containsKey(parameter.getName()) || ! (programArguments.get(parameter.getName()) instanceof Boolean)) {
+                                programArguments.put(parameter.getName(), false);
+                            }
+                        } else if (parameter.isArgument()) {
+                            // Throw exception if argument parameter is required, but not set
+                            if (parameter.isRequired() && !programArguments.containsKey(parameter.getName())) {
+                                throw new MissingParameterException(parameter);
+                            }
+                            // Throw exception if argument is required, but not set
+                            else if (programArguments.containsKey(parameter.getName()) && parameter.isArgumentRequired() && programArguments.get(parameter.getName()) == null) {
+                                throw new MissingArgumentException(parameter);
+                            }
+                            // Throw exception if argument has the wrong type
+                            else if (programArguments.get(parameter.getName()) != null && !parameter.getType().getType().isAssignableFrom(programArguments.get(parameter.getName()).getClass())) {
+                                throw new WrongArgumentTypeException(parameter, programArguments.get(parameter.getName()).toString());
+                            }
+                        } else if (parameter.isRest()) {
+                            // Throw exception if rest is required, but not set
+                            if (parameter.isRequired() && (!programArguments.containsKey(parameter.getName()) || ((String[]) programArguments.get(parameter.getName())).length == 0)) {
+                                throw new MissingParameterException(parameter);
+                            }
+                        }
+                    }
+                }
+                catch (ArgumentException e) {
+                    throw new IllegalArgumentException("Illegal program arguments", e);
+                }
+
+                return null;
+            }
+
+        });
+
+        RECEIVE_EVENTS = FunctionDefinitionFactory.create("receiveEvents", ProgramExecutor.class, CollectionPropertyAccessorFactory.createAdd(EVENTS), ProcessEvent.class);
+        NEXT_EVENT = FunctionDefinitionFactory.create("nextEvent", ProgramExecutor.class, new FunctionExecutor<ProcessEvent>() {
+
+            @Override
+            public ProcessEvent invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                Queue<ProcessEvent> clone = new LinkedList<ProcessEvent>(holder.get(EVENTS).get());
+                while (!clone.isEmpty()) {
+                    ProcessEvent current = clone.poll();
+                    if ( ((ProcessEventMatcher) arguments[0]).matches(current)) {
+                        holder.get(EVENTS).get().remove(current);
+                        return current;
+                    }
+                }
+
+                return null;
+            }
+
+        }, ProcessEventMatcher.class);
+
+        UPDATE = FunctionDefinitionFactory.create(TickSimulator.UPDATE_FUNCTION_NAME, Void.class);
+
+    }
+
+    // Help method because you can't attach @SuppressWarnings to static blocks
+    @SuppressWarnings ("unchecked")
+    private static <T> Class<T> castClass(Class<?> c) {
+
+        return (Class<T>) c;
+    }
+
+    // ----- Function Definitions End ----
 
     /**
      * Creates a new program executor.
-     * 
-     * @param host The host process which uses the created executor for running the program instance.
      */
-    public ProgramExecutor(Process host) {
+    public ProgramExecutor() {
 
-        this.host = host;
-
-        registerTask(new UpdateTask("update", 0, 1));
     }
 
     /**
-     * Registers the given update task so it will be scheduled.
-     * Every important parameter for scheduling (e.g. the delay) is set in the task object.
-     * 
-     * @param task The update task to register/schedule.
+     * Process event matchers are used to search for {@link ProcessEvent}s of a specific type.
+     * The matcher is used to retrieve the next {@link ProcessEvent} a {@link ProgramExecutor} wants to handle in {@link ProgramExecutor#NEXT_EVENT}.
      */
-    protected void registerTask(UpdateTask task) {
+    public static interface ProcessEventMatcher {
 
-        updateTasks.add(task);
-    }
+        /**
+         * Checks if the given {@link ProcessEvent} is requested by the caller.
+         * 
+         * @param event The {@link ProcessEvent} to check.
+         * @return True if the given {@link ProcessEvent} is requested, false if not.
+         * @throws StopExecutionException Something bad happens while checking.
+         */
+        public boolean matches(ProcessEvent event) throws StopExecutionException;
 
-    /**
-     * Unregisters the given update task so it will be canceled.
-     * Canceled tasks wont elapse any more ticks.
-     * 
-     * @param task The update timer task to unregister/cancel.
-     */
-    protected void unregisterTask(UpdateTask task) {
-
-        updateTasks.remove(task);
-    }
-
-    /**
-     * Returns the host process which uses the created executor for running the program instance.
-     * 
-     * @return The host process which uses the created executor for running the program instance.
-     */
-    public Process getHost() {
-
-        return host;
-    }
-
-    /**
-     * Returns a list of packet listeners which take care of handling incoming packets.
-     * 
-     * @return A list of packet listeners which take care of handling incoming packets.
-     */
-    public List<PacketListener> getPacketListeners() {
-
-        return Collections.unmodifiableList(packetListeners);
-    }
-
-    /**
-     * Returns the packet listener which has the given name identifier.
-     * This returns null if there isn't any packet listener with the given name identifier.
-     * 
-     * @return The packet listener which has the given name identifier.
-     */
-    public PacketListener getPacketListener(String name) {
-
-        for (PacketListener packetListener : packetListeners) {
-            if (packetListener.getName().equals(name)) {
-                return packetListener;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the packet listener which is bound to the given address.
-     * This returns null if there isn't any packet listener with the given binding.
-     * 
-     * @return The packet listener which is bound to the given address.
-     */
-    public PacketListener getPacketListener(Address binding) {
-
-        for (PacketListener packetListener : packetListeners) {
-            if (packetListener.getBinding().equals(binding)) {
-                return packetListener;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Registers a new packet listener to the executor.
-     * 
-     * @param packetListener The new packet listener to register to the executor.
-     * @throws There's already a packet listener bound to the given binding.
-     */
-    public void addPacketListener(PacketListener packetListener) {
-
-        if (host.getHost().getProcessManager().getProcess(packetListener.getBinding()) != null) {
-            throw new IllegalStateException("There's already a packet listener bound to " + packetListener.getBinding().toInfoString());
-        }
-
-        packetListeners.add(packetListener);
-    }
-
-    /**
-     * Unregisters a packet listener from the executor.
-     * This doesn't close existing connections.
-     * 
-     * @param packetListener The packet listener to unregister from the executor.
-     */
-    public void removePacketListener(PacketListener packetListener) {
-
-        packetListeners.remove(packetListener);
-    }
-
-    /**
-     * Creates a new process using the program stored in the given file.
-     * The new process will be a child of the process which hosts this executor.
-     * Returns null if the host process of this executor hasn't the rights to execute the file.
-     * 
-     * @param file The process launch file which contains the program for the process.
-     * @param arguments The argument map which contains values for the defined parameters.
-     * @throws NoFileRightException The host process of this executor hasn't the rights to execute the file.
-     * @throws WrongSessionTypeException The executor doesn't support the session it is running in.
-     * @throws ArgumentException Some parameters/arguments are not set correctly.
-     */
-    protected Process createProcess(File file, Map<String, Object> arguments) throws NoFileRightException, WrongSessionTypeException, ArgumentException {
-
-        FileRights.checkRight(host, file, FileRight.EXECUTE);
-        return host.createChild(file, arguments);
-    }
-
-    /**
-     * Adds a new packet to the list of all remaining packets which should be processed soon.
-     * 
-     * @param packet The new packet for processing.
-     */
-    public void receivePacket(Packet packet) {
-
-        remainingPackets.offer(packet);
-    }
-
-    /**
-     * Returns the packet which should be processed next.
-     * 
-     * @param remove True if the returned packet should be removed from the queue.
-     * @return The packet which should be processed next.
-     */
-    protected Packet nextReceivedPacket(boolean remove) {
-
-        if (remove) {
-            return remainingPackets.poll();
-        } else {
-            return remainingPackets.peek();
-        }
-    }
-
-    /**
-     * Elapses one tick on every update task and invokes the task's method if the timing condition is true.
-     * Every program is written using the tick system.
-     * The tick can change the state of the program, execute things related to the computer it's running on etc.
-     * Every state of an executor can be recovered loading JAXB-marked variables of the object.
-     */
-    public final void updateTasks() {
-
-        for (UpdateTask task : new ArrayList<UpdateTask>(updateTasks)) {
-            if (task.getElapsed() < 0) {
-                // Unregister cancelled tasks
-                unregisterTask(task);
-            } else {
-                // Elapse one tick.
-                task.elapse();
-
-                try {
-                    if (task.getPeriod() <= 0 && task.getElapsed() == task.getDelay()) {
-                        getClass().getMethod(task.getMethod()).invoke(this);
-                        unregisterTask(task);
-                    } else if (task.getPeriod() > 0 && (task.getElapsed() - task.getDelay()) % task.getPeriod() == 0) {
-                        Method method = getClass().getMethod(task.getMethod());
-                        method.setAccessible(true);
-                        method.invoke(this);
-                    }
-                }
-                catch (SecurityException e) {
-                    LOGGER.log(Level.SEVERE, "Can't access method '" + task.getMethod() + "' in '" + getClass().getName() + "' for update task", e);
-                }
-                catch (NoSuchMethodException e) {
-                    LOGGER.log(Level.SEVERE, "Can't find method '" + task.getMethod() + "' in '" + getClass().getName() + "' for update task", e);
-                }
-                catch (IllegalAccessException e) {
-                    LOGGER.log(Level.SEVERE, "Can't access method '" + task.getMethod() + "' in '" + getClass().getName() + "' for update task", e);
-                }
-                catch (InvocationTargetException e) {
-                    LOGGER.log(Level.SEVERE, "Can't invoke method '" + task.getMethod() + "' in '" + getClass().getName() + "' for update task", e);
-                }
-            }
-        }
-    }
-
-    /**
-     * Executes the default tick update in the program executor.
-     * Every program is written using the tick system.
-     * The tick can change the state of the program, execute things related to the computer it's running on etc.
-     * Every state of an executor can be recovered loading JAXB-marked variables of the object.
-     */
-    public abstract void update();
-
-    @Override
-    public int hashCode() {
-
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (packetListeners == null ? 0 : packetListeners.hashCode());
-        result = prime * result + (updateTasks == null ? 0 : updateTasks.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        ProgramExecutor other = (ProgramExecutor) obj;
-        if (packetListeners == null) {
-            if (other.packetListeners != null) {
-                return false;
-            }
-        } else if (!packetListeners.equals(other.packetListeners)) {
-            return false;
-        }
-        if (updateTasks == null) {
-            if (other.updateTasks != null) {
-                return false;
-            }
-        } else if (!updateTasks.equals(other.updateTasks)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toInfoString() {
-
-        return updateTasks.size() + " update tasks, " + remainingPackets.size() + " remaining packets on " + packetListeners.size() + " listeners";
-    }
-
-    @Override
-    public String toString() {
-
-        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }

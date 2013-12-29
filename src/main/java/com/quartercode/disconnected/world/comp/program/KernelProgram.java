@@ -18,16 +18,14 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
-import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.extra.Delay;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
+import com.quartercode.disconnected.mocl.extra.Limit;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.util.ResourceBundles;
-import com.quartercode.disconnected.world.comp.ByteUnit;
-import com.quartercode.disconnected.world.comp.Version;
-import com.quartercode.disconnected.world.comp.Vulnerability;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.program.Process.ProcessState;
 
@@ -36,76 +34,59 @@ import com.quartercode.disconnected.world.comp.program.Process.ProcessState;
  * 
  * @see OperatingSystem
  */
-@XmlSeeAlso ({ KernelProgram.KernelProgramExecutor.class })
-public class KernelProgram extends Program {
+public class KernelProgram extends ProgramExecutor {
+
+    // ----- Functions -----
+
+    static {
+
+        GET_RESOURCE_BUNDLE.addExecutor(KernelProgram.class, "default", new FunctionExecutor<ResourceBundle>() {
+
+            @Override
+            public ResourceBundle invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                return ResourceBundles.KERNEL;
+            }
+        });
+
+        UPDATE.addExecutor(KernelProgram.class, "main", new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                if ( ((KernelProgram) holder).getParent().get(Process.GET_STATE).invoke() == ProcessState.INTERRUPTED) {
+                    holder.get(UPDATE).getExecutor("stop").resetInvokationCounter();
+                    holder.get(UPDATE).getExecutor("stop").setLocked(false);
+                } else {
+                    holder.get(UPDATE).getExecutor("stop").setLocked(true);
+                }
+
+                return null;
+            }
+
+        });
+        UPDATE.addExecutor(KernelProgram.class, "stop", new FunctionExecutor<Void>() {
+
+            @Override
+            @Delay (firstDelay = Ticker.DEFAULT_TICKS_PER_SECOND * 5)
+            @Limit (1)
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                ((KernelProgram) holder).getParent().get(Process.STOP).invoke(true);
+
+                return null;
+            }
+
+        });
+
+    }
+
+    // ----- Functions End -----
 
     /**
-     * Creates a new empty kernel program.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * Creates a new kernel program.
      */
-    protected KernelProgram() {
-
-    }
-
-    /**
-     * Creates a new kernel program and sets the version and the vulnerabilities.
-     * 
-     * @param version The current version the program has.
-     * @param vulnerabilities The vulnerabilities the program has.
-     */
-    public KernelProgram(Version version, List<Vulnerability> vulnerabilities) {
-
-        super(ResourceBundles.KERNEL.getString("name"), version, vulnerabilities);
-    }
-
-    @Override
-    public long getSize() {
-
-        return ByteUnit.BYTE.convert(10, ByteUnit.MEGABYTE);
-    }
-
-    @Override
-    public ResourceBundle getResourceBundle() {
-
-        return ResourceBundles.KERNEL;
-    }
-
-    @Override
-    protected ProgramExecutor createExecutorInstance(Process host, Map<String, Object> arguments) {
-
-        return new KernelProgramExecutor(host);
-    }
-
-    protected static class KernelProgramExecutor extends ProgramExecutor {
-
-        @XmlElement
-        private int elapsedSinceInterrupt = -1;
-
-        protected KernelProgramExecutor() {
-
-        }
-
-        protected KernelProgramExecutor(Process host) {
-
-            super(host);
-        }
-
-        @Override
-        public void update() {
-
-            if (getHost().getState() == ProcessState.INTERRUPTED) {
-                elapsedSinceInterrupt = 0;
-            }
-            if (elapsedSinceInterrupt >= 0) {
-                elapsedSinceInterrupt++;
-            }
-
-            // Force stop after 5 seconds
-            if (elapsedSinceInterrupt > Ticker.DEFAULT_TICKS_PER_SECOND * 5) {
-                getHost().stop(true);
-                elapsedSinceInterrupt = -1;
-            }
-        }
+    public KernelProgram() {
 
     }
 

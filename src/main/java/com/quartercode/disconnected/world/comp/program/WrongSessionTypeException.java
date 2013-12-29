@@ -18,20 +18,20 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
-import com.quartercode.disconnected.world.comp.session.SessionProgram.Session;
+import com.quartercode.disconnected.world.comp.session.SessionProgram;
 
 /**
  * The wrong session type exception is thrown if a program attempts to run a child process which doesn't support the session.
  * 
  * @see Process
  * @see ProgramExecutor
- * @see Session
+ * @see SessionProgram
  */
 public class WrongSessionTypeException extends Exception {
 
-    private static final long     serialVersionUID = 6453250411076718750L;
+    private static final long     serialVersionUID = 7508147217329959389L;
 
-    private final Process         process;
+    private final Process<?>      process;
     private final ProgramExecutor executor;
 
     /**
@@ -40,9 +40,9 @@ public class WrongSessionTypeException extends Exception {
      * @param process The process the parent program attempted to run.
      * @param executor The executor which has the wrong type for the session it's running in.
      */
-    public WrongSessionTypeException(Process process, ProgramExecutor executor) {
+    public WrongSessionTypeException(Process<?> process, ProgramExecutor executor) {
 
-        super("Can't create process of type " + executor.getClass().getName() + ": Session is of type " + process.getSession().getClass().getSimpleName());
+        super("Can't create process of type " + executor.getClass().getName() + ": Session is of wrong type");
 
         this.process = process;
         this.executor = executor;
@@ -53,7 +53,7 @@ public class WrongSessionTypeException extends Exception {
      * 
      * @return The process the parent program attempted to run.
      */
-    public Process getProcess() {
+    public Process<?> getProcess() {
 
         return process;
     }

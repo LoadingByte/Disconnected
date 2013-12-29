@@ -24,7 +24,7 @@ package com.quartercode.disconnected.world.comp.program;
  */
 public class ArgumentException extends Exception {
 
-    private static final long serialVersionUID = 2473994665811595894L;
+    private static final long serialVersionUID = 3044592344874560217L;
 
     private final Parameter   parameter;
 
@@ -68,7 +68,7 @@ public class ArgumentException extends Exception {
      */
     public static class MissingParameterException extends ArgumentException {
 
-        private static final long serialVersionUID = 2138955512792779485L;
+        private static final long serialVersionUID = 2103108139948858881L;
 
         /**
          * Creates a new missing parameter exception.
@@ -99,7 +99,7 @@ public class ArgumentException extends Exception {
      */
     public static class MissingArgumentException extends ArgumentException {
 
-        private static final long serialVersionUID = -7408390821833517544L;
+        private static final long serialVersionUID = -206619774656934086L;
 
         /**
          * Creates a new missing argument exception.
@@ -129,7 +129,7 @@ public class ArgumentException extends Exception {
      */
     public static class WrongArgumentTypeException extends ArgumentException {
 
-        private static final long serialVersionUID = 9039285869652712981L;
+        private static final long serialVersionUID = 6558285306223301136L;
 
         private final String      argument;
 
