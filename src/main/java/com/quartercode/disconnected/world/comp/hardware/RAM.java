@@ -18,11 +18,14 @@
 
 package com.quartercode.disconnected.world.comp.hardware;
 
-import java.util.List;
-import javax.xml.bind.annotation.XmlElement;
-import com.quartercode.disconnected.world.comp.Computer;
-import com.quartercode.disconnected.world.comp.Version;
-import com.quartercode.disconnected.world.comp.Vulnerability;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.hardware.Mainboard.NeedsMainboardSlot;
 
 /**
@@ -34,93 +37,111 @@ import com.quartercode.disconnected.world.comp.hardware.Mainboard.NeedsMainboard
 @NeedsMainboardSlot
 public class RAM extends Hardware {
 
-    @XmlElement
-    private long size;
-    @XmlElement
-    private long frequency;
+    // ----- Properties -----
 
     /**
-     * Creates a new empty ram module.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * The size of the ram module, given in bytes.
      */
-    protected RAM() {
+    protected static final FeatureDefinition<ObjectProperty<Long>> SIZE;
+
+    /**
+     * The access frequency of the ram module, given in hertz.
+     */
+    protected static final FeatureDefinition<ObjectProperty<Long>> FREQUENCY;
+
+    static {
+
+        SIZE = new AbstractFeatureDefinition<ObjectProperty<Long>>("size") {
+
+            @Override
+            public ObjectProperty<Long> create(FeatureHolder holder) {
+
+                return new ObjectProperty<Long>(getName(), holder);
+            }
+
+        };
+
+        FREQUENCY = new AbstractFeatureDefinition<ObjectProperty<Long>>("frequency") {
+
+            @Override
+            public ObjectProperty<Long> create(FeatureHolder holder) {
+
+                return new ObjectProperty<Long>(getName(), holder);
+            }
+
+        };
 
     }
 
-    /**
-     * Creates a new ram module and sets the host computer, the name, the version, the vulnerabilities, the size and the access frequency.
-     * 
-     * @param host The host computer this part is built in.
-     * @param name The name the ram module has.
-     * @param version The current version the ram module has.
-     * @param vulnerabilities The vulnerabilities the ram module has.
-     * @param size The size of the ram module, given in bytes.
-     * @param frequency The access frequency of the ram module, given in hertz.
-     */
-    public RAM(Computer host, String name, Version version, List<Vulnerability> vulnerabilities, long size, long frequency) {
+    // ----- Properties End -----
 
-        super(host, name, version, vulnerabilities);
-
-        this.size = size;
-        this.frequency = frequency;
-    }
+    // ----- Functions -----
 
     /**
      * Returns the size of the ram module, given in bytes.
-     * 
-     * @return The size of the ram module, given in bytes.
      */
-    public long getSize() {
+    public static final FunctionDefinition<Long>                   GET_SIZE;
 
-        return size;
-    }
+    /**
+     * Changes the size of the ram module, given in bytes.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Long}</td>
+     * <td>size</td>
+     * <td>The new size.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                   SET_SIZE;
 
     /**
      * Returns the access frequency of the ram module, given in hertz.
-     * 
-     * @return The access frequency of the ram module, given in hertz.
      */
-    public long getFrequency() {
+    public static final FunctionDefinition<Long>                   GET_FREQUENCY;
 
-        return frequency;
+    /**
+     * Changes the access frequency of the ram module, given in hertz.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Long}</td>
+     * <td>frequency</td>
+     * <td>The new access frequency.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                   SET_FREQUENCY;
+
+    static {
+
+        GET_SIZE = FunctionDefinitionFactory.create("getSize", RAM.class, PropertyAccessorFactory.createGet(SIZE));
+        SET_SIZE = FunctionDefinitionFactory.create("setSize", RAM.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(SIZE)), Long.class);
+
+        GET_FREQUENCY = FunctionDefinitionFactory.create("getFrequency", RAM.class, PropertyAccessorFactory.createGet(FREQUENCY));
+        SET_FREQUENCY = FunctionDefinitionFactory.create("setFrequency", RAM.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(FREQUENCY)), Long.class);
+
     }
 
-    @Override
-    public int hashCode() {
+    /**
+     * Creates a new ram module.
+     */
+    public RAM() {
 
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (frequency ^ frequency >>> 32);
-        result = prime * result + (int) (size ^ size >>> 32);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (! (obj instanceof RAM)) {
-            return false;
-        }
-        RAM other = (RAM) obj;
-        if (frequency != other.frequency) {
-            return false;
-        }
-        if (size != other.size) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-
-        return getClass().getName() + " [" + toInfoString() + ", " + size + " bytes size, " + frequency + " hertz frequency]";
     }
 
 }

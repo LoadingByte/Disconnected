@@ -18,15 +18,19 @@
 
 package com.quartercode.disconnected.world.comp.hardware;
 
-import java.util.List;
-import javax.xml.bind.annotation.XmlElement;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.Computer;
-import com.quartercode.disconnected.world.comp.Version;
-import com.quartercode.disconnected.world.comp.Vulnerability;
 import com.quartercode.disconnected.world.comp.hardware.Mainboard.NeedsMainboardSlot;
 
 /**
- * This class represents a cpu of a computer.
+ * This class represents a cpu of a {@link Computer}.
  * A cpu has a count of possible threads running at the same time and a frequency (given in hertz).
  * 
  * @see Hardware
@@ -34,93 +38,113 @@ import com.quartercode.disconnected.world.comp.hardware.Mainboard.NeedsMainboard
 @NeedsMainboardSlot
 public class CPU extends Hardware {
 
-    @XmlElement
-    private int  threads;
-    @XmlElement
-    private long frequency;
+    // ----- Properties -----
 
     /**
-     * Creates a new empty cpu.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * The amount of possible threads running at the same time (virtual cores).
      */
-    protected CPU() {
+    protected static final FeatureDefinition<ObjectProperty<Integer>> THREADS;
+
+    /**
+     * The tick frequency of the cpu, given in hertz.
+     */
+    protected static final FeatureDefinition<ObjectProperty<Long>>    FREQUENCY;
+
+    static {
+
+        THREADS = new AbstractFeatureDefinition<ObjectProperty<Integer>>("threads") {
+
+            @Override
+            public ObjectProperty<Integer> create(FeatureHolder holder) {
+
+                return new ObjectProperty<Integer>(getName(), holder);
+            }
+
+        };
+
+        FREQUENCY = new AbstractFeatureDefinition<ObjectProperty<Long>>("frequency") {
+
+            @Override
+            public ObjectProperty<Long> create(FeatureHolder holder) {
+
+                return new ObjectProperty<Long>(getName(), holder);
+            }
+
+        };
 
     }
 
+    // ----- Properties End -----
+
+    // ----- Functions -----
+
     /**
-     * Creates a new cpu and sets the host computer, the name, the version, the vulnerabilities, the count of possible threads and the frequency.
+     * Returns the amount of possible threads running at the same time (virtual cores).
+     */
+    public static final FunctionDefinition<Integer>                   GET_THREADS;
+
+    /**
+     * Changes the amount of possible threads running at the same time (virtual cores).
      * 
-     * @param host The host computer this part is built in.
-     * @param name The name the cpu has.
-     * @param version The current version the cpu has.
-     * @param vulnerabilities The vulnerabilities the cpu has.
-     * @param threads The count of possible threads running at the same time.
-     * @param frequency The frequency of the cpu, given in hertz.
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Integer}</td>
+     * <td>threads</td>
+     * <td>The new thread amount.</td>
+     * </tr>
+     * </table>
      */
-    public CPU(Computer host, String name, Version version, List<Vulnerability> vulnerabilities, int threads, long frequency) {
-
-        super(host, name, version, vulnerabilities);
-
-        this.threads = threads;
-        this.frequency = frequency;
-    }
+    public static final FunctionDefinition<Void>                      SET_THREADS;
 
     /**
-     * Returns the count of possible threads running at the same time.
-     * 
-     * @return The count of possible threads running at the same time.
+     * Returns the tick frequency of the cpu, given in hertz.
      */
-    public int getThreads() {
-
-        return threads;
-    }
+    public static final FunctionDefinition<Long>                      GET_FREQUENCY;
 
     /**
-     * Returns the frequency of the cpu, given in hertz.
+     * Changes the tick frequency of the cpu, given in hertz.
      * 
-     * @return The frequency of the cpu, given in hertz.
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Long}</td>
+     * <td>frequency</td>
+     * <td>The new tick frequency.</td>
+     * </tr>
+     * </table>
      */
-    public long getFrequency() {
+    public static final FunctionDefinition<Void>                      SET_FREQUENCY;
 
-        return frequency;
+    static {
+
+        GET_THREADS = FunctionDefinitionFactory.create("getThreads", CPU.class, PropertyAccessorFactory.createGet(THREADS));
+        SET_THREADS = FunctionDefinitionFactory.create("setThreads", CPU.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(THREADS)), Integer.class);
+
+        GET_FREQUENCY = FunctionDefinitionFactory.create("getFrequency", CPU.class, PropertyAccessorFactory.createGet(FREQUENCY));
+        SET_FREQUENCY = FunctionDefinitionFactory.create("setFrequency", CPU.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(FREQUENCY)), Long.class);
+
     }
 
-    @Override
-    public int hashCode() {
+    // ----- Functions End -----
 
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (frequency ^ frequency >>> 32);
-        result = prime * result + threads;
-        return result;
-    }
+    /**
+     * Creates a new cpu.
+     */
+    public CPU() {
 
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        CPU other = (CPU) obj;
-        if (frequency != other.frequency) {
-            return false;
-        }
-        if (threads != other.threads) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-
-        return getClass().getName() + " [" + toInfoString() + ", " + frequency + " hertz frequency, " + threads + " threads]";
     }
 
 }

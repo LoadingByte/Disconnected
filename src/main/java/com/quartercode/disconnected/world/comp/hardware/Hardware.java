@@ -18,99 +18,157 @@
 
 package com.quartercode.disconnected.world.comp.hardware;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import javax.xml.bind.annotation.XmlElement;
+import java.util.HashSet;
+import java.util.Set;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.Computer;
-import com.quartercode.disconnected.world.comp.HostedComputerPart;
-import com.quartercode.disconnected.world.comp.Version;
 import com.quartercode.disconnected.world.comp.Vulnerability;
-import com.quartercode.disconnected.world.comp.Vulnerability.Vulnerable;
 
 /**
  * This class stores information about a part of hardware, like a mainboard, a cpu or a ram module.
  * This also contains a list of all vulnerabilities this hardware part has.
  * 
- * @see HostedComputerPart
- * @see Vulnerability
+ * @see Computer
  */
-public class Hardware extends HostedComputerPart implements Vulnerable {
+public class Hardware extends WorldChildFeatureHolder<Computer> {
 
-    @XmlElement (name = "vulnerability")
-    private List<Vulnerability> vulnerabilities = new ArrayList<Vulnerability>();
-
-    /**
-     * Creates a new empty hardware part.
-     * This is only recommended for direct field access (e.g. for serialization).
-     */
-    protected Hardware() {
-
-    }
+    // ----- Properties -----
 
     /**
-     * Creates a new hardware part and sets the host computer, the name, the version and the vulnerabilities.
-     * 
-     * @param host The host computer this part is built in.
-     * @param name The name the hardware part has.
-     * @param version The current version hardware the part has.
-     * @param vulnerabilities The vulnerabilities the hardware part has.
+     * The name of the hardware part.
      */
-    public Hardware(Computer host, String name, Version version, List<Vulnerability> vulnerabilities) {
+    protected static final FeatureDefinition<ObjectProperty<String>>             NAME;
 
-        super(host, name, version);
+    /**
+     * The {@link Vulnerability}s the hardware part has.
+     */
+    protected static final FeatureDefinition<ObjectProperty<Set<Vulnerability>>> VULNERABILITIES;
 
-        this.vulnerabilities = vulnerabilities == null ? new ArrayList<Vulnerability>() : vulnerabilities;
-    }
+    static {
 
-    @Override
-    public List<Vulnerability> getVulnerabilities() {
+        NAME = new AbstractFeatureDefinition<ObjectProperty<String>>("name") {
 
-        return Collections.unmodifiableList(vulnerabilities);
-    }
+            @Override
+            public ObjectProperty<String> create(FeatureHolder holder) {
 
-    @Override
-    public int hashCode() {
-
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (vulnerabilities == null ? 0 : vulnerabilities.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        Hardware other = (Hardware) obj;
-        if (vulnerabilities == null) {
-            if (other.vulnerabilities != null) {
-                return false;
+                return new ObjectProperty<String>(getName(), holder);
             }
-        } else if (!vulnerabilities.equals(other.vulnerabilities)) {
-            return false;
-        }
-        return true;
+
+        };
+
+        VULNERABILITIES = new AbstractFeatureDefinition<ObjectProperty<Set<Vulnerability>>>("vulnerabilities") {
+
+            @Override
+            public ObjectProperty<Set<Vulnerability>> create(FeatureHolder holder) {
+
+                return new ObjectProperty<Set<Vulnerability>>(getName(), holder, new HashSet<Vulnerability>());
+            }
+
+        };
+
     }
 
-    @Override
-    public String toInfoString() {
+    // ----- Properties End -----
 
-        return super.toInfoString() + ", " + vulnerabilities.size() + " vulns";
+    // ----- Functions -----
+
+    /**
+     * Returns the name of the hardware part.
+     */
+    public static final FunctionDefinition<String>                               GET_NAME;
+
+    /**
+     * Changes the name of the hardware part.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link String}</td>
+     * <td>name</td>
+     * <td>The new name.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                 SET_NAME;
+
+    /**
+     * Returns the {@link Vulnerability}s the hardware part has.
+     */
+    public static final FunctionDefinition<Set<Vulnerability>>                   GET_VULNERABILITIES;
+
+    /**
+     * Adds {@link Vulnerability}s to the hardware part.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0...</td>
+     * <td>{@link Vulnerability}...</td>
+     * <td>vulnerabilities</td>
+     * <td>The {@link Vulnerability}s to add to the hardware part.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                 ADD_VULNERABILITIES;
+
+    /**
+     * Removes {@link Vulnerability}s from the hardware part.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0...</td>
+     * <td>{@link Vulnerability}...</td>
+     * <td>vulnerabilities</td>
+     * <td>The {@link Vulnerability}s to remove from the hardware part.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                 REMOVE_VULNERABILITIES;
+
+    static {
+
+        GET_NAME = FunctionDefinitionFactory.create("getName", Hardware.class, PropertyAccessorFactory.createGet(NAME));
+        SET_NAME = FunctionDefinitionFactory.create("setName", Hardware.class, PropertyAccessorFactory.createSet(NAME), String.class);
+
+        GET_VULNERABILITIES = FunctionDefinitionFactory.create("getVulnerabilities", Hardware.class, CollectionPropertyAccessorFactory.createGet(VULNERABILITIES));
+        ADD_VULNERABILITIES = FunctionDefinitionFactory.create("addVulnerabilities", Hardware.class, new LockableFEWrapper<Void>(CollectionPropertyAccessorFactory.createAdd(VULNERABILITIES)), Vulnerability[].class);
+        REMOVE_VULNERABILITIES = FunctionDefinitionFactory.create("removeVulnerabilities", Hardware.class, new LockableFEWrapper<Void>(CollectionPropertyAccessorFactory.createRemove(VULNERABILITIES)), Vulnerability[].class);
+
     }
 
-    @Override
-    public String toString() {
+    // ----- Functions End -----
 
-        return getClass().getName() + "[" + toInfoString() + "]";
+    /**
+     * Creates a new hardware part.
+     */
+    public Hardware() {
+
     }
 
 }

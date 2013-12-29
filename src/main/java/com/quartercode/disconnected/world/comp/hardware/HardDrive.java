@@ -18,103 +18,95 @@
 
 package com.quartercode.disconnected.world.comp.hardware;
 
-import java.util.List;
-import javax.xml.bind.annotation.XmlElement;
-import com.quartercode.disconnected.util.InfoString;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.Computer;
-import com.quartercode.disconnected.world.comp.Version;
-import com.quartercode.disconnected.world.comp.Vulnerability;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
-import com.quartercode.disconnected.world.comp.file.FileSystemProvider;
 import com.quartercode.disconnected.world.comp.hardware.Mainboard.NeedsMainboardSlot;
 
 /**
- * This class represents a hard drive of a computer.
+ * This class represents a hard drive of a {@link Computer}.
  * A hard drive only has it's size stored (given in bytes).
- * The hard drive stores files which can be accessed like regular files.
+ * The hard drive stores a {@link FileSystem} which stores {@link File}s that can be accessed like regular files.
  * 
  * @see Hardware
- * @see File
+ * @see FileSystem
  */
 @NeedsMainboardSlot
-public class HardDrive extends Hardware implements FileSystemProvider, InfoString {
+public class HardDrive extends Hardware {
 
-    @XmlElement
-    private FileSystem fileSystem;
-
-    /**
-     * Creates a new empty hard drive.
-     * This is only recommended for direct field access (e.g. for serialization).
-     */
-    protected HardDrive() {
-
-    }
+    // ----- Properties -----
 
     /**
-     * Creates a new hard drive and sets the host computer, the name, the version, the vulnerabilities and the size.
-     * 
-     * @param host The host computer this part is built in.
-     * @param name The name the hard drive has.
-     * @param version The current version the hard drive has.
-     * @param vulnerabilities The vulnerabilities the hard drive has.
-     * @param size The size of the hard drive module, given in bytes.
+     * The {@link FileSystem} the hard drive contains.
+     * It is constructed automatically after creation.
      */
-    public HardDrive(Computer host, String name, Version version, List<Vulnerability> vulnerabilities, long size) {
+    protected static final FeatureDefinition<ObjectProperty<FileSystem>> FILE_SYSTEM;
 
-        super(host, name, version, vulnerabilities);
+    static {
 
-        fileSystem = new FileSystem(host, size);
-    }
+        FILE_SYSTEM = new AbstractFeatureDefinition<ObjectProperty<FileSystem>>("fileSystem") {
 
-    @Override
-    public FileSystem getFileSystem() {
+            @Override
+            public ObjectProperty<FileSystem> create(FeatureHolder holder) {
 
-        return fileSystem;
-    }
-
-    @Override
-    public int hashCode() {
-
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (fileSystem == null ? 0 : fileSystem.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        HardDrive other = (HardDrive) obj;
-        if (fileSystem == null) {
-            if (other.fileSystem != null) {
-                return false;
+                return new ObjectProperty<FileSystem>(getName(), holder, new FileSystem());
             }
-        } else if (!fileSystem.equals(other.fileSystem)) {
-            return false;
-        }
-        return true;
+
+        };
+
     }
 
-    @Override
-    public String toInfoString() {
+    // ----- Properties End -----
 
-        return super.toInfoString() + ", fs " + fileSystem.toInfoString();
+    // ----- Functions -----
+
+    /**
+     * Returns the {@link FileSystem} the hard drive contains.
+     */
+    public static final FunctionDefinition<FileSystem>                   GET_FILE_SYSTEM;
+
+    /**
+     * Changes the {@link FileSystem} the hard drive contains.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link FileSystem}</td>
+     * <td>fileSystem</td>
+     * <td>The new {@link FileSystem}.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                         SET_FILE_SYSTEM;
+
+    static {
+
+        GET_FILE_SYSTEM = FunctionDefinitionFactory.create("getFileSystem", HardDrive.class, PropertyAccessorFactory.createGet(FILE_SYSTEM));
+        SET_FILE_SYSTEM = FunctionDefinitionFactory.create("setFileSystem", HardDrive.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(FILE_SYSTEM)), FileSystem.class);
+
     }
 
-    @Override
-    public String toString() {
+    // ----- Functions End -----
 
-        return getClass().getName() + " [" + toInfoString() + "]";
+    /**
+     * Creates a new hard drive.
+     */
+    public HardDrive() {
+
     }
 
 }
