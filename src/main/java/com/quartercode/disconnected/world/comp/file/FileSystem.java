@@ -18,310 +18,267 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlIDREF;
-import com.quartercode.disconnected.util.InfoString;
-import com.quartercode.disconnected.world.comp.Computer;
-import com.quartercode.disconnected.world.comp.SizeUtil.SizeObject;
-import com.quartercode.disconnected.world.comp.file.File.FileType;
-import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
-import com.quartercode.disconnected.world.comp.os.User;
-import com.quartercode.disconnected.world.comp.program.Process;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
+import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.world.comp.SizeUtil;
+import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 
 /**
- * This class represents a file system.
+ * This class represents a file system of a {@link ComputerPart}.
  * The system stores files which can be accessed like regular file objects.
  * A file system can be virtual or physical.
  * 
  * @see File
  */
-public class FileSystem implements SizeObject, InfoString {
+public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
-    @XmlIDREF
-    @XmlAttribute
-    private Computer host;
-    @XmlElement
-    private long     size;
-
-    @XmlElement (name = "file")
-    private File     rootFile;
+    // ----- Properties -----
 
     /**
-     * Creates a new empty file system.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * The size of the file system, given in bytes.
      */
-    protected FileSystem() {
-
-    }
+    protected static final FeatureDefinition<ObjectProperty<Long>>     SIZE;
 
     /**
-     * Creates a new file system and sets the hosting computer and the size in bytes.
-     * 
-     * @param host The computer this file system is hosted on.
-     * @param size The size of the file system, given in bytes.
+     * The {@link RootFile} every other {@link File} branches of somehow.
      */
-    public FileSystem(Computer host, long size) {
+    protected static final FeatureDefinition<ObjectProperty<RootFile>> ROOT;
 
-        this.host = host;
-        this.size = size;
+    static {
 
-        rootFile = new File(this);
-    }
+        SIZE = new AbstractFeatureDefinition<ObjectProperty<Long>>("size") {
 
-    /**
-     * Returns the computer this file system is hosted on.
-     * This will only return the storing computer, not any accessing computers.
-     * 
-     * @return The computer this file system is hosted to.
-     */
-    public Computer getHost() {
+            @Override
+            public ObjectProperty<Long> create(FeatureHolder holder) {
 
-        return host;
-    }
-
-    /**
-     * Returns the size of the file system, given in bytes.
-     * 
-     * @return The size of the file system, given in bytes.
-     */
-    @Override
-    public long getSize() {
-
-        return size;
-    }
-
-    /**
-     * Returns the root file which every other file path branches of.
-     * 
-     * @return The root file which every other file path branches of.
-     */
-    public File getRootFile() {
-
-        return rootFile;
-    }
-
-    /**
-     * Returns the file which is stored on the file system under the given path.
-     * A path is a collection of files seperated by a seperator.
-     * This will look up the file using a local file system path.
-     * 
-     * @param path The path to look in for the file.
-     * @return The file which is stored on the file system under the given path.
-     */
-    public File getFile(String path) {
-
-        String[] parts = path.split(File.SEPERATOR);
-
-        File current = rootFile;
-        for (String part : parts) {
-            if (!part.isEmpty()) {
-                current = current.getChildFile(part);
-                if (current == null) {
-                    break;
-                }
+                return new ObjectProperty<Long>(getName(), holder);
             }
-        }
 
-        return current;
+        };
+
+        ROOT = new AbstractFeatureDefinition<ObjectProperty<RootFile>>("root") {
+
+            @Override
+            public ObjectProperty<RootFile> create(FeatureHolder holder) {
+
+                RootFile root = new RootFile();
+                root.setParent((FileSystem) holder);
+                return new ObjectProperty<RootFile>(getName(), holder, root);
+            }
+
+        };
+
     }
 
-    /**
-     * Creates a new file using the given path and type on this file system and returns it.
-     * If the file already exists, the existing file will be returned.
-     * A path is a collection of files seperated by a seperator.
-     * This will get the file location using a local file system path.
-     * 
-     * @param path The path the new file will be located under.
-     * @param type The file type the new file should has.
-     * @param user The user who owns the new file.
-     * @return The new file (or the existing one, if the file already exists).
-     * @throws OutOfSpaceException If there isn't enough space for the new file.
-     */
-    public File addFile(String path, FileType type, User user) throws OutOfSpaceException {
+    // ----- Properties End -----
 
-        try {
-            return addFile(null, path, type, user);
-        }
-        catch (NoFileRightException e) {
-            // Wont ever happen
-            return null;
-        }
-    }
+    // ----- Functions -----
 
     /**
-     * Creates a new file using the given path and type on this file system and returns it.
-     * If the file already exists, the existing file will be returned.
-     * A path is a collection of files seperated by a seperator.
-     * This will get the file location using a local file system path.
+     * Changes the size of the file system, given in bytes.
      * 
-     * @param process The process which wants to add the file.
-     * @param path The path the new file will be located under.
-     * @param type The file type the new file should has.
-     * @param user The user who owns the new file.
-     * @return The new file (or the existing one, if the file already exists).
-     * @throws NoFileRightException The given process hasn't the right to write into a directory where the algorithm needs to write
-     * @throws OutOfSpaceException If there isn't enough space for the new file.
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Long}</td>
+     * <td>size</td>
+     * <td>The new size of the file system.</td>
+     * </tr>
+     * </table>
      */
-    public File addFile(Process process, String path, FileType type, User user) throws NoFileRightException, OutOfSpaceException {
-
-        String[] parts = path.split(File.SEPERATOR);
-        File file = new File(this, parts[parts.length - 1], type, new FileRights("rwd-r---r---"), user, user.getPrimaryGroup());
-        addFile(process, file, path);
-        return file;
-    }
+    public static final FunctionDefinition<Void>                       SET_SIZE;
 
     /**
-     * Adds an existing file to the file system.
-     * If the given path doesn't exist, this creates a new one.
-     * 
-     * @param file The existing file object to add to the file system.
-     * @param path The path the file will be located under.
-     * @throws OutOfSpaceException If there isn't enough space for the new file.
-     * @throws IllegalStateException There's a non-directory file in the path.
+     * Returns the {@link RootFile} every other {@link File} branches of somehow.
      */
-    protected void addFile(File file, String path) throws OutOfSpaceException {
-
-        try {
-            addFile(null, file, path);
-        }
-        catch (NoFileRightException e) {
-            // Wont ever happen
-        }
-    }
+    public static final FunctionDefinition<RootFile>                   GET_ROOT;
 
     /**
-     * Adds an existing file to the file system.
-     * If the given path doesn't exist, this creates a new one.
+     * Returns the {@link File} which is stored under the given path.
+     * A path is a collection of {@link File}s seperated by a seperator.
+     * This will look up the {@link File} using a local file system path.
      * 
-     * @param process The process which wants to add the given file.
-     * @param file The existing file object to add to the file system.
-     * @param path The path the file will be located under.
-     * @throws NoFileRightException The given process hasn't the right to write into a directory where the algorithm needs to write
-     * @throws OutOfSpaceException If there isn't enough space for the new file.
-     * @throws IllegalStateException There's a non-directory file in the path.
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link String}</td>
+     * <td>path</td>
+     * <td>The path to search under.</td>
+     * </tr>
+     * </table>
      */
-    protected void addFile(Process process, File file, String path) throws NoFileRightException, OutOfSpaceException {
+    public static final FunctionDefinition<File<?>>                    GET_FILE;
 
-        String[] parts = path.split(File.SEPERATOR);
+    /**
+     * Adds the given {@link File} to the file system.
+     * If the given path doesn't exist, this creates directories to match it.
+     * The name of the {@link File} and the parent object will be changed to match the path.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link File}</td>
+     * <td>file</td>
+     * <td>The {@link File} to add to the file system.</td>
+     * </tr>
+     * <tr>
+     * <td>1</td>
+     * <td>{@link String}</td>
+     * <td>path</td>
+     * <td>The path for the new {@link File}. The name of the {@link File} will be changed to the last entry.</td>
+     * </tr>
+     * </table>
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link OutOfSpaceException}</td>
+     * <td>There is not enough space for the new {@link File}.</td>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalStateException}</td>
+     * <td>The given file path isn't valid.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                       ADD_FILE;
 
-        File current = rootFile;
-        for (int counter = 0; counter < parts.length; counter++) {
-            String part = parts[counter];
-            if (!part.isEmpty()) {
-                if (current.getChildFile(part) == null) {
-                    if (counter == parts.length - 1) {
-                        if (process != null) {
-                            FileRights.checkRight(process, current, FileRight.WRITE);
+    /**
+     * Returns the total amount of bytes which are occupied by {@link File}s on the file system.
+     */
+    public static final FunctionDefinition<Long>                       GET_FILLED;
+
+    /**
+     * Returns the total amount of bytes which are not occupied by {@link File}s on the file system.
+     */
+    public static final FunctionDefinition<Long>                       GET_FREE;
+
+    static {
+
+        GET_SIZE.addExecutor(FileSystem.class, "fileSystemSize", PropertyAccessorFactory.createGet(SIZE));
+        SET_SIZE = FunctionDefinitionFactory.create("setSize", FileSystem.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(SIZE)), Long.class);
+
+        GET_ROOT = FunctionDefinitionFactory.create("getRoot", FileSystem.class, PropertyAccessorFactory.createGet(ROOT));
+
+        GET_FILE = FunctionDefinitionFactory.create("getFile", FileSystem.class, new FunctionExecutor<File<?>>() {
+
+            @Override
+            public File<?> invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                String[] parts = ((String) arguments[0]).split(File.SEPERATOR);
+                File<?> current = holder.get(GET_ROOT).invoke();
+                for (String part : parts) {
+                    if (!part.isEmpty()) {
+                        if (current instanceof ParentFile) {
+                            current = current.get(ParentFile.GET_CHILD_BY_NAME).invoke(part);
+                            if (current == null) {
+                                break;
+                            }
                         }
-                        current.addChildFile(file);
-                        file.setName(part);
-                    } else {
-                        if (process != null) {
-                            FileRights.checkRight(process, current, FileRight.WRITE);
-                        }
-                        File dir = new File(this, part, FileType.DIRECTORY, new FileRights("rwd-r---r---"), file.getOwner(), file.getGroup());
-                        current.addChildFile(dir);
                     }
-                } else if (current.getChildFile(part).getType() != FileType.DIRECTORY) {
-                    throw new IllegalStateException("File path '" + path + "' isn't valid: File '" + current.getChildFile(part).getLocalPath() + "' isn't a directory");
                 }
-                current = current.getChildFile(part);
+
+                return current;
             }
-        }
+
+        }, String.class);
+
+        ADD_FILE = FunctionDefinitionFactory.create("addFile", FileSystem.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @SuppressWarnings ("unchecked")
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                String[] parts = ((String) arguments[1]).split(File.SEPERATOR);
+                File<?> current = holder.get(GET_ROOT).invoke();
+                File<FeatureHolder> file = (File<FeatureHolder>) arguments[0];
+                for (int counter = 0; counter < parts.length; counter++) {
+                    String part = parts[counter];
+                    if (!part.isEmpty()) {
+                        if (current.get(ParentFile.GET_CHILD_BY_NAME).invoke(part) == null) {
+                            if (counter == parts.length - 1) {
+                                file.get(File.SET_NAME).invoke(part);
+                                current.get(ParentFile.ADD_CHILDREN).invoke(file);
+                                return null;
+                            } else {
+                                Directory directory = new Directory();
+                                directory.get(File.SET_NAME).invoke(part);
+                                directory.get(File.SET_OWNER).invoke(file.get(File.GET_OWNER).invoke());
+                                directory.get(File.SET_GROUP).invoke(file.get(File.GET_GROUP).invoke());
+                                current.get(ParentFile.ADD_CHILDREN).invoke(directory);
+                            }
+                        }
+                        current = current.get(ParentFile.GET_CHILD_BY_NAME).invoke(part);
+                        if (! (current instanceof ParentFile)) {
+                            throw new StopExecutionException(new IllegalStateException("File path '" + arguments[1] + "' isn't valid: A file along the way isn't a parent file"));
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+        }, File.class, String.class);
+
+        GET_FILLED = FunctionDefinitionFactory.create("getFilled", FileSystem.class, new FunctionExecutor<Long>() {
+
+            @Override
+            public Long invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                return SizeUtil.getSize(holder.get(GET_ROOT).invoke());
+            }
+
+        });
+
+        GET_FREE = FunctionDefinitionFactory.create("getFree", FileSystem.class, new FunctionExecutor<Long>() {
+
+            @Override
+            public Long invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                return holder.get(GET_SIZE).invoke() - holder.get(GET_FILLED).invoke();
+            }
+
+        });
+
     }
+
+    // ----- Functions End -----
 
     /**
-     * Returns the total amount of bytes which are occupied by files.
-     * 
-     * @return The total amount of bytes which are occupied by files.
+     * Creates a new file system.
      */
-    public long getFilled() {
+    public FileSystem() {
 
-        return getFilled(rootFile);
-    }
-
-    private long getFilled(File file) {
-
-        long filled = file.getSize();
-        if (file.getChildFiles() != null) {
-            for (File childFile : file.getChildFiles()) {
-                filled += getFilled(childFile);
-            }
-        }
-        return filled;
-    }
-
-    /**
-     * Returns the total amount of bytes which are not occupied by any files.
-     * 
-     * @return The total amount of bytes which are not occupied by any files.
-     */
-    public long getFree() {
-
-        return size - getFilled();
-    }
-
-    /**
-     * Returns the unique serialization id for the file system.
-     * The id is the identy hash code of the fs object.
-     * 
-     * @return The unique serialization id for the file system.
-     */
-    @XmlAttribute
-    @XmlID
-    protected String getId() {
-
-        return Integer.toHexString(System.identityHashCode(this));
-    }
-
-    @Override
-    public int hashCode() {
-
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (rootFile == null ? 0 : rootFile.hashCode());
-        result = prime * result + (int) (size ^ size >>> 32);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        FileSystem other = (FileSystem) obj;
-        if (rootFile == null) {
-            if (other.rootFile != null) {
-                return false;
-            }
-        } else if (!rootFile.equals(other.rootFile)) {
-            return false;
-        }
-        if (size != other.size) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toInfoString() {
-
-        return getFilled() + "/" + size + "b filled, host computer " + host.getId();
-    }
-
-    @Override
-    public String toString() {
-
-        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }

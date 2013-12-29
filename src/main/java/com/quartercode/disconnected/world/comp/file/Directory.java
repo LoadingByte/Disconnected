@@ -18,14 +18,21 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
-import com.quartercode.disconnected.world.comp.SizeUtil.SizeObject;
-
 /**
- * Classes which implement file content can be used as content object for a file.
- * File content classes should be immutable because programs should use {@link File#write(Process, FileContent)} for that.
+ * This class represents a directory.
+ * Directories contain and hold other {@link File}s.
  * 
  * @see File
+ * @see ParentFile
+ * @see FileSystem
  */
-public interface FileContent extends SizeObject {
+public class Directory extends ParentFile<ParentFile<?>> {
+
+    /**
+     * Creates a new directory.
+     */
+    public Directory() {
+
+    }
 
 }

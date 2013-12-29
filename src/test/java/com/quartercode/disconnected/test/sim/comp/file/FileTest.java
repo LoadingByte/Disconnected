@@ -21,84 +21,65 @@ package com.quartercode.disconnected.test.sim.comp.file;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.world.comp.ByteUnit;
-import com.quartercode.disconnected.world.comp.Computer;
-import com.quartercode.disconnected.world.comp.Version;
+import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
-import com.quartercode.disconnected.world.comp.file.File.FileType;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
-import com.quartercode.disconnected.world.comp.file.MountException;
-import com.quartercode.disconnected.world.comp.file.OutOfSpaceException;
-import com.quartercode.disconnected.world.comp.file.StringContent;
-import com.quartercode.disconnected.world.comp.hardware.HardDrive;
-import com.quartercode.disconnected.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.world.comp.os.User;
 
 public class FileTest {
 
-    private FileSystem fileSystem;
-    private File       testFile;
+    private FileSystem  fileSystem;
+    private ContentFile testFile;
 
     @Before
-    public void setUp() throws MountException, OutOfSpaceException {
+    public void setUp() throws FunctionExecutionException {
 
-        Computer computer = new Computer(null);
+        fileSystem = new FileSystem();
+        fileSystem.setLocked(false);
+        fileSystem.get(FileSystem.SET_SIZE).invoke(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
+        fileSystem.setLocked(true);
 
-        OperatingSystem operatingSystem = new OperatingSystem(computer, "OperatingSystem", new Version(1, 0, 0), null);
-        computer.get(Computer.OS).set(operatingSystem);
+        testFile = new ContentFile();
+        fileSystem.get(FileSystem.ADD_FILE).invoke(testFile, "/test1/test2/test.txt");
 
-        HardDrive hardDrive = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
-        fileSystem = hardDrive.getFileSystem();
-        computer.get(Computer.HARDWARE).add(hardDrive);
-        operatingSystem.getFileSystemManager().setMountpoint(fileSystem, "test");
-        operatingSystem.getFileSystemManager().setMounted(fileSystem, true);
-
-        testFile = fileSystem.addFile("test1/test2/test.txt", FileType.FILE, new User(null, null));
-        testFile.setContent(new StringContent("Test-Content"));
+        ContentFile testFile2 = new ContentFile();
+        fileSystem.get(FileSystem.ADD_FILE).invoke(testFile2, "/test1/test2/test2.txt");
     }
 
     @Test
-    public void testGetLocalPath() {
+    public void testGetPath() throws FunctionExecutionException {
 
-        Assert.assertEquals("Local path is correct", "test1/test2/test.txt", testFile.getLocalPath());
+        Assert.assertEquals("Path", "/test1/test2/test.txt", testFile.get(File.GET_PATH).invoke());
     }
 
     @Test
-    public void testMove() throws OutOfSpaceException {
+    public void testSetPath() throws FunctionExecutionException {
 
-        testFile.move("../../test3/test.txt");
+        testFile.get(File.SET_PATH).invoke("../../test3/test4.txt");
 
-        Assert.assertEquals("Moved file exists", testFile, fileSystem.getFile("test1/test3/test.txt"));
-        Assert.assertEquals("Moved file has correct path", "test1/test3/test.txt", testFile.getLocalPath());
-        Assert.assertEquals("Moved file has correct content", new StringContent("Test-Content"), testFile.getContent());
+        Assert.assertTrue("Moved file doesn't exist", testFile.equals(fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test3/test4.txt")));
+        Assert.assertTrue("Removed file does exist", fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test.txt") == null);
+        Assert.assertEquals("Path of moved file", "/test1/test3/test4.txt", testFile.get(File.GET_PATH).invoke());
     }
 
     @Test
-    public void testRename() {
+    public void testSetName() throws FunctionExecutionException {
 
-        testFile.rename("test2.txt");
+        testFile.get(File.SET_NAME).invoke("test2.txt");
 
-        Assert.assertEquals("Renamed file exists", testFile, fileSystem.getFile("test1/test2/test2.txt"));
-        Assert.assertEquals("Renamed file has correct path", "test1/test2/test2.txt", testFile.getLocalPath());
-        Assert.assertEquals("Renamed file has correct content", new StringContent("Test-Content"), testFile.getContent());
+        Assert.assertTrue("Renamed file doesn't exist", testFile.equals(fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test2.txt")));
+        Assert.assertTrue("Removed file does exist", fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test.txt") == null);
+        Assert.assertEquals("Path of renamed file", "/test1/test2/test2.txt", testFile.get(File.GET_PATH).invoke());
     }
 
     @Test
-    public void testRemove() {
+    public void testRemove() throws FunctionExecutionException {
 
-        testFile.remove();
+        testFile.get(File.REMOVE).invoke();
 
-        Assert.assertEquals("Removed file no longer exists", null, fileSystem.getFile("test1/test2/test1.txt"));
-        Assert.assertEquals("Renamed file has null path", null, testFile.getLocalPath());
-    }
-
-    @Test
-    public void testResolvePath() {
-
-        Assert.assertEquals("Resolved path of relative one is correct", "/user/homes/test2/docs", File.resolvePath("/user/homes/test/", "../test2/docs/"));
-        Assert.assertEquals("Resolved path of relative one is correct", "/system/bin/kernel", File.resolvePath("/user/homes/test/", "../../../system/bin/kernel"));
-        Assert.assertEquals("Resolved path of relative one is correct", "/", File.resolvePath("/user/homes/test/", "../../../"));
-        Assert.assertEquals("Resolved path of absolute one is correct", "/system/bin/kernel", File.resolvePath("/user/homes/test/", "/system/bin/kernel"));
+        Assert.assertNull("Resolved file after removal", fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test.txt"));
+        Assert.assertEquals("Path of removed file (should be untouched)", "/test1/test2/test.txt", testFile.get(File.GET_PATH).invoke());
     }
 
 }

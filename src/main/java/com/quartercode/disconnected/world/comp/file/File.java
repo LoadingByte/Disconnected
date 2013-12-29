@@ -18,717 +18,356 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlIDREF;
-import javax.xml.bind.annotation.XmlTransient;
-import org.apache.commons.lang.Validate;
-import com.quartercode.disconnected.util.InfoString;
-import com.quartercode.disconnected.world.comp.Computer;
-import com.quartercode.disconnected.world.comp.SizeUtil.SizeObject;
-import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.extra.def.ReferenceProperty;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.world.WorldChildFeatureHolder;
+import com.quartercode.disconnected.world.comp.SizeUtil;
+import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 import com.quartercode.disconnected.world.comp.os.Group;
-import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.os.User;
-import com.quartercode.disconnected.world.comp.program.Process;
 
 /**
- * This class represents a file on a file system.
- * Every file knows his path and has a content string. Every directory has a list of child files.
+ * This class represents a file on a {@link FileSystem}.
+ * Every file knows its name and can resolve its path.
+ * There are different variants of a file: A {@link ContentFile} holds content, a {@link ParentFile} holds other files.
  * 
+ * @param <P> The type of the parent {@link FeatureHolder} which houses the file somehow.
+ * @see ContentFile
+ * @see ParentFile
  * @see FileSystem
- * @see FileContent
  */
-public class File implements SizeObject, InfoString {
+public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> implements DerivableSize {
 
-    /**
-     * The file type represents if a file is a content file or a directory.
-     */
-    public static enum FileType {
-
-        /**
-         * A normal file which can hold an object as its content.
-         */
-        FILE,
-        /**
-         * A folder which can have child files.
-         */
-        DIRECTORY;
-
-    }
+    private static final Logger                                          LOGGER              = Logger.getLogger(File.class.getName());
 
     /**
      * The path seperator which seperates different files in a path string.
      */
-    public static final String SEPERATOR = "/";
+    public static final String                                           SEPERATOR           = "/";
 
     /**
-     * Creates an absolute path out of the given one.
-     * The algorithm starts at the given start path and changes the path according to the "change" path.
-     * The "change" path also can be absolute. This will ignore the start path.
+     * The default {@link FileRights} string for every new file.
      * 
-     * Here's an example:
-     * 
-     * <pre>
-     * Start:  /user/homes/test/
-     * Change: ../test2/docs
-     * Result: /user/home/test2/docs
-     * </pre>
-     * 
-     * @param start The absolute path the algorithm starts at.
-     * @param path The "change" path which defines where the start path should change (see above).
-     * @return The resolved absolute path.
+     * @deprecated TODO: Make the default {@link FileRights} dynamic.
      */
-    public static String resolvePath(String start, String path) {
+    @Deprecated
+    public static final String                                           DEFAULT_FILE_RIGHTS = "rwd-r---r---";
 
-        if (!start.startsWith(File.SEPERATOR)) {
-            throw new IllegalArgumentException("Start path must be absolute (it has to start with " + File.SEPERATOR + "): " + start);
-        } else {
-            List<String> current = new ArrayList<String>();
-            if (!path.startsWith(File.SEPERATOR)) {
-                current.addAll(Arrays.asList(start.split(File.SEPERATOR)));
-                if (current.size() > 0) {
-                    // Remove first entry ([this]/...), it's empty
-                    current.remove(0);
-                }
+    // ----- Properties -----
+
+    /**
+     * The name of the file.
+     */
+    protected static final FeatureDefinition<ObjectProperty<String>>     NAME;
+
+    /**
+     * The {@link FileRights} object which stores the UNIX-like file right attributes.
+     * For more documentation on how it works, see the {@link FileRights} class.
+     */
+    protected static final FeatureDefinition<ObjectProperty<FileRights>> RIGHTS;
+
+    /**
+     * The {@link User} who owns the file.
+     * This is important for the {@link FileRights} system.
+     */
+    protected static final FeatureDefinition<ReferenceProperty<User>>    OWNER;
+
+    /**
+     * The {@link Group} which partly owns the file.
+     * This is important for the {@link FileRights} system.
+     */
+    protected static final FeatureDefinition<ReferenceProperty<Group>>   GROUP;
+
+    static {
+
+        NAME = new AbstractFeatureDefinition<ObjectProperty<String>>("name") {
+
+            @Override
+            public ObjectProperty<String> create(FeatureHolder holder) {
+
+                return new ObjectProperty<String>(getName(), holder);
             }
 
-            for (String pathChange : path.split(File.SEPERATOR)) {
-                if (!pathChange.equals(".") && !pathChange.isEmpty()) {
-                    if (pathChange.equals("..")) {
-                        current.remove(current.size() - 1);
-                    } else {
-                        current.add(pathChange);
-                    }
+        };
+
+        RIGHTS = new AbstractFeatureDefinition<ObjectProperty<FileRights>>("rights") {
+
+            @Override
+            public ObjectProperty<FileRights> create(FeatureHolder holder) {
+
+                FileRights rights = new FileRights();
+                try {
+                    rights.get(FileRights.FROM_STRING).invoke(DEFAULT_FILE_RIGHTS);
                 }
+                catch (FunctionExecutionException e) {
+                    LOGGER.log(Level.SEVERE, "Unexpected exception during creation of default file rights object", e);
+                }
+                return new ObjectProperty<FileRights>(getName(), holder, rights);
             }
 
-            if (current.isEmpty()) {
-                return File.SEPERATOR;
-            } else {
-                String resolvedPath = "";
-                for (String part : current) {
-                    resolvedPath += File.SEPERATOR + part;
-                }
-                return resolvedPath;
+        };
+
+        OWNER = new AbstractFeatureDefinition<ReferenceProperty<User>>("owner") {
+
+            @Override
+            public ReferenceProperty<User> create(FeatureHolder holder) {
+
+                return new ReferenceProperty<User>(getName(), holder);
             }
-        }
+
+        };
+
+        GROUP = new AbstractFeatureDefinition<ReferenceProperty<Group>>("group") {
+
+            @Override
+            public ReferenceProperty<Group> create(FeatureHolder holder) {
+
+                return new ReferenceProperty<Group>(getName(), holder);
+            }
+
+        };
+
     }
 
-    private FileSystem       host;
-    private String           name;
-    @XmlAttribute
-    private FileType         type;
-    private FileRights       rights;
-    private User             owner;
-    private Group            group;
+    // ----- Properties End -----
 
-    @XmlElement
-    private Object           content;
-    @XmlElement (name = "file")
-    private final List<File> children = new ArrayList<File>();
+    // ----- Functions -----
 
     /**
-     * Creates a new empty file.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * Returns the name of the file.
      */
-    protected File() {
-
-    }
-
-    /**
-     * Creates a new root file for a given file system host.
-     * 
-     * @param host The host which will use this file.
-     */
-    protected File(FileSystem host) {
-
-        this.host = host;
-        name = "root";
-        type = FileType.DIRECTORY;
-    }
-
-    /**
-     * Creates a new file for the given file system host using the given name and file type.
-     * 
-     * @param host The host which will use this file.
-     * @param name The name the new file will have.
-     * @param type The type the new file will have.
-     * @param rights The file rights object which stores the UNIX-like file right attributes.
-     * @param owner The user who owns the file. This is important for the rights system.
-     * @param group The group which partly owns the file. This is important for the rights system.
-     */
-    protected File(FileSystem host, String name, FileType type, FileRights rights, User owner, Group group) {
-
-        this.host = host;
-        this.name = name;
-        this.type = type;
-        setRights(rights);
-        setOwner(owner);
-        setGroup(group);
-    }
-
-    /**
-     * Returns the file system which hosts this file.
-     * 
-     * @return The file system which hosts this file.
-     */
-    public FileSystem getHost() {
-
-        return host;
-    }
-
-    /**
-     * Returns the name the file has.
-     * 
-     * @return The name the file has.
-     */
-    public String getName() {
-
-        return name;
-    }
+    public static final FunctionDefinition<String>                       GET_NAME;
 
     /**
      * Changes the name of the file.
      * 
-     * @param name The new name for the file.
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link String}</td>
+     * <td>name</td>
+     * <td>The new name of the file.</td>
+     * </tr>
+     * </table>
      */
-    @XmlAttribute
-    protected void setName(String name) {
-
-        this.name = name;
-    }
+    public static final FunctionDefinition<Void>                         SET_NAME;
 
     /**
-     * Returns the global path the file has on the given operating system.
-     * A path is a collection of files seperated by a seperator.
-     * The global path is made out of the mountpoint of the file system and the local file path
-     * It can be used on the os level.
-     * 
-     * @return The global path the file has on the given operating system.
-     */
-    public String getGlobalPath(OperatingSystem operatingSystem) {
-
-        return SEPERATOR + operatingSystem.getFileSystemManager().getMountpoint(host) + SEPERATOR + getLocalPath();
-    }
-
-    /**
-     * Returns the global path the file has on the hosting operating system.
-     * A path is a collection of files seperated by a seperator.
-     * The global path is made out of the local mountpoint of the file system and the local file path
-     * It can be used on the os level.
-     * 
-     * @return The path the file has.
-     */
-    public String getGlobalHostPath() {
-
-        return getGlobalPath(host.getHost().get(Computer.OS).get());
-    }
-
-    /**
-     * Returns the local the path the file has.
-     * A path is a collection of files seperated by a seperator.
-     * The local path can be used on the hardware level to look up a file on a given file system.
-     * 
-     * @return The path the file has.
-     */
-    public String getLocalPath() {
-
-        if (equals(host.getRootFile())) {
-            return "";
-        } else {
-            List<File> path = new ArrayList<File>();
-            host.getRootFile().generatePathSections(this, path);
-
-            String pathString = "";
-            for (File pathEntry : path) {
-                pathString += SEPERATOR + pathEntry.getName();
-            }
-
-            return pathString.isEmpty() ? null : pathString.substring(1);
-        }
-    }
-
-    private boolean generatePathSections(File target, List<File> path) {
-
-        for (File child : children) {
-            path.add(child);
-            if (target.equals(child) || child.generatePathSections(target, path)) {
-                return true;
-            } else {
-                path.remove(child);
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns the type the file has.
-     * The type sets if a file is a content one or a directory.
-     * 
-     * @return The type the file has.
-     */
-    public FileType getType() {
-
-        return type;
-    }
-
-    /**
-     * Returns the file rights object which stores the UNIX-like file right attributes.
+     * Returns the {@link FileRights} object which stores the UNIX-like file right attributes.
      * For more documentation on how it works, see the {@link FileRights} class.
-     * 
-     * @return The file rights storage.
      */
-    @XmlAttribute
-    public FileRights getRights() {
-
-        return rights;
-    }
+    public static final FunctionDefinition<FileRights>                   GET_RIGHTS;
 
     /**
-     * Changes the file rights storage which stores the UNIX-like file right attributes to a new one.
-     * For more documentation on how it works, see the {@link FileRights} class.
-     * 
-     * @param rights The new file rights storage.
+     * Returns the {@link User} who owns the file.
+     * This is important for the {@link FileRights} system.
      */
-    public void setRights(FileRights rights) {
-
-        Validate.notNull(rights, "A file can't have no right attributes");
-
-        this.rights = rights;
-    }
+    public static final FunctionDefinition<User>                         GET_OWNER;
 
     /**
-     * Returns the user who owns the file.
-     * This is important for the rights system.
+     * Changes the {@link User} who owns the file.
+     * This is important for the {@link FileRights} system.
      * 
-     * @return The user who owns the file.
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link User}</td>
+     * <td>owner</td>
+     * <td>The new {@link User} who owns the file.</td>
+     * </tr>
+     * </table>
      */
-    @XmlIDREF
-    @XmlAttribute
-    public User getOwner() {
-
-        return owner;
-    }
+    public static final FunctionDefinition<Void>                         SET_OWNER;
 
     /**
-     * Changes the user who owns the file.
-     * This is important for the rights system.
-     * 
-     * @param owner The new owner of the file.
+     * Returns the {@link Group} which partly owns the file.
+     * This is important for the {@link FileRights} system.
      */
-    public void setOwner(User owner) {
-
-        Validate.notNull(owner, "A file can't have no owner");
-
-        this.owner = owner;
-    }
+    public static final FunctionDefinition<Group>                        GET_GROUP;
 
     /**
-     * Returns the group which partly owns the file.
-     * This is important for the rights system.
+     * Changes the {@link Group} which partly owns the file.
+     * This is important for the {@link FileRights} system.
      * 
-     * @return The group which partly owns the file.
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Group}</td>
+     * <td>group</td>
+     * <td>The new {@link Group} which partly owns the file.</td>
+     * </tr>
+     * </table>
      */
-    @XmlIDREF
-    @XmlAttribute
-    public Group getGroup() {
-
-        return group;
-    }
+    public static final FunctionDefinition<Void>                         SET_GROUP;
 
     /**
-     * Changes the group who partly owns the file to a new one.
-     * This is important for the rights system.
-     * 
-     * @param group The new partly owning group of the file.
+     * Returns the local the path of the file.
+     * A path is a collection of files seperated by a seperator.
+     * The local path can be used to look up the file a on its {@link FileSystem}.
      */
-    public void setGroup(Group group) {
-
-        this.group = group;
-    }
+    public static final FunctionDefinition<String>                       GET_PATH;
 
     /**
-     * Returns the content the file has (if this file is a content one).
-     * If this file isn't a content one, this will return null.
+     * Moves the file to the given local path.
+     * A path is a collection of files seperated by a seperator.
      * 
-     * @return The content the file has (if this file is a content one).
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link String}</td>
+     * <td>path</td>
+     * <td>The path the file will be moved to.</td>
+     * </tr>
+     * </table>
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link OutOfSpaceException}</td>
+     * <td>There is not enough space for the moved file on the target {@link FileSystem}.</td>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalStateException}</td>
+     * <td>The given file path isn't valid.</td>
+     * </tr>
+     * </table>
      */
-    @XmlTransient
-    public FileContent getContent() {
-
-        return type == FileType.FILE ? (FileContent) content : null;
-    }
+    public static final FunctionDefinition<Void>                         SET_PATH;
 
     /**
-     * Returns the content the file has (if this file is a content one).
-     * If this file isn't a content one, this will return null.
-     * 
-     * @param process The process which wants to read from this file.
-     * @return The content the file has (if this file is a content one).
-     * @throws NoFileRightException The given process hasn't the right to read from this file.
+     * Removes the file from the {@link FileSystem}.
+     * If this file is a {@link ParentFile}, all child files will also be removed.
      */
-    public Object read(Process process) throws NoFileRightException {
-
-        FileRights.checkRight(process, this, FileRight.READ);
-        return getContent();
-    }
+    public static final FunctionDefinition<Void>                         REMOVE;
 
     /**
-     * Changes the content to new one (if this file is a content one).
-     * This throws an OutOfSpaceException if there isn't enough space on the host drive for the new content.
-     * 
-     * @param content The new content to write into the file.
-     * @throws OutOfSpaceException If there isn't enough space on the host drive for the new content.
+     * Returns the {@link FileSystem} which is hosting the file.
      */
-    public void setContent(FileContent content) throws OutOfSpaceException {
+    public static final FunctionDefinition<FileSystem>                   GET_FILE_SYSTEM;
 
-        if (type == FileType.FILE) {
-            FileContent oldContent = (FileContent) this.content;
-            this.content = content;
+    static {
 
-            if (host.getRootFile() != null && host.getFilled() > host.getFree()) {
-                long size = getSize();
-                this.content = oldContent;
-                throw new OutOfSpaceException(host, size);
+        GET_NAME = FunctionDefinitionFactory.create("getName", File.class, PropertyAccessorFactory.createGet(NAME));
+        SET_NAME = FunctionDefinitionFactory.create("setName", File.class, PropertyAccessorFactory.createSet(NAME), String.class);
+
+        GET_RIGHTS = FunctionDefinitionFactory.create("getRights", File.class, PropertyAccessorFactory.createGet(RIGHTS));
+
+        GET_OWNER = FunctionDefinitionFactory.create("getOwner", File.class, PropertyAccessorFactory.createGet(OWNER));
+        SET_OWNER = FunctionDefinitionFactory.create("setOwner", File.class, PropertyAccessorFactory.createSet(OWNER), User.class);
+
+        GET_GROUP = FunctionDefinitionFactory.create("getGroup", File.class, PropertyAccessorFactory.createGet(GROUP));
+        SET_GROUP = FunctionDefinitionFactory.create("setGroup", File.class, PropertyAccessorFactory.createSet(GROUP), Group.class);
+
+        GET_PATH = FunctionDefinitionFactory.create("getPath", File.class, new FunctionExecutor<String>() {
+
+            @Override
+            public String invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                return ((File<?>) holder).getParent().get(GET_PATH).invoke() + File.SEPERATOR + holder.get(GET_NAME).invoke();
             }
-        }
-    }
 
-    /**
-     * Changes the content to new one (if this file is a content one).
-     * This throws an OutOfSpaceException if there isn't enough space on the host drive for the new content.
-     * 
-     * @param process The process which wants to write to this file.
-     * @param content The new content to write into the file.
-     * @throws NoFileRightException The given process hasn't the right to write into this file.
-     * @throws OutOfSpaceException If there isn't enough space on the host drive for the new content.
-     */
-    public void write(Process process, FileContent content) throws NoFileRightException, OutOfSpaceException {
+        });
+        SET_PATH = FunctionDefinitionFactory.create("setPath", File.class, new FunctionExecutor<Void>() {
 
-        FileRights.checkRight(process, this, FileRight.WRITE);
-        setContent(content);
-    }
+            @Override
+            @SuppressWarnings ("unchecked")
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
-    /**
-     * Returns the size this file has in bytes (if this file is a content one).
-     * Directories have the size of all their children.
-     * 
-     * @return The size this file has in bytes (if this file is a content one).
-     */
-    @Override
-    public long getSize() {
-
-        if (type == FileType.FILE && content != null) {
-            return ((FileContent) content).getSize();
-        } else if (type == FileType.DIRECTORY && !children.isEmpty()) {
-            long size = 0;
-            for (File child : children) {
-                size += child.getSize();
-            }
-            return size;
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * Returns the child files the directory contains (if this file is a directory).
-     * If this file isn't a directory, this will return null.
-     * 
-     * @return The child files the directory contains (if this file is a directory).
-     */
-    public List<File> getChildFiles() {
-
-        return type == FileType.DIRECTORY ? Collections.unmodifiableList(children) : null;
-    }
-
-    /**
-     * Looks up the child file with the given name (if this file is a directory).
-     * If this file isn't a directory, this will return null.
-     * 
-     * @param name The name to look for.
-     * @return The child file with the given name (if this file is a directory).
-     */
-    public File getChildFile(String name) {
-
-        if (children != null) {
-            for (File child : children) {
-                if (child.getName().equals(name)) {
-                    return child;
+                FileSystem fileSystem = holder.get(GET_FILE_SYSTEM).invoke();
+                if (fileSystem != null) {
+                    ParentFile<?> oldParent = (ParentFile<?>) ((File<?>) holder).getParent();
+                    String path = FileUtils.resolvePath(holder.get(GET_PATH).invoke(), (String) arguments[0]);
+                    fileSystem.get(FileSystem.ADD_FILE).invoke(holder, path);
+                    FeatureHolder parent = ((File<?>) holder).getParent();
+                    oldParent.get(ParentFile.REMOVE_CHILDREN).invoke(holder);
+                    ((File<FeatureHolder>) holder).setParent(parent);
                 }
+
+                return null;
             }
-        }
 
-        return null;
-    }
+        }, String.class);
 
-    /**
-     * Adds a new child file to this directory (if this file is a directory).
-     * If this file isn't a directory, nothign will happen.
-     * This throws an OutOfSpaceException if there isn't enough space on the host drive for the new file.
-     * 
-     * @param file The file to add to this directory.
-     * @throws OutOfSpaceException If there isn't enough space on the host drive for the new file.
-     */
-    protected void addChildFile(File file) throws OutOfSpaceException {
+        REMOVE = FunctionDefinitionFactory.create("remove", File.class, new FunctionExecutor<Void>() {
 
-        if (children != null) {
-            if (!children.contains(file)) {
-                if (file.getSize() > host.getFree()) {
-                    throw new OutOfSpaceException(host, file.getSize());
-                } else {
-                    children.add(file);
+            @Override
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                if ( ((File<?>) holder).getParent() instanceof ParentFile) {
+                    ((File<?>) holder).getParent().get(ParentFile.REMOVE_CHILDREN).invoke(holder);
                 }
+
+                return null;
             }
-        }
-    }
 
-    /**
-     * Removes a child file from this directory (if this file is a directory).
-     * If this file isn't a directory, nothign will happen.
-     * 
-     * @param file The file to remove from this directory.
-     */
-    protected void removeChildFile(File file) {
+        });
 
-        if (children != null) {
-            children.remove(file);
-        }
-    }
+        GET_FILE_SYSTEM = FunctionDefinitionFactory.create("getFileSystem", File.class, new FunctionExecutor<FileSystem>() {
 
-    /**
-     * Returns the parent directory which contains this file.
-     * 
-     * @return The parent directory which contains this file.
-     */
-    public File getParent() {
+            @Override
+            public FileSystem invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
-        String path = getLocalPath();
-        return host.getFile(path.substring(0, path.lastIndexOf(SEPERATOR)));
-    }
+                if (holder instanceof RootFile) {
+                    return ((RootFile) holder).getParent();
+                } else if (holder instanceof File && ((File<?>) holder).getParent() != null) {
+                    return ((File<?>) holder).getParent().get(GET_FILE_SYSTEM).invoke();
+                }
 
-    /**
-     * Changes the name of the file to a new one.
-     * After the renaming, the file can be used like before.
-     * 
-     * @param name The new name for the file.
-     */
-    public void rename(String name) {
-
-        setName(name);
-    }
-
-    /**
-     * Changes the name of the file to a new one.
-     * After the renaming, the file can be used like before.
-     * 
-     * @param process The process which wants to rename this file.
-     * @param name The new name for the file.
-     * @throws NoFileRightException The given process hasn't the rights to delete this file and write into the parent directory.
-     */
-    public void rename(Process process, String name) throws NoFileRightException {
-
-        FileRights.checkRight(process, this, FileRight.DELETE);
-        FileRights.checkRight(process, getParent(), FileRight.WRITE);
-        rename(name);
-    }
-
-    /**
-     * Moves the file to a new location under the given path.
-     * After the movement, the file can be used like before.
-     * This throws an OutOfSpaceException if there isn't enough space on the new host drive for the file.
-     * 
-     * @param path The new location for the file.
-     * @throws OutOfSpaceException If there isn't enough space on the new host drive for the file.
-     */
-    public void move(String path) throws OutOfSpaceException {
-
-        try {
-            move(null, path);
-        }
-        catch (NoFileRightException e) {
-            // Wont ever happen
-        }
-    }
-
-    /**
-     * Moves the file to a new location under the given path.
-     * After the movement, the file can be used like before.
-     * This throws an OutOfSpaceException if there isn't enough space on the new host drive for the file.
-     * 
-     * @param process The process which wants to move this file.
-     * @param path The new location for the file.
-     * @throws NoFileRightException The given process hasn't the right to delete the file or write into a directory where the algorithm needs to write.
-     * @throws OutOfSpaceException If there isn't enough space on the new host drive for the file.
-     */
-    public void move(Process process, String path) throws NoFileRightException, OutOfSpaceException {
-
-        if (process != null) {
-            FileRights.checkRight(process, this, FileRight.DELETE);
-        }
-
-        File oldParent = getParent();
-        path = File.resolvePath(getGlobalHostPath(), path);
-        host = host.getHost().get(Computer.OS).get().getFileSystemManager().getMounted(path);
-        host.addFile(process, this, path.substring(path.indexOf(SEPERATOR, 1)));
-        oldParent.removeChildFile(this);
-    }
-
-    /**
-     * Removes this file from the file system.
-     * If this file is a directory, all child files will also be removed.
-     */
-    public void remove() {
-
-        getParent().removeChildFile(this);
-    }
-
-    /**
-     * Removes this file from the file system.
-     * If this file is a directory, all child files will also be removed.
-     * 
-     * @param process The process which wants to remove the file.
-     * @throws NoFileRightException The process hasn't the right to delete this file.
-     */
-    public void remove(Process process) throws NoFileRightException {
-
-        FileRights.checkRight(process, this, FileRight.DELETE);
-        remove();
-    }
-
-    /**
-     * Changes the current hosting file system of this file to a new one.
-     * 
-     * @param host The new file system which will host this file.
-     */
-    protected void changeHost(FileSystem host) {
-
-        this.host = host;
-
-        if (children != null) {
-            for (File child : children) {
-                child.changeHost(host);
+                return null;
             }
-        }
+
+        });
+
+        GET_SIZE.addExecutor(File.class, "name", SizeUtil.createGetSize(NAME));
+        GET_SIZE.addExecutor(File.class, "rights", SizeUtil.createGetSize(RIGHTS));
+
     }
+
+    // ----- Functions End -----
 
     /**
-     * Returns the unique serialization id for the file.
-     * The id is a combination of the host file system's id and the local path of the file.
-     * It should only be used by a serialization algorithm.
-     * 
-     * @return The unique serialization id for the file.
+     * Creates a new file.
      */
-    @XmlAttribute
-    @XmlID
-    protected String getId() {
+    public File() {
 
-        return host.getId() + "-" + getLocalPath();
-    }
-
-    protected void beforeUnmarshal(Unmarshaller unmarshaller, Object parent) {
-
-        if (parent instanceof FileSystem) {
-            host = (FileSystem) parent;
-        } else {
-            host = ((File) parent).getHost();
-        }
-    }
-
-    @Override
-    public int hashCode() {
-
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (children == null ? 0 : children.hashCode());
-        result = prime * result + (content == null ? 0 : content.hashCode());
-        result = prime * result + (group == null ? 0 : group.hashCode());
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        result = prime * result + (owner == null ? 0 : owner.hashCode());
-        result = prime * result + (rights == null ? 0 : rights.hashCode());
-        result = prime * result + (type == null ? 0 : type.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        File other = (File) obj;
-        if (children == null) {
-            if (other.children != null) {
-                return false;
-            }
-        } else if (!children.equals(other.children)) {
-            return false;
-        }
-        if (content == null) {
-            if (other.content != null) {
-                return false;
-            }
-        } else if (!content.equals(other.content)) {
-            return false;
-        }
-        if (group == null) {
-            if (other.group != null) {
-                return false;
-            }
-        } else if (!group.equals(other.group)) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (owner == null) {
-            if (other.owner != null) {
-                return false;
-            }
-        } else if (!owner.equals(other.owner)) {
-            return false;
-        }
-        if (rights == null) {
-            if (other.rights != null) {
-                return false;
-            }
-        } else if (!rights.equals(other.rights)) {
-            return false;
-        }
-        if (type != other.type) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toInfoString() {
-
-        return type.toString().toLowerCase() + " " + name + ", " + rights.toString() + " (o " + owner.getName() + ", g " + group.getName() + "), " + children.size() + " child files";
-    }
-
-    @Override
-    public String toString() {
-
-        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }

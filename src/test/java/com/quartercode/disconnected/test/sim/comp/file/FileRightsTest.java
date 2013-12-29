@@ -21,89 +21,48 @@ package com.quartercode.disconnected.test.sim.comp.file;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.world.comp.ByteUnit;
-import com.quartercode.disconnected.world.comp.Computer;
-import com.quartercode.disconnected.world.comp.Version;
-import com.quartercode.disconnected.world.comp.file.File;
-import com.quartercode.disconnected.world.comp.file.File.FileType;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.world.comp.file.FileRights;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileAccessor;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
-import com.quartercode.disconnected.world.comp.file.FileSystem;
-import com.quartercode.disconnected.world.comp.file.MountException;
-import com.quartercode.disconnected.world.comp.file.OutOfSpaceException;
-import com.quartercode.disconnected.world.comp.file.StringContent;
-import com.quartercode.disconnected.world.comp.hardware.HardDrive;
-import com.quartercode.disconnected.world.comp.os.Group;
-import com.quartercode.disconnected.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.world.comp.os.User;
 
 public class FileRightsTest {
 
-    private FileSystem fileSystem;
-    private File       testFile;
-    private User       testUser;
-    private Group      testGroup;
-
     @Before
-    public void setUp() throws MountException, OutOfSpaceException {
+    public void setUp() {
 
-        Computer computer = new Computer(null);
-
-        OperatingSystem operatingSystem = new OperatingSystem(computer, "OperatingSystem", new Version(1, 0, 0), null);
-        computer.get(Computer.OS).set(operatingSystem);
-
-        HardDrive hardDrive = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
-        fileSystem = hardDrive.getFileSystem();
-        computer.get(Computer.HARDWARE).add(hardDrive);
-        operatingSystem.getFileSystemManager().setMountpoint(fileSystem, "test");
-        operatingSystem.getFileSystemManager().setMounted(fileSystem, true);
-
-        testUser = new User(operatingSystem, "testu");
-        testGroup = new Group(operatingSystem, "testg");
-        testUser.addToGroup(testGroup, true);
-        operatingSystem.getUserManager().addUser(testUser);
-        operatingSystem.getUserManager().addGroup(testGroup);
-
-        testFile = fileSystem.addFile("test1/test2/test.txt", FileType.FILE, testUser);
-        testFile.setContent(new StringContent("Test-Content"));
     }
 
     @Test
-    public void testGetRight() {
+    public void testGet() throws FunctionExecutionException {
 
-        FileRights rights = testFile.getRights();
+        FileRights rights = new FileRights();
+        rights.get(FileRights.FROM_STRING).invoke("-w------r---");
 
-        Assert.assertEquals("Owner write right is set correctly", true, rights.getRight(FileAccessor.OWNER, FileRight.WRITE));
-        Assert.assertEquals("Group delete right is set correctly", false, rights.getRight(FileAccessor.GROUP, FileRight.DELETE));
-        Assert.assertEquals("Others read right is set correctly", true, rights.getRight(FileAccessor.OTHERS, FileRight.READ));
+        Assert.assertTrue("Owner write right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.WRITE));
+        Assert.assertFalse("Group delete right is set", rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.DELETE));
+        Assert.assertTrue("Others read right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.READ));
     }
 
     @Test
-    public void testSetRight() {
+    public void testSet() throws FunctionExecutionException {
 
-        FileRights rights = testFile.getRights();
+        FileRights rights = new FileRights();
+        rights.get(FileRights.FROM_STRING).invoke("------------");
 
-        rights.setRight(FileAccessor.OWNER, FileRight.EXECUTE, true);
-        Assert.assertEquals("Owner execute right can be set", true, rights.getRight(FileAccessor.OWNER, FileRight.EXECUTE));
+        rights.get(FileRights.SET).invoke(FileAccessor.OWNER, FileRight.EXECUTE, true);
+        Assert.assertTrue("Owner execute right can't get set", rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.EXECUTE));
 
-        rights.setRight(FileAccessor.GROUP, FileRight.WRITE, true);
-        Assert.assertEquals("Group write right is set correctly", true, rights.getRight(FileAccessor.GROUP, FileRight.WRITE));
+        rights.get(FileRights.SET).invoke(FileAccessor.GROUP, FileRight.WRITE, true);
+        Assert.assertTrue("Group write right can't get set", rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.WRITE));
 
-        rights.setRight(FileAccessor.OTHERS, FileRight.READ, false);
-        Assert.assertEquals("Others write right is set correctly", false, rights.getRight(FileAccessor.OTHERS, FileRight.READ));
+        rights.get(FileRights.SET).invoke(FileAccessor.OTHERS, FileRight.READ, false);
+        Assert.assertFalse("Others write can't get set", rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.READ));
     }
 
     @Test
-    public void testHasRight() {
+    public void testFileUtilsHasRight() throws FunctionExecutionException {
 
-        testFile.setRights(new FileRights("------------"));
-        testFile.getRights().setRight(FileAccessor.OWNER, FileRight.READ, true);
-        Assert.assertEquals("Owner has read right", true, FileRights.hasRight(testUser, testFile, FileRight.READ));
-
-        testFile.setRights(new FileRights("------------"));
-        testFile.getRights().setRight(FileAccessor.GROUP, FileRight.READ, true);
-        Assert.assertEquals("User in group has read right", true, FileRights.hasRight(testUser, testFile, FileRight.READ));
     }
 
 }

@@ -28,10 +28,10 @@ import com.quartercode.disconnected.world.comp.program.Process;
  */
 public class NoFileRightException extends Exception {
 
-    private static final long serialVersionUID = -1309109849854511720L;
+    private static final long serialVersionUID = 1461048154676356785L;
 
-    private final Process     process;
-    private final File        file;
+    private final Process<?>  process;
+    private final File<?>     file;
     private final FileRight   requiredRight;
 
     /**
@@ -41,9 +41,9 @@ public class NoFileRightException extends Exception {
      * @param file The file the given process tried to access.
      * @param requiredRight The right the given process didn't have which is required for accessing the file.
      */
-    public NoFileRightException(Process process, File file, FileRight requiredRight) {
+    public NoFileRightException(Process<?> process, File<?> file, FileRight requiredRight) {
 
-        super("Error while accessing '" + file.getGlobalHostPath() + "': Executing process " + process.getPid() + " hasn't right '" + requiredRight.toString().toLowerCase() + "'");
+        super("Error while accessing file: Executing process hasn't right '" + requiredRight.toString().toLowerCase() + "'");
 
         this.process = process;
         this.file = file;
@@ -55,7 +55,7 @@ public class NoFileRightException extends Exception {
      * 
      * @return The process which tried to access the given file.
      */
-    public Process getProcess() {
+    public Process<?> getProcess() {
 
         return process;
     }
@@ -65,7 +65,7 @@ public class NoFileRightException extends Exception {
      * 
      * @return The file the given process tried to access.
      */
-    public File getFile() {
+    public File<?> getFile() {
 
         return file;
     }

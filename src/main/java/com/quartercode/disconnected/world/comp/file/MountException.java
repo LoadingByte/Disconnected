@@ -28,15 +28,10 @@ import com.quartercode.disconnected.world.comp.os.OperatingSystem;
  */
 public class MountException extends Exception {
 
-    private static final long serialVersionUID = 1957527882081049990L;
+    private static final long serialVersionUID = -6971327868164892094L;
 
-    private static String getInfoMessage(FileSystem fileSystem, boolean mount) {
-
-        return "Can't " + (mount ? "mount" : "unmount") + " file system " + (mount ? "to" : "from") + " computer " + fileSystem.getHost().getId();
-    }
-
-    private FileSystem    fileSystem;
-    private final boolean mount;
+    private FileSystem        fileSystem;
+    private final boolean     mount;
 
     /**
      * Creates a new mount exception and sets the file system which should have been mounted or unmounted.
@@ -46,7 +41,7 @@ public class MountException extends Exception {
      */
     public MountException(FileSystem fileSystem, boolean mount) {
 
-        super(getInfoMessage(fileSystem, mount));
+        super("Can't " + (mount ? "mount" : "unmount") + " file system");
 
         this.mount = mount;
     }
@@ -60,7 +55,7 @@ public class MountException extends Exception {
      */
     public MountException(FileSystem fileSystem, boolean mount, String message) {
 
-        super(getInfoMessage(fileSystem, mount) + ": " + message);
+        super("Can't " + (mount ? "mount" : "unmount") + " file system" + ": " + message);
 
         this.mount = mount;
     }

@@ -19,19 +19,21 @@
 package com.quartercode.disconnected.world.comp.file;
 
 import java.util.Arrays;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.apache.commons.lang.Validate;
-import com.quartercode.disconnected.world.comp.file.File.FileType;
-import com.quartercode.disconnected.world.comp.os.User;
-import com.quartercode.disconnected.world.comp.program.Process;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 
 /**
  * File rights control the access to files by users.
  * You can set if a given user/group is allowed to read, write, execute or delete.
  */
-@XmlJavaTypeAdapter (FileRights.FileRightsAdapter.class)
-public class FileRights {
+public class FileRights extends WorldChildFeatureHolder<File<?>> {
 
     /**
      * The file accessor represents the type of person who accesses a file in its context.
@@ -147,316 +149,278 @@ public class FileRights {
 
     }
 
+    // ----- Properties -----
+
     /**
-     * Returns if the given user has the given right on the given file.
-     * 
-     * @param user The user who may have the given right on the given file.
-     * @param file The file the given user may have access to.
-     * @param right The right the given user may have.
-     * @return True if the given user has the given right on the given file.
+     * The boolean array which stores the rights.
+     * The first four booleans represent the owner rights in the order read, write, delete, execute.
+     * The booleans from index 4 to 7 represent the group rights, the ones from 8 to 11 the others' rights.
      */
-    public static boolean hasRight(User user, File file, FileRight right) {
+    protected static final FeatureDefinition<ObjectProperty<Boolean[]>> RIGHTS;
 
-        if (user.isSuperuser()) {
-            return true;
-        } else if (checkRight(file, FileAccessor.OWNER, right) && file.getOwner().equals(user)) {
-            return true;
-        } else if (checkRight(file, FileAccessor.GROUP, right) && user.getGroups().contains(file.getGroup())) {
-            return true;
-        } else if (checkRight(file, FileAccessor.OTHERS, right)) {
-            return true;
-        }
+    static {
 
-        return false;
+        RIGHTS = new AbstractFeatureDefinition<ObjectProperty<Boolean[]>>("rights") {
+
+            @Override
+            public ObjectProperty<Boolean[]> create(FeatureHolder holder) {
+
+                return new ObjectProperty<Boolean[]>(getName(), holder, new Boolean[4 * 3]);
+            }
+
+        };
+
     }
 
-    private static boolean checkRight(File file, FileAccessor accessor, FileRight right) {
+    // ----- Properties End -----
 
-        // Only the superuser can write/delete/execute files in root directories of file systems
-        if (file.getRights() == null) {
-            return right == FileRight.READ ? true : false;
-        } else if (file.getRights().getRight(accessor, right)) {
-            if (right == FileRight.DELETE && file.getType() == FileType.DIRECTORY) {
-                for (File child : file.getChildFiles()) {
-                    if (!checkRight(child, accessor, right)) {
-                        return false;
-                    }
+    // ----- Functions -----
+
+    /**
+     * Returns if the given {@link FileRight} is set for the given {@link FileAccessor}.
+     * If a {@link FileRight} is set, the given {@link FileAccessor} can use functions related to the right.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link FileAccessor}</td>
+     * <td>accessor</td>
+     * <td>The accessor who wants to access the file.</td>
+     * </tr>
+     * <tr>
+     * <td>1</td>
+     * <td>{@link FileRight}</td>
+     * <td>rights</td>
+     * <td>The file right to test.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Boolean>                     GET;
+
+    /**
+     * Sets or unsets the given {@link FileRight} for the given {@link FileAccessor}.
+     * If a {@link FileRight} is set, the given {@link FileAccessor} can use functions related to the right.
+     * If you use null for the {@link FileAccessor}, you will change the right for every accessor type.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link FileAccessor}</td>
+     * <td>accessor</td>
+     * <td>The accessor who wants to access the file; null for all.</td>
+     * </tr>
+     * <tr>
+     * <td>1</td>
+     * <td>{@link FileRight}</td>
+     * <td>rights</td>
+     * <td>The file right to set or unset.</td>
+     * </tr>
+     * <tr>
+     * <td>1</td>
+     * <td>{@link Boolean}</td>
+     * <td>set</td>
+     * <td>If the given right should be set (true) or unset (false).</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                        SET;
+
+    /**
+     * Changes the stored rights to the ones stored in the given file rights object.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link FileRights}</td>
+     * <td>rights</td>
+     * <td>The file rights object to get the rights from.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                        FROM_OBJECT;
+
+    /**
+     * Changes the rights to the ones stored in the given rights string.
+     * The string is using the typcial UNIX-format with some changes. Examples:
+     * 
+     * <pre>
+     * rwdxr--xr--x
+     * rwdxrwdx----
+     * </pre>
+     * 
+     * You can split the string into 3 segments.
+     * 
+     * <pre>
+     * rwdx | r--x | r--x
+     * rwdx | rwdx | ----
+     * </pre>
+     * 
+     * The first segment defines the rights for the owner, the second for the group and the third for everyone else.
+     * 
+     * A "r" means that you can read from the file or directory.
+     * A "w" means that you can write content into the file or create new files inside a directory.
+     * A "d" means that you can delete the file or directory (if it's empty).
+     * A "x" means that you can execute the file.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link String}</td>
+     * <td>rights</td>
+     * <td>The right information to parse.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                        FROM_STRING;
+
+    /**
+     * Returns the stored file rights as a string.
+     * The string is using the typcial UNIX-format with some changes. Examples:
+     * 
+     * <pre>
+     * rwdxr--xr--x
+     * rwdxrwdx----
+     * </pre>
+     * 
+     * You can split the string into 3 segments.
+     * 
+     * <pre>
+     * rwdx | r--x | r--x
+     * rwdx | rwdx | ----
+     * </pre>
+     * 
+     * The first segment defines the rights for the owner, the second for the group and the third for everyone else.
+     * 
+     * A "r" means that you can read from the file or directory.
+     * A "w" means that you can write content into the file or create new files inside a directory.
+     * A "d" means that you can delete the file or directory (if it's empty).
+     * A "x" means that you can execute the file.
+     */
+    public static final FunctionDefinition<String>                      TO_STRING;
+
+    static {
+
+        GET = FunctionDefinitionFactory.create("get", FileRights.class, new FunctionExecutor<Boolean>() {
+
+            @Override
+            public Boolean invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                if (arguments[0] != null) {
+                    return holder.get(RIGHTS).get()[ ((FileAccessor) arguments[0]).ordinal() * 4 + ((FileRight) arguments[1]).ordinal()];
+                } else {
+                    return false;
                 }
             }
-            return true;
-        }
 
-        return false;
-    }
+        }, FileAccessor.class, FileRight.class);
 
-    /**
-     * Throws a {@link NoFileRightException} if the given process hasn't the given right on the given file.
-     * 
-     * @param process The process which may have the given right on the given file.
-     * @param file The file the given process may have access to.
-     * @param right The right the given process may have.
-     * @throws NoFileRightException The given process hasn't the given right on the given file.
-     */
-    public static void checkRight(Process process, File file, FileRight right) throws NoFileRightException {
+        SET = FunctionDefinitionFactory.create("set", FileRights.class, new FunctionExecutor<Void>() {
 
-        if (!hasRight(process.getSession().getUser(), file, right)) {
-            throw new NoFileRightException(process, file, right);
-        }
-    }
+            @Override
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
-    /**
-     * Returns if the given user can change the right attributes of the given file.
-     * Every process has to check this for itself!
-     * 
-     * @param user The user who may can change the right attributes.
-     * @param file The file the given user may have access to.
-     * @return True if the given user can change the right attributes of the given file.
-     */
-    public static boolean canChangeRights(User user, File file) {
+                if (arguments[0] == null) {
+                    holder.get(SET).invoke(FileAccessor.OWNER, arguments[1], arguments[2]);
+                    holder.get(SET).invoke(FileAccessor.GROUP, arguments[1], arguments[2]);
+                    holder.get(SET).invoke(FileAccessor.OTHERS, arguments[1], arguments[2]);
+                } else {
+                    holder.get(RIGHTS).get()[ ((FileAccessor) arguments[0]).ordinal() * 4 + ((FileRight) arguments[1]).ordinal()] = (Boolean) arguments[2];
+                }
 
-        return file.getOwner().equals(user) || user.isSuperuser();
-    }
-
-    private FileRight[] ownerRights;
-    private FileRight[] groupRights;
-    private FileRight[] othersRights;
-
-    /**
-     * Creates a new empty file rights storage.
-     * This is only recommended for direct field access (e.g. for serialization).
-     */
-    protected FileRights() {
-
-    }
-
-    /**
-     * Creates a new file rights storage using the given file right arrays.
-     * Every array sets the rights for the self-explantory group of users.
-     * The arrays hold {@link FileRight} values. Examples for the format:
-     * 
-     * <pre>
-     * Right string:
-     * rwdxr--xr--x
-     * 
-     * Arrays:
-     * ownerRights[READ, WRITE, DELETE, EXECUTE]
-     * groupRights[READ, null, null, EXECUTE]
-     * othersRights[READ, null, null, EXECUTE]
-     * </pre>
-     * 
-     * @param ownerRights The array which defines the rights the file owner has.
-     * @param groupRights The array which defines the rights the file group has.
-     * @param othersRights The array which defines the rights everyone else has.
-     */
-    public FileRights(FileRight[] ownerRights, FileRight[] groupRights, FileRight[] othersRights) {
-
-        Validate.isTrue(ownerRights.length == 4, "Owner right array must contain 4 elements");
-        Validate.isTrue(groupRights.length == 4, "Group right array must contain 4 elements");
-        Validate.isTrue(othersRights.length == 4, "Others right array must contain 4 elements");
-
-        this.ownerRights = othersRights;
-        this.groupRights = groupRights;
-        this.othersRights = othersRights;
-    }
-
-    /**
-     * Creates a new file rights storage using the given file right string.
-     * This is using the typcial UNIX-format with some changes. Examples:
-     * 
-     * <pre>
-     * rwdxr--xr--x
-     * rwdxrwdx----
-     * </pre>
-     * 
-     * You can split the string into 3 segments.
-     * 
-     * <pre>
-     * rwdx | r--x | r--x
-     * rwdx | rwdx | ----
-     * </pre>
-     * 
-     * The first segment defines the rights for the owner, the second for the group and the third for everyone else.
-     * 
-     * A "r" means that you can read from the file or directory.
-     * A "w" means that you can write content into the file or create new files inside a directory.
-     * A "d" means that you can delete the file or directory (if it's empty).
-     * A "x" means that you can execute the file.
-     * 
-     * @param rights The right information to parse.
-     */
-    public FileRights(String rights) {
-
-        Validate.isTrue(rights.length() == 4 * 3, "The right string must contain 4 * 3 = 12 characters");
-
-        ownerRights = parseCharRights(rights.substring(0, 4).toCharArray());
-        groupRights = parseCharRights(rights.substring(4, 8).toCharArray());
-        othersRights = parseCharRights(rights.substring(8, 12).toCharArray());
-    }
-
-    private FileRight[] parseCharRights(char[] rights) {
-
-        FileRight[] enumRights = new FileRight[4];
-        for (int index = 0; index < rights.length; index++) {
-            enumRights[index] = FileRight.valueOf(rights[index]);
-        }
-        return enumRights;
-    }
-
-    private FileRight[] getRightArray(FileAccessor accessor) {
-
-        if (accessor == FileAccessor.OWNER) {
-            return ownerRights;
-        } else if (accessor == FileAccessor.GROUP) {
-            return groupRights;
-        } else if (accessor == FileAccessor.OTHERS) {
-            return othersRights;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Returns if the given right is set for the given file accessor.
-     * 
-     * @param accessor The accessor who wants to access the file.
-     * @param right The file right to test on.
-     * @return If the given right is set for the given file accessor.
-     */
-    public boolean getRight(FileAccessor accessor, FileRight right) {
-
-        if (accessor != null) {
-            return getRightArray(accessor)[right.ordinal()] == right;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Sets or unsets the given right for the given file accessor.
-     * If a right is set, the given file accessor use functions related to the right.
-     * If you use null for the file accessor, you will change the right for every accessor type.
-     * 
-     * @param accessor The accessor who wants to access the file; null for all.
-     * @param right The file right to set or unset.
-     * @param set If the given right should be set (true) or unset (false).
-     */
-    public void setRight(FileAccessor accessor, FileRight right, boolean set) {
-
-        if (accessor == null) {
-            ownerRights[right.ordinal()] = set ? right : null;
-            groupRights[right.ordinal()] = set ? right : null;
-            othersRights[right.ordinal()] = set ? right : null;
-        } else {
-            getRightArray(accessor)[right.ordinal()] = set ? right : null;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.hashCode(groupRights);
-        result = prime * result + Arrays.hashCode(othersRights);
-        result = prime * result + Arrays.hashCode(ownerRights);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        FileRights other = (FileRights) obj;
-        if (!Arrays.equals(groupRights, other.groupRights)) {
-            return false;
-        }
-        if (!Arrays.equals(othersRights, other.othersRights)) {
-            return false;
-        }
-        if (!Arrays.equals(ownerRights, other.ownerRights)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-
-        return generateRightString(ownerRights) + generateRightString(groupRights) + generateRightString(othersRights);
-    }
-
-    private String generateRightString(FileRight[] rights) {
-
-        String rightString = "";
-        for (FileRight right : rights) {
-            if (right == null) {
-                rightString += '-';
-            } else {
-                rightString += right.getLetter();
-            }
-        }
-        return rightString;
-    }
-
-    /**
-     * This file rights adapter is for storing a file rights object as a simple string.
-     * This is using the typcial UNIX-format with some changes. Examples:
-     * 
-     * <pre>
-     * rwdxr--xr--x
-     * rwdxrwdx----
-     * </pre>
-     * 
-     * You can split the string into 3 segments.
-     * 
-     * <pre>
-     * rwdx | r--x | r--x
-     * rwdx | rwdx | ----
-     * </pre>
-     * 
-     * The first segment defines the rights for the owner, the second for the group and the third for everyone else.
-     * 
-     * A "r" means that you can read from the file or directory.
-     * A "w" means that you can write content into the file or create new files inside a directory.
-     * A "d" means that you can delete the file or directory (if it's empty).
-     * A "x" means that you can execute the file.
-     */
-    public static class FileRightsAdapter extends XmlAdapter<String, FileRights> {
-
-        /**
-         * Creates a new file rights adapter.
-         */
-        public FileRightsAdapter() {
-
-        }
-
-        @Override
-        public FileRights unmarshal(String v) {
-
-            if (v == null) {
                 return null;
-            } else {
-                return new FileRights(v);
             }
-        }
 
-        @Override
-        public String marshal(FileRights v) {
+        }, FileAccessor.class, FileRight.class, Boolean.class);
 
-            if (v == null) {
+        FROM_OBJECT = FunctionDefinitionFactory.create("fromObject", FileRights.class, new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                holder.get(RIGHTS).set(Arrays.copyOf( ((FileRights) arguments[0]).get(RIGHTS).get(), 3 * 4));
+
                 return null;
-            } else {
-                return v.toString();
             }
-        }
+
+        }, FileRights.class);
+
+        FROM_STRING = FunctionDefinitionFactory.create("fromString", FileRights.class, new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                char[] rights = ((String) arguments[0]).toCharArray();
+                for (int index = 0; index < 3 * 4; index++) {
+                    holder.get(RIGHTS).get()[index] = rights[index] != '-';
+                }
+
+                return null;
+            }
+
+        }, String.class);
+
+        TO_STRING = FunctionDefinitionFactory.create("toString", FileRights.class, new FunctionExecutor<String>() {
+
+            @Override
+            public String invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                String rights = "";
+                for (int index = 0; index < 3 * 4; index++) {
+                    if (holder.get(RIGHTS).get()[index]) {
+                        FileRight right = null;
+                        if (index == 0 || index == 4 || index == 8) {
+                            right = FileRight.READ;
+                        } else if (index == 1 || index == 5 || index == 9) {
+                            right = FileRight.WRITE;
+                        } else if (index == 2 || index == 6 || index == 10) {
+                            right = FileRight.DELETE;
+                        } else if (index == 3 || index == 7 || index == 11) {
+                            right = FileRight.EXECUTE;
+                        }
+                        rights += right.getLetter();
+                    } else {
+                        rights += '-';
+                    }
+                }
+
+                return rights;
+            }
+
+        });
+
+    }
+
+    // ----- Functions End -----
+
+    /**
+     * Creates a new file rights storage.
+     * You can fill using {@link #GET}.
+     */
+    public FileRights() {
 
     }
 

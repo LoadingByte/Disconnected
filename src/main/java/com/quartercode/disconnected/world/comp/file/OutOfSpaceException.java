@@ -25,7 +25,7 @@ package com.quartercode.disconnected.world.comp.file;
  */
 public class OutOfSpaceException extends Exception {
 
-    private static final long serialVersionUID = -905196120194774390L;
+    private static final long serialVersionUID = 6091324719748985758L;
 
     private final FileSystem  fileSystem;
     private final long        size;
@@ -38,7 +38,8 @@ public class OutOfSpaceException extends Exception {
      */
     public OutOfSpaceException(FileSystem fileSystem, long size) {
 
-        super("Out of space on file system for computer " + fileSystem.getHost().getId() + ": " + fileSystem.getFilled() + "b/" + fileSystem.getSize() + "b filled, can't store " + size + "b");
+        super("Out of space: Can't store " + size + "b");
+
         this.fileSystem = fileSystem;
         this.size = size;
     }

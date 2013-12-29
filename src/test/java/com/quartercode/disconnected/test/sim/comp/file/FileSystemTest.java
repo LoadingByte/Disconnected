@@ -21,54 +21,46 @@ package com.quartercode.disconnected.test.sim.comp.file;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.world.comp.ByteUnit;
-import com.quartercode.disconnected.world.comp.Computer;
-import com.quartercode.disconnected.world.comp.Version;
-import com.quartercode.disconnected.world.comp.file.File;
-import com.quartercode.disconnected.world.comp.file.File.FileType;
+import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
+import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
-import com.quartercode.disconnected.world.comp.file.MountException;
-import com.quartercode.disconnected.world.comp.file.OutOfSpaceException;
-import com.quartercode.disconnected.world.comp.file.StringContent;
-import com.quartercode.disconnected.world.comp.hardware.HardDrive;
-import com.quartercode.disconnected.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.world.comp.os.User;
 
 public class FileSystemTest {
 
-    private FileSystem fileSystem;
-    private File       testFile;
+    private FileSystem  fileSystem;
+    private ContentFile testFile;
 
     @Before
-    public void setUp() throws MountException, OutOfSpaceException {
+    public void setUp() throws FunctionExecutionException {
 
-        Computer computer = new Computer(null);
+        fileSystem = new FileSystem();
+        fileSystem.setLocked(false);
+        fileSystem.get(FileSystem.SET_SIZE).invoke(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
+        fileSystem.setLocked(true);
 
-        OperatingSystem operatingSystem = new OperatingSystem(computer, "OperatingSystem", new Version(1, 0, 0), null);
-        computer.get(Computer.OS).set(operatingSystem);
-
-        HardDrive hardDrive = new HardDrive(computer, "HardDrive", new Version(1, 0, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
-        fileSystem = hardDrive.getFileSystem();
-        computer.get(Computer.HARDWARE).add(hardDrive);
-        operatingSystem.getFileSystemManager().setMountpoint(fileSystem, "test");
-        operatingSystem.getFileSystemManager().setMounted(fileSystem, true);
-
-        testFile = fileSystem.addFile("test1/test2/test.txt", FileType.FILE, new User(null, null));
-        testFile.setContent(new StringContent("Test-Content"));
+        testFile = new ContentFile();
+        testFile.get(ContentFile.SET_CONTENT).invoke("Test-Content");
+        fileSystem.get(FileSystem.ADD_FILE).invoke(testFile, "/test1/test2/test.txt");
     }
 
     @Test
-    public void testGetFile() {
+    public void testGetFile() throws FunctionExecutionException {
 
-        Assert.assertEquals("Returned file equals original", testFile, fileSystem.getFile("test1/test2/test.txt"));
+        Assert.assertEquals("Resolved file", testFile, fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test.txt"));
     }
 
     @Test
-    public void testCalcSpace() {
+    public void testCalcSpace() throws FunctionExecutionException {
 
-        Assert.assertEquals("Filled bytes", 12288, fileSystem.getFilled());
-        Assert.assertEquals("Free bytes", fileSystem.getSize() - 12288, fileSystem.getFree());
-        Assert.assertEquals("Filled + free = size", fileSystem.getSize(), fileSystem.getFilled() + fileSystem.getFree());
+        long contentSize = 30;
+        long filled = fileSystem.get(FileSystem.GET_FILLED).invoke();
+        long free = fileSystem.get(FileSystem.GET_FREE).invoke();
+
+        Assert.assertEquals("Filled bytes", contentSize, filled);
+        Assert.assertEquals("Free bytes", fileSystem.get(DerivableSize.GET_SIZE).invoke() - contentSize, free);
+        Assert.assertEquals("Size (Filled + free)", (long) fileSystem.get(DerivableSize.GET_SIZE).invoke(), free + filled);
     }
 
 }
