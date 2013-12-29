@@ -22,9 +22,12 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.Disconnected;
-import com.quartercode.disconnected.world.general.Location;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
+import com.quartercode.disconnected.world.Location;
 
 /**
  * This utility class generates random locations on an earth map.
@@ -32,6 +35,8 @@ import com.quartercode.disconnected.world.general.Location;
  * @see Location
  */
 public class LocationGenerator {
+
+    private static final Logger LOGGER = Logger.getLogger(LocationGenerator.class.getName());
 
     /**
      * Generates the given amount of locations on an earth map.
@@ -66,20 +71,30 @@ public class LocationGenerator {
         int width = map.getWidth();
         int height = map.getHeight();
 
-        List<Location> result = new ArrayList<Location>();
-        int blackRGB = Color.BLACK.getRGB();
-        while (result.size() < amount) {
-            int x = random.nextInt(width);
-            int y = random.nextInt(height);
-            if (map.getRGB(x, y) == blackRGB) {
-                Location location = new Location((float) x / (float) width, (float) y / (float) height);
-                if (!ignore.contains(location) && !result.contains(location)) {
-                    result.add(location);
+        try {
+            List<Location> result = new ArrayList<Location>();
+            int blackRGB = Color.BLACK.getRGB();
+            while (result.size() < amount) {
+                int x = random.nextInt(width);
+                int y = random.nextInt(height);
+                if (map.getRGB(x, y) == blackRGB) {
+                    Location location = new Location();
+                    location.setLocked(false);
+                    location.get(Location.SET_X).invoke((float) x / (float) width);
+                    location.get(Location.SET_Y).invoke((float) y / (float) height);
+                    location.setLocked(true);
+                    if (!ignore.contains(location) && !result.contains(location)) {
+                        result.add(location);
+                    }
                 }
             }
-        }
 
-        return result;
+            return result;
+        }
+        catch (FunctionExecutionException e) {
+            LOGGER.log(Level.SEVERE, "Unknown error while generating locations", e.getCause());
+            return null;
+        }
     }
 
     private LocationGenerator() {
