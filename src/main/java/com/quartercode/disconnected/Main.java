@@ -34,6 +34,9 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import com.quartercode.disconnected.graphics.GraphicsManager;
 import com.quartercode.disconnected.graphics.session.DesktopState;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.extra.def.ReferenceProperty;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.profile.Profile;
 import com.quartercode.disconnected.sim.profile.ProfileManager;
@@ -46,17 +49,14 @@ import com.quartercode.disconnected.util.ObjectAdapter;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.util.ResourceStore;
-import com.quartercode.disconnected.world.ListProperty;
-import com.quartercode.disconnected.world.ObjectProperty;
-import com.quartercode.disconnected.world.ObjectReferenceProperty;
-import com.quartercode.disconnected.world.QueueProperty;
-import com.quartercode.disconnected.world.TickProperty;
+import com.quartercode.disconnected.world.Location;
+import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.Version;
-import com.quartercode.disconnected.world.comp.file.StringContent;
 import com.quartercode.disconnected.world.comp.hardware.CPU;
 import com.quartercode.disconnected.world.comp.hardware.HardDrive;
 import com.quartercode.disconnected.world.comp.hardware.Mainboard;
+import com.quartercode.disconnected.world.comp.hardware.Mainboard.MainboardSlot;
 import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.world.comp.hardware.RAM;
 import com.quartercode.disconnected.world.comp.os.Environment;
@@ -71,10 +71,6 @@ import com.quartercode.disconnected.world.comp.program.shell.ListFilesProgram;
 import com.quartercode.disconnected.world.comp.program.shell.MakeFileProgram;
 import com.quartercode.disconnected.world.comp.session.DesktopSessionProgram;
 import com.quartercode.disconnected.world.comp.session.ShellSessionProgram;
-import com.quartercode.disconnected.world.general.Location;
-import com.quartercode.disconnected.world.general.RootObject;
-import com.quartercode.disconnected.world.general.RootObject.MemberGroupListProperty;
-import com.quartercode.disconnected.world.general.RootObject.MemberListProperty;
 import com.quartercode.disconnected.world.member.Member;
 import com.quartercode.disconnected.world.member.MemberGroup;
 import com.quartercode.disconnected.world.member.ai.PlayerController;
@@ -180,8 +176,14 @@ public class Main {
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG-ACTION: Generating new simulation");
         Simulation simulation = SimulationGenerator.generateSimulation(10, 2, new RandomPool(Simulation.RANDOM_POOL_SIZE));
-        for (Computer computer : simulation.getWorld().getRoot().get(RootObject.COMPUTERS)) {
-            computer.get(Computer.OS).get().setRunning(true);
+
+        try {
+            for (Computer computer : simulation.getWorld().get(World.GET_COMPUTERS).invoke()) {
+                computer.get(Computer.GET_OS).invoke().setRunning(true);
+            }
+        }
+        catch (FunctionExecutionException e) {
+            LOGGER.log(Level.SEVERE, "Unknown error while booting up computers", e.getCause());
         }
         Profile profile = new Profile("test", simulation);
         Disconnected.getProfileManager().addProfile(profile);
@@ -219,14 +221,7 @@ public class Main {
 
         // Properties
         registry.registerClass(ObjectProperty.class);
-        registry.registerClass(ObjectReferenceProperty.class);
-        registry.registerClass(ListProperty.class);
-        registry.registerClass(QueueProperty.class);
-        registry.registerClass(TickProperty.class);
-
-        // Custom Properties
-        registry.registerClass(MemberListProperty.class);
-        registry.registerClass(MemberGroupListProperty.class);
+        registry.registerClass(ReferenceProperty.class);
 
         // Other
         registry.registerClass(ObjectAdapter.ClassElement.class);
@@ -254,10 +249,10 @@ public class Main {
         // Mixed computer stuff
         registry.registerClass(Version.class);
         registry.registerClass(Environment.class);
-        registry.registerClass(StringContent.class);
 
         // Hardware
         registry.registerClass(Mainboard.class);
+        registry.registerClass(MainboardSlot.class);
         registry.registerClass(CPU.class);
         registry.registerClass(RAM.class);
         registry.registerClass(HardDrive.class);
