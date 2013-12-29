@@ -19,7 +19,8 @@
 package com.quartercode.disconnected.graphics.session;
 
 import com.quartercode.disconnected.Disconnected;
-import com.quartercode.disconnected.world.comp.file.File;
+import com.quartercode.disconnected.world.comp.file.FileUtils;
+import com.quartercode.disconnected.world.comp.file.ParentFile;
 import com.quartercode.disconnected.world.comp.session.Shell;
 import com.quartercode.disconnected.world.comp.session.ShellMessage;
 import com.quartercode.disconnected.world.comp.session.ShellUserInterface;
@@ -156,9 +157,9 @@ public class ShellWidget extends Widget implements ShellUserInterface {
     }
 
     @Override
-    public void updateCurrentDirectory(File currentDirectory) {
+    public void updateCurrentDirectory(ParentFile<?> currentDirectory) {
 
-        String dir = currentDirectory == null ? "/" : currentDirectory.getGlobalPath(shell.getHost().getHost().getHost());
+        String dir = currentDirectory == null ? "/" : FileUtils.getGlobalPath(shell.getHost().getHost().getHost().getFileSystemManager(), currentDirectory);
         prompt.setText(shell.getHost().getUser().getName() + "@unknown " + dir + " $");
     }
 

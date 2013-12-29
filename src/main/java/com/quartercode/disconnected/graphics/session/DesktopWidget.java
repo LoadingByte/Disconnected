@@ -78,15 +78,15 @@ public class DesktopWidget extends Widget {
                 // TODO: Display launch menu
                 try {
                     // TODO: Check for execution rights
-                    Process sessionProcess = DesktopWidget.this.desktop.getHost().getHost();
+                    Process<?> sessionProcess = DesktopWidget.this.desktop.getHost().getHost();
                     // sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("/system/bin/sysviewer.exe"), null);
                     sessionProcess.createChild(sessionProcess.getHost().getFileSystemManager().getFile("/system/bin/terminal.exe"), null);
                 }
                 catch (WrongSessionTypeException e) {
-                    // Wont ever happen
+                    // Won't ever happen
                 }
                 catch (ArgumentException e) {
-                    // Wont ever happen
+                    // Won't ever happen
                 }
             }
         });
@@ -152,7 +152,7 @@ public class DesktopWidget extends Widget {
 
     /**
      * Removes a window from the desktop.
-     * The window wont be just minimized, it will be removed until it gets added again.
+     * The window won't be just minimized, it will be removed until it gets added again.
      * 
      * @param window The window to remove from the desktop.
      */

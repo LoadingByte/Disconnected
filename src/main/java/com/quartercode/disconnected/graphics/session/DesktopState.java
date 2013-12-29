@@ -20,15 +20,18 @@ package com.quartercode.disconnected.graphics.session;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import com.quartercode.disconnected.graphics.component.GraphicsState;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.sim.Simulation;
+import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.world.comp.program.ArgumentException;
 import com.quartercode.disconnected.world.comp.program.Process;
-import com.quartercode.disconnected.world.comp.program.WrongSessionTypeException;
 import com.quartercode.disconnected.world.comp.session.DesktopSessionProgram.DesktopSession;
-import com.quartercode.disconnected.world.general.RootObject;
+import com.quartercode.disconnected.world.member.Member;
+import com.quartercode.disconnected.world.member.ai.PlayerController;
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.Widget;
 
@@ -39,9 +42,11 @@ import de.matthiasmann.twl.Widget;
  */
 public class DesktopState extends GraphicsState {
 
-    private final Simulation simulation;
+    private static final Logger LOGGER = Logger.getLogger(DesktopState.class.getName());
 
-    private Widget           widget;
+    private final Simulation    simulation;
+
+    private Widget              widget;
 
     /**
      * Creates a new desktop state and sets it up.
@@ -77,18 +82,28 @@ public class DesktopState extends GraphicsState {
         try {
             // TODO: Boot the computer & listen for new session (shell or desktop).
             // Open a new desktop session (temp)
-            OperatingSystem os = simulation.getWorld().getRoot().get(RootObject.MEMBERS).getLocalPlayer().getComputer().get(Computer.OS).get();
-            Map<String, Object> arguments = new HashMap<String, Object>();
-            arguments.put("user", os.getUserManager().getUsers().get(0).getName());
-            Process process = os.getProcessManager().getRootProcess().createChild(os.getFileSystemManager().getFile("/system/bin/desktops.exe"), arguments);
-            widget = ((DesktopSession) process.getExecutor()).createWidget();
-            add(widget);
+            Member localPlayer = null;
+            for (Member member : simulation.getWorld().get(World.GET_MEMBERS).invoke()) {
+                if (member.getAiController() instanceof PlayerController && ((PlayerController) member.getAiController()).isLocal()) {
+                    localPlayer = member;
+                    break;
+                }
+            }
+            if (localPlayer != null) {
+                OperatingSystem os = localPlayer.getComputer().get(Computer.GET_OS).invoke();
+                Map<String, Object> arguments = new HashMap<String, Object>();
+                arguments.put("user", os.getUserManager().getUsers().get(0).getName());
+                Process<?> process = os.getProcessManager().getRootProcess().get(Process.CREATE_CHILD).invoke();
+                process.setLocked(false);
+                process.get(Process.SET_SOURCE).invoke(os.getFileSystemManager().getFile("/system/bin/desktops.exe"));
+                process.get(Process.LAUNCH).invoke(arguments);
+                process.setLocked(true);
+                widget = ((DesktopSession) process.get(Process.GET_EXECUTOR).invoke()).createWidget();
+                add(widget);
+            }
         }
-        catch (WrongSessionTypeException e) {
-            // Wont ever happen
-        }
-        catch (ArgumentException e) {
-            // Wont ever happen
+        catch (FunctionExecutionException e) {
+            LOGGER.log(Level.SEVERE, "Unexpected error during desktop graphic state initialization", e);
         }
     }
 
