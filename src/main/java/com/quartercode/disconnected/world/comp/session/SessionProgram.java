@@ -18,15 +18,32 @@
 
 package com.quartercode.disconnected.world.comp.session;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlIDREF;
-import com.quartercode.disconnected.util.InfoString;
-import com.quartercode.disconnected.world.comp.Version;
-import com.quartercode.disconnected.world.comp.Vulnerability;
+import java.util.ResourceBundle;
+import java.util.Set;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.Delay;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
+import com.quartercode.disconnected.mocl.extra.Limit;
+import com.quartercode.disconnected.mocl.extra.Prioritized;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
+import com.quartercode.disconnected.mocl.extra.def.ReferenceProperty;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.util.ResourceBundles;
+import com.quartercode.disconnected.world.comp.file.ContentFile;
+import com.quartercode.disconnected.world.comp.file.File;
+import com.quartercode.disconnected.world.comp.file.FileSystem;
 import com.quartercode.disconnected.world.comp.os.User;
-import com.quartercode.disconnected.world.comp.program.ArgumentException;
 import com.quartercode.disconnected.world.comp.program.ArgumentException.WrongArgumentTypeException;
+import com.quartercode.disconnected.world.comp.program.ChildProcess;
 import com.quartercode.disconnected.world.comp.program.Parameter;
 import com.quartercode.disconnected.world.comp.program.Parameter.ArgumentType;
 import com.quartercode.disconnected.world.comp.program.Process;
@@ -34,144 +51,146 @@ import com.quartercode.disconnected.world.comp.program.Program;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 
 /**
- * This class represents program which opens a session.
+ * This class represents a program which opens a session.
  * For opening an actual session, you just have to create a process out of this with the argument "user".
- * 
- * @see Program
- * @see Session
  */
-public abstract class SessionProgram extends Program {
+public abstract class SessionProgram extends ProgramExecutor {
+
+    // ----- Properties -----
 
     /**
-     * Creates a new empty session program.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * The {@link User} the session is running under.
+     * Every {@link ChildProcess} of the session can use the rights provided by the session.
      */
-    protected SessionProgram() {
+    protected static final FeatureDefinition<ReferenceProperty<User>> USER;
 
-    }
+    static {
 
-    /**
-     * Creates a new session program and sets the name, the version and the vulnerabilities.
-     * 
-     * @param name The name the session program has.
-     * @param version The current version the session program has.
-     * @param vulnerabilities The vulnerabilities the session program has.
-     */
-    protected SessionProgram(String name, Version version, List<Vulnerability> vulnerabilities) {
+        USER = new AbstractFeatureDefinition<ReferenceProperty<User>>("user") {
 
-        super(name, version, vulnerabilities);
-    }
+            @Override
+            public ReferenceProperty<User> create(FeatureHolder holder) {
 
-    @Override
-    protected void addParameters() {
-
-        addParameter(Parameter.createArgument("user", "u", ArgumentType.STRING, false, true));
-    }
-
-    @Override
-    protected ProgramExecutor createExecutorInstance(Process host, Map<String, Object> arguments) throws ArgumentException {
-
-        String username = (String) arguments.get("user");
-        User user = null;
-        for (User testUser : host.getHost().getUserManager().getUsers()) {
-            if (testUser.getName().equals(username)) {
-                user = testUser;
+                return new ReferenceProperty<User>(getName(), holder);
             }
-        }
 
-        if (user == null) {
-            throw new WrongArgumentTypeException(getParameter("user"), arguments.get("user").toString());
-        } else {
-            return openSession(host, user);
-        }
+        };
+
     }
 
-    /**
-     * Creates and returns a new session instance of the implementing session program.
-     * 
-     * @param host The host process of the session process.
-     * @param user The user the new session will run under.
-     * @return The new open session instance.
-     */
-    protected abstract Session openSession(Process host, User user);
+    // ----- Properties End -----
+
+    // ----- Functions -----
 
     /**
-     * A session is an instance of a session program.
-     * Sessions are used for letting users interact with a system.
-     * Such a session is simply a process, every child of this process can use the rights provided by the parent session.
-     * 
-     * @see SessionProgram
+     * Returns the {@link User} the session is running under.
+     * Every {@link ChildProcess} of the session can use the rights provided by the session.
      */
-    public static abstract class Session extends ProgramExecutor implements InfoString {
+    public static final FunctionDefinition<User>                      GET_USER;
 
-        @XmlIDREF
-        private User user;
+    static {
 
-        /**
-         * Creates a new empty session.
-         * This is only recommended for direct field access (e.g. for serialization).
-         */
-        protected Session() {
+        GET_USER = FunctionDefinitionFactory.create("getUser", SessionProgram.class, PropertyAccessorFactory.createGet(USER));
 
-        }
+        GET_PARAMETERS.addExecutor(SessionProgram.class, "sessionProgramDefault", new FunctionExecutor<List<Parameter>>() {
 
-        /**
-         * Creates a new session instance and sets the parent process and the user the session is running under.
-         * 
-         * @param host The parent process of the session instance.
-         * @param user The user the session is running under.
-         */
-        protected Session(Process host, User user) {
+            @Override
+            public List<Parameter> invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
-            super(host);
-            this.user = user;
-        }
+                List<Parameter> parameters = new ArrayList<Parameter>();
+                parameters.add(Parameter.createArgument("user", "u", ArgumentType.STRING, false, true));
+                return parameters;
+            }
 
-        /**
-         * Returns the user the session is running under.
-         * Every child process of this session can use the rights provided by this session.
-         * 
-         * @return The user the session is running under.
-         */
-        public User getUser() {
+        });
 
-            return user;
-        }
+        GET_RESOURCE_BUNDLE.addExecutor(SessionProgram.class, "default", new FunctionExecutor<ResourceBundle>() {
 
-        /**
-         * Returns true if this session instance is serializable, false if not.
-         * Sessions which are not serializable must be closed before the simulation can be serialized.
-         * 
-         * @return True if this session instance is serializable.
-         */
-        public abstract boolean isSerializable();
+            @Override
+            public ResourceBundle invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
-        /**
-         * Returns true if the given executor type can be executed in this session.
-         * 
-         * @param executor The executor type to check.
-         * @return True if the given executor type can be executed in this session.
-         */
-        public abstract boolean accept(Class<? extends ProgramExecutor> executor);
+                return ResourceBundles.KERNEL;
+            }
+        });
 
-        /**
-         * Closes the session.
-         * You need to close sessions after usage, so the operating system can free the resources.
-         * Sessions which are not serializable must also be closed before the simulation can be serialized.
-         */
-        protected abstract void close();
+        UPDATE.addExecutor(SessionProgram.class, "sessionProgramParseArgsDefault", new FunctionExecutor<Void>() {
 
-        @Override
-        public final void update() {
+            @Override
+            @SuppressWarnings ("unchecked")
+            @Limit (1)
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
-            // Do nothing
-        }
+                Map<String, Object> programArguments = (Map<String, Object>) arguments[0];
 
-        @Override
-        public String toInfoString() {
+                String username = (String) programArguments.get("user");
+                User user = null;
+                for (User testUser : ((SessionProgram) holder).getParent().get(Process.GET_ROOT).invoke().getUserManager().getUsers()) {
+                    if (testUser.getName().equals(username)) {
+                        user = testUser;
+                        break;
+                    }
+                }
 
-            return user.getName() + "@" + getHost().getHost().getId();
-        }
+                if (user == null) {
+                    throw new StopExecutionException(new WrongArgumentTypeException(holder.get(GET_PARAMETER_BY_NAME).invoke("user"), programArguments.get("user").toString()));
+                } else {
+                    holder.get(USER).set(user);
+                }
+
+                return null;
+            }
+
+        });
+        UPDATE.addExecutor(SessionProgram.class, "manageDeamons", new FunctionExecutor<Void>() {
+
+            @Override
+            @Delay (delay = 10)
+            @Prioritized (Prioritized.BEFORE_CHECK)
+            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+
+                // Gather classes of child processes
+                Set<ContentFile> childSources = new HashSet<ContentFile>();
+                for (Process<?> child : ((ProgramExecutor) holder).getParent().get(Process.GET_CHILDREN).invoke()) {
+                    childSources.add(child.get(Process.GET_SOURCE).invoke());
+                }
+
+                // Accesss deamons configuration on current FileSystem
+                FileSystem fileSystem = ((SessionProgram) holder).getParent().get(Process.GET_SOURCE).invoke().get(File.GET_FILE_SYSTEM).invoke();
+                ContentFile deamonsConfiguration = (ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke("etc/deamons.cfg");
+                Set<ContentFile> deamons = new HashSet<ContentFile>();
+                for (String line : String.valueOf(deamonsConfiguration.get(ContentFile.GET_CONTENT).invoke()).split("\n")) {
+                    if (!line.isEmpty()) {
+                        File<?> lineFile = fileSystem.get(FileSystem.GET_FILE).invoke(line);
+                        if (lineFile != null && ((ContentFile) lineFile).get(ContentFile.GET_CONTENT) instanceof Program) {
+                            deamons.add((ContentFile) lineFile);
+                        }
+                    }
+                }
+
+                for (ContentFile deamon : deamons) {
+                    if (!childSources.contains(deamon)) {
+                        ChildProcess child = ((SessionProgram) holder).getParent().get(Process.CREATE_CHILD).invoke();
+                        child.setLocked(false);
+                        child.get(Process.SET_SOURCE).invoke(deamon);
+                        child.get(Process.LAUNCH).invoke(new HashMap<String, Object>());
+                        child.setLocked(true);
+                        // TODO: Launch
+                    }
+                }
+
+                return null;
+            }
+
+        });
+
+    }
+
+    // ----- Functions End -----
+
+    /**
+     * Creates a new session program.
+     */
+    public SessionProgram() {
 
     }
 
