@@ -20,7 +20,6 @@ package com.quartercode.disconnected.sim;
 
 import com.quartercode.disconnected.sim.run.TickSimulator;
 import com.quartercode.disconnected.sim.run.Ticker;
-import com.quartercode.disconnected.util.InfoString;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.World;
 
@@ -31,23 +30,15 @@ import com.quartercode.disconnected.world.World;
  * @see World
  * @see RandomPool
  */
-public class Simulation implements InfoString {
+public class Simulation {
 
     /**
      * The default size a random pool which is used for a simulation should have.
      */
-    public static final int RANDOM_POOL_SIZE = 1000;
+    public static final int  RANDOM_POOL_SIZE = 1000;
 
-    private World           world;
-    private RandomPool      random;
-
-    /**
-     * Creates a new empty simulation.
-     * This is only recommended for direct field access (e.g. for serialization).
-     */
-    protected Simulation() {
-
-    }
+    private World            world;
+    private final RandomPool random;
 
     /**
      * Creates a new empty simulation using the given {@link RandomPool}.
@@ -130,15 +121,9 @@ public class Simulation implements InfoString {
     }
 
     @Override
-    public String toInfoString() {
-
-        return world.toInfoString() + ", random: " + random.toInfoString();
-    }
-
-    @Override
     public String toString() {
 
-        return getClass().getName() + " [" + toInfoString() + "]";
+        return getClass().getName() + " [random=" + random + "]";
     }
 
 }
