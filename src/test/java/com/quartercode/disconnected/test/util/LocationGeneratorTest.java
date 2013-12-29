@@ -23,7 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import com.quartercode.disconnected.util.LocationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
-import com.quartercode.disconnected.world.general.Location;
+import com.quartercode.disconnected.world.Location;
 
 public class LocationGeneratorTest {
 
