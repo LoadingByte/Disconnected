@@ -20,24 +20,27 @@ package com.quartercode.disconnected.sim.run.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.util.LocationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
+import com.quartercode.disconnected.world.Location;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.ByteUnit;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.Version;
-import com.quartercode.disconnected.world.comp.file.File.FileType;
-import com.quartercode.disconnected.world.comp.file.FileContent;
+import com.quartercode.disconnected.world.comp.file.ContentFile;
+import com.quartercode.disconnected.world.comp.file.Directory;
+import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileRights;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
-import com.quartercode.disconnected.world.comp.file.OutOfSpaceException;
-import com.quartercode.disconnected.world.comp.file.StringContent;
 import com.quartercode.disconnected.world.comp.hardware.CPU;
 import com.quartercode.disconnected.world.comp.hardware.HardDrive;
 import com.quartercode.disconnected.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.world.comp.hardware.Mainboard;
-import com.quartercode.disconnected.world.comp.hardware.Mainboard.MainboradSlot;
+import com.quartercode.disconnected.world.comp.hardware.Mainboard.MainboardSlot;
 import com.quartercode.disconnected.world.comp.hardware.Mainboard.NeedsMainboardSlot;
 import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.world.comp.hardware.RAM;
@@ -48,6 +51,8 @@ import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.os.User;
 import com.quartercode.disconnected.world.comp.os.UserManager;
 import com.quartercode.disconnected.world.comp.program.KernelProgram;
+import com.quartercode.disconnected.world.comp.program.Program;
+import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.comp.program.desktop.SystemViewerProgram;
 import com.quartercode.disconnected.world.comp.program.desktop.TerminalProgram;
 import com.quartercode.disconnected.world.comp.program.shell.ChangeDirectoryProgram;
@@ -58,8 +63,6 @@ import com.quartercode.disconnected.world.comp.program.shell.ListFilesProgram;
 import com.quartercode.disconnected.world.comp.program.shell.MakeFileProgram;
 import com.quartercode.disconnected.world.comp.session.DesktopSessionProgram;
 import com.quartercode.disconnected.world.comp.session.ShellSessionProgram;
-import com.quartercode.disconnected.world.general.Location;
-import com.quartercode.disconnected.world.general.RootObject;
 import com.quartercode.disconnected.world.member.Member;
 import com.quartercode.disconnected.world.member.MemberGroup;
 import com.quartercode.disconnected.world.member.Reputation;
@@ -72,6 +75,8 @@ import com.quartercode.disconnected.world.member.ai.UserController;
  * The utility can also generate some parts without creating a whole {@link World}.
  */
 public class SimulationGenerator {
+
+    private static final Logger LOGGER = Logger.getLogger(SimulationGenerator.class.getName());
 
     /**
      * Generates a new {@link Simulation} with the given settings.
@@ -101,38 +106,45 @@ public class SimulationGenerator {
      */
     public static World generateWorld(int computers, int groups, Simulation simulation, RandomPool random) {
 
-        World world = new World(simulation);
+        try {
+            World world = new World(simulation);
 
-        // Assemble basic objects
-        for (Computer computer : generateComputers(world, computers, random)) {
-            world.getRoot().get(RootObject.COMPUTERS).add(computer);
-        }
-        for (MemberGroup memberGroup : generateMemberGroups(world, groups, random)) {
-            world.getRoot().get(RootObject.GROUPS).add(memberGroup);
-        }
-        for (Member member : generateMembers(world.getRoot().get(RootObject.COMPUTERS), world.getRoot().get(RootObject.GROUPS), random)) {
-            world.getRoot().get(RootObject.MEMBERS).add(member);
-        }
+            // Assemble basic objects
+            for (Computer computer : generateComputers(world, computers, random)) {
+                world.get(World.ADD_COMPUTERS).invoke(computer);
+            }
+            for (MemberGroup memberGroup : generateMemberGroups(world, groups, random)) {
+                world.get(World.ADD_GROUPS).invoke(memberGroup);
+            }
+            for (Member member : generateMembers(world.get(World.GET_COMPUTERS).invoke(), world.get(World.GET_GROUPS).invoke(), random)) {
+                world.get(World.ADD_MEMBERS).invoke(member);
+            }
 
-        // Add local player
-        Member localPlayer = new Member("player");
-        localPlayer.setComputer(generateComputers(world, 1, world.getRoot().get(RootObject.COMPUTERS), random).get(0));
-        world.getRoot().get(RootObject.COMPUTERS).add(localPlayer.getComputer());
-        localPlayer.setAiController(new PlayerController(localPlayer, true));
-        world.getRoot().get(RootObject.MEMBERS).add(localPlayer);
+            // Add local player
+            Member localPlayer = new Member("player");
+            localPlayer.setComputer(generateComputers(world, 1, world.get(World.GET_COMPUTERS).invoke(), random).get(0));
+            world.get(World.ADD_COMPUTERS).invoke(localPlayer.getComputer());
+            localPlayer.setAiController(new PlayerController(localPlayer, true));
+            world.get(World.ADD_MEMBERS).invoke(localPlayer);
 
-        // Generate reputations
-        for (MemberGroup group : world.getRoot().get(RootObject.GROUPS)) {
-            for (Member member : world.getRoot().get(RootObject.MEMBERS)) {
-                if (group.getMembers().contains(member)) {
-                    group.getReputation(member).addValue(random.nextInt(10));
-                } else {
-                    group.getReputation(member).subtractValue(random.nextInt(12));
+            // Generate reputations
+            for (MemberGroup group : world.get(World.GET_GROUPS).invoke()) {
+                for (Member member : world.get(World.GET_MEMBERS).invoke()) {
+                    if (group.getMembers().contains(member)) {
+                        group.getReputation(member).addValue(random.nextInt(10));
+                    } else {
+                        group.getReputation(member).subtractValue(random.nextInt(12));
+                    }
                 }
             }
+
+            return world;
+        }
+        catch (FunctionExecutionException e) {
+            LOGGER.log(Level.SEVERE, "Unknown error while generating simulation", e.getCause());
+            return null;
         }
 
-        return world;
     }
 
     /**
@@ -153,114 +165,188 @@ public class SimulationGenerator {
      * 
      * @param world The {@link World} the new {@link Computer}s will be in.
      * @param amount The amount of {@link Computer}s the generator should generate.
-     * @param ignore There wont be any {@link Computer}s with one of those {@link Location}s.
+     * @param ignore There won't be any {@link Computer}s with one of those {@link Location}s.
      * @param random The {@link RandomPool} which is used for generating the {@link Computer}s.
      * @return The generated list of {@link Computer}s.
      */
     public static List<Computer> generateComputers(World world, int amount, List<Computer> ignore, RandomPool random) {
 
-        List<Computer> computers = new ArrayList<Computer>();
+        try {
+            List<Computer> computers = new ArrayList<Computer>();
 
-        List<Location> ignoreLocations = new ArrayList<Location>();
-        if (ignore != null) {
-            for (Computer computer : ignore) {
-                ignoreLocations.add(computer.get(Computer.LOCATION).get());
+            List<Location> ignoreLocations = new ArrayList<Location>();
+            if (ignore != null) {
+                for (Computer computer : ignore) {
+                    ignoreLocations.add(computer.get(Computer.GET_LOCATION).invoke());
+                }
             }
-        }
 
-        for (Location location : LocationGenerator.generateLocations(amount, ignoreLocations, random)) {
-            Computer computer = new Computer(world.getRoot());
-            computer.get(Computer.LOCATION).set(location);
-            computers.add(computer);
+            for (Location location : LocationGenerator.generateLocations(amount, ignoreLocations, random)) {
+                Computer computer = new Computer();
+                computer.get(Computer.SET_LOCATION).invoke(location);
+                computers.add(computer);
 
-            List<MainboradSlot> mainboradSlots = new ArrayList<MainboradSlot>();
-            mainboradSlots.add(new MainboradSlot(CPU.class));
-            mainboradSlots.add(new MainboradSlot(RAM.class));
-            mainboradSlots.add(new MainboradSlot(HardDrive.class));
-            mainboradSlots.add(new MainboradSlot(HardDrive.class));
-            mainboradSlots.add(new MainboradSlot(NetworkInterface.class));
-            computer.get(Computer.HARDWARE).add(new Mainboard(computer, "MB XYZ 2000 Pro", new Version(1, 2, 5), null, mainboradSlots));
+                Mainboard mainboard = new Mainboard();
+                mainboard.setLocked(false);
+                mainboard.get(Hardware.SET_NAME).invoke("MB XYZ 2000 Pro");
+                mainboard.get(Mainboard.ADD_SLOTS).invoke(generateMainboardSlot(CPU.class));
+                mainboard.get(Mainboard.ADD_SLOTS).invoke(generateMainboardSlot(RAM.class));
+                mainboard.get(Mainboard.ADD_SLOTS).invoke(generateMainboardSlot(HardDrive.class));
+                mainboard.get(Mainboard.ADD_SLOTS).invoke(generateMainboardSlot(HardDrive.class));
+                mainboard.get(Mainboard.ADD_SLOTS).invoke(generateMainboardSlot(NetworkInterface.class));
+                mainboard.setLocked(true);
+                computer.get(Computer.ADD_HARDWARE).invoke(mainboard);
 
-            List<Hardware> hardware = new ArrayList<Hardware>();
-            hardware.add(new CPU(computer, "Intel Core i7-4950HQ", new Version(1, 0, 0), null, 8, 2400000000L));
-            hardware.add(new RAM(computer, "EpicRAM 4194304", new Version(1, 0, 5), null, ByteUnit.BYTE.convert(4, ByteUnit.MEGABYTE), 1600000000L));
-            hardware.add(new NetworkInterface(computer, "NI FiberScore Ultimate", new Version(1, 2, 0), null));
+                CPU cpu = new CPU();
+                cpu.setLocked(false);
+                cpu.get(Hardware.SET_NAME).invoke("Intel Core i7-4950HQ");
+                cpu.get(CPU.SET_THREADS).invoke(8);
+                cpu.get(CPU.SET_FREQUENCY).invoke(2400000000L);
+                cpu.setLocked(true);
+                computer.get(Computer.ADD_HARDWARE).invoke(cpu);
 
-            HardDrive systemMedium = new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
-            hardware.add(systemMedium);
-            HardDrive userMedium = new HardDrive(computer, "TheHardDrive 1TB", new Version(1, 2, 0), null, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
-            hardware.add(userMedium);
+                RAM ram = new RAM();
+                ram.setLocked(false);
+                ram.get(Hardware.SET_NAME).invoke("EpicRAM 4194304");
+                ram.get(RAM.SET_SIZE).invoke(ByteUnit.BYTE.convert(4, ByteUnit.MEGABYTE));
+                ram.get(RAM.SET_FREQUENCY).invoke(1600000000L);
+                ram.setLocked(true);
+                computer.get(Computer.ADD_HARDWARE).invoke(ram);
 
-            for (MainboradSlot slot : computer.get(Computer.HARDWARE).get(Mainboard.class).get(0).getSlots()) {
-                Hardware useHardware = null;
-                for (Hardware testHardware : hardware) {
-                    if (testHardware.getClass().isAnnotationPresent(NeedsMainboardSlot.class) && slot.accept(testHardware)) {
-                        useHardware = testHardware;
-                        break;
+                NetworkInterface networkInterface = new NetworkInterface();
+                networkInterface.setLocked(false);
+                networkInterface.get(Hardware.SET_NAME).invoke("NI FiberScore Ultimate");
+                networkInterface.setLocked(true);
+                computer.get(Computer.ADD_HARDWARE).invoke(networkInterface);
+
+                HardDrive systemMedium = new HardDrive();
+                systemMedium.setLocked(false);
+                systemMedium.get(Hardware.SET_NAME).invoke("TheHardDrive 1TB");
+                systemMedium.get(HardDrive.GET_FILE_SYSTEM).invoke().get(FileSystem.SET_SIZE).invoke(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
+                systemMedium.setLocked(true);
+                computer.get(Computer.ADD_HARDWARE).invoke(systemMedium);
+
+                HardDrive userMedium = new HardDrive();
+                userMedium.setLocked(false);
+                userMedium.get(Hardware.SET_NAME).invoke("TheHardDrive 1TB");
+                userMedium.get(HardDrive.GET_FILE_SYSTEM).invoke().get(FileSystem.SET_SIZE).invoke(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
+                userMedium.setLocked(true);
+                computer.get(Computer.ADD_HARDWARE).invoke(userMedium);
+
+                for (MainboardSlot slot : computer.get(Computer.GET_HARDWARE_BY_TYPE).invoke(Mainboard.class).get(0).get(Mainboard.GET_SLOTS).invoke()) {
+                    Hardware useHardware = null;
+                    for (Hardware hardware : computer.get(Computer.GET_HARDWARE).invoke()) {
+                        if (!hardware.equals(mainboard)) {
+                            if (hardware.getClass().isAnnotationPresent(NeedsMainboardSlot.class) && slot.get(MainboardSlot.GET_TYPE).invoke().isAssignableFrom(hardware.getClass())) {
+                                useHardware = hardware;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (useHardware != null) {
+                        slot.get(MainboardSlot.SET_CONTENT).invoke(useHardware);
                     }
                 }
 
-                if (useHardware != null) {
-                    computer.get(Computer.HARDWARE).add(useHardware);
-                    slot.setContent(useHardware);
-                    hardware.remove(useHardware);
-                }
+                OperatingSystem operatingSystem = new OperatingSystem();
+                operatingSystem.get(OperatingSystem.SET_NAME).invoke("Franes");
+                operatingSystem.get(OperatingSystem.SET_VERSION).invoke(createVersion(3, 7, 65));
+                computer.get(Computer.SET_OS).invoke(operatingSystem);
+
+                operatingSystem.getUserManager().addUser(new User(operatingSystem, User.SUPERUSER_NAME));
+                Group genpop = new Group(operatingSystem, "genpop");
+                operatingSystem.getUserManager().addGroup(genpop);
+                User genuser = new User(operatingSystem, "genuser");
+                genuser.addToGroup(genpop, true);
+                operatingSystem.getUserManager().addUser(genuser);
+
+                operatingSystem.getFileSystemManager().setMountpoint(systemMedium.get(HardDrive.GET_FILE_SYSTEM).invoke(), "system");
+                addSystemFiles(systemMedium.get(HardDrive.GET_FILE_SYSTEM).invoke(), operatingSystem.getUserManager());
+                operatingSystem.getFileSystemManager().setMountpoint(userMedium.get(HardDrive.GET_FILE_SYSTEM).invoke(), "user");
+                addUserFiles(userMedium.get(HardDrive.GET_FILE_SYSTEM).invoke(), operatingSystem.getUserManager());
             }
 
-            computer.get(Computer.OS).set(new OperatingSystem(computer, "Frames", new Version(3, 7, 65), null));
-            computer.get(Computer.OS).get().getUserManager().addUser(new User(computer.get(Computer.OS).get(), User.SUPERUSER_NAME));
-
-            Group genpop = new Group(computer.get(Computer.OS).get(), "genpop");
-            computer.get(Computer.OS).get().getUserManager().addGroup(genpop);
-            User genuser = new User(computer.get(Computer.OS).get(), "genuser");
-            genuser.addToGroup(genpop, true);
-            computer.get(Computer.OS).get().getUserManager().addUser(genuser);
-
-            try {
-                computer.get(Computer.OS).get().getFileSystemManager().setMountpoint(systemMedium.getFileSystem(), "system");
-                addSystemFiles(systemMedium.getFileSystem(), computer.get(Computer.OS).get().getUserManager());
-                computer.get(Computer.OS).get().getFileSystemManager().setMountpoint(userMedium.getFileSystem(), "user");
-                addUserFiles(userMedium.getFileSystem(), computer.get(Computer.OS).get().getUserManager());
-            }
-            catch (OutOfSpaceException e) {
-                // Really shouldn't happen
-            }
+            return computers;
         }
+        catch (FunctionExecutionException e) {
+            LOGGER.log(Level.SEVERE, "Unknown error while generating computer", e.getCause());
+            return null;
+        }
+    }
 
-        return computers;
+    private static Version createVersion(int major, int minor, int revision) throws FunctionExecutionException {
+
+        Version version = new Version();
+        version.setLocked(false);
+        version.get(Version.SET_MAJOR).invoke(major);
+        version.get(Version.SET_MINOR).invoke(major);
+        version.get(Version.SET_REVISION).invoke(revision);
+        version.setLocked(true);
+        return version;
+    }
+
+    private static MainboardSlot generateMainboardSlot(Class<? extends Hardware> type) throws FunctionExecutionException {
+
+        MainboardSlot slot = new MainboardSlot();
+        slot.setLocked(false);
+        slot.get(MainboardSlot.SET_TYPE).invoke(type);
+        slot.setLocked(true);
+        return slot;
     }
 
     // Temporary method for generating the kernel and some system programs
-    private static void addSystemFiles(FileSystem fileSystem, UserManager userManager) throws OutOfSpaceException {
+    private static void addSystemFiles(FileSystem fileSystem, UserManager userManager) throws FunctionExecutionException {
 
         User superuser = userManager.getSuperuser();
 
         // Generate kernel file (temp)
-        addFile(fileSystem, "boot/kernel", superuser, new FileRights("r--xr--xr--x"), new KernelProgram(new Version("1.0.0"), null));
+        addContentFile(fileSystem, "boot/kernel", superuser, "r--xr--xr--x", createProgram(KernelProgram.class, createVersion(1, 0, 0)));
 
         // Generate session programs
-        addFile(fileSystem, "bin/lash.exe", superuser, new FileRights("r--xr--xr--x"), new ShellSessionProgram(new Version("1.0.0"), null));
-        addFile(fileSystem, "bin/desktops.exe", superuser, new FileRights("r--xr--xr--x"), new DesktopSessionProgram(new Version("1.0.0"), null));
+        addContentFile(fileSystem, "bin/lash.exe", superuser, "r--xr--xr--x", createProgram(ShellSessionProgram.class, createVersion(1, 0, 0)));
+        addContentFile(fileSystem, "bin/desktops.exe", superuser, "r--xr--xr--x", createProgram(DesktopSessionProgram.class, createVersion(1, 0, 0)));
 
         // Generate system programs
-        addFile(fileSystem, "bin/cd.exe", superuser, new FileRights("r--xr--xr--x"), new ChangeDirectoryProgram(new Version("1.0.0"), null));
-        addFile(fileSystem, "bin/ls.exe", superuser, new FileRights("r--xr--xr--x"), new ListFilesProgram(new Version("1.0.0"), null));
-        addFile(fileSystem, "bin/rights.exe", superuser, new FileRights("r--xr--xr--x"), new FileRightsProgram(new Version("1.0.0"), null));
-        addFile(fileSystem, "bin/fc.exe", superuser, new FileRights("r--xr--xr--x"), new FileContentProgram(new Version("1.0.0"), null));
-        addFile(fileSystem, "bin/fmk.exe", superuser, new FileRights("r--xr--xr--x"), new MakeFileProgram(new Version("1.0.0"), null));
-        addFile(fileSystem, "bin/fdel.exe", superuser, new FileRights("r--xr--xr--x"), new DeleteFileProgram(new Version("1.0.0"), null));
+        addContentFile(fileSystem, "bin/cd.exe", superuser, "r--xr--xr--x", createProgram(ChangeDirectoryProgram.class, createVersion(1, 0, 0)));
+        addContentFile(fileSystem, "bin/ls.exe", superuser, "r--xr--xr--x", createProgram(ListFilesProgram.class, createVersion(1, 0, 0)));
+        addContentFile(fileSystem, "bin/rights.exe", superuser, "r--xr--xr--x", createProgram(FileRightsProgram.class, createVersion(1, 0, 0)));
+        addContentFile(fileSystem, "bin/fc.exe", superuser, "r--xr--xr--x", createProgram(FileContentProgram.class, createVersion(1, 0, 0)));
+        addContentFile(fileSystem, "bin/fmk.exe", superuser, "r--xr--xr--x", createProgram(MakeFileProgram.class, createVersion(1, 0, 0)));
+        addContentFile(fileSystem, "bin/fdel.exe", superuser, "r--xr--xr--x", createProgram(DeleteFileProgram.class, createVersion(1, 0, 0)));
 
-        addFile(fileSystem, "bin/terminal.exe", superuser, new FileRights("r--xr--xr--x"), new TerminalProgram(new Version("1.0.0"), null));
-        addFile(fileSystem, "bin/sysviewer.exe", superuser, new FileRights("r--xr--xr--x"), new SystemViewerProgram(new Version("1.0.0"), null));
+        addContentFile(fileSystem, "bin/terminal.exe", superuser, "r--xr--xr--x", createProgram(TerminalProgram.class, createVersion(1, 0, 0)));
+        addContentFile(fileSystem, "bin/sysviewer.exe", superuser, "r--xr--xr--x", createProgram(SystemViewerProgram.class, createVersion(1, 0, 0)));
 
         // Generate environment
         Environment environment = new Environment();
         environment.addVariable(new EnvironmentVariable("PATH", "/system/bin:/user/bin"));
-        addFile(fileSystem, "config/environment.cfg", superuser, new FileRights("rw--r---r---"), new StringContent(environment.toString()));
+        addContentFile(fileSystem, "etc/environment.cfg", superuser, "rw--r---r---", environment.toString());
+
+        // Generate kernel module configuration
+        StringBuilder kernelModules = new StringBuilder();
+        kernelModules.append("bin/filesysd.exe").append("\n");
+        addContentFile(fileSystem, "etc/kernelmodules.cfg", superuser, "rw--r---r---", kernelModules.toString());
+    }
+
+    private static Program createProgram(Class<? extends ProgramExecutor> executorClass, Version version) throws FunctionExecutionException {
+
+        try {
+            Program program = new Program();
+            program.setLocked(false);
+            program.get(Program.SET_VERSION).invoke(version);
+            program.get(Program.SET_EXECUTOR_CLASS).invoke(executorClass);
+            return program;
+        }
+        catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Unexpected exception during the initialization of a new program object", e);
+        }
+
+        return null;
     }
 
     // Temporary method for generating some unnecessary programs and personal files
-    private static void addUserFiles(FileSystem fileSystem, UserManager userManager) throws OutOfSpaceException {
+    private static void addUserFiles(FileSystem fileSystem, UserManager userManager) throws FunctionExecutionException {
 
         User superuser = userManager.getSuperuser();
 
@@ -268,21 +354,31 @@ public class SimulationGenerator {
         // Nothing here yet
 
         // Generate home directories
-        fileSystem.addFile("homes", FileType.DIRECTORY, superuser);
-        fileSystem.getFile("homes").setRights(new FileRights("r---r---r---"));
+        addDirectory(fileSystem, "homes", superuser, "r---r---r---");
         for (User user : userManager.getUsers()) {
             if (!user.equals(userManager.getSuperuser())) {
-                fileSystem.addFile("homes/" + user.getName(), FileType.DIRECTORY, user);
-                fileSystem.getFile("homes/" + user.getName()).setRights(new FileRights("rwdx--------"));
+                addDirectory(fileSystem, "homes/" + user.getName(), user, "rwdx--------");
             }
         }
     }
 
-    private static void addFile(FileSystem fileSystem, String path, User user, FileRights rights, FileContent content) throws OutOfSpaceException {
+    private static void addDirectory(FileSystem fileSystem, String path, User owner, String rights) throws FunctionExecutionException {
 
-        fileSystem.addFile(path, FileType.FILE, user);
-        fileSystem.getFile(path).setRights(rights);
-        fileSystem.getFile(path).setContent(content);
+        Directory directory = new Directory();
+        directory.get(File.SET_OWNER).invoke(owner);
+        directory.get(File.GET_RIGHTS).invoke().get(FileRights.FROM_STRING).invoke(rights);
+
+        fileSystem.get(FileSystem.ADD_FILE).invoke(directory, path);
+    }
+
+    private static void addContentFile(FileSystem fileSystem, String path, User owner, String rights, Object content) throws FunctionExecutionException {
+
+        ContentFile file = new ContentFile();
+        file.get(File.SET_OWNER).invoke(owner);
+        file.get(File.GET_RIGHTS).invoke().get(FileRights.FROM_STRING).invoke(rights);
+        file.get(ContentFile.SET_CONTENT).invoke(content);
+
+        fileSystem.get(FileSystem.ADD_FILE).invoke(file, path);
     }
 
     /**
