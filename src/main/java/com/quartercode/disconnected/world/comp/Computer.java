@@ -18,14 +18,23 @@
 
 package com.quartercode.disconnected.world.comp;
 
-import com.quartercode.disconnected.world.ListProperty;
-import com.quartercode.disconnected.world.ObjectProperty;
-import com.quartercode.disconnected.world.Property;
-import com.quartercode.disconnected.world.PropertyDefinition;
-import com.quartercode.disconnected.world.WorldObject;
+import java.util.ArrayList;
+import java.util.List;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
+import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.world.Location;
+import com.quartercode.disconnected.world.World;
+import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.world.general.Location;
 
 /**
  * This class stores information about a computer, like the {@link Location} or the {@link Hardware} parts.
@@ -33,77 +42,208 @@ import com.quartercode.disconnected.world.general.Location;
  * @see Location
  * @see Hardware
  */
-public class Computer extends WorldObject {
+public class Computer extends WorldChildFeatureHolder<World> {
 
-    // ----- Property Definitions -----
+    // ----- Properties -----
 
     /**
-     * The {@link Location} where the computer actually is.
+     * The {@link Location} of the computer.
      */
-    public static final PropertyDefinition<ObjectProperty<Location>>        LOCATION;
+    protected static final FeatureDefinition<ObjectProperty<Location>>        LOCATION;
 
     /**
      * The {@link Hardware} parts the computer contains.
      */
-    public static final PropertyDefinition<ListProperty<Hardware>>          HARDWARE;
+    protected static final FeatureDefinition<ObjectProperty<List<Hardware>>>  HARDWARE;
 
     /**
-     * The {@link OperatingSystem} which is running on the computer.
+     * The active {@link OperatingSystem} instance which is currently running the computer.
      */
-    public static final PropertyDefinition<ObjectProperty<OperatingSystem>> OS;
+    protected static final FeatureDefinition<ObjectProperty<OperatingSystem>> OS;
 
     static {
 
-        LOCATION = new PropertyDefinition<ObjectProperty<Location>>("location") {
+        LOCATION = new AbstractFeatureDefinition<ObjectProperty<Location>>("location") {
 
             @Override
-            public ObjectProperty<Location> createProperty(WorldObject parent) {
+            public ObjectProperty<Location> create(FeatureHolder holder) {
 
-                return new ObjectProperty<Location>(getName(), parent);
+                return new ObjectProperty<Location>(getName(), holder);
             }
 
         };
 
-        HARDWARE = new PropertyDefinition<ListProperty<Hardware>>("hardware") {
+        HARDWARE = new AbstractFeatureDefinition<ObjectProperty<List<Hardware>>>("hardware") {
 
             @Override
-            public ListProperty<Hardware> createProperty(WorldObject parent) {
+            public ObjectProperty<List<Hardware>> create(FeatureHolder holder) {
 
-                return new ListProperty<Hardware>(getName(), parent);
+                return new ObjectProperty<List<Hardware>>(getName(), holder, new ArrayList<Hardware>());
             }
 
         };
 
-        OS = new PropertyDefinition<ObjectProperty<OperatingSystem>>("operatingSystem") {
+        OS = new AbstractFeatureDefinition<ObjectProperty<OperatingSystem>>("operatingSystem") {
 
             @Override
-            public ObjectProperty<OperatingSystem> createProperty(WorldObject parent) {
+            public ObjectProperty<OperatingSystem> create(FeatureHolder holder) {
 
-                return new ObjectProperty<OperatingSystem>(getName(), parent);
+                return new ObjectProperty<OperatingSystem>(getName(), holder);
             }
 
         };
 
     }
 
-    // ----- Property Definitions End -----
+    // ----- Properties End -----
+
+    // ----- Functions -----
 
     /**
-     * Creates a new empty computer.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * Returns the {@link Location} of the computer.
      */
-    protected Computer() {
-
-    }
+    public static final FunctionDefinition<Location>                          GET_LOCATION;
 
     /**
-     * Creates a new computer which has the given parent object.
+     * Changes the {@link Location} of the computer.
      * 
-     * @param parent The parent {@link WorldObject} which has a {@link Property} which houses the new computer.
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Location}</td>
+     * <td>location</td>
+     * <td>The new {@link Location}.</td>
+     * </tr>
+     * </table>
      */
-    public Computer(WorldObject parent) {
+    public static final FunctionDefinition<Void>                              SET_LOCATION;
 
-        super(parent);
+    /**
+     * Returns the {@link Hardware} parts the computer contains.
+     */
+    public static final FunctionDefinition<List<Hardware>>                    GET_HARDWARE;
+
+    /**
+     * Returns the {@link Hardware} parts of the computer which have the given type as a superclass.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Class}</td>
+     * <td>type</td>
+     * <td>The type to use for the selection.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<List<Hardware>>                    GET_HARDWARE_BY_TYPE;
+
+    /**
+     * Adds {@link Hardware} parts to the computer.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0...</td>
+     * <td>{@link Hardware}...</td>
+     * <td>hardware</td>
+     * <td>The {@link Hardware} parts to add to the computer.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                              ADD_HARDWARE;
+
+    /**
+     * Removes {@link Hardware} parts from the computer.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0...</td>
+     * <td>{@link Hardware}...</td>
+     * <td>hardware</td>
+     * <td>The {@link Hardware} parts to remove from the computer.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                              REMOVE_HARDWARE;
+
+    /**
+     * Returns the active {@link OperatingSystem} instance which is currently running the computer.
+     */
+    public static final FunctionDefinition<OperatingSystem>                   GET_OS;
+
+    /**
+     * Changes the active {@link OperatingSystem} instance which runs the computer.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link OperatingSystem}</td>
+     * <td>os</td>
+     * <td>The new active {@link OperatingSystem}.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                              SET_OS;
+
+    static {
+
+        GET_LOCATION = FunctionDefinitionFactory.create("getLocation", Computer.class, PropertyAccessorFactory.createGet(LOCATION));
+        SET_LOCATION = FunctionDefinitionFactory.create("setLocation", Computer.class, PropertyAccessorFactory.createSet(LOCATION), Location.class);
+
+        GET_HARDWARE = FunctionDefinitionFactory.create("getHardware", Computer.class, CollectionPropertyAccessorFactory.createGet(HARDWARE));
+        GET_HARDWARE_BY_TYPE = FunctionDefinitionFactory.create("getHardwareByType", Computer.class, CollectionPropertyAccessorFactory.createGet(HARDWARE, new CriteriumMatcher<Hardware>() {
+
+            @Override
+            public boolean matches(Hardware element, Object... arguments) throws StopExecutionException {
+
+                return ((Class<?>) arguments[0]).isAssignableFrom(element.getClass());
+            }
+
+        }), Class.class);
+        ADD_HARDWARE = FunctionDefinitionFactory.create("addHardware", Computer.class, CollectionPropertyAccessorFactory.createAdd(HARDWARE), Hardware[].class);
+        REMOVE_HARDWARE = FunctionDefinitionFactory.create("removeHardware", Computer.class, CollectionPropertyAccessorFactory.createRemove(HARDWARE), Hardware[].class);
+
+        GET_OS = FunctionDefinitionFactory.create("getOs", Computer.class, PropertyAccessorFactory.createGet(OS));
+        SET_OS = FunctionDefinitionFactory.create("setOs", Computer.class, PropertyAccessorFactory.createSet(OS), OperatingSystem.class);
+
+    }
+
+    // ----- Functions End -----
+
+    /**
+     * Creates a new computer.
+     */
+    public Computer() {
+
     }
 
 }
