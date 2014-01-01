@@ -28,6 +28,8 @@ import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.world.comp.os.User;
+import com.quartercode.disconnected.world.comp.os.UserSyscalls;
 import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.session.DesktopSessionProgram.DesktopSession;
 import com.quartercode.disconnected.world.member.Member;
@@ -92,7 +94,7 @@ public class DesktopState extends GraphicsState {
             if (localPlayer != null) {
                 OperatingSystem os = localPlayer.getComputer().get(Computer.GET_OS).invoke();
                 Map<String, Object> arguments = new HashMap<String, Object>();
-                arguments.put("user", os.getUserManager().getUsers().get(0).getName());
+                arguments.put("user", os.get(UserSyscalls.GET_USERS).invoke().iterator().next().get(User.GET_NAME).invoke());
                 Process<?> process = os.getProcessManager().getRootProcess().get(Process.CREATE_CHILD).invoke();
                 process.setLocked(false);
                 process.get(Process.SET_SOURCE).invoke(os.getFileSystemManager().getFile("/system/bin/desktops.exe"));
