@@ -42,7 +42,6 @@ import com.quartercode.disconnected.world.WorldChildFeatureHolder;
  * This class stores information about a mainboard.
  * A mainboard has {@link MainboardSlot}s that house different pieces of {@link Hardware}.
  * 
- * @see ComputerPart
  * @see Hardware
  */
 public class Mainboard extends Hardware {

@@ -33,8 +33,8 @@ import com.quartercode.disconnected.world.comp.SizeUtil;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 
 /**
- * This class represents a file system of a {@link ComputerPart}.
- * The system stores files which can be accessed like regular file objects.
+ * This class represents a file system.
+ * The system stores {@link File}s which can be accessed like regular file objects.
  * A file system can be virtual or physical.
  * 
  * @see File

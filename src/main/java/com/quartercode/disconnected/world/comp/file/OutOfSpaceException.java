@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.world.comp.file;
 
 /**
- * This runtime exception occures if there is not enough space on a file system for storing some new bytes (e.g. from a file).
+ * This runtime exception occurres if there is not enough space on a {@link FileSystem} for storing some new data (e.g. from a {@link File}).
  * 
  * @see FileSystem
  */

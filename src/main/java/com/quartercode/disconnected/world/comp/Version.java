@@ -34,10 +34,8 @@ import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
 
 /**
- * This class represents a simple version of a {@link ComputerPart}.
+ * This class represents a simple version.
  * A version contains a major version, minor version and a patch level.
- * 
- * @see ComputerPart
  */
 public class Version extends DefaultFeatureHolder {
 

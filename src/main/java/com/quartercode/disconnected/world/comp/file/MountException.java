@@ -21,7 +21,7 @@ package com.quartercode.disconnected.world.comp.file;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 
 /**
- * This runtime exception occures if a file system can't be mounted or unmounted.
+ * This exception occurres if a {@link FileSystem} can't be mounted or unmounted.
  * 
  * @see FileSystem
  * @see OperatingSystem
