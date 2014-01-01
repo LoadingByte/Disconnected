@@ -520,6 +520,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
             @Override
             @Prioritized (Prioritized.CHECK)
+            @Lockable
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 Validate.isTrue( ((ContentFile) arguments[0]).get(ContentFile.GET_CONTENT).invoke() instanceof Program, "Source must contain a program");

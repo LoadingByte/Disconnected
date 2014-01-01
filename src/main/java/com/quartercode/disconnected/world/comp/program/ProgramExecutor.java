@@ -30,6 +30,7 @@ import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
+import com.quartercode.disconnected.mocl.extra.Lockable;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
 import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
@@ -253,6 +254,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
             @Override
             @SuppressWarnings ("unchecked")
             @Prioritized (Prioritized.CHECK)
+            @Lockable
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
                 // Create a new hash map with the contents of the old one (it will get modified)
