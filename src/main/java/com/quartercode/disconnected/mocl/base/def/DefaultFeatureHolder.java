@@ -72,8 +72,9 @@ public class DefaultFeatureHolder implements FeatureHolder, LockableClass {
         }
     }
 
-    @Override
+    // If this doesn't succeed we have a really serious programming problem
     @SuppressWarnings ("unchecked")
+    @Override
     public <F extends Feature> F get(FeatureDefinition<F> definition) {
 
         for (Feature feature : features) {

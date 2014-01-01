@@ -69,6 +69,7 @@ public class CollectionPropertyAccessorFactory {
      * The {@link CriteriumMatcher} only lets certain elements through into the return collection.
      * 
      * @param propertyDefinition The {@link FeatureDefinition} of the {@link Collection} {@link Property} to access.
+     *        Content must be of type {@link List}, {@link Set}, {@link SortedSet} or {@link Collection}, no implementations like {@link ArrayList} are allowed!
      * @param matcher The {@link CriteriumMatcher} for checking if certain elements should be returned.
      * @return The created {@link FunctionExecutor}.
      */
@@ -76,8 +77,8 @@ public class CollectionPropertyAccessorFactory {
 
         return new FunctionExecutor<C>() {
 
-            @Override
             @SuppressWarnings ("unchecked")
+            @Override
             public C invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 C originalCollection = holder.get(propertyDefinition).get();
@@ -89,6 +90,7 @@ public class CollectionPropertyAccessorFactory {
                     }
                 }
 
+                // These casts always return the right value IF C is no implementation (e.g. ArrayList instead of just List)
                 if (originalCollection instanceof List) {
                     return (C) Collections.unmodifiableList(new ArrayList<E>(collection));
                 } else if (originalCollection instanceof Set) {
@@ -141,15 +143,17 @@ public class CollectionPropertyAccessorFactory {
 
         return new FunctionExecutor<Void>() {
 
-            @Override
             @SuppressWarnings ("unchecked")
+            @Override
             public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 for (Object element : arguments) {
+                    // Hope that the using FunctionDefinition has the correct parameters
                     boolean changed = holder.get(propertyDefinition).get().add((E) element);
 
                     // Set the parent of the added element the new holder
                     if (changed && element instanceof ChildFeatureHolder) {
+                        // Is always true because of <P extends FeatureHolder> in ChildFeatureHolder
                         ((ChildFeatureHolder<FeatureHolder>) element).setParent(holder);
                     }
                 }
@@ -172,7 +176,6 @@ public class CollectionPropertyAccessorFactory {
         return new FunctionExecutor<Void>() {
 
             @Override
-            @SuppressWarnings ("unchecked")
             public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 for (Object element : arguments) {
@@ -180,7 +183,7 @@ public class CollectionPropertyAccessorFactory {
 
                     // Set the parent of the removed element to null
                     if (changed && element instanceof ChildFeatureHolder) {
-                        ((ChildFeatureHolder<FeatureHolder>) element).setParent(null);
+                        ((ChildFeatureHolder<?>) element).setParent(null);
                     }
                 }
 
@@ -222,14 +225,13 @@ public class CollectionPropertyAccessorFactory {
         return new FunctionExecutor<E>() {
 
             @Override
-            @SuppressWarnings ("unchecked")
             public E invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 E element = holder.get(propertyDefinition).get().poll();
 
                 // Set the parent of the removed (polled) element to null
                 if (element != null && element instanceof ChildFeatureHolder) {
-                    ((ChildFeatureHolder<FeatureHolder>) element).setParent(null);
+                    ((ChildFeatureHolder<?>) element).setParent(null);
                 }
 
                 return element;

@@ -64,19 +64,22 @@ public class PropertyAccessorFactory {
 
         return new FunctionExecutor<Void>() {
 
-            @Override
             @SuppressWarnings ("unchecked")
+            @Override
             public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 // Set the parent of the old object to null
                 if (holder.get(propertyDefinition).get() instanceof ChildFeatureHolder) {
+                    // Is always true because of <P extends FeatureHolder> in ChildFeatureHolder
                     ((ChildFeatureHolder<FeatureHolder>) holder.get(propertyDefinition).get()).setParent(null);
                 }
 
+                // Hope that the using FunctionDefinition has the correct parameters
                 holder.get(propertyDefinition).set((T) arguments[0]);
 
                 // Set the parent of the new object the new holder
                 if (arguments[0] instanceof ChildFeatureHolder) {
+                    // Is always true because of <P extends FeatureHolder> in ChildFeatureHolder
                     ((ChildFeatureHolder<FeatureHolder>) arguments[0]).setParent(holder);
                 }
 
