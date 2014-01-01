@@ -39,8 +39,8 @@ public class RootFile extends ParentFile<FileSystem> {
         GET_NAME.addExecutor(RootFile.class, "overwrite", new FunctionExecutor<String>() {
 
             @Override
-            @Prioritized (Prioritized.OVERWRITE_5)
             public String invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            @Prioritized (Prioritized.LEVEL_5)
 
                 return "root";
             }
@@ -49,8 +49,8 @@ public class RootFile extends ParentFile<FileSystem> {
         SET_NAME.addExecutor(RootFile.class, "overwrite", new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.OVERWRITE_5)
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            @Prioritized (Prioritized.LEVEL_5)
 
                 throw new StopExecutionException("Overwrite: Do nothing");
             }
@@ -60,8 +60,8 @@ public class RootFile extends ParentFile<FileSystem> {
         GET_PATH.addExecutor(RootFile.class, "overwrite", new FunctionExecutor<String>() {
 
             @Override
-            @Prioritized (Prioritized.OVERWRITE_5)
             public String invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            @Prioritized (Prioritized.LEVEL_5)
 
                 return "";
             }
@@ -70,8 +70,8 @@ public class RootFile extends ParentFile<FileSystem> {
         SET_PATH.addExecutor(RootFile.class, "overwrite", new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.OVERWRITE_5)
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            @Prioritized (Prioritized.LEVEL_5)
 
                 throw new StopExecutionException("Overwrite: Do nothing");
             }
@@ -81,8 +81,8 @@ public class RootFile extends ParentFile<FileSystem> {
         REMOVE.addExecutor(RootFile.class, "overwrite", new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.OVERWRITE_5)
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            @Prioritized (Prioritized.LEVEL_5)
 
                 throw new StopExecutionException("Overwrite: Do nothing");
             }

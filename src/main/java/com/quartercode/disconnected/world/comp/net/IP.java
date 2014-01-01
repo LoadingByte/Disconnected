@@ -152,7 +152,7 @@ public class IP extends DefaultFeatureHolder {
         SET_PARTS.addExecutor(IP.class, "checkQuadRange", new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.CHECK)
+            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_6)
             @Lockable
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 

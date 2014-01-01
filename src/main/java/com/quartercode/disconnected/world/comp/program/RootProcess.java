@@ -38,8 +38,8 @@ public class RootProcess extends Process<OperatingSystem> {
         GET_ROOT.addExecutor(RootProcess.class, "overwrite", new FunctionExecutor<RootProcess>() {
 
             @Override
-            @Prioritized (Prioritized.OVERWRITE_5)
             public RootProcess invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            @Prioritized (Prioritized.LEVEL_5)
 
                 return (RootProcess) holder;
             }

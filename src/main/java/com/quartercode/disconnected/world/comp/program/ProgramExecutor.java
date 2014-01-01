@@ -253,7 +253,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
 
             @Override
             @SuppressWarnings ("unchecked")
-            @Prioritized (Prioritized.CHECK)
+            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
             @Lockable
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 

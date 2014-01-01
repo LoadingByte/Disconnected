@@ -160,8 +160,8 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
         ADD_CHILDREN.addExecutor(ParentFile.class, "checkSize", new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.CHECK)
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
 
                 FileSystem fileSystem = holder.get(GET_FILE_SYSTEM).invoke();
                 if (fileSystem != null) {

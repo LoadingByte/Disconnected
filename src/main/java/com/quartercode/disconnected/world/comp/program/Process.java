@@ -519,7 +519,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         SET_SOURCE.addExecutor(Process.class, "checkFileContent", new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.CHECK)
+            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
             @Lockable
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 

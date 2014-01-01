@@ -191,7 +191,7 @@ public class Address extends DefaultFeatureHolder {
         SET_PORT.addExecutor(IP.class, "checkRange", new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.CHECK)
+            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_6)
             @Lockable
             public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
 
