@@ -254,12 +254,11 @@ public class SimulationGenerator {
                 operatingSystem.get(OperatingSystem.SET_VERSION).invoke(createVersion(3, 7, 65));
                 computer.get(Computer.SET_OS).invoke(operatingSystem);
 
-                operatingSystem.getUserManager().addUser(new User(operatingSystem, User.SUPERUSER_NAME));
-                Group genpop = new Group(operatingSystem, "genpop");
-                operatingSystem.getUserManager().addGroup(genpop);
-                User genuser = new User(operatingSystem, "genuser");
-                genuser.addToGroup(genpop, true);
-                operatingSystem.getUserManager().addUser(genuser);
+                // Generate debug users and groups
+                User superUser = operatingSystem.get(UserSyscalls.ADD_USER).invoke(User.SUPERUSER_NAME);
+                Group defaultGroup = operatingSystem.get(UserSyscalls.ADD_GROUP).invoke("defaultgroup");
+                User defaultUser = operatingSystem.get(UserSyscalls.ADD_USER).invoke("defaultuser");
+                defaultUser.get(User.ADD_TO_GROUPS).invoke(defaultGroup);
 
                 operatingSystem.getFileSystemManager().setMountpoint(systemMedium.get(HardDrive.GET_FILE_SYSTEM).invoke(), "system");
                 addSystemFiles(systemMedium.get(HardDrive.GET_FILE_SYSTEM).invoke(), operatingSystem.getUserManager());

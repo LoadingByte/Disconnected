@@ -41,6 +41,8 @@ import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.os.Environment;
+import com.quartercode.disconnected.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.world.comp.os.SyscallInvoker;
 import com.quartercode.disconnected.world.comp.os.User;
 import com.quartercode.disconnected.world.comp.program.event.IPCMessageEvent;
 import com.quartercode.disconnected.world.comp.program.event.ProcessEvent;
@@ -54,7 +56,7 @@ import com.quartercode.disconnected.world.comp.session.SessionProgram;
  * @see Program
  * @see ProgramExecutor
  */
-public abstract class Process<P extends FeatureHolder> extends WorldChildFeatureHolder<P> {
+public abstract class Process<P extends FeatureHolder> extends WorldChildFeatureHolder<P> implements SyscallInvoker {
 
     /**
      * The process state defines the global state of the process the os can see.
@@ -774,6 +776,16 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             }
 
         }, Process.class, Map.class);
+
+        GET_OPERATING_SYSTEM.addExecutor(Process.class, "default", new FunctionExecutor<OperatingSystem>() {
+
+            @Override
+            public OperatingSystem invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                return holder.get(GET_ROOT).invoke().getParent();
+            }
+
+        });
 
     }
 

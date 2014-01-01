@@ -19,36 +19,27 @@
 package com.quartercode.disconnected.world.comp.session;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.extra.Delay;
 import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Limit;
-import com.quartercode.disconnected.mocl.extra.Prioritized;
 import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.ReferenceProperty;
 import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.util.ResourceBundles;
-import com.quartercode.disconnected.world.comp.file.ContentFile;
-import com.quartercode.disconnected.world.comp.file.File;
-import com.quartercode.disconnected.world.comp.file.FileSystem;
 import com.quartercode.disconnected.world.comp.os.User;
+import com.quartercode.disconnected.world.comp.os.UserSyscalls;
 import com.quartercode.disconnected.world.comp.program.ArgumentException.WrongArgumentTypeException;
 import com.quartercode.disconnected.world.comp.program.ChildProcess;
 import com.quartercode.disconnected.world.comp.program.Parameter;
 import com.quartercode.disconnected.world.comp.program.Parameter.ArgumentType;
-import com.quartercode.disconnected.world.comp.program.Process;
-import com.quartercode.disconnected.world.comp.program.Program;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 
 /**
@@ -125,8 +116,8 @@ public abstract class SessionProgram extends ProgramExecutor {
 
                 String username = (String) programArguments.get("user");
                 User user = null;
-                for (User testUser : ((SessionProgram) holder).getParent().get(Process.GET_ROOT).invoke().getUserManager().getUsers()) {
-                    if (testUser.getName().equals(username)) {
+                for (User testUser : ((SessionProgram) holder).getParent().get(UserSyscalls.GET_USERS).invoke()) {
+                    if (testUser.get(User.GET_NAME).equals(username)) {
                         user = testUser;
                         break;
                     }
@@ -136,47 +127,6 @@ public abstract class SessionProgram extends ProgramExecutor {
                     throw new StopExecutionException(new WrongArgumentTypeException(holder.get(GET_PARAMETER_BY_NAME).invoke("user"), programArguments.get("user").toString()));
                 } else {
                     holder.get(USER).set(user);
-                }
-
-                return null;
-            }
-
-        });
-        UPDATE.addExecutor(SessionProgram.class, "manageDeamons", new FunctionExecutor<Void>() {
-
-            @Override
-            @Delay (delay = 10)
-            @Prioritized (Prioritized.BEFORE_CHECK)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
-
-                // Gather classes of child processes
-                Set<ContentFile> childSources = new HashSet<ContentFile>();
-                for (Process<?> child : ((ProgramExecutor) holder).getParent().get(Process.GET_CHILDREN).invoke()) {
-                    childSources.add(child.get(Process.GET_SOURCE).invoke());
-                }
-
-                // Accesss deamons configuration on current FileSystem
-                FileSystem fileSystem = ((SessionProgram) holder).getParent().get(Process.GET_SOURCE).invoke().get(File.GET_FILE_SYSTEM).invoke();
-                ContentFile deamonsConfiguration = (ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke("etc/deamons.cfg");
-                Set<ContentFile> deamons = new HashSet<ContentFile>();
-                for (String line : String.valueOf(deamonsConfiguration.get(ContentFile.GET_CONTENT).invoke()).split("\n")) {
-                    if (!line.isEmpty()) {
-                        File<?> lineFile = fileSystem.get(FileSystem.GET_FILE).invoke(line);
-                        if (lineFile != null && ((ContentFile) lineFile).get(ContentFile.GET_CONTENT) instanceof Program) {
-                            deamons.add((ContentFile) lineFile);
-                        }
-                    }
-                }
-
-                for (ContentFile deamon : deamons) {
-                    if (!childSources.contains(deamon)) {
-                        ChildProcess child = ((SessionProgram) holder).getParent().get(Process.CREATE_CHILD).invoke();
-                        child.setLocked(false);
-                        child.get(Process.SET_SOURCE).invoke(deamon);
-                        child.get(Process.LAUNCH).invoke(new HashMap<String, Object>());
-                        child.setLocked(true);
-                        // TODO: Launch
-                    }
                 }
 
                 return null;

@@ -43,12 +43,11 @@ import com.quartercode.disconnected.world.comp.program.Process.ProcessState;
  * This class stores information about an operating system.
  * 
  * @see ProcessManager
- * @see UserManager
  * @see FileSystemManager
  * @see NetworkManager
  */
 // TODO: Replace OperatingSystem with root process and managers with process deamons -> Everything will be done using processes
-public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
+public class OperatingSystem extends WorldChildFeatureHolder<Computer> implements SyscallInvoker {
 
     // ----- Properties -----
 
@@ -212,6 +211,15 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
         ADD_VULNERABILITIES = FunctionDefinitionFactory.create("addVulnerabilities", OperatingSystem.class, new LockableFEWrapper<Void>(CollectionPropertyAccessorFactory.createAdd(VULNERABILITIES)), Vulnerability[].class);
         REMOVE_VULNERABILITIES = FunctionDefinitionFactory.create("removeVulnerabilities", OperatingSystem.class, new LockableFEWrapper<Void>(CollectionPropertyAccessorFactory.createRemove(VULNERABILITIES)), Vulnerability[].class);
 
+        GET_OPERATING_SYSTEM.addExecutor(OperatingSystem.class, "default", new FunctionExecutor<OperatingSystem>() {
+
+            @Override
+            public OperatingSystem invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                return (OperatingSystem) holder;
+            }
+        });
+
     }
 
     // ----- Functions End -----
@@ -223,7 +231,6 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
         // ----- Temporary -----
         processManager = new ProcessManager(this);
-        userManager = new UserManager(this);
         fileSystemManager = new FileSystemManager(this);
         networkManager = new NetworkManager(this);
         // ----- Temporary End -----
@@ -234,8 +241,6 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
     @XmlElement
     private final ProcessManager    processManager;
-    @XmlElement
-    private final UserManager       userManager;
     @XmlElement
     private final FileSystemManager fileSystemManager;
     private final NetworkManager    networkManager;
@@ -248,16 +253,6 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
     public ProcessManager getProcessManager() {
 
         return processManager;
-    }
-
-    /**
-     * Returns the user manager which is used for holding and modifying users and groups.
-     * 
-     * @return The user manager which is used for holding and modifying users and groups.
-     */
-    public UserManager getUserManager() {
-
-        return userManager;
     }
 
     /**
@@ -310,53 +305,5 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
     }
 
     // ----- Temporary End -----
-
-    @Override
-    public int hashCode() {
-
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (fileSystemManager == null ? 0 : fileSystemManager.hashCode());
-        result = prime * result + (processManager == null ? 0 : processManager.hashCode());
-        result = prime * result + (userManager == null ? 0 : userManager.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        OperatingSystem other = (OperatingSystem) obj;
-        if (fileSystemManager == null) {
-            if (other.fileSystemManager != null) {
-                return false;
-            }
-        } else if (!fileSystemManager.equals(other.fileSystemManager)) {
-            return false;
-        }
-        if (processManager == null) {
-            if (other.processManager != null) {
-                return false;
-            }
-        } else if (!processManager.equals(other.processManager)) {
-            return false;
-        }
-        if (userManager == null) {
-            if (other.userManager != null) {
-                return false;
-            }
-        } else if (!userManager.equals(other.userManager)) {
-            return false;
-        }
-        return true;
-    }
 
 }
