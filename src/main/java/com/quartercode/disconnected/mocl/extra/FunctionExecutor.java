@@ -34,8 +34,8 @@ public interface FunctionExecutor<R> {
      * @param holder The {@link FeatureHolder} the function executor is invoked in.
      * @param arguments Some arguments for the function executor.
      * @return The value the invoked function executor returns. Can be null.
-     * @throws StopExecutionException The execution of the invokation queue should stop.
+     * @throws ExecutorInvokationException The function executor sends a signal.
      */
-    public R invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException;
+    public R invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException;
 
 }

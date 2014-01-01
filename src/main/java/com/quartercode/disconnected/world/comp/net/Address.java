@@ -23,11 +23,11 @@ import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
 import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Lockable;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
@@ -193,7 +193,7 @@ public class Address extends DefaultFeatureHolder {
             @Override
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_6)
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 int port = (Integer) arguments[0];
                 Validate.isTrue(port >= 0 || port <= 65535, "The port must be in range 0 <= port <= 65535 (e.g. 8080): ", port);
@@ -207,7 +207,7 @@ public class Address extends DefaultFeatureHolder {
 
             @Override
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 String ipString = ((Address) arguments[0]).get(IP).get().get(com.quartercode.disconnected.world.comp.net.IP.TO_STRING).invoke();
                 IP ip = new IP();
@@ -226,7 +226,7 @@ public class Address extends DefaultFeatureHolder {
 
             @Override
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 String[] parts = ((String) arguments[0]).split(":");
                 Validate.isTrue(parts.length == 2, "Address must have the format IP:PORT: ", arguments[0]);
@@ -245,7 +245,7 @@ public class Address extends DefaultFeatureHolder {
         TO_STRING = FunctionDefinitionFactory.create("toString", Address.class, new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return holder.get(GET_IP).invoke().get(com.quartercode.disconnected.world.comp.net.IP.TO_STRING).invoke() + ":" + holder.get(GET_PORT).invoke();
             }

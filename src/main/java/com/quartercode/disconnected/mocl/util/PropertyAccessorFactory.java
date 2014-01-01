@@ -21,9 +21,9 @@ package com.quartercode.disconnected.mocl.util;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.extra.ChildFeatureHolder;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Property;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 
 /**
  * A utility class for creating {@link FunctionExecutor}s which can access simple {@link Property}s (like getters or setters).
@@ -45,7 +45,7 @@ public class PropertyAccessorFactory {
         return new FunctionExecutor<T>() {
 
             @Override
-            public T invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public T invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return holder.get(propertyDefinition).get();
             }
@@ -66,7 +66,7 @@ public class PropertyAccessorFactory {
 
             @Override
             @SuppressWarnings ("unchecked")
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 // Set the parent of the old object to null
                 if (holder.get(propertyDefinition).get() instanceof ChildFeatureHolder) {

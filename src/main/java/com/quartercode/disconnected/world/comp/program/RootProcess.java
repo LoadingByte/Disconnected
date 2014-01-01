@@ -19,9 +19,9 @@
 package com.quartercode.disconnected.world.comp.program;
 
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 
 /**
@@ -38,8 +38,8 @@ public class RootProcess extends Process<OperatingSystem> {
         GET_ROOT.addExecutor(RootProcess.class, "overwrite", new FunctionExecutor<RootProcess>() {
 
             @Override
-            public RootProcess invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
             @Prioritized (Prioritized.LEVEL_5)
+            public RootProcess invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return (RootProcess) holder;
             }

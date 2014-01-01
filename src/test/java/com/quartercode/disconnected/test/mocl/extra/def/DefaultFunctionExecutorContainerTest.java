@@ -6,8 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import org.junit.Assert;
 import org.junit.Test;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.AbstractFunction.DefaultFunctionExecutorContainer;
 
 public class DefaultFunctionExecutorContainerTest {
@@ -19,7 +19,7 @@ public class DefaultFunctionExecutorContainerTest {
 
             @Override
             @TestAnnotation (value1 = 7, value2 = "test")
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return null;
             }
@@ -35,7 +35,7 @@ public class DefaultFunctionExecutorContainerTest {
         DefaultFunctionExecutorContainer<Void> container = new DefaultFunctionExecutorContainer<Void>("test", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return null;
             }
@@ -51,7 +51,7 @@ public class DefaultFunctionExecutorContainerTest {
         DefaultFunctionExecutorContainer<Void> container = new DefaultFunctionExecutorContainer<Void>("test", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return null;
             }

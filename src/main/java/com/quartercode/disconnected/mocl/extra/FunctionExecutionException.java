@@ -20,13 +20,11 @@ package com.quartercode.disconnected.mocl.extra;
 
 /**
  * The function execution exception is thrown if an {@link Throwable} occurres during the invokation of a {@link FunctionExecutor}.
- * Function execution exception are constructed with the cause {@link Throwable} of a caught {@link StopExecutionException}.
+ * It is a wrapper which brings the wrapped {@link Throwable} through the {@link Function#invoke(Object...)} method.
  * 
  * @see Function
- * @see FunctionExecutor
- * @see StopExecutionException
  */
-public class FunctionExecutionException extends StopExecutionException {
+public class FunctionExecutionException extends ExecutorInvokationException {
 
     private static final long serialVersionUID = -5515825410776845247L;
 

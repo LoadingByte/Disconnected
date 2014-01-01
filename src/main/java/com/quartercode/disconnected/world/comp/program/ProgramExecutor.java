@@ -28,11 +28,11 @@ import java.util.ResourceBundle;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Lockable;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
@@ -230,7 +230,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
         GET_PARAMETER_BY_NAME = FunctionDefinitionFactory.create("getParameterByName", ProgramExecutor.class, new FunctionExecutor<Parameter>() {
 
             @Override
-            public Parameter invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Parameter invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 for (List<Parameter> parameterList : holder.get(GET_PARAMETERS).invokeRA()) {
                     for (Parameter parameter : parameterList) {
@@ -255,7 +255,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
             @SuppressWarnings ("unchecked")
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 // Create a new hash map with the contents of the old one (it will get modified)
                 Map<String, Object> programArguments = arguments[0] == null ? new HashMap<String, Object>() : new HashMap<String, Object>((Map<String, Object>) arguments[0]);
@@ -306,7 +306,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
         NEXT_EVENT = FunctionDefinitionFactory.create("nextEvent", ProgramExecutor.class, new FunctionExecutor<ProcessEvent>() {
 
             @Override
-            public ProcessEvent invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public ProcessEvent invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 Queue<ProcessEvent> clone = new LinkedList<ProcessEvent>(holder.get(EVENTS).get());
                 while (!clone.isEmpty()) {
@@ -353,9 +353,9 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
          * 
          * @param event The {@link ProcessEvent} to check.
          * @return True if the given {@link ProcessEvent} is requested, false if not.
-         * @throws StopExecutionException Something bad happens while checking.
+         * @throws ExecutorInvokationException Something bad happens while checking.
          */
-        public boolean matches(ProcessEvent event) throws StopExecutionException;
+        public boolean matches(ProcessEvent event) throws ExecutorInvokationException;
 
     }
 

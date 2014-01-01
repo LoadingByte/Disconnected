@@ -30,9 +30,9 @@ import java.util.TreeSet;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.extra.ChildFeatureHolder;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Property;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 
 /**
  * A utility class for creating {@link FunctionExecutor}s which can access simple {@link Collection} {@link Property}s.
@@ -55,7 +55,7 @@ public class CollectionPropertyAccessorFactory {
         return createGet(propertyDefinition, new CriteriumMatcher<E>() {
 
             @Override
-            public boolean matches(E element, Object... arguments) throws StopExecutionException {
+            public boolean matches(E element, Object... arguments) throws ExecutorInvokationException {
 
                 return true;
             }
@@ -78,7 +78,7 @@ public class CollectionPropertyAccessorFactory {
 
             @Override
             @SuppressWarnings ("unchecked")
-            public C invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public C invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 C originalCollection = holder.get(propertyDefinition).get();
 
@@ -116,7 +116,7 @@ public class CollectionPropertyAccessorFactory {
         return new FunctionExecutor<E>() {
 
             @Override
-            public E invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public E invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 for (E element : holder.get(propertyDefinition).get()) {
                     if (matcher.matches(element, arguments)) {
@@ -143,7 +143,7 @@ public class CollectionPropertyAccessorFactory {
 
             @Override
             @SuppressWarnings ("unchecked")
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 for (Object element : arguments) {
                     boolean changed = holder.get(propertyDefinition).get().add((E) element);
@@ -173,7 +173,7 @@ public class CollectionPropertyAccessorFactory {
 
             @Override
             @SuppressWarnings ("unchecked")
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 for (Object element : arguments) {
                     boolean changed = holder.get(propertyDefinition).get().remove(element);
@@ -202,7 +202,7 @@ public class CollectionPropertyAccessorFactory {
         return new FunctionExecutor<E>() {
 
             @Override
-            public E invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public E invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return holder.get(propertyDefinition).get().peek();
             }
@@ -223,7 +223,7 @@ public class CollectionPropertyAccessorFactory {
 
             @Override
             @SuppressWarnings ("unchecked")
-            public E invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public E invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 E element = holder.get(propertyDefinition).get().poll();
 
@@ -251,9 +251,9 @@ public class CollectionPropertyAccessorFactory {
          * @param element The element to check.
          * @param arguments The arguments which were passed during invokation.
          * @return True if the given element matches, false if not.
-         * @throws StopExecutionException The execution of the current invokation queue should stop.
+         * @throws ExecutorInvokationException The execution of the current invokation queue should stop.
          */
-        public boolean matches(E element, Object... arguments) throws StopExecutionException;
+        public boolean matches(E element, Object... arguments) throws ExecutorInvokationException;
 
     }
 

@@ -25,12 +25,12 @@ import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Lockable;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.extra.def.ReferenceProperty;
@@ -521,7 +521,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 Validate.isTrue( ((ContentFile) arguments[0]).get(ContentFile.GET_CONTENT).invoke() instanceof Program, "Source must contain a program");
                 return null;
@@ -536,7 +536,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         IS_STATE_APPLIED = FunctionDefinitionFactory.create("isStateApplied", Process.class, new FunctionExecutor<Boolean>() {
 
             @Override
-            public Boolean invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Boolean invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 if (holder.get(GET_STATE).invoke() != arguments[0]) {
                     return false;
@@ -554,7 +554,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         SET_STATE = FunctionDefinitionFactory.create("setState", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 holder.get(STATE).set((ProcessState) arguments[0]);
                 holder.get(GET_EXECUTOR).invoke().setLocked(holder.get(GET_STATE).invoke().isLock());
@@ -572,7 +572,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         SUSPEND = FunctionDefinitionFactory.create("suspend", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 if (holder.get(GET_STATE).invoke() == ProcessState.RUNNING) {
                     holder.get(SET_STATE).invoke(ProcessState.SUSPENDED, arguments[0]);
@@ -585,7 +585,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         RESUME = FunctionDefinitionFactory.create("resume", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 if (holder.get(GET_STATE).invoke() == ProcessState.SUSPENDED) {
                     holder.get(SET_STATE).invoke(ProcessState.RUNNING, arguments[0]);
@@ -598,7 +598,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         INTERRUPT = FunctionDefinitionFactory.create("interrupt", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 if (holder.get(GET_STATE).invoke() == ProcessState.RUNNING) {
                     holder.get(SET_STATE).invoke(ProcessState.INTERRUPTED, arguments[0]);
@@ -611,7 +611,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         STOP = FunctionDefinitionFactory.create("stop", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 if (holder.get(GET_STATE).invoke() != ProcessState.STOPPED) {
                     holder.get(SET_STATE).invoke(ProcessState.STOPPED, arguments[0]);
@@ -633,7 +633,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         GET_ALL_CHILDREN = FunctionDefinitionFactory.create("getAllChildren", Process.class, new FunctionExecutor<List<Process<?>>>() {
 
             @Override
-            public List<Process<?>> invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public List<Process<?>> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return getAllChildren((Process<?>) holder);
             }
@@ -653,7 +653,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         CREATE_CHILD = FunctionDefinitionFactory.create("createChild", Process.class, new FunctionExecutor<ChildProcess>() {
 
             @Override
-            public ChildProcess invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public ChildProcess invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 ChildProcess process = new ChildProcess();
                 process.setParent((Process<?>) holder);
@@ -668,7 +668,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         GET_ROOT = FunctionDefinitionFactory.create("getRoot", Process.class, new FunctionExecutor<RootProcess>() {
 
             @Override
-            public RootProcess invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public RootProcess invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 if ( ((Process<?>) holder).getParent() == null) {
                     return (RootProcess) holder;
@@ -682,7 +682,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         GET_SESSION_PROCESS = FunctionDefinitionFactory.create("getSessionProcess", Process.class, new FunctionExecutor<Process<?>>() {
 
             @Override
-            public Process<?> invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Process<?> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 if ( ((Process<?>) holder).getParent() == null) {
                     // Error
@@ -700,7 +700,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         GET_SESSION = FunctionDefinitionFactory.create("getSession", Process.class, new FunctionExecutor<SessionProgram>() {
 
             @Override
-            public SessionProgram invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public SessionProgram invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return (SessionProgram) holder.get(GET_SESSION_PROCESS).invoke().get(GET_EXECUTOR).invoke();
             }
@@ -710,7 +710,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         GET_USER = FunctionDefinitionFactory.create("getUser", Process.class, new FunctionExecutor<User>() {
 
             @Override
-            public User invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public User invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return holder.get(GET_SESSION).invoke().get(SessionProgram.GET_USER).invoke();
             }
@@ -721,7 +721,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
             @Override
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 // Calculate new pid
                 List<Integer> existingPids = new ArrayList<Integer>();
@@ -757,7 +757,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
             @Override
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 // Construct message
                 IPCMessageEvent message = new IPCMessageEvent();

@@ -22,9 +22,9 @@ import java.util.Arrays;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
@@ -327,7 +327,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> {
         GET = FunctionDefinitionFactory.create("get", FileRights.class, new FunctionExecutor<Boolean>() {
 
             @Override
-            public Boolean invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Boolean invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 if (arguments[0] != null) {
                     return holder.get(RIGHTS).get()[ ((FileAccessor) arguments[0]).ordinal() * 4 + ((FileRight) arguments[1]).ordinal()];
@@ -341,7 +341,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> {
         SET = FunctionDefinitionFactory.create("set", FileRights.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 if (arguments[0] == null) {
                     holder.get(SET).invoke(FileAccessor.OWNER, arguments[1], arguments[2]);
@@ -359,7 +359,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> {
         FROM_OBJECT = FunctionDefinitionFactory.create("fromObject", FileRights.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 holder.get(RIGHTS).set(Arrays.copyOf( ((FileRights) arguments[0]).get(RIGHTS).get(), 3 * 4));
 
@@ -371,7 +371,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> {
         FROM_STRING = FunctionDefinitionFactory.create("fromString", FileRights.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 char[] rights = ((String) arguments[0]).toCharArray();
                 for (int index = 0; index < 3 * 4; index++) {
@@ -386,7 +386,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> {
         TO_STRING = FunctionDefinitionFactory.create("toString", FileRights.class, new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 String rights = "";
                 for (int index = 0; index < 3 * 4; index++) {

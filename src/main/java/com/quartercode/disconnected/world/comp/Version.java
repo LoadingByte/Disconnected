@@ -24,10 +24,10 @@ import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
 import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Lockable;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
@@ -231,7 +231,7 @@ public class Version extends DefaultFeatureHolder {
 
             @Override
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 holder.get(SET_MAJOR).invoke( ((Version) arguments[0]).get(GET_MAJOR).invoke());
                 holder.get(SET_MINOR).invoke( ((Version) arguments[0]).get(GET_MINOR).invoke());
@@ -246,7 +246,7 @@ public class Version extends DefaultFeatureHolder {
 
             @Override
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 String[] versionParts = ((String) arguments[0]).split("\\.");
                 Validate.isTrue(versionParts.length == 3, "The version string must be splitted in 3 parts by dots (e.g. 1.2.5): ", Arrays.toString(versionParts));
@@ -262,7 +262,7 @@ public class Version extends DefaultFeatureHolder {
         TO_STRING = FunctionDefinitionFactory.create("toString", Version.class, new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return holder.get(GET_MAJOR).invoke() + "." + holder.get(GET_MINOR).invoke() + "." + holder.get(GET_REVISION).invoke();
             }

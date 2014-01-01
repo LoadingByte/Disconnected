@@ -27,8 +27,8 @@ import java.util.List;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.extra.def.ReferenceProperty;
@@ -144,7 +144,7 @@ public class Mainboard extends Hardware {
         GET_SLOTS_BY_CONTENT_TYPE = FunctionDefinitionFactory.create("getSlotsByContentType", Mainboard.class, CollectionPropertyAccessorFactory.createGet(SLOTS, new CriteriumMatcher<MainboardSlot>() {
 
             @Override
-            public boolean matches(MainboardSlot element, Object... arguments) throws StopExecutionException {
+            public boolean matches(MainboardSlot element, Object... arguments) throws ExecutorInvokationException {
 
                 return ((Class<?>) arguments[0]).isAssignableFrom(element.get(MainboardSlot.GET_TYPE).invoke());
             }

@@ -25,7 +25,7 @@ package com.quartercode.disconnected.mocl.extra;
  * 
  * @see FunctionExecutor
  */
-public class StopExecutionException extends Exception {
+public class StopExecutionException extends ExecutorInvokationException {
 
     private static final long serialVersionUID = -5169233409509164509L;
 

@@ -23,8 +23,8 @@ import java.util.List;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
 import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
@@ -223,7 +223,7 @@ public class Computer extends WorldChildFeatureHolder<World> {
         GET_HARDWARE_BY_TYPE = FunctionDefinitionFactory.create("getHardwareByType", Computer.class, CollectionPropertyAccessorFactory.createGet(HARDWARE, new CriteriumMatcher<Hardware>() {
 
             @Override
-            public boolean matches(Hardware element, Object... arguments) throws StopExecutionException {
+            public boolean matches(Hardware element, Object... arguments) throws ExecutorInvokationException {
 
                 return ((Class<?>) arguments[0]).isAssignableFrom(element.getClass());
             }

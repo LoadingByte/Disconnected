@@ -32,10 +32,10 @@ import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
 import com.quartercode.disconnected.mocl.extra.Delay;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Limit;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.AbstractFunction;
 
 @RunWith (Parameterized.class)
@@ -52,7 +52,7 @@ public class AbstractFunctionLimitsTest {
         data.add(new Object[] { new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 actualTimesInvoked.incrementAndGet();
                 return null;
@@ -64,7 +64,7 @@ public class AbstractFunctionLimitsTest {
 
             @Override
             @Delay
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 actualTimesInvoked.incrementAndGet();
                 return null;
@@ -76,7 +76,7 @@ public class AbstractFunctionLimitsTest {
 
             @Override
             @Delay (firstDelay = 2)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 actualTimesInvoked.incrementAndGet();
                 return null;
@@ -88,7 +88,7 @@ public class AbstractFunctionLimitsTest {
 
             @Override
             @Delay (delay = 2)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 actualTimesInvoked.incrementAndGet();
                 return null;
@@ -98,7 +98,7 @@ public class AbstractFunctionLimitsTest {
 
             @Override
             @Delay (delay = 2)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 actualTimesInvoked.incrementAndGet();
                 return null;
@@ -110,7 +110,7 @@ public class AbstractFunctionLimitsTest {
 
             @Override
             @Delay (firstDelay = 2, delay = 3)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 actualTimesInvoked.incrementAndGet();
                 return null;
@@ -122,7 +122,7 @@ public class AbstractFunctionLimitsTest {
 
             @Override
             @Limit (3)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 actualTimesInvoked.incrementAndGet();
                 return null;
@@ -135,7 +135,7 @@ public class AbstractFunctionLimitsTest {
             @Override
             @Delay (firstDelay = 2, delay = 3)
             @Limit (3)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 actualTimesInvoked.incrementAndGet();
                 return null;

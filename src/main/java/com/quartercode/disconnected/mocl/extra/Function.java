@@ -160,9 +160,9 @@ public interface Function<R> extends Feature, LockableClass {
          * @param holder The {@link FeatureHolder} the stored {@link FunctionExecutor} is invoked in.
          * @param arguments Some arguments for the stored {@link FunctionExecutor}.
          * @return The value the invoked {@link FunctionExecutor} returns. Can be null.
-         * @throws StopExecutionException The execution of the invokation queue should stop.
+         * @throws ExecutorInvokationException The stored {@link FunctionExecutor} sends a signal.
          */
-        public R invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException;
+        public R invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException;
 
     }
 

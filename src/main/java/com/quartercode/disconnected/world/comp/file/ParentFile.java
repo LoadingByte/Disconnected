@@ -23,6 +23,7 @@ import java.util.List;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
@@ -150,7 +151,7 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
         GET_CHILD_BY_NAME = FunctionDefinitionFactory.create("getChildByName", ParentFile.class, CollectionPropertyAccessorFactory.createGetSingle(CHILDREN, new CriteriumMatcher<File<ParentFile<?>>>() {
 
             @Override
-            public boolean matches(File<ParentFile<?>> element, Object... arguments) throws StopExecutionException {
+            public boolean matches(File<ParentFile<?>> element, Object... arguments) throws ExecutorInvokationException {
 
                 return element.get(GET_NAME).invoke().equals(arguments[0]);
             }
@@ -160,8 +161,8 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
         ADD_CHILDREN.addExecutor(ParentFile.class, "checkSize", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 FileSystem fileSystem = holder.get(GET_FILE_SYSTEM).invoke();
                 if (fileSystem != null) {
@@ -182,7 +183,7 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
 
             @Override
             @SuppressWarnings ("unchecked")
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 for (Object file : arguments) {
                     ((File<FeatureHolder>) file).setParent(holder);
@@ -196,7 +197,7 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
         REMOVE_CHILDREN.addExecutor(ParentFile.class, "removeParent", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 for (Object file : arguments) {
                     ((File<?>) file).setParent(null);

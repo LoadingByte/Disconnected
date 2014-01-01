@@ -21,9 +21,9 @@ package com.quartercode.disconnected.world.comp.program;
 import java.util.ResourceBundle;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.extra.Delay;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Limit;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.util.ResourceBundles;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
@@ -43,7 +43,7 @@ public class KernelProgram extends ProgramExecutor {
         GET_RESOURCE_BUNDLE.addExecutor(KernelProgram.class, "default", new FunctionExecutor<ResourceBundle>() {
 
             @Override
-            public ResourceBundle invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public ResourceBundle invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return ResourceBundles.KERNEL;
             }
@@ -52,7 +52,7 @@ public class KernelProgram extends ProgramExecutor {
         UPDATE.addExecutor(KernelProgram.class, "main", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 if ( ((KernelProgram) holder).getParent().get(Process.GET_STATE).invoke() == ProcessState.INTERRUPTED) {
                     holder.get(UPDATE).getExecutor("stop").resetInvokationCounter();
@@ -70,7 +70,7 @@ public class KernelProgram extends ProgramExecutor {
             @Override
             @Delay (firstDelay = Ticker.DEFAULT_TICKS_PER_SECOND * 5)
             @Limit (1)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 ((KernelProgram) holder).getParent().get(Process.STOP).invoke(true);
 

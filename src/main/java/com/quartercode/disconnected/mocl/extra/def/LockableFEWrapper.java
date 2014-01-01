@@ -19,9 +19,9 @@
 package com.quartercode.disconnected.mocl.extra.def;
 
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Lockable;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 
 /**
  * A lockable function executor wrapper is a {@link Lockable} {@link FunctionExecutor} which wraps around another {@link FunctionExecutor}.
@@ -57,7 +57,7 @@ public class LockableFEWrapper<R> implements FunctionExecutor<R> {
 
     @Override
     @Lockable
-    public R invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+    public R invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
         return executor.invoke(holder, arguments);
     }

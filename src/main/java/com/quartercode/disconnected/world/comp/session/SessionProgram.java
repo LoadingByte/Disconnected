@@ -29,6 +29,7 @@ import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
 import com.quartercode.disconnected.mocl.extra.Delay;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Limit;
@@ -95,7 +96,7 @@ public abstract class SessionProgram extends ProgramExecutor {
         GET_PARAMETERS.addExecutor(SessionProgram.class, "sessionProgramDefault", new FunctionExecutor<List<Parameter>>() {
 
             @Override
-            public List<Parameter> invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public List<Parameter> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 List<Parameter> parameters = new ArrayList<Parameter>();
                 parameters.add(Parameter.createArgument("user", "u", ArgumentType.STRING, false, true));
@@ -107,7 +108,7 @@ public abstract class SessionProgram extends ProgramExecutor {
         GET_RESOURCE_BUNDLE.addExecutor(SessionProgram.class, "default", new FunctionExecutor<ResourceBundle>() {
 
             @Override
-            public ResourceBundle invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public ResourceBundle invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return ResourceBundles.KERNEL;
             }
@@ -118,7 +119,7 @@ public abstract class SessionProgram extends ProgramExecutor {
             @Override
             @SuppressWarnings ("unchecked")
             @Limit (1)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 Map<String, Object> programArguments = (Map<String, Object>) arguments[0];
 

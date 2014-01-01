@@ -24,6 +24,7 @@ import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
 import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.StopExecutionException;
@@ -220,7 +221,7 @@ public class Program extends DefaultFeatureHolder implements DerivableSize {
         CREATE_EXECUTOR = FunctionDefinitionFactory.create("createExecutor", Program.class, new FunctionExecutor<ProgramExecutor>() {
 
             @Override
-            public ProgramExecutor invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public ProgramExecutor invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 Class<? extends ProgramExecutor> executorClass = holder.get(GET_EXECUTOR_CLASS).invoke();
 
@@ -237,7 +238,7 @@ public class Program extends DefaultFeatureHolder implements DerivableSize {
         GET_SIZE.addExecutor(Program.class, "executor", new FunctionExecutor<Long>() {
 
             @Override
-            public Long invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Long invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 // TODO: Make something related to the size
                 return 0L;

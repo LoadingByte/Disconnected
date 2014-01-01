@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.world.comp.file;
 
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
 import com.quartercode.disconnected.mocl.extra.StopExecutionException;
@@ -39,8 +40,8 @@ public class RootFile extends ParentFile<FileSystem> {
         GET_NAME.addExecutor(RootFile.class, "overwrite", new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
             @Prioritized (Prioritized.LEVEL_5)
+            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return "root";
             }
@@ -49,8 +50,8 @@ public class RootFile extends ParentFile<FileSystem> {
         SET_NAME.addExecutor(RootFile.class, "overwrite", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
             @Prioritized (Prioritized.LEVEL_5)
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 throw new StopExecutionException("Overwrite: Do nothing");
             }
@@ -60,8 +61,8 @@ public class RootFile extends ParentFile<FileSystem> {
         GET_PATH.addExecutor(RootFile.class, "overwrite", new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
             @Prioritized (Prioritized.LEVEL_5)
+            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return "";
             }
@@ -70,8 +71,8 @@ public class RootFile extends ParentFile<FileSystem> {
         SET_PATH.addExecutor(RootFile.class, "overwrite", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
             @Prioritized (Prioritized.LEVEL_5)
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 throw new StopExecutionException("Overwrite: Do nothing");
             }
@@ -81,8 +82,8 @@ public class RootFile extends ParentFile<FileSystem> {
         REMOVE.addExecutor(RootFile.class, "overwrite", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
             @Prioritized (Prioritized.LEVEL_5)
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 throw new StopExecutionException("Overwrite: Do nothing");
             }

@@ -27,9 +27,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.AbstractFunction;
 
 public class AbstractFunctionTest {
@@ -43,7 +43,7 @@ public class AbstractFunctionTest {
         executors.put("default", new FunctionExecutor<Object>() {
 
             @Override
-            public Object invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Object invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 actualArguments.addAll(Arrays.asList(arguments));
                 return returnValue;

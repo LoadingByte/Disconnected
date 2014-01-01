@@ -22,6 +22,7 @@ import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
 import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.StopExecutionException;
@@ -193,7 +194,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
         GET_FILE = FunctionDefinitionFactory.create("getFile", FileSystem.class, new FunctionExecutor<File<?>>() {
 
             @Override
-            public File<?> invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public File<?> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 String[] parts = ((String) arguments[0]).split(File.SEPERATOR);
                 File<?> current = holder.get(GET_ROOT).invoke();
@@ -217,7 +218,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
             @Override
             @SuppressWarnings ("unchecked")
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 String[] parts = ((String) arguments[1]).split(File.SEPERATOR);
                 File<?> current = holder.get(GET_ROOT).invoke();
@@ -253,7 +254,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
         GET_FILLED = FunctionDefinitionFactory.create("getFilled", FileSystem.class, new FunctionExecutor<Long>() {
 
             @Override
-            public Long invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Long invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return SizeUtil.getSize(holder.get(GET_ROOT).invoke());
             }
@@ -263,7 +264,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
         GET_FREE = FunctionDefinitionFactory.create("getFree", FileSystem.class, new FunctionExecutor<Long>() {
 
             @Override
-            public Long invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Long invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return holder.get(GET_SIZE).invoke() - holder.get(GET_FILLED).invoke();
             }

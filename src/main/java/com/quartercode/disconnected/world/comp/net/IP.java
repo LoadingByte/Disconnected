@@ -25,11 +25,11 @@ import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
 import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Lockable;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
@@ -154,7 +154,7 @@ public class IP extends DefaultFeatureHolder {
             @Override
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_6)
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 Integer[] parts = (Integer[]) arguments[0];
                 Validate.isTrue(parts.length == 4, "The ip must have 4 parts (e.g. [127, 0, 0, 1]): ", Arrays.toString(parts));
@@ -171,7 +171,7 @@ public class IP extends DefaultFeatureHolder {
 
             @Override
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 holder.get(PARTS).set(Arrays.copyOf( ((IP) arguments[0]).get(PARTS).get(), 4));
 
@@ -184,7 +184,7 @@ public class IP extends DefaultFeatureHolder {
 
             @Override
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 int[] parts = new int[4];
                 String[] stringParts = ((String) arguments[0]).split("\\.");
@@ -201,7 +201,7 @@ public class IP extends DefaultFeatureHolder {
         TO_STRING = FunctionDefinitionFactory.create("toString", IP.class, new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 String parts = "";
                 for (int part : holder.get(GET_PARTS).invoke()) {

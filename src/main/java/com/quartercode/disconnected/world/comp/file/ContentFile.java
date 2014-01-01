@@ -21,6 +21,7 @@ package com.quartercode.disconnected.world.comp.file;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
@@ -107,8 +108,8 @@ public class ContentFile extends File<ParentFile<?>> {
         SET_CONTENT.addExecutor(ContentFile.class, "checkSize", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 FileSystem fileSystem = holder.get(GET_FILE_SYSTEM).invoke();
                 if (fileSystem != null && SizeUtil.getSize(arguments[0]) > fileSystem.get(FileSystem.GET_FREE).invoke()) {

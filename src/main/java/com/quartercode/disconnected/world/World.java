@@ -25,8 +25,8 @@ import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
 import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
 import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
@@ -282,7 +282,7 @@ public class World extends DefaultFeatureHolder {
         GET_MEMBER_BY_NAME = FunctionDefinitionFactory.create("getMemberByName", World.class, CollectionPropertyAccessorFactory.createGetSingle(MEMBERS, new CriteriumMatcher<Member>() {
 
             @Override
-            public boolean matches(Member element, Object... arguments) throws StopExecutionException {
+            public boolean matches(Member element, Object... arguments) throws ExecutorInvokationException {
 
                 return element.getName().equals(arguments[0]);
             }
@@ -295,7 +295,7 @@ public class World extends DefaultFeatureHolder {
         GET_GROUP_BY_MEMBER = FunctionDefinitionFactory.create("getGroupByMember", World.class, CollectionPropertyAccessorFactory.createGetSingle(GROUPS, new CriteriumMatcher<MemberGroup>() {
 
             @Override
-            public boolean matches(MemberGroup element, Object... arguments) throws StopExecutionException {
+            public boolean matches(MemberGroup element, Object... arguments) throws ExecutorInvokationException {
 
                 return element.getMembers().contains(arguments[0]);
             }

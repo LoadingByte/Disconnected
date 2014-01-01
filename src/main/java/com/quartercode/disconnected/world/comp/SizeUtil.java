@@ -21,11 +21,11 @@ package com.quartercode.disconnected.world.comp;
 import java.math.BigDecimal;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Property;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
 
 /**
@@ -92,7 +92,7 @@ public class SizeUtil {
         return new FunctionExecutor<Long>() {
 
             @Override
-            public Long invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Long invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return SizeUtil.getSize(holder.get(propertyDefinition).get());
             }

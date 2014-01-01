@@ -23,10 +23,10 @@ import java.util.logging.Logger;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.extra.def.ReferenceProperty;
 import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
@@ -299,7 +299,7 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
         GET_PATH = FunctionDefinitionFactory.create("getPath", File.class, new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return ((File<?>) holder).getParent().get(GET_PATH).invoke() + File.SEPERATOR + holder.get(GET_NAME).invoke();
             }
@@ -309,7 +309,7 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
 
             @Override
             @SuppressWarnings ("unchecked")
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 FileSystem fileSystem = holder.get(GET_FILE_SYSTEM).invoke();
                 if (fileSystem != null) {
@@ -329,7 +329,7 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
         REMOVE = FunctionDefinitionFactory.create("remove", File.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 if ( ((File<?>) holder).getParent() instanceof ParentFile) {
                     ((File<?>) holder).getParent().get(ParentFile.REMOVE_CHILDREN).invoke(holder);
@@ -343,7 +343,7 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
         GET_FILE_SYSTEM = FunctionDefinitionFactory.create("getFileSystem", File.class, new FunctionExecutor<FileSystem>() {
 
             @Override
-            public FileSystem invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+            public FileSystem invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 if (holder instanceof RootFile) {
                     return ((RootFile) holder).getParent();

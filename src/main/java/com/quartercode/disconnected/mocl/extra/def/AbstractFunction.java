@@ -38,6 +38,7 @@ import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeature;
 import com.quartercode.disconnected.mocl.extra.Delay;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.Function;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
@@ -46,6 +47,7 @@ import com.quartercode.disconnected.mocl.extra.Limit;
 import com.quartercode.disconnected.mocl.extra.Lockable;
 import com.quartercode.disconnected.mocl.extra.LockableClass;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
+import com.quartercode.disconnected.mocl.extra.ReturnNextException;
 import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 
 /**
@@ -268,8 +270,7 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
                     returnValues.add(executor.invoke(getHolder(), arguments));
                 }
                 catch (Exception e) {
-                    // Allow StopExecutionException and IllegalArgumentException (argument validation)
-                    if (e instanceof StopExecutionException || e instanceof IllegalArgumentException) {
+                    if (e instanceof StopExecutionException || e instanceof FunctionExecutionException || e instanceof IllegalArgumentException) {
                         if (priorityGroup.size() > 1) {
                             String otherExecutors = "";
                             for (FunctionExecutorContainer<R> otherExecutor : priorityGroup) {
@@ -286,6 +287,8 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
                         } else {
                             throw new FunctionExecutionException(e.getCause());
                         }
+                    } else if (e instanceof ReturnNextException) {
+                        continue;
                     } else {
                         LOGGER.log(Level.SEVERE, "Function executor '" + executor.getExecutor().getClass().getName() + "' threw an unexpected exception", e);
                     }
@@ -429,10 +432,10 @@ public class AbstractFunction<R> extends AbstractFeature implements Function<R> 
          * @param holder The {@link FeatureHolder} the stored {@link FunctionExecutor} is invoked in.
          * @param arguments Some arguments for the stored {@link FunctionExecutor}.
          * @return The value the invoked {@link FunctionExecutor} returns. Can be null.
-         * @throws StopExecutionException The execution of the invokation queue should stop.
+         * @throws ExecutorInvokationException The execution of the invokation queue should stop.
          */
         @Override
-        public R invoke(FeatureHolder holder, Object... arguments) throws StopExecutionException {
+        public R invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
             if (!locked) {
                 invokationCounter++;
