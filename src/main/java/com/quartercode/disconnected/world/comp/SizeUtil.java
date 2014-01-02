@@ -112,7 +112,7 @@ public class SizeUtil {
         /**
          * Derives the size of the implementing {@link FeatureHolder} in bytes.
          */
-        public static final FunctionDefinition<Long> GET_SIZE = FunctionDefinitionFactory.create("getSize", Long.class);
+        public static final FunctionDefinition<Long> GET_SIZE = FunctionDefinitionFactory.create("getSize");
 
     }
 

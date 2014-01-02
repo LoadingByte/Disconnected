@@ -226,7 +226,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
 
     static {
 
-        GET_PARAMETERS = FunctionDefinitionFactory.create("getParameters", ProgramExecutor.<List<Parameter>> castClass(List.class));
+        GET_PARAMETERS = FunctionDefinitionFactory.create("getParameters");
         GET_PARAMETER_BY_NAME = FunctionDefinitionFactory.create("getParameterByName", ProgramExecutor.class, new FunctionExecutor<Parameter>() {
 
             @Override
@@ -324,13 +324,6 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
 
         UPDATE = FunctionDefinitionFactory.create(TickSimulator.UPDATE_FUNCTION_NAME, Void.class);
 
-    }
-
-    // Help method because you can't attach @SuppressWarnings to static blocks
-    @SuppressWarnings ("unchecked")
-    private static <T> Class<T> castClass(Class<?> c) {
-
-        return (Class<T>) c;
     }
 
     // ----- Function Definitions End ----

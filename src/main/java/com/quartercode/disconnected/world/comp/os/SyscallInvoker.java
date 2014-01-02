@@ -16,6 +16,6 @@ public interface SyscallInvoker extends FeatureHolder {
     /**
      * Returns the {@link OperatingSystem} the syscall invoker is related to.
      */
-    public static final FunctionDefinition<OperatingSystem> GET_OPERATING_SYSTEM = FunctionDefinitionFactory.create("getOperatingSystem", OperatingSystem.class);
+    public static final FunctionDefinition<OperatingSystem> GET_OPERATING_SYSTEM = FunctionDefinitionFactory.create("getOperatingSystem");
 
 }

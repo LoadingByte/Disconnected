@@ -35,15 +35,14 @@ import com.quartercode.disconnected.mocl.extra.def.AbstractFunctionDefinition;
 public class FunctionDefinitionFactory {
 
     /**
-     * Creates a new {@link FunctionDefinition} with the given parameters which accepts {@link FunctionExecutor}s with the given return type.
+     * Creates a new {@link FunctionDefinition} with the given parameters.
      * Of course, the parameters can be changed later on using {@link FunctionDefinition#setParameter(int, Class)}.
      * 
-     * @param name The name of the new {@link FunctionDefinition}.
-     * @param returnType The type of the objects {@link Function}s created by the definition return.
+     * @param name The name of the new {@link FunctionDefinition}. 
      * @param parameters The parameters for the defined function. See {@link FunctionDefinition#setParameter(int, Class)} for further explanation.
      * @return The new {@link FunctionDefinition}.
      */
-    public static <R> FunctionDefinition<R> create(String name, Class<R> returnType, Class<?>... parameters) {
+    public static <R> FunctionDefinition<R> create(String name, Class<?>... parameters) {
 
         return new AbstractFunctionDefinition<R>(name) {
 
