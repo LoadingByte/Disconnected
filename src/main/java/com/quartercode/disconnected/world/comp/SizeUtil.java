@@ -19,6 +19,8 @@
 package com.quartercode.disconnected.world.comp;
 
 import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Map.Entry;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
@@ -73,6 +75,14 @@ public class SizeUtil {
             long size = 0;
             for (Object entry : (Iterable<?>) object) {
                 size += getSize(entry);
+            }
+            return size;
+        } else if (object instanceof Map) {
+            // Go over all keys and values and derive their size
+            long size = 0;
+            for (Entry<?, ?> entry : ((Map<?, ?>) object).entrySet()) {
+                size += getSize(entry.getKey());
+                size += getSize(entry.getValue());
             }
             return size;
         } else {
