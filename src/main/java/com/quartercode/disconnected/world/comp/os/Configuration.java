@@ -153,7 +153,7 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
      * 
      * @see Configuration
      */
-    public static abstract class ConfigurationEntry extends WorldChildFeatureHolder<Configuration> implements DerivableSize {
+    public static class ConfigurationEntry extends WorldChildFeatureHolder<Configuration> implements DerivableSize {
 
         // ----- Functions -----
 
@@ -188,6 +188,7 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
         public static final FunctionDefinition<Void>                SET_COLUMNS;
 
         static {
+
             GET_COLUMNS = FunctionDefinitionFactory.create("getColumns");
             SET_COLUMNS = FunctionDefinitionFactory.create("setColumns", Map.class);
 
