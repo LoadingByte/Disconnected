@@ -96,11 +96,11 @@ public class FileUtils {
     public static boolean hasRight(User user, File<?> file, FileRight right) {
 
         try {
-            if (user.isSuperuser()) {
+            if (user.get(User.IS_SUPERUSER).invoke()) {
                 return true;
             } else if (checkRight(file, FileAccessor.OWNER, right) && file.get(File.GET_OWNER).invoke().equals(user)) {
                 return true;
-            } else if (checkRight(file, FileAccessor.GROUP, right) && user.getGroups().contains(file.get(File.GET_GROUP).invoke())) {
+            } else if (checkRight(file, FileAccessor.GROUP, right) && user.get(User.GET_GROUPS).invoke().contains(file.get(File.GET_GROUP).invoke())) {
                 return true;
             } else if (checkRight(file, FileAccessor.OTHERS, right)) {
                 return true;
@@ -161,7 +161,7 @@ public class FileUtils {
     public static boolean canChangeRights(User user, File<?> file) {
 
         try {
-            return file.get(File.GET_OWNER).invoke().equals(user) || user.isSuperuser();
+            return file.get(File.GET_OWNER).invoke().equals(user) || user.get(User.IS_SUPERUSER).invoke();
         }
         catch (FunctionExecutionException e) {
             // Won't happen

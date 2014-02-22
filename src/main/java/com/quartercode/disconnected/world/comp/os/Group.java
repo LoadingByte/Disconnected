@@ -18,142 +18,119 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlIDREF;
-import com.quartercode.disconnected.util.InfoString;
+import java.util.HashMap;
+import java.util.Map;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
+import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.world.comp.os.Configuration.ConfigurationEntry;
 
-public class Group implements Comparable<Group>, InfoString {
+/**
+ * A group represents a collection of multiple {@link User}s which have the same rights.
+ * The group object also takes care of the right system and other things related to {@link User}s.
+ * 
+ * @see User
+ */
+public class Group extends ConfigurationEntry {
 
-    @XmlIDREF
-    @XmlAttribute
-    private OperatingSystem host;
-    @XmlElement
-    private String          name;
+    // ----- Properties -----
 
     /**
-     * Creates a new empty group object.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * The name of the group.
+     * The name is used for recognizing a group on the os-level.
      */
-    protected Group() {
+    protected static final FeatureDefinition<ObjectProperty<String>> NAME;
+
+    static {
+
+        NAME = new AbstractFeatureDefinition<ObjectProperty<String>>("name") {
+
+            @Override
+            public ObjectProperty<String> create(FeatureHolder holder) {
+
+                return new ObjectProperty<String>(getName(), holder);
+            }
+
+        };
 
     }
 
-    /**
-     * Creates a new group and sets the host system the object is used for and his name.
-     * 
-     * @param host The host operating system the group is used for.
-     * @param name The name the group has.
-     */
-    public Group(OperatingSystem host, String name) {
+    // ----- Properties End -----
 
-        this.host = host;
-        this.name = name;
-    }
-
-    /**
-     * Returns the host operating system the group is used for.
-     * 
-     * @return The host operating system the group is used for.
-     */
-    public OperatingSystem getHost() {
-
-        return host;
-    }
+    // ----- Functions -----
 
     /**
      * Returns the name of the group.
      * The name is used for recognizing a group on the os-level.
-     * 
-     * @return The name the group has.
      */
-    public String getName() {
-
-        return name;
-    }
+    public static final FunctionDefinition<String>                   GET_NAME;
 
     /**
-     * Resolves a list of all users which are members of the group.
-     * This iterates through all users on the system and doesn't cache the list.
+     * Changes the name of the group.
+     * The name is used for recognizing a group on the os-level.
      * 
-     * @return A list of all groups the user is in.
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link String}</td>
+     * <td>name</td>
+     * <td>The new name of the group.</td>
+     * </tr>
+     * </table>
      */
-    public List<User> getUsers() {
+    public static final FunctionDefinition<Void>                     SET_NAME;
 
-        List<User> users = new ArrayList<User>();
-        for (User user : host.getUserManager().getUsers()) {
-            if (user.getGroups().contains(this)) {
-                users.add(user);
+    static {
+
+        GET_NAME = FunctionDefinitionFactory.create("getName", Group.class, PropertyAccessorFactory.createGet(NAME));
+        SET_NAME = FunctionDefinitionFactory.create("setName", Group.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(NAME)), String.class);
+
+        GET_COLUMNS.addExecutor(User.class, "default", new FunctionExecutor<Map<String, Object>>() {
+
+            @Override
+            public Map<String, Object> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                Map<String, Object> columns = new HashMap<String, Object>();
+                columns.put("name", holder.get(GET_NAME).invoke());
+                return columns;
             }
-        }
-        return users;
+
+        });
+        SET_COLUMNS.addExecutor(User.class, "default", new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                // Trust the user of the method
+                @SuppressWarnings ("unchecked")
+                Map<String, Object> columns = (Map<String, Object>) arguments[0];
+                holder.get(SET_NAME).invoke(columns.get("name"));
+                return null;
+            }
+
+        });
     }
+
+    // ----- Functions End -----
 
     /**
-     * Returns the unique serialization id for the group.
-     * The id is a combination of the host computer's id and the group's name.
-     * It should only be used by a serialization algorithm.
-     * 
-     * @return The unique serialization id for the group.
+     * Creates a new group object.
      */
-    @XmlAttribute
-    @XmlID
-    protected String getId() {
+    public Group() {
 
-        return host.getHost().getId() + "-" + name;
-    }
-
-    @Override
-    public int compareTo(Group o) {
-
-        return name.compareTo(o.getName());
-    }
-
-    @Override
-    public int hashCode() {
-
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        Group other = (Group) obj;
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toInfoString() {
-
-        return name + ", " + getUsers().size() + " members";
-    }
-
-    @Override
-    public String toString() {
-
-        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }

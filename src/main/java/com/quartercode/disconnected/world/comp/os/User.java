@@ -19,241 +19,338 @@
 package com.quartercode.disconnected.world.comp.os;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlIDREF;
-import javax.xml.bind.annotation.XmlList;
-import javax.xml.bind.annotation.XmlTransient;
-import com.quartercode.disconnected.util.InfoString;
+import java.util.Map;
+import org.apache.commons.lang.Validate;
+import com.quartercode.disconnected.mocl.base.FeatureDefinition;
+import com.quartercode.disconnected.mocl.base.FeatureHolder;
+import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
+import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
+import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
+import com.quartercode.disconnected.mocl.extra.Lockable;
+import com.quartercode.disconnected.mocl.extra.Prioritized;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
+import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
+import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
+import com.quartercode.disconnected.mocl.extra.def.ReferenceProperty;
+import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
+import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.world.comp.os.Configuration.ConfigurationEntry;
 
 /**
- * A user represents someone who uses a system.
- * The user object takes care of the right system and other things related to users.
+ * A user represents a system user (basically someone who can use a system).
+ * The user object represents a user and all its properties. It can be used as {@link ConfigurationEntry}.
  * 
  * @see Group
  */
-public class User implements Comparable<User>, InfoString {
+public class User extends ConfigurationEntry {
 
     /**
      * This is the name of the superuser on a system.
-     * The superuser of a system can do everything without having the rights for doing it.
-     * You can check if a user is the superuser by using {@link #isSuperuser()}.
+     * The superuser of a system can do everything without having the rights applied for doing it.
+     * You can check if a user is the superuser by using {@link #IS_SUPERUSER}.
      */
-    public static final String SUPERUSER_NAME = "root";
+    public static final String                                               SUPERUSER_NAME = "root";
 
-    @XmlIDREF
-    @XmlAttribute
-    private OperatingSystem    host;
-    @XmlElement
-    private String             name;
-    @XmlIDREF
-    @XmlList
-    private List<Group>        groups;
+    // ----- Properties -----
 
     /**
-     * Creates a new empty user object.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * The name of the user.
+     * The name is used for recognizing a user on the os-level.
      */
-    protected User() {
+    protected static final FeatureDefinition<ObjectProperty<String>>         NAME;
+
+    /**
+     * A list of all {@link Group}s the user is a member in.
+     * Such {@link Group}s are used to set rights for multiple users.
+     */
+    protected static final FeatureDefinition<ReferenceProperty<List<Group>>> GROUPS;
+
+    static {
+
+        NAME = new AbstractFeatureDefinition<ObjectProperty<String>>("name") {
+
+            @Override
+            public ObjectProperty<String> create(FeatureHolder holder) {
+
+                return new ObjectProperty<String>(getName(), holder);
+            }
+
+        };
+
+        GROUPS = new AbstractFeatureDefinition<ReferenceProperty<List<Group>>>("groups") {
+
+            @Override
+            public ReferenceProperty<List<Group>> create(FeatureHolder holder) {
+
+                return new ReferenceProperty<List<Group>>(getName(), holder, new ArrayList<Group>());
+            }
+
+        };
 
     }
 
-    /**
-     * Creates a new user and sets the host system the object is used for and his name.
-     * 
-     * @param host The host operating system the user is used for.
-     * @param name The name the user has.
-     */
-    public User(OperatingSystem host, String name) {
+    // ----- Properties End -----
 
-        this.host = host;
-        this.name = name;
-
-        groups = new ArrayList<Group>();
-    }
-
-    /**
-     * Returns the host operating system the user is used for.
-     * 
-     * @return The host operating system the user is used for.
-     */
-    public OperatingSystem getHost() {
-
-        return host;
-    }
+    // ----- Functions -----
 
     /**
      * Returns the name of the user.
      * The name is used for recognizing a user on the os-level.
-     * 
-     * @return The name the user has.
      */
-    public String getName() {
-
-        return name;
-    }
+    public static final FunctionDefinition<String>                           GET_NAME;
 
     /**
-     * Returns a list of all groups the user is in.
-     * Groups are used to set rights for multiple users.
+     * Changes the name of the user.
+     * The name is used for recognizing a user on the os-level.
      * 
-     * @return A list of all groups the user is in.
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link String}</td>
+     * <td>name</td>
+     * <td>The new name of the user.</td>
+     * </tr>
+     * </table>
      */
-    public List<Group> getGroups() {
-
-        return Collections.unmodifiableList(groups);
-    }
+    public static final FunctionDefinition<Void>                             SET_NAME;
 
     /**
-     * Adds the user as a member to the given group.
-     * If primary is set, the new group automatically becomes the primary one.
-     * 
-     * @param group The group to add the user to.
-     * @param primary True if the new group should become the primary one.
+     * Returns a list of all {@link Group}s the user is a member in.
+     * Such {@link Group}s are used to set rights for multiple users.
      */
-    public void addToGroup(Group group, boolean primary) {
+    public static final FunctionDefinition<List<Group>>                      GET_GROUPS;
 
-        if (!isSuperuser() && !groups.contains(group)) {
-            groups.add(group);
+    /**
+     * Adds the user as a member to the given {@link Group}s.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0...</td>
+     * <td>{@link Group}...</td>
+     * <td>groups</td>
+     * <td>The {@link Group}s to add the user to.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                             ADD_TO_GROUPS;
 
-            if (primary) {
-                setPrimaryGroup(group);
+    /**
+     * Removes the membership of the user from the given {@link Group}s.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0...</td>
+     * <td>{@link Group}...</td>
+     * <td>groups</td>
+     * <td>The {@link Group}s to remove the user from.</td>
+     * </tr>
+     * </table>
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalStateException}</td>
+     * <td>The {@link Group} is the current primary one (you have to set another {@link Group} as primary first).</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                             REMOVE_FROM_GROUPS;
+
+    /**
+     * Returns the primary {@link Group} of the user.
+     * The primary {@link Group} is the first {@link Group} in the {@link #GET_GROUPS} list and is used when new rights are applied.
+     */
+    public static final FunctionDefinition<Group>                            GET_PRIMARY_GROUP;
+
+    /**
+     * Changes the primary {@link Group} of the user to the given one.
+     * The user must already be a member of the {@link Group}.
+     * The primary {@link Group} is the first {@link Group} in the {@link #GET_GROUPS} list and is used when new rights are applied.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Group}</td>
+     * <td>primaryGroup</td>
+     * <td>The new primary {@link Group} of the user.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                             SET_PRIMARY_GROUP;
+
+    /**
+     * Returns true if the user is a superuser.
+     * The superuser of a system can do everything without having the rights applied for doing it.
+     */
+    public static final FunctionDefinition<Boolean>                          IS_SUPERUSER;
+
+    static {
+
+        GET_NAME = FunctionDefinitionFactory.create("getName", User.class, PropertyAccessorFactory.createGet(NAME));
+        SET_NAME = FunctionDefinitionFactory.create("setName", User.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(NAME)), String.class);
+        SET_NAME.addExecutor(User.class, "checkNotSuperuser", new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+            @Lockable
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                if (holder.get(IS_SUPERUSER).invoke()) {
+                    throw new StopExecutionException("Can't change the name of the superuser '" + SUPERUSER_NAME + "'");
+                }
+
+                return null;
             }
-        }
-    }
 
-    /**
-     * Removes the membership of this user from the given group.
-     * 
-     * @param group The group to remove the user from.
-     * @throws IllegalStateException The group is the primary one (you have to set another group as primary first).
-     */
-    public void removeFromGroup(Group group) throws IllegalStateException {
+        });
 
-        if (!getPrimaryGroup().equals(group)) {
-            if (!isSuperuser()) {
-                groups.remove(group);
+        GET_GROUPS = FunctionDefinitionFactory.create("getGroups", User.class, CollectionPropertyAccessorFactory.createGet(GROUPS));
+        ADD_TO_GROUPS = FunctionDefinitionFactory.create("addToGroups", User.class, CollectionPropertyAccessorFactory.createAdd(GROUPS), Group[].class);
+        ADD_TO_GROUPS.addExecutor(User.class, "checkAllowed", new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                Validate.isTrue(!holder.get(IS_SUPERUSER).invoke(), "The superuser can't be a member in any group");
+                Validate.isTrue(!holder.get(GET_GROUPS).invoke().contains(arguments[0]), "The user is already a member in that group");
+
+                return null;
             }
-        } else {
-            throw new IllegalStateException("Can't remove group " + group.getName() + ": group is primary");
-        }
-    }
 
-    /**
-     * Returns the primary group of the user.
-     * The primary group is the first group in the groups list and is used when rights are applied.
-     * 
-     * @return The primary group of the user.
-     */
-    @XmlTransient
-    public Group getPrimaryGroup() {
+        });
+        REMOVE_FROM_GROUPS = FunctionDefinitionFactory.create("removeFromGroups", User.class, CollectionPropertyAccessorFactory.createRemove(GROUPS), Group[].class);
+        REMOVE_FROM_GROUPS.addExecutor(User.class, "checkAllowed", new FunctionExecutor<Void>() {
 
-        if (groups.size() > 0) {
-            return groups.get(0);
-        } else {
-            return null;
-        }
-    }
+            @Override
+            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
-    /**
-     * Changes the primary group of the user to the given one.
-     * The user must already be a member of the group.
-     * The primary group is the first group in the groups list and is used when rights are applied.
-     * 
-     * @param group The new primary group of the user.
-     */
-    public void setPrimaryGroup(Group group) {
+                Validate.isTrue(!holder.get(IS_SUPERUSER).invoke(), "The superuser can't be a member in any group");
+                if (holder.get(GET_PRIMARY_GROUP).invoke().equals(arguments[0])) {
+                    throw new StopExecutionException(new IllegalStateException("Can't remove user from its primary group"));
+                }
 
-        if (!isSuperuser() && groups.contains(group)) {
-            groups.remove(group);
-            groups.add(0, group);
-        }
-    }
-
-    /**
-     * Returns true if this user is the superuser.
-     * The superuser of a system can do everything without having the rights for doing it.
-     * 
-     * @return True if this user is the superuser.
-     */
-    public boolean isSuperuser() {
-
-        return name.equals(SUPERUSER_NAME);
-    }
-
-    /**
-     * Returns the unique serialization id for the user.
-     * The id is a combination of the host computer's id and the user's name.
-     * It should only be used by a serialization algorithm.
-     * 
-     * @return The unique serialization id for the user.
-     */
-    @XmlAttribute
-    @XmlID
-    protected String getId() {
-
-        return host.getHost().getId() + "-" + name;
-    }
-
-    @Override
-    public int compareTo(User o) {
-
-        return name.compareTo(o.getName());
-    }
-
-    @Override
-    public int hashCode() {
-
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (groups == null ? 0 : groups.hashCode());
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        User other = (User) obj;
-        if (groups == null) {
-            if (other.groups != null) {
-                return false;
+                return null;
             }
-        } else if (!groups.equals(other.groups)) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
+
+        });
+
+        GET_PRIMARY_GROUP = FunctionDefinitionFactory.create("getPrimaryGroup", User.class, new FunctionExecutor<Group>() {
+
+            @Override
+            public Group invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                if (holder.get(GET_GROUPS).invoke().size() > 0) {
+                    return holder.get(GET_GROUPS).invoke().get(0);
+                } else {
+                    return null;
+                }
             }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        return true;
+
+        });
+        SET_PRIMARY_GROUP = FunctionDefinitionFactory.create("setPrimaryGroup", User.class, new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                if (holder.get(GET_GROUPS).invoke().contains(arguments[0])) {
+                    holder.get(GROUPS).get().remove(arguments[0]);
+                    holder.get(GROUPS).get().add(0, (Group) arguments[0]);
+                }
+
+                return null;
+            }
+
+        }, Group.class);
+
+        IS_SUPERUSER = FunctionDefinitionFactory.create("isSuperuser", User.class, new FunctionExecutor<Boolean>() {
+
+            @Override
+            public Boolean invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                return holder.get(GET_NAME).invoke().equals(SUPERUSER_NAME);
+            }
+        });
+
+        GET_COLUMNS.addExecutor(User.class, "default", new FunctionExecutor<Map<String, Object>>() {
+
+            @Override
+            public Map<String, Object> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                Map<String, Object> columns = new HashMap<String, Object>();
+                columns.put("name", holder.get(GET_NAME).invoke());
+                columns.put("groups", holder.get(GET_GROUPS).invoke());
+                return columns;
+            }
+
+        });
+        SET_COLUMNS.addExecutor(User.class, "default", new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                // Trust the user of the method
+                @SuppressWarnings ("unchecked")
+                Map<String, Object> columns = (Map<String, Object>) arguments[0];
+                holder.get(SET_NAME).invoke(columns.get("name"));
+
+                Validate.isTrue(columns.get("groups") instanceof List, "Groups must be a list");
+                // Trust the user again
+                @SuppressWarnings ("unchecked")
+                List<Group> groups = (List<Group>) columns.get("groups");
+                if (groups.size() > 0) {
+                    for (Group group : groups) {
+                        holder.get(ADD_TO_GROUPS).invoke(group);
+                    }
+                    holder.get(SET_PRIMARY_GROUP).invoke(groups.get(0));
+                }
+
+                return null;
+            }
+
+        });
+
     }
 
-    @Override
-    public String toInfoString() {
+    // ----- Functions End -----
 
-        return name + ", " + groups.size() + " memberships";
-    }
+    /**
+     * Creates a new user.
+     */
+    public User() {
 
-    @Override
-    public String toString() {
-
-        return getClass().getName() + " [" + toInfoString() + "]";
     }
 
 }
