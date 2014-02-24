@@ -36,7 +36,6 @@ public class MultiactionButton extends Button {
 
     public MultiactionButton() {
 
-        super();
     }
 
     public MultiactionButton(ButtonModel model) {
