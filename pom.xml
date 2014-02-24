@@ -4,7 +4,7 @@
 
     <groupId>com.quartercode</groupId>
     <artifactId>disconnected</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Disconnected</name>
@@ -23,21 +23,6 @@
         <url>http://www.quartercode.com</url>
     </organization>
 
-    <licenses>
-        <license>
-            <name>GNU General Public License Version 3</name>
-            <url>http://opensource.org/licenses/GPL-3.0</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-    <scm>
-        <url>https://github.com/QuarterCode/Disconnected/tree/master/</url>
-        <connection>scm:git:git://github.com/QuarterCode/Disconnected.git</connection>
-        <developerConnection>scm:git:git@github.com:QuarterCode/Disconnected.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
-
     <developers>
         <developer>
             <name>LoadingByte</name>
@@ -46,6 +31,40 @@
             <organization>QuarterCode</organization>
         </developer>
     </developers>
+
+    <licenses>
+        <license>
+            <name>GNU General Public License Version 3</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/QuarterCode/Disconnected</url>
+        <connection>scm:git:git://github.com/QuarterCode/Disconnected.git</connection>
+        <developerConnection>scm:git:git@github.com:QuarterCode/Disconnected.git</developerConnection>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/QuarterCode/Disconnected/issues</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>Jenkins</system>
+        <url>http://ci.quartercode.com</url>
+    </ciManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>quartercode-deployment</id>
+            <url>http://repo.quartercode.com/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>quartercode-deployment</id>
+            <url>http://repo.quartercode.com/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <dependencies>
         <!-- Utility -->
