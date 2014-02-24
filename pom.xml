@@ -105,8 +105,26 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>quartercode-repository</id>
+            <name>QuarterCode Repository</name>
+            <url>http://repo.quartercode.com/content/groups/public/</url>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
+            <!-- Gitflow -->
+            <plugin>
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>maven-jgitflow-plugin</artifactId>
+                <version>1.0-alpha27</version>
+                <configuration>
+                    <noDeploy>true</noDeploy>
+                </configuration>
+            </plugin>
+
             <!-- License header -->
             <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>
@@ -210,9 +228,6 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.4</version>
-                <configuration>
-                    <outputDirectory>${project.build.directory}</outputDirectory>
-                </configuration>
                 <executions>
                     <execution>
                         <id>assemble-packages</id>

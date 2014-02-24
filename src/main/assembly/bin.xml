@@ -6,14 +6,16 @@
         <format>zip</format>
     </formats>
 
-    <files>
-        <file>
-            <source>${project.build.directory}/${finalName}.jar</source>
-            <outputDirectory>.</outputDirectory>
-        </file>
-    </files>
-
     <fileSets>
+        <!-- Jar -->
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory>.</outputDirectory>
+            <includes>
+                <include>${finalName}.jar</include>
+            </includes>
+        </fileSet>
+
         <!-- Information -->
         <fileSet>
             <directory>${project.basedir}</directory>
@@ -21,15 +23,6 @@
             <includes>
                 <include>README.*</include>
                 <include>LICENSE.*</include>
-            </includes>
-        </fileSet>
-
-        <!-- Shortcuts -->
-        <fileSet>
-            <directory>${project.build.directory}</directory>
-            <outputDirectory>.</outputDirectory>
-            <includes>
-                <include>*.exe</include>
             </includes>
         </fileSet>
 
