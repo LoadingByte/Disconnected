@@ -18,14 +18,30 @@
 
 package com.quartercode.disconnected.test.util;
 
+import java.io.IOException;
 import java.util.List;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import com.quartercode.disconnected.Disconnected;
+import com.quartercode.disconnected.Main;
 import com.quartercode.disconnected.sim.Location;
 import com.quartercode.disconnected.util.LocationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
+import com.quartercode.disconnected.util.Registry;
+import com.quartercode.disconnected.util.ResourceStore;
 
 public class LocationGeneratorTest {
+
+    @BeforeClass
+    public static void setUpBeforeClass() throws IOException {
+
+        Disconnected.setRegistry(new Registry());
+        Main.fillRegistry(Disconnected.getRegistry());
+
+        Disconnected.setRS(new ResourceStore());
+        Main.fillResourceStore(Disconnected.getRS());
+    }
 
     @Test
     public void testGenerateLocations() {
