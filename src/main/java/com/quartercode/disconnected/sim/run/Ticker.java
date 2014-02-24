@@ -58,7 +58,7 @@ public class Ticker {
     }
 
     /**
-     * Creates a new ticker and initalizes some default tick actions.
+     * Creates a new ticker and initializes some default tick actions.
      * 
      * @param actions A list of default tick actions which get called on every tick.
      */

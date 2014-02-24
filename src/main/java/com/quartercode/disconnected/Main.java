@@ -68,14 +68,14 @@ import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.util.ResourceStore;
 
 /**
- * The main class which initalizes the whole game.
+ * The main class which initializes the whole game.
  */
 public class Main {
 
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     /**
-     * The main method which initalizes the whole game.
+     * The main method which initializes the whole game.
      * 
      * @param args The command line arguments.
      */
@@ -132,14 +132,14 @@ public class Main {
             Locale.setDefault(new Locale(language, country, variant));
         }
 
-        // Initalize & fill registry
-        LOGGER.info("Initalizing & filling class registry");
+        // Initialize & fill registry
+        LOGGER.info("Initializing & filling class registry");
         Disconnected.setRegistry(new Registry());
         fillRegistry(Disconnected.getRegistry());
 
-        // Initalize & fill resource store
+        // Initialize & fill resource store
         try {
-            LOGGER.info("Initalizing & filling resource store");
+            LOGGER.info("Initializing & filling resource store");
             Disconnected.setRS(new ResourceStore());
             fillResourceStore(Disconnected.getRS());
         }
@@ -148,17 +148,17 @@ public class Main {
             return;
         }
 
-        // Initalize profile manager and load stored profiles
-        LOGGER.info("Initalizing profile manager");
+        // Initialize profile manager and load stored profiles
+        LOGGER.info("Initializing profile manager");
         Disconnected.setProfileManager(new ProfileManager(new File("profiles")));
 
-        // Initalize graphics manager and start it
-        LOGGER.info("Initalizing & starting graphics manager");
+        // Initialize graphics manager and start it
+        LOGGER.info("Initializing & starting graphics manager");
         Disconnected.setGraphicsManager(new GraphicsManager());
         Disconnected.getGraphicsManager().setRunning(true);
 
-        // Initalize ticker
-        LOGGER.info("Initalizing ticker");
+        // Initialize ticker
+        LOGGER.info("Initializing ticker");
         List<TickAction> tickActions = new ArrayList<TickAction>();
         tickActions.add(new TickSimulator());
         Disconnected.setTicker(new Ticker(tickActions.toArray(new TickAction[tickActions.size()])));

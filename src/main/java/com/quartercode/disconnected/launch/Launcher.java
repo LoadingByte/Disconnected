@@ -49,7 +49,7 @@ public class Launcher {
     }
 
     /**
-     * Creates a new launcher and initalizes the main class.
+     * Creates a new launcher and initializes the main class.
      * 
      * @param mainClass The main class which get called on launch.
      */
@@ -60,7 +60,7 @@ public class Launcher {
     }
 
     /**
-     * Creates a new launcher and initalizes the main class and vm and program arguments.
+     * Creates a new launcher and initializes the main class and vm and program arguments.
      * 
      * @param mainClass The main class which get called on launch.
      * @param vmArguments The vm arguments which are set on launch and read by the virtual machine.
