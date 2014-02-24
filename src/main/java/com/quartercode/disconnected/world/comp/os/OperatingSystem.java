@@ -36,6 +36,8 @@ import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.Version;
 import com.quartercode.disconnected.world.comp.Vulnerability;
+import com.quartercode.disconnected.world.comp.file.FileSystem;
+import com.quartercode.disconnected.world.comp.program.FileSystemModule;
 import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.Process.ProcessState;
 
@@ -43,7 +45,6 @@ import com.quartercode.disconnected.world.comp.program.Process.ProcessState;
  * This class stores information about an operating system.
  * 
  * @see ProcessManager
- * @see FileSystemManager
  * @see NetworkManager
  */
 // TODO: Replace OperatingSystem with root process and managers with process deamons -> Everything will be done using processes
@@ -65,6 +66,11 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> implement
      * The {@link Vulnerability}s the operating system has.
      */
     protected static final FeatureDefinition<ObjectProperty<Set<Vulnerability>>> VULNERABILITIES;
+
+    /**
+     * The {@link FileSystemModule} for managing and accessing {@link FileSystem}s.
+     */
+    protected static final FeatureDefinition<ObjectProperty<FileSystemModule>>   FILE_SYSTEM_MODULE;
 
     static {
 
@@ -94,6 +100,16 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> implement
             public ObjectProperty<Set<Vulnerability>> create(FeatureHolder holder) {
 
                 return new ObjectProperty<Set<Vulnerability>>(getName(), holder, new HashSet<Vulnerability>());
+            }
+
+        };
+
+        FILE_SYSTEM_MODULE = new AbstractFeatureDefinition<ObjectProperty<FileSystemModule>>("fileSystemModule") {
+
+            @Override
+            public ObjectProperty<FileSystemModule> create(FeatureHolder holder) {
+
+                return new ObjectProperty<FileSystemModule>(getName(), holder, new FileSystemModule());
             }
 
         };
@@ -199,6 +215,11 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> implement
      */
     public static final FunctionDefinition<Void>                                 REMOVE_VULNERABILITIES;
 
+    /**
+     * Returns the {@link FileSystemModule} for managing and accessing {@link FileSystem}s.
+     */
+    public static final FunctionDefinition<FileSystemModule>                     GET_FS_MODULE;
+
     static {
 
         GET_NAME = FunctionDefinitionFactory.create("getName", OperatingSystem.class, PropertyAccessorFactory.createGet(NAME));
@@ -210,6 +231,8 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> implement
         GET_VULNERABILITIES = FunctionDefinitionFactory.create("getVulnerabilities", OperatingSystem.class, CollectionPropertyAccessorFactory.createGet(VULNERABILITIES));
         ADD_VULNERABILITIES = FunctionDefinitionFactory.create("addVulnerabilities", OperatingSystem.class, new LockableFEWrapper<Void>(CollectionPropertyAccessorFactory.createAdd(VULNERABILITIES)), Vulnerability[].class);
         REMOVE_VULNERABILITIES = FunctionDefinitionFactory.create("removeVulnerabilities", OperatingSystem.class, new LockableFEWrapper<Void>(CollectionPropertyAccessorFactory.createRemove(VULNERABILITIES)), Vulnerability[].class);
+
+        GET_FS_MODULE = FunctionDefinitionFactory.create("getFsModule", OperatingSystem.class, PropertyAccessorFactory.createGet(FILE_SYSTEM_MODULE));
 
         GET_OPERATING_SYSTEM.addExecutor(OperatingSystem.class, "default", new FunctionExecutor<OperatingSystem>() {
 
@@ -231,7 +254,6 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> implement
 
         // ----- Temporary -----
         processManager = new ProcessManager(this);
-        fileSystemManager = new FileSystemManager(this);
         networkManager = new NetworkManager(this);
         // ----- Temporary End -----
     }
@@ -240,10 +262,8 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> implement
     // ----- Temporary -----
 
     @XmlElement
-    private final ProcessManager    processManager;
-    @XmlElement
-    private final FileSystemManager fileSystemManager;
-    private final NetworkManager    networkManager;
+    private final ProcessManager processManager;
+    private final NetworkManager networkManager;
 
     /**
      * Returns the process manager which is used for holding and modifying processes.
@@ -256,19 +276,9 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> implement
     }
 
     /**
-     * Returns the file system manager which is used for holding and modifying file systems.
+     * Returns the network manager which is used for storing and delivering packets.
      * 
-     * @return The file system manager which is used for holding and modifying file systems.
-     */
-    public FileSystemManager getFileSystemManager() {
-
-        return fileSystemManager;
-    }
-
-    /**
-     * Returns the file system manager which is used for storing and delivering packets.
-     * 
-     * @return The file system manager which is used for storing and delivering packets.
+     * @return The network manager which is used for storing and delivering packets.
      */
     public NetworkManager getNetworkManager() {
 
@@ -296,11 +306,9 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> implement
     public void setRunning(boolean running) throws FunctionExecutionException {
 
         if (running) {
-            fileSystemManager.setRunning(true);
             processManager.setRunning(true);
         } else {
             processManager.setRunning(false);
-            fileSystemManager.setRunning(false);
         }
     }
 
