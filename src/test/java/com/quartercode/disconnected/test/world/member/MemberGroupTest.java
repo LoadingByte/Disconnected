@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.test.sim.member;
+package com.quartercode.disconnected.test.world.member;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -48,7 +48,7 @@ public class MemberGroupTest {
     @Test
     public void testGetMember() {
 
-        Assert.assertEquals("Member exists", group.getMembers().get(1), group.getMember("member2"));
+        Assert.assertTrue("Member doesn't exist", group.getMembers().get(1).equals(group.getMember("member2")));
     }
 
     @Test

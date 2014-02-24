@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.test.sim.member;
+package com.quartercode.disconnected.test.world.member;
 
 import org.junit.Assert;
 import org.junit.Before;

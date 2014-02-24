@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.test.sim.comp.file;
+package com.quartercode.disconnected.test.world.comp.file;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,11 +40,20 @@ public class FileUtilsTest {
         Assert.assertEquals("Resolved path of absolute one", "/system/bin/kernel", FileUtils.resolvePath("/user/homes/test/", "/system/bin/kernel"));
     }
 
+    private User createUser(String name) throws FunctionExecutionException {
+
+        User user = new User();
+        user.setLocked(false);
+        user.get(User.SET_NAME).invoke(name);
+        user.setLocked(true);
+        return user;
+    }
+
     @Test
     public void testHasRight() throws FunctionExecutionException {
 
         ContentFile file = new ContentFile();
-        User owner = new User(null, "owner");
+        User owner = createUser("owner");
         file.get(File.SET_OWNER).invoke(owner);
 
         file.get(File.GET_RIGHTS).invoke().get(FileRights.SET).invoke(FileAccessor.OWNER, FileRight.READ, true);
@@ -58,8 +67,8 @@ public class FileUtilsTest {
     public void testCanChangeRights() throws FunctionExecutionException {
 
         ContentFile file = new ContentFile();
-        User owner = new User(null, "owner");
-        User other = new User(null, "other");
+        User owner = createUser("owner");
+        User other = createUser("other");
         file.get(File.SET_OWNER).invoke(owner);
 
         Assert.assertTrue("Owner can't change rights", FileUtils.canChangeRights(owner, file));

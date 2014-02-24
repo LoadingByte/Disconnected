@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.test.profile;
+package com.quartercode.disconnected.test.sim.profile;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -58,7 +58,7 @@ public class ProfileSerializerTest {
     }
 
     @Test
-    public void testSerializeEquals() throws IOException, JAXBException {
+    public void testSerializeWorld() throws IOException, JAXBException {
 
         StringWriter serialized = new StringWriter();
         WriterOutputStream outputStream = new WriterOutputStream(serialized);
@@ -66,7 +66,7 @@ public class ProfileSerializerTest {
         outputStream.close();
 
         World copy = ProfileSerializer.deserializeWorld(new ReaderInputStream(new StringReader(serialized.toString())));
-        Assert.assertEquals("World equals serialized and deserialized copy", world, copy);
+        Assert.assertEquals("Serialized-deserialized copy of world", world, copy);
     }
 
 }
