@@ -81,11 +81,9 @@ public class DesktopState extends GraphicsState {
             Process process = os.getProcessManager().getRootProcess().createChild(os.getFileSystemManager().getFile("/system/bin/desktops.exe"), arguments);
             widget = ((DesktopSession) process.getExecutor()).createWidget();
             add(widget);
-        }
-        catch (WrongSessionTypeException e) {
+        } catch (WrongSessionTypeException e) {
             // Wont ever happen
-        }
-        catch (ArgumentException e) {
+        } catch (ArgumentException e) {
             // Wont ever happen
         }
     }

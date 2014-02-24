@@ -151,11 +151,9 @@ public class UpdateThread extends Thread {
                 themeFileWriter.println("</themes>");
                 themeFileWriter.flush();
                 theme = ThemeManager.createThemeManager(themeFile.toURI().toURL(), renderer);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new IOException("Error while creating temporary theme file", e);
-            }
-            finally {
+            } finally {
                 if (themeFileWriter != null) {
                     themeFileWriter.close();
                 }
@@ -191,11 +189,9 @@ public class UpdateThread extends Thread {
                 Mouse.poll();
                 Keyboard.poll();
             }
-        }
-        catch (LWJGLException e) {
+        } catch (LWJGLException e) {
             LOGGER.log(Level.SEVERE, "Error while creating lwjgl display", e);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error while loading files", e);
         }
 
@@ -216,8 +212,7 @@ public class UpdateThread extends Thread {
             decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
             buffer.flip();
             return buffer;
-        }
-        finally {
+        } finally {
             inputStream.close();
         }
     }

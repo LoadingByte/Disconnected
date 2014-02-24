@@ -115,8 +115,7 @@ public class ProfileSerializer {
 
         try {
             return JAXBContext.newInstance(classes.toArray(new Class[classes.size()]));
-        }
-        catch (JAXBException e) {
+        } catch (JAXBException e) {
             LOGGER.log(Level.SEVERE, "A JAXB exception occurred while creating context", e);
         }
 

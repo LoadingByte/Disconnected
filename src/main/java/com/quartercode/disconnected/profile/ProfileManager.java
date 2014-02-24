@@ -130,8 +130,7 @@ public class ProfileManager {
         try {
             outputStream = new FileOutputStream(profileFile);
             ProfileSerializer.serializeProfile(outputStream, profile);
-        }
-        finally {
+        } finally {
             outputStream.close();
         }
     }
@@ -175,8 +174,7 @@ public class ProfileManager {
                 Simulation simulation = (Simulation) data[0];
                 simulation.setRandom((RandomPool) data[1]);
                 profile.setSimulation(simulation);
-            }
-            finally {
+            } finally {
                 inputStream.close();
             }
         }

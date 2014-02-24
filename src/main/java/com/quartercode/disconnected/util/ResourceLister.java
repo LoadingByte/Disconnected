@@ -104,8 +104,7 @@ public class ResourceLister {
                     }
                 }
             }
-        }
-        finally {
+        } finally {
             if (zipFile != null) {
                 zipFile.close();
             }

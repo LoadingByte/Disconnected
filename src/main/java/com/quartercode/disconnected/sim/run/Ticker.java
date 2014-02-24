@@ -219,16 +219,14 @@ public class Ticker {
                     for (TickAction action : new ArrayList<TickAction>(ticker.getActions())) {
                         try {
                             action.update();
-                        }
-                        catch (Throwable t) {
+                        } catch (Throwable t) {
                             LOGGER.log(Level.SEVERE, "An exception occurred while executing tick action update (tick action " + action.getClass().getName() + ")", t);
                         }
                     }
 
                     try {
                         Thread.sleep(ticker.getDelay());
-                    }
-                    catch (InterruptedException e) {
+                    } catch (InterruptedException e) {
                         LOGGER.log(Level.SEVERE, "Tick thread has been interrupted", e);
                     }
                 }

@@ -84,8 +84,7 @@ public class Main {
         // Logging configuration
         try {
             LogManager.getLogManager().readConfiguration(Main.class.getResourceAsStream("/config/logging.properties"));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Can't load logging configuration", e);
             return;
         }
@@ -101,8 +100,7 @@ public class Main {
         CommandLine line = null;
         try {
             line = new PosixParser().parse(options, args, true);
-        }
-        catch (ParseException e) {
+        } catch (ParseException e) {
             LOGGER.warning(e.getMessage());
             new HelpFormatter().printHelp("java -jar disconnected-" + Disconnected.getVersion() + ".jar", options, true);
         }
@@ -142,8 +140,7 @@ public class Main {
             LOGGER.info("Initializing & filling resource store");
             Disconnected.setRS(new ResourceStore());
             fillResourceStore(Disconnected.getRS());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Can't fill resource store", e);
             return;
         }
@@ -173,8 +170,7 @@ public class Main {
         Disconnected.getProfileManager().addProfile(profile);
         try {
             Disconnected.getProfileManager().setActive(profile);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             // Wont ever happen (we created a new profile)
         }

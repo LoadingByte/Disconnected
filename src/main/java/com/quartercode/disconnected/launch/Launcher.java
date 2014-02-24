@@ -202,14 +202,11 @@ public class Launcher {
 
             outputGobbler.interrupt();
             errorGobbler.interrupt();
-        }
-        catch (URISyntaxException e) {
+        } catch (URISyntaxException e) {
             LOGGER.log(Level.SEVERE, "Can't find jar file", e);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Can't build process/read process output", e);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             LOGGER.log(Level.SEVERE, "Interrupted while waiting for launched process", e);
         }
 
