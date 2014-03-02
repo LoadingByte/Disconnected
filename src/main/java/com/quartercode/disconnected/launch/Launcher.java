@@ -132,7 +132,7 @@ public class Launcher {
      * Sets the program arguments which are set on launch.
      * Program arguments are read by the executed program. Every program handles them differently.
      * 
-     * @param vmArguments The program arguments which are set on launch.
+     * @param programArguments The program arguments which are set on launch.
      */
     public void setProgramArguments(String[] programArguments) {
 
