@@ -24,9 +24,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A registry holds all kinds of classes for a later use, e.g. for serialization using JAXB.
+ * A registry holds all kinds of classes and TWL themes for a later use, e.g. for serialization using JAXB.
  * 
  * @see Class
+ * @see URL
  */
 public class Registry {
 
