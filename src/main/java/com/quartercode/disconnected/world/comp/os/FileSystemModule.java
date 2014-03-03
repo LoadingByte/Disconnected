@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.world.comp.program;
+package com.quartercode.disconnected.world.comp.os;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -41,7 +41,7 @@ import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
 import com.quartercode.disconnected.world.comp.hardware.Hardware;
-import com.quartercode.disconnected.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.world.comp.program.Process;
 
 /**
  * This class represents a kernel module which is used to access the available {@link FileSystem}s.
