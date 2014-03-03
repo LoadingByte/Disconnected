@@ -32,12 +32,13 @@ import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.world.StringRepresentable;
 
 /**
  * This class represents a simple version.
  * A version contains a major version, minor version and a patch level.
  */
-public class Version extends DefaultFeatureHolder {
+public class Version extends DefaultFeatureHolder implements StringRepresentable {
 
     // ----- Properties -----
 
@@ -190,6 +191,12 @@ public class Version extends DefaultFeatureHolder {
     public static final FunctionDefinition<Void>                      FROM_OBJECT;
 
     /**
+     * Returns the stored version as a string.
+     * The string is using the format MAJOR.MINOR.PATCHLEVEL (e.g. 1.2.5).
+     */
+    public static final FunctionDefinition<String>                    TO_STRING   = StringRepresentable.TO_STRING;
+
+    /**
      * Changes the stored version to the ones stored in the given version string.
      * The string is using the format MAJOR.MINOR.PATCHLEVEL (e.g. 1.2.5).
      * 
@@ -208,13 +215,7 @@ public class Version extends DefaultFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                      FROM_STRING;
-
-    /**
-     * Returns the stored version as a string.
-     * The string is using the format MAJOR.MINOR.PATCHLEVEL (e.g. 1.2.5).
-     */
-    public static final FunctionDefinition<String>                    TO_STRING;
+    public static final FunctionDefinition<Void>                      FROM_STRING = StringRepresentable.FROM_STRING;
 
     static {
 
@@ -242,7 +243,16 @@ public class Version extends DefaultFeatureHolder {
 
         }, Version.class);
 
-        FROM_STRING = FunctionDefinitionFactory.create("fromString", Version.class, new FunctionExecutor<Void>() {
+        TO_STRING.addExecutor(Version.class, "default", new FunctionExecutor<String>() {
+
+            @Override
+            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                return holder.get(GET_MAJOR).invoke() + "." + holder.get(GET_MINOR).invoke() + "." + holder.get(GET_REVISION).invoke();
+            }
+
+        });
+        FROM_STRING.addExecutor(Version.class, "default", new FunctionExecutor<Void>() {
 
             @Override
             @Lockable
@@ -255,16 +265,6 @@ public class Version extends DefaultFeatureHolder {
                 holder.get(SET_REVISION).invoke(Integer.parseInt(versionParts[2]));
 
                 return null;
-            }
-
-        }, String.class);
-
-        TO_STRING = FunctionDefinitionFactory.create("toString", Version.class, new FunctionExecutor<String>() {
-
-            @Override
-            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
-
-                return holder.get(GET_MAJOR).invoke() + "." + holder.get(GET_MINOR).invoke() + "." + holder.get(GET_REVISION).invoke();
             }
 
         });

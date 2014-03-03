@@ -32,16 +32,17 @@ import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.world.StringRepresentable;
 import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
 
 /**
- * This class represents an address which locates a specific service which is avaiable through a specific network interface.
+ * This class represents an address which locates a specific service which is available through a specific network interface.
  * The network interface is defined by an ip, the service by a port on which it's listening.
  * 
  * @see IP
  * @see NetworkInterface
  */
-public class Address extends DefaultFeatureHolder {
+public class Address extends DefaultFeatureHolder implements StringRepresentable {
 
     // ----- Properties -----
 
@@ -155,6 +156,12 @@ public class Address extends DefaultFeatureHolder {
     public static final FunctionDefinition<Void>                      FROM_OBJECT;
 
     /**
+     * Returns the stored address as a string.
+     * The string is using the format IP:PORT (e.g. 127.0.0.1:8080).
+     */
+    public static final FunctionDefinition<String>                    TO_STRING   = StringRepresentable.TO_STRING;
+
+    /**
      * Changes the stored address to the one set by the given string.
      * The string is using the format IP:PORT (e.g. 127.0.0.1:8080).
      * 
@@ -173,13 +180,7 @@ public class Address extends DefaultFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                      FROM_STRING;
-
-    /**
-     * Returns the stored address as a string.
-     * The string is using the format IP:PORT (e.g. 127.0.0.1:8080).
-     */
-    public static final FunctionDefinition<String>                    TO_STRING;
+    public static final FunctionDefinition<Void>                      FROM_STRING = StringRepresentable.FROM_STRING;
 
     static {
 
@@ -222,7 +223,16 @@ public class Address extends DefaultFeatureHolder {
 
         }, Address.class);
 
-        FROM_STRING = FunctionDefinitionFactory.create("fromString", Address.class, new FunctionExecutor<Void>() {
+        TO_STRING.addExecutor(Address.class, "default", new FunctionExecutor<String>() {
+
+            @Override
+            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                return holder.get(GET_IP).invoke().get(com.quartercode.disconnected.world.comp.net.IP.TO_STRING).invoke() + ":" + holder.get(GET_PORT).invoke();
+            }
+
+        });
+        FROM_STRING.addExecutor(Address.class, "default", new FunctionExecutor<Void>() {
 
             @Override
             @Lockable
@@ -238,16 +248,6 @@ public class Address extends DefaultFeatureHolder {
                 holder.get(SET_PORT).invoke(Integer.parseInt(parts[1]));
 
                 return null;
-            }
-
-        }, String.class);
-
-        TO_STRING = FunctionDefinitionFactory.create("toString", Address.class, new FunctionExecutor<String>() {
-
-            @Override
-            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
-
-                return holder.get(GET_IP).invoke().get(com.quartercode.disconnected.world.comp.net.IP.TO_STRING).invoke() + ":" + holder.get(GET_PORT).invoke();
             }
 
         });

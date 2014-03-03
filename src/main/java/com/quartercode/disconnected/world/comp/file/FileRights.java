@@ -27,13 +27,14 @@ import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.world.StringRepresentable;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 
 /**
  * File rights control the access to files by users.
  * You can set if a given user/group is allowed to read, write, execute or delete.
  */
-public class FileRights extends WorldChildFeatureHolder<File<?>> {
+public class FileRights extends WorldChildFeatureHolder<File<?>> implements StringRepresentable {
 
     /**
      * The file accessor represents the type of person who accesses a file in its context.
@@ -258,6 +259,31 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> {
     public static final FunctionDefinition<Void>                        FROM_OBJECT;
 
     /**
+     * Returns the stored file rights as a string.
+     * The string is using the typcial UNIX-format with some changes. Examples:
+     * 
+     * <pre>
+     * rwdxr--xr--x
+     * rwdxrwdx----
+     * </pre>
+     * 
+     * You can split the string into 3 segments.
+     * 
+     * <pre>
+     * rwdx | r--x | r--x
+     * rwdx | rwdx | ----
+     * </pre>
+     * 
+     * The first segment defines the rights for the owner, the second for the group and the third for everyone else.
+     * 
+     * A "r" means that you can read from the file or directory.
+     * A "w" means that you can write content into the file or create new files inside a directory.
+     * A "d" means that you can delete the file or directory (if it's empty).
+     * A "x" means that you can execute the file.
+     */
+    public static final FunctionDefinition<String>                      TO_STRING   = StringRepresentable.TO_STRING;
+
+    /**
      * Changes the rights to the ones stored in the given rights string.
      * The string is using the typcial UNIX-format with some changes. Examples:
      * 
@@ -295,32 +321,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                        FROM_STRING;
-
-    /**
-     * Returns the stored file rights as a string.
-     * The string is using the typcial UNIX-format with some changes. Examples:
-     * 
-     * <pre>
-     * rwdxr--xr--x
-     * rwdxrwdx----
-     * </pre>
-     * 
-     * You can split the string into 3 segments.
-     * 
-     * <pre>
-     * rwdx | r--x | r--x
-     * rwdx | rwdx | ----
-     * </pre>
-     * 
-     * The first segment defines the rights for the owner, the second for the group and the third for everyone else.
-     * 
-     * A "r" means that you can read from the file or directory.
-     * A "w" means that you can write content into the file or create new files inside a directory.
-     * A "d" means that you can delete the file or directory (if it's empty).
-     * A "x" means that you can execute the file.
-     */
-    public static final FunctionDefinition<String>                      TO_STRING;
+    public static final FunctionDefinition<Void>                        FROM_STRING = StringRepresentable.FROM_STRING;
 
     static {
 
@@ -368,22 +369,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> {
 
         }, FileRights.class);
 
-        FROM_STRING = FunctionDefinitionFactory.create("fromString", FileRights.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
-
-                char[] rights = ((String) arguments[0]).toCharArray();
-                for (int index = 0; index < 3 * 4; index++) {
-                    holder.get(RIGHTS).get()[index] = rights[index] != '-';
-                }
-
-                return null;
-            }
-
-        }, String.class);
-
-        TO_STRING = FunctionDefinitionFactory.create("toString", FileRights.class, new FunctionExecutor<String>() {
+        TO_STRING.addExecutor(FileRights.class, "default", new FunctionExecutor<String>() {
 
             @Override
             public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
@@ -408,6 +394,20 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> {
                 }
 
                 return rights;
+            }
+
+        });
+        FROM_STRING.addExecutor(FileRights.class, "default", new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                char[] rights = ((String) arguments[0]).toCharArray();
+                for (int index = 0; index < 3 * 4; index++) {
+                    holder.get(RIGHTS).get()[index] = rights[index] != '-';
+                }
+
+                return null;
             }
 
         });

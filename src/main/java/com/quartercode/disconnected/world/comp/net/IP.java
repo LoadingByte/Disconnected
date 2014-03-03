@@ -34,6 +34,7 @@ import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.world.StringRepresentable;
 import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
 
 /**
@@ -43,7 +44,7 @@ import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
  * @see NetworkInterface
  * @see Address
  */
-public class IP extends DefaultFeatureHolder {
+public class IP extends DefaultFeatureHolder implements StringRepresentable {
 
     // ----- Properties -----
 
@@ -117,6 +118,13 @@ public class IP extends DefaultFeatureHolder {
     public static final FunctionDefinition<Void>                        FROM_OBJECT;
 
     /**
+     * Returns the stored ip in the dotted quad notation.
+     * The string is using the format XXXX.XXXX.XXXX.XXXX (e.g. 127.0.0.1).
+     * Each number (they are seperated by dots) represents a quad in the dotted quad notation and must be in range 0 <= number <= 255.
+     */
+    public static final FunctionDefinition<String>                      TO_STRING   = StringRepresentable.TO_STRING;
+
+    /**
      * Changes the stored ip to the one set by the given dotted quad notation string.
      * The string is using the format XXXX.XXXX.XXXX.XXXX (e.g. 127.0.0.1).
      * Each number (they are seperated by dots) represents a quad in the dotted quad notation and must be in range 0 <= number <= 255.
@@ -136,14 +144,7 @@ public class IP extends DefaultFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                        FROM_STRING;
-
-    /**
-     * Returns the stored ip in the dotted quad notation.
-     * The string is using the format XXXX.XXXX.XXXX.XXXX (e.g. 127.0.0.1).
-     * Each number (they are seperated by dots) represents a quad in the dotted quad notation and must be in range 0 <= number <= 255.
-     */
-    public static final FunctionDefinition<String>                      TO_STRING;
+    public static final FunctionDefinition<Void>                        FROM_STRING = StringRepresentable.FROM_STRING;
 
     static {
 
@@ -180,7 +181,20 @@ public class IP extends DefaultFeatureHolder {
 
         }, IP.class);
 
-        FROM_STRING = FunctionDefinitionFactory.create("fromString", IP.class, new FunctionExecutor<Void>() {
+        TO_STRING.addExecutor(IP.class, "default", new FunctionExecutor<String>() {
+
+            @Override
+            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                String parts = "";
+                for (int part : holder.get(GET_PARTS).invoke()) {
+                    parts += "." + part;
+                }
+                return parts.substring(1);
+            }
+
+        });
+        FROM_STRING.addExecutor(IP.class, "default", new FunctionExecutor<Void>() {
 
             @Override
             @Lockable
@@ -194,20 +208,6 @@ public class IP extends DefaultFeatureHolder {
                 holder.get(SET_PARTS).invoke(parts);
 
                 return null;
-            }
-
-        }, String.class);
-
-        TO_STRING = FunctionDefinitionFactory.create("toString", IP.class, new FunctionExecutor<String>() {
-
-            @Override
-            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
-
-                String parts = "";
-                for (int part : holder.get(GET_PARTS).invoke()) {
-                    parts += "." + part;
-                }
-                return parts.substring(1);
             }
 
         });
