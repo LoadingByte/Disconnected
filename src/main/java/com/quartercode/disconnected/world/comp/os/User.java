@@ -64,6 +64,12 @@ public class User extends ConfigurationEntry {
     protected static final FeatureDefinition<ObjectProperty<String>>         NAME;
 
     /**
+     * The hashed password of the user.
+     * It is hashed using the SHA-256 algorithm and can be used to authenticate as the user.
+     */
+    protected static final FeatureDefinition<ObjectProperty<String>>         PASSWORD;
+
+    /**
      * A list of all {@link Group}s the user is a member in.
      * Such {@link Group}s are used to set rights for multiple users.
      */
@@ -72,6 +78,16 @@ public class User extends ConfigurationEntry {
     static {
 
         NAME = new AbstractFeatureDefinition<ObjectProperty<String>>("name") {
+
+            @Override
+            public ObjectProperty<String> create(FeatureHolder holder) {
+
+                return new ObjectProperty<String>(getName(), holder);
+            }
+
+        };
+
+        PASSWORD = new AbstractFeatureDefinition<ObjectProperty<String>>("password") {
 
             @Override
             public ObjectProperty<String> create(FeatureHolder holder) {
@@ -123,6 +139,34 @@ public class User extends ConfigurationEntry {
      * </table>
      */
     public static final FunctionDefinition<Void>                             SET_NAME;
+
+    /**
+     * Returns the hashed password of the user.
+     * It is hashed using the SHA-256 algorithm and can be used to authenticate as the user.
+     */
+    public static final FunctionDefinition<String>                           GET_PASSWORD;
+
+    /**
+     * Sets the hashed password of the user.
+     * The new password must be hashed using the SHA-256 algorithm.
+     * It can be used to authenticate as the user.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link String}</td>
+     * <td>password</td>
+     * <td>The new password of the user. It must be hashed using the SHA-256 algorithm.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                             SET_PASSWORD;
 
     /**
      * Returns a list of all {@link Group}s the user is a member in.
@@ -234,6 +278,9 @@ public class User extends ConfigurationEntry {
             }
 
         });
+
+        GET_PASSWORD = FunctionDefinitionFactory.create("getPassword", User.class, PropertyAccessorFactory.createGet(PASSWORD));
+        SET_PASSWORD = FunctionDefinitionFactory.create("setPassword", User.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(PASSWORD)), String.class);
 
         GET_GROUPS = FunctionDefinitionFactory.create("getGroups", User.class, CollectionPropertyAccessorFactory.createGet(GROUPS));
         ADD_TO_GROUPS = FunctionDefinitionFactory.create("addToGroups", User.class, CollectionPropertyAccessorFactory.createAdd(GROUPS), Group[].class);
