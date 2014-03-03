@@ -51,19 +51,19 @@ public class FileUtils {
      */
     public static String resolvePath(String start, String path) {
 
-        if (!start.startsWith(File.SEPERATOR)) {
-            throw new IllegalArgumentException("Start path must be absolute (it has to start with " + File.SEPERATOR + "): " + start);
+        if (!start.startsWith(File.SEPARATOR)) {
+            throw new IllegalArgumentException("Start path must be absolute (it has to start with " + File.SEPARATOR + "): " + start);
         } else {
             List<String> current = new ArrayList<String>();
-            if (!path.startsWith(File.SEPERATOR)) {
-                current.addAll(Arrays.asList(start.split(File.SEPERATOR)));
+            if (!path.startsWith(File.SEPARATOR)) {
+                current.addAll(Arrays.asList(start.split(File.SEPARATOR)));
                 if (current.size() > 0) {
                     // Remove first entry ([this]/...), it's empty
                     current.remove(0);
                 }
             }
 
-            for (String pathChange : path.split(File.SEPERATOR)) {
+            for (String pathChange : path.split(File.SEPARATOR)) {
                 if (!pathChange.equals(".") && !pathChange.isEmpty()) {
                     if (pathChange.equals("..")) {
                         current.remove(current.size() - 1);
@@ -74,11 +74,11 @@ public class FileUtils {
             }
 
             if (current.isEmpty()) {
-                return File.SEPERATOR;
+                return File.SEPARATOR;
             } else {
                 String resolvedPath = "";
                 for (String part : current) {
-                    resolvedPath += File.SEPERATOR + part;
+                    resolvedPath += File.SEPARATOR + part;
                 }
                 return resolvedPath;
             }

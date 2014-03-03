@@ -52,9 +52,9 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
     private static final Logger                                          LOGGER              = Logger.getLogger(File.class.getName());
 
     /**
-     * The path seperator which seperates different files in a path string.
+     * The path separator which seperates different files in a path string.
      */
-    public static final String                                           SEPERATOR           = "/";
+    public static final String                                           SEPARATOR           = "/";
 
     /**
      * The default {@link FileRights} string for every new file.
@@ -231,14 +231,14 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
 
     /**
      * Returns the local the path of the file.
-     * A path is a collection of files seperated by a seperator.
+     * A path is a collection of files seperated by a separator.
      * The local path can be used to look up the file a on its {@link FileSystem}.
      */
     public static final FunctionDefinition<String>                       GET_PATH;
 
     /**
      * Moves the file to the given local path.
-     * A path is a collection of files seperated by a seperator.
+     * A path is a collection of files seperated by a separator.
      * 
      * <table>
      * <tr>
@@ -301,7 +301,7 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
             @Override
             public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
-                return ((File<?>) holder).getParent().get(GET_PATH).invoke() + File.SEPERATOR + holder.get(GET_NAME).invoke();
+                return ((File<?>) holder).getParent().get(GET_PATH).invoke() + File.SEPARATOR + holder.get(GET_NAME).invoke();
             }
 
         });

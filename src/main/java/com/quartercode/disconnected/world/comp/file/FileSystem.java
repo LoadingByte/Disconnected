@@ -111,7 +111,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
     /**
      * Returns the {@link File} which is stored under the given path.
-     * A path is a collection of {@link File}s seperated by a seperator.
+     * A path is a collection of {@link File}s seperated by a separator.
      * This will look up the {@link File} using a local file system path.
      * 
      * <table>
@@ -196,7 +196,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
             @Override
             public File<?> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
-                String[] parts = ((String) arguments[0]).split(File.SEPERATOR);
+                String[] parts = ((String) arguments[0]).split(File.SEPARATOR);
                 File<?> current = holder.get(GET_ROOT).invoke();
                 for (String part : parts) {
                     if (!part.isEmpty()) {
@@ -220,7 +220,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
             @SuppressWarnings ("unchecked")
             public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
-                String[] parts = ((String) arguments[1]).split(File.SEPERATOR);
+                String[] parts = ((String) arguments[1]).split(File.SEPARATOR);
                 File<?> current = holder.get(GET_ROOT).invoke();
                 File<FeatureHolder> file = (File<FeatureHolder>) arguments[0];
                 for (int counter = 0; counter < parts.length; counter++) {
