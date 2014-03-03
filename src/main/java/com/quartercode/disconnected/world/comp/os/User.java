@@ -53,7 +53,7 @@ public class User extends ConfigurationEntry {
      * The superuser of a system can do everything without having the rights applied for doing it.
      * You can check if a user is the superuser by using {@link #IS_SUPERUSER}.
      */
-    public static final String                                               SUPERUSER_NAME = "root";
+    public static final String                                                SUPERUSER_NAME = "root";
 
     // ----- Properties -----
 
@@ -61,19 +61,19 @@ public class User extends ConfigurationEntry {
      * The name of the user.
      * The name is used for recognizing a user on the os-level.
      */
-    protected static final FeatureDefinition<ObjectProperty<String>>         NAME;
+    protected static final FeatureDefinition<ObjectProperty<String>>          NAME;
 
     /**
      * The hashed password of the user.
      * It is hashed using the SHA-256 algorithm and can be used to authenticate as the user.
      */
-    protected static final FeatureDefinition<ObjectProperty<String>>         PASSWORD;
+    protected static final FeatureDefinition<ObjectProperty<String>>          PASSWORD;
 
     /**
-     * A list of all {@link Group}s the user is a member in.
+     * The names of all {@link Group}s the user is a member in.
      * Such {@link Group}s are used to set rights for multiple users.
      */
-    protected static final FeatureDefinition<ReferenceProperty<List<Group>>> GROUPS;
+    protected static final FeatureDefinition<ReferenceProperty<List<String>>> GROUPS;
 
     static {
 
@@ -97,12 +97,12 @@ public class User extends ConfigurationEntry {
 
         };
 
-        GROUPS = new AbstractFeatureDefinition<ReferenceProperty<List<Group>>>("groups") {
+        GROUPS = new AbstractFeatureDefinition<ReferenceProperty<List<String>>>("groups") {
 
             @Override
-            public ReferenceProperty<List<Group>> create(FeatureHolder holder) {
+            public ReferenceProperty<List<String>> create(FeatureHolder holder) {
 
-                return new ReferenceProperty<List<Group>>(getName(), holder, new ArrayList<Group>());
+                return new ReferenceProperty<List<String>>(getName(), holder, new ArrayList<String>());
             }
 
         };
@@ -117,7 +117,7 @@ public class User extends ConfigurationEntry {
      * Returns the name of the user.
      * The name is used for recognizing a user on the os-level.
      */
-    public static final FunctionDefinition<String>                           GET_NAME;
+    public static final FunctionDefinition<String>                            GET_NAME;
 
     /**
      * Changes the name of the user.
@@ -138,13 +138,13 @@ public class User extends ConfigurationEntry {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                             SET_NAME;
+    public static final FunctionDefinition<Void>                              SET_NAME;
 
     /**
      * Returns the hashed password of the user.
      * It is hashed using the SHA-256 algorithm and can be used to authenticate as the user.
      */
-    public static final FunctionDefinition<String>                           GET_PASSWORD;
+    public static final FunctionDefinition<String>                            GET_PASSWORD;
 
     /**
      * Sets the hashed password of the user.
@@ -166,16 +166,16 @@ public class User extends ConfigurationEntry {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                             SET_PASSWORD;
+    public static final FunctionDefinition<Void>                              SET_PASSWORD;
 
     /**
-     * Returns a list of all {@link Group}s the user is a member in.
+     * Returns the names of all {@link Group}s the user is a member in.
      * Such {@link Group}s are used to set rights for multiple users.
      */
-    public static final FunctionDefinition<List<Group>>                      GET_GROUPS;
+    public static final FunctionDefinition<List<String>>                      GET_GROUPS;
 
     /**
-     * Adds the user as a member to the given {@link Group}s.
+     * Adds the user as a member to the {@link Group}s with the given names.
      * 
      * <table>
      * <tr>
@@ -186,16 +186,16 @@ public class User extends ConfigurationEntry {
      * </tr>
      * <tr>
      * <td>0...</td>
-     * <td>{@link Group}...</td>
+     * <td>{@link String}...</td>
      * <td>groups</td>
-     * <td>The {@link Group}s to add the user to.</td>
+     * <td>The names of the {@link Group}s to add the user to.</td>
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                             ADD_TO_GROUPS;
+    public static final FunctionDefinition<Void>                              ADD_TO_GROUPS;
 
     /**
-     * Removes the membership of the user from the given {@link Group}s.
+     * Removes the membership of the user from the {@link Group}s with the given names.
      * 
      * <table>
      * <tr>
@@ -206,9 +206,9 @@ public class User extends ConfigurationEntry {
      * </tr>
      * <tr>
      * <td>0...</td>
-     * <td>{@link Group}...</td>
+     * <td>{@link String}...</td>
      * <td>groups</td>
-     * <td>The {@link Group}s to remove the user from.</td>
+     * <td>The names of the {@link Group}s to remove the user from.</td>
      * </tr>
      * </table>
      * 
@@ -219,20 +219,20 @@ public class User extends ConfigurationEntry {
      * </tr>
      * <tr>
      * <td>{@link IllegalStateException}</td>
-     * <td>The {@link Group} is the current primary one (you have to set another {@link Group} as primary first).</td>
+     * <td>The {@link Group} currently is the primary one (you have to set another {@link Group} as primary first).</td>
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                             REMOVE_FROM_GROUPS;
+    public static final FunctionDefinition<Void>                              REMOVE_FROM_GROUPS;
 
     /**
-     * Returns the primary {@link Group} of the user.
+     * Returns the name of the primary {@link Group} of the user.
      * The primary {@link Group} is the first {@link Group} in the {@link #GET_GROUPS} list and is used when new rights are applied.
      */
-    public static final FunctionDefinition<Group>                            GET_PRIMARY_GROUP;
+    public static final FunctionDefinition<String>                            GET_PRIMARY_GROUP;
 
     /**
-     * Changes the primary {@link Group} of the user to the given one.
+     * Changes the primary {@link Group} of the user to the one which has the given name.
      * The user must already be a member of the {@link Group}.
      * The primary {@link Group} is the first {@link Group} in the {@link #GET_GROUPS} list and is used when new rights are applied.
      * 
@@ -245,19 +245,19 @@ public class User extends ConfigurationEntry {
      * </tr>
      * <tr>
      * <td>0</td>
-     * <td>{@link Group}</td>
+     * <td>{@link String}</td>
      * <td>primaryGroup</td>
-     * <td>The new primary {@link Group} of the user.</td>
+     * <td>The name of the new primary {@link Group} of the user.</td>
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                             SET_PRIMARY_GROUP;
+    public static final FunctionDefinition<Void>                              SET_PRIMARY_GROUP;
 
     /**
      * Returns true if the user is a superuser.
      * The superuser of a system can do everything without having the rights applied for doing it.
      */
-    public static final FunctionDefinition<Boolean>                          IS_SUPERUSER;
+    public static final FunctionDefinition<Boolean>                           IS_SUPERUSER;
 
     static {
 
@@ -314,10 +314,10 @@ public class User extends ConfigurationEntry {
 
         });
 
-        GET_PRIMARY_GROUP = FunctionDefinitionFactory.create("getPrimaryGroup", User.class, new FunctionExecutor<Group>() {
+        GET_PRIMARY_GROUP = FunctionDefinitionFactory.create("getPrimaryGroup", User.class, new FunctionExecutor<String>() {
 
             @Override
-            public Group invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 if (holder.get(GET_GROUPS).invoke().size() > 0) {
                     return holder.get(GET_GROUPS).invoke().get(0);
@@ -334,7 +334,7 @@ public class User extends ConfigurationEntry {
 
                 if (holder.get(GET_GROUPS).invoke().contains(arguments[0])) {
                     holder.get(GROUPS).get().remove(arguments[0]);
-                    holder.get(GROUPS).get().add(0, (Group) arguments[0]);
+                    holder.get(GROUPS).get().add(0, (String) arguments[0]);
                 }
 
                 return null;
@@ -376,9 +376,9 @@ public class User extends ConfigurationEntry {
                 Validate.isTrue(columns.get("groups") instanceof List, "Groups must be a list");
                 // Trust the user again
                 @SuppressWarnings ("unchecked")
-                List<Group> groups = (List<Group>) columns.get("groups");
+                List<String> groups = (List<String>) columns.get("groups");
                 if (groups.size() > 0) {
-                    for (Group group : groups) {
+                    for (String group : groups) {
                         holder.get(ADD_TO_GROUPS).invoke(group);
                     }
                     holder.get(SET_PRIMARY_GROUP).invoke(groups.get(0));
