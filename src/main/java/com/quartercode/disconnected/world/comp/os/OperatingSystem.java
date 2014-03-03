@@ -25,10 +25,8 @@ import javax.xml.bind.annotation.XmlTransient;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
@@ -48,7 +46,7 @@ import com.quartercode.disconnected.world.comp.program.Process.ProcessState;
  * @see ProcessManager
  * @see NetworkManager
  */
-public class OperatingSystem extends WorldChildFeatureHolder<Computer> implements SyscallInvoker {
+public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
     // ----- Properties -----
 
@@ -233,15 +231,6 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> implement
         REMOVE_VULNERABILITIES = FunctionDefinitionFactory.create("removeVulnerabilities", OperatingSystem.class, new LockableFEWrapper<Void>(CollectionPropertyAccessorFactory.createRemove(VULNERABILITIES)), Vulnerability[].class);
 
         GET_FS_MODULE = FunctionDefinitionFactory.create("getFsModule", OperatingSystem.class, PropertyAccessorFactory.createGet(FILE_SYSTEM_MODULE));
-
-        GET_OPERATING_SYSTEM.addExecutor(OperatingSystem.class, "default", new FunctionExecutor<OperatingSystem>() {
-
-            @Override
-            public OperatingSystem invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
-
-                return (OperatingSystem) holder;
-            }
-        });
 
     }
 
