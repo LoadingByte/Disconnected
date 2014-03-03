@@ -44,7 +44,7 @@ public class PlayerController extends AIController {
     /**
      * Creates a new user controller and sets the represented member and if he is local.
      * 
-     * @param member The member which should be represented by this controller.
+     * @param member The member who should be represented by this controller.
      * @param local The player is interacting with the computer this program runs on.
      */
     public PlayerController(Member member, boolean local) {

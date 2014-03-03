@@ -31,7 +31,7 @@ public interface ReputationChangeProvider {
      * Returns the reputation change of a group to a member if the member executes the interest.
      * 
      * @param simulation The simulation which contains the given member.
-     * @param member The member which reputation changes.
+     * @param member The member whose reputation changes.
      * @param group The group which holds the change perspective.
      * @return The reputation change of a group to a member if the member executes the interest.
      */

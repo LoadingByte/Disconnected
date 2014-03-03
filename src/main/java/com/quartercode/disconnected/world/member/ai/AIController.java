@@ -38,9 +38,9 @@ public abstract class AIController {
     }
 
     /**
-     * Creates a new ai controller and sets the member which should be simulated.
+     * Creates a new ai controller and sets the member who should be simulated.
      * 
-     * @param member The member which should be simulated using this controller.
+     * @param member The member who should be simulated using this controller.
      */
     public AIController(Member member) {
 
@@ -48,9 +48,9 @@ public abstract class AIController {
     }
 
     /**
-     * Returns the member which should be simulated using this ai controller.
+     * Returns the member who should be simulated using this ai controller.
      * 
-     * @return The member which should be simulated using this ai controller.
+     * @return The member who should be simulated using this ai controller.
      */
     public Member getMember() {
 

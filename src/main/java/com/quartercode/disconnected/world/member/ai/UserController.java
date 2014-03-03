@@ -46,9 +46,9 @@ public class UserController extends AIController {
     }
 
     /**
-     * Creates a new user controller and sets the member which should be simulated.
+     * Creates a new user controller and sets the member who should be simulated.
      * 
-     * @param member The member which should be simulated using this controller.
+     * @param member The member who should be simulated using this controller.
      */
     public UserController(Member member) {
 

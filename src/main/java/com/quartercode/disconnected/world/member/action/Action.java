@@ -58,7 +58,7 @@ public abstract class Action {
      * In the case of a failure, this returns false, in the other case true.
      * 
      * @param simulation The simulation the execute the defined action in.
-     * @param member The member which should execute the defined action.
+     * @param member The member who should execute the defined action.
      * @return False in the case of a failure, true in the other case.
      */
     public abstract boolean execute(Simulation simulation, Member member);

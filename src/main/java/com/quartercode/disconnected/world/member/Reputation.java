@@ -44,7 +44,7 @@ public class Reputation {
     }
 
     /**
-     * Creates a new reputation object and sets the member which reputation should be stored.
+     * Creates a new reputation object and sets the member whose reputation should be stored.
      * 
      * @param member The member to set.
      */
@@ -54,7 +54,7 @@ public class Reputation {
     }
 
     /**
-     * Creates a new reputation object and sets the member which reputation should be stored and his reputation.
+     * Creates a new reputation object and sets the member whose reputation should be stored and his reputation.
      * 
      * @param member The member to set.
      * @param value The reputation to set.

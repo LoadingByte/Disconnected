@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlIDREF;
 import com.quartercode.disconnected.world.member.interest.Interest;
 
 /**
- * This class represents a group of members which may have interests of the same type.
+ * This class represents a group of members who may have interests of the same type.
  * A group also has a reputation on a member which is stored in the member's object. One member can't have an own reputation on another member.
  * Global interests which every member cares of are also defined in this class.
  * 
