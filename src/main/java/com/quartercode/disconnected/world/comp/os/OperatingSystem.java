@@ -42,9 +42,9 @@ import com.quartercode.disconnected.world.comp.program.Process.ProcessState;
 
 /**
  * This class stores information about an operating system.
+ * It is the core part of a running computer and manages all required modules (e.g. the {@link FileSystemModule}).
  * 
- * @see ProcessManager
- * @see NetworkManager
+ * @see FileSystemModule
  */
 public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
