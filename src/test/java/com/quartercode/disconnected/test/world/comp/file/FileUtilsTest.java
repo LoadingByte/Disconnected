@@ -40,6 +40,17 @@ public class FileUtilsTest {
         Assert.assertEquals("Resolved path of absolute one", "/system/bin/kernel", FileUtils.resolvePath("/user/homes/test/", "/system/bin/kernel"));
     }
 
+    @Test
+    public void testGetComponents() {
+
+        Assert.assertArrayEquals("Resolved components", new String[] { "system", "etc/test" }, FileUtils.getComponents("/system/etc/test"));
+        Assert.assertArrayEquals("Resolved components", new String[] { "system", "etc/test/" }, FileUtils.getComponents("/system/etc/test/"));
+        Assert.assertArrayEquals("Resolved components", new String[] { "system", null }, FileUtils.getComponents("/system"));
+        Assert.assertArrayEquals("Resolved components", new String[] { "system", null }, FileUtils.getComponents("/system/"));
+        Assert.assertArrayEquals("Resolved components", new String[] { null, "etc/test" }, FileUtils.getComponents("etc/test"));
+        Assert.assertArrayEquals("Resolved components", new String[] { null, "etc/test/" }, FileUtils.getComponents("etc/test/"));
+    }
+
     private User createUser(String name) throws FunctionExecutionException {
 
         User user = new User();
