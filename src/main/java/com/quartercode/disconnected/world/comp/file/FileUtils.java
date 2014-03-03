@@ -133,44 +133,35 @@ public class FileUtils {
      * @param file The {@link File} the given {@link User} may have access to.
      * @param right The {@link FileRight} the given {@link User} may have.
      * @return True if the given {@link User} has the given {@link FileRight} on the given {@link File}.
+     * @throws FunctionExecutionException Something unexpected goes wrong.
      */
-    public static boolean hasRight(User user, File<?> file, FileRight right) {
+    public static boolean hasRight(User user, File<?> file, FileRight right) throws FunctionExecutionException {
 
-        try {
-            if (user.get(User.IS_SUPERUSER).invoke()) {
-                return true;
-            } else if (checkRight(file, FileAccessor.OWNER, right) && file.get(File.GET_OWNER).invoke().equals(user)) {
-                return true;
-            } else if (checkRight(file, FileAccessor.GROUP, right) && user.get(User.GET_GROUPS).invoke().contains(file.get(File.GET_GROUP).invoke())) {
-                return true;
-            } else if (checkRight(file, FileAccessor.OTHERS, right)) {
-                return true;
-            }
-        }
-        catch (FunctionExecutionException e) {
-            // Won't happen
+        if (user.get(User.IS_SUPERUSER).invoke()) {
+            return true;
+        } else if (checkRight(file, FileAccessor.OWNER, right) && file.get(File.GET_OWNER).invoke().equals(user)) {
+            return true;
+        } else if (checkRight(file, FileAccessor.GROUP, right) && user.get(User.GET_GROUPS).invoke().contains(file.get(File.GET_GROUP).invoke())) {
+            return true;
+        } else if (checkRight(file, FileAccessor.OTHERS, right)) {
+            return true;
         }
 
         return false;
     }
 
-    private static boolean checkRight(File<?> file, FileAccessor accessor, FileRight right) {
+    private static boolean checkRight(File<?> file, FileAccessor accessor, FileRight right) throws FunctionExecutionException {
 
-        try {
-            if (file.get(File.GET_RIGHTS).invoke().get(FileRights.GET).invoke(accessor, right)) {
-                if (right == FileRight.DELETE && file instanceof ParentFile) {
-                    for (File<?> child : file.get(ParentFile.GET_CHILDREN).invoke()) {
-                        if (!checkRight(child, accessor, right)) {
-                            return false;
-                        }
+        if (file.get(File.GET_RIGHTS).invoke().get(FileRights.GET).invoke(accessor, right)) {
+            if (right == FileRight.DELETE && file instanceof ParentFile) {
+                for (File<?> child : file.get(ParentFile.GET_CHILDREN).invoke()) {
+                    if (!checkRight(child, accessor, right)) {
+                        return false;
                     }
                 }
-
-                return true;
             }
-        }
-        catch (FunctionExecutionException e) {
-            // Won't happen
+
+            return true;
         }
 
         return false;
@@ -198,16 +189,11 @@ public class FileUtils {
      * @param user The {@link User} who may can change the {@link FileRights} attributes.
      * @param file The {@link File} the given {@link User} may have access to.
      * @return True if the given {@link User} can change the {@link FileRights} attributes of the given {@link File}.
+     * @throws FunctionExecutionException Something unexpected goes wrong.
      */
-    public static boolean canChangeRights(User user, File<?> file) {
+    public static boolean canChangeRights(User user, File<?> file) throws FunctionExecutionException {
 
-        try {
-            return file.get(File.GET_OWNER).invoke().equals(user) || user.get(User.IS_SUPERUSER).invoke();
-        }
-        catch (FunctionExecutionException e) {
-            // Won't happen
-            return false;
-        }
+        return file.get(File.GET_OWNER).invoke().equals(user) || user.get(User.IS_SUPERUSER).invoke();
     }
 
     /**
