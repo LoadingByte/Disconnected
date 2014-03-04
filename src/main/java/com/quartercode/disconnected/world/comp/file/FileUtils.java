@@ -21,12 +21,9 @@ package com.quartercode.disconnected.world.comp.file;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileAccessor;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
-import com.quartercode.disconnected.world.comp.os.FileSystemModule;
-import com.quartercode.disconnected.world.comp.os.FileSystemModule.KnownFileSystem;
 import com.quartercode.disconnected.world.comp.os.User;
 import com.quartercode.disconnected.world.comp.program.Process;
 
@@ -194,64 +191,6 @@ public class FileUtils {
     public static boolean canChangeRights(User user, File<?> file) throws FunctionExecutionException {
 
         return file.get(File.GET_OWNER).invoke().equals(user) || user.get(User.IS_SUPERUSER).invoke();
-    }
-
-    /**
-     * Returns the {@link File} which is stored on a mounted {@link FileSystem} under the given path.
-     * A path is a collection of {@link File}s seperated by a separator.
-     * This will look up the {@link File} using a global os path.
-     * 
-     * @param fsModule The {@link FileSystemModule} which houses the {@link FileSystem} the {@link File} for return is stored on.
-     * @param path The path to search under.
-     * @return The {@link File} which is stored under the given path. Can be null if the {@link File} doesn't exist or the used {@link FileSystem} isn't mounted.
-     * @throws FunctionExecutionException Something unexpected goes wrong while asking the {@link FileSystemModule} or the queried {@link FileSystem}.
-     */
-    public static File<?> getFile(FileSystemModule fsModule, String path) throws FunctionExecutionException {
-
-        String[] pathComponents = getComponents(path);
-        Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path");
-
-        FileSystem fileSystem = fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]).get(KnownFileSystem.GET_FILE_SYSTEM).invoke();
-        if (fileSystem != null) {
-            return fileSystem.get(FileSystem.GET_FILE).invoke(pathComponents[1]);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Adds the given {@link File} to a mounted {@link FileSystem} and locates it under the given path.
-     * If the given path doesn't exist, this creates {@link Directory Directories} to match it.
-     * The name of the {@link File} and the parent object will be changed to match the path.
-     * 
-     * @param fsModule The {@link FileSystemModule} which houses the {@link FileSystem} the given {@link File} should be stored on.
-     * @param file The {@link File} to add under the given path.
-     * @param path The path for the new {@link File}. The name of the {@link File} will be changed to the last entry.
-     * @throws OutOfSpaceException There is not enough space on the target {@link FileSystem} for the new {@link File}.
-     * @throws IllegalStateException The given {@link File} path isn't valid or the {@link FileSystem} for the path can't be found.
-     * @throws FunctionExecutionException Something unexpected goes wrong while asking the {@link FileSystemModule} or the queried {@link FileSystem}.
-     */
-    public static void addFile(FileSystemModule fsModule, File<?> file, String path) throws OutOfSpaceException, FunctionExecutionException {
-
-        String[] pathComponents = getComponents(path);
-        Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path");
-
-        FileSystem fileSystem = fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]).get(KnownFileSystem.GET_FILE_SYSTEM).invoke();
-        if (fileSystem != null) {
-            try {
-                fileSystem.get(FileSystem.ADD_FILE).invoke(file, pathComponents[1]);
-            } catch (FunctionExecutionException e) {
-                if (e.getCause() instanceof OutOfSpaceException) {
-                    throw (OutOfSpaceException) e.getCause();
-                } else if (e.getCause() instanceof IllegalStateException) {
-                    throw (IllegalStateException) e.getCause();
-                } else {
-                    throw e;
-                }
-            }
-        } else {
-            throw new IllegalStateException();
-        }
     }
 
     private FileUtils() {

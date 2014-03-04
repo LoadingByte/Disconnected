@@ -163,12 +163,12 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
      * <th>When?</th>
      * </tr>
      * <tr>
-     * <td>{@link OutOfSpaceException}</td>
-     * <td>There is not enough space for the new {@link File}.</td>
+     * <td>{@link IllegalArgumentException}</td>
+     * <td>The given file path isn't valid.</td>
      * </tr>
      * <tr>
-     * <td>{@link IllegalStateException}</td>
-     * <td>The given file path isn't valid.</td>
+     * <td>{@link OutOfSpaceException}</td>
+     * <td>There is not enough space for the new {@link File}.</td>
      * </tr>
      * </table>
      */
@@ -241,7 +241,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
                         }
                         current = current.get(ParentFile.GET_CHILD_BY_NAME).invoke(part);
                         if (! (current instanceof ParentFile)) {
-                            throw new StopExecutionException(new IllegalStateException("File path '" + arguments[1] + "' isn't valid: A file along the way isn't a parent file"));
+                            throw new StopExecutionException(new IllegalArgumentException("File path '" + arguments[1] + "' isn't valid: A file along the way isn't a parent file"));
                         }
                     }
                 }

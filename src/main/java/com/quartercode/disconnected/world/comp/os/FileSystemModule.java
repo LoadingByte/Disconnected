@@ -38,8 +38,11 @@ import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory.
 import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.Computer;
+import com.quartercode.disconnected.world.comp.file.Directory;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
+import com.quartercode.disconnected.world.comp.file.FileUtils;
+import com.quartercode.disconnected.world.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.world.comp.program.Process;
 
@@ -181,6 +184,75 @@ public class FileSystemModule extends DefaultChildFeatureHolder<OperatingSystem>
      */
     public static final FunctionDefinition<KnownFileSystem>                        GET_MOUNTED_BY_MOUNTPOINT;
 
+    /**
+     * Returns the {@link File} which is stored on a mounted {@link FileSystem} under the given path.
+     * A path is a collection of {@link File}s seperated by a separator.
+     * This will look up the {@link File} using a global os path.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link String}</td>
+     * <td>path</td>
+     * <td>The path to search under.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<File<?>>                                GET_FILE;
+
+    /**
+     * Adds the given {@link File} to a mounted {@link FileSystem} and locates it under the given path.
+     * If the given path doesn't exist, this creates {@link Directory Directories} to match it.
+     * The name of the {@link File} and the parent object will be changed to match the path.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link File}</td>
+     * <td>file</td>
+     * <td>The {@link File} to add under the given path.</td>
+     * </tr>
+     * <tr>
+     * <td>1</td>
+     * <td>{@link String}</td>
+     * <td>path</td>
+     * <td>The path for the new {@link File}. The name of the {@link File} will be changed to the last entry.</td>
+     * </tr>
+     * </table>
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalArgumentException}</td>
+     * <td>The given file path isn't valid.</td>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalStateException}</td>
+     * <td>The {@link FileSystem} for the path can't be found.</td>
+     * </tr>
+     * <tr>
+     * <td>{@link OutOfSpaceException}</td>
+     * <td>There is not enough space for the new {@link File}.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                   ADD_FILE;
+
     static {
 
         GET_AVAIABLE = FunctionDefinitionFactory.create("getAvaiable", FileSystemModule.class, new FunctionExecutor<Set<FileSystem>>() {
@@ -251,6 +323,46 @@ public class FileSystemModule extends DefaultChildFeatureHolder<OperatingSystem>
             }
 
         }), String.class);
+
+        GET_FILE = FunctionDefinitionFactory.create("getFile", FileSystemModule.class, new FunctionExecutor<File<?>>() {
+
+            @Override
+            public File<?> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                String path = (String) arguments[0];
+                String[] pathComponents = FileUtils.getComponents(path);
+                Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path");
+
+                FileSystem fileSystem = holder.get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]).get(KnownFileSystem.GET_FILE_SYSTEM).invoke();
+                if (fileSystem != null) {
+                    return fileSystem.get(FileSystem.GET_FILE).invoke(pathComponents[1]);
+                } else {
+                    return null;
+                }
+            }
+
+        }, String.class);
+        ADD_FILE = FunctionDefinitionFactory.create("addFile", FileSystemModule.class, new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                File<?> file = (File<?>) arguments[0];
+                String path = (String) arguments[1];
+
+                String[] pathComponents = FileUtils.getComponents(path);
+                Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path");
+
+                FileSystem fileSystem = holder.get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]).get(KnownFileSystem.GET_FILE_SYSTEM).invoke();
+                if (fileSystem != null) {
+                    fileSystem.get(FileSystem.ADD_FILE).invoke(file, pathComponents[1]);
+                    return null;
+                } else {
+                    throw new IllegalStateException("No mounted file system with mountpoint '" + pathComponents[0] + "'");
+                }
+            }
+
+        }, File.class, String.class);
 
     }
 
