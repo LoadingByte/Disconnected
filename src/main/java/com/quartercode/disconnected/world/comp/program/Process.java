@@ -719,10 +719,12 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        LAUNCH = FunctionDefinitionFactory.create("launch", Process.class, new FunctionExecutor<Void>() {
+        LAUNCH = FunctionDefinitionFactory.create("launch", Map.class);
+        LAUNCH.addExecutor(Process.class, "setPid", new FunctionExecutor<Void>() {
 
             @Override
             @Lockable
+            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_7)
             public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 // Calculate new pid
@@ -736,16 +738,41 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 while (existingPids.contains(pid)) {
                     pid++;
                 }
+
                 holder.get(PID).set(pid);
+                return null;
+            }
+
+        });
+        LAUNCH.addExecutor(Process.class, "launchExecutor", new FunctionExecutor<Void>() {
+
+            @Override
+            @Lockable
+            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_5)
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 // Launch new executor
                 Program program = (Program) holder.get(GET_SOURCE).invoke().get(ContentFile.GET_CONTENT).invoke();
+
+                // Set new executor
                 holder.get(EXECUTOR).set(program.get(Program.CREATE_EXECUTOR).invoke());
                 holder.get(GET_EXECUTOR).invoke().setParent((Process<?>) holder);
                 holder.get(GET_EXECUTOR).invoke().get(ProgramExecutor.SET_ARGUMENTS).invoke(arguments[0]);
 
-                // Wrong arguments -> Stop process
+                return null;
+            }
+
+        });
+        LAUNCH.addExecutor(Process.class, "checkArguments", new FunctionExecutor<Void>() {
+
+            @Override
+            @Lockable
+            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_2)
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                // Check for wrong arguments
                 if (holder.get(GET_EXECUTOR).invoke().get(ProgramExecutor.GET_ARGUMENTS).invoke() == null) {
+                    // Stop process
                     holder.get(EXECUTOR).set(null);
                     holder.get(STOP).invoke(false);
                 }
@@ -753,7 +780,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 return null;
             }
 
-        }, Map.class);
+        });
 
         SEND_MESSAGE = FunctionDefinitionFactory.create("sendMessage", Process.class, new FunctionExecutor<Void>() {
 
