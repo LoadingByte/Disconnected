@@ -42,7 +42,6 @@ import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.os.Environment;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.world.comp.os.SyscallInvoker;
 import com.quartercode.disconnected.world.comp.os.User;
 import com.quartercode.disconnected.world.comp.program.event.IPCMessageEvent;
 import com.quartercode.disconnected.world.comp.program.event.ProcessEvent;
@@ -56,7 +55,7 @@ import com.quartercode.disconnected.world.comp.session.SessionProgram;
  * @see Program
  * @see ProgramExecutor
  */
-public abstract class Process<P extends FeatureHolder> extends WorldChildFeatureHolder<P> implements SyscallInvoker {
+public abstract class Process<P extends FeatureHolder> extends WorldChildFeatureHolder<P> {
 
     /**
      * The process state defines the global state of the process the os can see.
@@ -441,9 +440,14 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
     public static final FunctionDefinition<ChildProcess>                       CREATE_CHILD;
 
     /**
-     * Returns the root process which is hosts every other process somehow.
+     * Returns the root {@link RootProcess} which is the parent of every other process somewhere in the tree.
      */
     public static final FunctionDefinition<RootProcess>                        GET_ROOT;
+
+    /**
+     * Returns the {@link OperatingSystem} which is hosting the {@link RootProcess} which is the parent of every other process.
+     */
+    public static final FunctionDefinition<OperatingSystem>                    GET_OPERATING_SYSTEM;
 
     /**
      * Resolves the {@link SessionProgram} process this process is running under.
@@ -681,6 +685,16 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
+        GET_OPERATING_SYSTEM = FunctionDefinitionFactory.create("getOperatingSystem", Process.class, new FunctionExecutor<OperatingSystem>() {
+
+            @Override
+            public OperatingSystem invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                return holder.get(GET_ROOT).invoke().getParent();
+            }
+
+        });
+
         GET_SESSION_PROCESS = FunctionDefinitionFactory.create("getSessionProcess", Process.class, new FunctionExecutor<Process<?>>() {
 
             @Override
@@ -803,16 +817,6 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             }
 
         }, Process.class, Map.class);
-
-        GET_OPERATING_SYSTEM.addExecutor(Process.class, "default", new FunctionExecutor<OperatingSystem>() {
-
-            @Override
-            public OperatingSystem invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
-
-                return holder.get(GET_ROOT).invoke().getParent();
-            }
-
-        });
 
     }
 
