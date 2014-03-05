@@ -22,6 +22,7 @@ import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Prioritized;
+import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 
 /**
@@ -42,6 +43,17 @@ public class RootProcess extends Process<OperatingSystem> {
             public RootProcess invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                 return (RootProcess) holder;
+            }
+
+        });
+
+        // Stop the execution after the setting of the pid
+        LAUNCH.addExecutor(RootProcess.class, "stop", new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                throw new StopExecutionException("Invocation of program executor logic is not required");
             }
 
         });
