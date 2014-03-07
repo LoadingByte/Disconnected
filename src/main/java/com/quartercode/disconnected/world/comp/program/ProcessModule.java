@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.world.comp.os;
+package com.quartercode.disconnected.world.comp.program;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,8 +35,11 @@ import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
-import com.quartercode.disconnected.world.comp.program.Process;
-import com.quartercode.disconnected.world.comp.program.RootProcess;
+import com.quartercode.disconnected.world.comp.file.FileSystemModule;
+import com.quartercode.disconnected.world.comp.os.CommonFiles;
+import com.quartercode.disconnected.world.comp.os.Environment;
+import com.quartercode.disconnected.world.comp.os.OSModule;
+import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 
 /**
  * This class represents an {@link OperatingSystem} module which is used to manage the {@link RootProcess}.

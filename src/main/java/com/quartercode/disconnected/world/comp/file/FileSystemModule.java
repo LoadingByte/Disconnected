@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.world.comp.os;
+package com.quartercode.disconnected.world.comp.file;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -38,12 +38,10 @@ import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory.
 import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.Computer;
-import com.quartercode.disconnected.world.comp.file.Directory;
-import com.quartercode.disconnected.world.comp.file.File;
-import com.quartercode.disconnected.world.comp.file.FileSystem;
-import com.quartercode.disconnected.world.comp.file.FileUtils;
-import com.quartercode.disconnected.world.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.world.comp.hardware.Hardware;
+import com.quartercode.disconnected.world.comp.os.CommonFiles;
+import com.quartercode.disconnected.world.comp.os.OSModule;
+import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.program.Process;
 
 /**
