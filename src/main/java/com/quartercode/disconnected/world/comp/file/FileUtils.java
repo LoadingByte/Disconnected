@@ -25,7 +25,6 @@ import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileAccessor;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.world.comp.os.User;
-import com.quartercode.disconnected.world.comp.program.Process;
 
 /**
  * This file utility contains methods related to {@link File}s and {@link FileSystem}s.
@@ -165,22 +164,6 @@ public class FileUtils {
         }
 
         return false;
-    }
-
-    /**
-     * Throws a {@link NoFileRightException} if the given {@link Process} hasn't the given {@link FileRight} on the given {@link File}.
-     * 
-     * @param process The {@link Process} which may have the given {@link FileRight} on the given {@link File}.
-     * @param file The {@link File} the given {@link Process} may have access to.
-     * @param right The {@link FileRight} the given {@link Process} may have.
-     * @throws NoFileRightException The given {@link Process} hasn't the given {@link FileRight} on the given {@link File}.
-     * @throws FunctionExecutionException Something goes wrong while retrieving the session {@link User} for the given {@link Process}.
-     */
-    public static void checkRight(Process<?> process, File<?> file, FileRight right) throws NoFileRightException, FunctionExecutionException {
-
-        if (!hasRight(process.get(Process.GET_USER).invoke(), file, right)) {
-            throw new NoFileRightException(process, file, right);
-        }
     }
 
     /**

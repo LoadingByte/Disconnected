@@ -60,17 +60,6 @@ import com.quartercode.disconnected.world.comp.hardware.Mainboard.MainboardSlot;
 import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.world.comp.hardware.RAM;
 import com.quartercode.disconnected.world.comp.os.Environment;
-import com.quartercode.disconnected.world.comp.program.KernelProgram;
-import com.quartercode.disconnected.world.comp.program.desktop.SystemViewerProgram;
-import com.quartercode.disconnected.world.comp.program.desktop.TerminalProgram;
-import com.quartercode.disconnected.world.comp.program.shell.ChangeDirectoryProgram;
-import com.quartercode.disconnected.world.comp.program.shell.DeleteFileProgram;
-import com.quartercode.disconnected.world.comp.program.shell.FileContentProgram;
-import com.quartercode.disconnected.world.comp.program.shell.FileRightsProgram;
-import com.quartercode.disconnected.world.comp.program.shell.ListFilesProgram;
-import com.quartercode.disconnected.world.comp.program.shell.MakeFileProgram;
-import com.quartercode.disconnected.world.comp.session.DesktopSessionProgram;
-import com.quartercode.disconnected.world.comp.session.ShellSessionProgram;
 import com.quartercode.disconnected.world.member.Member;
 import com.quartercode.disconnected.world.member.MemberGroup;
 import com.quartercode.disconnected.world.member.ai.PlayerController;
@@ -259,20 +248,6 @@ public class Main {
         registry.registerClass(NetworkInterface.class);
 
         // Programs
-        registry.registerClass(KernelProgram.class);
-
-        registry.registerClass(ShellSessionProgram.class);
-        registry.registerClass(DesktopSessionProgram.class);
-
-        registry.registerClass(ChangeDirectoryProgram.class);
-        registry.registerClass(ListFilesProgram.class);
-        registry.registerClass(FileRightsProgram.class);
-        registry.registerClass(FileContentProgram.class);
-        registry.registerClass(MakeFileProgram.class);
-        registry.registerClass(DeleteFileProgram.class);
-
-        registry.registerClass(TerminalProgram.class);
-        registry.registerClass(SystemViewerProgram.class);
 
         // ----- Computers End -----
 
