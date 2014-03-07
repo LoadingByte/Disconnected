@@ -60,6 +60,8 @@ import com.quartercode.disconnected.world.comp.hardware.Mainboard.MainboardSlot;
 import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.world.comp.hardware.RAM;
 import com.quartercode.disconnected.world.comp.os.Environment;
+import com.quartercode.disconnected.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.world.comp.os.Session;
 import com.quartercode.disconnected.world.member.Member;
 import com.quartercode.disconnected.world.member.MemberGroup;
 import com.quartercode.disconnected.world.member.ai.PlayerController;
@@ -83,8 +85,7 @@ public class Main {
         // Logging configuration
         try {
             LogManager.getLogManager().readConfiguration(Main.class.getResourceAsStream("/config/logging.properties"));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Can't load logging configuration", e);
             return;
         }
@@ -100,8 +101,7 @@ public class Main {
         CommandLine line = null;
         try {
             line = new PosixParser().parse(options, args, true);
-        }
-        catch (ParseException e) {
+        } catch (ParseException e) {
             LOGGER.warning(e.getMessage());
             new HelpFormatter().printHelp("java -jar disconnected-" + Disconnected.getVersion() + ".jar", options, true);
         }
@@ -141,8 +141,7 @@ public class Main {
             LOGGER.info("Initalizing & filling resource store");
             Disconnected.setRS(new ResourceStore());
             fillResourceStore(Disconnected.getRS());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Can't fill resource store", e);
             return;
         }
@@ -168,20 +167,18 @@ public class Main {
 
         try {
             for (Computer computer : simulation.getWorld().get(World.GET_COMPUTERS).invoke()) {
-                computer.get(Computer.GET_OS).invoke().setRunning(true);
+                computer.get(Computer.GET_OS).invoke().get(OperatingSystem.SET_RUNNING).invoke(true);
             }
-        }
-        catch (FunctionExecutionException e) {
+        } catch (FunctionExecutionException e) {
             LOGGER.log(Level.SEVERE, "Unknown error while booting up computers", e.getCause());
         }
         Profile profile = new Profile("test", simulation);
         Disconnected.getProfileManager().addProfile(profile);
         try {
             Disconnected.getProfileManager().setActive(profile);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            // Wont ever happen (we created a new profile)
+            // Won't ever happen (we just created a new profile)
         }
 
         // DEBUG: Start "game" with current simulation
@@ -248,6 +245,7 @@ public class Main {
         registry.registerClass(NetworkInterface.class);
 
         // Programs
+        registry.registerClass(Session.class);
 
         // ----- Computers End -----
 
