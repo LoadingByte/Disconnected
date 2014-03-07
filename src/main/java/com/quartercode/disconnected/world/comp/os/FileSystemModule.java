@@ -47,14 +47,15 @@ import com.quartercode.disconnected.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.world.comp.program.Process;
 
 /**
- * This class represents a kernel module which is used to access the available {@link FileSystem}s.
- * It is an essential part of the {@link OperatingSystem} and directly used by it.
+ * This class represents an {@link OperatingSystem} module which is used to access the available {@link FileSystem}s.
+ * It is an essential part of the {@link OperatingSystem} and is directly used by it.
  * 
  * @see FileSystem
  * @see File
+ * @see OSModule
  * @see OperatingSystem
  */
-public class FileSystemModule extends DefaultChildFeatureHolder<OperatingSystem> {
+public class FileSystemModule extends OSModule {
 
     // ----- Properties -----
 
@@ -363,6 +364,26 @@ public class FileSystemModule extends DefaultChildFeatureHolder<OperatingSystem>
             }
 
         }, File.class, String.class);
+
+        SET_RUNNING.addExecutor(FileSystemModule.class, "mountSystemFs", new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                // Only invoke on bootstrap
+                if ((Boolean) arguments[0]) {
+                    for (KnownFileSystem fileSystem : holder.get(GET_KNOWN).invoke()) {
+                        if (fileSystem.get(KnownFileSystem.GET_MOUNTPOINT).invoke().equals(CommonFiles.SYSTEM_MOUNTPOINT)) {
+                            fileSystem.get(KnownFileSystem.SET_MOUNTED).invoke(true);
+                            break;
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+        });
 
     }
 

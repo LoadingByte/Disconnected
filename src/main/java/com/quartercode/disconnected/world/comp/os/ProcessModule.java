@@ -19,28 +19,34 @@
 package com.quartercode.disconnected.world.comp.os;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
+import com.quartercode.disconnected.mocl.extra.Delay;
 import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.def.DefaultChildFeatureHolder;
+import com.quartercode.disconnected.mocl.extra.Limit;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.sim.run.Ticker;
+import com.quartercode.disconnected.world.comp.file.ContentFile;
+import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.RootProcess;
 
 /**
- * This class represents a kernel module which is used to manage the {@link RootProcess}.
- * It is an essential part of the {@link OperatingSystem} and directly used by it.
+ * This class represents an {@link OperatingSystem} module which is used to manage the {@link RootProcess}.
+ * It is an essential part of the {@link OperatingSystem} and is directly used by it.
  * 
  * @see RootProcess
+ * @see OSModule
  * @see OperatingSystem
  */
-public class ProcessModule extends DefaultChildFeatureHolder<OperatingSystem> {
+public class ProcessModule extends OSModule {
 
     // ----- Properties -----
 
@@ -93,6 +99,64 @@ public class ProcessModule extends DefaultChildFeatureHolder<OperatingSystem> {
                 processes.add(root);
                 processes.addAll(root.get(Process.GET_ALL_CHILDREN).invoke());
                 return processes;
+            }
+
+        });
+
+        SET_RUNNING.addExecutor(ProcessModule.class, "startRootProcess", new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                // Only invoke on bootstrap
+                if ((Boolean) arguments[0]) {
+                    RootProcess root = new RootProcess();
+                    root.setLocked(false);
+
+                    FileSystemModule fsModule = ((ProcessModule) holder).getParent().get(OperatingSystem.GET_FS_MODULE).invoke();
+                    File<?> environmentFile = fsModule.get(FileSystemModule.GET_FILE).invoke(CommonFiles.ENVIRONMENT_CONFIG);
+                    Environment environment = ((Environment) environmentFile.get(ContentFile.GET_CONTENT).invoke()).clone();
+                    root.get(Process.SET_ENVIRONMENT).invoke(environment);
+
+                    root.get(Process.LAUNCH).invoke(new HashMap<String, Object>());
+                    root.setLocked(true);
+
+                    holder.get(ProcessModule.ROOT_PROCESS).set(root);
+                }
+
+                return null;
+            }
+        });
+
+        SET_RUNNING.addExecutor(OperatingSystem.class, "interruptRootProcess", new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                // Only invoke on shutdown
+                if (! ((Boolean) arguments[0])) {
+                    holder.get(ProcessModule.GET_ROOT).invoke().get(Process.INTERRUPT).invoke();
+                    // Stop the root process after 5 seconds
+                    holder.get(SET_RUNNING).getExecutor("procManagerStopRoot").resetInvokationCounter();
+                    holder.get(SET_RUNNING).getExecutor("procManagerStopRoot").setLocked(false);
+                }
+
+                return null;
+            }
+
+        });
+        SET_RUNNING.addExecutor(OperatingSystem.class, "stopRootProcess", new FunctionExecutor<Void>() {
+
+            @Override
+            @Limit (1)
+            // 5 seconds delay after interrupt
+            @Delay (firstDelay = Ticker.DEFAULT_TICKS_PER_SECOND * 5)
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                holder.get(ProcessModule.GET_ROOT).invoke().get(Process.STOP).invoke();
+                holder.get(ProcessModule.ROOT_PROCESS).set(null);
+
+                return null;
             }
 
         });

@@ -18,31 +18,24 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.extra.Delay;
 import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.Limit;
 import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
 import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
 import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
 import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
-import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.Version;
 import com.quartercode.disconnected.world.comp.Vulnerability;
-import com.quartercode.disconnected.world.comp.file.ContentFile;
-import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
-import com.quartercode.disconnected.world.comp.os.FileSystemModule.KnownFileSystem;
 import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.Process.ProcessState;
 import com.quartercode.disconnected.world.comp.program.RootProcess;
@@ -254,7 +247,8 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
     /**
      * Boots up (true) or shuts down (false) the operating system.
      * If the operating system already is in the correct state, nothing happens.
-     * This method executes some actions like creating the {@link RootProcess} or mounting some {@link FileSystem}s.
+     * This method calls the {@link OSModule#SET_RUNNING} function on every used module.
+     * Because of the fact that modules are not stored in a central collection, every module has its executor which invokes the module method.
      * 
      * <table>
      * <tr>
@@ -307,77 +301,22 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
     static {
 
-        SET_RUNNING.addExecutor(OperatingSystem.class, "fsManagerMountSystem", new FunctionExecutor<Void>() {
+        SET_RUNNING.addExecutor(OperatingSystem.class, "fileSystemModule", new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
-                // Only invoke on bootstrap
-                if ((Boolean) arguments[0]) {
-                    for (KnownFileSystem fileSystem : holder.get(GET_FS_MODULE).invoke().get(FileSystemModule.GET_KNOWN).invoke()) {
-                        if (fileSystem.get(KnownFileSystem.GET_MOUNTPOINT).invoke().equals(CommonFiles.SYSTEM_MOUNTPOINT)) {
-                            fileSystem.get(KnownFileSystem.SET_MOUNTED).invoke(true);
-                            break;
-                        }
-                    }
-                }
-
+                holder.get(GET_FS_MODULE).invoke().get(OSModule.SET_RUNNING).invoke(arguments);
                 return null;
             }
 
         });
-
-        SET_RUNNING.addExecutor(OperatingSystem.class, "procManagerStartRoot", new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
-
-                // Only invoke on bootstrap
-                if ((Boolean) arguments[0]) {
-                    RootProcess root = new RootProcess();
-                    root.setLocked(false);
-
-                    File<?> environmentFile = holder.get(GET_FS_MODULE).invoke().get(FileSystemModule.GET_FILE).invoke(CommonFiles.ENVIRONMENT_CONFIG);
-                    Environment environment = ((Environment) environmentFile.get(ContentFile.GET_CONTENT).invoke()).clone();
-                    root.get(Process.SET_ENVIRONMENT).invoke(environment);
-
-                    root.get(Process.LAUNCH).invoke(new HashMap<String, Object>());
-                    root.setLocked(true);
-
-                    holder.get(GET_PROC_MODULE).invoke().get(ProcessModule.ROOT_PROCESS).set(root);
-                }
-
-                return null;
-            }
-
-        });
-        SET_RUNNING.addExecutor(OperatingSystem.class, "procManagerInterruptRoot", new FunctionExecutor<Void>() {
+        SET_RUNNING.addExecutor(OperatingSystem.class, "processModule", new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
-                // Only invoke on shutdown
-                if (! ((Boolean) arguments[0])) {
-                    holder.get(GET_PROC_MODULE).invoke().get(ProcessModule.GET_ROOT).invoke().get(Process.INTERRUPT).invoke();
-                    // Stop the root process after 5 seconds
-                    holder.get(SET_RUNNING).getExecutor("procManagerStopRoot").resetInvokationCounter();
-                    holder.get(SET_RUNNING).getExecutor("procManagerStopRoot").setLocked(false);
-                }
-
-                return null;
-            }
-
-        });
-        SET_RUNNING.addExecutor(OperatingSystem.class, "procManagerStopRoot", new FunctionExecutor<Void>() {
-
-            @Override
-            @Limit (1)
-            @Delay (firstDelay = Ticker.DEFAULT_TICKS_PER_SECOND * 5)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
-
-                holder.get(GET_PROC_MODULE).invoke().get(ProcessModule.GET_ROOT).invoke().get(Process.STOP).invoke();
-                holder.get(GET_PROC_MODULE).invoke().get(ProcessModule.ROOT_PROCESS).set(null);
-
+                holder.get(GET_PROC_MODULE).invoke().get(OSModule.SET_RUNNING).invoke(arguments);
                 return null;
             }
 
