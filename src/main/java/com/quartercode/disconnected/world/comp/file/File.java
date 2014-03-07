@@ -109,8 +109,7 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
                 FileRights rights = new FileRights();
                 try {
                     rights.get(FileRights.FROM_STRING).invoke(DEFAULT_FILE_RIGHTS);
-                }
-                catch (FunctionExecutionException e) {
+                } catch (FunctionExecutionException e) {
                     LOGGER.log(Level.SEVERE, "Unexpected exception during creation of default file rights object", e);
                 }
                 return new ObjectProperty<FileRights>(getName(), holder, rights);

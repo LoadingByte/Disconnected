@@ -21,7 +21,7 @@ package com.quartercode.disconnected.util;
 import java.util.ResourceBundle;
 
 /**
- * This is a simple class which enumerates some important resource bundles as constants.
+ * This is a simple class which enumerates some important {@link ResourceBundle}s as constants.
  */
 public class ResourceBundles {
 

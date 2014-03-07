@@ -227,8 +227,7 @@ public class Program extends DefaultFeatureHolder implements DerivableSize {
 
                 try {
                     return executorClass.newInstance();
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     throw new StopExecutionException("Unexpected exception during initialization of new program executor (class '" + executorClass.getName() + "'", e);
                 }
             }

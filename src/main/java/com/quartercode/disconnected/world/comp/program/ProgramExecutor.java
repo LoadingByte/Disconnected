@@ -292,8 +292,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
                             }
                         }
                     }
-                }
-                catch (ArgumentException e) {
+                } catch (ArgumentException e) {
                     throw new IllegalArgumentException("Illegal program arguments", e);
                 }
 

@@ -142,8 +142,7 @@ public class Parameter {
 
                 try {
                     return Integer.parseInt(argument);
-                }
-                catch (NumberFormatException e) {
+                } catch (NumberFormatException e) {
                     throw new WrongArgumentTypeException(parameter, argument);
                 }
             }
@@ -159,8 +158,7 @@ public class Parameter {
 
                 try {
                     return Double.parseDouble(argument);
-                }
-                catch (NumberFormatException e) {
+                } catch (NumberFormatException e) {
                     throw new WrongArgumentTypeException(parameter, argument);
                 }
             }

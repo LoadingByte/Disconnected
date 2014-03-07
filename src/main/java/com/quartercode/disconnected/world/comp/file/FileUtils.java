@@ -28,7 +28,10 @@ import com.quartercode.disconnected.world.comp.os.User;
 import com.quartercode.disconnected.world.comp.program.Process;
 
 /**
- * This file utility contains method related to the {@link File} system.
+ * This file utility contains methods related to {@link File}s and {@link FileSystem}s.
+ * 
+ * @see File
+ * @see FileSystem
  */
 public class FileUtils {
 
