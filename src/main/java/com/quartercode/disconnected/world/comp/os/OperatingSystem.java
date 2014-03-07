@@ -37,9 +37,11 @@ import com.quartercode.disconnected.world.comp.Version;
 import com.quartercode.disconnected.world.comp.Vulnerability;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
 import com.quartercode.disconnected.world.comp.file.FileSystemModule;
+import com.quartercode.disconnected.world.comp.net.NetworkModule;
+import com.quartercode.disconnected.world.comp.net.Packet;
 import com.quartercode.disconnected.world.comp.program.Process;
-import com.quartercode.disconnected.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.world.comp.program.Process.ProcessState;
+import com.quartercode.disconnected.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.world.comp.program.RootProcess;
 
 /**
@@ -76,6 +78,11 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
      * The {@link ProcessModule} which manages the {@link RootProcess}.
      */
     protected static final FeatureDefinition<ObjectProperty<ProcessModule>>      PROCESS_MODULE;
+
+    /**
+     * The {@link NetworkManager} which takes care of sending and receiving {@link Packet}s.
+     */
+    protected static final FeatureDefinition<ObjectProperty<NetworkModule>>      NETWORK_MODULE;
 
     static {
 
@@ -125,6 +132,16 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
             public ObjectProperty<ProcessModule> create(FeatureHolder holder) {
 
                 return new ObjectProperty<ProcessModule>(getName(), holder, new ProcessModule());
+            }
+
+        };
+
+        NETWORK_MODULE = new AbstractFeatureDefinition<ObjectProperty<NetworkModule>>("networkModule") {
+
+            @Override
+            public ObjectProperty<NetworkModule> create(FeatureHolder holder) {
+
+                return new ObjectProperty<NetworkModule>(getName(), holder, new NetworkModule());
             }
 
         };
@@ -241,6 +258,11 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
     public static final FunctionDefinition<ProcessModule>                        GET_PROC_MODULE;
 
     /**
+     * Returns the {@link NetworkManager} which takes care of sending and receiving {@link Packet}s.
+     */
+    public static final FunctionDefinition<NetworkModule>                        GET_NET_MODULE;
+
+    /**
      * Returns whether the operating system is running or not.
      * The state is determinated by the running state of the {@link RootProcess}.
      */
@@ -283,6 +305,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
         GET_FS_MODULE = FunctionDefinitionFactory.create("getFsModule", OperatingSystem.class, PropertyAccessorFactory.createGet(FILE_SYSTEM_MODULE));
         GET_PROC_MODULE = FunctionDefinitionFactory.create("getProcModule", OperatingSystem.class, PropertyAccessorFactory.createGet(PROCESS_MODULE));
+        GET_NET_MODULE = FunctionDefinitionFactory.create("getNetModule", OperatingSystem.class, PropertyAccessorFactory.createGet(NETWORK_MODULE));
 
         IS_RUNNING = FunctionDefinitionFactory.create("isRunning", OperatingSystem.class, new FunctionExecutor<Boolean>() {
 
@@ -327,32 +350,5 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
     }
 
     // ----- Foreign Content End -----
-
-    /**
-     * Creates a new operating system.
-     */
-    public OperatingSystem() {
-
-        // ----- Temporary -----
-        networkManager = new NetworkManager(this);
-        // ----- Temporary End -----
-    }
-
-    // TODO: Remove
-    // ----- Temporary -----
-
-    private final NetworkManager networkManager;
-
-    /**
-     * Returns the network manager which is used for storing and delivering packets.
-     * 
-     * @return The network manager which is used for storing and delivering packets.
-     */
-    public NetworkManager getNetworkManager() {
-
-        return networkManager;
-    }
-
-    // ----- Temporary End -----
 
 }
