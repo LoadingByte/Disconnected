@@ -42,10 +42,10 @@ import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.os.Environment;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.world.comp.os.Session;
 import com.quartercode.disconnected.world.comp.os.User;
 import com.quartercode.disconnected.world.comp.program.event.IPCMessageEvent;
 import com.quartercode.disconnected.world.comp.program.event.ProcessEvent;
-import com.quartercode.disconnected.world.comp.session.SessionProgram;
 
 /**
  * This class represents a process which is basically a running instance of a program.
@@ -450,20 +450,20 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
     public static final FunctionDefinition<OperatingSystem>                    GET_OPERATING_SYSTEM;
 
     /**
-     * Resolves the {@link SessionProgram} process this process is running under.
-     * This process is running with the rights of that {@link SessionProgram}.
+     * Resolves the {@link Session} process this process is running under.
+     * This process is running with the rights of that {@link Session}.
      */
     public static final FunctionDefinition<Process<?>>                         GET_SESSION_PROCESS;
 
     /**
-     * Resolves the actual {@link SessionProgram} executor this process is running under.
-     * This process is running with the rights of that {@link SessionProgram}.
+     * Resolves the actual {@link Session} executor this process is running under.
+     * This process is running with the rights of that {@link Session}.
      */
-    public static final FunctionDefinition<SessionProgram>                     GET_SESSION;
+    public static final FunctionDefinition<Session>                            GET_SESSION;
 
     /**
      * Resolves the {@link User} this process is running under.
-     * This uses the {@link #GET_SESSION} function for resolving the {@link SessionProgram} object.
+     * This uses the {@link #GET_SESSION} function for resolving the Session} object.
      */
     public static final FunctionDefinition<User>                               GET_USER;
 
@@ -703,7 +703,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 if ( ((Process<?>) holder).getParent() == null) {
                     // Error
                     return null;
-                } else if ( ((Process<?>) holder).getParent().get(GET_EXECUTOR).invoke() instanceof SessionProgram) {
+                } else if ( ((Process<?>) holder).getParent().get(GET_EXECUTOR).invoke() instanceof Session) {
                     return (Process<?>) ((Process<?>) holder).getParent();
                 } else {
                     // Ask parent process
@@ -713,12 +713,12 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        GET_SESSION = FunctionDefinitionFactory.create("getSession", Process.class, new FunctionExecutor<SessionProgram>() {
+        GET_SESSION = FunctionDefinitionFactory.create("getSession", Process.class, new FunctionExecutor<Session>() {
 
             @Override
-            public SessionProgram invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Session invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
-                return (SessionProgram) holder.get(GET_SESSION_PROCESS).invoke().get(GET_EXECUTOR).invoke();
+                return (Session) holder.get(GET_SESSION_PROCESS).invoke().get(GET_EXECUTOR).invoke();
             }
 
         });
@@ -728,7 +728,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public User invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
-                return holder.get(GET_SESSION).invoke().get(SessionProgram.GET_USER).invoke();
+                return holder.get(GET_SESSION).invoke().get(Session.GET_USER).invoke();
             }
 
         });

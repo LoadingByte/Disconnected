@@ -16,12 +16,13 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.world.comp.session;
+package com.quartercode.disconnected.world.comp.os;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import org.apache.commons.codec.digest.DigestUtils;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
@@ -29,24 +30,32 @@ import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
 import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
 import com.quartercode.disconnected.mocl.extra.Limit;
+import com.quartercode.disconnected.mocl.extra.Prioritized;
 import com.quartercode.disconnected.mocl.extra.StopExecutionException;
 import com.quartercode.disconnected.mocl.extra.def.ReferenceProperty;
 import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.util.ResourceBundles;
-import com.quartercode.disconnected.world.comp.os.User;
-import com.quartercode.disconnected.world.comp.os.UserSyscalls;
-import com.quartercode.disconnected.world.comp.program.ArgumentException.WrongArgumentTypeException;
+import com.quartercode.disconnected.world.comp.file.ContentFile;
+import com.quartercode.disconnected.world.comp.file.File;
+import com.quartercode.disconnected.world.comp.file.FileSystemModule;
+import com.quartercode.disconnected.world.comp.os.Configuration.ConfigurationEntry;
 import com.quartercode.disconnected.world.comp.program.ChildProcess;
 import com.quartercode.disconnected.world.comp.program.Parameter;
 import com.quartercode.disconnected.world.comp.program.Parameter.ArgumentType;
+import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 
 /**
  * This class represents a program which opens a session.
- * For opening an actual session, you just have to create a process out of this with the argument "user".
+ * For opening an actual session, you just have to create a process using this with these arguments:
+ * 
+ * <ul>
+ * <li>user: The name of the {@link User} the session should be running under.</li>
+ * <li>password: The password of the given {@link User}. Can be null if the parent session is null or a root session.</li>
+ * </ul>
  */
-public abstract class SessionProgram extends ProgramExecutor {
+public class Session extends ProgramExecutor {
 
     // ----- Properties -----
 
@@ -82,9 +91,9 @@ public abstract class SessionProgram extends ProgramExecutor {
 
     static {
 
-        GET_USER = FunctionDefinitionFactory.create("getUser", SessionProgram.class, PropertyAccessorFactory.createGet(USER));
+        GET_USER = FunctionDefinitionFactory.create("getUser", Session.class, PropertyAccessorFactory.createGet(USER));
 
-        GET_PARAMETERS.addExecutor(SessionProgram.class, "sessionProgramDefault", new FunctionExecutor<List<Parameter>>() {
+        GET_PARAMETERS.addExecutor(Session.class, "default", new FunctionExecutor<List<Parameter>>() {
 
             @Override
             public List<Parameter> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
@@ -96,7 +105,7 @@ public abstract class SessionProgram extends ProgramExecutor {
 
         });
 
-        GET_RESOURCE_BUNDLE.addExecutor(SessionProgram.class, "default", new FunctionExecutor<ResourceBundle>() {
+        GET_RESOURCE_BUNDLE.addExecutor(Session.class, "default", new FunctionExecutor<ResourceBundle>() {
 
             @Override
             public ResourceBundle invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
@@ -105,28 +114,55 @@ public abstract class SessionProgram extends ProgramExecutor {
             }
         });
 
-        UPDATE.addExecutor(SessionProgram.class, "sessionProgramParseArgsDefault", new FunctionExecutor<Void>() {
+        UPDATE.addExecutor(Session.class, "setUserFromArgument", new FunctionExecutor<Void>() {
 
             @Override
-            @SuppressWarnings ("unchecked")
+            @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_7)
             @Limit (1)
             public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
+                @SuppressWarnings ("unchecked")
                 Map<String, Object> programArguments = (Map<String, Object>) arguments[0];
-
                 String username = (String) programArguments.get("user");
-                User user = null;
-                for (User testUser : ((SessionProgram) holder).getParent().get(UserSyscalls.GET_USERS).invoke()) {
-                    if (testUser.get(User.GET_NAME).equals(username)) {
-                        user = testUser;
-                        break;
+
+                // This program is always allowed to read the user configuration file
+                FileSystemModule fsModule = ((Session) holder).getParent().get(Process.GET_OPERATING_SYSTEM).invoke().get(OperatingSystem.GET_FS_MODULE).invoke();
+                File<?> userConfigFile = fsModule.get(FileSystemModule.GET_FILE).invoke(CommonFiles.USER_CONFIG);
+                if (! (userConfigFile instanceof ContentFile) || userConfigFile.get(ContentFile.GET_CONTENT).invoke() == null) {
+                    throw new StopExecutionException(new IllegalStateException("User configuration file doesn't exist under '" + CommonFiles.USER_CONFIG + "'"));
+                }
+                Configuration userConfig = (Configuration) userConfigFile.get(ContentFile.GET_CONTENT).invoke();
+
+                for (ConfigurationEntry entry : userConfig.get(Configuration.GET_ENTRIES).invoke()) {
+                    if (entry instanceof User && ((User) entry).get(User.GET_NAME).equals(username)) {
+                        holder.get(USER).set((User) entry);
+                        return null;
                     }
                 }
 
-                if (user == null) {
-                    throw new StopExecutionException(new WrongArgumentTypeException(holder.get(GET_PARAMETER_BY_NAME).invoke("user"), programArguments.get("user").toString()));
-                } else {
-                    holder.get(USER).set(user);
+                throw new StopExecutionException(new IllegalArgumentException("Unknown user"));
+            }
+
+        });
+
+        UPDATE.addExecutor(Session.class, "checkPassword", new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_5)
+            @Limit (1)
+            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+
+                // Check for no parent session or a parent root session
+                Session parentSession = ((Session) holder).getParent().get(Process.GET_SESSION).invoke();
+                if (parentSession != null && !parentSession.get(GET_USER).invoke().get(User.IS_SUPERUSER).invoke()) {
+                    @SuppressWarnings ("unchecked")
+                    Map<String, Object> programArguments = (Map<String, Object>) arguments[0];
+                    String rawPassword = (String) programArguments.get("password");
+
+                    String hashedPassword = DigestUtils.sha256Hex(rawPassword);
+                    if (!holder.get(GET_USER).invoke().get(User.GET_PASSWORD).invoke().equals(hashedPassword)) {
+                        throw new StopExecutionException(new IllegalArgumentException("Wrong password"));
+                    }
                 }
 
                 return null;
@@ -141,7 +177,7 @@ public abstract class SessionProgram extends ProgramExecutor {
     /**
      * Creates a new session program.
      */
-    public SessionProgram() {
+    public Session() {
 
     }
 
