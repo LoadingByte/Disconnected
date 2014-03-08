@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.world.comp.program;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.Validate;
@@ -40,7 +41,7 @@ import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
-import com.quartercode.disconnected.world.comp.os.Environment;
+import com.quartercode.disconnected.world.comp.os.EnvironmentVariable;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.os.Session;
 import com.quartercode.disconnected.world.comp.os.User;
@@ -113,34 +114,34 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * The unique id the process has.
      * It is used to identify the process.
      */
-    protected static final FeatureDefinition<ObjectProperty<Integer>>          PID;
+    protected static final FeatureDefinition<ObjectProperty<Integer>>             PID;
 
     /**
      * The {@link File} which contains the program the process runs.
      */
-    protected static final FeatureDefinition<ReferenceProperty<ContentFile>>   SOURCE;
+    protected static final FeatureDefinition<ReferenceProperty<ContentFile>>      SOURCE;
 
     /**
-     * The {@link Environment} the process is running in.
-     * An {@link Environment} object contains useful environment variables.
+     * The environment variables that are assigned to the process.
+     * See {@link EnvironmentVariable} for more information.
      */
-    protected static final FeatureDefinition<ObjectProperty<Environment>>      ENVIRONMENT;
+    protected static final FeatureDefinition<ObjectProperty<Map<String, String>>> ENVIRONMENT;
 
     /**
      * The {@link ProcessState} which defines the global state of the process the os can see.
      * It stores if the process is running, interrupted etc.
      */
-    protected static final FeatureDefinition<ObjectProperty<ProcessState>>     STATE;
+    protected static final FeatureDefinition<ObjectProperty<ProcessState>>        STATE;
 
     /**
      * The {@link ProgramExecutor} which contains the logic of the process.
      */
-    protected static final FeatureDefinition<ObjectProperty<ProgramExecutor>>  EXECUTOR;
+    protected static final FeatureDefinition<ObjectProperty<ProgramExecutor>>     EXECUTOR;
 
     /**
      * The child processes the process launched.
      */
-    protected static final FeatureDefinition<ObjectProperty<List<Process<?>>>> CHILDREN;
+    protected static final FeatureDefinition<ObjectProperty<List<Process<?>>>>    CHILDREN;
 
     static {
 
@@ -164,12 +165,12 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         };
 
-        ENVIRONMENT = new AbstractFeatureDefinition<ObjectProperty<Environment>>("environment") {
+        ENVIRONMENT = new AbstractFeatureDefinition<ObjectProperty<Map<String, String>>>("environment") {
 
             @Override
-            public ObjectProperty<Environment> create(FeatureHolder holder) {
+            public ObjectProperty<Map<String, String>> create(FeatureHolder holder) {
 
-                return new ObjectProperty<Environment>(getName(), holder);
+                return new ObjectProperty<Map<String, String>>(getName(), holder, new HashMap<String, String>());
             }
 
         };
@@ -214,12 +215,12 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * Returns the unique id the process has.
      * It is used to identify the process.
      */
-    public static final FunctionDefinition<Integer>                            GET_PID;
+    public static final FunctionDefinition<Integer>                               GET_PID;
 
     /**
      * Returns the {@link File} which contains the {@link Program} the process runs.
      */
-    public static final FunctionDefinition<ContentFile>                        GET_SOURCE;
+    public static final FunctionDefinition<ContentFile>                           GET_SOURCE;
 
     /**
      * Changes the {@link File} which contains the {@link Program} the process runs.
@@ -239,17 +240,17 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                               SET_SOURCE;
+    public static final FunctionDefinition<Void>                                  SET_SOURCE;
 
     /**
-     * Returns the {@link Environment} the process is running in. It can be modified.
-     * An {@link Environment} object contains useful environment variables.
+     * Returns the environment variables that are assigned to the process.
+     * See {@link EnvironmentVariable} for more information.
      */
-    public static final FunctionDefinition<Environment>                        GET_ENVIRONMENT;
+    public static final FunctionDefinition<Map<String, String>>                   GET_ENVIRONMENT;
 
     /**
-     * Changes the {@link Environment} the process is running in. It can be modified.
-     * An {@link Environment} object contains useful environment variables.
+     * Changes the environment variables that are assigned to the process.
+     * See {@link EnvironmentVariable} for more information.
      * 
      * <table>
      * <tr>
@@ -260,19 +261,19 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * </tr>
      * <tr>
      * <td>0</td>
-     * <td>{@link Environment}</td>
+     * <td>{@link Map}&lt;{@link String}, {@link String}&gt;</td>
      * <td>environment</td>
-     * <td>The new {@link Environment} the process is running in.</td>
+     * <td>The new environment variables for the process.</td>
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                               SET_ENVIRONMENT;
+    public static final FunctionDefinition<Void>                                  SET_ENVIRONMENT;
 
     /**
      * Returns the {@link ProcessState} which defines the global state of the process the os can see.
      * It stores if the process is running, interrupted etc.
      */
-    public static final FunctionDefinition<ProcessState>                       GET_STATE;
+    public static final FunctionDefinition<ProcessState>                          GET_STATE;
 
     /**
      * Returns true if the given {@link ProcessState} is applied to this process and all child processes (recursively).
@@ -293,7 +294,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Boolean>                            IS_STATE_APPLIED;
+    public static final FunctionDefinition<Boolean>                               IS_STATE_APPLIED;
 
     /**
      * Changes the {@link ProcessState} which defines the global state of the process the os can see.
@@ -321,7 +322,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * </tr>
      * </table>
      */
-    protected static final FunctionDefinition<Void>                            SET_STATE;
+    protected static final FunctionDefinition<Void>                               SET_STATE;
 
     /**
      * Suspends the execution temporarily, tick updates will be ignored.
@@ -343,7 +344,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                               SUSPEND;
+    public static final FunctionDefinition<Void>                                  SUSPEND;
 
     /**
      * Resumes a suspended process.
@@ -365,7 +366,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                               RESUME;
+    public static final FunctionDefinition<Void>                                  RESUME;
 
     /**
      * Interrupts the execution friendly and expresses that it should be stopped as soon as possible.
@@ -388,7 +389,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                               INTERRUPT;
+    public static final FunctionDefinition<Void>                                  INTERRUPT;
 
     /**
      * Suspends the execution temporarily, tick updates will be ignored.
@@ -414,58 +415,58 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                               STOP;
+    public static final FunctionDefinition<Void>                                  STOP;
 
     /**
      * Returns the {@link ProgramExecutor} which contains the logic of the process.
      */
-    public static final FunctionDefinition<ProgramExecutor>                    GET_EXECUTOR;
+    public static final FunctionDefinition<ProgramExecutor>                       GET_EXECUTOR;
 
     /**
      * Returns the direct child processes the process launched.
      * Direct children are present in the child datastructure of this object.
      */
-    public static final FunctionDefinition<List<Process<?>>>                   GET_CHILDREN;
+    public static final FunctionDefinition<List<Process<?>>>                      GET_CHILDREN;
 
     /**
      * Returns all child processes the process launched.
      * That includes all children which are present in the child datastructure of this object, all child objects etc.
      */
-    public static final FunctionDefinition<List<Process<?>>>                   GET_ALL_CHILDREN;
+    public static final FunctionDefinition<List<Process<?>>>                      GET_ALL_CHILDREN;
 
     /**
-     * Creates a new empty {@link ChildProcess} which uses the same {@link Environment} as this one.
+     * Creates a new empty {@link ChildProcess} which uses the same environment variables as this one.
      * You can run the returned process after creation using {@link #LAUNCH}.
      */
-    public static final FunctionDefinition<ChildProcess>                       CREATE_CHILD;
+    public static final FunctionDefinition<ChildProcess>                          CREATE_CHILD;
 
     /**
      * Returns the root {@link RootProcess} which is the parent of every other process somewhere in the tree.
      */
-    public static final FunctionDefinition<RootProcess>                        GET_ROOT;
+    public static final FunctionDefinition<RootProcess>                           GET_ROOT;
 
     /**
      * Returns the {@link OperatingSystem} which is hosting the {@link RootProcess} which is the parent of every other process.
      */
-    public static final FunctionDefinition<OperatingSystem>                    GET_OPERATING_SYSTEM;
+    public static final FunctionDefinition<OperatingSystem>                       GET_OPERATING_SYSTEM;
 
     /**
      * Resolves the {@link Session} process this process is running under.
      * This process is running with the rights of that {@link Session}.
      */
-    public static final FunctionDefinition<Process<?>>                         GET_SESSION_PROCESS;
+    public static final FunctionDefinition<Process<?>>                            GET_SESSION_PROCESS;
 
     /**
      * Resolves the actual {@link Session} executor this process is running under.
      * This process is running with the rights of that {@link Session}.
      */
-    public static final FunctionDefinition<Session>                            GET_SESSION;
+    public static final FunctionDefinition<Session>                               GET_SESSION;
 
     /**
      * Resolves the {@link User} this process is running under.
      * This uses the {@link #GET_SESSION} function for resolving the Session} object.
      */
-    public static final FunctionDefinition<User>                               GET_USER;
+    public static final FunctionDefinition<User>                                  GET_USER;
 
     /**
      * Launches a new process using the {@link Program} stored in the set source {@link ContentFile}.
@@ -486,7 +487,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                               LAUNCH;
+    public static final FunctionDefinition<Void>                                  LAUNCH;
 
     /**
      * Sends a new {@link ProcessEvent} to the given receiving {@link Process} with the given payload map.
@@ -514,7 +515,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * 
      * @see ProcessEvent
      */
-    public static final FunctionDefinition<Void>                               SEND_MESSAGE;
+    public static final FunctionDefinition<Void>                                  SEND_MESSAGE;
 
     static {
 
@@ -536,7 +537,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         });
 
         GET_ENVIRONMENT = FunctionDefinitionFactory.create("getEnvironment", Process.class, PropertyAccessorFactory.createGet(ENVIRONMENT));
-        SET_ENVIRONMENT = FunctionDefinitionFactory.create("setEnvironment", Process.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(ENVIRONMENT)), Environment.class);
+        SET_ENVIRONMENT = FunctionDefinitionFactory.create("setEnvironment", Process.class, PropertyAccessorFactory.createSet(ENVIRONMENT), Map.class);
 
         GET_STATE = FunctionDefinitionFactory.create("getState", Process.class, PropertyAccessorFactory.createGet(STATE));
         IS_STATE_APPLIED = FunctionDefinitionFactory.create("isStateApplied", Process.class, new FunctionExecutor<Boolean>() {
@@ -663,9 +664,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
                 ChildProcess process = new ChildProcess();
                 process.setParent((Process<?>) holder);
-                process.setLocked(false);
-                process.get(ENVIRONMENT).set(holder.get(GET_ENVIRONMENT).invoke());
-                process.setLocked(true);
+                process.get(SET_ENVIRONMENT).invoke(new HashMap<String, String>(holder.get(GET_ENVIRONMENT).invoke()));
                 return process;
             }
 

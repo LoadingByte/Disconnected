@@ -21,6 +21,7 @@ package com.quartercode.disconnected.world.comp.program;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import com.quartercode.disconnected.mocl.base.FeatureDefinition;
 import com.quartercode.disconnected.mocl.base.FeatureHolder;
 import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
@@ -37,7 +38,9 @@ import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.world.comp.os.CommonFiles;
-import com.quartercode.disconnected.world.comp.os.Environment;
+import com.quartercode.disconnected.world.comp.os.Configuration;
+import com.quartercode.disconnected.world.comp.os.Configuration.ConfigurationEntry;
+import com.quartercode.disconnected.world.comp.os.EnvironmentVariable;
 import com.quartercode.disconnected.world.comp.os.OSModule;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 
@@ -118,7 +121,11 @@ public class ProcessModule extends OSModule {
 
                     FileSystemModule fsModule = ((ProcessModule) holder).getParent().get(OperatingSystem.GET_FS_MODULE).invoke();
                     File<?> environmentFile = fsModule.get(FileSystemModule.GET_FILE).invoke(CommonFiles.ENVIRONMENT_CONFIG);
-                    Environment environment = ((Environment) environmentFile.get(ContentFile.GET_CONTENT).invoke()).clone();
+                    Configuration environmentConfig = (Configuration) environmentFile.get(ContentFile.GET_CONTENT).invoke();
+                    Map<String, String> environment = new HashMap<String, String>();
+                    for (ConfigurationEntry variable : environmentConfig.get(Configuration.GET_ENTRIES).invoke()) {
+                        environment.put(variable.get(EnvironmentVariable.GET_NAME).invoke(), variable.get(EnvironmentVariable.GET_VALUE).invoke());
+                    }
                     root.get(Process.SET_ENVIRONMENT).invoke(environment);
 
                     root.get(Process.LAUNCH).invoke(new HashMap<String, Object>());
