@@ -19,7 +19,6 @@
 package com.quartercode.disconnected.test.world.comp.file;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.world.comp.file.FileRights;
@@ -27,11 +26,6 @@ import com.quartercode.disconnected.world.comp.file.FileRights.FileAccessor;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
 
 public class FileRightsTest {
-
-    @Before
-    public void setUp() {
-
-    }
 
     @Test
     public void testGet() throws FunctionExecutionException {

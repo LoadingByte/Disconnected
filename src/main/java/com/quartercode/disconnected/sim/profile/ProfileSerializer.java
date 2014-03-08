@@ -38,7 +38,6 @@ import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.World;
-import com.quartercode.disconnected.world.comp.session.SessionProgram.Session;
 
 /**
  * This utility class loads a saves stored {@link Profile}s for serializing {@link Simulation}s.
@@ -137,7 +136,6 @@ public class ProfileSerializer {
      * 
      * @param outputStream The {@link OutputStream} for writing.
      * @param world The {@link World} to serialize.
-     * @throws IllegalStateException There are open {@link Session}s which aren't serializable.
      * @throws JAXBException An exception occurred while serializing the xml document.
      */
     public static void serializeWorld(OutputStream outputStream, World world) throws JAXBException {
