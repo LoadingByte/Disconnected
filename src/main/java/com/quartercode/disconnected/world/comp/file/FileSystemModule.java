@@ -565,7 +565,7 @@ public class FileSystemModule extends OSModule {
                 public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
 
                     FileSystemModule parent = ((KnownFileSystem) holder).getParent();
-                    Validate.isTrue(parent.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke(holder.get(GET_MOUNTED).invoke()) == null, "Other known file system with same mountpoint already mounted");
+                    Validate.isTrue(parent.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke(holder.get(GET_MOUNTPOINT).invoke()) == null, "Other known file system with same mountpoint already mounted");
                     return null;
                 }
 
