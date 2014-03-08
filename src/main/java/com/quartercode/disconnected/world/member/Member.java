@@ -24,7 +24,6 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
-import com.quartercode.disconnected.util.InfoString;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.member.ai.AIController;
 
@@ -37,7 +36,7 @@ import com.quartercode.disconnected.world.member.ai.AIController;
  * @see BrainData
  * @see AIController
  */
-public class Member implements InfoString {
+public class Member {
 
     @XmlID
     @XmlElement
@@ -213,15 +212,9 @@ public class Member implements InfoString {
     }
 
     @Override
-    public String toInfoString() {
-
-        return name + ", computer " + computer.getId() + ", " + brainData.size() + " brain data entries";
-    }
-
-    @Override
     public String toString() {
 
-        return getClass().getName() + " [" + toInfoString() + "]";
+        return getClass().getName() + " [name=" + name + ", aiController=" + aiController.getClass() + ", brainDataEntries=" + brainData.size() + "]";
     }
 
 }

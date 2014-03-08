@@ -33,9 +33,9 @@ import java.util.Random;
  * 
  * @see Random
  */
-public class RandomPool implements Serializable, InfoString {
+public class RandomPool implements Serializable {
 
-    private static final long  serialVersionUID = 4448882577260750865L;
+    private static final long  serialVersionUID = 1187445181932361744L;
 
     private final List<Random> randoms          = new ArrayList<Random>();
     private int                currentIndex;
@@ -277,15 +277,9 @@ public class RandomPool implements Serializable, InfoString {
     }
 
     @Override
-    public String toInfoString() {
-
-        return "pool with " + randoms.size() + " randoms";
-    }
-
-    @Override
     public String toString() {
 
-        return getClass().getName() + " [" + toInfoString() + "]";
+        return getClass().getName() + " [" + randoms.size() + " randoms]";
     }
 
 }
