@@ -27,11 +27,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
+import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.disconnected.util.PrimitiveUtil;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 
@@ -71,20 +71,20 @@ public class SizeUtilTest {
         data.add(new Object[] { Arrays.asList(new Object[] { "Test", true, 128 }), 4 + 1 + 2 });
 
         // Feature holders
-        DerivableSize.GET_SIZE.addExecutor(FeatureHolder.class, "test1", new FunctionExecutor<Long>() {
+        DerivableSize.GET_SIZE.addExecutor(TestFeatureHolder.class, "test1", new FunctionExecutor<Long>() {
 
             @Override
-            public Long invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                return 100L;
+                return 100L + PrimitiveUtil.preventNull(invocation.next(arguments));
             }
         });
-        DerivableSize.GET_SIZE.addExecutor(FeatureHolder.class, "test2", new FunctionExecutor<Long>() {
+        DerivableSize.GET_SIZE.addExecutor(TestFeatureHolder.class, "test2", new FunctionExecutor<Long>() {
 
             @Override
-            public Long invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                return 500L;
+                return 500L + PrimitiveUtil.preventNull(invocation.next(arguments));
             }
         });
         data.add(new Object[] { new TestFeatureHolder(), 100 + 500 });
@@ -106,7 +106,7 @@ public class SizeUtilTest {
     }
 
     @Test
-    public void testGetSize() throws FunctionExecutionException {
+    public void testGetSize() throws ExecutorInvocationException {
 
         Assert.assertEquals("Calculated Size", expectedSize, SizeUtil.getSize(object));
     }

@@ -21,14 +21,15 @@ package com.quartercode.disconnected.world.comp;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Map.Entry;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.Property;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Property;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.util.PrimitiveUtil;
 
 /**
  * This utility calculates the size of certain objects in bytes (of course, it's a fictional size).
@@ -45,19 +46,15 @@ public class SizeUtil {
      * 
      * @param object The object to calculate the size of.
      * @return The size of the object in bytes (of course, it's a fictitious size).
-     * @throws FunctionExecutionException The object is a {@link FeatureHolder} and an exception occurres during deriving.
+     * @throws ExecutorInvocationException The object is a {@link FeatureHolder} and an exception occurres during deriving.
      */
-    public static long getSize(Object object) throws FunctionExecutionException {
+    public static long getSize(Object object) throws ExecutorInvocationException {
 
         if (object == null) {
             return 0; // Nulls have no size
         } else if (object instanceof DerivableSize) {
             // Feature holders which implement DerivableSize have the size provided by DerivableSize.GET_SIZE
-            long size = 0;
-            for (long sizePart : ((DerivableSize) object).get(DerivableSize.GET_SIZE).invokeRA()) {
-                size += sizePart;
-            }
-            return size;
+            return ((DerivableSize) object).get(DerivableSize.GET_SIZE).invoke();
         } else if (object instanceof Boolean) {
             return 1; // Booleans only need one bit -> one byte
         } else if (object instanceof Character || object instanceof String) {
@@ -102,9 +99,9 @@ public class SizeUtil {
         return new FunctionExecutor<Long>() {
 
             @Override
-            public Long invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                return SizeUtil.getSize(holder.get(propertyDefinition).get());
+                return SizeUtil.getSize(invocation.getHolder().get(propertyDefinition).get()) + PrimitiveUtil.preventNull(invocation.next(arguments));
             }
 
         };

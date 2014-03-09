@@ -21,16 +21,18 @@ package com.quartercode.disconnected.world.comp.os;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.util.PrimitiveUtil;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
@@ -195,9 +197,9 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
             GET_SIZE.addExecutor(ConfigurationEntry.class, "columns", new FunctionExecutor<Long>() {
 
                 @Override
-                public Long invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+                public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                    return SizeUtil.getSize(holder.get(GET_COLUMNS).invoke());
+                    return SizeUtil.getSize(invocation.getHolder().get(GET_COLUMNS).invoke()) + PrimitiveUtil.preventNull(invocation.next(arguments));
                 }
 
             });
