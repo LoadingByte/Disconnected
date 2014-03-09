@@ -91,6 +91,14 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>quartercode-repository</id>
+            <name>QuarterCode Repository</name>
+            <url>http://repo.quartercode.com/content/groups/public/</url>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <!-- License header -->
