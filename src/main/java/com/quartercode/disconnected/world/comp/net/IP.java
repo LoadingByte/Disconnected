@@ -21,19 +21,20 @@ package com.quartercode.disconnected.world.comp.net;
 import java.net.InetAddress;
 import java.util.Arrays;
 import org.apache.commons.lang.Validate;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.Lockable;
-import com.quartercode.disconnected.mocl.extra.Prioritized;
-import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Lockable;
+import com.quartercode.classmod.extra.Prioritized;
+import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.StringRepresentable;
 import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
 
@@ -155,7 +156,7 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
             @Override
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_6)
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 Integer[] parts = (Integer[]) arguments[0];
                 Validate.isTrue(parts.length == 4, "The ip must have 4 parts (e.g. [127, 0, 0, 1]): ", Arrays.toString(parts));
@@ -163,7 +164,7 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
                     Validate.isTrue(part >= 0 || part <= 255, "Every ip part must be in range 0 <= part <= 255 (e.g. [127, 0, 0, 1]): ", Arrays.toString(parts));
                 }
 
-                return null;
+                return invocation.next(arguments);
             }
 
         });
@@ -172,11 +173,11 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
 
             @Override
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                holder.get(PARTS).set(Arrays.copyOf( ((IP) arguments[0]).get(PARTS).get(), 4));
+                invocation.getHolder().get(PARTS).set(Arrays.copyOf( ((IP) arguments[0]).get(PARTS).get(), 4));
 
-                return null;
+                return invocation.next(arguments);
             }
 
         }, IP.class);
@@ -184,12 +185,14 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
         TO_STRING.addExecutor(IP.class, "default", new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                String parts = "";
-                for (int part : holder.get(GET_PARTS).invoke()) {
-                    parts += "." + part;
+                StringBuilder parts = new StringBuilder();
+                for (int part : invocation.getHolder().get(GET_PARTS).invoke()) {
+                    parts.append(".").append(part);
                 }
+
+                invocation.next(arguments);
                 return parts.substring(1);
             }
 
@@ -198,16 +201,16 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
 
             @Override
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 int[] parts = new int[4];
                 String[] stringParts = ((String) arguments[0]).split("\\.");
                 for (int counter = 0; counter < parts.length; counter++) {
                     parts[counter] = Integer.parseInt(stringParts[counter]);
                 }
-                holder.get(SET_PARTS).invoke(parts);
+                invocation.getHolder().get(SET_PARTS).invoke(parts);
 
-                return null;
+                return invocation.next(arguments);
             }
 
         });

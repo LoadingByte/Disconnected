@@ -19,19 +19,20 @@
 package com.quartercode.disconnected.world.comp.net;
 
 import org.apache.commons.lang.Validate;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.Lockable;
-import com.quartercode.disconnected.mocl.extra.Prioritized;
-import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Lockable;
+import com.quartercode.classmod.extra.Prioritized;
+import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.StringRepresentable;
 import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
 
@@ -194,12 +195,12 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
             @Override
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_6)
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 int port = (Integer) arguments[0];
                 Validate.isTrue(port >= 0 || port <= 65535, "The port must be in range 0 <= port <= 65535 (e.g. 8080): ", port);
 
-                return null;
+                return invocation.next(arguments);
             }
 
         });
@@ -208,7 +209,9 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
 
             @Override
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+
+                FeatureHolder holder = invocation.getHolder();
 
                 String ipString = ((Address) arguments[0]).get(IP).get().get(com.quartercode.disconnected.world.comp.net.IP.TO_STRING).invoke();
                 IP ip = new IP();
@@ -218,7 +221,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
                 holder.get(SET_IP).invoke(ip);
                 holder.get(SET_PORT).invoke( ((Address) arguments[0]).get(PORT).get());
 
-                return null;
+                return invocation.next(arguments);
             }
 
         }, Address.class);
@@ -226,9 +229,12 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
         TO_STRING.addExecutor(Address.class, "default", new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                return holder.get(GET_IP).invoke().get(com.quartercode.disconnected.world.comp.net.IP.TO_STRING).invoke() + ":" + holder.get(GET_PORT).invoke();
+                FeatureHolder holder = invocation.getHolder();
+                String result = holder.get(GET_IP).invoke().get(com.quartercode.disconnected.world.comp.net.IP.TO_STRING).invoke() + ":" + holder.get(GET_PORT).invoke();
+                invocation.next(arguments);
+                return result;
             }
 
         });
@@ -236,7 +242,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
 
             @Override
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 String[] parts = ((String) arguments[0]).split(":");
                 Validate.isTrue(parts.length == 2, "Address must have the format IP:PORT: ", arguments[0]);
@@ -244,10 +250,10 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
                 ip.setLocked(false);
                 ip.get(com.quartercode.disconnected.world.comp.net.IP.FROM_STRING).invoke(parts[0]);
                 ip.setLocked(true);
-                holder.get(SET_IP).invoke(ip);
-                holder.get(SET_PORT).invoke(Integer.parseInt(parts[1]));
+                invocation.getHolder().get(SET_IP).invoke(ip);
+                invocation.getHolder().get(SET_PORT).invoke(Integer.parseInt(parts[1]));
 
-                return null;
+                return invocation.next(arguments);
             }
 
         });
