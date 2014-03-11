@@ -7,7 +7,7 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.ByteUnit;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
@@ -22,7 +22,7 @@ public class FileSystemModuleTest {
     private final KnownFileSystem[] knownFileSystems = new KnownFileSystem[3];
 
     @Before
-    public void setUp() throws FunctionExecutionException {
+    public void setUp() throws ExecutorInvocationException {
 
         fsModule = new FileSystemModule();
 
@@ -34,7 +34,7 @@ public class FileSystemModuleTest {
         knownFileSystems[2] = addKnown(fsModule, fileSystems[2], "fs3", false);
     }
 
-    private FileSystem createFileSystem(long size) throws FunctionExecutionException {
+    private FileSystem createFileSystem(long size) throws ExecutorInvocationException {
 
         FileSystem fileSystem = new FileSystem();
         fileSystem.setLocked(false);
@@ -43,7 +43,7 @@ public class FileSystemModuleTest {
         return fileSystem;
     }
 
-    private KnownFileSystem addKnown(FileSystemModule fsModule, FileSystem fileSystem, String mountpoint, boolean mounted) throws FunctionExecutionException {
+    private KnownFileSystem addKnown(FileSystemModule fsModule, FileSystem fileSystem, String mountpoint, boolean mounted) throws ExecutorInvocationException {
 
         KnownFileSystem known = new KnownFileSystem();
         known.setLocked(false);
@@ -58,14 +58,14 @@ public class FileSystemModuleTest {
     }
 
     @Test
-    public void testGetKnown() throws FunctionExecutionException {
+    public void testGetKnown() throws ExecutorInvocationException {
 
         Set<KnownFileSystem> expected = new HashSet<KnownFileSystem>(Arrays.asList(knownFileSystems));
         Assert.assertEquals("Known file systems", expected, fsModule.get(FileSystemModule.GET_KNOWN).invoke());
     }
 
     @Test
-    public void testGetMountedByMountpoint() throws FunctionExecutionException {
+    public void testGetMountedByMountpoint() throws ExecutorInvocationException {
 
         Assert.assertEquals("Mounted file system fs1", fileSystems[0], fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs1").get(KnownFileSystem.GET_FILE_SYSTEM).invoke());
         Assert.assertEquals("Mounted file system fs2", fileSystems[1], fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs2").get(KnownFileSystem.GET_FILE_SYSTEM).invoke());
@@ -73,15 +73,15 @@ public class FileSystemModuleTest {
         Assert.assertEquals("No mounted file system fs3", null, fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs3"));
     }
 
-    @Test (expected = FunctionExecutionException.class)
-    public void testMountSameMountpoint() throws FunctionExecutionException {
+    @Test (expected = ExecutorInvocationException.class)
+    public void testMountSameMountpoint() throws ExecutorInvocationException {
 
         FileSystem fileSystem = new FileSystem();
         addKnown(fsModule, fileSystem, "fs1", true);
     }
 
     @Test
-    public void testGetFile() throws FunctionExecutionException {
+    public void testGetFile() throws ExecutorInvocationException {
 
         File<?> file = new ContentFile();
         fileSystems[0].get(FileSystem.ADD_FILE).invoke(file, "some/path/to/file");
@@ -91,7 +91,7 @@ public class FileSystemModuleTest {
     }
 
     @Test
-    public void testAddFile() throws FunctionExecutionException {
+    public void testAddFile() throws ExecutorInvocationException {
 
         File<?> file = new ContentFile();
         fsModule.get(FileSystemModule.ADD_FILE).invoke(file, "/fs1/some/path/to/file");

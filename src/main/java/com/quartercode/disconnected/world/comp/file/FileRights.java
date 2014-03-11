@@ -19,14 +19,15 @@
 package com.quartercode.disconnected.world.comp.file;
 
 import java.util.Arrays;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.world.StringRepresentable;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 
@@ -328,13 +329,15 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
         GET = FunctionDefinitionFactory.create("get", FileRights.class, new FunctionExecutor<Boolean>() {
 
             @Override
-            public Boolean invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) throws ExecutorInvocationException {
 
+                boolean result = false;
                 if (arguments[0] != null) {
-                    return holder.get(RIGHTS).get()[ ((FileAccessor) arguments[0]).ordinal() * 4 + ((FileRight) arguments[1]).ordinal()];
-                } else {
-                    return false;
+                    result = invocation.getHolder().get(RIGHTS).get()[ ((FileAccessor) arguments[0]).ordinal() * 4 + ((FileRight) arguments[1]).ordinal()];
                 }
+
+                invocation.next(arguments);
+                return result;
             }
 
         }, FileAccessor.class, FileRight.class);
@@ -342,8 +345,9 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
         SET = FunctionDefinitionFactory.create("set", FileRights.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
+                FeatureHolder holder = invocation.getHolder();
                 if (arguments[0] == null) {
                     holder.get(SET).invoke(FileAccessor.OWNER, arguments[1], arguments[2]);
                     holder.get(SET).invoke(FileAccessor.GROUP, arguments[1], arguments[2]);
@@ -352,7 +356,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
                     holder.get(RIGHTS).get()[ ((FileAccessor) arguments[0]).ordinal() * 4 + ((FileRight) arguments[1]).ordinal()] = (Boolean) arguments[2];
                 }
 
-                return null;
+                return invocation.next(arguments);
             }
 
         }, FileAccessor.class, FileRight.class, Boolean.class);
@@ -360,11 +364,11 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
         FROM_OBJECT = FunctionDefinitionFactory.create("fromObject", FileRights.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                holder.get(RIGHTS).set(Arrays.copyOf( ((FileRights) arguments[0]).get(RIGHTS).get(), 3 * 4));
+                invocation.getHolder().get(RIGHTS).set(Arrays.copyOf( ((FileRights) arguments[0]).get(RIGHTS).get(), 3 * 4));
 
-                return null;
+                return invocation.next(arguments);
             }
 
         }, FileRights.class);
@@ -372,11 +376,11 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
         TO_STRING.addExecutor(FileRights.class, "default", new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 String rights = "";
                 for (int index = 0; index < 3 * 4; index++) {
-                    if (holder.get(RIGHTS).get()[index]) {
+                    if (invocation.getHolder().get(RIGHTS).get()[index]) {
                         FileRight right = null;
                         if (index == 0 || index == 4 || index == 8) {
                             right = FileRight.READ;
@@ -393,6 +397,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
                     }
                 }
 
+                invocation.next(arguments);
                 return rights;
             }
 
@@ -400,14 +405,14 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
         FROM_STRING.addExecutor(FileRights.class, "default", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 char[] rights = ((String) arguments[0]).toCharArray();
                 for (int index = 0; index < 3 * 4; index++) {
-                    holder.get(RIGHTS).get()[index] = rights[index] != '-';
+                    invocation.getHolder().get(RIGHTS).get()[index] = rights[index] != '-';
                 }
 
-                return null;
+                return invocation.next(arguments);
             }
 
         });

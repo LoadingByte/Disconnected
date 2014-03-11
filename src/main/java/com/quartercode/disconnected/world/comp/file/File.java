@@ -20,17 +20,17 @@ package com.quartercode.disconnected.world.comp.file;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.extra.def.ReferenceProperty;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.def.ReferenceProperty;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
@@ -109,7 +109,7 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
                 FileRights rights = new FileRights();
                 try {
                     rights.get(FileRights.FROM_STRING).invoke(DEFAULT_FILE_RIGHTS);
-                } catch (FunctionExecutionException e) {
+                } catch (ExecutorInvocationException e) {
                     LOGGER.log(Level.SEVERE, "Unexpected exception during creation of default file rights object", e);
                 }
                 return new ObjectProperty<FileRights>(getName(), holder, rights);
@@ -298,9 +298,17 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
         GET_PATH = FunctionDefinitionFactory.create("getPath", File.class, new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                return ((File<?>) holder).getParent().get(GET_PATH).invoke() + File.SEPARATOR + holder.get(GET_NAME).invoke();
+                FeatureHolder holder = invocation.getHolder();
+                String path = null;
+                // Check for removed files
+                if ( ((File<?>) holder).getParent() != null) {
+                    path = ((File<?>) holder).getParent().get(GET_PATH).invoke() + File.SEPARATOR + holder.get(GET_NAME).invoke();
+                }
+
+                invocation.next(arguments);
+                return path;
             }
 
         });
@@ -308,7 +316,9 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
 
             @Override
             @SuppressWarnings ("unchecked")
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+
+                FeatureHolder holder = invocation.getHolder();
 
                 FileSystem fileSystem = holder.get(GET_FILE_SYSTEM).invoke();
                 if (fileSystem != null) {
@@ -320,7 +330,7 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
                     ((File<FeatureHolder>) holder).setParent(parent);
                 }
 
-                return null;
+                return invocation.next(arguments);
             }
 
         }, String.class);
@@ -328,13 +338,14 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
         REMOVE = FunctionDefinitionFactory.create("remove", File.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
+                FeatureHolder holder = invocation.getHolder();
                 if ( ((File<?>) holder).getParent() instanceof ParentFile) {
                     ((File<?>) holder).getParent().get(ParentFile.REMOVE_CHILDREN).invoke(holder);
                 }
 
-                return null;
+                return invocation.next(arguments);
             }
 
         });
@@ -342,15 +353,19 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
         GET_FILE_SYSTEM = FunctionDefinitionFactory.create("getFileSystem", File.class, new FunctionExecutor<FileSystem>() {
 
             @Override
-            public FileSystem invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public FileSystem invoke(FunctionInvocation<FileSystem> invocation, Object... arguments) throws ExecutorInvocationException {
 
+                FeatureHolder holder = invocation.getHolder();
+
+                FileSystem fileSystem = null;
                 if (holder instanceof RootFile) {
-                    return ((RootFile) holder).getParent();
+                    fileSystem = ((RootFile) holder).getParent();
                 } else if (holder instanceof File && ((File<?>) holder).getParent() != null) {
-                    return ((File<?>) holder).getParent().get(GET_FILE_SYSTEM).invoke();
+                    fileSystem = ((File<?>) holder).getParent().get(GET_FILE_SYSTEM).invoke();
                 }
 
-                return null;
+                invocation.next(arguments);
+                return fileSystem;
             }
 
         });

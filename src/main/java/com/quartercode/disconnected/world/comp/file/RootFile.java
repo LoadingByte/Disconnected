@@ -18,11 +18,10 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.Prioritized;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Prioritized;
 
 /**
  * This class represents the root file of a {@link FileSystem}.
@@ -41,7 +40,7 @@ public class RootFile extends ParentFile<FileSystem> {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
-            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 return "root";
             }
@@ -51,9 +50,9 @@ public class RootFile extends ParentFile<FileSystem> {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                throw new StopExecutionException("Overwrite: Do nothing");
+                return null;
             }
 
         });
@@ -62,7 +61,7 @@ public class RootFile extends ParentFile<FileSystem> {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
-            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 return "";
             }
@@ -72,9 +71,9 @@ public class RootFile extends ParentFile<FileSystem> {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                throw new StopExecutionException("Overwrite: Do nothing");
+                return null;
             }
 
         });
@@ -83,9 +82,9 @@ public class RootFile extends ParentFile<FileSystem> {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                throw new StopExecutionException("Overwrite: Do nothing");
+                return null;
             }
 
         });

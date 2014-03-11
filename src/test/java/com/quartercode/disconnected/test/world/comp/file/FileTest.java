@@ -21,7 +21,7 @@ package com.quartercode.disconnected.test.world.comp.file;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.ByteUnit;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
@@ -33,7 +33,7 @@ public class FileTest {
     private ContentFile testFile;
 
     @Before
-    public void setUp() throws FunctionExecutionException {
+    public void setUp() throws ExecutorInvocationException {
 
         fileSystem = new FileSystem();
         fileSystem.setLocked(false);
@@ -48,13 +48,13 @@ public class FileTest {
     }
 
     @Test
-    public void testGetPath() throws FunctionExecutionException {
+    public void testGetPath() throws ExecutorInvocationException {
 
         Assert.assertEquals("Path", "/test1/test2/test.txt", testFile.get(File.GET_PATH).invoke());
     }
 
     @Test
-    public void testSetPath() throws FunctionExecutionException {
+    public void testSetPath() throws ExecutorInvocationException {
 
         testFile.get(File.SET_PATH).invoke("../../test3/test4.txt");
 
@@ -64,7 +64,7 @@ public class FileTest {
     }
 
     @Test
-    public void testSetName() throws FunctionExecutionException {
+    public void testSetName() throws ExecutorInvocationException {
 
         testFile.get(File.SET_NAME).invoke("test2.txt");
 
@@ -74,12 +74,12 @@ public class FileTest {
     }
 
     @Test
-    public void testRemove() throws FunctionExecutionException {
+    public void testRemove() throws ExecutorInvocationException {
 
         testFile.get(File.REMOVE).invoke();
 
         Assert.assertNull("Resolved file after removal", fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test.txt"));
-        Assert.assertEquals("Path of removed file (should be untouched)", "/test1/test2/test.txt", testFile.get(File.GET_PATH).invoke());
+        Assert.assertEquals("Path of removed file (should be null)", null, testFile.get(File.GET_PATH).invoke());
     }
 
 }

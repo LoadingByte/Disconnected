@@ -20,7 +20,7 @@ package com.quartercode.disconnected.test.world.comp.file;
 
 import org.junit.Assert;
 import org.junit.Test;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.file.FileRights;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileAccessor;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
@@ -28,7 +28,7 @@ import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
 public class FileRightsTest {
 
     @Test
-    public void testGet() throws FunctionExecutionException {
+    public void testGet() throws ExecutorInvocationException {
 
         FileRights rights = new FileRights();
         rights.get(FileRights.FROM_STRING).invoke("-w------r---");
@@ -39,7 +39,7 @@ public class FileRightsTest {
     }
 
     @Test
-    public void testSet() throws FunctionExecutionException {
+    public void testSet() throws ExecutorInvocationException {
 
         FileRights rights = new FileRights();
         rights.get(FileRights.FROM_STRING).invoke("------------");
@@ -55,7 +55,7 @@ public class FileRightsTest {
     }
 
     @Test
-    public void testFileUtilsHasRight() throws FunctionExecutionException {
+    public void testFileUtilsHasRight() throws ExecutorInvocationException {
 
     }
 

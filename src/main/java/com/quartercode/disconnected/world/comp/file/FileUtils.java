@@ -21,7 +21,7 @@ package com.quartercode.disconnected.world.comp.file;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileAccessor;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.world.comp.os.User;
@@ -132,9 +132,9 @@ public class FileUtils {
      * @param file The {@link File} the given {@link User} may have access to.
      * @param right The {@link FileRight} the given {@link User} may have.
      * @return True if the given {@link User} has the given {@link FileRight} on the given {@link File}.
-     * @throws FunctionExecutionException Something unexpected goes wrong.
+     * @throws ExecutorInvocationException Something unexpected goes wrong.
      */
-    public static boolean hasRight(User user, File<?> file, FileRight right) throws FunctionExecutionException {
+    public static boolean hasRight(User user, File<?> file, FileRight right) throws ExecutorInvocationException {
 
         if (user.get(User.IS_SUPERUSER).invoke()) {
             return true;
@@ -149,7 +149,7 @@ public class FileUtils {
         return false;
     }
 
-    private static boolean checkRight(File<?> file, FileAccessor accessor, FileRight right) throws FunctionExecutionException {
+    private static boolean checkRight(File<?> file, FileAccessor accessor, FileRight right) throws ExecutorInvocationException {
 
         if (file.get(File.GET_RIGHTS).invoke().get(FileRights.GET).invoke(accessor, right)) {
             if (right == FileRight.DELETE && file instanceof ParentFile) {
@@ -172,9 +172,9 @@ public class FileUtils {
      * @param user The {@link User} who may can change the {@link FileRights} attributes.
      * @param file The {@link File} the given {@link User} may have access to.
      * @return True if the given {@link User} can change the {@link FileRights} attributes of the given {@link File}.
-     * @throws FunctionExecutionException Something unexpected goes wrong.
+     * @throws ExecutorInvocationException Something unexpected goes wrong.
      */
-    public static boolean canChangeRights(User user, File<?> file) throws FunctionExecutionException {
+    public static boolean canChangeRights(User user, File<?> file) throws ExecutorInvocationException {
 
         return file.get(File.GET_OWNER).invoke().equals(user) || user.get(User.IS_SUPERUSER).invoke();
     }

@@ -20,7 +20,7 @@ package com.quartercode.disconnected.test.world.comp.file;
 
 import org.junit.Assert;
 import org.junit.Test;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileRights;
@@ -51,7 +51,7 @@ public class FileUtilsTest {
         Assert.assertArrayEquals("Resolved components", new String[] { null, "etc/test/" }, FileUtils.getComponents("etc/test/"));
     }
 
-    private User createUser(String name) throws FunctionExecutionException {
+    private User createUser(String name) throws ExecutorInvocationException {
 
         User user = new User();
         user.setLocked(false);
@@ -61,7 +61,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testHasRight() throws FunctionExecutionException {
+    public void testHasRight() throws ExecutorInvocationException {
 
         ContentFile file = new ContentFile();
         User owner = createUser("owner");
@@ -75,7 +75,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testCanChangeRights() throws FunctionExecutionException {
+    public void testCanChangeRights() throws ExecutorInvocationException {
 
         ContentFile file = new ContentFile();
         User owner = createUser("owner");

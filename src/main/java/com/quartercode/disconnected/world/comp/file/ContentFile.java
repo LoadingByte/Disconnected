@@ -18,17 +18,17 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.Prioritized;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Prioritized;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 
 /**
@@ -109,14 +109,14 @@ public class ContentFile extends File<ParentFile<?>> {
 
             @Override
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                FileSystem fileSystem = holder.get(GET_FILE_SYSTEM).invoke();
+                FileSystem fileSystem = invocation.getHolder().get(GET_FILE_SYSTEM).invoke();
                 if (fileSystem != null && SizeUtil.getSize(arguments[0]) > fileSystem.get(FileSystem.GET_FREE).invoke()) {
-                    throw new StopExecutionException(new OutOfSpaceException(fileSystem, SizeUtil.getSize(arguments[0])));
+                    throw new ExecutorInvocationException(new OutOfSpaceException(fileSystem, SizeUtil.getSize(arguments[0])));
                 }
 
-                return null;
+                return invocation.next(arguments);
             }
 
         });

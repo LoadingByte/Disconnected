@@ -21,7 +21,7 @@ package com.quartercode.disconnected.test.world.comp.file;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.ByteUnit;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
@@ -33,7 +33,7 @@ public class FileSystemTest {
     private ContentFile testFile;
 
     @Before
-    public void setUp() throws FunctionExecutionException {
+    public void setUp() throws ExecutorInvocationException {
 
         fileSystem = new FileSystem();
         fileSystem.setLocked(false);
@@ -46,13 +46,13 @@ public class FileSystemTest {
     }
 
     @Test
-    public void testGetFile() throws FunctionExecutionException {
+    public void testGetFile() throws ExecutorInvocationException {
 
         Assert.assertEquals("Resolved file", testFile, fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test.txt"));
     }
 
     @Test
-    public void testCalcSpace() throws FunctionExecutionException {
+    public void testCalcSpace() throws ExecutorInvocationException {
 
         long contentSize = 30;
         long filled = fileSystem.get(FileSystem.GET_FILLED).invoke();

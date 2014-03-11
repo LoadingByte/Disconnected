@@ -21,22 +21,23 @@ package com.quartercode.disconnected.world.comp.file;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang.Validate;
-import com.quartercode.disconnected.mocl.base.Feature;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.Prioritized;
-import com.quartercode.disconnected.mocl.extra.def.DefaultChildFeatureHolder;
-import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.extra.def.ReferenceProperty;
-import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
-import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.classmod.base.Feature;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Prioritized;
+import com.quartercode.classmod.extra.def.DefaultChildFeatureHolder;
+import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.def.ReferenceProperty;
+import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
+import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.world.comp.os.CommonFiles;
@@ -257,10 +258,10 @@ public class FileSystemModule extends OSModule {
         GET_AVAIABLE = FunctionDefinitionFactory.create("getAvaiable", FileSystemModule.class, new FunctionExecutor<Set<FileSystem>>() {
 
             @Override
-            public Set<FileSystem> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Set<FileSystem> invoke(FunctionInvocation<Set<FileSystem>> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 Set<FileSystem> available = new HashSet<FileSystem>();
-                Computer computer = ((FileSystemModule) holder).getParent().get(Process.GET_ROOT).invoke().getParent().getParent();
+                Computer computer = ((FileSystemModule) invocation.getHolder()).getParent().get(Process.GET_ROOT).invoke().getParent().getParent();
                 for (Hardware hardware : computer.get(Computer.GET_HARDWARE).invoke()) {
                     for (Feature feature : hardware) {
                         if (feature instanceof Iterable) {
@@ -273,6 +274,7 @@ public class FileSystemModule extends OSModule {
                     }
                 }
 
+                invocation.next(arguments);
                 return available;
             }
 
@@ -282,7 +284,7 @@ public class FileSystemModule extends OSModule {
         GET_KNOWN_BY_FILESYSTEM = FunctionDefinitionFactory.create("getKnownByFilesystem", FileSystemModule.class, CollectionPropertyAccessorFactory.createGetSingle(KNOWN_FILE_SYSTEMS, new CriteriumMatcher<KnownFileSystem>() {
 
             @Override
-            public boolean matches(KnownFileSystem element, Object... arguments) throws ExecutorInvokationException {
+            public boolean matches(KnownFileSystem element, Object... arguments) throws ExecutorInvocationException {
 
                 return element.get(KnownFileSystem.GET_FILE_SYSTEM).invoke().equals(arguments[0]);
             }
@@ -293,12 +295,13 @@ public class FileSystemModule extends OSModule {
 
             @Override
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 for (Object element : arguments) {
                     Validate.isTrue(! ((KnownFileSystem) element).get(KnownFileSystem.IS_MOUNTED).invoke(), "Can't register known file system while mounted");
                 }
-                return null;
+
+                return invocation.next(arguments);
             }
 
         });
@@ -307,7 +310,7 @@ public class FileSystemModule extends OSModule {
         GET_MOUNTED = FunctionDefinitionFactory.create("getMounted", FileSystemModule.class, CollectionPropertyAccessorFactory.createGet(KNOWN_FILE_SYSTEMS, new CriteriumMatcher<KnownFileSystem>() {
 
             @Override
-            public boolean matches(KnownFileSystem element, Object... arguments) throws ExecutorInvokationException {
+            public boolean matches(KnownFileSystem element, Object... arguments) throws ExecutorInvocationException {
 
                 return element.get(KnownFileSystem.IS_MOUNTED).invoke();
             }
@@ -316,7 +319,7 @@ public class FileSystemModule extends OSModule {
         GET_MOUNTED_BY_MOUNTPOINT = FunctionDefinitionFactory.create("getMountedByMountpoint", FileSystemModule.class, CollectionPropertyAccessorFactory.createGetSingle(KNOWN_FILE_SYSTEMS, new CriteriumMatcher<KnownFileSystem>() {
 
             @Override
-            public boolean matches(KnownFileSystem element, Object... arguments) throws ExecutorInvokationException {
+            public boolean matches(KnownFileSystem element, Object... arguments) throws ExecutorInvocationException {
 
                 return element.get(KnownFileSystem.IS_MOUNTED).invoke() && element.get(KnownFileSystem.GET_MOUNTPOINT).invoke().equals(arguments[0]);
             }
@@ -326,25 +329,27 @@ public class FileSystemModule extends OSModule {
         GET_FILE = FunctionDefinitionFactory.create("getFile", FileSystemModule.class, new FunctionExecutor<File<?>>() {
 
             @Override
-            public File<?> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public File<?> invoke(FunctionInvocation<File<?>> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 String path = (String) arguments[0];
                 String[] pathComponents = FileUtils.getComponents(path);
                 Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path");
 
-                FileSystem fileSystem = holder.get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]).get(KnownFileSystem.GET_FILE_SYSTEM).invoke();
+                FileSystem fileSystem = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]).get(KnownFileSystem.GET_FILE_SYSTEM).invoke();
+                File<?> result = null;
                 if (fileSystem != null) {
-                    return fileSystem.get(FileSystem.GET_FILE).invoke(pathComponents[1]);
-                } else {
-                    return null;
+                    result = fileSystem.get(FileSystem.GET_FILE).invoke(pathComponents[1]);
                 }
+
+                invocation.next(arguments);
+                return result;
             }
 
         }, String.class);
         ADD_FILE = FunctionDefinitionFactory.create("addFile", FileSystemModule.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 File<?> file = (File<?>) arguments[0];
                 String path = (String) arguments[1];
@@ -352,13 +357,14 @@ public class FileSystemModule extends OSModule {
                 String[] pathComponents = FileUtils.getComponents(path);
                 Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path");
 
-                FileSystem fileSystem = holder.get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]).get(KnownFileSystem.GET_FILE_SYSTEM).invoke();
+                FileSystem fileSystem = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]).get(KnownFileSystem.GET_FILE_SYSTEM).invoke();
                 if (fileSystem != null) {
                     fileSystem.get(FileSystem.ADD_FILE).invoke(file, pathComponents[1]);
-                    return null;
                 } else {
                     throw new IllegalStateException("No mounted file system with mountpoint '" + pathComponents[0] + "'");
                 }
+
+                return invocation.next(arguments);
             }
 
         }, File.class, String.class);
@@ -366,11 +372,11 @@ public class FileSystemModule extends OSModule {
         SET_RUNNING.addExecutor(FileSystemModule.class, "mountSystemFs", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 // Only invoke on bootstrap
                 if ((Boolean) arguments[0]) {
-                    for (KnownFileSystem fileSystem : holder.get(GET_KNOWN).invoke()) {
+                    for (KnownFileSystem fileSystem : invocation.getHolder().get(GET_KNOWN).invoke()) {
                         if (fileSystem.get(KnownFileSystem.GET_MOUNTPOINT).invoke().equals(CommonFiles.SYSTEM_MOUNTPOINT)) {
                             fileSystem.get(KnownFileSystem.SET_MOUNTED).invoke(true);
                             break;
@@ -378,7 +384,7 @@ public class FileSystemModule extends OSModule {
                     }
                 }
 
-                return null;
+                return invocation.next(arguments);
             }
 
         });
@@ -548,10 +554,10 @@ public class FileSystemModule extends OSModule {
 
                 @Override
                 @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
-                public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                    Validate.isTrue(!holder.get(IS_MOUNTED).invoke(), "Can't change mountpoint of known file system while mounted");
-                    return null;
+                    Validate.isTrue(!invocation.getHolder().get(IS_MOUNTED).invoke(), "Can't change mountpoint of known file system while mounted");
+                    return invocation.next(arguments);
                 }
 
             });
@@ -562,11 +568,13 @@ public class FileSystemModule extends OSModule {
 
                 @Override
                 @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
-                public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
+                    FeatureHolder holder = invocation.getHolder();
                     FileSystemModule parent = ((KnownFileSystem) holder).getParent();
                     Validate.isTrue(parent.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke(holder.get(GET_MOUNTPOINT).invoke()) == null, "Other known file system with same mountpoint already mounted");
-                    return null;
+
+                    return invocation.next(arguments);
                 }
 
             });
