@@ -29,7 +29,7 @@ import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Property;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.util.PrimitiveUtil;
+import com.quartercode.disconnected.util.NullPreventer;
 
 /**
  * This utility calculates the size of certain objects in bytes (of course, it's a fictional size).
@@ -101,7 +101,7 @@ public class SizeUtil {
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                return SizeUtil.getSize(invocation.getHolder().get(propertyDefinition).get()) + PrimitiveUtil.preventNull(invocation.next(arguments));
+                return SizeUtil.getSize(invocation.getHolder().get(propertyDefinition).get()) + NullPreventer.prevent(invocation.next(arguments));
             }
 
         };

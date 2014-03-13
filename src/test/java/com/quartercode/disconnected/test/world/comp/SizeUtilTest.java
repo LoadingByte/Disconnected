@@ -31,7 +31,7 @@ import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.disconnected.util.PrimitiveUtil;
+import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 
@@ -76,7 +76,7 @@ public class SizeUtilTest {
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                return 100L + PrimitiveUtil.preventNull(invocation.next(arguments));
+                return 100L + NullPreventer.prevent(invocation.next(arguments));
             }
         });
         DerivableSize.GET_SIZE.addExecutor(TestFeatureHolder.class, "test2", new FunctionExecutor<Long>() {
@@ -84,7 +84,7 @@ public class SizeUtilTest {
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                return 500L + PrimitiveUtil.preventNull(invocation.next(arguments));
+                return 500L + NullPreventer.prevent(invocation.next(arguments));
             }
         });
         data.add(new Object[] { new TestFeatureHolder(), 100 + 500 });

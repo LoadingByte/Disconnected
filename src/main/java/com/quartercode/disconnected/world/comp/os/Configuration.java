@@ -32,7 +32,7 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.util.PrimitiveUtil;
+import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
@@ -199,7 +199,7 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
                 @Override
                 public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                    return SizeUtil.getSize(invocation.getHolder().get(GET_COLUMNS).invoke()) + PrimitiveUtil.preventNull(invocation.next(arguments));
+                    return SizeUtil.getSize(invocation.getHolder().get(GET_COLUMNS).invoke()) + NullPreventer.prevent(invocation.next(arguments));
                 }
 
             });
