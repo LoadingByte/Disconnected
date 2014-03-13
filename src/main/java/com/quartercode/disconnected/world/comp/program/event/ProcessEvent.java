@@ -18,15 +18,15 @@
 
 package com.quartercode.disconnected.world.comp.program.event;
 
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
-import com.quartercode.disconnected.mocl.extra.def.ReferenceProperty;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.def.ReferenceProperty;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 import com.quartercode.disconnected.world.comp.program.Process;
 

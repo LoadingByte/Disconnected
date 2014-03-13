@@ -18,27 +18,28 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.ResourceBundle;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.Lockable;
-import com.quartercode.disconnected.mocl.extra.Prioritized;
-import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Lockable;
+import com.quartercode.classmod.extra.Prioritized;
+import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.sim.run.TickSimulator;
+import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.program.ArgumentException.MissingArgumentException;
 import com.quartercode.disconnected.world.comp.program.ArgumentException.MissingParameterException;
@@ -157,6 +158,17 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
      * <td>The initial arguments the program executor needs to operate.</td>
      * </tr>
      * </table>
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link ArgumentException}</td>
+     * <td>The input arguments don't match the parameters provided by {@link #GET_PARAMETERS}.</td>
+     * </tr>
+     * </table>
      */
     public static final FunctionDefinition<Void>                                  SET_ARGUMENTS;
 
@@ -230,17 +242,18 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
         GET_PARAMETER_BY_NAME = FunctionDefinitionFactory.create("getParameterByName", ProgramExecutor.class, new FunctionExecutor<Parameter>() {
 
             @Override
-            public Parameter invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Parameter invoke(FunctionInvocation<Parameter> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                for (List<Parameter> parameterList : holder.get(GET_PARAMETERS).invokeRA()) {
-                    for (Parameter parameter : parameterList) {
-                        if (parameter.getName().equals(arguments[0])) {
-                            return parameter;
-                        }
+                Parameter result = null;
+                for (Parameter parameter : invocation.getHolder().get(GET_PARAMETERS).invoke()) {
+                    if (parameter.getName().equals(arguments[0])) {
+                        result = parameter;
+                        break;
                     }
                 }
 
-                return null;
+                invocation.next(arguments);
+                return result;
             }
 
         });
@@ -255,15 +268,11 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
             @SuppressWarnings ("unchecked")
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                // Create a new hash map with the contents of the old one (it will get modified)
-                Map<String, Object> programArguments = arguments[0] == null ? new HashMap<String, Object>() : new HashMap<String, Object>((Map<String, Object>) arguments[0]);
-
-                List<Parameter> parameters = new ArrayList<Parameter>();
-                for (List<Parameter> parameterList : holder.get(GET_PARAMETERS).invokeRA()) {
-                    parameters.addAll(parameterList);
-                }
+                // Create a new map with the contents of the old one (it will be modified)
+                Map<String, Object> programArguments = new HashMap<String, Object>(NullPreventer.prevent((Map<String, Object>) arguments[0]));
+                List<Parameter> parameters = invocation.getHolder().get(GET_PARAMETERS).invoke();
 
                 try {
                     for (Parameter parameter : parameters) {
@@ -293,10 +302,10 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
                         }
                     }
                 } catch (ArgumentException e) {
-                    throw new IllegalArgumentException("Illegal program arguments", e);
+                    throw new ExecutorInvocationException("Illegal program arguments", e);
                 }
 
-                return null;
+                return invocation.next(arguments);
             }
 
         });
@@ -305,18 +314,23 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
         NEXT_EVENT = FunctionDefinitionFactory.create("nextEvent", ProgramExecutor.class, new FunctionExecutor<ProcessEvent>() {
 
             @Override
-            public ProcessEvent invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public ProcessEvent invoke(FunctionInvocation<ProcessEvent> invocation, Object... arguments) throws ExecutorInvocationException {
+
+                FeatureHolder holder = invocation.getHolder();
 
                 Queue<ProcessEvent> clone = new LinkedList<ProcessEvent>(holder.get(EVENTS).get());
+                ProcessEvent nextEvent = null;
                 while (!clone.isEmpty()) {
                     ProcessEvent current = clone.poll();
                     if ( ((ProcessEventMatcher) arguments[0]).matches(current)) {
                         holder.get(EVENTS).get().remove(current);
-                        return current;
+                        nextEvent = current;
+                        break;
                     }
                 }
 
-                return null;
+                invocation.next(arguments);
+                return nextEvent;
             }
 
         }, ProcessEventMatcher.class);
@@ -345,9 +359,9 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
          * 
          * @param event The {@link ProcessEvent} to check.
          * @return True if the given {@link ProcessEvent} is requested, false if not.
-         * @throws ExecutorInvokationException Something bad happens while checking.
+         * @throws ExecutorInvocationException Something bad happens while checking.
          */
-        public boolean matches(ProcessEvent event) throws ExecutorInvokationException;
+        public boolean matches(ProcessEvent event) throws ExecutorInvocationException;
 
     }
 

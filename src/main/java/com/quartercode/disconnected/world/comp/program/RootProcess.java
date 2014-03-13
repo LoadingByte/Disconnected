@@ -18,11 +18,10 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.Prioritized;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 
 /**
@@ -40,9 +39,10 @@ public class RootProcess extends Process<OperatingSystem> {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
-            public RootProcess invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public RootProcess invoke(FunctionInvocation<RootProcess> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                return (RootProcess) holder;
+                invocation.next(arguments);
+                return (RootProcess) invocation.getHolder();
             }
 
         });
@@ -51,9 +51,10 @@ public class RootProcess extends Process<OperatingSystem> {
         LAUNCH.addExecutor(RootProcess.class, "stop", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            @Prioritized (Prioritized.LEVEL_5)
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                throw new StopExecutionException("Invocation of program executor logic is not required");
+                return null;
             }
 
         });

@@ -22,17 +22,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.extra.Delay;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.Limit;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.extra.Delay;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Limit;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
@@ -98,12 +99,14 @@ public class ProcessModule extends OSModule {
         GET_ALL = FunctionDefinitionFactory.create("getAll", ProcessModule.class, new FunctionExecutor<List<Process<?>>>() {
 
             @Override
-            public List<Process<?>> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public List<Process<?>> invoke(FunctionInvocation<List<Process<?>>> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 List<Process<?>> processes = new ArrayList<Process<?>>();
-                RootProcess root = holder.get(GET_ROOT).invoke();
+                RootProcess root = invocation.getHolder().get(GET_ROOT).invoke();
                 processes.add(root);
                 processes.addAll(root.get(Process.GET_ALL_CHILDREN).invoke());
+
+                invocation.next(arguments);
                 return processes;
             }
 
@@ -112,7 +115,9 @@ public class ProcessModule extends OSModule {
         SET_RUNNING.addExecutor(ProcessModule.class, "startRootProcess", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+
+                FeatureHolder holder = invocation.getHolder();
 
                 // Only invoke on bootstrap
                 if ((Boolean) arguments[0]) {
@@ -134,24 +139,26 @@ public class ProcessModule extends OSModule {
                     holder.get(ProcessModule.ROOT_PROCESS).set(root);
                 }
 
-                return null;
+                return invocation.next(arguments);
             }
         });
 
         SET_RUNNING.addExecutor(OperatingSystem.class, "interruptRootProcess", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+
+                FeatureHolder holder = invocation.getHolder();
 
                 // Only invoke on shutdown
                 if (! ((Boolean) arguments[0])) {
                     holder.get(ProcessModule.GET_ROOT).invoke().get(Process.INTERRUPT).invoke();
                     // Stop the root process after 5 seconds
-                    holder.get(SET_RUNNING).getExecutor("procManagerStopRoot").resetInvokationCounter();
+                    holder.get(SET_RUNNING).getExecutor("procManagerStopRoot").resetInvocations();
                     holder.get(SET_RUNNING).getExecutor("procManagerStopRoot").setLocked(false);
                 }
 
-                return null;
+                return invocation.next(arguments);
             }
 
         });
@@ -161,12 +168,13 @@ public class ProcessModule extends OSModule {
             @Limit (1)
             // 5 seconds delay after interrupt
             @Delay (firstDelay = Ticker.DEFAULT_TICKS_PER_SECOND * 5)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
+                FeatureHolder holder = invocation.getHolder();
                 holder.get(ProcessModule.GET_ROOT).invoke().get(Process.STOP).invoke();
                 holder.get(ProcessModule.ROOT_PROCESS).set(null);
 
-                return null;
+                return invocation.next(arguments);
             }
 
         });

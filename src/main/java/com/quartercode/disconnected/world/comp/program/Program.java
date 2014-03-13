@@ -20,19 +20,20 @@ package com.quartercode.disconnected.world.comp.program;
 
 import java.util.HashSet;
 import java.util.Set;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
-import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 import com.quartercode.disconnected.world.comp.Version;
 import com.quartercode.disconnected.world.comp.Vulnerability;
@@ -221,14 +222,14 @@ public class Program extends DefaultFeatureHolder implements DerivableSize {
         CREATE_EXECUTOR = FunctionDefinitionFactory.create("createExecutor", Program.class, new FunctionExecutor<ProgramExecutor>() {
 
             @Override
-            public ProgramExecutor invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public ProgramExecutor invoke(FunctionInvocation<ProgramExecutor> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                Class<? extends ProgramExecutor> executorClass = holder.get(GET_EXECUTOR_CLASS).invoke();
+                Class<? extends ProgramExecutor> executorClass = invocation.getHolder().get(GET_EXECUTOR_CLASS).invoke();
 
                 try {
                     return executorClass.newInstance();
                 } catch (Exception e) {
-                    throw new StopExecutionException("Unexpected exception during initialization of new program executor (class '" + executorClass.getName() + "'", e);
+                    throw new ExecutorInvocationException("Unexpected exception during initialization of new program executor (class '" + executorClass.getName() + "'", e);
                 }
             }
 
@@ -237,10 +238,10 @@ public class Program extends DefaultFeatureHolder implements DerivableSize {
         GET_SIZE.addExecutor(Program.class, "executor", new FunctionExecutor<Long>() {
 
             @Override
-            public Long invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 // TODO: Make something related to the size
-                return 0L;
+                return 0 + NullPreventer.prevent(invocation.next(arguments));
             }
 
         });
