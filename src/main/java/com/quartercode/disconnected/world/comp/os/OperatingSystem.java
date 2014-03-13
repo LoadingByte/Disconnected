@@ -20,17 +20,18 @@ package com.quartercode.disconnected.world.comp.os;
 
 import java.util.HashSet;
 import java.util.Set;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.Version;
@@ -310,9 +311,13 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
         IS_RUNNING = FunctionDefinitionFactory.create("isRunning", OperatingSystem.class, new FunctionExecutor<Boolean>() {
 
             @Override
-            public Boolean invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                return holder.get(GET_PROC_MODULE).invoke().get(ProcessModule.GET_ROOT).invoke().get(Process.GET_STATE).invoke() != ProcessState.STOPPED;
+                FeatureHolder holder = invocation.getHolder();
+                boolean running = holder.get(GET_PROC_MODULE).invoke().get(ProcessModule.GET_ROOT).invoke().get(Process.GET_STATE).invoke() != ProcessState.STOPPED;
+
+                invocation.next(arguments);
+                return running;
             }
 
         });
@@ -329,20 +334,20 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
         SET_RUNNING.addExecutor(OperatingSystem.class, "fileSystemModule", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                holder.get(GET_FS_MODULE).invoke().get(OSModule.SET_RUNNING).invoke(arguments);
-                return null;
+                invocation.getHolder().get(GET_FS_MODULE).invoke().get(OSModule.SET_RUNNING).invoke(arguments);
+                return invocation.next(arguments);
             }
 
         });
         SET_RUNNING.addExecutor(OperatingSystem.class, "processModule", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                holder.get(GET_PROC_MODULE).invoke().get(OSModule.SET_RUNNING).invoke(arguments);
-                return null;
+                invocation.getHolder().get(GET_PROC_MODULE).invoke().get(OSModule.SET_RUNNING).invoke(arguments);
+                return invocation.next(arguments);
             }
 
         });

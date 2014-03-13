@@ -23,18 +23,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import org.apache.commons.codec.digest.DigestUtils;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.Limit;
-import com.quartercode.disconnected.mocl.extra.Prioritized;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
-import com.quartercode.disconnected.mocl.extra.def.ReferenceProperty;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import org.apache.commons.lang.Validate;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Limit;
+import com.quartercode.classmod.extra.Prioritized;
+import com.quartercode.classmod.extra.def.ReferenceProperty;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.util.ResourceBundles;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
@@ -96,10 +98,13 @@ public class Session extends ProgramExecutor {
         GET_PARAMETERS.addExecutor(Session.class, "default", new FunctionExecutor<List<Parameter>>() {
 
             @Override
-            public List<Parameter> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public List<Parameter> invoke(FunctionInvocation<List<Parameter>> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 List<Parameter> parameters = new ArrayList<Parameter>();
+
                 parameters.add(Parameter.createArgument("user", "u", ArgumentType.STRING, false, true));
+
+                parameters.addAll(NullPreventer.prevent(invocation.next(arguments)));
                 return parameters;
             }
 
@@ -108,8 +113,9 @@ public class Session extends ProgramExecutor {
         GET_RESOURCE_BUNDLE.addExecutor(Session.class, "default", new FunctionExecutor<ResourceBundle>() {
 
             @Override
-            public ResourceBundle invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public ResourceBundle invoke(FunctionInvocation<ResourceBundle> invocation, Object... arguments) throws ExecutorInvocationException {
 
+                invocation.next(arguments);
                 return ResourceBundles.KERNEL;
             }
         });
@@ -119,8 +125,9 @@ public class Session extends ProgramExecutor {
             @Override
             @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_7)
             @Limit (1)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
+                FeatureHolder holder = invocation.getHolder();
                 @SuppressWarnings ("unchecked")
                 Map<String, Object> programArguments = (Map<String, Object>) arguments[0];
                 String username = (String) programArguments.get("user");
@@ -129,18 +136,19 @@ public class Session extends ProgramExecutor {
                 FileSystemModule fsModule = ((Session) holder).getParent().get(Process.GET_OPERATING_SYSTEM).invoke().get(OperatingSystem.GET_FS_MODULE).invoke();
                 File<?> userConfigFile = fsModule.get(FileSystemModule.GET_FILE).invoke(CommonFiles.USER_CONFIG);
                 if (! (userConfigFile instanceof ContentFile) || userConfigFile.get(ContentFile.GET_CONTENT).invoke() == null) {
-                    throw new StopExecutionException(new IllegalStateException("User configuration file doesn't exist under '" + CommonFiles.USER_CONFIG + "'"));
+                    throw new IllegalStateException("User configuration file doesn't exist under '" + CommonFiles.USER_CONFIG + "'");
                 }
                 Configuration userConfig = (Configuration) userConfigFile.get(ContentFile.GET_CONTENT).invoke();
 
                 for (ConfigurationEntry entry : userConfig.get(Configuration.GET_ENTRIES).invoke()) {
                     if (entry instanceof User && ((User) entry).get(User.GET_NAME).equals(username)) {
                         holder.get(USER).set((User) entry);
-                        return null;
+                        // Continue with the update
+                        return invocation.next(arguments);
                     }
                 }
 
-                throw new StopExecutionException(new IllegalArgumentException("Unknown user"));
+                throw new IllegalArgumentException("Unknown user");
             }
 
         });
@@ -150,7 +158,9 @@ public class Session extends ProgramExecutor {
             @Override
             @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_5)
             @Limit (1)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+
+                FeatureHolder holder = invocation.getHolder();
 
                 // Check for no parent session or a parent root session
                 Session parentSession = ((Session) holder).getParent().get(Process.GET_SESSION).invoke();
@@ -160,12 +170,11 @@ public class Session extends ProgramExecutor {
                     String rawPassword = (String) programArguments.get("password");
 
                     String hashedPassword = DigestUtils.sha256Hex(rawPassword);
-                    if (!holder.get(GET_USER).invoke().get(User.GET_PASSWORD).invoke().equals(hashedPassword)) {
-                        throw new StopExecutionException(new IllegalArgumentException("Wrong password"));
-                    }
+                    Validate.isTrue(holder.get(GET_USER).invoke().get(User.GET_PASSWORD).invoke().equals(hashedPassword), "Wrong password");
                 }
 
-                return null;
+                // Continue with the update
+                return invocation.next(arguments);
             }
 
         });

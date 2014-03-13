@@ -20,16 +20,18 @@ package com.quartercode.disconnected.world.comp.os;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.comp.os.Configuration.ConfigurationEntry;
 
 /**
@@ -101,10 +103,14 @@ public class Group extends ConfigurationEntry {
         GET_COLUMNS.addExecutor(User.class, "default", new FunctionExecutor<Map<String, Object>>() {
 
             @Override
-            public Map<String, Object> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Map<String, Object> invoke(FunctionInvocation<Map<String, Object>> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 Map<String, Object> columns = new HashMap<String, Object>();
+                FeatureHolder holder = invocation.getHolder();
+
                 columns.put("name", holder.get(GET_NAME).invoke());
+
+                columns.putAll(NullPreventer.prevent(invocation.next(arguments)));
                 return columns;
             }
 
@@ -112,13 +118,16 @@ public class Group extends ConfigurationEntry {
         SET_COLUMNS.addExecutor(User.class, "default", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 // Trust the user of the method
                 @SuppressWarnings ("unchecked")
                 Map<String, Object> columns = (Map<String, Object>) arguments[0];
+                FeatureHolder holder = invocation.getHolder();
+
                 holder.get(SET_NAME).invoke(columns.get("name"));
-                return null;
+
+                return invocation.next(arguments);
             }
 
         });

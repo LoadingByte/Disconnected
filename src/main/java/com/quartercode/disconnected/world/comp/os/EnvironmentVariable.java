@@ -23,16 +23,18 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.comp.os.Configuration.ConfigurationEntry;
 
 /**
@@ -45,7 +47,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
     /**
      * The separator which is used to separate the different entries of a value list.
      */
-    private static final String                                      LIST_SEPARATOR = ":";
+    public static final String                                       LIST_SEPARATOR = ":";
 
     // ----- Properties -----
 
@@ -195,25 +197,26 @@ public class EnvironmentVariable extends ConfigurationEntry {
         GET_VALUE_LIST = FunctionDefinitionFactory.create("getValueList", EnvironmentVariable.class, new FunctionExecutor<List<String>>() {
 
             @Override
-            public List<String> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public List<String> invoke(FunctionInvocation<List<String>> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                String value = holder.get(GET_VALUE).invoke();
+                String value = invocation.getHolder().get(GET_VALUE).invoke();
+                List<String> valueList = new ArrayList<String>();
 
-                if (value == null || value.isEmpty()) {
-                    // Empty list
-                    return new ArrayList<String>();
-                } else {
+                if (value != null && !value.isEmpty()) {
                     // Split at separator and return
                     // If there's no separator, the whole value is handled as one entry
-                    return new ArrayList<String>(Arrays.asList(value.split(LIST_SEPARATOR)));
+                    valueList.addAll(Arrays.asList(value.split(LIST_SEPARATOR)));
                 }
+
+                invocation.next(arguments);
+                return valueList;
             }
 
         });
         SET_VALUE_LIST = FunctionDefinitionFactory.create("setValueList", EnvironmentVariable.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 // Trust the user of the method
                 @SuppressWarnings ("unchecked")
@@ -223,9 +226,9 @@ public class EnvironmentVariable extends ConfigurationEntry {
                 for (String listValue : list) {
                     value += ":" + listValue;
                 }
-                holder.get(SET_VALUE).invoke(value.substring(1));
+                invocation.getHolder().get(SET_VALUE).invoke(value.substring(1));
 
-                return null;
+                return invocation.next(arguments);
             }
 
         }, List.class);
@@ -233,11 +236,15 @@ public class EnvironmentVariable extends ConfigurationEntry {
         GET_COLUMNS.addExecutor(EnvironmentVariable.class, "default", new FunctionExecutor<Map<String, Object>>() {
 
             @Override
-            public Map<String, Object> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Map<String, Object> invoke(FunctionInvocation<Map<String, Object>> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 Map<String, Object> columns = new HashMap<String, Object>();
+                FeatureHolder holder = invocation.getHolder();
+
                 columns.put("name", holder.get(GET_NAME).invoke());
                 columns.put("value", holder.get(GET_VALUE).invoke());
+
+                columns.putAll(NullPreventer.prevent(invocation.next(arguments)));
                 return columns;
             }
 
@@ -245,14 +252,17 @@ public class EnvironmentVariable extends ConfigurationEntry {
         SET_COLUMNS.addExecutor(EnvironmentVariable.class, "default", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 // Trust the user of the method
                 @SuppressWarnings ("unchecked")
                 Map<String, Object> columns = (Map<String, Object>) arguments[0];
+                FeatureHolder holder = invocation.getHolder();
+
                 holder.get(SET_NAME).invoke(columns.get("name"));
                 holder.get(SET_VALUE).invoke(columns.get("value"));
-                return null;
+
+                return invocation.next(arguments);
             }
 
         });

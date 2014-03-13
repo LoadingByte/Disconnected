@@ -23,21 +23,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.Validate;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.Lockable;
-import com.quartercode.disconnected.mocl.extra.Prioritized;
-import com.quartercode.disconnected.mocl.extra.StopExecutionException;
-import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.extra.def.ReferenceProperty;
-import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Lockable;
+import com.quartercode.classmod.extra.Prioritized;
+import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.def.ReferenceProperty;
+import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.comp.os.Configuration.ConfigurationEntry;
 
 /**
@@ -191,6 +192,17 @@ public class User extends ConfigurationEntry {
      * <td>The names of the {@link Group}s to add the user to.</td>
      * </tr>
      * </table>
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalStateException}</td>
+     * <td>The user already is a member in the given {@link Group}.</td>
+     * </tr>
+     * </table>
      */
     public static final FunctionDefinition<Void>                              ADD_TO_GROUPS;
 
@@ -268,13 +280,14 @@ public class User extends ConfigurationEntry {
             @Override
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                if (holder.get(IS_SUPERUSER).invoke()) {
-                    throw new StopExecutionException("Can't change the name of the superuser '" + SUPERUSER_NAME + "'");
+                if (invocation.getHolder().get(IS_SUPERUSER).invoke()) {
+                    // Cancel invocation
+                    return null;
                 }
 
-                return null;
+                return invocation.next(arguments);
             }
 
         });
@@ -288,12 +301,15 @@ public class User extends ConfigurationEntry {
 
             @Override
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
+                FeatureHolder holder = invocation.getHolder();
                 Validate.isTrue(!holder.get(IS_SUPERUSER).invoke(), "The superuser can't be a member in any group");
-                Validate.isTrue(!holder.get(GET_GROUPS).invoke().contains(arguments[0]), "The user is already a member in that group");
+                if (holder.get(GET_GROUPS).invoke().contains(arguments[0])) {
+                    throw new IllegalStateException("The user is already a member in that group");
+                }
 
-                return null;
+                return invocation.next(arguments);
             }
 
         });
@@ -302,14 +318,15 @@ public class User extends ConfigurationEntry {
 
             @Override
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
+                FeatureHolder holder = invocation.getHolder();
                 Validate.isTrue(!holder.get(IS_SUPERUSER).invoke(), "The superuser can't be a member in any group");
                 if (holder.get(GET_PRIMARY_GROUP).invoke().equals(arguments[0])) {
-                    throw new StopExecutionException(new IllegalStateException("Can't remove user from its primary group"));
+                    throw new IllegalStateException("Can't remove user from its primary group");
                 }
 
-                return null;
+                return invocation.next(arguments);
             }
 
         });
@@ -317,27 +334,31 @@ public class User extends ConfigurationEntry {
         GET_PRIMARY_GROUP = FunctionDefinitionFactory.create("getPrimaryGroup", User.class, new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
 
+                FeatureHolder holder = invocation.getHolder();
+                String primaryGroup = null;
                 if (holder.get(GET_GROUPS).invoke().size() > 0) {
-                    return holder.get(GET_GROUPS).invoke().get(0);
-                } else {
-                    return null;
+                    primaryGroup = holder.get(GET_GROUPS).invoke().get(0);
                 }
+
+                invocation.next(arguments);
+                return primaryGroup;
             }
 
         });
         SET_PRIMARY_GROUP = FunctionDefinitionFactory.create("setPrimaryGroup", User.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
+                FeatureHolder holder = invocation.getHolder();
                 if (holder.get(GET_GROUPS).invoke().contains(arguments[0])) {
                     holder.get(GROUPS).get().remove(arguments[0]);
                     holder.get(GROUPS).get().add(0, (String) arguments[0]);
                 }
 
-                return null;
+                return invocation.next(arguments);
             }
 
         }, Group.class);
@@ -345,20 +366,26 @@ public class User extends ConfigurationEntry {
         IS_SUPERUSER = FunctionDefinitionFactory.create("isSuperuser", User.class, new FunctionExecutor<Boolean>() {
 
             @Override
-            public Boolean invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                return holder.get(GET_NAME).invoke().equals(SUPERUSER_NAME);
+                boolean result = invocation.getHolder().get(GET_NAME).invoke().equals(SUPERUSER_NAME);
+                invocation.next(arguments);
+                return result;
             }
         });
 
         GET_COLUMNS.addExecutor(User.class, "default", new FunctionExecutor<Map<String, Object>>() {
 
             @Override
-            public Map<String, Object> invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Map<String, Object> invoke(FunctionInvocation<Map<String, Object>> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 Map<String, Object> columns = new HashMap<String, Object>();
+                FeatureHolder holder = invocation.getHolder();
+
                 columns.put("name", holder.get(GET_NAME).invoke());
                 columns.put("groups", holder.get(GET_GROUPS).invoke());
+
+                columns.putAll(NullPreventer.prevent(invocation.next(arguments)));
                 return columns;
             }
 
@@ -366,11 +393,13 @@ public class User extends ConfigurationEntry {
         SET_COLUMNS.addExecutor(User.class, "default", new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 // Trust the user of the method
                 @SuppressWarnings ("unchecked")
                 Map<String, Object> columns = (Map<String, Object>) arguments[0];
+                FeatureHolder holder = invocation.getHolder();
+
                 holder.get(SET_NAME).invoke(columns.get("name"));
 
                 Validate.isTrue(columns.get("groups") instanceof List, "Groups must be a list");
@@ -384,7 +413,7 @@ public class User extends ConfigurationEntry {
                     holder.get(SET_PRIMARY_GROUP).invoke(groups.get(0));
                 }
 
-                return null;
+                return invocation.next(arguments);
             }
 
         });

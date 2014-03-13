@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.def.DefaultChildFeatureHolder;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.def.DefaultChildFeatureHolder;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
 
 /**
  * The base class for all {@link OperatingSystem} modules.
