@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.world;
 
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.extra.ChildFeatureHolder;
-import com.quartercode.disconnected.mocl.extra.def.DefaultChildFeatureHolder;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.ChildFeatureHolder;
+import com.quartercode.classmod.extra.def.DefaultChildFeatureHolder;
 
 /**
  * The world child feature holder is a special {@link ChildFeatureHolder} which allows to resolve the holding {@link World}.

@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.world.comp.attack;
 
-import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.disconnected.world.comp.Vulnerability;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 

@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.Validate;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.Disconnected;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.world.Location;
 
 /**
@@ -91,7 +91,7 @@ public class LocationGenerator {
 
             return result;
         }
-        catch (FunctionExecutionException e) {
+        catch (ExecutorInvocationException e) {
             LOGGER.log(Level.SEVERE, "Unknown error while generating locations", e.getCause());
             return null;
         }

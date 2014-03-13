@@ -20,18 +20,19 @@ package com.quartercode.disconnected.world.comp;
 
 import java.util.Arrays;
 import org.apache.commons.lang.Validate;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutor;
-import com.quartercode.disconnected.mocl.extra.Lockable;
-import com.quartercode.disconnected.mocl.extra.def.LockableFEWrapper;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Lockable;
+import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.StringRepresentable;
 
 /**
@@ -232,13 +233,14 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
 
             @Override
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
+                FeatureHolder holder = invocation.getHolder();
                 holder.get(SET_MAJOR).invoke( ((Version) arguments[0]).get(GET_MAJOR).invoke());
                 holder.get(SET_MINOR).invoke( ((Version) arguments[0]).get(GET_MINOR).invoke());
                 holder.get(SET_REVISION).invoke( ((Version) arguments[0]).get(GET_REVISION).invoke());
 
-                return null;
+                return invocation.next(arguments);
             }
 
         }, Version.class);
@@ -246,9 +248,13 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
         TO_STRING.addExecutor(Version.class, "default", new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                return holder.get(GET_MAJOR).invoke() + "." + holder.get(GET_MINOR).invoke() + "." + holder.get(GET_REVISION).invoke();
+                FeatureHolder holder = invocation.getHolder();
+                String string = holder.get(GET_MAJOR).invoke() + "." + holder.get(GET_MINOR).invoke() + "." + holder.get(GET_REVISION).invoke();
+
+                invocation.next(arguments);
+                return string;
             }
 
         });
@@ -256,15 +262,17 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
 
             @Override
             @Lockable
-            public Void invoke(FeatureHolder holder, Object... arguments) throws ExecutorInvokationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 String[] versionParts = ((String) arguments[0]).split("\\.");
                 Validate.isTrue(versionParts.length == 3, "The version string must be splitted in 3 parts by dots (e.g. 1.2.5): ", Arrays.toString(versionParts));
+
+                FeatureHolder holder = invocation.getHolder();
                 holder.get(SET_MAJOR).invoke(Integer.parseInt(versionParts[0]));
                 holder.get(SET_MINOR).invoke(Integer.parseInt(versionParts[1]));
                 holder.get(SET_REVISION).invoke(Integer.parseInt(versionParts[2]));
 
-                return null;
+                return invocation.next(arguments);
             }
 
         });

@@ -1,9 +1,9 @@
 
 package com.quartercode.disconnected.world;
 
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
 
 /**
  * <p>

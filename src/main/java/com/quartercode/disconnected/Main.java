@@ -32,11 +32,11 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.def.ReferenceProperty;
 import com.quartercode.disconnected.graphics.GraphicsManager;
 import com.quartercode.disconnected.graphics.session.DesktopState;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.extra.def.ReferenceProperty;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.profile.Profile;
 import com.quartercode.disconnected.sim.profile.ProfileManager;
@@ -45,7 +45,6 @@ import com.quartercode.disconnected.sim.run.TickSimulator;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
 import com.quartercode.disconnected.util.LogExceptionHandler;
-import com.quartercode.disconnected.util.ObjectAdapter;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.util.ResourceStore;
@@ -59,7 +58,7 @@ import com.quartercode.disconnected.world.comp.hardware.Mainboard;
 import com.quartercode.disconnected.world.comp.hardware.Mainboard.MainboardSlot;
 import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
 import com.quartercode.disconnected.world.comp.hardware.RAM;
-import com.quartercode.disconnected.world.comp.os.Environment;
+import com.quartercode.disconnected.world.comp.os.EnvironmentVariable;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.os.Session;
 import com.quartercode.disconnected.world.member.Member;
@@ -169,7 +168,7 @@ public class Main {
             for (Computer computer : simulation.getWorld().get(World.GET_COMPUTERS).invoke()) {
                 computer.get(Computer.GET_OS).invoke().get(OperatingSystem.SET_RUNNING).invoke(true);
             }
-        } catch (FunctionExecutionException e) {
+        } catch (ExecutorInvocationException e) {
             LOGGER.log(Level.SEVERE, "Unknown error while booting up computers", e.getCause());
         }
         Profile profile = new Profile("test", simulation);
@@ -210,7 +209,6 @@ public class Main {
         registry.registerClass(ReferenceProperty.class);
 
         // Other
-        registry.registerClass(ObjectAdapter.ClassElement.class);
         registry.registerClass(Location.class);
 
         // ----- General End -----
@@ -234,7 +232,7 @@ public class Main {
 
         // Mixed computer stuff
         registry.registerClass(Version.class);
-        registry.registerClass(Environment.class);
+        registry.registerClass(EnvironmentVariable.class);
 
         // Hardware
         registry.registerClass(Mainboard.class);

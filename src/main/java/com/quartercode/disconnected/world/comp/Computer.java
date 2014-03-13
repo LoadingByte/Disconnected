@@ -20,16 +20,16 @@ package com.quartercode.disconnected.world.comp;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
-import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.mocl.util.PropertyAccessorFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
+import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.Location;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
@@ -223,7 +223,7 @@ public class Computer extends WorldChildFeatureHolder<World> {
         GET_HARDWARE_BY_TYPE = FunctionDefinitionFactory.create("getHardwareByType", Computer.class, CollectionPropertyAccessorFactory.createGet(HARDWARE, new CriteriumMatcher<Hardware>() {
 
             @Override
-            public boolean matches(Hardware element, Object... arguments) throws ExecutorInvokationException {
+            public boolean matches(Hardware element, Object... arguments) throws ExecutorInvocationException {
 
                 return ((Class<?>) arguments[0]).isAssignableFrom(element.getClass());
             }

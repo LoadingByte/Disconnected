@@ -21,16 +21,16 @@ package com.quartercode.disconnected.world;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
-import com.quartercode.disconnected.mocl.base.FeatureDefinition;
-import com.quartercode.disconnected.mocl.base.FeatureHolder;
-import com.quartercode.disconnected.mocl.base.def.AbstractFeatureDefinition;
-import com.quartercode.disconnected.mocl.base.def.DefaultFeatureHolder;
-import com.quartercode.disconnected.mocl.extra.ExecutorInvokationException;
-import com.quartercode.disconnected.mocl.extra.FunctionDefinition;
-import com.quartercode.disconnected.mocl.extra.def.ObjectProperty;
-import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory;
-import com.quartercode.disconnected.mocl.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
-import com.quartercode.disconnected.mocl.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
+import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.member.Member;
@@ -282,7 +282,7 @@ public class World extends DefaultFeatureHolder {
         GET_MEMBER_BY_NAME = FunctionDefinitionFactory.create("getMemberByName", World.class, CollectionPropertyAccessorFactory.createGetSingle(MEMBERS, new CriteriumMatcher<Member>() {
 
             @Override
-            public boolean matches(Member element, Object... arguments) throws ExecutorInvokationException {
+            public boolean matches(Member element, Object... arguments) throws ExecutorInvocationException {
 
                 return element.getName().equals(arguments[0]);
             }
@@ -295,7 +295,7 @@ public class World extends DefaultFeatureHolder {
         GET_GROUP_BY_MEMBER = FunctionDefinitionFactory.create("getGroupByMember", World.class, CollectionPropertyAccessorFactory.createGetSingle(GROUPS, new CriteriumMatcher<MemberGroup>() {
 
             @Override
-            public boolean matches(MemberGroup element, Object... arguments) throws ExecutorInvokationException {
+            public boolean matches(MemberGroup element, Object... arguments) throws ExecutorInvocationException {
 
                 return element.getMembers().contains(arguments[0]);
             }

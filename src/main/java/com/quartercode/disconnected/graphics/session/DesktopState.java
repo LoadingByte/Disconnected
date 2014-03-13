@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.graphics.component.GraphicsState;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
@@ -104,7 +104,7 @@ public class DesktopState extends GraphicsState {
                 add(widget);
             }
         }
-        catch (FunctionExecutionException e) {
+        catch (ExecutorInvocationException e) {
             LOGGER.log(Level.SEVERE, "Unexpected error during desktop graphic state initialization", e);
         }
     }

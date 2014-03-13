@@ -20,8 +20,8 @@ package com.quartercode.disconnected.sim.run;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.quartercode.disconnected.mocl.extra.Function;
-import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.Function;
 import com.quartercode.disconnected.sim.Simulation;
 
 /**
@@ -88,7 +88,7 @@ public class TickSimulator implements TickAction {
                 // Execute world object ticks
                 updateObject(simulation.getWorld());
             }
-            catch (FunctionExecutionException e) {
+            catch (ExecutorInvocationException e) {
                 LOGGER.log(Level.SEVERE, "Unexcpected function execution exception during world tick update", e);
             }
 
@@ -191,7 +191,7 @@ public class TickSimulator implements TickAction {
         }
     }
 
-    private void updateObject(Object object) throws FunctionExecutionException {
+    private void updateObject(Object object) throws ExecutorInvocationException {
 
         if (object instanceof Function && ((Function<?>) object).getName().contains(UPDATE_FUNCTION_NAME)) {
             ((Function<?>) object).invoke();
