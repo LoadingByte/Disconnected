@@ -31,8 +31,8 @@ import java.util.List;
  */
 public class Registry {
 
-    private final List<Class<?>> classes = new ArrayList<Class<?>>();
-    private final List<URL>      themes  = new ArrayList<URL>();
+    private final List<String> contextPath = new ArrayList<String>();
+    private final List<URL>    themes      = new ArrayList<URL>();
 
     /**
      * Creates a new empty registry.
@@ -42,59 +42,38 @@ public class Registry {
     }
 
     /**
-     * Returns all classes which are currently registered in the registry.
-     * Those classes are known object tree ones which are used by JAXB.
+     * Returns all packages which are currently registered as context path entries.
+     * JAXB can look up classes which are important for XML mapping in the <code>jaxb.index</code> files which is located in such packages.
      * 
-     * @return All classes which are currently registered in the registry.
+     * @return All context path packages which are currently registered in the registry.
      */
-    public List<Class<?>> getClasses() {
+    public List<String> getContextPath() {
 
-        return Collections.unmodifiableList(classes);
+        return Collections.unmodifiableList(contextPath);
     }
 
     /**
-     * Returns the registered classes which have the given type as a superclass.
-     * Those classes are known object tree ones which are used by JAXB.
+     * Registers a new context path package to the registry.
+     * JAXB can look up classes which are important for XML mapping in the <code>jaxb.index</code> files which is located in such packages.
      * 
-     * @param type The type to use for the selection.
-     * @return The registered classes which have the given type as a superclass.
+     * @param packageName The name of the new context path package.
      */
-    @SuppressWarnings ("unchecked")
-    public <T> List<Class<? extends T>> getClasses(Class<T> type) {
+    public void registerContextPathEntry(String packageName) {
 
-        List<Class<? extends T>> classes = new ArrayList<Class<? extends T>>();
-        for (Class<?> c : this.classes) {
-            if (type.isAssignableFrom(c)) {
-                classes.add((Class<? extends T>) c);
-            }
-        }
-        return classes;
-    }
-
-    /**
-     * Registers a new class to the registry.
-     * Those classes are known object tree ones which are used by JAXB.
-     * 
-     * @param c The new class to register in the registry.
-     */
-    public void registerClass(Class<?> c) {
-
-        if (!classes.contains(c)) {
-            classes.add(c);
+        if (!contextPath.contains(packageName)) {
+            contextPath.add(packageName);
         }
     }
 
     /**
-     * Unregisters a class from the registry.
-     * Those classes are known object tree ones which are used by JAXB.
+     * Unregisters a context path package from the registry.
+     * JAXB can look up classes which are important for XML mapping in the <code>jaxb.index</code> files which is located in such packages.
      * 
-     * @param c The class to unregister from the registry.
+     * @param packageName The name of the context path package to remove.
      */
-    public void unregisterClass(Class<?> c) {
+    public void unregisterContextPathEntry(String packageName) {
 
-        if (classes.contains(c)) {
-            classes.remove(c);
-        }
+        contextPath.remove(packageName);
     }
 
     /**

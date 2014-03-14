@@ -33,8 +33,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.extra.def.ReferenceProperty;
+import com.quartercode.classmod.util.Classmod;
 import com.quartercode.disconnected.graphics.GraphicsManager;
 import com.quartercode.disconnected.graphics.session.DesktopState;
 import com.quartercode.disconnected.sim.Simulation;
@@ -48,24 +47,9 @@ import com.quartercode.disconnected.util.LogExceptionHandler;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.util.ResourceStore;
-import com.quartercode.disconnected.world.Location;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
-import com.quartercode.disconnected.world.comp.Version;
-import com.quartercode.disconnected.world.comp.hardware.CPU;
-import com.quartercode.disconnected.world.comp.hardware.HardDrive;
-import com.quartercode.disconnected.world.comp.hardware.Mainboard;
-import com.quartercode.disconnected.world.comp.hardware.Mainboard.MainboardSlot;
-import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
-import com.quartercode.disconnected.world.comp.hardware.RAM;
-import com.quartercode.disconnected.world.comp.os.EnvironmentVariable;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.world.comp.os.Session;
-import com.quartercode.disconnected.world.member.Member;
-import com.quartercode.disconnected.world.member.MemberGroup;
-import com.quartercode.disconnected.world.member.ai.PlayerController;
-import com.quartercode.disconnected.world.member.ai.UserController;
-import com.quartercode.disconnected.world.member.interest.DestroyInterest;
 
 /**
  * The main class which initalizes the whole game.
@@ -196,56 +180,27 @@ public class Main {
     }
 
     /**
-     * Fills the given registry with the default values which are needed for running vanilla disconnected.
+     * Fills the given registry with the default values which are needed for running Disconnected.
      * 
      * @param registry The registry to fill.
      */
     public static void fillRegistry(Registry registry) {
 
-        // ----- General -----
+        // ----- Context Path -----
 
-        // Properties
-        registry.registerClass(ObjectProperty.class);
-        registry.registerClass(ReferenceProperty.class);
+        registry.registerContextPathEntry(Classmod.CONTEXT_PATH);
 
-        // Other
-        registry.registerClass(Location.class);
+        registry.registerContextPathEntry("com.quartercode.disconnected.world");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.attack");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.file");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.hardware");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.net");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.os");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.program");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.program.event");
 
-        // ----- General End -----
-
-        // ----- Members -----
-
-        // Mixed member stuff
-        registry.registerClass(Member.class);
-        registry.registerClass(MemberGroup.class);
-
-        // AI Controllers
-        registry.registerClass(PlayerController.class);
-        registry.registerClass(UserController.class);
-
-        // Interests
-        registry.registerClass(DestroyInterest.class);
-
-        // ----- Members End -----
-
-        // ----- Computers -----
-
-        // Mixed computer stuff
-        registry.registerClass(Version.class);
-        registry.registerClass(EnvironmentVariable.class);
-
-        // Hardware
-        registry.registerClass(Mainboard.class);
-        registry.registerClass(MainboardSlot.class);
-        registry.registerClass(CPU.class);
-        registry.registerClass(RAM.class);
-        registry.registerClass(HardDrive.class);
-        registry.registerClass(NetworkInterface.class);
-
-        // Programs
-        registry.registerClass(Session.class);
-
-        // ----- Computers End -----
+        // ----- Context Path End -----
 
         // ----- Themes -----
 
@@ -257,7 +212,7 @@ public class Main {
     }
 
     /**
-     * Fills the given resource store with the default resource objects which are needed for running vanilla disconnected.
+     * Fills the given resource store with the default resource objects which are needed for running Disconnected.
      * 
      * @param resourceStore The resource store to fill.
      * @throws IOException Something goes wrong while reading from a jar file or resource.

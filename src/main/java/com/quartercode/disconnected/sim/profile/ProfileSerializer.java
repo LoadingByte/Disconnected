@@ -24,8 +24,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -117,14 +115,15 @@ public class ProfileSerializer {
      */
     public static JAXBContext createWorldContext() {
 
-        List<Class<?>> classes = new ArrayList<Class<?>>();
-        classes.add(World.class);
-        classes.addAll(Disconnected.getRegistry().getClasses());
+        StringBuilder contextPathStringBuilder = new StringBuilder();
+        for (String contextPathEntry : Disconnected.getRegistry().getContextPath()) {
+            contextPathStringBuilder.append(":").append(contextPathEntry);
+        }
+        String contextPathString = contextPathStringBuilder.length() > 0 ? contextPathStringBuilder.substring(1) : "";
 
         try {
-            return JAXBContext.newInstance(classes.toArray(new Class[classes.size()]));
-        }
-        catch (JAXBException e) {
+            return JAXBContext.newInstance(contextPathString);
+        } catch (JAXBException e) {
             LOGGER.log(Level.SEVERE, "A JAXB exception occurred while creating context", e);
         }
 
