@@ -144,8 +144,7 @@ public class DesktopWidget extends Widget {
 
             taskbar.add(window.getFrame().getTaskbarButton());
             taskbar.invalidateLayout();
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             // TODO: Replace workaround with real solution
         }
     }

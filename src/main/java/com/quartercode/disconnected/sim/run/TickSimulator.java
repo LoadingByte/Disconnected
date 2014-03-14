@@ -87,8 +87,7 @@ public class TickSimulator implements TickAction {
             try {
                 // Execute world object ticks
                 updateObject(simulation.getWorld());
-            }
-            catch (ExecutorInvocationException e) {
+            } catch (ExecutorInvocationException e) {
                 LOGGER.log(Level.SEVERE, "Unexcpected function execution exception during world tick update", e);
             }
 

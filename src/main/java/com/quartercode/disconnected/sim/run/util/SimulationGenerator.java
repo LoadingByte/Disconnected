@@ -139,8 +139,7 @@ public class SimulationGenerator {
             }
 
             return world;
-        }
-        catch (FunctionExecutionException e) {
+        } catch (ExecutorInvocationException e) {
             LOGGER.log(Level.SEVERE, "Unknown error while generating simulation", e.getCause());
             return null;
         }
@@ -267,8 +266,7 @@ public class SimulationGenerator {
             }
 
             return computers;
-        }
-        catch (FunctionExecutionException e) {
+        } catch (ExecutorInvocationException e) {
             LOGGER.log(Level.SEVERE, "Unknown error while generating computer", e.getCause());
             return null;
         }
@@ -336,8 +334,7 @@ public class SimulationGenerator {
             program.get(Program.SET_VERSION).invoke(version);
             program.get(Program.SET_EXECUTOR_CLASS).invoke(executorClass);
             return program;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Unexpected exception during the initialization of a new program object", e);
         }
 

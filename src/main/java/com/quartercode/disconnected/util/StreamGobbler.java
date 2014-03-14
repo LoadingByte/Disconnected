@@ -60,8 +60,7 @@ public class StreamGobbler extends Thread {
             while ( (line = reader.readLine()) != null) {
                 outputStream.println( (prefix == null ? "" : prefix) + line);
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error while listening on process stream", e);
         }
     }

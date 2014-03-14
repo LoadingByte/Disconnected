@@ -90,8 +90,7 @@ public class LocationGenerator {
             }
 
             return result;
-        }
-        catch (ExecutorInvocationException e) {
+        } catch (ExecutorInvocationException e) {
             LOGGER.log(Level.SEVERE, "Unknown error while generating locations", e.getCause());
             return null;
         }

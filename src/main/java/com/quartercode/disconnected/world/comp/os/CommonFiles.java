@@ -34,7 +34,7 @@ public class CommonFiles {
     public static final String GROUP_CONFIG       = CONFIG_DIR + "/groups.cfg";
 
     /**
-     * The {@link Configuration} {@link File} which stores the default {@link Environment} every new process gets assigned.
+     * The {@link Configuration} {@link File} which stores the default {@link EnvironmentVariable}s every new process gets assigned.
      */
     public static final String ENVIRONMENT_CONFIG = CONFIG_DIR + "/environment.cfg";
 

@@ -129,8 +129,7 @@ public class ProfileManager {
         try {
             outputStream = new FileOutputStream(profileFile);
             ProfileSerializer.serializeProfile(outputStream, profile);
-        }
-        finally {
+        } finally {
             outputStream.close();
         }
     }
@@ -176,8 +175,7 @@ public class ProfileManager {
                 } else {
                     // TODO: React on deserialization fail
                 }
-            }
-            finally {
+            } finally {
                 inputStream.close();
             }
         }
