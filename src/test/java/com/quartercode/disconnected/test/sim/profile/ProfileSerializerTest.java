@@ -21,6 +21,8 @@ package com.quartercode.disconnected.test.sim.profile;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Collection;
+import java.util.Set;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.io.output.WriterOutputStream;
@@ -28,6 +30,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import com.quartercode.classmod.base.Feature;
+import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.extra.Property;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.Main;
 import com.quartercode.disconnected.sim.profile.ProfileSerializer;
@@ -66,7 +71,72 @@ public class ProfileSerializerTest {
         outputStream.close();
 
         World copy = ProfileSerializer.deserializeWorld(new ReaderInputStream(new StringReader(serialized.toString())));
-        Assert.assertEquals("Serialized-deserialized copy of world", world, copy);
+        Assert.assertEquals("Serialized-deserialized copy of world equals original", equalsPersistent(world, copy));
+    }
+
+    /*
+     * Method for checking whether the persistent features of the given feature holders are equal to each other.
+     */
+    private boolean equalsPersistent(DefaultFeatureHolder holder1, DefaultFeatureHolder holder2) {
+
+        Set<Feature> features1 = holder1.getPersistentFeatures();
+        Set<Feature> features2 = holder2.getPersistentFeatures();
+
+        if (features1.size() != features2.size()) {
+            return false;
+        } else {
+            for (Feature feature1 : features1) {
+                boolean contains = false;
+                for (Feature feature2 : features2) {
+                    if (equalsPersistent(feature1, feature2)) {
+                        contains = true;
+                        break;
+                    }
+                }
+
+                if (!contains) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
+    private boolean equalsPersistent(Feature feature1, Feature feature2) {
+
+        // Only check for persistent properties
+        if (! (feature1 instanceof Property) || ! (feature2 instanceof Property)) {
+            return true;
+        }
+
+        return equalsPersistent( ((Property<?>) feature1).get(), ((Property<?>) feature2).get());
+    }
+
+    private boolean equalsPersistent(Object o1, Object o2) {
+
+        if (o1 instanceof Collection<?> && o2 instanceof Collection<?>) {
+            Object[] collection1 = ((Collection<?>) o1).toArray(new Object[ ((Collection<?>) o1).size()]);
+            Object[] collection2 = ((Collection<?>) o2).toArray(new Object[ ((Collection<?>) o2).size()]);
+
+            if (collection1.length != collection2.length) {
+                return false;
+            } else {
+                for (int index = 0; index < collection1.length; index++) {
+                    if (!equalsPersistent(collection1[index], collection2[index])) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        } else if (o1 instanceof DefaultFeatureHolder && o2 instanceof DefaultFeatureHolder) {
+            return equalsPersistent((DefaultFeatureHolder) o1, (DefaultFeatureHolder) o2);
+        } else if (o1 == null && o2 == null) {
+            return true;
+        } else {
+            return o1 != null && o1.equals(o2);
+        }
     }
 
 }
