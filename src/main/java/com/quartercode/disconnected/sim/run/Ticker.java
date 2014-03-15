@@ -176,7 +176,7 @@ public class Ticker {
      * 
      * @return The current tick thread which executes the actual tick update.
      */
-    public TickThread getThread() {
+    public TickThread getTickThread() {
 
         return thread;
     }
