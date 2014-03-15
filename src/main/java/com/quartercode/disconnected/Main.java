@@ -34,8 +34,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.util.Classmod;
+import com.quartercode.disconnected.graphics.DefaultStates;
 import com.quartercode.disconnected.graphics.GraphicsManager;
-import com.quartercode.disconnected.graphics.session.DesktopState;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.profile.Profile;
 import com.quartercode.disconnected.sim.profile.ProfileManager;
@@ -131,6 +131,8 @@ public class Main {
             return;
         }
 
+        // TODO: Initialize default graphics states
+
         // Initalize profile manager and load stored profiles
         LOGGER.info("Initalizing profile manager");
         Disconnected.setProfileManager(new ProfileManager(new File("profiles")));
@@ -169,7 +171,7 @@ public class Main {
         // DEBUG: Start "game" with current simulation
         LOGGER.info("DEBUG-ACTION: Starting test-game with current simulation");
         Disconnected.getTicker().setRunning(true);
-        Disconnected.getGraphicsManager().setState(new DesktopState(profile.getSimulation()));
+        Disconnected.getGraphicsManager().setState(DefaultStates.DESKTOP.create());
     }
 
     @SuppressWarnings ("static-access")

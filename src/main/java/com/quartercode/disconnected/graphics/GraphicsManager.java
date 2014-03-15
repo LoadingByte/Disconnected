@@ -18,15 +18,14 @@
 
 package com.quartercode.disconnected.graphics;
 
-import com.quartercode.disconnected.graphics.component.GraphicsState;
-
 /**
  * This is the main manager of the graphics system.
  * The manager can create or destroy the lwjgl context and keeps track of all important twl internals.
  */
 public class GraphicsManager {
 
-    private UpdateThread updateThread;
+    private UpdateThread  updateThread;
+    private GraphicsState state;
 
     /**
      * Creates a new graphics manager.
@@ -55,6 +54,7 @@ public class GraphicsManager {
 
         if (running && !isRunning()) {
             updateThread = new UpdateThread();
+            updateThread.changeState(state);
             updateThread.start();
         } else if (!running && isRunning()) {
             updateThread.exit();
@@ -64,7 +64,6 @@ public class GraphicsManager {
 
     /**
      * Returns the current update thread which keeps the lwjgl display alive.
-     * The update thread stores all interesting graphics information, like the main widget or the twl gui object.
      * If the graphics manager is not running, this returns null.
      * 
      * @return The current update thread which keeps the lwjgl display alive.
@@ -82,7 +81,7 @@ public class GraphicsManager {
      */
     public GraphicsState getState() {
 
-        return updateThread.getRoot().getState();
+        return state;
     }
 
     /**
@@ -93,7 +92,11 @@ public class GraphicsManager {
      */
     public void setState(GraphicsState state) {
 
-        updateThread.getRoot().setState(state);
+        this.state = state;
+
+        if (updateThread != null) {
+            updateThread.changeState(state);
+        }
     }
 
     /**

@@ -37,9 +37,10 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import com.quartercode.disconnected.Disconnected;
-import com.quartercode.disconnected.graphics.component.GraphicsState;
-import com.quartercode.disconnected.graphics.component.RootWidget;
+import com.quartercode.disconnected.Main;
+import de.matthiasmann.twl.Container;
 import de.matthiasmann.twl.GUI;
+import de.matthiasmann.twl.renderer.Renderer;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 import de.matthiasmann.twl.theme.ThemeManager;
 import de.matthiasmann.twl.utils.PNGDecoder;
@@ -53,10 +54,11 @@ public class UpdateThread extends Thread {
 
     private static final Logger   LOGGER   = Logger.getLogger(UpdateThread.class.getName());
 
-    private final RootWidget      root;
     private GUI                   gui;
-    private LWJGLRenderer         renderer;
+    private ThemeManager          theme;
+    private Container             root;
 
+    private GraphicsState         newState;
     private final Queue<Runnable> toInvoke = new LinkedList<Runnable>();
     private boolean               exit;
 
@@ -66,38 +68,17 @@ public class UpdateThread extends Thread {
     public UpdateThread() {
 
         super("graphis-update");
-
-        root = new RootWidget();
     }
 
     /**
-     * Returns the used root widget (the parent frame of every other widget).
+     * Changes the current {@link GraphicsState} to the given one.
+     * The change is applied on the next tick.
      * 
-     * @return The used root widget (the parent frame of every other widget).
+     * @param newState The new {@link GraphicsState} to use.
      */
-    public RootWidget getRoot() {
+    protected void changeState(GraphicsState newState) {
 
-        return root;
-    }
-
-    /**
-     * Returns the twl gui object.
-     * 
-     * @return The twl gui object.
-     */
-    public GUI getGui() {
-
-        return gui;
-    }
-
-    /**
-     * Returns the twl lwjgl renderer which renders the widgets on the display.
-     * 
-     * @return The twl lwjgl renderer which renders the widgets on the display.
-     */
-    public LWJGLRenderer getRenderer() {
-
-        return renderer;
+        this.newState = newState;
     }
 
     /**
@@ -105,7 +86,7 @@ public class UpdateThread extends Thread {
      * 
      * @param runnable The runnable to invoke in the update thread.
      */
-    public void invoke(Runnable runnable) {
+    protected void invoke(Runnable runnable) {
 
         toInvoke.offer(runnable);
     }
@@ -122,98 +103,45 @@ public class UpdateThread extends Thread {
     @Override
     public void run() {
 
-        ThemeManager theme = null;
-
         try {
-            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            // Display.setDisplayMode(new DisplayMode(1200, 700));
-            Display.setDisplayMode(new DisplayMode((int) (screenSize.width * 0.75F), (int) (screenSize.height * 0.75F)));
-            // Display.setFullscreen(true);
-            Display.setTitle("Disconnected " + Disconnected.getVersion());
-            ByteBuffer[] icons = new ByteBuffer[4];
-            icons[0] = loadImage(getClass().getResource("/images/icons/icon16.png"));
-            icons[1] = loadImage(getClass().getResource("/images/icons/icon32.png"));
-            icons[2] = loadImage(getClass().getResource("/images/icons/icon64.png"));
-            icons[3] = loadImage(getClass().getResource("/images/icons/icon128.png"));
-            Display.setIcon(icons);
-
-            Display.setVSyncEnabled(true);
-            Display.create();
-
-            renderer = new LWJGLRenderer();
-            renderer.setUseSWMouseCursors(true);
-            gui = new GUI(root, renderer);
-            gui.setSize();
-            renderer.syncViewportSize();
-
-            PrintWriter themeFileWriter = null;
-            File themeFile = null;
-            try {
-                themeFile = File.createTempFile("disconnected-theme", ".xml");
-                themeFileWriter = new PrintWriter(themeFile);
-                themeFileWriter.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-                themeFileWriter.println("<!DOCTYPE themes PUBLIC \"-//www.matthiasmann.de//TWL-Theme//EN\"");
-                themeFileWriter.println("\"http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd\">");
-                themeFileWriter.println("<themes>");
-                for (URL themeURL : Disconnected.getRegistry().getThemes()) {
-                    themeFileWriter.println("<include filename=\"" + themeURL + "\"/>");
-                }
-                themeFileWriter.println("</themes>");
-                themeFileWriter.flush();
-                theme = ThemeManager.createThemeManager(themeFile.toURI().toURL(), renderer);
-            } catch (IOException e) {
-                throw new IOException("Error while creating temporary theme file", e);
-            } finally {
-                if (themeFileWriter != null) {
-                    themeFileWriter.close();
-                }
-                if (themeFile != null) {
-                    themeFile.delete();
-                }
-            }
-
-            gui.applyTheme(theme);
-
-            GraphicsState lastState = null;
-                if (lastState == null || !lastState.equals(root.getState())) {
-            while (!Display.isCloseRequested() && !exit) {
-                    if (lastState != null) {
-                        root.removeChild(lastState);
-                    }
-                    lastState = root.getState();
-                    if (lastState != null) {
-                        root.add(lastState);
-                    }
-                }
-
-                if (!toInvoke.isEmpty()) {
-                    toInvoke.poll().run();
-                }
-
-                gui.update();
-                Display.sync(60);
-                Display.update();
-
-                // Reduce lag on input devices
-                GL11.glGetError();
-                Display.processMessages();
-                Mouse.poll();
-                Keyboard.poll();
-            }
+            initialize();
+            startLoop();
         } catch (LWJGLException e) {
             LOGGER.log(Level.SEVERE, "Error while creating lwjgl display", e);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error while loading files", e);
+        } finally {
+            end();
         }
+    }
 
-        gui.destroy();
-        if (theme != null) {
-            theme.destroy();
-        }
-        Display.destroy();
+    private void initialize() throws LWJGLException, IOException {
 
-        // Try to exit (the exit method blocks the call if it was already called)
-        Main.exit();
+        createDisplay();
+        createRoot();
+        Renderer renderer = createRenderer();
+        loadTheme(renderer);
+        gui.applyTheme(theme);
+    }
+
+    private void createDisplay() throws LWJGLException, IOException {
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Display.setDisplayMode(new DisplayMode((int) (screenSize.width * 0.75F), (int) (screenSize.height * 0.75F)));
+        Display.setTitle("Disconnected " + Disconnected.getVersion());
+        Display.setIcon(loadIcons());
+        Display.setVSyncEnabled(true);
+        Display.create();
+    }
+
+    private ByteBuffer[] loadIcons() throws IOException {
+
+        ByteBuffer[] icons = new ByteBuffer[4];
+        icons[0] = loadImage(getClass().getResource("/images/icons/icon16.png"));
+        icons[1] = loadImage(getClass().getResource("/images/icons/icon32.png"));
+        icons[2] = loadImage(getClass().getResource("/images/icons/icon64.png"));
+        icons[3] = loadImage(getClass().getResource("/images/icons/icon128.png"));
+        return icons;
     }
 
     private ByteBuffer loadImage(URL url) throws IOException {
@@ -228,6 +156,98 @@ public class UpdateThread extends Thread {
         } finally {
             inputStream.close();
         }
+    }
+
+    private void createRoot() {
+
+        root = new Container();
+        root.setTheme("");
+    }
+
+    private Renderer createRenderer() throws LWJGLException {
+
+        LWJGLRenderer renderer = new LWJGLRenderer();
+        renderer.setUseSWMouseCursors(true);
+
+        gui = new GUI(root, renderer);
+        gui.setSize();
+
+        renderer.syncViewportSize();
+        return renderer;
+    }
+
+    private void loadTheme(Renderer renderer) throws LWJGLException, IOException {
+
+        PrintWriter themeFileWriter = null;
+        File themeFile = null;
+        try {
+            themeFile = File.createTempFile("disconnected-theme", ".xml");
+            themeFileWriter = new PrintWriter(themeFile);
+            themeFileWriter.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            themeFileWriter.println("<!DOCTYPE themes PUBLIC \"-//www.matthiasmann.de//TWL-Theme//EN\"");
+            themeFileWriter.println("\"http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd\">");
+            themeFileWriter.println("<themes>");
+            for (URL themeURL : Disconnected.getRegistry().getThemes()) {
+                themeFileWriter.println("<include filename=\"" + themeURL + "\"/>");
+            }
+            themeFileWriter.println("</themes>");
+            themeFileWriter.flush();
+            theme = ThemeManager.createThemeManager(themeFile.toURI().toURL(), renderer);
+        } catch (IOException e) {
+            throw new IOException("Error while creating temporary theme file", e);
+        } finally {
+            if (themeFileWriter != null) {
+                themeFileWriter.close();
+            }
+            if (themeFile != null) {
+                themeFile.delete();
+            }
+        }
+    }
+
+    private void startLoop() {
+
+        GraphicsState lastState = null;
+        while (!Display.isCloseRequested() && !exit) {
+            if (newState != null) {
+                if (lastState != null) {
+                    root.removeChild(lastState);
+                }
+                lastState = newState;
+                newState = null;
+                if (lastState != null) {
+                    root.add(lastState);
+                }
+            }
+
+            if (!toInvoke.isEmpty()) {
+                toInvoke.poll().run();
+            }
+
+            gui.update();
+            Display.sync(60);
+            Display.update();
+
+            // Reduce lag on input devices
+            GL11.glGetError();
+            Display.processMessages();
+            Mouse.poll();
+            Keyboard.poll();
+        }
+    }
+
+    private void end() {
+
+        if (gui != null) {
+            gui.destroy();
+        }
+        if (theme != null) {
+            theme.destroy();
+        }
+        Display.destroy();
+
+        // Try to exit (the exit method blocks the call if it was already called)
+        Main.exit();
     }
 
 }
