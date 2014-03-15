@@ -227,7 +227,8 @@ public class Ticker {
                     try {
                         Thread.sleep(ticker.getDelay());
                     } catch (InterruptedException e) {
-                        LOGGER.log(Level.SEVERE, "Tick thread has been interrupted", e);
+                        // Interruption -> Exit thread
+                        break;
                     }
                 }
             }

@@ -57,7 +57,7 @@ public class GraphicsManager {
             updateThread = new UpdateThread();
             updateThread.start();
         } else if (!running && isRunning()) {
-            updateThread.interrupt();
+            updateThread.exit();
             updateThread = null;
         }
     }

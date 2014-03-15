@@ -58,6 +58,7 @@ public class UpdateThread extends Thread {
     private LWJGLRenderer         renderer;
 
     private final Queue<Runnable> toInvoke = new LinkedList<Runnable>();
+    private boolean               exit;
 
     /**
      * Creates a new update thread.
@@ -107,6 +108,15 @@ public class UpdateThread extends Thread {
     public void invoke(Runnable runnable) {
 
         toInvoke.offer(runnable);
+    }
+
+    /**
+     * Tells the update thread to exit after the current loop cycle.
+     * This method has to be used instead of {@link #interrupt()} because the interrupt system is blocked by LWJGL.
+     */
+    protected void exit() {
+
+        exit = true;
     }
 
     @Override
@@ -165,8 +175,8 @@ public class UpdateThread extends Thread {
             gui.applyTheme(theme);
 
             GraphicsState lastState = null;
-            while (!Display.isCloseRequested() && !interrupted()) {
                 if (lastState == null || !lastState.equals(root.getState())) {
+            while (!Display.isCloseRequested() && !exit) {
                     if (lastState != null) {
                         root.removeChild(lastState);
                     }
@@ -179,6 +189,7 @@ public class UpdateThread extends Thread {
                 if (!toInvoke.isEmpty()) {
                     toInvoke.poll().run();
                 }
+
                 gui.update();
                 Display.sync(60);
                 Display.update();
@@ -200,7 +211,9 @@ public class UpdateThread extends Thread {
             theme.destroy();
         }
         Display.destroy();
-        System.exit(0);
+
+        // Try to exit (the exit method blocks the call if it was already called)
+        Main.exit();
     }
 
     private ByteBuffer loadImage(URL url) throws IOException {

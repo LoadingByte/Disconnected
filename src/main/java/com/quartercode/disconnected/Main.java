@@ -58,6 +58,8 @@ public class Main {
 
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
+    private static boolean      exitUnderway;
+
     /**
      * The main method which initalizes the whole game.
      * 
@@ -220,6 +222,19 @@ public class Main {
     public static void fillResourceStore(ResourceStore resourceStore) throws IOException {
 
         resourceStore.loadFromClasspath("/data");
+    }
+
+    public static synchronized void exit() {
+
+        if (!exitUnderway) {
+            exitUnderway = true;
+
+            LOGGER.info("Shutting down graphics thread");
+            Disconnected.getGraphicsManager().setRunning(false);
+
+            LOGGER.info("Shutting down ticker");
+            Disconnected.getTicker().setRunning(false);
+        }
     }
 
     private Main() {
