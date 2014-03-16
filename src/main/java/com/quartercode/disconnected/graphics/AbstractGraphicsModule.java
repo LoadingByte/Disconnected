@@ -29,7 +29,7 @@ public abstract class AbstractGraphicsModule implements GraphicsModule {
      */
     public int getRelativeX(GraphicsState state, float percent) {
 
-        return (int) (state.getParent().getWidth() * percent);
+        return (int) (state.getWidth() * percent);
     }
 
     /**
@@ -57,7 +57,7 @@ public abstract class AbstractGraphicsModule implements GraphicsModule {
      */
     public int getRelativeY(GraphicsState state, float percent) {
 
-        return (int) (state.getParent().getHeight() * percent);
+        return (int) (state.getHeight() * percent);
     }
 
     /**
