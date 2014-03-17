@@ -38,7 +38,7 @@ import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.classmod.util.PropertyAccessorFactory;
-import com.quartercode.disconnected.sim.run.TickSimulator;
+import com.quartercode.disconnected.sim.run.TickSimulator.TickUpdatable;
 import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.program.ArgumentException.MissingArgumentException;
@@ -54,7 +54,7 @@ import com.quartercode.disconnected.world.comp.program.event.ProcessEvent;
  * @see Process
  * @see PacketListener
  */
-public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>> {
+public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>> implements TickUpdatable {
 
     // ----- Properties -----
 
@@ -234,7 +234,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
      * Every program is written using the tick system.
      * You can add {@link FunctionExecutor}s to the definition which actually execute a program tick.
      */
-    public static final FunctionDefinition<Void>                                  UPDATE;
+    public static final FunctionDefinition<Void>                                  TICK_UPDATE = TickUpdatable.TICK_UPDATE;
 
     static {
 
@@ -334,8 +334,6 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
             }
 
         }, ProcessEventMatcher.class);
-
-        UPDATE = FunctionDefinitionFactory.create(TickSimulator.UPDATE_FUNCTION_NAME, Void.class);
 
     }
 

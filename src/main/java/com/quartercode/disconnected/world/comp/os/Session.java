@@ -120,7 +120,7 @@ public class Session extends ProgramExecutor {
             }
         });
 
-        UPDATE.addExecutor(Session.class, "setUserFromArgument", new FunctionExecutor<Void>() {
+        TICK_UPDATE.addExecutor(Session.class, "setUserFromArgument", new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_7)
@@ -153,7 +153,7 @@ public class Session extends ProgramExecutor {
 
         });
 
-        UPDATE.addExecutor(Session.class, "checkPassword", new FunctionExecutor<Void>() {
+        TICK_UPDATE.addExecutor(Session.class, "checkPassword", new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_5)

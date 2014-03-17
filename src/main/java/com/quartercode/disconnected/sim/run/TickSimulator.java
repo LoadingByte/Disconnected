@@ -20,8 +20,11 @@ package com.quartercode.disconnected.sim.run;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.Function;
+import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.sim.Simulation;
 
 /**
@@ -29,12 +32,7 @@ import com.quartercode.disconnected.sim.Simulation;
  */
 public class TickSimulator implements TickAction {
 
-    private static final Logger LOGGER               = Logger.getLogger(TickSimulator.class.getName());
-
-    /**
-     * {@link Function}s whose names contain this string are automatically invoked by the tick simulator.
-     */
-    public static final String  UPDATE_FUNCTION_NAME = "tickUpdate";
+    private static final Logger LOGGER = Logger.getLogger(TickSimulator.class.getName());
 
     private Simulation          simulation;
 
@@ -192,8 +190,8 @@ public class TickSimulator implements TickAction {
 
     private void updateObject(Object object) throws ExecutorInvocationException {
 
-        if (object instanceof Function && ((Function<?>) object).getName().contains(UPDATE_FUNCTION_NAME)) {
-            ((Function<?>) object).invoke();
+        if (object instanceof TickUpdatable) {
+            ((TickUpdatable) object).get(TickUpdatable.TICK_UPDATE).invoke();
         }
 
         if (object instanceof Iterable) {
@@ -201,6 +199,20 @@ public class TickSimulator implements TickAction {
                 updateObject(child);
             }
         }
+    }
+
+    /**
+     * {@link FeatureHolder}s which implement this interface inherit the {@link #TICK_UPDATE} {@link Function} that is automatically invoked by the tick simulator.
+     * The simulator goes over all {@link FeatureHolder}s of a world and invoked that {@link #TICK_UPDATE} {@link Function} on all tick updatables.
+     */
+    public static interface TickUpdatable extends FeatureHolder {
+
+        /**
+         * The tick update {@link Function} is automatically invoked by the tick simulator on every tick.
+         * It should execute some activities related to the simulation of the world tree.
+         */
+        public static final FunctionDefinition<Void> TICK_UPDATE = FunctionDefinitionFactory.create("tickUpdate");
+
     }
 
 }
