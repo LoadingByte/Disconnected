@@ -55,7 +55,7 @@ public class ResourceBundles {
      * @param name The name of the program the returned bundle belongs to.
      * @return The bundle of the program with the given name.
      */
-    public static ResourceBundle PROGRAM(String name) {
+    public static ResourceBundle forProgram(String name) {
 
         return getBundle("program-" + name);
     }
