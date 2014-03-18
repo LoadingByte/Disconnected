@@ -50,4 +50,16 @@ public class ResourceBundleGroup {
         return ResourceBundle.getBundle("i18n." + name + "." + name);
     }
 
+    /**
+     * Returns the string that is associated with the given key in the {@link ResourceBundle} retrieved with {@link #get()}.
+     * The method actually invokes the {@link ResourceBundle#getString(String)} method on the {@link #get()} bundle and returns the result.
+     * 
+     * @param key The key the returned value is associated with.
+     * @return The value in the {@link #get()} {@link ResourceBundle} which is associated with the given key.
+     */
+    public String getString(String key) {
+
+        return get().getString(key);
+    }
+
 }
