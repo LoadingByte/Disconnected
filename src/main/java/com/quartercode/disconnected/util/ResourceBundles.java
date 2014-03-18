@@ -18,10 +18,11 @@
 
 package com.quartercode.disconnected.util;
 
-import java.util.ResourceBundle;
-
 /**
- * This is a simple class which enumerates some important {@link ResourceBundle}s as constants.
+ * This is a simple class which enumerates some important {@link ResourceBundleGroup}s as constants.
+ * It also enables quick access to typical bundle groups like desktop program resources.
+ * 
+ * @see ResourceBundleGroup
  */
 public class ResourceBundles {
 
@@ -29,22 +30,17 @@ public class ResourceBundles {
      * The desktop bundle contains all objects related to the desktop ui (launch menu etc.).
      * This does not contain anything related to desktop programs.
      */
-    public static final ResourceBundle DESKTOP = getBundle("desktop");
+    public static final ResourceBundleGroup DESKTOP = new ResourceBundleGroup("desktop");
 
     /**
-     * This returns the bundle of the program with the given name.
+     * Returns the {@link ResourceBundleGroup} of the desktop program with the given name.
      * 
-     * @param name The name of the program the returned bundle belongs to.
-     * @return The bundle of the program with the given name.
+     * @param name The name of the desktop program the returned bundle group belongs to.
+     * @return The {@link ResourceBundleGroup} of the desktop program which has the given name.
      */
-    public static ResourceBundle forProgram(String name) {
+    public static ResourceBundleGroup forProgram(String name) {
 
-        return getBundle("program-" + name);
-    }
-
-    private static ResourceBundle getBundle(String name) {
-
-        return ResourceBundle.getBundle("i18n." + name + "." + name);
+        return new ResourceBundleGroup("program-" + name);
     }
 
     private ResourceBundles() {
