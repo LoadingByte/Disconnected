@@ -36,6 +36,15 @@ import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.util.Classmod;
 import com.quartercode.disconnected.graphics.DefaultStates;
 import com.quartercode.disconnected.graphics.GraphicsManager;
+import com.quartercode.disconnected.graphics.GraphicsModule;
+import com.quartercode.disconnected.graphics.GraphicsState;
+import com.quartercode.disconnected.graphics.desktop.DefaultDesktopProgramManager;
+import com.quartercode.disconnected.graphics.desktop.DesktopLaunchButtonModule;
+import com.quartercode.disconnected.graphics.desktop.DesktopProgramDescriptor;
+import com.quartercode.disconnected.graphics.desktop.DesktopPrograms;
+import com.quartercode.disconnected.graphics.desktop.DesktopTaskbarModule;
+import com.quartercode.disconnected.graphics.desktop.DesktopWidgetModule;
+import com.quartercode.disconnected.graphics.desktop.DesktopWindowAreaModule;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.profile.Profile;
 import com.quartercode.disconnected.sim.profile.ProfileManager;
@@ -131,7 +140,9 @@ public class Main {
             return;
         }
 
-        // TODO: Initialize default graphics states
+        LOGGER.info("Initalizing default graphics states");
+        initializeDefaultGraphicsStates();
+        fillDefaultDesktopPrograms();
 
         // Initalize profile manager and load stored profiles
         LOGGER.info("Initalizing profile manager");
@@ -224,6 +235,27 @@ public class Main {
     public static void fillResourceStore(ResourceStore resourceStore) throws IOException {
 
         resourceStore.loadFromClasspath("/data");
+    }
+
+    /**
+     * Adds the default {@link GraphicsModule}s to the default {@link GraphicsState}s declared in {@link DefaultStates}.
+     */
+    public static void initializeDefaultGraphicsStates() {
+
+        DefaultStates.DESKTOP.addModule(DesktopWidgetModule.class, "desktopWidget", 100);
+        DefaultStates.DESKTOP.addModule(DesktopWindowAreaModule.class, "windowArea", 80);
+        DefaultStates.DESKTOP.addModule(DesktopLaunchButtonModule.class, "launchButton", 80);
+        DefaultStates.DESKTOP.addModule(DesktopTaskbarModule.class, "taskbar", 80);
+        DefaultStates.DESKTOP.addModule(DefaultDesktopProgramManager.class, "programManager", 0);
+    }
+
+    /**
+     * Adds the default {@link DesktopProgramDescriptor}s to the {@link DesktopPrograms} list.
+     * 
+     * @see DesktopPrograms
+     */
+    public static void fillDefaultDesktopPrograms() {
+
     }
 
     public static synchronized void exit() {
