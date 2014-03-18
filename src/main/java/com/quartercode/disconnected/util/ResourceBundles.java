@@ -26,24 +26,6 @@ import java.util.ResourceBundle;
 public class ResourceBundles {
 
     /**
-     * The ui bundle contains all objects related to the basic game ui (menus etc.).
-     * This does not contain anything related to desktop programs or the desktop itself.
-     */
-    public static final ResourceBundle UI      = getBundle("ui");
-
-    /**
-     * The kernel bundle contains all objects related to the operating system kernel.
-     * This does not contain anything like sessions etc.
-     */
-    public static final ResourceBundle KERNEL  = getBundle("kernel");
-
-    /**
-     * The shell bundle contains all objects related to the shell interface.
-     * This does not contain anything related to shell programs.
-     */
-    public static final ResourceBundle SHELL   = getBundle("shell");
-
-    /**
      * The desktop bundle contains all objects related to the desktop ui (launch menu etc.).
      * This does not contain anything related to desktop programs.
      */
