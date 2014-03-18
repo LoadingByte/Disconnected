@@ -37,7 +37,6 @@ import com.quartercode.classmod.extra.def.ReferenceProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.util.NullPreventer;
-import com.quartercode.disconnected.util.ResourceBundles;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileSystemModule;
@@ -116,7 +115,7 @@ public class Session extends ProgramExecutor {
             public ResourceBundle invoke(FunctionInvocation<ResourceBundle> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 invocation.next(arguments);
-                return ResourceBundles.KERNEL;
+                return null;
             }
         });
 
