@@ -21,8 +21,6 @@ package com.quartercode.disconnected.world.comp.hardware;
 import java.util.HashSet;
 import java.util.Set;
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.def.LockableFEWrapper;
 import com.quartercode.classmod.extra.def.ObjectProperty;
@@ -55,25 +53,8 @@ public class Hardware extends WorldChildFeatureHolder<Computer> {
 
     static {
 
-        NAME = new AbstractFeatureDefinition<ObjectProperty<String>>("name") {
-
-            @Override
-            public ObjectProperty<String> create(FeatureHolder holder) {
-
-                return new ObjectProperty<String>(getName(), holder);
-            }
-
-        };
-
-        VULNERABILITIES = new AbstractFeatureDefinition<ObjectProperty<Set<Vulnerability>>>("vulnerabilities") {
-
-            @Override
-            public ObjectProperty<Set<Vulnerability>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Set<Vulnerability>>(getName(), holder, new HashSet<Vulnerability>());
-            }
-
-        };
+        NAME = ObjectProperty.createDefinition("name");
+        VULNERABILITIES = ObjectProperty.<Set<Vulnerability>> createDefinition("vulnerabilities", new HashSet<Vulnerability>());
 
     }
 

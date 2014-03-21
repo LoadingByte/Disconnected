@@ -24,7 +24,6 @@ import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.Feature;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -66,15 +65,7 @@ public class FileSystemModule extends OSModule {
 
     static {
 
-        KNOWN_FILE_SYSTEMS = new AbstractFeatureDefinition<ObjectProperty<Set<KnownFileSystem>>>("knownFileSytems") {
-
-            @Override
-            public ObjectProperty<Set<KnownFileSystem>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Set<KnownFileSystem>>(getName(), holder, new HashSet<KnownFileSystem>());
-            }
-
-        };
+        KNOWN_FILE_SYSTEMS = ObjectProperty.<Set<KnownFileSystem>> createDefinition("knownFileSytems", new HashSet<KnownFileSystem>());
 
     }
 
@@ -429,35 +420,9 @@ public class FileSystemModule extends OSModule {
 
         static {
 
-            FILE_SYSTEM = new AbstractFeatureDefinition<ReferenceProperty<FileSystem>>("fileSystem") {
-
-                @Override
-                public ReferenceProperty<FileSystem> create(FeatureHolder holder) {
-
-                    return new ReferenceProperty<FileSystem>(getName(), holder);
-                }
-
-            };
-
-            MOUNTPOINT = new AbstractFeatureDefinition<ObjectProperty<String>>("mountpoint") {
-
-                @Override
-                public ObjectProperty<String> create(FeatureHolder holder) {
-
-                    return new ObjectProperty<String>(getName(), holder);
-                }
-
-            };
-
-            MOUNTED = new AbstractFeatureDefinition<ObjectProperty<Boolean>>("mounted") {
-
-                @Override
-                public ObjectProperty<Boolean> create(FeatureHolder holder) {
-
-                    return new ObjectProperty<Boolean>(getName(), holder, false);
-                }
-
-            };
+            FILE_SYSTEM = ReferenceProperty.createDefinition("fileSystem");
+            MOUNTPOINT = ObjectProperty.createDefinition("mountpoint");
+            MOUNTED = ObjectProperty.createDefinition("mounted", false);
 
         }
 

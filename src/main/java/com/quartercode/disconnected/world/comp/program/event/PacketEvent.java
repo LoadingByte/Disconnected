@@ -19,8 +19,6 @@
 package com.quartercode.disconnected.world.comp.program.event;
 
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.def.LockableFEWrapper;
 import com.quartercode.classmod.extra.def.ObjectProperty;
@@ -47,15 +45,7 @@ public class PacketEvent extends ProcessEvent {
 
     static {
 
-        PACKET = new AbstractFeatureDefinition<ObjectProperty<Packet>>("packet") {
-
-            @Override
-            public ObjectProperty<Packet> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Packet>(getName(), holder);
-            }
-
-        };
+        PACKET = ObjectProperty.createDefinition("packet");
 
     }
 

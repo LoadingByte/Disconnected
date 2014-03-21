@@ -56,16 +56,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
     static {
 
-        SIZE = new AbstractFeatureDefinition<ObjectProperty<Long>>("size") {
-
-            @Override
-            public ObjectProperty<Long> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Long>(getName(), holder);
-            }
-
-        };
-
+        SIZE = ObjectProperty.createDefinition("size");
         ROOT = new AbstractFeatureDefinition<ObjectProperty<RootFile>>("root") {
 
             @Override

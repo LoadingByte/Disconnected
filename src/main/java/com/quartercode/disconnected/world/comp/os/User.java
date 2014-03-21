@@ -25,7 +25,6 @@ import java.util.Map;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -34,7 +33,6 @@ import com.quartercode.classmod.extra.Lockable;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.def.LockableFEWrapper;
 import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.extra.def.ReferenceProperty;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.classmod.util.PropertyAccessorFactory;
@@ -54,7 +52,7 @@ public class User extends ConfigurationEntry {
      * The superuser of a system can do everything without having the rights applied for doing it.
      * You can check if a user is the superuser by using {@link #IS_SUPERUSER}.
      */
-    public static final String                                                SUPERUSER_NAME = "root";
+    public static final String                                             SUPERUSER_NAME = "root";
 
     // ----- Properties -----
 
@@ -62,51 +60,25 @@ public class User extends ConfigurationEntry {
      * The name of the user.
      * The name is used for recognizing a user on the os-level.
      */
-    protected static final FeatureDefinition<ObjectProperty<String>>          NAME;
+    protected static final FeatureDefinition<ObjectProperty<String>>       NAME;
 
     /**
      * The hashed password of the user.
      * It is hashed using the SHA-256 algorithm and can be used to authenticate as the user.
      */
-    protected static final FeatureDefinition<ObjectProperty<String>>          PASSWORD;
+    protected static final FeatureDefinition<ObjectProperty<String>>       PASSWORD;
 
     /**
      * The names of all {@link Group}s the user is a member in.
      * Such {@link Group}s are used to set rights for multiple users.
      */
-    protected static final FeatureDefinition<ReferenceProperty<List<String>>> GROUPS;
+    protected static final FeatureDefinition<ObjectProperty<List<String>>> GROUPS;
 
     static {
 
-        NAME = new AbstractFeatureDefinition<ObjectProperty<String>>("name") {
-
-            @Override
-            public ObjectProperty<String> create(FeatureHolder holder) {
-
-                return new ObjectProperty<String>(getName(), holder);
-            }
-
-        };
-
-        PASSWORD = new AbstractFeatureDefinition<ObjectProperty<String>>("password") {
-
-            @Override
-            public ObjectProperty<String> create(FeatureHolder holder) {
-
-                return new ObjectProperty<String>(getName(), holder);
-            }
-
-        };
-
-        GROUPS = new AbstractFeatureDefinition<ReferenceProperty<List<String>>>("groups") {
-
-            @Override
-            public ReferenceProperty<List<String>> create(FeatureHolder holder) {
-
-                return new ReferenceProperty<List<String>>(getName(), holder, new ArrayList<String>());
-            }
-
-        };
+        NAME = ObjectProperty.createDefinition("name");
+        PASSWORD = ObjectProperty.createDefinition("password");
+        GROUPS = ObjectProperty.<List<String>> createDefinition("groups", new ArrayList<String>());
 
     }
 
@@ -118,7 +90,7 @@ public class User extends ConfigurationEntry {
      * Returns the name of the user.
      * The name is used for recognizing a user on the os-level.
      */
-    public static final FunctionDefinition<String>                            GET_NAME;
+    public static final FunctionDefinition<String>                         GET_NAME;
 
     /**
      * Changes the name of the user.
@@ -139,13 +111,13 @@ public class User extends ConfigurationEntry {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                              SET_NAME;
+    public static final FunctionDefinition<Void>                           SET_NAME;
 
     /**
      * Returns the hashed password of the user.
      * It is hashed using the SHA-256 algorithm and can be used to authenticate as the user.
      */
-    public static final FunctionDefinition<String>                            GET_PASSWORD;
+    public static final FunctionDefinition<String>                         GET_PASSWORD;
 
     /**
      * Sets the hashed password of the user.
@@ -167,13 +139,13 @@ public class User extends ConfigurationEntry {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                              SET_PASSWORD;
+    public static final FunctionDefinition<Void>                           SET_PASSWORD;
 
     /**
      * Returns the names of all {@link Group}s the user is a member in.
      * Such {@link Group}s are used to set rights for multiple users.
      */
-    public static final FunctionDefinition<List<String>>                      GET_GROUPS;
+    public static final FunctionDefinition<List<String>>                   GET_GROUPS;
 
     /**
      * Adds the user as a member to the {@link Group}s with the given names.
@@ -204,7 +176,7 @@ public class User extends ConfigurationEntry {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                              ADD_TO_GROUPS;
+    public static final FunctionDefinition<Void>                           ADD_TO_GROUPS;
 
     /**
      * Removes the membership of the user from the {@link Group}s with the given names.
@@ -235,13 +207,13 @@ public class User extends ConfigurationEntry {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                              REMOVE_FROM_GROUPS;
+    public static final FunctionDefinition<Void>                           REMOVE_FROM_GROUPS;
 
     /**
      * Returns the name of the primary {@link Group} of the user.
      * The primary {@link Group} is the first {@link Group} in the {@link #GET_GROUPS} list and is used when new rights are applied.
      */
-    public static final FunctionDefinition<String>                            GET_PRIMARY_GROUP;
+    public static final FunctionDefinition<String>                         GET_PRIMARY_GROUP;
 
     /**
      * Changes the primary {@link Group} of the user to the one which has the given name.
@@ -263,13 +235,13 @@ public class User extends ConfigurationEntry {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                              SET_PRIMARY_GROUP;
+    public static final FunctionDefinition<Void>                           SET_PRIMARY_GROUP;
 
     /**
      * Returns true if the user is a superuser.
      * The superuser of a system can do everything without having the rights applied for doing it.
      */
-    public static final FunctionDefinition<Boolean>                           IS_SUPERUSER;
+    public static final FunctionDefinition<Boolean>                        IS_SUPERUSER;
 
     static {
 

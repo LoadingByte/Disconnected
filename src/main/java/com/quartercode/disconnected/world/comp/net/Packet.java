@@ -19,8 +19,6 @@
 package com.quartercode.disconnected.world.comp.net;
 
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.def.LockableFEWrapper;
@@ -56,35 +54,9 @@ public class Packet extends DefaultFeatureHolder implements DerivableSize {
 
     static {
 
-        SENDER = new AbstractFeatureDefinition<ObjectProperty<Address>>("sender") {
-
-            @Override
-            public ObjectProperty<Address> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Address>(getName(), holder);
-            }
-
-        };
-
-        RECEIVER = new AbstractFeatureDefinition<ObjectProperty<Address>>("receiver") {
-
-            @Override
-            public ObjectProperty<Address> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Address>(getName(), holder);
-            }
-
-        };
-
-        DATA = new AbstractFeatureDefinition<ObjectProperty<Object>>("data") {
-
-            @Override
-            public ObjectProperty<Object> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Object>(getName(), holder);
-            }
-
-        };
+        SENDER = ObjectProperty.createDefinition("sender");
+        RECEIVER = ObjectProperty.createDefinition("receiver");
+        DATA = ObjectProperty.createDefinition("data");
 
     }
 

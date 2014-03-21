@@ -19,8 +19,6 @@
 package com.quartercode.disconnected.world.comp.hardware;
 
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.def.LockableFEWrapper;
 import com.quartercode.classmod.extra.def.ObjectProperty;
@@ -52,15 +50,7 @@ public class HardDrive extends Hardware {
 
     static {
 
-        FILE_SYSTEM = new AbstractFeatureDefinition<ObjectProperty<FileSystem>>("fileSystem") {
-
-            @Override
-            public ObjectProperty<FileSystem> create(FeatureHolder holder) {
-
-                return new ObjectProperty<FileSystem>(getName(), holder, new FileSystem());
-            }
-
-        };
+        FILE_SYSTEM = ObjectProperty.createDefinition("fileSystem", new FileSystem());
 
     }
 

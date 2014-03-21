@@ -18,11 +18,9 @@
 
 package com.quartercode.disconnected.world.comp;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
@@ -54,7 +52,7 @@ public class Computer extends WorldChildFeatureHolder<World> {
     /**
      * The {@link Hardware} parts the computer contains.
      */
-    protected static final FeatureDefinition<ObjectProperty<List<Hardware>>>  HARDWARE;
+    protected static final FeatureDefinition<ObjectProperty<Set<Hardware>>>   HARDWARE;
 
     /**
      * The active {@link OperatingSystem} instance which is currently running the computer.
@@ -63,35 +61,9 @@ public class Computer extends WorldChildFeatureHolder<World> {
 
     static {
 
-        LOCATION = new AbstractFeatureDefinition<ObjectProperty<Location>>("location") {
-
-            @Override
-            public ObjectProperty<Location> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Location>(getName(), holder);
-            }
-
-        };
-
-        HARDWARE = new AbstractFeatureDefinition<ObjectProperty<List<Hardware>>>("hardware") {
-
-            @Override
-            public ObjectProperty<List<Hardware>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<List<Hardware>>(getName(), holder, new ArrayList<Hardware>());
-            }
-
-        };
-
-        OS = new AbstractFeatureDefinition<ObjectProperty<OperatingSystem>>("operatingSystem") {
-
-            @Override
-            public ObjectProperty<OperatingSystem> create(FeatureHolder holder) {
-
-                return new ObjectProperty<OperatingSystem>(getName(), holder);
-            }
-
-        };
+        LOCATION = ObjectProperty.createDefinition("location");
+        HARDWARE = ObjectProperty.<Set<Hardware>> createDefinition("hardware", new HashSet<Hardware>());
+        OS = ObjectProperty.createDefinition("operatingSystem");
 
     }
 
@@ -127,7 +99,7 @@ public class Computer extends WorldChildFeatureHolder<World> {
     /**
      * Returns the {@link Hardware} parts the computer contains.
      */
-    public static final FunctionDefinition<List<Hardware>>                    GET_HARDWARE;
+    public static final FunctionDefinition<Set<Hardware>>                     GET_HARDWARE;
 
     /**
      * Returns the {@link Hardware} parts of the computer which have the given type as a superclass.
@@ -147,7 +119,7 @@ public class Computer extends WorldChildFeatureHolder<World> {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<List<Hardware>>                    GET_HARDWARE_BY_TYPE;
+    public static final FunctionDefinition<Set<Hardware>>                     GET_HARDWARE_BY_TYPE;
 
     /**
      * Adds {@link Hardware} parts to the computer.

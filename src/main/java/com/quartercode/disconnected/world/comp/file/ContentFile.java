@@ -19,8 +19,6 @@
 package com.quartercode.disconnected.world.comp.file;
 
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -49,15 +47,7 @@ public class ContentFile extends File<ParentFile<?>> {
 
     static {
 
-        CONTENT = new AbstractFeatureDefinition<ObjectProperty<Object>>("content") {
-
-            @Override
-            public ObjectProperty<Object> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Object>(getName(), holder);
-            }
-
-        };
+        CONTENT = ObjectProperty.createDefinition("content");
 
     }
 

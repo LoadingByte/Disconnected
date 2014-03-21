@@ -18,13 +18,13 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.Delay;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -65,15 +65,7 @@ public class ProcessModule extends OSModule {
 
     static {
 
-        ROOT_PROCESS = new AbstractFeatureDefinition<ObjectProperty<RootProcess>>("rootProcess") {
-
-            @Override
-            public ObjectProperty<RootProcess> create(FeatureHolder holder) {
-
-                return new ObjectProperty<RootProcess>(getName(), holder);
-            }
-
-        };
+        ROOT_PROCESS = ObjectProperty.createDefinition("rootProcess");
 
     }
 
@@ -90,18 +82,18 @@ public class ProcessModule extends OSModule {
     /**
      * Returns a {@link List} containing all currently running {@link Process}es.
      */
-    public static final FunctionDefinition<List<Process<?>>>              GET_ALL;
+    public static final FunctionDefinition<Set<Process<?>>>               GET_ALL;
 
     static {
 
         GET_ROOT = FunctionDefinitionFactory.create("getRoot", ProcessModule.class, PropertyAccessorFactory.createGet(ROOT_PROCESS));
 
-        GET_ALL = FunctionDefinitionFactory.create("getAll", ProcessModule.class, new FunctionExecutor<List<Process<?>>>() {
+        GET_ALL = FunctionDefinitionFactory.create("getAll", ProcessModule.class, new FunctionExecutor<Set<Process<?>>>() {
 
             @Override
-            public List<Process<?>> invoke(FunctionInvocation<List<Process<?>>> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Set<Process<?>> invoke(FunctionInvocation<Set<Process<?>>> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                List<Process<?>> processes = new ArrayList<Process<?>>();
+                Set<Process<?>> processes = new HashSet<Process<?>>();
                 RootProcess root = invocation.getHolder().get(GET_ROOT).invoke();
                 processes.add(root);
                 processes.addAll(root.get(Process.GET_ALL_CHILDREN).invoke());

@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -65,14 +63,7 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
 
     static {
 
-        ENTRIES = new AbstractFeatureDefinition<ObjectProperty<List<ConfigurationEntry>>>("entries") {
-
-            @Override
-            public ObjectProperty<List<ConfigurationEntry>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<List<ConfigurationEntry>>(getName(), holder, new ArrayList<ConfigurationEntry>());
-            }
-        };
+        ENTRIES = ObjectProperty.<List<ConfigurationEntry>> createDefinition("entires", new ArrayList<ConfigurationEntry>());
 
     }
 

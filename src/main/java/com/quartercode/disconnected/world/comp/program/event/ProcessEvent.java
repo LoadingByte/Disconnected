@@ -19,8 +19,6 @@
 package com.quartercode.disconnected.world.comp.program.event;
 
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.def.LockableFEWrapper;
@@ -45,15 +43,7 @@ public class ProcessEvent extends DefaultFeatureHolder implements DerivableSize 
 
     static {
 
-        RECEIVER = new AbstractFeatureDefinition<ReferenceProperty<Process<?>>>("receiver") {
-
-            @Override
-            public ReferenceProperty<Process<?>> create(FeatureHolder holder) {
-
-                return new ReferenceProperty<Process<?>>(getName(), holder);
-            }
-
-        };
+        RECEIVER = ReferenceProperty.createDefinition("receiver");
 
     }
 

@@ -21,7 +21,6 @@ package com.quartercode.disconnected.world.comp.net;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -59,25 +58,8 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
 
     static {
 
-        IP = new AbstractFeatureDefinition<ObjectProperty<IP>>("ip") {
-
-            @Override
-            public ObjectProperty<IP> create(FeatureHolder holder) {
-
-                return new ObjectProperty<IP>(getName(), holder);
-            }
-
-        };
-
-        PORT = new AbstractFeatureDefinition<ObjectProperty<Integer>>("port") {
-
-            @Override
-            public ObjectProperty<Integer> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Integer>(getName(), holder);
-            }
-
-        };
+        IP = ObjectProperty.createDefinition("ip");
+        PORT = ObjectProperty.createDefinition("port");
 
     }
 

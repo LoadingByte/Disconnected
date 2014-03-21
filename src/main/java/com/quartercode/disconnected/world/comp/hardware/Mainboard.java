@@ -22,11 +22,9 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.def.LockableFEWrapper;
@@ -52,19 +50,11 @@ public class Mainboard extends Hardware {
      * The {@link MainboardSlot}s the mainboard offers.
      * The slots may have a content on them, you have to check before you set the content to a new one.
      */
-    protected static final FeatureDefinition<ObjectProperty<List<MainboardSlot>>> SLOTS;
+    protected static final FeatureDefinition<ObjectProperty<Set<MainboardSlot>>> SLOTS;
 
     static {
 
-        SLOTS = new AbstractFeatureDefinition<ObjectProperty<List<MainboardSlot>>>("slots") {
-
-            @Override
-            public ObjectProperty<List<MainboardSlot>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<List<MainboardSlot>>(getName(), holder, new ArrayList<MainboardSlot>());
-            }
-
-        };
+        SLOTS = ObjectProperty.<Set<MainboardSlot>> createDefinition("slots", new HashSet<MainboardSlot>());
 
     }
 
@@ -75,7 +65,7 @@ public class Mainboard extends Hardware {
     /**
      * Returns the {@link MainboardSlot}s the mainboard offers.
      */
-    public static final FunctionDefinition<List<MainboardSlot>>                   GET_SLOTS;
+    public static final FunctionDefinition<Set<MainboardSlot>>                   GET_SLOTS;
 
     /**
      * Returns the {@link MainboardSlot}s the mainboard offers which have the given content type.
@@ -95,7 +85,7 @@ public class Mainboard extends Hardware {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<List<MainboardSlot>>                   GET_SLOTS_BY_CONTENT_TYPE;
+    public static final FunctionDefinition<Set<MainboardSlot>>                   GET_SLOTS_BY_CONTENT_TYPE;
 
     /**
      * Adds {@link MainboardSlot}s to the mainboard
@@ -115,7 +105,7 @@ public class Mainboard extends Hardware {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                  ADD_SLOTS;
+    public static final FunctionDefinition<Void>                                 ADD_SLOTS;
 
     /**
      * Removes {@link MainboardSlot}s from the mainboard
@@ -136,7 +126,7 @@ public class Mainboard extends Hardware {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                  REMOVE_SLOTS;
+    public static final FunctionDefinition<Void>                                 REMOVE_SLOTS;
 
     static {
 
@@ -186,25 +176,8 @@ public class Mainboard extends Hardware {
 
         static {
 
-            TYPE = new AbstractFeatureDefinition<ObjectProperty<Class<? extends Hardware>>>("type") {
-
-                @Override
-                public ObjectProperty<Class<? extends Hardware>> create(FeatureHolder holder) {
-
-                    return new ObjectProperty<Class<? extends Hardware>>(getName(), holder);
-                }
-
-            };
-
-            CONTENT = new AbstractFeatureDefinition<ReferenceProperty<Hardware>>("content") {
-
-                @Override
-                public ReferenceProperty<Hardware> create(FeatureHolder holder) {
-
-                    return new ReferenceProperty<Hardware>(getName(), holder);
-                }
-
-            };
+            TYPE = ObjectProperty.createDefinition("name");
+            CONTENT = ReferenceProperty.createDefinition("contentt");
 
         }
 

@@ -19,8 +19,6 @@
 package com.quartercode.disconnected.world.comp.hardware;
 
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.def.LockableFEWrapper;
 import com.quartercode.classmod.extra.def.ObjectProperty;
@@ -51,25 +49,8 @@ public class RAM extends Hardware {
 
     static {
 
-        SIZE = new AbstractFeatureDefinition<ObjectProperty<Long>>("size") {
-
-            @Override
-            public ObjectProperty<Long> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Long>(getName(), holder);
-            }
-
-        };
-
-        FREQUENCY = new AbstractFeatureDefinition<ObjectProperty<Long>>("frequency") {
-
-            @Override
-            public ObjectProperty<Long> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Long>(getName(), holder);
-            }
-
-        };
+        SIZE = ObjectProperty.createDefinition("size");
+        FREQUENCY = ObjectProperty.createDefinition("frequency");
 
     }
 

@@ -19,8 +19,6 @@
 package com.quartercode.disconnected.world;
 
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.def.LockableFEWrapper;
@@ -47,25 +45,8 @@ public class Location extends DefaultFeatureHolder {
 
     static {
 
-        X = new AbstractFeatureDefinition<ObjectProperty<Float>>("x") {
-
-            @Override
-            public ObjectProperty<Float> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Float>(getName(), holder);
-            }
-
-        };
-
-        Y = new AbstractFeatureDefinition<ObjectProperty<Float>>("y") {
-
-            @Override
-            public ObjectProperty<Float> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Float>(getName(), holder);
-            }
-
-        };
+        X = ObjectProperty.createDefinition("x");
+        Y = ObjectProperty.createDefinition("y");
 
     }
 

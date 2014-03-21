@@ -18,14 +18,13 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -141,69 +140,16 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
     /**
      * The child processes the process launched.
      */
-    protected static final FeatureDefinition<ObjectProperty<List<Process<?>>>>    CHILDREN;
+    protected static final FeatureDefinition<ObjectProperty<Set<Process<?>>>>     CHILDREN;
 
     static {
 
-        PID = new AbstractFeatureDefinition<ObjectProperty<Integer>>("pid") {
-
-            @Override
-            public ObjectProperty<Integer> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Integer>(getName(), holder);
-            }
-
-        };
-
-        SOURCE = new AbstractFeatureDefinition<ReferenceProperty<ContentFile>>("source") {
-
-            @Override
-            public ReferenceProperty<ContentFile> create(FeatureHolder holder) {
-
-                return new ReferenceProperty<ContentFile>(getName(), holder);
-            }
-
-        };
-
-        ENVIRONMENT = new AbstractFeatureDefinition<ObjectProperty<Map<String, String>>>("environment") {
-
-            @Override
-            public ObjectProperty<Map<String, String>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Map<String, String>>(getName(), holder, new HashMap<String, String>());
-            }
-
-        };
-
-        STATE = new AbstractFeatureDefinition<ObjectProperty<ProcessState>>("state") {
-
-            @Override
-            public ObjectProperty<ProcessState> create(FeatureHolder holder) {
-
-                return new ObjectProperty<ProcessState>(getName(), holder, ProcessState.RUNNING);
-            }
-
-        };
-
-        EXECUTOR = new AbstractFeatureDefinition<ObjectProperty<ProgramExecutor>>("executor") {
-
-            @Override
-            public ObjectProperty<ProgramExecutor> create(FeatureHolder holder) {
-
-                return new ObjectProperty<ProgramExecutor>(getName(), holder);
-            }
-
-        };
-
-        CHILDREN = new AbstractFeatureDefinition<ObjectProperty<List<Process<?>>>>("children") {
-
-            @Override
-            public ObjectProperty<List<Process<?>>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<List<Process<?>>>(getName(), holder, new ArrayList<Process<?>>());
-            }
-
-        };
+        PID = ObjectProperty.createDefinition("pid");
+        SOURCE = ReferenceProperty.createDefinition("source");
+        ENVIRONMENT = ObjectProperty.<Map<String, String>> createDefinition("environment", new HashMap<String, String>());
+        STATE = ObjectProperty.createDefinition("state", ProcessState.RUNNING);
+        EXECUTOR = ObjectProperty.createDefinition("executor");
+        CHILDREN = ObjectProperty.<Set<Process<?>>> createDefinition("children", new HashSet<Process<?>>());
 
     }
 
@@ -392,10 +338,6 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
     public static final FunctionDefinition<Void>                                  INTERRUPT;
 
     /**
-     * Suspends the execution temporarily, tick updates will be ignored.
-     * Suspension only works when the execution is running. During an interruption, an execution can't be suspended.
-     * The state change can also apply to every child process using the recursive parameter.
-     * 
      * Forces the process to stop the execution.
      * This will act like {@link #SUSPEND}, apart from the fact that a stopped process won't ever be able to resume/restart.
      * The forced stopping action should only be used if the further execution of the process must be stopped or when the interruption finished.
@@ -426,13 +368,13 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * Returns the direct child processes the process launched.
      * Direct children are present in the child datastructure of this object.
      */
-    public static final FunctionDefinition<List<Process<?>>>                      GET_CHILDREN;
+    public static final FunctionDefinition<Set<Process<?>>>                       GET_CHILDREN;
 
     /**
      * Returns all child processes the process launched.
      * That includes all children which are present in the child datastructure of this object, all child objects etc.
      */
-    public static final FunctionDefinition<List<Process<?>>>                      GET_ALL_CHILDREN;
+    public static final FunctionDefinition<Set<Process<?>>>                       GET_ALL_CHILDREN;
 
     /**
      * Creates a new empty {@link ChildProcess} which uses the same environment variables as this one.
@@ -664,19 +606,19 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         GET_CHILDREN = FunctionDefinitionFactory.create("getChildren", Process.class, CollectionPropertyAccessorFactory.createGet(CHILDREN));
 
-        GET_ALL_CHILDREN = FunctionDefinitionFactory.create("getAllChildren", Process.class, new FunctionExecutor<List<Process<?>>>() {
+        GET_ALL_CHILDREN = FunctionDefinitionFactory.create("getAllChildren", Process.class, new FunctionExecutor<Set<Process<?>>>() {
 
             @Override
-            public List<Process<?>> invoke(FunctionInvocation<List<Process<?>>> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Set<Process<?>> invoke(FunctionInvocation<Set<Process<?>>> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                List<Process<?>> children = getAllChildren((Process<?>) invocation.getHolder());
+                Set<Process<?>> children = getAllChildren((Process<?>) invocation.getHolder());
                 invocation.next(arguments);
                 return children;
             }
 
-            private List<Process<?>> getAllChildren(Process<?> parent) throws ExecutorInvocationException {
+            private Set<Process<?>> getAllChildren(Process<?> parent) throws ExecutorInvocationException {
 
-                List<Process<?>> allChildren = new ArrayList<Process<?>>();
+                Set<Process<?>> allChildren = new HashSet<Process<?>>();
                 for (Process<?> directChild : parent.get(GET_CHILDREN).invoke()) {
                     allChildren.addAll(directChild.get(GET_ALL_CHILDREN).invoke());
                 }
@@ -794,7 +736,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 FeatureHolder holder = invocation.getHolder();
 
                 // Calculate new pid
-                List<Integer> existingPids = new ArrayList<Integer>();
+                Set<Integer> existingPids = new HashSet<Integer>();
                 Process<?> root = holder.get(GET_ROOT).invoke();
                 existingPids.add(root.get(GET_PID).invoke());
                 for (Process<?> process : root.get(GET_ALL_CHILDREN).invoke()) {

@@ -21,7 +21,6 @@ package com.quartercode.disconnected.world.comp.file;
 import java.util.Arrays;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -162,15 +161,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
 
     static {
 
-        RIGHTS = new AbstractFeatureDefinition<ObjectProperty<Boolean[]>>("rights") {
-
-            @Override
-            public ObjectProperty<Boolean[]> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Boolean[]>(getName(), holder, new Boolean[4 * 3]);
-            }
-
-        };
+        RIGHTS = ObjectProperty.createDefinition("rights", new Boolean[4 * 3]);
 
     }
 

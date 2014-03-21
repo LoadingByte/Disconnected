@@ -21,8 +21,6 @@ package com.quartercode.disconnected.world.comp.program.event;
 import java.util.HashMap;
 import java.util.Map;
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.def.LockableFEWrapper;
 import com.quartercode.classmod.extra.def.ObjectProperty;
@@ -54,25 +52,8 @@ public class IPCMessageEvent extends ProcessEvent {
 
     static {
 
-        SENDER = new AbstractFeatureDefinition<ReferenceProperty<Process<?>>>("sender") {
-
-            @Override
-            public ReferenceProperty<Process<?>> create(FeatureHolder holder) {
-
-                return new ReferenceProperty<Process<?>>(getName(), holder);
-            }
-
-        };
-
-        DATA = new AbstractFeatureDefinition<ObjectProperty<Map<String, Object>>>("data") {
-
-            @Override
-            public ObjectProperty<Map<String, Object>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Map<String, Object>>(getName(), holder, new HashMap<String, Object>());
-            }
-
-        };
+        SENDER = ReferenceProperty.createDefinition("sender");
+        DATA = ObjectProperty.<Map<String, Object>> createDefinition("data", new HashMap<String, Object>());
 
     }
 

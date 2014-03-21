@@ -22,7 +22,6 @@ import java.util.Arrays;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -60,35 +59,9 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
 
     static {
 
-        MAJOR = new AbstractFeatureDefinition<ObjectProperty<Integer>>("major") {
-
-            @Override
-            public ObjectProperty<Integer> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Integer>(getName(), holder);
-            }
-
-        };
-
-        MINOR = new AbstractFeatureDefinition<ObjectProperty<Integer>>("minor") {
-
-            @Override
-            public ObjectProperty<Integer> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Integer>(getName(), holder);
-            }
-
-        };
-
-        REVISION = new AbstractFeatureDefinition<ObjectProperty<Integer>>("revision") {
-
-            @Override
-            public ObjectProperty<Integer> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Integer>(getName(), holder);
-            }
-
-        };
+        MAJOR = ObjectProperty.createDefinition("major");
+        MINOR = ObjectProperty.createDefinition("minor");
+        REVISION = ObjectProperty.createDefinition("revision");
 
     }
 

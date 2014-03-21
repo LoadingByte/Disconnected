@@ -21,8 +21,6 @@ package com.quartercode.disconnected.world.comp.program;
 import java.util.HashSet;
 import java.util.Set;
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -69,35 +67,9 @@ public class Program extends DefaultFeatureHolder implements DerivableSize {
 
     static {
 
-        VERSION = new AbstractFeatureDefinition<ObjectProperty<Version>>("version") {
-
-            @Override
-            public ObjectProperty<Version> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Version>(getName(), holder);
-            }
-
-        };
-
-        VULNERABILITIES = new AbstractFeatureDefinition<ObjectProperty<Set<Vulnerability>>>("version") {
-
-            @Override
-            public ObjectProperty<Set<Vulnerability>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Set<Vulnerability>>(getName(), holder, new HashSet<Vulnerability>());
-            }
-
-        };
-
-        EXECUTOR_CLASS = new AbstractFeatureDefinition<ObjectProperty<Class<? extends ProgramExecutor>>>("executorClass") {
-
-            @Override
-            public ObjectProperty<Class<? extends ProgramExecutor>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Class<? extends ProgramExecutor>>(getName(), holder);
-            }
-
-        };
+        VERSION = ObjectProperty.createDefinition("version");
+        VULNERABILITIES = ObjectProperty.<Set<Vulnerability>> createDefinition("vulnerabilities", new HashSet<Vulnerability>());
+        EXECUTOR_CLASS = ObjectProperty.createDefinition("executorClass");
 
     }
 

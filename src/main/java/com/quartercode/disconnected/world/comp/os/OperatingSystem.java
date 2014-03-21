@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Set;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -87,65 +86,12 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
     static {
 
-        NAME = new AbstractFeatureDefinition<ObjectProperty<String>>("name") {
-
-            @Override
-            public ObjectProperty<String> create(FeatureHolder holder) {
-
-                return new ObjectProperty<String>(getName(), holder);
-            }
-
-        };
-
-        VERSION = new AbstractFeatureDefinition<ObjectProperty<Version>>("version") {
-
-            @Override
-            public ObjectProperty<Version> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Version>(getName(), holder);
-            }
-
-        };
-
-        VULNERABILITIES = new AbstractFeatureDefinition<ObjectProperty<Set<Vulnerability>>>("vulnerabilities") {
-
-            @Override
-            public ObjectProperty<Set<Vulnerability>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Set<Vulnerability>>(getName(), holder, new HashSet<Vulnerability>());
-            }
-
-        };
-
-        FILE_SYSTEM_MODULE = new AbstractFeatureDefinition<ObjectProperty<FileSystemModule>>("fileSystemModule") {
-
-            @Override
-            public ObjectProperty<FileSystemModule> create(FeatureHolder holder) {
-
-                return new ObjectProperty<FileSystemModule>(getName(), holder, new FileSystemModule());
-            }
-
-        };
-
-        PROCESS_MODULE = new AbstractFeatureDefinition<ObjectProperty<ProcessModule>>("processModule") {
-
-            @Override
-            public ObjectProperty<ProcessModule> create(FeatureHolder holder) {
-
-                return new ObjectProperty<ProcessModule>(getName(), holder, new ProcessModule());
-            }
-
-        };
-
-        NETWORK_MODULE = new AbstractFeatureDefinition<ObjectProperty<NetworkModule>>("networkModule") {
-
-            @Override
-            public ObjectProperty<NetworkModule> create(FeatureHolder holder) {
-
-                return new ObjectProperty<NetworkModule>(getName(), holder, new NetworkModule());
-            }
-
-        };
+        NAME = ObjectProperty.createDefinition("name");
+        VERSION = ObjectProperty.createDefinition("version");
+        VULNERABILITIES = ObjectProperty.<Set<Vulnerability>> createDefinition("vulnerabilities", new HashSet<Vulnerability>());
+        FILE_SYSTEM_MODULE = ObjectProperty.createDefinition("fileSystemModule", new FileSystemModule());
+        PROCESS_MODULE = ObjectProperty.createDefinition("processModule", new ProcessModule());
+        NETWORK_MODULE = ObjectProperty.createDefinition("networkModule", new NetworkModule());
 
     }
 

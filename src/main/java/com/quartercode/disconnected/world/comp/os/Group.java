@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -52,15 +51,7 @@ public class Group extends ConfigurationEntry {
 
     static {
 
-        NAME = new AbstractFeatureDefinition<ObjectProperty<String>>("name") {
-
-            @Override
-            public ObjectProperty<String> create(FeatureHolder holder) {
-
-                return new ObjectProperty<String>(getName(), holder);
-            }
-
-        };
+        NAME = ObjectProperty.createDefinition("name");
 
     }
 

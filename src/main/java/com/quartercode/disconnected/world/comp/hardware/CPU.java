@@ -19,8 +19,6 @@
 package com.quartercode.disconnected.world.comp.hardware;
 
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.def.LockableFEWrapper;
 import com.quartercode.classmod.extra.def.ObjectProperty;
@@ -52,25 +50,8 @@ public class CPU extends Hardware {
 
     static {
 
-        THREADS = new AbstractFeatureDefinition<ObjectProperty<Integer>>("threads") {
-
-            @Override
-            public ObjectProperty<Integer> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Integer>(getName(), holder);
-            }
-
-        };
-
-        FREQUENCY = new AbstractFeatureDefinition<ObjectProperty<Long>>("frequency") {
-
-            @Override
-            public ObjectProperty<Long> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Long>(getName(), holder);
-            }
-
-        };
+        THREADS = ObjectProperty.createDefinition("threads");
+        FREQUENCY = ObjectProperty.createDefinition("frequency");
 
     }
 

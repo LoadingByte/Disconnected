@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -65,25 +64,8 @@ public class EnvironmentVariable extends ConfigurationEntry {
 
     static {
 
-        NAME = new AbstractFeatureDefinition<ObjectProperty<String>>("name") {
-
-            @Override
-            public ObjectProperty<String> create(FeatureHolder holder) {
-
-                return new ObjectProperty<String>(getName(), holder);
-            }
-
-        };
-
-        VALUE = new AbstractFeatureDefinition<ObjectProperty<String>>("value") {
-
-            @Override
-            public ObjectProperty<String> create(FeatureHolder holder) {
-
-                return new ObjectProperty<String>(getName(), holder);
-            }
-
-        };
+        NAME = ObjectProperty.createDefinition("name");
+        VALUE = ObjectProperty.createDefinition("value");
 
     }
 

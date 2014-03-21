@@ -26,7 +26,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -68,15 +67,7 @@ public class Session extends ProgramExecutor {
 
     static {
 
-        USER = new AbstractFeatureDefinition<ReferenceProperty<User>>("user") {
-
-            @Override
-            public ReferenceProperty<User> create(FeatureHolder holder) {
-
-                return new ReferenceProperty<User>(getName(), holder);
-            }
-
-        };
+        USER = ReferenceProperty.createDefinition("user");
 
     }
 

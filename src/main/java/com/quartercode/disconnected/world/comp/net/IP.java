@@ -22,8 +22,6 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -56,15 +54,7 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
 
     static {
 
-        PARTS = new AbstractFeatureDefinition<ObjectProperty<Integer[]>>("parts") {
-
-            @Override
-            public ObjectProperty<Integer[]> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Integer[]>(getName(), holder, new Integer[4]);
-            }
-
-        };
+        PARTS = ObjectProperty.createDefinition("parts", new Integer[4]);
 
     }
 

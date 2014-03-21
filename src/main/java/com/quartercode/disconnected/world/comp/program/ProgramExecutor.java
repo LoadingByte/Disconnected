@@ -26,7 +26,6 @@ import java.util.Queue;
 import java.util.ResourceBundle;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -72,25 +71,8 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
 
     static {
 
-        ARGUMENTS = new AbstractFeatureDefinition<ObjectProperty<Map<String, Object>>>("arguments") {
-
-            @Override
-            public ObjectProperty<Map<String, Object>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Map<String, Object>>(getName(), holder);
-            }
-
-        };
-
-        EVENTS = new AbstractFeatureDefinition<ObjectProperty<Queue<ProcessEvent>>>("events") {
-
-            @Override
-            public ObjectProperty<Queue<ProcessEvent>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Queue<ProcessEvent>>(getName(), holder, new LinkedList<ProcessEvent>());
-            }
-
-        };
+        ARGUMENTS = ObjectProperty.createDefinition("arguments");
+        EVENTS = ObjectProperty.<Queue<ProcessEvent>> createDefinition("events", new LinkedList<ProcessEvent>());
 
     }
 

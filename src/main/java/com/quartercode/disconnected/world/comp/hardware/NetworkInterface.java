@@ -18,10 +18,9 @@
 
 package com.quartercode.disconnected.world.comp.hardware;
 
+import java.util.LinkedList;
 import java.util.Queue;
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
@@ -56,25 +55,8 @@ public class NetworkInterface extends Hardware {
 
     static {
 
-        IP = new AbstractFeatureDefinition<ObjectProperty<IP>>("ip") {
-
-            @Override
-            public ObjectProperty<IP> create(FeatureHolder holder) {
-
-                return new ObjectProperty<IP>(getName(), holder);
-            }
-
-        };
-
-        REMAINING_PACKETS = new AbstractFeatureDefinition<ObjectProperty<Queue<Packet>>>("remainingPackets") {
-
-            @Override
-            public ObjectProperty<Queue<Packet>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<Queue<Packet>>(getName(), holder);
-            }
-
-        };
+        IP = ObjectProperty.createDefinition("ip");
+        REMAINING_PACKETS = ObjectProperty.<Queue<Packet>> createDefinition("remainingPackets", new LinkedList<Packet>());
 
     }
 

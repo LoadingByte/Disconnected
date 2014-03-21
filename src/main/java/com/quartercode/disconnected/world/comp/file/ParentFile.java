@@ -18,11 +18,10 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -49,19 +48,11 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
     /**
      * The child {@link File}s the parent file contains.
      */
-    protected static final FeatureDefinition<ObjectProperty<List<File<ParentFile<?>>>>> CHILDREN;
+    protected static final FeatureDefinition<ObjectProperty<Set<File<ParentFile<?>>>>> CHILDREN;
 
     static {
 
-        CHILDREN = new AbstractFeatureDefinition<ObjectProperty<List<File<ParentFile<?>>>>>("children") {
-
-            @Override
-            public ObjectProperty<List<File<ParentFile<?>>>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<List<File<ParentFile<?>>>>(getName(), holder, new ArrayList<File<ParentFile<?>>>());
-            }
-
-        };
+        CHILDREN = ObjectProperty.<Set<File<ParentFile<?>>>> createDefinition("children", new HashSet<File<ParentFile<?>>>());
 
     }
 
@@ -72,7 +63,7 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
     /**
      * Returns the child {@link File}s the parent file contains.
      */
-    public static final FunctionDefinition<List<File<ParentFile<?>>>>                   GET_CHILDREN;
+    public static final FunctionDefinition<Set<File<ParentFile<?>>>>                   GET_CHILDREN;
 
     /**
      * Returns the child {@link File} which has the given name.
@@ -92,7 +83,7 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<File<ParentFile<?>>>                         GET_CHILD_BY_NAME;
+    public static final FunctionDefinition<File<ParentFile<?>>>                        GET_CHILD_BY_NAME;
 
     /**
      * Adds child {@link File}s to the parent file.
@@ -123,7 +114,7 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                        ADD_CHILDREN;
+    public static final FunctionDefinition<Void>                                       ADD_CHILDREN;
 
     /**
      * Removes child {@link File}s from the parent file.
@@ -143,7 +134,7 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                        REMOVE_CHILDREN;
+    public static final FunctionDefinition<Void>                                       REMOVE_CHILDREN;
 
     static {
 

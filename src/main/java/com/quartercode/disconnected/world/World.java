@@ -18,12 +18,10 @@
 
 package com.quartercode.disconnected.world;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.xml.bind.annotation.XmlRootElement;
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -48,49 +46,23 @@ public class World extends DefaultFeatureHolder {
     /**
      * The {@link Member}s who are present in the world.
      */
-    protected static final FeatureDefinition<ObjectProperty<List<Member>>>      MEMBERS;
+    protected static final FeatureDefinition<ObjectProperty<Set<Member>>>      MEMBERS;
 
     /**
      * The {@link MemberGroup}s which are present in the world.
      */
-    protected static final FeatureDefinition<ObjectProperty<List<MemberGroup>>> GROUPS;
+    protected static final FeatureDefinition<ObjectProperty<Set<MemberGroup>>> GROUPS;
 
     /**
      * The {@link Computer}s which are present in the world.
      */
-    protected static final FeatureDefinition<ObjectProperty<List<Computer>>>    COMPUTERS;
+    protected static final FeatureDefinition<ObjectProperty<Set<Computer>>>    COMPUTERS;
 
     static {
 
-        MEMBERS = new AbstractFeatureDefinition<ObjectProperty<List<Member>>>("members") {
-
-            @Override
-            public ObjectProperty<List<Member>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<List<Member>>(getName(), holder, new ArrayList<Member>());
-            }
-
-        };
-
-        GROUPS = new AbstractFeatureDefinition<ObjectProperty<List<MemberGroup>>>("memberGroups") {
-
-            @Override
-            public ObjectProperty<List<MemberGroup>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<List<MemberGroup>>(getName(), holder, new ArrayList<MemberGroup>());
-            }
-
-        };
-
-        COMPUTERS = new AbstractFeatureDefinition<ObjectProperty<List<Computer>>>("computers") {
-
-            @Override
-            public ObjectProperty<List<Computer>> create(FeatureHolder holder) {
-
-                return new ObjectProperty<List<Computer>>(getName(), holder, new ArrayList<Computer>());
-            }
-
-        };
+        MEMBERS = ObjectProperty.<Set<Member>> createDefinition("members", new HashSet<Member>());
+        GROUPS = ObjectProperty.<Set<MemberGroup>> createDefinition("memberGroups", new HashSet<MemberGroup>());
+        COMPUTERS = ObjectProperty.<Set<Computer>> createDefinition("computers", new HashSet<Computer>());
 
     }
 
@@ -102,7 +74,7 @@ public class World extends DefaultFeatureHolder {
      * Returns the {@link Member}s who are present in the world.
      * The returned list is an unmodifiable one.
      */
-    public static final FunctionDefinition<List<Member>>                        GET_MEMBERS;
+    public static final FunctionDefinition<Set<Member>>                        GET_MEMBERS;
 
     /**
      * Returns the {@link Member} who has the given name.
@@ -122,7 +94,7 @@ public class World extends DefaultFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Member>                              GET_MEMBER_BY_NAME;
+    public static final FunctionDefinition<Member>                             GET_MEMBER_BY_NAME;
 
     /**
      * Adds {@link Member}s to the world.
@@ -142,7 +114,7 @@ public class World extends DefaultFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                ADD_MEMBERS;
+    public static final FunctionDefinition<Void>                               ADD_MEMBERS;
 
     /**
      * Removes {@link Member}s from the world.
@@ -162,13 +134,13 @@ public class World extends DefaultFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                REMOVE_MEMBERS;
+    public static final FunctionDefinition<Void>                               REMOVE_MEMBERS;
 
     /**
      * Returns the {@link MemberGroup}s which are present in the world.
      * The returned list is an unmodifiable one.
      */
-    public static final FunctionDefinition<List<MemberGroup>>                   GET_GROUPS;
+    public static final FunctionDefinition<Set<MemberGroup>>                   GET_GROUPS;
 
     /**
      * Returns the {@link MemberGroup} the given {@link Member} is in.
@@ -188,7 +160,7 @@ public class World extends DefaultFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<MemberGroup>                         GET_GROUP_BY_MEMBER;
+    public static final FunctionDefinition<MemberGroup>                        GET_GROUP_BY_MEMBER;
 
     /**
      * Adds {@link MemberGroup}s to the world.
@@ -208,7 +180,7 @@ public class World extends DefaultFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                ADD_GROUPS;
+    public static final FunctionDefinition<Void>                               ADD_GROUPS;
 
     /**
      * Removes {@link MemberGroup}s from the world.
@@ -228,13 +200,13 @@ public class World extends DefaultFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                REMOVE_GROUPS;
+    public static final FunctionDefinition<Void>                               REMOVE_GROUPS;
 
     /**
      * Returns the {@link Computer}s which are present in the world.
      * The returned list is an unmodifiable one.
      */
-    public static final FunctionDefinition<List<Computer>>                      GET_COMPUTERS;
+    public static final FunctionDefinition<Set<Computer>>                      GET_COMPUTERS;
 
     /**
      * Adds {@link Computer}s to the world.
@@ -254,7 +226,7 @@ public class World extends DefaultFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                ADD_COMPUTERS;
+    public static final FunctionDefinition<Void>                               ADD_COMPUTERS;
 
     /**
      * Removes {@link Computer}s from the world.
@@ -274,7 +246,7 @@ public class World extends DefaultFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                REMOVE_COMPUTERS;
+    public static final FunctionDefinition<Void>                               REMOVE_COMPUTERS;
 
     static {
 
@@ -312,7 +284,7 @@ public class World extends DefaultFeatureHolder {
 
     // ----- Functions End -----
 
-    private Simulation                                                          simulation;
+    private Simulation                                                         simulation;
 
     /**
      * Creates a new empty world.

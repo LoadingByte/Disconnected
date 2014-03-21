@@ -91,16 +91,7 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
 
     static {
 
-        NAME = new AbstractFeatureDefinition<ObjectProperty<String>>("name") {
-
-            @Override
-            public ObjectProperty<String> create(FeatureHolder holder) {
-
-                return new ObjectProperty<String>(getName(), holder);
-            }
-
-        };
-
+        NAME = ObjectProperty.createDefinition("name");
         RIGHTS = new AbstractFeatureDefinition<ObjectProperty<FileRights>>("rights") {
 
             @Override
@@ -116,26 +107,8 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
             }
 
         };
-
-        OWNER = new AbstractFeatureDefinition<ReferenceProperty<User>>("owner") {
-
-            @Override
-            public ReferenceProperty<User> create(FeatureHolder holder) {
-
-                return new ReferenceProperty<User>(getName(), holder);
-            }
-
-        };
-
-        GROUP = new AbstractFeatureDefinition<ReferenceProperty<Group>>("group") {
-
-            @Override
-            public ReferenceProperty<Group> create(FeatureHolder holder) {
-
-                return new ReferenceProperty<Group>(getName(), holder);
-            }
-
-        };
+        OWNER = ReferenceProperty.createDefinition("owner");
+        GROUP = ReferenceProperty.createDefinition("group");
 
     }
 
