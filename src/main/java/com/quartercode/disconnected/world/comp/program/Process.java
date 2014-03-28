@@ -44,8 +44,6 @@ import com.quartercode.disconnected.world.comp.os.EnvironmentVariable;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.os.Session;
 import com.quartercode.disconnected.world.comp.os.User;
-import com.quartercode.disconnected.world.comp.program.event.IPCMessageEvent;
-import com.quartercode.disconnected.world.comp.program.event.ProcessEvent;
 
 /**
  * This class represents a process which is basically a running instance of a program.
@@ -442,34 +440,6 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      */
     public static final FunctionDefinition<Void>                                  LAUNCH;
 
-    /**
-     * Sends a new {@link ProcessEvent} to the given receiving {@link Process} with the given payload map.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Process}</td>
-     * <td>receiver</td>
-     * <td>The {@link Process} which should receive the message.</td>
-     * </tr>
-     * <tr>
-     * <td>1</td>
-     * <td>{@link Map}&lt;{@link String}, {@link Object}&gt;</td>
-     * <td>data</td>
-     * <td>The data map which contains the payload {@link Object}s to send.</td>
-     * </tr>
-     * </table>
-     * 
-     * @see ProcessEvent
-     */
-    public static final FunctionDefinition<Void>                                  SEND_MESSAGE;
-
     static {
 
         GET_PID = FunctionDefinitionFactory.create("getPid", Process.class, PropertyAccessorFactory.createGet(PID));
@@ -798,28 +768,6 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             }
 
         });
-
-        SEND_MESSAGE = FunctionDefinitionFactory.create("sendMessage", Process.class, new FunctionExecutor<Void>() {
-
-            @Override
-            @Lockable
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
-
-                // Construct message
-                IPCMessageEvent message = new IPCMessageEvent();
-                message.setLocked(false);
-                message.get(IPCMessageEvent.SET_SENDER).invoke(invocation.getHolder());
-                message.get(ProcessEvent.SET_RECEIVER).invoke(arguments[0]);
-                message.get(IPCMessageEvent.SET_DATA).invoke(arguments[1]);
-                message.setLocked(true);
-
-                // Send message
-                ((Process<?>) arguments[0]).get(Process.GET_EXECUTOR).invoke().get(ProgramExecutor.RECEIVE_EVENTS).invoke(message);
-
-                return invocation.next(arguments);
-            }
-
-        }, Process.class, Map.class);
 
     }
 
