@@ -21,7 +21,6 @@ package com.quartercode.disconnected.world.comp.os;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.FeatureDefinition;
@@ -98,16 +97,6 @@ public class Session extends ProgramExecutor {
                 return parameters;
             }
 
-        });
-
-        GET_RESOURCE_BUNDLE.addExecutor(Session.class, "default", new FunctionExecutor<ResourceBundle>() {
-
-            @Override
-            public ResourceBundle invoke(FunctionInvocation<ResourceBundle> invocation, Object... arguments) throws ExecutorInvocationException {
-
-                invocation.next(arguments);
-                return null;
-            }
         });
 
         TICK_UPDATE.addExecutor(Session.class, "setUserFromArgument", new FunctionExecutor<Void>() {

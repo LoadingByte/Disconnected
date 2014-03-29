@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.ResourceBundle;
 import java.util.Set;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
@@ -118,12 +117,6 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
      * </table>
      */
     public static final FunctionDefinition<Parameter>                               GET_PARAMETER_BY_NAME;
-
-    /**
-     * Returns the {@link ResourceBundle} the program uses.
-     * This should be implemented by the actual child program class.
-     */
-    protected static final FunctionDefinition<ResourceBundle>                       GET_RESOURCE_BUNDLE;
 
     /**
      * Returns the initial arguments the program executor needs to operate.
@@ -276,8 +269,6 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
             }
 
         });
-
-        GET_RESOURCE_BUNDLE = FunctionDefinitionFactory.create("getResourceBundle", ResourceBundle.class);
 
         GET_ARGUMENTS = FunctionDefinitionFactory.create("getArguments", ProgramExecutor.class, PropertyAccessorFactory.createGet(ARGUMENTS));
         SET_ARGUMENTS = FunctionDefinitionFactory.create("setArguments", ProgramExecutor.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(ARGUMENTS)), Map.class);
