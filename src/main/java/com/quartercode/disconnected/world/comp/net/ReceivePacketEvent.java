@@ -18,12 +18,8 @@
 
 package com.quartercode.disconnected.world.comp.net;
 
-import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.extra.FunctionDefinition;
-import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 import com.quartercode.disconnected.world.event.Event;
@@ -43,7 +39,7 @@ public class ReceivePacketEvent extends Event implements DerivableSize {
     /**
      * The received network {@link Packet} that has something to do with the event receiver.
      */
-    protected static final FeatureDefinition<ObjectProperty<Packet>> PACKET;
+    public static final PropertyDefinition<Packet> PACKET;
 
     static {
 
@@ -55,37 +51,9 @@ public class ReceivePacketEvent extends Event implements DerivableSize {
 
     // ----- Functions -----
 
-    /**
-     * Returns the received network {@link Packet} that has something to do with the event receiver.
-     */
-    public static final FunctionDefinition<Packet>                   GET_PACKET;
-
-    /**
-     * Changes the received network {@link Packet} that should have something to do with the event receiver.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Packet}</td>
-     * <td>packet</td>
-     * <td>The new received network {@link Packet}.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                     SET_PACKET;
-
     static {
 
-        GET_PACKET = FunctionDefinitionFactory.create("getPacket", ReceivePacketEvent.class, PropertyAccessorFactory.createGet(PACKET));
-        SET_PACKET = FunctionDefinitionFactory.create("setPacket", ReceivePacketEvent.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(PACKET)), Packet.class);
-
-        GET_SIZE.addExecutor(ReceivePacketEvent.class, "packet", SizeUtil.createGetSize(PACKET));
+        GET_SIZE.addExecutor("packet", ReceivePacketEvent.class, SizeUtil.createGetSize(PACKET));
 
     }
 

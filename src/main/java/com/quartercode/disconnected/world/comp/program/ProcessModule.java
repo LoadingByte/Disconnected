@@ -23,17 +23,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.Delay;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Limit;
+import com.quartercode.classmod.extra.Prioritized;
+import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.classmod.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.sim.run.TickSimulator.TickUpdatable;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
@@ -53,7 +53,7 @@ import com.quartercode.disconnected.world.comp.os.OperatingSystem;
  * @see OSModule
  * @see OperatingSystem
  */
-public class ProcessModule extends OSModule {
+public class ProcessModule extends OSModule implements TickUpdatable {
 
     // ----- Properties -----
 
@@ -61,7 +61,7 @@ public class ProcessModule extends OSModule {
      * The {@link RootProcess} which is the root of the entire {@link Process} tree.
      * It always has a pid of 0.
      */
-    protected static final FeatureDefinition<ObjectProperty<RootProcess>> ROOT_PROCESS;
+    public static final PropertyDefinition<RootProcess>     ROOT_PROCESS;
 
     static {
 
@@ -74,19 +74,11 @@ public class ProcessModule extends OSModule {
     // ----- Functions -----
 
     /**
-     * Returns the {@link RootProcess} which always has a pid of 0.
-     * The {@link RootProcess} is started by the os kernel.
-     */
-    public static final FunctionDefinition<RootProcess>                   GET_ROOT;
-
-    /**
      * Returns a {@link List} containing all currently running {@link Process}es.
      */
-    public static final FunctionDefinition<Set<Process<?>>>               GET_ALL;
+    public static final FunctionDefinition<Set<Process<?>>> GET_ALL;
 
     static {
-
-        GET_ROOT = FunctionDefinitionFactory.create("getRoot", ProcessModule.class, PropertyAccessorFactory.createGet(ROOT_PROCESS));
 
         GET_ALL = FunctionDefinitionFactory.create("getAll", ProcessModule.class, new FunctionExecutor<Set<Process<?>>>() {
 
@@ -94,7 +86,7 @@ public class ProcessModule extends OSModule {
             public Set<Process<?>> invoke(FunctionInvocation<Set<Process<?>>> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 Set<Process<?>> processes = new HashSet<Process<?>>();
-                RootProcess root = invocation.getHolder().get(GET_ROOT).invoke();
+                RootProcess root = invocation.getHolder().get(ROOT_PROCESS).get();
                 processes.add(root);
                 processes.addAll(root.get(Process.GET_ALL_CHILDREN).invoke());
 
@@ -104,7 +96,7 @@ public class ProcessModule extends OSModule {
 
         });
 
-        SET_RUNNING.addExecutor(ProcessModule.class, "startRootProcess", new FunctionExecutor<Void>() {
+        SET_RUNNING.addExecutor("startRootProcess", ProcessModule.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
@@ -114,28 +106,25 @@ public class ProcessModule extends OSModule {
                 // Only invoke on bootstrap
                 if ((Boolean) arguments[0]) {
                     RootProcess root = new RootProcess();
-                    root.setLocked(false);
 
                     FileSystemModule fsModule = ((ProcessModule) holder).getParent().get(OperatingSystem.GET_FS_MODULE).invoke();
                     File<?> environmentFile = fsModule.get(FileSystemModule.GET_FILE).invoke(CommonFiles.ENVIRONMENT_CONFIG);
-                    Configuration environmentConfig = (Configuration) environmentFile.get(ContentFile.GET_CONTENT).invoke();
+                    Configuration environmentConfig = (Configuration) environmentFile.get(ContentFile.CONTENT).get();
                     Map<String, String> environment = new HashMap<String, String>();
-                    for (ConfigurationEntry variable : environmentConfig.get(Configuration.GET_ENTRIES).invoke()) {
-                        environment.put(variable.get(EnvironmentVariable.GET_NAME).invoke(), variable.get(EnvironmentVariable.GET_VALUE).invoke());
+                    for (ConfigurationEntry variable : environmentConfig.get(Configuration.ENTRIES).get()) {
+                        environment.put(variable.get(EnvironmentVariable.NAME).get(), variable.get(EnvironmentVariable.VALUE).get());
                     }
-                    root.get(Process.SET_ENVIRONMENT).invoke(environment);
+                    root.get(Process.ENVIRONMENT).set(environment);
 
                     root.get(Process.LAUNCH).invoke(new HashMap<String, Object>());
-                    root.setLocked(true);
-
-                    holder.get(ProcessModule.ROOT_PROCESS).set(root);
+                    holder.get(ROOT_PROCESS).set(root);
                 }
 
                 return invocation.next(arguments);
             }
         });
 
-        SET_RUNNING.addExecutor(OperatingSystem.class, "interruptRootProcess", new FunctionExecutor<Void>() {
+        SET_RUNNING.addExecutor("interruptRootProcess", OperatingSystem.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
@@ -144,28 +133,39 @@ public class ProcessModule extends OSModule {
 
                 // Only invoke on shutdown
                 if (! ((Boolean) arguments[0])) {
-                    holder.get(ProcessModule.GET_ROOT).invoke().get(Process.INTERRUPT).invoke();
+                    holder.get(ROOT_PROCESS).get().get(Process.INTERRUPT).invoke();
                     // Stop the root process after 5 seconds
-                    holder.get(SET_RUNNING).getExecutor("procManagerStopRoot").resetInvocations();
-                    holder.get(SET_RUNNING).getExecutor("procManagerStopRoot").setLocked(false);
+                    holder.get(TICK_UPDATE).getExecutor("stopRootProcess").setLocked(false);
                 }
 
                 return invocation.next(arguments);
             }
 
         });
-        SET_RUNNING.addExecutor(OperatingSystem.class, "stopRootProcess", new FunctionExecutor<Void>() {
+        TICK_UPDATE.addExecutor("stopRootProcess", RootProcess.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Limit (1)
             // 5 seconds delay after interrupt
             @Delay (firstDelay = Ticker.DEFAULT_TICKS_PER_SECOND * 5)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 FeatureHolder holder = invocation.getHolder();
-                holder.get(ProcessModule.GET_ROOT).invoke().get(Process.STOP).invoke();
-                holder.get(ProcessModule.ROOT_PROCESS).set(null);
+                holder.get(ROOT_PROCESS).get().get(Process.STOP).invoke();
+                holder.get(ROOT_PROCESS).set(null);
 
+                invocation.getHolder().get(TICK_UPDATE).getExecutor("stopAfterDelay").setLocked(true);
+                return invocation.next(arguments);
+            }
+
+        });
+
+        TICK_UPDATE.addExecutor("lockDefaults", RootProcess.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.LEVEL_7)
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+
+                invocation.getHolder().get(TICK_UPDATE).getExecutor("stopRootProcess").setLocked(true);
                 return invocation.next(arguments);
             }
 

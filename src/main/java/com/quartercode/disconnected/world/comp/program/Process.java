@@ -23,20 +23,18 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang.Validate;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Lockable;
 import com.quartercode.classmod.extra.Prioritized;
-import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.PropertyDefinition;
+import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.extra.def.ReferenceProperty;
-import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
@@ -81,26 +79,26 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
          */
         STOPPED (true);
 
-        private boolean lock;
+        private boolean tickState;
 
         /**
          * Creates a new process state enumeration entry.
          * 
-         * @param lock True if the state should lock the execution of the program it is applied on.
+         * @param tickState True if the state should allow execution of the program it is applied on.
          */
-        private ProcessState(boolean lock) {
+        private ProcessState(boolean tickState) {
 
-            this.lock = lock;
+            this.tickState = tickState;
         }
 
         /**
-         * Returns True if the state should lock the execution of the program it is applied on.
+         * Returns true if the state should allow execution of the program it is applied on.
          * 
-         * @return If the state should lock the execution of the program it is applied on.
+         * @return Whether the state should allow the execution of the program it is applied on.
          */
-        public boolean isLock() {
+        public boolean isTickState() {
 
-            return lock;
+            return tickState;
         }
 
     }
@@ -111,113 +109,65 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * The unique id the process has.
      * It is used to identify the process.
      */
-    protected static final FeatureDefinition<ObjectProperty<Integer>>             PID;
+    public static final PropertyDefinition<Integer>                               PID;
 
     /**
-     * The {@link File} which contains the program the process runs.
+     * The {@link File} which contains the {@link Program} the process runs.
      */
-    protected static final FeatureDefinition<ReferenceProperty<ContentFile>>      SOURCE;
+    public static final PropertyDefinition<ContentFile>                           SOURCE;
 
     /**
      * The environment variables that are assigned to the process.
      * See {@link EnvironmentVariable} for more information.
      */
-    protected static final FeatureDefinition<ObjectProperty<Map<String, String>>> ENVIRONMENT;
+    public static final PropertyDefinition<Map<String, String>>                   ENVIRONMENT;
 
     /**
      * The {@link ProcessState} which defines the global state of the process the os can see.
-     * It stores if the process is running, interrupted etc.
+     * It stores whether the process is running, interrupted etc.<br>
+     * Note that using the {@link #APPLY_STATE} or {@link #SUSPEND}/{@link #RESUME}/{@link #INTERRUPT}/{@link #STOP} methods
+     * is preferred over directly accessing the property.
      */
-    protected static final FeatureDefinition<ObjectProperty<ProcessState>>        STATE;
+    public static final PropertyDefinition<ProcessState>                          STATE;
 
     /**
      * The {@link ProgramExecutor} which contains the logic of the process.
      */
-    protected static final FeatureDefinition<ObjectProperty<ProgramExecutor>>     EXECUTOR;
+    public static final PropertyDefinition<ProgramExecutor>                       EXECUTOR;
 
     /**
-     * The child processes the process launched.
+     * The child processes the process launched.<br>
+     * Note that using the {@link #CREATE_CHILD} method is preferred over directly accessing the property.
      */
-    protected static final FeatureDefinition<ObjectProperty<Set<Process<?>>>>     CHILDREN;
+    public static final CollectionPropertyDefinition<Process<?>, Set<Process<?>>> CHILDREN;
 
     static {
 
         PID = ObjectProperty.createDefinition("pid");
+
         SOURCE = ReferenceProperty.createDefinition("source");
+        SOURCE.addSetterExecutor("checkFileContent", Process.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+
+                Validate.isTrue( ((ContentFile) arguments[0]).get(ContentFile.CONTENT).get() instanceof Program, "Source must contain a program");
+                return invocation.next(arguments);
+            }
+
+        });
+
         ENVIRONMENT = ObjectProperty.<Map<String, String>> createDefinition("environment", new HashMap<String, String>());
         STATE = ObjectProperty.createDefinition("state", ProcessState.RUNNING);
         EXECUTOR = ObjectProperty.createDefinition("executor");
-        CHILDREN = ObjectProperty.<Set<Process<?>>> createDefinition("children", new HashSet<Process<?>>());
+        CHILDREN = ObjectCollectionProperty.createDefinition("children", new HashSet<Process<?>>());
 
     }
 
     // ----- Properties End -----
 
     // ----- Functions -----
-
-    /**
-     * Returns the unique id the process has.
-     * It is used to identify the process.
-     */
-    public static final FunctionDefinition<Integer>                               GET_PID;
-
-    /**
-     * Returns the {@link File} which contains the {@link Program} the process runs.
-     */
-    public static final FunctionDefinition<ContentFile>                           GET_SOURCE;
-
-    /**
-     * Changes the {@link File} which contains the {@link Program} the process runs.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link ContentFile}</td>
-     * <td>source</td>
-     * <td>The new {@link ContentFile} which contains the {@link Program} the process runs.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                                  SET_SOURCE;
-
-    /**
-     * Returns the environment variables that are assigned to the process.
-     * See {@link EnvironmentVariable} for more information.
-     */
-    public static final FunctionDefinition<Map<String, String>>                   GET_ENVIRONMENT;
-
-    /**
-     * Changes the environment variables that are assigned to the process.
-     * See {@link EnvironmentVariable} for more information.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Map}&lt;{@link String}, {@link String}&gt;</td>
-     * <td>environment</td>
-     * <td>The new environment variables for the process.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                                  SET_ENVIRONMENT;
-
-    /**
-     * Returns the {@link ProcessState} which defines the global state of the process the os can see.
-     * It stores if the process is running, interrupted etc.
-     */
-    public static final FunctionDefinition<ProcessState>                          GET_STATE;
 
     /**
      * Returns true if the given {@link ProcessState} is applied to this process and all child processes (recursively).
@@ -242,8 +192,8 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
     /**
      * Changes the {@link ProcessState} which defines the global state of the process the os can see.
-     * It stores if the process is running, interrupted etc.
-     * The state change can also apply to every child process using the recursive parameter.
+     * The state change can also apply to every child process using the recursive parameter.<br>
+     * Note that using the specific state-changing methods like {@link #SUSPEND} is preferred over using this plain function.
      * 
      * <table>
      * <tr>
@@ -265,8 +215,13 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * <td>True if the state change should affect all child processes.</td>
      * </tr>
      * </table>
+     * 
+     * @see #SUSPEND
+     * @see #RESUME
+     * @see #INTERRUPT
+     * @see #STOP
      */
-    protected static final FunctionDefinition<Void>                               SET_STATE;
+    public static final FunctionDefinition<Void>                                  APPLY_STATE;
 
     /**
      * Suspends the execution temporarily, tick updates will be ignored.
@@ -358,17 +313,6 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
     public static final FunctionDefinition<Void>                                  STOP;
 
     /**
-     * Returns the {@link ProgramExecutor} which contains the logic of the process.
-     */
-    public static final FunctionDefinition<ProgramExecutor>                       GET_EXECUTOR;
-
-    /**
-     * Returns the direct child processes the process launched.
-     * Direct children are present in the child datastructure of this object.
-     */
-    public static final FunctionDefinition<Set<Process<?>>>                       GET_CHILDREN;
-
-    /**
      * Returns all child processes the process launched.
      * That includes all children which are present in the child datastructure of this object, all child objects etc.
      */
@@ -442,27 +386,6 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
     static {
 
-        GET_PID = FunctionDefinitionFactory.create("getPid", Process.class, PropertyAccessorFactory.createGet(PID));
-
-        GET_SOURCE = FunctionDefinitionFactory.create("getSource", Process.class, PropertyAccessorFactory.createGet(SOURCE));
-        SET_SOURCE = FunctionDefinitionFactory.create("setSource", Process.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(SOURCE)), ContentFile.class);
-        SET_SOURCE.addExecutor(Process.class, "checkFileContent", new FunctionExecutor<Void>() {
-
-            @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
-            @Lockable
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
-
-                Validate.isTrue( ((ContentFile) arguments[0]).get(ContentFile.GET_CONTENT).invoke() instanceof Program, "Source must contain a program");
-                return invocation.next(arguments);
-            }
-
-        });
-
-        GET_ENVIRONMENT = FunctionDefinitionFactory.create("getEnvironment", Process.class, PropertyAccessorFactory.createGet(ENVIRONMENT));
-        SET_ENVIRONMENT = FunctionDefinitionFactory.create("setEnvironment", Process.class, PropertyAccessorFactory.createSet(ENVIRONMENT), Map.class);
-
-        GET_STATE = FunctionDefinitionFactory.create("getState", Process.class, PropertyAccessorFactory.createGet(STATE));
         IS_STATE_APPLIED = FunctionDefinitionFactory.create("isStateApplied", Process.class, new FunctionExecutor<Boolean>() {
 
             @Override
@@ -471,10 +394,10 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 FeatureHolder holder = invocation.getHolder();
                 boolean stateApplied = true;
 
-                if (holder.get(GET_STATE).invoke() != arguments[0]) {
+                if (holder.get(STATE).get() != arguments[0]) {
                     stateApplied = false;
                 } else {
-                    for (Process<?> child : holder.get(GET_CHILDREN).invoke()) {
+                    for (Process<?> child : holder.get(CHILDREN).get()) {
                         if (!child.get(IS_STATE_APPLIED).invoke()) {
                             stateApplied = false;
                             break;
@@ -487,7 +410,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             }
 
         }, ProcessState.class);
-        SET_STATE = FunctionDefinitionFactory.create("setState", Process.class, new FunctionExecutor<Void>() {
+        APPLY_STATE = FunctionDefinitionFactory.create("setState", Process.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
@@ -495,11 +418,9 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 FeatureHolder holder = invocation.getHolder();
 
                 holder.get(STATE).set((ProcessState) arguments[0]);
-                holder.get(GET_EXECUTOR).invoke().setLocked(holder.get(GET_STATE).invoke().isLock());
-
                 if ((Boolean) arguments[1]) {
-                    for (Process<?> child : holder.get(GET_CHILDREN).invoke()) {
-                        child.get(SET_STATE).invoke(arguments[0], arguments[1]);
+                    for (Process<?> child : holder.get(CHILDREN).get()) {
+                        child.get(APPLY_STATE).invoke(arguments[0], arguments[1]);
                     }
                 }
 
@@ -514,8 +435,8 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
                 FeatureHolder holder = invocation.getHolder();
 
-                if (holder.get(GET_STATE).invoke() == ProcessState.RUNNING) {
-                    holder.get(SET_STATE).invoke(ProcessState.SUSPENDED, arguments[0]);
+                if (holder.get(STATE).get() == ProcessState.RUNNING) {
+                    holder.get(APPLY_STATE).invoke(ProcessState.SUSPENDED, arguments[0]);
                 }
 
                 return invocation.next(arguments);
@@ -529,8 +450,8 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
                 FeatureHolder holder = invocation.getHolder();
 
-                if (holder.get(GET_STATE).invoke() == ProcessState.SUSPENDED) {
-                    holder.get(SET_STATE).invoke(ProcessState.RUNNING, arguments[0]);
+                if (holder.get(STATE).get() == ProcessState.SUSPENDED) {
+                    holder.get(APPLY_STATE).invoke(ProcessState.RUNNING, arguments[0]);
                 }
 
                 return invocation.next(arguments);
@@ -544,8 +465,8 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
                 FeatureHolder holder = invocation.getHolder();
 
-                if (holder.get(GET_STATE).invoke() == ProcessState.RUNNING) {
-                    holder.get(SET_STATE).invoke(ProcessState.INTERRUPTED, arguments[0]);
+                if (holder.get(STATE).get() == ProcessState.RUNNING) {
+                    holder.get(APPLY_STATE).invoke(ProcessState.INTERRUPTED, arguments[0]);
                 }
 
                 return invocation.next(arguments);
@@ -559,8 +480,8 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
                 FeatureHolder holder = invocation.getHolder();
 
-                if (holder.get(GET_STATE).invoke() != ProcessState.STOPPED) {
-                    holder.get(SET_STATE).invoke(ProcessState.STOPPED, arguments[0]);
+                if (holder.get(STATE).get() != ProcessState.STOPPED) {
+                    holder.get(APPLY_STATE).invoke(ProcessState.STOPPED, arguments[0]);
                     // Unregister stopped process from parent
                     if ( ((Process<?>) holder).getParent() != null) {
                         ((Process<?>) holder).getParent().get(CHILDREN).get().remove(holder);
@@ -571,10 +492,6 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             }
 
         }, Boolean.class);
-
-        GET_EXECUTOR = FunctionDefinitionFactory.create("getExecutor", Process.class, PropertyAccessorFactory.createGet(EXECUTOR));
-
-        GET_CHILDREN = FunctionDefinitionFactory.create("getChildren", Process.class, CollectionPropertyAccessorFactory.createGet(CHILDREN));
 
         GET_ALL_CHILDREN = FunctionDefinitionFactory.create("getAllChildren", Process.class, new FunctionExecutor<Set<Process<?>>>() {
 
@@ -589,7 +506,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             private Set<Process<?>> getAllChildren(Process<?> parent) throws ExecutorInvocationException {
 
                 Set<Process<?>> allChildren = new HashSet<Process<?>>();
-                for (Process<?> directChild : parent.get(GET_CHILDREN).invoke()) {
+                for (Process<?> directChild : parent.get(CHILDREN).get()) {
                     allChildren.addAll(directChild.get(GET_ALL_CHILDREN).invoke());
                 }
 
@@ -607,7 +524,8 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
                 ChildProcess process = new ChildProcess();
                 process.setParent((Process<?>) holder);
-                process.get(SET_ENVIRONMENT).invoke(new HashMap<String, String>(holder.get(GET_ENVIRONMENT).invoke()));
+                process.get(ENVIRONMENT).set(new HashMap<String, String>(holder.get(ENVIRONMENT).get()));
+                holder.get(CHILDREN).add(process);
 
                 invocation.next(arguments);
                 return process;
@@ -657,7 +575,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
                 // Error check
                 if ( ((Process<?>) holder).getParent() != null) {
-                    if ( ((Process<?>) holder).getParent().get(GET_EXECUTOR).invoke() instanceof Session) {
+                    if ( ((Process<?>) holder).getParent().get(EXECUTOR).get() instanceof Session) {
                         sessionProcess = (Process<?>) ((Process<?>) holder).getParent();
                     } else {
                         // Ask parent process
@@ -676,7 +594,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public Session invoke(FunctionInvocation<Session> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                Session session = (Session) invocation.getHolder().get(GET_SESSION_PROCESS).invoke().get(GET_EXECUTOR).invoke();
+                Session session = (Session) invocation.getHolder().get(GET_SESSION_PROCESS).invoke().get(EXECUTOR).get();
                 invocation.next(arguments);
                 return session;
             }
@@ -696,10 +614,9 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         });
 
         LAUNCH = FunctionDefinitionFactory.create("launch", Map.class);
-        LAUNCH.addExecutor(Process.class, "setPid", new FunctionExecutor<Void>() {
+        LAUNCH.addExecutor("setPid", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Lockable
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
@@ -708,9 +625,9 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 // Calculate new pid
                 Set<Integer> existingPids = new HashSet<Integer>();
                 Process<?> root = holder.get(GET_ROOT).invoke();
-                existingPids.add(root.get(GET_PID).invoke());
+                existingPids.add(root.get(PID).get());
                 for (Process<?> process : root.get(GET_ALL_CHILDREN).invoke()) {
-                    existingPids.add(process.get(GET_PID).invoke());
+                    existingPids.add(process.get(PID).get());
                 }
                 int pid = 0;
                 while (existingPids.contains(pid)) {
@@ -722,24 +639,24 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             }
 
         });
-        LAUNCH.addExecutor(Process.class, "launchExecutor", new FunctionExecutor<Void>() {
+        LAUNCH.addExecutor("launchExecutor", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Lockable
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_5)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 FeatureHolder holder = invocation.getHolder();
 
                 // Create new executor
-                Program program = (Program) holder.get(GET_SOURCE).invoke().get(ContentFile.GET_CONTENT).invoke();
+                Program program = (Program) holder.get(SOURCE).get().get(ContentFile.CONTENT).get();
                 ProgramExecutor executor = program.get(Program.CREATE_EXECUTOR).invoke();
 
                 // Initialize new executor
-                executor.setLocked(false);
                 executor.setParent((Process<?>) holder);
-                executor.get(ProgramExecutor.SET_ARGUMENTS).invoke(arguments[0]);
-                executor.setLocked(true);
+                // Trust the user at this point
+                @SuppressWarnings ("unchecked")
+                Map<String, Object> executorArguments = (Map<String, Object>) arguments[0];
+                executor.get(ProgramExecutor.ARGUMENTS).set(executorArguments);
 
                 // Set new executor
                 holder.get(EXECUTOR).set(executor);
@@ -748,17 +665,16 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             }
 
         });
-        LAUNCH.addExecutor(Process.class, "checkArguments", new FunctionExecutor<Void>() {
+        LAUNCH.addExecutor("checkArguments", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Lockable
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_2)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 FeatureHolder holder = invocation.getHolder();
 
                 // Check for wrong arguments
-                if (holder.get(GET_EXECUTOR).invoke().get(ProgramExecutor.GET_ARGUMENTS).invoke() == null) {
+                if (holder.get(EXECUTOR).get().get(ProgramExecutor.ARGUMENTS).get() == null) {
                     // Stop process
                     holder.get(EXECUTOR).set(null);
                     holder.get(STOP).invoke(false);

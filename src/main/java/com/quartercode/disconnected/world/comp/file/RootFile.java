@@ -36,7 +36,7 @@ public class RootFile extends ParentFile<FileSystem> {
 
     static {
 
-        GET_NAME.addExecutor(RootFile.class, "overwrite", new FunctionExecutor<String>() {
+        NAME.addGetterExecutor("returnStatic", RootFile.class, new FunctionExecutor<String>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
@@ -46,7 +46,7 @@ public class RootFile extends ParentFile<FileSystem> {
             }
 
         });
-        SET_NAME.addExecutor(RootFile.class, "overwrite", new FunctionExecutor<Void>() {
+        NAME.addSetterExecutor("cancel", RootFile.class, new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
@@ -57,7 +57,7 @@ public class RootFile extends ParentFile<FileSystem> {
 
         });
 
-        GET_PATH.addExecutor(RootFile.class, "overwrite", new FunctionExecutor<String>() {
+        GET_PATH.addExecutor("returnStatic", RootFile.class, new FunctionExecutor<String>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
@@ -67,7 +67,7 @@ public class RootFile extends ParentFile<FileSystem> {
             }
 
         });
-        SET_PATH.addExecutor(RootFile.class, "overwrite", new FunctionExecutor<Void>() {
+        SET_PATH.addExecutor("cancel", RootFile.class, new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
@@ -78,7 +78,7 @@ public class RootFile extends ParentFile<FileSystem> {
 
         });
 
-        REMOVE.addExecutor(RootFile.class, "overwrite", new FunctionExecutor<Void>() {
+        REMOVE.addExecutor("cancel", RootFile.class, new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)

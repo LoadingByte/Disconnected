@@ -71,7 +71,7 @@ public class SizeUtilTest {
         data.add(new Object[] { Arrays.asList(new Object[] { "Test", true, 128 }), 4 + 1 + 2 });
 
         // Feature holders
-        DerivableSize.GET_SIZE.addExecutor(TestFeatureHolder.class, "test1", new FunctionExecutor<Long>() {
+        DerivableSize.GET_SIZE.addExecutor("test1", TestFeatureHolder.class, new FunctionExecutor<Long>() {
 
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
@@ -79,7 +79,7 @@ public class SizeUtilTest {
                 return 100L + NullPreventer.prevent(invocation.next(arguments));
             }
         });
-        DerivableSize.GET_SIZE.addExecutor(TestFeatureHolder.class, "test2", new FunctionExecutor<Long>() {
+        DerivableSize.GET_SIZE.addExecutor("test2", TestFeatureHolder.class, new FunctionExecutor<Long>() {
 
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {

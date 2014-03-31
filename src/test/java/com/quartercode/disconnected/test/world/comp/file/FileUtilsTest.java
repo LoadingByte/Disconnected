@@ -54,9 +54,7 @@ public class FileUtilsTest {
     private User createUser(String name) throws ExecutorInvocationException {
 
         User user = new User();
-        user.setLocked(false);
-        user.get(User.SET_NAME).invoke(name);
-        user.setLocked(true);
+        user.get(User.NAME).set(name);
         return user;
     }
 
@@ -65,12 +63,12 @@ public class FileUtilsTest {
 
         ContentFile file = new ContentFile();
         User owner = createUser("owner");
-        file.get(File.SET_OWNER).invoke(owner);
+        file.get(File.OWNER).set(owner);
 
-        file.get(File.GET_RIGHTS).invoke().get(FileRights.SET).invoke(FileAccessor.OWNER, FileRight.READ, true);
+        file.get(File.RIGHTS).get().get(FileRights.SET).invoke(FileAccessor.OWNER, FileRight.READ, true);
         Assert.assertTrue("Owner hasn't read right", FileUtils.hasRight(owner, file, FileRight.READ));
 
-        file.get(File.GET_RIGHTS).invoke().get(FileRights.SET).invoke(FileAccessor.OWNER, FileRight.READ, false);
+        file.get(File.RIGHTS).get().get(FileRights.SET).invoke(FileAccessor.OWNER, FileRight.READ, false);
         Assert.assertTrue("Owner has read right", FileUtils.hasRight(owner, file, FileRight.READ));
     }
 
@@ -80,7 +78,7 @@ public class FileUtilsTest {
         ContentFile file = new ContentFile();
         User owner = createUser("owner");
         User other = createUser("other");
-        file.get(File.SET_OWNER).invoke(owner);
+        file.get(File.OWNER).set(owner);
 
         Assert.assertTrue("Owner can't change rights", FileUtils.canChangeRights(owner, file));
         Assert.assertFalse("Other user can change rights", FileUtils.canChangeRights(other, file));

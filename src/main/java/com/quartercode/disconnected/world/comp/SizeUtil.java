@@ -21,13 +21,15 @@ package com.quartercode.disconnected.world.comp;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Map.Entry;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CollectionProperty;
+import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Property;
+import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.util.NullPreventer;
 
@@ -88,13 +90,33 @@ public class SizeUtil {
     }
 
     /**
-     * Creates a new size getter {@link FunctionExecutor} for the given {@link Property} definition.
+     * Creates a new size getter {@link FunctionExecutor} for the given {@link PropertyDefinition}.
      * A size getter {@link FunctionExecutor} returns the size of a {@link Property} using {@link #getSize(Object)}.
      * 
-     * @param propertyDefinition The {@link FeatureDefinition} of the {@link Property} to access.
+     * @param propertyDefinition The {@link PropertyDefinition} of the {@link Property} to access.
      * @return The created {@link FunctionExecutor}.
      */
-    public static <T> FunctionExecutor<Long> createGetSize(final FeatureDefinition<? extends Property<T>> propertyDefinition) {
+    public static FunctionExecutor<Long> createGetSize(final PropertyDefinition<?> propertyDefinition) {
+
+        return new FunctionExecutor<Long>() {
+
+            @Override
+            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
+
+                return SizeUtil.getSize(invocation.getHolder().get(propertyDefinition).get()) + NullPreventer.prevent(invocation.next(arguments));
+            }
+
+        };
+    }
+
+    /**
+     * Creates a new size getter {@link FunctionExecutor} for the given {@link CollectionPropertyDefinition}.
+     * A size getter {@link FunctionExecutor} returns the size of a {@link CollectionProperty} using {@link #getSize(Object)}.
+     * 
+     * @param propertyDefinition The {@link CollectionPropertyDefinition} of the {CollectionProperty Property} to access.
+     * @return The created {@link FunctionExecutor}.
+     */
+    public static FunctionExecutor<Long> createGetSize(final CollectionPropertyDefinition<?, ?> propertyDefinition) {
 
         return new FunctionExecutor<Long>() {
 

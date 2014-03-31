@@ -19,12 +19,12 @@
 package com.quartercode.disconnected.world.comp.file;
 
 import java.util.Arrays;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.world.StringRepresentable;
@@ -157,7 +157,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
      * The first four booleans represent the owner rights in the order read, write, delete, execute.
      * The booleans from index 4 to 7 represent the group rights, the ones from 8 to 11 the others' rights.
      */
-    protected static final FeatureDefinition<ObjectProperty<Boolean[]>> RIGHTS;
+    protected static final PropertyDefinition<Boolean[]> RIGHTS;
 
     static {
 
@@ -194,7 +194,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Boolean>                     GET;
+    public static final FunctionDefinition<Boolean>      GET;
 
     /**
      * Sets or unsets the given {@link FileRight} for the given {@link FileAccessor}.
@@ -228,7 +228,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                        SET;
+    public static final FunctionDefinition<Void>         SET;
 
     /**
      * Changes the stored rights to the ones stored in the given file rights object.
@@ -248,7 +248,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                        FROM_OBJECT;
+    public static final FunctionDefinition<Void>         FROM_OBJECT;
 
     /**
      * Returns the stored file rights as a string.
@@ -273,7 +273,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
      * A "d" means that you can delete the file or directory (if it's empty).
      * A "x" means that you can execute the file.
      */
-    public static final FunctionDefinition<String>                      TO_STRING   = StringRepresentable.TO_STRING;
+    public static final FunctionDefinition<String>       TO_STRING   = StringRepresentable.TO_STRING;
 
     /**
      * Changes the rights to the ones stored in the given rights string.
@@ -313,7 +313,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                        FROM_STRING = StringRepresentable.FROM_STRING;
+    public static final FunctionDefinition<Void>         FROM_STRING = StringRepresentable.FROM_STRING;
 
     static {
 
@@ -364,7 +364,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
 
         }, FileRights.class);
 
-        TO_STRING.addExecutor(FileRights.class, "default", new FunctionExecutor<String>() {
+        TO_STRING.addExecutor("default", FileRights.class, new FunctionExecutor<String>() {
 
             @Override
             public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
@@ -393,7 +393,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
             }
 
         });
-        FROM_STRING.addExecutor(FileRights.class, "default", new FunctionExecutor<Void>() {
+        FROM_STRING.addExecutor("default", FileRights.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {

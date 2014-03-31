@@ -19,19 +19,16 @@
 package com.quartercode.disconnected.world.comp.net;
 
 import org.apache.commons.lang.Validate;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Lockable;
 import com.quartercode.classmod.extra.Prioritized;
-import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.StringRepresentable;
 import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
 
@@ -49,74 +46,37 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
     /**
      * The target {@link IP} which represents the network interface which holds the service.
      */
-    protected static final FeatureDefinition<ObjectProperty<IP>>      IP;
+    public static final PropertyDefinition<IP>      IP;
 
     /**
      * The target port which specifies the service.
      */
-    protected static final FeatureDefinition<ObjectProperty<Integer>> PORT;
+    public static final PropertyDefinition<Integer> PORT;
 
     static {
 
         IP = ObjectProperty.createDefinition("ip");
+
         PORT = ObjectProperty.createDefinition("port");
+        PORT.addSetterExecutor("checkRange", Address.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_6)
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+
+                int port = (Integer) arguments[0];
+                Validate.isTrue(port >= 0 || port <= 65535, "The port must be in range 0 <= port <= 65535 (e.g. 8080): ", port);
+
+                return invocation.next(arguments);
+            }
+
+        });
 
     }
 
     // ----- Properties End -----
 
     // ----- Functions -----
-
-    /**
-     * Returns the target {@link IP} which represents the network interface which holds the service.
-     * The returned object shouldn't be changed in any way. You can use {@link #SET_IP} for that purpose.
-     */
-    public static final FunctionDefinition<IP>                        GET_IP;
-
-    /**
-     * Changes the target {@link IP} which represents the network interface which holds the service.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link IP}</td>
-     * <td>ip</td>
-     * <td>The new target {@link IP}.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                      SET_IP;
-
-    /**
-     * Returns the target port which specifies the service.
-     */
-    public static final FunctionDefinition<Integer>                   GET_PORT;
-
-    /**
-     * Changes the target port which specifies the service.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Integer}</td>
-     * <td>port</td>
-     * <td>The new target port.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                      SET_PORT;
 
     /**
      * Changes the stored ip and port to the ones stored by the given address object.
@@ -136,13 +96,13 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                      FROM_OBJECT;
+    public static final FunctionDefinition<Void>    FROM_OBJECT;
 
     /**
      * Returns the stored address as a string.
      * The string is using the format IP:PORT (e.g. 127.0.0.1:8080).
      */
-    public static final FunctionDefinition<String>                    TO_STRING   = StringRepresentable.TO_STRING;
+    public static final FunctionDefinition<String>  TO_STRING   = StringRepresentable.TO_STRING;
 
     /**
      * Changes the stored address to the one set by the given string.
@@ -163,77 +123,51 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                      FROM_STRING = StringRepresentable.FROM_STRING;
+    public static final FunctionDefinition<Void>    FROM_STRING = StringRepresentable.FROM_STRING;
 
     static {
-
-        GET_IP = FunctionDefinitionFactory.create("getIp", Address.class, PropertyAccessorFactory.createGet(IP));
-        SET_IP = FunctionDefinitionFactory.create("setIp", Address.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(IP)), IP.class);
-
-        GET_PORT = FunctionDefinitionFactory.create("getPort", Address.class, PropertyAccessorFactory.createGet(PORT));
-        SET_PORT = FunctionDefinitionFactory.create("setPort", Address.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(PORT)), Integer.class);
-        SET_PORT.addExecutor(IP.class, "checkRange", new FunctionExecutor<Void>() {
-
-            @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_6)
-            @Lockable
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
-
-                int port = (Integer) arguments[0];
-                Validate.isTrue(port >= 0 || port <= 65535, "The port must be in range 0 <= port <= 65535 (e.g. 8080): ", port);
-
-                return invocation.next(arguments);
-            }
-
-        });
 
         FROM_OBJECT = FunctionDefinitionFactory.create("fromObject", Address.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Lockable
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 FeatureHolder holder = invocation.getHolder();
 
                 String ipString = ((Address) arguments[0]).get(IP).get().get(com.quartercode.disconnected.world.comp.net.IP.TO_STRING).invoke();
                 IP ip = new IP();
-                ip.setLocked(false);
                 ip.get(com.quartercode.disconnected.world.comp.net.IP.FROM_STRING).invoke(ipString);
-                ip.setLocked(true);
-                holder.get(SET_IP).invoke(ip);
-                holder.get(SET_PORT).invoke( ((Address) arguments[0]).get(PORT).get());
+                holder.get(IP).set(ip);
+                holder.get(PORT).set( ((Address) arguments[0]).get(PORT).get());
 
                 return invocation.next(arguments);
             }
 
         }, Address.class);
 
-        TO_STRING.addExecutor(Address.class, "default", new FunctionExecutor<String>() {
+        TO_STRING.addExecutor("default", Address.class, new FunctionExecutor<String>() {
 
             @Override
             public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 FeatureHolder holder = invocation.getHolder();
-                String result = holder.get(GET_IP).invoke().get(com.quartercode.disconnected.world.comp.net.IP.TO_STRING).invoke() + ":" + holder.get(GET_PORT).invoke();
+                String result = holder.get(IP).get().get(com.quartercode.disconnected.world.comp.net.IP.TO_STRING).invoke() + ":" + holder.get(PORT).get();
                 invocation.next(arguments);
                 return result;
             }
 
         });
-        FROM_STRING.addExecutor(Address.class, "default", new FunctionExecutor<Void>() {
+        FROM_STRING.addExecutor("default", Address.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Lockable
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 String[] parts = ((String) arguments[0]).split(":");
                 Validate.isTrue(parts.length == 2, "Address must have the format IP:PORT: ", arguments[0]);
                 IP ip = new IP();
-                ip.setLocked(false);
                 ip.get(com.quartercode.disconnected.world.comp.net.IP.FROM_STRING).invoke(parts[0]);
-                ip.setLocked(true);
-                invocation.getHolder().get(SET_IP).invoke(ip);
-                invocation.getHolder().get(SET_PORT).invoke(Integer.parseInt(parts[1]));
+                invocation.getHolder().get(IP).set(ip);
+                invocation.getHolder().get(PORT).set(Integer.parseInt(parts[1]));
 
                 return invocation.next(arguments);
             }

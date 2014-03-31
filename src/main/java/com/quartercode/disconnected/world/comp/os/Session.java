@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.Validate;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -31,6 +30,7 @@ import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Limit;
 import com.quartercode.classmod.extra.Prioritized;
+import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ReferenceProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.classmod.util.PropertyAccessorFactory;
@@ -62,7 +62,7 @@ public class Session extends ProgramExecutor {
      * The {@link User} the session is running under.
      * Every {@link ChildProcess} of the session can use the rights provided by the session.
      */
-    protected static final FeatureDefinition<ReferenceProperty<User>> USER;
+    protected static final PropertyDefinition<User> USER;
 
     static {
 
@@ -78,13 +78,13 @@ public class Session extends ProgramExecutor {
      * Returns the {@link User} the session is running under.
      * Every {@link ChildProcess} of the session can use the rights provided by the session.
      */
-    public static final FunctionDefinition<User>                      GET_USER;
+    public static final FunctionDefinition<User>    GET_USER;
 
     static {
 
         GET_USER = FunctionDefinitionFactory.create("getUser", Session.class, PropertyAccessorFactory.createGet(USER));
 
-        GET_PARAMETERS.addExecutor(Session.class, "default", new FunctionExecutor<List<Parameter>>() {
+        GET_PARAMETERS.addExecutor("default", Session.class, new FunctionExecutor<List<Parameter>>() {
 
             @Override
             public List<Parameter> invoke(FunctionInvocation<List<Parameter>> invocation, Object... arguments) throws ExecutorInvocationException {
@@ -99,7 +99,7 @@ public class Session extends ProgramExecutor {
 
         });
 
-        TICK_UPDATE.addExecutor(Session.class, "setUserFromArgument", new FunctionExecutor<Void>() {
+        TICK_UPDATE.addExecutor("setUserFromArgument", Session.class, new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_7)
@@ -114,13 +114,13 @@ public class Session extends ProgramExecutor {
                 // This program is always allowed to read the user configuration file
                 FileSystemModule fsModule = ((Session) holder).getParent().get(Process.GET_OPERATING_SYSTEM).invoke().get(OperatingSystem.GET_FS_MODULE).invoke();
                 File<?> userConfigFile = fsModule.get(FileSystemModule.GET_FILE).invoke(CommonFiles.USER_CONFIG);
-                if (! (userConfigFile instanceof ContentFile) || userConfigFile.get(ContentFile.GET_CONTENT).invoke() == null) {
+                if (! (userConfigFile instanceof ContentFile) || userConfigFile.get(ContentFile.CONTENT).get() == null) {
                     throw new IllegalStateException("User configuration file doesn't exist under '" + CommonFiles.USER_CONFIG + "'");
                 }
-                Configuration userConfig = (Configuration) userConfigFile.get(ContentFile.GET_CONTENT).invoke();
+                Configuration userConfig = (Configuration) userConfigFile.get(ContentFile.CONTENT).get();
 
-                for (ConfigurationEntry entry : userConfig.get(Configuration.GET_ENTRIES).invoke()) {
-                    if (entry instanceof User && ((User) entry).get(User.GET_NAME).equals(username)) {
+                for (ConfigurationEntry entry : userConfig.get(Configuration.ENTRIES).get()) {
+                    if (entry instanceof User && ((User) entry).get(User.NAME).get().equals(username)) {
                         holder.get(USER).set((User) entry);
                         // Continue with the update
                         return invocation.next(arguments);
@@ -132,7 +132,7 @@ public class Session extends ProgramExecutor {
 
         });
 
-        TICK_UPDATE.addExecutor(Session.class, "checkPassword", new FunctionExecutor<Void>() {
+        TICK_UPDATE.addExecutor("checkPassword", Session.class, new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_5)
@@ -149,7 +149,7 @@ public class Session extends ProgramExecutor {
                     String rawPassword = (String) programArguments.get("password");
 
                     String hashedPassword = DigestUtils.sha256Hex(rawPassword);
-                    Validate.isTrue(holder.get(GET_USER).invoke().get(User.GET_PASSWORD).invoke().equals(hashedPassword), "Wrong password");
+                    Validate.isTrue(holder.get(GET_USER).invoke().get(User.PASSWORD).get().equals(hashedPassword), "Wrong password");
                 }
 
                 // Continue with the update

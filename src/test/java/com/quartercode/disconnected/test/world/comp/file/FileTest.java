@@ -36,9 +36,7 @@ public class FileTest {
     public void setUp() throws ExecutorInvocationException {
 
         fileSystem = new FileSystem();
-        fileSystem.setLocked(false);
-        fileSystem.get(FileSystem.SET_SIZE).invoke(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
-        fileSystem.setLocked(true);
+        fileSystem.get(FileSystem.SIZE).set(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
 
         testFile = new ContentFile();
         fileSystem.get(FileSystem.ADD_FILE).invoke(testFile, "/test1/test2/test.txt");
@@ -66,7 +64,7 @@ public class FileTest {
     @Test
     public void testSetName() throws ExecutorInvocationException {
 
-        testFile.get(File.SET_NAME).invoke("test2.txt");
+        testFile.get(File.NAME).set("test2.txt");
 
         Assert.assertTrue("Renamed file doesn't exist", testFile.equals(fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test2.txt")));
         Assert.assertTrue("Removed file does exist", fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test.txt") == null);

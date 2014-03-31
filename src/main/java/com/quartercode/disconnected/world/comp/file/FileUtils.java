@@ -138,9 +138,9 @@ public class FileUtils {
 
         if (user.get(User.IS_SUPERUSER).invoke()) {
             return true;
-        } else if (checkRight(file, FileAccessor.OWNER, right) && file.get(File.GET_OWNER).invoke().equals(user)) {
+        } else if (checkRight(file, FileAccessor.OWNER, right) && file.get(File.OWNER).get().equals(user)) {
             return true;
-        } else if (checkRight(file, FileAccessor.GROUP, right) && user.get(User.GET_GROUPS).invoke().contains(file.get(File.GET_GROUP).invoke())) {
+        } else if (checkRight(file, FileAccessor.GROUP, right) && user.get(User.GROUPS).get().contains(file.get(File.GROUP).get())) {
             return true;
         } else if (checkRight(file, FileAccessor.OTHERS, right)) {
             return true;
@@ -151,9 +151,9 @@ public class FileUtils {
 
     private static boolean checkRight(File<?> file, FileAccessor accessor, FileRight right) throws ExecutorInvocationException {
 
-        if (file.get(File.GET_RIGHTS).invoke().get(FileRights.GET).invoke(accessor, right)) {
+        if (file.get(File.RIGHTS).get().get(FileRights.GET).invoke(accessor, right)) {
             if (right == FileRight.DELETE && file instanceof ParentFile) {
-                for (File<?> child : file.get(ParentFile.GET_CHILDREN).invoke()) {
+                for (File<?> child : file.get(ParentFile.CHILDREN).get()) {
                     if (!checkRight(child, accessor, right)) {
                         return false;
                     }
@@ -176,7 +176,7 @@ public class FileUtils {
      */
     public static boolean canChangeRights(User user, File<?> file) throws ExecutorInvocationException {
 
-        return file.get(File.GET_OWNER).invoke().equals(user) || user.get(User.IS_SUPERUSER).invoke();
+        return file.get(File.OWNER).get().equals(user) || user.get(User.IS_SUPERUSER).invoke();
     }
 
     private FileUtils() {

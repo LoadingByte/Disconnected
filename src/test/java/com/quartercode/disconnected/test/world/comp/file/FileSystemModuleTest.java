@@ -54,22 +54,18 @@ public class FileSystemModuleTest {
     private FileSystem createFileSystem(long size) throws ExecutorInvocationException {
 
         FileSystem fileSystem = new FileSystem();
-        fileSystem.setLocked(false);
-        fileSystem.get(FileSystem.SET_SIZE).invoke(size);
-        fileSystem.setLocked(true);
+        fileSystem.get(FileSystem.SIZE).set(size);
         return fileSystem;
     }
 
     private KnownFileSystem addKnown(FileSystemModule fsModule, FileSystem fileSystem, String mountpoint, boolean mounted) throws ExecutorInvocationException {
 
         KnownFileSystem known = new KnownFileSystem();
-        known.setLocked(false);
-        known.get(KnownFileSystem.SET_FILE_SYSTEM).invoke(fileSystem);
-        known.setLocked(true);
-        known.get(KnownFileSystem.SET_MOUNTPOINT).invoke(mountpoint);
+        known.get(KnownFileSystem.FILE_SYSTEM).set(fileSystem);
+        known.get(KnownFileSystem.MOUNTPOINT).set(mountpoint);
 
-        fsModule.get(FileSystemModule.ADD_KNOWN).invoke(known);
-        known.get(KnownFileSystem.SET_MOUNTED).invoke(mounted);
+        fsModule.get(FileSystemModule.KNOWN_FS).add(known);
+        known.get(KnownFileSystem.MOUNTED).set(mounted);
 
         return known;
     }
@@ -78,14 +74,14 @@ public class FileSystemModuleTest {
     public void testGetKnown() throws ExecutorInvocationException {
 
         Set<KnownFileSystem> expected = new HashSet<KnownFileSystem>(Arrays.asList(knownFileSystems));
-        Assert.assertEquals("Known file systems", expected, fsModule.get(FileSystemModule.GET_KNOWN).invoke());
+        Assert.assertEquals("Known file systems", expected, fsModule.get(FileSystemModule.KNOWN_FS).get());
     }
 
     @Test
     public void testGetMountedByMountpoint() throws ExecutorInvocationException {
 
-        Assert.assertEquals("Mounted file system fs1", fileSystems[0], fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs1").get(KnownFileSystem.GET_FILE_SYSTEM).invoke());
-        Assert.assertEquals("Mounted file system fs2", fileSystems[1], fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs2").get(KnownFileSystem.GET_FILE_SYSTEM).invoke());
+        Assert.assertEquals("Mounted file system fs1", fileSystems[0], fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs1").get(KnownFileSystem.FILE_SYSTEM).get());
+        Assert.assertEquals("Mounted file system fs2", fileSystems[1], fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs2").get(KnownFileSystem.FILE_SYSTEM).get());
         // File system 3 isn't mounted
         Assert.assertEquals("No mounted file system fs3", null, fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs3"));
     }

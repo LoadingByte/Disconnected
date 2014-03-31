@@ -3,14 +3,14 @@ package com.quartercode.disconnected.world.event;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 
@@ -33,11 +33,11 @@ public class QueueEventListener extends DefaultFeatureHolder implements EventLis
      * The {@link #HANDLE_EVENT} method offers a new {@link Event} to this {@link Queue}.
      * The {@link #NEXT_EVENT} method "polls" from this {@link Queue} in order to retrieve the first received {@link Event}s.
      */
-    protected static final FeatureDefinition<ObjectProperty<Queue<Event>>> EVENTS;
+    protected static final CollectionPropertyDefinition<Event, Queue<Event>> EVENTS;
 
     static {
 
-        EVENTS = ObjectProperty.<Queue<Event>> createDefinition("events", new LinkedList<Event>());
+        EVENTS = ObjectCollectionProperty.createDefinition("events", new LinkedList<Event>());
 
     }
 
@@ -63,7 +63,7 @@ public class QueueEventListener extends DefaultFeatureHolder implements EventLis
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                           HANDLE_EVENT = EventListener.HANDLE_EVENT;
+    public static final FunctionDefinition<Void>                             HANDLE_EVENT = EventListener.HANDLE_EVENT;
 
     /**
      * Returns the next received {@link Event} from the {@link Queue} which matches the criteria of the given {@link EventMatcher}.
@@ -99,11 +99,11 @@ public class QueueEventListener extends DefaultFeatureHolder implements EventLis
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Event>                          NEXT_EVENT;
+    public static final FunctionDefinition<Event>                            NEXT_EVENT;
 
     static {
 
-        HANDLE_EVENT.addExecutor(QueueEventListener.class, "addToQueue", CollectionPropertyAccessorFactory.createAdd(EVENTS));
+        HANDLE_EVENT.addExecutor("addToQueue", QueueEventListener.class, CollectionPropertyAccessorFactory.createAdd(EVENTS));
         NEXT_EVENT = FunctionDefinitionFactory.create("nextEvent", QueueEventListener.class, new FunctionExecutor<Event>() {
 
             @Override

@@ -21,9 +21,11 @@ package com.quartercode.disconnected.sim.run;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CollectionProperty;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.Function;
 import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.Property;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.sim.Simulation;
 
@@ -101,6 +103,10 @@ public class TickSimulator implements TickAction {
             for (Object child : (Iterable<?>) object) {
                 updateObject(child);
             }
+        } else if (object instanceof Property) {
+            updateObject( ((Property<?>) object).get());
+        } else if (object instanceof CollectionProperty) {
+            updateObject( ((CollectionProperty<?, ?>) object).get());
         }
     }
 

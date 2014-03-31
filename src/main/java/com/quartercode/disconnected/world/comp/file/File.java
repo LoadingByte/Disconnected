@@ -20,17 +20,17 @@ package com.quartercode.disconnected.world.comp.file;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Property;
+import com.quartercode.classmod.extra.PropertyDefinition;
+import com.quartercode.classmod.extra.def.AbstractPropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.extra.def.ReferenceProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
@@ -49,12 +49,12 @@ import com.quartercode.disconnected.world.comp.os.User;
  */
 public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> implements DerivableSize {
 
-    private static final Logger                                          LOGGER              = Logger.getLogger(File.class.getName());
+    private static final Logger                        LOGGER              = Logger.getLogger(File.class.getName());
 
     /**
      * The path separator which seperates different files in a path string.
      */
-    public static final String                                           SEPARATOR           = "/";
+    public static final String                         SEPARATOR           = "/";
 
     /**
      * The default {@link FileRights} string for every new file.
@@ -62,40 +62,41 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
      * @deprecated TODO: Make the default {@link FileRights} dynamic.
      */
     @Deprecated
-    public static final String                                           DEFAULT_FILE_RIGHTS = "rwd-r---r---";
+    public static final String                         DEFAULT_FILE_RIGHTS = "rwd-r---r---";
 
     // ----- Properties -----
 
     /**
      * The name of the file.
      */
-    protected static final FeatureDefinition<ObjectProperty<String>>     NAME;
+    public static final PropertyDefinition<String>     NAME;
 
     /**
      * The {@link FileRights} object which stores the UNIX-like file right attributes.
      * For more documentation on how it works, see the {@link FileRights} class.
      */
-    protected static final FeatureDefinition<ObjectProperty<FileRights>> RIGHTS;
+    public static final PropertyDefinition<FileRights> RIGHTS;
 
     /**
      * The {@link User} who owns the file.
      * This is important for the {@link FileRights} system.
      */
-    protected static final FeatureDefinition<ReferenceProperty<User>>    OWNER;
+    public static final PropertyDefinition<User>       OWNER;
 
     /**
      * The {@link Group} which partly owns the file.
      * This is important for the {@link FileRights} system.
      */
-    protected static final FeatureDefinition<ReferenceProperty<Group>>   GROUP;
+    public static final PropertyDefinition<Group>      GROUP;
 
     static {
 
         NAME = ObjectProperty.createDefinition("name");
-        RIGHTS = new AbstractFeatureDefinition<ObjectProperty<FileRights>>("rights") {
+
+        RIGHTS = new AbstractPropertyDefinition<FileRights>("rights") {
 
             @Override
-            public ObjectProperty<FileRights> create(FeatureHolder holder) {
+            public Property<FileRights> create(FeatureHolder holder) {
 
                 FileRights rights = new FileRights();
                 try {
@@ -107,6 +108,7 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
             }
 
         };
+
         OWNER = ReferenceProperty.createDefinition("owner");
         GROUP = ReferenceProperty.createDefinition("group");
 
@@ -117,96 +119,11 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
     // ----- Functions -----
 
     /**
-     * Returns the name of the file.
-     */
-    public static final FunctionDefinition<String>                       GET_NAME;
-
-    /**
-     * Changes the name of the file.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link String}</td>
-     * <td>name</td>
-     * <td>The new name of the file.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                         SET_NAME;
-
-    /**
-     * Returns the {@link FileRights} object which stores the UNIX-like file right attributes.
-     * For more documentation on how it works, see the {@link FileRights} class.
-     */
-    public static final FunctionDefinition<FileRights>                   GET_RIGHTS;
-
-    /**
-     * Returns the {@link User} who owns the file.
-     * This is important for the {@link FileRights} system.
-     */
-    public static final FunctionDefinition<User>                         GET_OWNER;
-
-    /**
-     * Changes the {@link User} who owns the file.
-     * This is important for the {@link FileRights} system.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link User}</td>
-     * <td>owner</td>
-     * <td>The new {@link User} who owns the file.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                         SET_OWNER;
-
-    /**
-     * Returns the {@link Group} which partly owns the file.
-     * This is important for the {@link FileRights} system.
-     */
-    public static final FunctionDefinition<Group>                        GET_GROUP;
-
-    /**
-     * Changes the {@link Group} which partly owns the file.
-     * This is important for the {@link FileRights} system.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Group}</td>
-     * <td>group</td>
-     * <td>The new {@link Group} which partly owns the file.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                         SET_GROUP;
-
-    /**
      * Returns the local the path of the file.
      * A path is a collection of files seperated by a separator.
      * The local path can be used to look up the file a on its {@link FileSystem}.
      */
-    public static final FunctionDefinition<String>                       GET_PATH;
+    public static final FunctionDefinition<String>     GET_PATH;
 
     /**
      * Moves the file to the given local path.
@@ -242,31 +159,20 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                         SET_PATH;
+    public static final FunctionDefinition<Void>       SET_PATH;
 
     /**
      * Removes the file from the {@link FileSystem}.
      * If this file is a {@link ParentFile}, all child files will also be removed.
      */
-    public static final FunctionDefinition<Void>                         REMOVE;
+    public static final FunctionDefinition<Void>       REMOVE;
 
     /**
      * Returns the {@link FileSystem} which is hosting the file.
      */
-    public static final FunctionDefinition<FileSystem>                   GET_FILE_SYSTEM;
+    public static final FunctionDefinition<FileSystem> GET_FILE_SYSTEM;
 
     static {
-
-        GET_NAME = FunctionDefinitionFactory.create("getName", File.class, PropertyAccessorFactory.createGet(NAME));
-        SET_NAME = FunctionDefinitionFactory.create("setName", File.class, PropertyAccessorFactory.createSet(NAME), String.class);
-
-        GET_RIGHTS = FunctionDefinitionFactory.create("getRights", File.class, PropertyAccessorFactory.createGet(RIGHTS));
-
-        GET_OWNER = FunctionDefinitionFactory.create("getOwner", File.class, PropertyAccessorFactory.createGet(OWNER));
-        SET_OWNER = FunctionDefinitionFactory.create("setOwner", File.class, PropertyAccessorFactory.createSet(OWNER), User.class);
-
-        GET_GROUP = FunctionDefinitionFactory.create("getGroup", File.class, PropertyAccessorFactory.createGet(GROUP));
-        SET_GROUP = FunctionDefinitionFactory.create("setGroup", File.class, PropertyAccessorFactory.createSet(GROUP), Group.class);
 
         GET_PATH = FunctionDefinitionFactory.create("getPath", File.class, new FunctionExecutor<String>() {
 
@@ -277,7 +183,7 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
                 String path = null;
                 // Check for removed files
                 if ( ((File<?>) holder).getParent() != null) {
-                    path = ((File<?>) holder).getParent().get(GET_PATH).invoke() + File.SEPARATOR + holder.get(GET_NAME).invoke();
+                    path = ((File<?>) holder).getParent().get(GET_PATH).invoke() + File.SEPARATOR + holder.get(NAME).get();
                 }
 
                 invocation.next(arguments);
@@ -299,7 +205,7 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
                     String path = FileUtils.resolvePath(holder.get(GET_PATH).invoke(), (String) arguments[0]);
                     fileSystem.get(FileSystem.ADD_FILE).invoke(holder, path);
                     FeatureHolder parent = ((File<?>) holder).getParent();
-                    oldParent.get(ParentFile.REMOVE_CHILDREN).invoke(holder);
+                    oldParent.get(ParentFile.CHILDREN).remove((File<ParentFile<?>>) holder);
                     ((File<FeatureHolder>) holder).setParent(parent);
                 }
 
@@ -311,11 +217,12 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
         REMOVE = FunctionDefinitionFactory.create("remove", File.class, new FunctionExecutor<Void>() {
 
             @Override
+            @SuppressWarnings ("unchecked")
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 FeatureHolder holder = invocation.getHolder();
                 if ( ((File<?>) holder).getParent() instanceof ParentFile) {
-                    ((File<?>) holder).getParent().get(ParentFile.REMOVE_CHILDREN).invoke(holder);
+                    ((File<?>) holder).getParent().get(ParentFile.CHILDREN).remove((File<ParentFile<?>>) holder);
                 }
 
                 return invocation.next(arguments);
@@ -343,8 +250,8 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
 
         });
 
-        GET_SIZE.addExecutor(File.class, "name", SizeUtil.createGetSize(NAME));
-        GET_SIZE.addExecutor(File.class, "rights", SizeUtil.createGetSize(RIGHTS));
+        GET_SIZE.addExecutor("name", File.class, SizeUtil.createGetSize(NAME));
+        GET_SIZE.addExecutor("rights", File.class, SizeUtil.createGetSize(RIGHTS));
 
     }
 

@@ -5,8 +5,8 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
+import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.disconnected.world.event.Event;
 import com.quartercode.disconnected.world.event.EventListener;
@@ -57,7 +57,7 @@ public class QueueEventListenerTest {
 
     private static class TestEvent extends Event {
 
-        public static final FeatureDefinition<ObjectProperty<String>> TEST_DATA = ObjectProperty.createDefinition("testData");
+        public static final PropertyDefinition<String> TEST_DATA = ObjectProperty.createDefinition("testData");
 
     }
 

@@ -21,14 +21,13 @@ package com.quartercode.disconnected.world.comp.os;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
+import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
@@ -59,75 +58,15 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
      * The {@link ConfigurationEntry}s the configuration object contains.
      * Such {@link ConfigurationEntry}s represents the lines in a configuration file.
      */
-    protected static final FeatureDefinition<ObjectProperty<List<ConfigurationEntry>>> ENTRIES;
+    public static final CollectionPropertyDefinition<ConfigurationEntry, List<ConfigurationEntry>> ENTRIES;
 
     static {
 
-        ENTRIES = ObjectProperty.<List<ConfigurationEntry>> createDefinition("entires", new ArrayList<ConfigurationEntry>());
+        ENTRIES = ObjectCollectionProperty.createDefinition("entires", new ArrayList<ConfigurationEntry>());
 
     }
 
     // ----- Properties End -----
-
-    // ----- Functions -----
-
-    /**
-     * Returns the {@link ConfigurationEntry}s the configuration object contains.
-     * Such {@link ConfigurationEntry}s represents the lines in a configuration file.
-     */
-    public static final FunctionDefinition<List<ConfigurationEntry>>                   GET_ENTRIES;
-
-    /**
-     * Adds some {@link ConfigurationEntry}s to the configuration object.
-     * Such {@link ConfigurationEntry}s represents the lines in a configuration file.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0...</td>
-     * <td>{@link ConfigurationEntry}...</td>
-     * <td>entries</td>
-     * <td>The {@link ConfigurationEntry}s to add to the configuration object.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                                       ADD_ENTRIES;
-
-    /**
-     * Removes some {@link ConfigurationEntry}s from the configuration object.
-     * Such {@link ConfigurationEntry}s represents the lines in a configuration file.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0...</td>
-     * <td>{@link ConfigurationEntry}...</td>
-     * <td>entries</td>
-     * <td>The {@link ConfigurationEntry}s to remove from the configuration object.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                                       REMOVE_ENTRIES;
-
-    static {
-
-        GET_ENTRIES = FunctionDefinitionFactory.create("getEntires", Configuration.class, CollectionPropertyAccessorFactory.createGet(ENTRIES));
-        ADD_ENTRIES = FunctionDefinitionFactory.create("addEntries", Configuration.class, CollectionPropertyAccessorFactory.createAdd(ENTRIES), ConfigurationEntry[].class);
-        REMOVE_ENTRIES = FunctionDefinitionFactory.create("removeEntires", Configuration.class, CollectionPropertyAccessorFactory.createRemove(ENTRIES), ConfigurationEntry[].class);
-
-    }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new configuration object.
@@ -185,7 +124,7 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
             GET_COLUMNS = FunctionDefinitionFactory.create("getColumns");
             SET_COLUMNS = FunctionDefinitionFactory.create("setColumns", Map.class);
 
-            GET_SIZE.addExecutor(ConfigurationEntry.class, "columns", new FunctionExecutor<Long>() {
+            GET_SIZE.addExecutor("columns", ConfigurationEntry.class, new FunctionExecutor<Long>() {
 
                 @Override
                 public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {

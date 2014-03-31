@@ -20,12 +20,13 @@ package com.quartercode.disconnected.world.comp.hardware;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.PropertyDefinition;
+import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.hardware.Mainboard.NeedsMainboardSlot;
 import com.quartercode.disconnected.world.comp.net.IP;
 import com.quartercode.disconnected.world.comp.net.Packet;
@@ -46,17 +47,17 @@ public class NetworkInterface extends Hardware {
     /**
      * The {@link IP} this interface can be found under.
      */
-    protected static final FeatureDefinition<ObjectProperty<IP>>            IP;
+    public static final PropertyDefinition<IP>                                 IP;
 
     /**
      * A {@link Queue} of remaining {@link Packet}s that should be sent soon.
      */
-    protected static final FeatureDefinition<ObjectProperty<Queue<Packet>>> REMAINING_PACKETS;
+    protected static final CollectionPropertyDefinition<Packet, Queue<Packet>> REMAINING_PACKETS;
 
     static {
 
         IP = ObjectProperty.createDefinition("ip");
-        REMAINING_PACKETS = ObjectProperty.<Queue<Packet>> createDefinition("remainingPackets", new LinkedList<Packet>());
+        REMAINING_PACKETS = ObjectCollectionProperty.createDefinition("remainingPackets", new LinkedList<Packet>());
 
     }
 
@@ -65,34 +66,9 @@ public class NetworkInterface extends Hardware {
     // ----- Functions -----
 
     /**
-     * Returns the {@link IP} this interface can be found under.
-     */
-    public static final FunctionDefinition<IP>                              GET_IP;
-
-    /**
-     * Changes the {@link IP} this interface can be found under.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link IP}</td>
-     * <td>ip</td>
-     * <td>The new {@link IP}.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                            SET_IP;
-
-    /**
      * Retrieves the next {@link Packet} in the sending queue and removes it ({@link Queue} poll).
      */
-    public static final FunctionDefinition<Packet>                          NEXT_PACKET;
+    public static final FunctionDefinition<Packet>                             NEXT_PACKET;
 
     /**
      * Sends some {@link Packet}s through the network interface by putting them on the internal {@link Packet} {@link Queue}.
@@ -112,12 +88,9 @@ public class NetworkInterface extends Hardware {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                            SEND_PACKETS;
+    public static final FunctionDefinition<Void>                               SEND_PACKETS;
 
     static {
-
-        GET_IP = FunctionDefinitionFactory.create("getIp", NetworkInterface.class, PropertyAccessorFactory.createGet(IP));
-        SET_IP = FunctionDefinitionFactory.create("setIp", NetworkInterface.class, PropertyAccessorFactory.createSet(IP), IP.class);
 
         NEXT_PACKET = FunctionDefinitionFactory.create("nextPacket", NetworkInterface.class, CollectionPropertyAccessorFactory.createPoll(REMAINING_PACKETS));
         SEND_PACKETS = FunctionDefinitionFactory.create("sendPacket", NetworkInterface.class, CollectionPropertyAccessorFactory.createAdd(REMAINING_PACKETS), Packet[].class);

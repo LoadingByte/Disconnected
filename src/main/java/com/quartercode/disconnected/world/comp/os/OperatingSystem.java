@@ -20,15 +20,15 @@ package com.quartercode.disconnected.world.comp.os;
 
 import java.util.HashSet;
 import java.util.Set;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.PropertyDefinition;
+import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
 import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
@@ -57,38 +57,38 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
     /**
      * The name of the operating system.
      */
-    protected static final FeatureDefinition<ObjectProperty<String>>             NAME;
+    public static final PropertyDefinition<String>                                      NAME;
 
     /**
      * The {@link Version} of the operating system.
      */
-    protected static final FeatureDefinition<ObjectProperty<Version>>            VERSION;
+    public static final PropertyDefinition<Version>                                     VERSION;
 
     /**
      * The {@link Vulnerability}s the operating system has.
      */
-    protected static final FeatureDefinition<ObjectProperty<Set<Vulnerability>>> VULNERABILITIES;
+    public static final CollectionPropertyDefinition<Vulnerability, Set<Vulnerability>> VULNERABILITIES;
 
     /**
      * The {@link FileSystemModule} for managing and accessing {@link FileSystem}s.
      */
-    protected static final FeatureDefinition<ObjectProperty<FileSystemModule>>   FILE_SYSTEM_MODULE;
+    protected static final PropertyDefinition<FileSystemModule>                         FILE_SYSTEM_MODULE;
 
     /**
      * The {@link ProcessModule} which manages the {@link RootProcess}.
      */
-    protected static final FeatureDefinition<ObjectProperty<ProcessModule>>      PROCESS_MODULE;
+    protected static final PropertyDefinition<ProcessModule>                            PROCESS_MODULE;
 
     /**
      * The {@link NetworkManager} which takes care of sending and receiving {@link Packet}s.
      */
-    protected static final FeatureDefinition<ObjectProperty<NetworkModule>>      NETWORK_MODULE;
+    protected static final PropertyDefinition<NetworkModule>                            NETWORK_MODULE;
 
     static {
 
         NAME = ObjectProperty.createDefinition("name");
         VERSION = ObjectProperty.createDefinition("version");
-        VULNERABILITIES = ObjectProperty.<Set<Vulnerability>> createDefinition("vulnerabilities", new HashSet<Vulnerability>());
+        VULNERABILITIES = ObjectCollectionProperty.createDefinition("vulnerabilities", new HashSet<Vulnerability>());
         FILE_SYSTEM_MODULE = ObjectProperty.createDefinition("fileSystemModule", new FileSystemModule());
         PROCESS_MODULE = ObjectProperty.createDefinition("processModule", new ProcessModule());
         NETWORK_MODULE = ObjectProperty.createDefinition("networkModule", new NetworkModule());
@@ -100,120 +100,25 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
     // ----- Functions -----
 
     /**
-     * Returns the name of the operating system.
+     * Returns the {@link FileSystemModule} for managing and accessing {@link FileSystem}s.
      */
-    public static final FunctionDefinition<String>                               GET_NAME;
-
-    /**
-     * Changes the name of the operating system.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link String}</td>
-     * <td>name</td>
-     * <td>The new name for the operating system.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                                 SET_NAME;
-
-    /**
-     * Returns the {@link Version} of the operating system.
-     */
-    public static final FunctionDefinition<Version>                              GET_VERSION;
-
-    /**
-     * Changes the {@link Version} of the operating system.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Version}</td>
-     * <td>version</td>
-     * <td>The new {@link Version} for the operating system.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                                 SET_VERSION;
-
-    /**
-     * Returns the {@link Vulnerability}s the operating system has.
-     */
-    public static final FunctionDefinition<Set<Vulnerability>>                   GET_VULNERABILITIES;
-
-    /**
-     * Adds {@link Vulnerability}s to the operating system.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0...</td>
-     * <td>{@link Vulnerability}...</td>
-     * <td>vulnerabilities</td>
-     * <td>The {@link Vulnerability}s to add to the operating system.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                                 ADD_VULNERABILITIES;
-
-    /**
-     * Removes {@link Vulnerability}s from the operating system.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0...</td>
-     * <td>{@link Vulnerability}...</td>
-     * <td>vulnerabilities</td>
-     * <td>The {@link Vulnerability}s to remove from the operating system.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                                 REMOVE_VULNERABILITIES;
+    public static final FunctionDefinition<FileSystemModule>                            GET_FS_MODULE;
 
     /**
      * Returns the {@link FileSystemModule} for managing and accessing {@link FileSystem}s.
      */
-    public static final FunctionDefinition<FileSystemModule>                     GET_FS_MODULE;
-
-    /**
-     * Returns the {@link FileSystemModule} for managing and accessing {@link FileSystem}s.
-     */
-    public static final FunctionDefinition<ProcessModule>                        GET_PROC_MODULE;
+    public static final FunctionDefinition<ProcessModule>                               GET_PROC_MODULE;
 
     /**
      * Returns the {@link NetworkManager} which takes care of sending and receiving {@link Packet}s.
      */
-    public static final FunctionDefinition<NetworkModule>                        GET_NET_MODULE;
+    public static final FunctionDefinition<NetworkModule>                               GET_NET_MODULE;
 
     /**
      * Returns whether the operating system is running or not.
      * The state is determinated by the running state of the {@link RootProcess}.
      */
-    public static final FunctionDefinition<Boolean>                              IS_RUNNING;
+    public static final FunctionDefinition<Boolean>                                     IS_RUNNING;
 
     /**
      * Boots up (true) or shuts down (false) the operating system.
@@ -236,19 +141,9 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                 SET_RUNNING;
+    public static final FunctionDefinition<Void>                                        SET_RUNNING;
 
     static {
-
-        GET_NAME = FunctionDefinitionFactory.create("getName", OperatingSystem.class, PropertyAccessorFactory.createGet(NAME));
-        SET_NAME = FunctionDefinitionFactory.create("setName", OperatingSystem.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(NAME)), String.class);
-
-        GET_VERSION = FunctionDefinitionFactory.create("getVersion", OperatingSystem.class, PropertyAccessorFactory.createGet(VERSION));
-        SET_VERSION = FunctionDefinitionFactory.create("setVersion", OperatingSystem.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(VERSION)), Version.class);
-
-        GET_VULNERABILITIES = FunctionDefinitionFactory.create("getVulnerabilities", OperatingSystem.class, CollectionPropertyAccessorFactory.createGet(VULNERABILITIES));
-        ADD_VULNERABILITIES = FunctionDefinitionFactory.create("addVulnerabilities", OperatingSystem.class, new LockableFEWrapper<Void>(CollectionPropertyAccessorFactory.createAdd(VULNERABILITIES)), Vulnerability[].class);
-        REMOVE_VULNERABILITIES = FunctionDefinitionFactory.create("removeVulnerabilities", OperatingSystem.class, new LockableFEWrapper<Void>(CollectionPropertyAccessorFactory.createRemove(VULNERABILITIES)), Vulnerability[].class);
 
         GET_FS_MODULE = FunctionDefinitionFactory.create("getFsModule", OperatingSystem.class, PropertyAccessorFactory.createGet(FILE_SYSTEM_MODULE));
         GET_PROC_MODULE = FunctionDefinitionFactory.create("getProcModule", OperatingSystem.class, PropertyAccessorFactory.createGet(PROCESS_MODULE));
@@ -260,7 +155,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 FeatureHolder holder = invocation.getHolder();
-                boolean running = holder.get(GET_PROC_MODULE).invoke().get(ProcessModule.GET_ROOT).invoke().get(Process.GET_STATE).invoke() != ProcessState.STOPPED;
+                boolean running = holder.get(GET_PROC_MODULE).invoke().get(ProcessModule.ROOT_PROCESS).get().get(Process.STATE).get() != ProcessState.STOPPED;
 
                 invocation.next(arguments);
                 return running;
@@ -277,7 +172,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
     static {
 
-        SET_RUNNING.addExecutor(OperatingSystem.class, "fileSystemModule", new FunctionExecutor<Void>() {
+        SET_RUNNING.addExecutor("fileSystemModule", OperatingSystem.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
@@ -287,7 +182,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
             }
 
         });
-        SET_RUNNING.addExecutor(OperatingSystem.class, "processModule", new FunctionExecutor<Void>() {
+        SET_RUNNING.addExecutor("processModule", OperatingSystem.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {

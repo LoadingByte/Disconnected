@@ -24,16 +24,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.HashSet;
 import java.util.Set;
-import com.quartercode.classmod.base.FeatureDefinition;
+import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
-import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.PropertyDefinition;
+import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.extra.def.ReferenceProperty;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 
 /**
@@ -48,24 +48,19 @@ public class Mainboard extends Hardware {
 
     /**
      * The {@link MainboardSlot}s the mainboard offers.
-     * The slots may have a content on them, you have to check before you set the content to a new one.
+     * The slots could have a content on them, you have to check before you set the content to a new one.
      */
-    protected static final FeatureDefinition<ObjectProperty<Set<MainboardSlot>>> SLOTS;
+    public static final CollectionPropertyDefinition<MainboardSlot, Set<MainboardSlot>> SLOTS;
 
     static {
 
-        SLOTS = ObjectProperty.<Set<MainboardSlot>> createDefinition("slots", new HashSet<MainboardSlot>());
+        SLOTS = ObjectCollectionProperty.createDefinition("slots", new HashSet<MainboardSlot>());
 
     }
 
     // ----- Properties End -----
 
     // ----- Functions -----
-
-    /**
-     * Returns the {@link MainboardSlot}s the mainboard offers.
-     */
-    public static final FunctionDefinition<Set<MainboardSlot>>                   GET_SLOTS;
 
     /**
      * Returns the {@link MainboardSlot}s the mainboard offers which have the given content type.
@@ -85,63 +80,19 @@ public class Mainboard extends Hardware {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Set<MainboardSlot>>                   GET_SLOTS_BY_CONTENT_TYPE;
-
-    /**
-     * Adds {@link MainboardSlot}s to the mainboard
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0...</td>
-     * <td>{@link MainboardSlot}...</td>
-     * <td>slots</td>
-     * <td>The {@link MainboardSlot}s to add to the mainboard.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                                 ADD_SLOTS;
-
-    /**
-     * Removes {@link MainboardSlot}s from the mainboard
-     * The slots may have a content on them, you have to check before removing them.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0...</td>
-     * <td>{@link MainboardSlot}...</td>
-     * <td>slots</td>
-     * <td>The {@link MainboardSlot}s to remove from the mainboard.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                                 REMOVE_SLOTS;
+    public static final FunctionDefinition<Set<MainboardSlot>>                          GET_SLOTS_BY_CONTENT_TYPE;
 
     static {
 
-        GET_SLOTS = FunctionDefinitionFactory.create("getSlots", Mainboard.class, CollectionPropertyAccessorFactory.createGet(SLOTS));
         GET_SLOTS_BY_CONTENT_TYPE = FunctionDefinitionFactory.create("getSlotsByContentType", Mainboard.class, CollectionPropertyAccessorFactory.createGet(SLOTS, new CriteriumMatcher<MainboardSlot>() {
 
             @Override
             public boolean matches(MainboardSlot element, Object... arguments) throws ExecutorInvocationException {
 
-                return ((Class<?>) arguments[0]).isAssignableFrom(element.get(MainboardSlot.GET_TYPE).invoke());
+                return ((Class<?>) arguments[0]).isAssignableFrom(element.get(MainboardSlot.TYPE).get());
             }
 
         }), Class.class);
-        ADD_SLOTS = FunctionDefinitionFactory.create("addSlots", Mainboard.class, new LockableFEWrapper<Void>(CollectionPropertyAccessorFactory.createAdd(SLOTS)), MainboardSlot[].class);
-        REMOVE_SLOTS = FunctionDefinitionFactory.create("removeSlots", Mainboard.class, new LockableFEWrapper<Void>(CollectionPropertyAccessorFactory.createRemove(SLOTS)), MainboardSlot[].class);
 
     }
 
@@ -167,12 +118,12 @@ public class Mainboard extends Hardware {
         /**
          * The {@link Hardware} type the mainboard slot accepts.
          */
-        protected static final FeatureDefinition<ObjectProperty<Class<? extends Hardware>>> TYPE;
+        public static final PropertyDefinition<Class<? extends Hardware>> TYPE;
 
         /**
          * The {@link Hardware} part which currently uses the mainboard slot.
          */
-        protected static final FeatureDefinition<ReferenceProperty<Hardware>>               CONTENT;
+        public static final PropertyDefinition<Hardware>                  CONTENT;
 
         static {
 
@@ -182,70 +133,6 @@ public class Mainboard extends Hardware {
         }
 
         // ----- Properties End -----
-
-        // ----- Functions -----
-
-        /**
-         * Returns the {@link Hardware} type the mainboard slot accepts.
-         */
-        public static final FunctionDefinition<Class<? extends Hardware>>                   GET_TYPE;
-
-        /**
-         * Changes the {@link Hardware} type the mainboard slot accepts.
-         * 
-         * <table>
-         * <tr>
-         * <th>Index</th>
-         * <th>Type</th>
-         * <th>Parameter</th>
-         * <th>Description</th>
-         * </tr>
-         * <tr>
-         * <td>0</td>
-         * <td>{@link Class}&lt;? extends {@link Hardware}&gt;</td>
-         * <td>type</td>
-         * <td>The new allowed {@link Hardware} type.</td>
-         * </tr>
-         * </table>
-         */
-        public static final FunctionDefinition<Void>                                        SET_TYPE;
-
-        /**
-         * Returns the {@link Hardware} part which currently uses the mainboard slot.
-         */
-        public static final FunctionDefinition<Hardware>                                    GET_CONTENT;
-
-        /**
-         * Changes the {@link Hardware} part which currently uses the mainboard slot.
-         * 
-         * <table>
-         * <tr>
-         * <th>Index</th>
-         * <th>Type</th>
-         * <th>Parameter</th>
-         * <th>Description</th>
-         * </tr>
-         * <tr>
-         * <td>0</td>
-         * <td>{@link Hardware}</td>
-         * <td>content</td>
-         * <td>The new content {@link Hardware} part.</td>
-         * </tr>
-         * </table>
-         */
-        public static final FunctionDefinition<Void>                                        SET_CONTENT;
-
-        static {
-
-            GET_TYPE = FunctionDefinitionFactory.create("getType", MainboardSlot.class, PropertyAccessorFactory.createGet(TYPE));
-            SET_TYPE = FunctionDefinitionFactory.create("setType", MainboardSlot.class, PropertyAccessorFactory.createSet(TYPE));
-
-            GET_CONTENT = FunctionDefinitionFactory.create("getContent", MainboardSlot.class, PropertyAccessorFactory.createGet(CONTENT));
-            SET_CONTENT = FunctionDefinitionFactory.create("setContent", MainboardSlot.class, PropertyAccessorFactory.createSet(CONTENT));
-
-        }
-
-        // ----- Functions End -----
 
         /**
          * Creates a new mainboard slot.

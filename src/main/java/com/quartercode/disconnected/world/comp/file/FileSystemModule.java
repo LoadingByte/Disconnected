@@ -22,21 +22,21 @@ import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.Feature;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
+import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.DefaultChildFeatureHolder;
-import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.extra.def.ReferenceProperty;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.world.comp.os.CommonFiles;
@@ -58,14 +58,26 @@ public class FileSystemModule extends OSModule {
     // ----- Properties -----
 
     /**
-     * The {@link FileSystem}s which are associated with a known mountpoint and can be mounted.
+     * The {@link FileSystem}s which are associated with a known mountpoint (e.g. "system") and can be mounted.
      * These representation objects are called {@link KnownFileSystem}s.
      */
-    protected static final FeatureDefinition<ObjectProperty<Set<KnownFileSystem>>> KNOWN_FILE_SYSTEMS;
+    public static final CollectionPropertyDefinition<KnownFileSystem, Set<KnownFileSystem>> KNOWN_FS;
 
     static {
 
-        KNOWN_FILE_SYSTEMS = ObjectProperty.<Set<KnownFileSystem>> createDefinition("knownFileSytems", new HashSet<KnownFileSystem>());
+        KNOWN_FS = ObjectCollectionProperty.createDefinition("knownFs", new HashSet<KnownFileSystem>());
+        KNOWN_FS.addAdderExecutor("checkNotMounted", FileSystemModule.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+
+                KnownFileSystem element = (KnownFileSystem) arguments[0];
+                Validate.isTrue(!element.get(KnownFileSystem.MOUNTED).get(), "Can't register known file system while mounted");
+                return invocation.next(arguments);
+            }
+
+        });
 
     }
 
@@ -77,14 +89,7 @@ public class FileSystemModule extends OSModule {
      * Returns a {@link Set} containing all available {@link FileSystem}s which are connected to the computer.
      * This uses different resources to collect the {@link FileSystem}s.
      */
-    public static final FunctionDefinition<Set<FileSystem>>                        GET_AVAIABLE;
-
-    /**
-     * Returns a {@link Set} containing all {@link KnownFileSystem}s.
-     * A {@link KnownFileSystem} can be mounted and associated with a set mountpoint (e.g. "system").
-     * Only {@link KnownFileSystem}s can be mounted.
-     */
-    public static final FunctionDefinition<Set<KnownFileSystem>>                   GET_KNOWN;
+    public static final FunctionDefinition<Set<FileSystem>>                                 GET_AVAILABLE;
 
     /**
      * Returns the {@link KnownFileSystem} object representing the given {@link FileSystem}.
@@ -104,55 +109,14 @@ public class FileSystemModule extends OSModule {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<KnownFileSystem>                        GET_KNOWN_BY_FILESYSTEM;
-
-    /**
-     * Registers some {@link KnownFileSystem}s to the {@link OperatingSystem}.
-     * The new {@link KnownFileSystem} can't be mounted already.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0...</td>
-     * <td>{@link KnownFileSystem}...</td>
-     * <td>knownFileSystems</td>
-     * <td>The {@link KnownFileSystem}s to register to the system.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                                   ADD_KNOWN;
-
-    /**
-     * Unregisters some {@link KnownFileSystem}s to the {@link OperatingSystem}.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0...</td>
-     * <td>{@link KnownFileSystem}...</td>
-     * <td>knownFileSystems</td>
-     * <td>The {@link KnownFileSystem}s to unregister from the system.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                                   REMOVE_KNOWN;
+    public static final FunctionDefinition<KnownFileSystem>                                 GET_KNOWN_BY_FILESYSTEM;
 
     /**
      * Returns a {@link Set} containing all mounted {@link KnownFileSystem}s.
      * Only the {@link File}s of currently mounted file systems can be accessed.
      * If you want to get all {@link KnownFileSystem}s, take a look at {@link #GET_KNOWN}.
      */
-    public static final FunctionDefinition<Set<KnownFileSystem>>                   GET_MOUNTED;
+    public static final FunctionDefinition<Set<KnownFileSystem>>                            GET_MOUNTED;
 
     /**
      * Returns the mounted {@link KnownFileSystem} which is associated with the given mountpoint.
@@ -173,7 +137,7 @@ public class FileSystemModule extends OSModule {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<KnownFileSystem>                        GET_MOUNTED_BY_MOUNTPOINT;
+    public static final FunctionDefinition<KnownFileSystem>                                 GET_MOUNTED_BY_MOUNTPOINT;
 
     /**
      * Returns the {@link File} which is stored on a mounted {@link FileSystem} under the given path.
@@ -195,7 +159,7 @@ public class FileSystemModule extends OSModule {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<File<?>>                                GET_FILE;
+    public static final FunctionDefinition<File<?>>                                         GET_FILE;
 
     /**
      * Adds the given {@link File} to a mounted {@link FileSystem} and locates it under the given path.
@@ -242,18 +206,18 @@ public class FileSystemModule extends OSModule {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                   ADD_FILE;
+    public static final FunctionDefinition<Void>                                            ADD_FILE;
 
     static {
 
-        GET_AVAIABLE = FunctionDefinitionFactory.create("getAvaiable", FileSystemModule.class, new FunctionExecutor<Set<FileSystem>>() {
+        GET_AVAILABLE = FunctionDefinitionFactory.create("getAvailable", FileSystemModule.class, new FunctionExecutor<Set<FileSystem>>() {
 
             @Override
             public Set<FileSystem> invoke(FunctionInvocation<Set<FileSystem>> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 Set<FileSystem> available = new HashSet<FileSystem>();
                 Computer computer = ((FileSystemModule) invocation.getHolder()).getParent().get(Process.GET_ROOT).invoke().getParent().getParent();
-                for (Hardware hardware : computer.get(Computer.GET_HARDWARE).invoke()) {
+                for (Hardware hardware : computer.get(Computer.HARDWARE).get()) {
                     for (Feature feature : hardware) {
                         if (feature instanceof Iterable) {
                             for (Object child : (Iterable<?>) feature) {
@@ -271,48 +235,31 @@ public class FileSystemModule extends OSModule {
 
         });
 
-        GET_KNOWN = FunctionDefinitionFactory.create("getKnown", FileSystemModule.class, CollectionPropertyAccessorFactory.createGet(KNOWN_FILE_SYSTEMS));
-        GET_KNOWN_BY_FILESYSTEM = FunctionDefinitionFactory.create("getKnownByFilesystem", FileSystemModule.class, CollectionPropertyAccessorFactory.createGetSingle(KNOWN_FILE_SYSTEMS, new CriteriumMatcher<KnownFileSystem>() {
+        GET_KNOWN_BY_FILESYSTEM = FunctionDefinitionFactory.create("getKnownByFilesystem", FileSystemModule.class, CollectionPropertyAccessorFactory.createGetSingle(KNOWN_FS, new CriteriumMatcher<KnownFileSystem>() {
 
             @Override
             public boolean matches(KnownFileSystem element, Object... arguments) throws ExecutorInvocationException {
 
-                return element.get(KnownFileSystem.GET_FILE_SYSTEM).invoke().equals(arguments[0]);
+                return element.get(KnownFileSystem.FILE_SYSTEM).get().equals(arguments[0]);
             }
 
         }), FileSystem.class);
-        ADD_KNOWN = FunctionDefinitionFactory.create("addKnown", FileSystemModule.class, CollectionPropertyAccessorFactory.createAdd(KNOWN_FILE_SYSTEMS), KnownFileSystem[].class);
-        ADD_KNOWN.addExecutor(FileSystemModule.class, "checkNotMounted", new FunctionExecutor<Void>() {
 
-            @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
-
-                for (Object element : arguments) {
-                    Validate.isTrue(! ((KnownFileSystem) element).get(KnownFileSystem.IS_MOUNTED).invoke(), "Can't register known file system while mounted");
-                }
-
-                return invocation.next(arguments);
-            }
-
-        });
-        REMOVE_KNOWN = FunctionDefinitionFactory.create("removeKnown", FileSystemModule.class, CollectionPropertyAccessorFactory.createRemove(KNOWN_FILE_SYSTEMS), KnownFileSystem[].class);
-
-        GET_MOUNTED = FunctionDefinitionFactory.create("getMounted", FileSystemModule.class, CollectionPropertyAccessorFactory.createGet(KNOWN_FILE_SYSTEMS, new CriteriumMatcher<KnownFileSystem>() {
+        GET_MOUNTED = FunctionDefinitionFactory.create("getMounted", FileSystemModule.class, CollectionPropertyAccessorFactory.createGet(KNOWN_FS, new CriteriumMatcher<KnownFileSystem>() {
 
             @Override
             public boolean matches(KnownFileSystem element, Object... arguments) throws ExecutorInvocationException {
 
-                return element.get(KnownFileSystem.IS_MOUNTED).invoke();
+                return element.get(KnownFileSystem.MOUNTED).get();
             }
 
         }));
-        GET_MOUNTED_BY_MOUNTPOINT = FunctionDefinitionFactory.create("getMountedByMountpoint", FileSystemModule.class, CollectionPropertyAccessorFactory.createGetSingle(KNOWN_FILE_SYSTEMS, new CriteriumMatcher<KnownFileSystem>() {
+        GET_MOUNTED_BY_MOUNTPOINT = FunctionDefinitionFactory.create("getMountedByMountpoint", FileSystemModule.class, CollectionPropertyAccessorFactory.createGetSingle(KNOWN_FS, new CriteriumMatcher<KnownFileSystem>() {
 
             @Override
             public boolean matches(KnownFileSystem element, Object... arguments) throws ExecutorInvocationException {
 
-                return element.get(KnownFileSystem.IS_MOUNTED).invoke() && element.get(KnownFileSystem.GET_MOUNTPOINT).invoke().equals(arguments[0]);
+                return element.get(KnownFileSystem.MOUNTED).get() && element.get(KnownFileSystem.MOUNTPOINT).get().equals(arguments[0]);
             }
 
         }), String.class);
@@ -326,7 +273,7 @@ public class FileSystemModule extends OSModule {
                 String[] pathComponents = FileUtils.getComponents(path);
                 Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path");
 
-                FileSystem fileSystem = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]).get(KnownFileSystem.GET_FILE_SYSTEM).invoke();
+                FileSystem fileSystem = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]).get(KnownFileSystem.FILE_SYSTEM).get();
                 File<?> result = null;
                 if (fileSystem != null) {
                     result = fileSystem.get(FileSystem.GET_FILE).invoke(pathComponents[1]);
@@ -348,7 +295,7 @@ public class FileSystemModule extends OSModule {
                 String[] pathComponents = FileUtils.getComponents(path);
                 Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path");
 
-                FileSystem fileSystem = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]).get(KnownFileSystem.GET_FILE_SYSTEM).invoke();
+                FileSystem fileSystem = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]).get(KnownFileSystem.FILE_SYSTEM).get();
                 if (fileSystem != null) {
                     fileSystem.get(FileSystem.ADD_FILE).invoke(file, pathComponents[1]);
                 } else {
@@ -360,16 +307,16 @@ public class FileSystemModule extends OSModule {
 
         }, File.class, String.class);
 
-        SET_RUNNING.addExecutor(FileSystemModule.class, "mountSystemFs", new FunctionExecutor<Void>() {
+        SET_RUNNING.addExecutor("mountSystemFs", FileSystemModule.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 // Only invoke on bootstrap
                 if ((Boolean) arguments[0]) {
-                    for (KnownFileSystem fileSystem : invocation.getHolder().get(GET_KNOWN).invoke()) {
-                        if (fileSystem.get(KnownFileSystem.GET_MOUNTPOINT).invoke().equals(CommonFiles.SYSTEM_MOUNTPOINT)) {
-                            fileSystem.get(KnownFileSystem.SET_MOUNTED).invoke(true);
+                    for (KnownFileSystem fileSystem : invocation.getHolder().get(KNOWN_FS).get()) {
+                        if (fileSystem.get(KnownFileSystem.MOUNTPOINT).get().equals(CommonFiles.SYSTEM_MOUNTPOINT)) {
+                            fileSystem.get(KnownFileSystem.MOUNTED).set(true);
                             break;
                         }
                     }
@@ -405,131 +352,38 @@ public class FileSystemModule extends OSModule {
         /**
          * The {@link FileSystem} which is represented by the data structure object.
          */
-        protected static final FeatureDefinition<ReferenceProperty<FileSystem>> FILE_SYSTEM;
+        public static final PropertyDefinition<FileSystem> FILE_SYSTEM;
 
         /**
          * The mountpoint the represented {@link FileSystem} is using.
          * A mountpoint is a string like "system" which defines where you can find the {@link FileSystem}.
          */
-        protected static final FeatureDefinition<ObjectProperty<String>>        MOUNTPOINT;
+        public static final PropertyDefinition<String>     MOUNTPOINT;
 
         /**
          * If the represented {@link FileSystem} is actually mounted to the set {@link #MOUNTPOINT}.
          */
-        protected static final FeatureDefinition<ObjectProperty<Boolean>>       MOUNTED;
+        public static final PropertyDefinition<Boolean>    MOUNTED;
 
         static {
 
             FILE_SYSTEM = ReferenceProperty.createDefinition("fileSystem");
+
             MOUNTPOINT = ObjectProperty.createDefinition("mountpoint");
-            MOUNTED = ObjectProperty.createDefinition("mounted", false);
-
-        }
-
-        // ----- Properties End -----
-
-        // ----- Functions -----
-
-        /**
-         * Returns the {@link FileSystem} which is represented by the data structure object.
-         */
-        public static final FunctionDefinition<FileSystem>                      GET_FILE_SYSTEM;
-
-        /**
-         * Changes the {@link FileSystem} which is represented by the data structure object.
-         * 
-         * <table>
-         * <tr>
-         * <th>Index</th>
-         * <th>Type</th>
-         * <th>Parameter</th>
-         * <th>Description</th>
-         * </tr>
-         * <tr>
-         * <td>0</td>
-         * <td>{@link FileSystem}</td>
-         * <td>fileSystem</td>
-         * <td>The new {@link FileSystem} the data structure object represents.</td>
-         * </tr>
-         * </table>
-         */
-        public static final FunctionDefinition<Void>                            SET_FILE_SYSTEM;
-
-        /**
-         * Returns the mountpoint the represented {@link FileSystem} is using.
-         * A mountpoint is a string like "system" which defines where you can find the {@link FileSystem}.
-         */
-        public static final FunctionDefinition<String>                          GET_MOUNTPOINT;
-
-        /**
-         * Changes the mountpoint the represented {@link FileSystem} is using.
-         * A mountpoint is a string like "system" which defines where you can find the {@link FileSystem}.
-         * 
-         * <table>
-         * <tr>
-         * <th>Index</th>
-         * <th>Type</th>
-         * <th>Parameter</th>
-         * <th>Description</th>
-         * </tr>
-         * <tr>
-         * <td>0</td>
-         * <td>{@link String}</td>
-         * <td>mountpoint</td>
-         * <td>The new mountpoint for the represented {@link FileSystem}.</td>
-         * </tr>
-         * </table>
-         */
-        public static final FunctionDefinition<Void>                            SET_MOUNTPOINT;
-
-        /**
-         * Returns true if the represented {@link FileSystem} is actually mounted to the set {@link #MOUNTPOINT}.
-         */
-        public static final FunctionDefinition<Boolean>                         IS_MOUNTED;
-
-        /**
-         * Changes if the represented {@link FileSystem} is actually mounted to the set {@link #MOUNTPOINT}.
-         * That process is also called mounting/unmounting.
-         * 
-         * <table>
-         * <tr>
-         * <th>Index</th>
-         * <th>Type</th>
-         * <th>Parameter</th>
-         * <th>Description</th>
-         * </tr>
-         * <tr>
-         * <td>0</td>
-         * <td>{@link Boolean}</td>
-         * <td>mounted</td>
-         * <td>True if the represented {@link FileSystem} is mounted, false if not.</td>
-         * </tr>
-         * </table>
-         */
-        public static final FunctionDefinition<Void>                            SET_MOUNTED;
-
-        static {
-
-            GET_FILE_SYSTEM = FunctionDefinitionFactory.create("getFileSystem", KnownFileSystem.class, PropertyAccessorFactory.createGet(FILE_SYSTEM));
-            SET_FILE_SYSTEM = FunctionDefinitionFactory.create("setFileSystem", KnownFileSystem.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(FILE_SYSTEM)), FileSystem.class);
-
-            GET_MOUNTPOINT = FunctionDefinitionFactory.create("getMountpoint", KnownFileSystem.class, PropertyAccessorFactory.createGet(MOUNTPOINT));
-            SET_MOUNTPOINT = FunctionDefinitionFactory.create("setMountpoint", KnownFileSystem.class, PropertyAccessorFactory.createSet(MOUNTPOINT), String.class);
-            SET_MOUNTPOINT.addExecutor(KnownFileSystem.class, "checkNotMounted", new FunctionExecutor<Void>() {
+            MOUNTPOINT.addSetterExecutor("checkNotMounted", KnownFileSystem.class, new FunctionExecutor<Void>() {
 
                 @Override
                 @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
                 public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                    Validate.isTrue(!invocation.getHolder().get(IS_MOUNTED).invoke(), "Can't change mountpoint of known file system while mounted");
+                    Validate.isTrue(!invocation.getHolder().get(MOUNTED).get(), "Can't change mountpoint of known file system while mounted");
                     return invocation.next(arguments);
                 }
 
             });
 
-            IS_MOUNTED = FunctionDefinitionFactory.create("isMounted", KnownFileSystem.class, PropertyAccessorFactory.createGet(MOUNTED));
-            SET_MOUNTED = FunctionDefinitionFactory.create("setMounted", KnownFileSystem.class, PropertyAccessorFactory.createSet(MOUNTED), Boolean.class);
-            SET_MOUNTED.addExecutor(KnownFileSystem.class, "checkMountpointNotTaken", new FunctionExecutor<Void>() {
+            MOUNTED = ObjectProperty.createDefinition("mounted", false);
+            MOUNTED.addSetterExecutor("checkMountpointNotTaken", KnownFileSystem.class, new FunctionExecutor<Void>() {
 
                 @Override
                 @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
@@ -537,7 +391,7 @@ public class FileSystemModule extends OSModule {
 
                     FeatureHolder holder = invocation.getHolder();
                     FileSystemModule parent = ((KnownFileSystem) holder).getParent();
-                    Validate.isTrue(parent.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke(holder.get(GET_MOUNTPOINT).invoke()) == null, "Other known file system with same mountpoint already mounted");
+                    Validate.isTrue(parent.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke(holder.get(MOUNTPOINT).get()) == null, "Other known file system with same mountpoint already mounted");
 
                     return invocation.next(arguments);
                 }
@@ -546,7 +400,7 @@ public class FileSystemModule extends OSModule {
 
         }
 
-        // ----- Functions End -----
+        // ----- Properties End -----
 
         /**
          * Creates a new known file system representation object.

@@ -20,16 +20,12 @@ package com.quartercode.disconnected.world.comp.os;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
-import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.comp.os.Configuration.ConfigurationEntry;
 
@@ -47,7 +43,7 @@ public class Group extends ConfigurationEntry {
      * The name of the group.
      * The name is used for recognizing a group on the os-level.
      */
-    protected static final FeatureDefinition<ObjectProperty<String>> NAME;
+    public static final PropertyDefinition<String> NAME;
 
     static {
 
@@ -59,39 +55,9 @@ public class Group extends ConfigurationEntry {
 
     // ----- Functions -----
 
-    /**
-     * Returns the name of the group.
-     * The name is used for recognizing a group on the os-level.
-     */
-    public static final FunctionDefinition<String>                   GET_NAME;
-
-    /**
-     * Changes the name of the group.
-     * The name is used for recognizing a group on the os-level.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link String}</td>
-     * <td>name</td>
-     * <td>The new name of the group.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                     SET_NAME;
-
     static {
 
-        GET_NAME = FunctionDefinitionFactory.create("getName", Group.class, PropertyAccessorFactory.createGet(NAME));
-        SET_NAME = FunctionDefinitionFactory.create("setName", Group.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(NAME)), String.class);
-
-        GET_COLUMNS.addExecutor(User.class, "default", new FunctionExecutor<Map<String, Object>>() {
+        GET_COLUMNS.addExecutor("default", User.class, new FunctionExecutor<Map<String, Object>>() {
 
             @Override
             public Map<String, Object> invoke(FunctionInvocation<Map<String, Object>> invocation, Object... arguments) throws ExecutorInvocationException {
@@ -99,14 +65,14 @@ public class Group extends ConfigurationEntry {
                 Map<String, Object> columns = new HashMap<String, Object>();
                 FeatureHolder holder = invocation.getHolder();
 
-                columns.put("name", holder.get(GET_NAME).invoke());
+                columns.put("name", holder.get(NAME).get());
 
                 columns.putAll(NullPreventer.prevent(invocation.next(arguments)));
                 return columns;
             }
 
         });
-        SET_COLUMNS.addExecutor(User.class, "default", new FunctionExecutor<Void>() {
+        SET_COLUMNS.addExecutor("default", User.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
@@ -116,7 +82,7 @@ public class Group extends ConfigurationEntry {
                 Map<String, Object> columns = (Map<String, Object>) arguments[0];
                 FeatureHolder holder = invocation.getHolder();
 
-                holder.get(SET_NAME).invoke(columns.get("name"));
+                holder.get(NAME).set((String) columns.get("name"));
 
                 return invocation.next(arguments);
             }

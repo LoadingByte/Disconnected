@@ -23,16 +23,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.comp.os.Configuration.ConfigurationEntry;
 
@@ -46,7 +44,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
     /**
      * The separator which is used to separate the different entries of a value list.
      */
-    public static final String                                       LIST_SEPARATOR = ":";
+    public static final String                           LIST_SEPARATOR = ":";
 
     // ----- Properties -----
 
@@ -54,13 +52,13 @@ public class EnvironmentVariable extends ConfigurationEntry {
      * The name of the environment variable (the "key").
      * It is final and can't be changed.
      */
-    protected static final FeatureDefinition<ObjectProperty<String>> NAME;
+    public static final PropertyDefinition<String>       NAME;
 
     /**
      * The value {@link String} which is assigned to the environment variable.
      * It is modifiable can be changed.
      */
-    protected static final FeatureDefinition<ObjectProperty<String>> VALUE;
+    public static final PropertyDefinition<String>       VALUE;
 
     static {
 
@@ -74,57 +72,6 @@ public class EnvironmentVariable extends ConfigurationEntry {
     // ----- Functions -----
 
     /**
-     * Returns the name of the environment variable (the "key").
-     */
-    public static final FunctionDefinition<String>                   GET_NAME;
-
-    /**
-     * Changes the name of the environment variable (the "key").
-     * This method is typically locked and shouldn't be used while the environment variable is used.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link String}</td>
-     * <td>name</td>
-     * <td>The new name of the environment variable.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                     SET_NAME;
-
-    /**
-     * Returns the value {@link String} which is assigned to the environment variable.
-     */
-    public static final FunctionDefinition<String>                   GET_VALUE;
-
-    /**
-     * Changes the value {@link String} which is assigned to the environment variable.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link String}</td>
-     * <td>value</td>
-     * <td>The new value of the environment variable.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                     SET_VALUE;
-
-    /**
      * Returns the value you can retrieve with {@link #GET_VALUE} as a {@link List}.
      * Such a list is a collection of entries separated by the character {@value #LIST_SEPARATOR}.
      * Example:
@@ -136,7 +83,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
      * 
      * Modifications to the returned {@link List} object do not apply to the variable.
      */
-    public static final FunctionDefinition<List<String>>             GET_VALUE_LIST;
+    public static final FunctionDefinition<List<String>> GET_VALUE_LIST;
 
     /**
      * Changes the value of the environment variable to the given {@link List}.
@@ -166,22 +113,16 @@ public class EnvironmentVariable extends ConfigurationEntry {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                     SET_VALUE_LIST;
+    public static final FunctionDefinition<Void>         SET_VALUE_LIST;
 
     static {
-
-        GET_NAME = FunctionDefinitionFactory.create("getName", EnvironmentVariable.class, PropertyAccessorFactory.createGet(NAME));
-        SET_NAME = FunctionDefinitionFactory.create("setName", EnvironmentVariable.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(NAME)), String.class);
-
-        GET_VALUE = FunctionDefinitionFactory.create("getValue", EnvironmentVariable.class, PropertyAccessorFactory.createGet(VALUE));
-        SET_VALUE = FunctionDefinitionFactory.create("setValue", EnvironmentVariable.class, PropertyAccessorFactory.createSet(VALUE), String.class);
 
         GET_VALUE_LIST = FunctionDefinitionFactory.create("getValueList", EnvironmentVariable.class, new FunctionExecutor<List<String>>() {
 
             @Override
             public List<String> invoke(FunctionInvocation<List<String>> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                String value = invocation.getHolder().get(GET_VALUE).invoke();
+                String value = invocation.getHolder().get(VALUE).get();
                 List<String> valueList = new ArrayList<String>();
 
                 if (value != null && !value.isEmpty()) {
@@ -208,14 +149,14 @@ public class EnvironmentVariable extends ConfigurationEntry {
                 for (String listValue : list) {
                     value += ":" + listValue;
                 }
-                invocation.getHolder().get(SET_VALUE).invoke(value.substring(1));
+                invocation.getHolder().get(VALUE).set(value.substring(1));
 
                 return invocation.next(arguments);
             }
 
         }, List.class);
 
-        GET_COLUMNS.addExecutor(EnvironmentVariable.class, "default", new FunctionExecutor<Map<String, Object>>() {
+        GET_COLUMNS.addExecutor("default", EnvironmentVariable.class, new FunctionExecutor<Map<String, Object>>() {
 
             @Override
             public Map<String, Object> invoke(FunctionInvocation<Map<String, Object>> invocation, Object... arguments) throws ExecutorInvocationException {
@@ -223,15 +164,15 @@ public class EnvironmentVariable extends ConfigurationEntry {
                 Map<String, Object> columns = new HashMap<String, Object>();
                 FeatureHolder holder = invocation.getHolder();
 
-                columns.put("name", holder.get(GET_NAME).invoke());
-                columns.put("value", holder.get(GET_VALUE).invoke());
+                columns.put("name", holder.get(NAME).get());
+                columns.put("value", holder.get(VALUE).get());
 
                 columns.putAll(NullPreventer.prevent(invocation.next(arguments)));
                 return columns;
             }
 
         });
-        SET_COLUMNS.addExecutor(EnvironmentVariable.class, "default", new FunctionExecutor<Void>() {
+        SET_COLUMNS.addExecutor("default", EnvironmentVariable.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
@@ -241,8 +182,8 @@ public class EnvironmentVariable extends ConfigurationEntry {
                 Map<String, Object> columns = (Map<String, Object>) arguments[0];
                 FeatureHolder holder = invocation.getHolder();
 
-                holder.get(SET_NAME).invoke(columns.get("name"));
-                holder.get(SET_VALUE).invoke(columns.get("value"));
+                holder.get(NAME).set((String) columns.get("name"));
+                holder.get(VALUE).set((String) columns.get("value"));
 
                 return invocation.next(arguments);
             }

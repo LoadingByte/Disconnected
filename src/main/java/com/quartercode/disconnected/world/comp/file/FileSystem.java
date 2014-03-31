@@ -18,15 +18,15 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.Property;
+import com.quartercode.classmod.extra.PropertyDefinition;
+import com.quartercode.classmod.extra.def.AbstractPropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.classmod.util.PropertyAccessorFactory;
@@ -47,20 +47,21 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
     /**
      * The size of the file system, given in bytes.
      */
-    protected static final FeatureDefinition<ObjectProperty<Long>>     SIZE;
+    public static final PropertyDefinition<Long>        SIZE;
 
     /**
      * The {@link RootFile} every other {@link File} branches of somehow.
      */
-    protected static final FeatureDefinition<ObjectProperty<RootFile>> ROOT;
+    protected static final PropertyDefinition<RootFile> ROOT;
 
     static {
 
         SIZE = ObjectProperty.createDefinition("size");
-        ROOT = new AbstractFeatureDefinition<ObjectProperty<RootFile>>("root") {
+
+        ROOT = new AbstractPropertyDefinition<RootFile>("root") {
 
             @Override
-            public ObjectProperty<RootFile> create(FeatureHolder holder) {
+            public Property<RootFile> create(FeatureHolder holder) {
 
                 RootFile root = new RootFile();
                 root.setParent((FileSystem) holder);
@@ -76,34 +77,9 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
     // ----- Functions -----
 
     /**
-     * Returns the size of the file system in bytes.
-     */
-    public static final FunctionDefinition<Long>                       GET_SIZE = DerivableSize.GET_SIZE;
-
-    /**
-     * Changes the size of the file system, given in bytes.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Long}</td>
-     * <td>size</td>
-     * <td>The new size of the file system.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                       SET_SIZE;
-
-    /**
      * Returns the {@link RootFile} every other {@link File} branches of somehow.
      */
-    public static final FunctionDefinition<RootFile>                   GET_ROOT;
+    public static final FunctionDefinition<RootFile>    GET_ROOT;
 
     /**
      * Returns the {@link File} which is stored under the given path.
@@ -125,7 +101,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<File<?>>                    GET_FILE;
+    public static final FunctionDefinition<File<?>>     GET_FILE;
 
     /**
      * Adds the given {@link File} to the file system.
@@ -168,22 +144,19 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                       ADD_FILE;
+    public static final FunctionDefinition<Void>        ADD_FILE;
 
     /**
      * Returns the total amount of bytes which are occupied by {@link File}s on the file system.
      */
-    public static final FunctionDefinition<Long>                       GET_FILLED;
+    public static final FunctionDefinition<Long>        GET_FILLED;
 
     /**
      * Returns the total amount of bytes which are not occupied by {@link File}s on the file system.
      */
-    public static final FunctionDefinition<Long>                       GET_FREE;
+    public static final FunctionDefinition<Long>        GET_FREE;
 
     static {
-
-        GET_SIZE.addExecutor(FileSystem.class, "fileSystemSize", PropertyAccessorFactory.createGet(SIZE));
-        SET_SIZE = FunctionDefinitionFactory.create("setSize", FileSystem.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(SIZE)), Long.class);
 
         GET_ROOT = FunctionDefinitionFactory.create("getRoot", FileSystem.class, PropertyAccessorFactory.createGet(ROOT));
 
@@ -219,21 +192,21 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
                 String[] parts = ((String) arguments[1]).split(File.SEPARATOR);
                 File<?> current = invocation.getHolder().get(GET_ROOT).invoke();
-                File<FeatureHolder> file = (File<FeatureHolder>) arguments[0];
+                File<ParentFile<?>> file = (File<ParentFile<?>>) arguments[0];
                 for (int counter = 0; counter < parts.length; counter++) {
                     String part = parts[counter];
                     if (!part.isEmpty()) {
                         if (current.get(ParentFile.GET_CHILD_BY_NAME).invoke(part) == null) {
                             if (counter == parts.length - 1) {
-                                file.get(File.SET_NAME).invoke(part);
-                                current.get(ParentFile.ADD_CHILDREN).invoke(file);
+                                file.get(File.NAME).set(part);
+                                current.get(ParentFile.CHILDREN).add(file);
                                 break;
                             } else {
                                 Directory directory = new Directory();
-                                directory.get(File.SET_NAME).invoke(part);
-                                directory.get(File.SET_OWNER).invoke(file.get(File.GET_OWNER).invoke());
-                                directory.get(File.SET_GROUP).invoke(file.get(File.GET_GROUP).invoke());
-                                current.get(ParentFile.ADD_CHILDREN).invoke(directory);
+                                directory.get(File.NAME).set(part);
+                                directory.get(File.OWNER).set(file.get(File.OWNER).get());
+                                directory.get(File.GROUP).set(file.get(File.GROUP).get());
+                                current.get(ParentFile.CHILDREN).add(directory);
                             }
                         }
                         current = current.get(ParentFile.GET_CHILD_BY_NAME).invoke(part);
@@ -271,6 +244,8 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
             }
 
         });
+
+        GET_SIZE.addExecutor("fileSystemSize", FileSystem.class, PropertyAccessorFactory.createGet(SIZE));
 
     }
 

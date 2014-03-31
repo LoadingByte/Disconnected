@@ -32,6 +32,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import com.quartercode.classmod.base.Feature;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.Property;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.Main;
@@ -63,7 +64,7 @@ public class ProfileSerializerTest {
     }
 
     @Test
-    public void testSerializeWorld() throws IOException, JAXBException {
+    public void testSerializeWorld() throws IOException, JAXBException, ExecutorInvocationException {
 
         StringWriter serialized = new StringWriter();
         WriterOutputStream outputStream = new WriterOutputStream(serialized);
@@ -77,7 +78,7 @@ public class ProfileSerializerTest {
     /*
      * Method for checking whether the persistent features of the given feature holders are equal to each other.
      */
-    private boolean equalsPersistent(DefaultFeatureHolder holder1, DefaultFeatureHolder holder2) {
+    private boolean equalsPersistent(DefaultFeatureHolder holder1, DefaultFeatureHolder holder2) throws ExecutorInvocationException {
 
         Set<Feature> features1 = holder1.getPersistentFeatures();
         Set<Feature> features2 = holder2.getPersistentFeatures();
@@ -103,7 +104,7 @@ public class ProfileSerializerTest {
         }
     }
 
-    private boolean equalsPersistent(Feature feature1, Feature feature2) {
+    private boolean equalsPersistent(Feature feature1, Feature feature2) throws ExecutorInvocationException {
 
         // Only check for persistent properties
         if (! (feature1 instanceof Property) || ! (feature2 instanceof Property)) {
@@ -113,7 +114,7 @@ public class ProfileSerializerTest {
         return equalsPersistent( ((Property<?>) feature1).get(), ((Property<?>) feature2).get());
     }
 
-    private boolean equalsPersistent(Object o1, Object o2) {
+    private boolean equalsPersistent(Object o1, Object o2) throws ExecutorInvocationException {
 
         if (o1 instanceof Collection<?> && o2 instanceof Collection<?>) {
             Object[] collection1 = ((Collection<?>) o1).toArray(new Object[ ((Collection<?>) o1).size()]);

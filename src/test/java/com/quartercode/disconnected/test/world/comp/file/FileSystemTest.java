@@ -36,12 +36,10 @@ public class FileSystemTest {
     public void setUp() throws ExecutorInvocationException {
 
         fileSystem = new FileSystem();
-        fileSystem.setLocked(false);
-        fileSystem.get(FileSystem.SET_SIZE).invoke(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
-        fileSystem.setLocked(true);
+        fileSystem.get(FileSystem.SIZE).set(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
 
         testFile = new ContentFile();
-        testFile.get(ContentFile.SET_CONTENT).invoke("Test-Content");
+        testFile.get(ContentFile.CONTENT).set("Test-Content");
         fileSystem.get(FileSystem.ADD_FILE).invoke(testFile, "/test1/test2/test.txt");
     }
 

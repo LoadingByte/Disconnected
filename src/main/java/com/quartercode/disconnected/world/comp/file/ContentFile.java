@@ -18,15 +18,12 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
-import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
+import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 
 /**
@@ -43,59 +40,12 @@ public class ContentFile extends File<ParentFile<?>> {
     /**
      * The content of the content file.
      */
-    protected static final FeatureDefinition<ObjectProperty<Object>> CONTENT;
+    public static final PropertyDefinition<Object> CONTENT;
 
     static {
 
         CONTENT = ObjectProperty.createDefinition("content");
-
-    }
-
-    // ----- Properties End -----
-
-    // ----- Functions -----
-
-    /**
-     * Returns the content of the content file.
-     */
-    public static final FunctionDefinition<Object>                   GET_CONTENT;
-
-    /**
-     * Changes the content of the content file.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Object}</td>
-     * <td>content</td>
-     * <td>The new content of the content file.</td>
-     * </tr>
-     * </table>
-     * 
-     * <table>
-     * <tr>
-     * <th>Exception</th>
-     * <th>When?</th>
-     * </tr>
-     * <tr>
-     * <td>{@link OutOfSpaceException}</td>
-     * <td>There is not enough space for the new file content.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                     SET_CONTENT;
-
-    static {
-
-        GET_CONTENT = FunctionDefinitionFactory.create("getContent", ContentFile.class, PropertyAccessorFactory.createGet(CONTENT));
-        SET_CONTENT = FunctionDefinitionFactory.create("setContent", ContentFile.class, PropertyAccessorFactory.createSet(CONTENT), Object.class);
-        SET_CONTENT.addExecutor(ContentFile.class, "checkSize", new FunctionExecutor<Void>() {
+        CONTENT.addSetterExecutor("checkSize", ContentFile.class, new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
@@ -111,7 +61,15 @@ public class ContentFile extends File<ParentFile<?>> {
 
         });
 
-        GET_SIZE.addExecutor(ContentFile.class, "content", SizeUtil.createGetSize(CONTENT));
+    }
+
+    // ----- Properties End -----
+
+    // ----- Functions -----
+
+    static {
+
+        GET_SIZE.addExecutor("content", ContentFile.class, SizeUtil.createGetSize(CONTENT));
 
     }
 

@@ -20,14 +20,14 @@ package com.quartercode.disconnected.world.comp.file;
 
 import java.util.HashSet;
 import java.util.Set;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
-import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
@@ -46,24 +46,51 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
     // ----- Properties -----
 
     /**
-     * The child {@link File}s the parent file contains.
+     * The child {@link File}s the parent file contains.<br>
+     * <br>
+     * Exceptions that can occur when adding:
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link OutOfSpaceException}</td>
+     * <td>There is not enough space for the new child {@link File}s.</td>
+     * </tr>
+     * </table>
      */
-    protected static final FeatureDefinition<ObjectProperty<Set<File<ParentFile<?>>>>> CHILDREN;
+    public static final CollectionPropertyDefinition<File<ParentFile<?>>, Set<File<ParentFile<?>>>> CHILDREN;
 
     static {
 
-        CHILDREN = ObjectProperty.<Set<File<ParentFile<?>>>> createDefinition("children", new HashSet<File<ParentFile<?>>>());
+        CHILDREN = ObjectCollectionProperty.createDefinition("children", new HashSet<File<ParentFile<?>>>());
+        CHILDREN.addAdderExecutor("checkSize", ParentFile.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+
+                FileSystem fileSystem = invocation.getHolder().get(GET_FILE_SYSTEM).invoke();
+                if (fileSystem != null) {
+                    int totalSize = 0;
+                    totalSize += SizeUtil.getSize(arguments[0]);
+                    if (totalSize > fileSystem.get(FileSystem.GET_FREE).invoke()) {
+                        throw new ExecutorInvocationException(new OutOfSpaceException(fileSystem, totalSize));
+                    }
+                }
+
+                return invocation.next(arguments);
+            }
+
+        });
 
     }
 
     // ----- Properties End -----
 
     // ----- Functions -----
-
-    /**
-     * Returns the child {@link File}s the parent file contains.
-     */
-    public static final FunctionDefinition<Set<File<ParentFile<?>>>>                   GET_CHILDREN;
 
     /**
      * Returns the child {@link File} which has the given name.
@@ -83,123 +110,21 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<File<ParentFile<?>>>                        GET_CHILD_BY_NAME;
-
-    /**
-     * Adds child {@link File}s to the parent file.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0...</td>
-     * <td>{@link File}...</td>
-     * <td>files</td>
-     * <td>The child {@link File}s to add to the parent file.</td>
-     * </tr>
-     * </table>
-     * 
-     * <table>
-     * <tr>
-     * <th>Exception</th>
-     * <th>When?</th>
-     * </tr>
-     * <tr>
-     * <td>{@link OutOfSpaceException}</td>
-     * <td>There is not enough space for the new child {@link File}s.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                                       ADD_CHILDREN;
-
-    /**
-     * Removes child {@link File}s from the parent file.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0...</td>
-     * <td>{@link File}...</td>
-     * <td>files</td>
-     * <td>The child {@link File}s to remove from the parent file.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                                       REMOVE_CHILDREN;
+    public static final FunctionDefinition<File<ParentFile<?>>>                                     GET_CHILD_BY_NAME;
 
     static {
 
-        GET_CHILDREN = FunctionDefinitionFactory.create("getChildren", ParentFile.class, CollectionPropertyAccessorFactory.createGet(CHILDREN));
         GET_CHILD_BY_NAME = FunctionDefinitionFactory.create("getChildByName", ParentFile.class, CollectionPropertyAccessorFactory.createGetSingle(CHILDREN, new CriteriumMatcher<File<ParentFile<?>>>() {
 
             @Override
             public boolean matches(File<ParentFile<?>> element, Object... arguments) throws ExecutorInvocationException {
 
-                return element.get(GET_NAME).invoke().equals(arguments[0]);
+                return element.get(NAME).get().equals(arguments[0]);
             }
 
         }), String.class);
-        ADD_CHILDREN = FunctionDefinitionFactory.create("addChildren", ParentFile.class, CollectionPropertyAccessorFactory.createAdd(CHILDREN), File[].class);
-        ADD_CHILDREN.addExecutor(ParentFile.class, "checkSize", new FunctionExecutor<Void>() {
 
-            @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
-
-                FileSystem fileSystem = invocation.getHolder().get(GET_FILE_SYSTEM).invoke();
-                if (fileSystem != null) {
-                    int totalSize = 0;
-                    for (Object file : arguments) {
-                        totalSize += SizeUtil.getSize(file);
-                    }
-                    if (totalSize > fileSystem.get(FileSystem.GET_FREE).invoke()) {
-                        throw new ExecutorInvocationException(new OutOfSpaceException(fileSystem, totalSize));
-                    }
-                }
-
-                return invocation.next(arguments);
-            }
-
-        });
-        ADD_CHILDREN.addExecutor(ParentFile.class, "setParent", new FunctionExecutor<Void>() {
-
-            @Override
-            @SuppressWarnings ("unchecked")
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
-
-                for (Object file : arguments) {
-                    ((File<FeatureHolder>) file).setParent(invocation.getHolder());
-                }
-
-                return invocation.next(arguments);
-            }
-
-        });
-        REMOVE_CHILDREN = FunctionDefinitionFactory.create("removeChildren", ParentFile.class, CollectionPropertyAccessorFactory.createRemove(CHILDREN), File[].class);
-        REMOVE_CHILDREN.addExecutor(ParentFile.class, "removeParent", new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
-
-                for (Object file : arguments) {
-                    ((File<?>) file).setParent(null);
-                }
-
-                return invocation.next(arguments);
-            }
-
-        });
-
-        GET_SIZE.addExecutor(ParentFile.class, "children", SizeUtil.createGetSize(CHILDREN));
+        GET_SIZE.addExecutor("children", ParentFile.class, SizeUtil.createGetSize(CHILDREN));
 
     }
 

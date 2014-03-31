@@ -18,12 +18,8 @@
 
 package com.quartercode.disconnected.world.comp.hardware;
 
-import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.extra.FunctionDefinition;
-import com.quartercode.classmod.extra.def.LockableFEWrapper;
+import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
@@ -46,7 +42,7 @@ public class HardDrive extends Hardware {
      * The {@link FileSystem} the hard drive contains.
      * It is constructed automatically after creation.
      */
-    protected static final FeatureDefinition<ObjectProperty<FileSystem>> FILE_SYSTEM;
+    public static final PropertyDefinition<FileSystem> FILE_SYSTEM;
 
     static {
 
@@ -55,42 +51,6 @@ public class HardDrive extends Hardware {
     }
 
     // ----- Properties End -----
-
-    // ----- Functions -----
-
-    /**
-     * Returns the {@link FileSystem} the hard drive contains.
-     */
-    public static final FunctionDefinition<FileSystem>                   GET_FILE_SYSTEM;
-
-    /**
-     * Changes the {@link FileSystem} the hard drive contains.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link FileSystem}</td>
-     * <td>fileSystem</td>
-     * <td>The new {@link FileSystem}.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                         SET_FILE_SYSTEM;
-
-    static {
-
-        GET_FILE_SYSTEM = FunctionDefinitionFactory.create("getFileSystem", HardDrive.class, PropertyAccessorFactory.createGet(FILE_SYSTEM));
-        SET_FILE_SYSTEM = FunctionDefinitionFactory.create("setFileSystem", HardDrive.class, new LockableFEWrapper<Void>(PropertyAccessorFactory.createSet(FILE_SYSTEM)), FileSystem.class);
-
-    }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new hard drive.
