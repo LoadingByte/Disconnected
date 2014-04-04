@@ -21,9 +21,8 @@ package com.quartercode.disconnected.sim.run;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.extra.CollectionProperty;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
-import com.quartercode.classmod.extra.Property;
+import com.quartercode.classmod.extra.GetterSupplier;
 import com.quartercode.disconnected.sim.Simulation;
 
 /**
@@ -96,14 +95,12 @@ public class TickSimulator implements TickAction {
             ((TickUpdatable) object).get(TickUpdatable.TICK_UPDATE).invoke();
         }
 
-        if (object instanceof Iterable) {
-            for (Object child : (Iterable<?>) object) {
+        if (object instanceof FeatureHolder) {
+            for (Object child : (FeatureHolder) object) {
                 updateObject(child);
             }
-        } else if (object instanceof Property) {
-            updateObject( ((Property<?>) object).get());
-        } else if (object instanceof CollectionProperty) {
-            updateObject( ((CollectionProperty<?, ?>) object).get());
+        } else if (object instanceof GetterSupplier) {
+            updateObject( ((GetterSupplier<?>) object).get());
         }
     }
 
