@@ -285,7 +285,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
 
     }
 
-    // ----- Function Definitions End ----
+    // ----- Functions End -----
 
     /**
      * Creates a new program executor.

@@ -220,7 +220,7 @@ public class Ticker {
                         try {
                             action.update();
                         } catch (Throwable t) {
-                            LOGGER.log(Level.SEVERE, "An exception occurred while executing tick action update (tick action " + action.getClass().getName() + ")", t);
+                            LOGGER.log(Level.SEVERE, "An exception occurred while executing tick action update (tick action '" + action.getClass().getName() + "')", t);
                         }
                     }
 

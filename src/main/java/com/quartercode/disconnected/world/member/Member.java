@@ -31,7 +31,7 @@ import com.quartercode.disconnected.world.member.ai.AIController;
  * This class represents a member of a simulation (someone who has a brain containing specific interests and knowledge entries).
  * The member doesn't know his simulation, so you could use one member in multiple simulations.
  * A member also holds brain data like interest or knowledge chunks.
- * An AIController controls the behavior of the member (if no controller is set, the member is a human player).
+ * An AIController controls the behavior of the member.
  * 
  * @see BrainData
  * @see AIController

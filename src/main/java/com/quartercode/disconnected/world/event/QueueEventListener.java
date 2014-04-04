@@ -131,7 +131,7 @@ public class QueueEventListener extends DefaultFeatureHolder implements EventLis
 
     }
 
-    // ----- Function Definitions End ----
+    // ----- Functions End -----
 
     /**
      * Creates a new queue event listener.

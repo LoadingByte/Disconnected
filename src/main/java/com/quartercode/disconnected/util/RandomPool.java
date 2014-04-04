@@ -27,7 +27,7 @@ import java.util.Random;
 /**
  * A random pool stores a list of randoms for generating more independent randoms out of one object.
  * The randoms can get added manually or generated using another random which generates their seeds.
- * If a random number is requested, the next avaiable random in the list generates the number, and the index for the next generation increases by one.
+ * If a random number is requested, the next available random in the list generates the number, and the index for the next generation increases by one.
  * The next time, the next random will generate the number.
  * This is especially useful for generating large fields of random numbers without any pattern. If you need a pattern, you should use the original class instead.
  * 
