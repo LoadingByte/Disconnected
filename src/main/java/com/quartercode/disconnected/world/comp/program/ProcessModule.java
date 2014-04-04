@@ -24,16 +24,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.extra.Delay;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.sim.run.TickSimulator.TickUpdatable;
+import com.quartercode.disconnected.sim.run.FunctionCallScheduleTask;
+import com.quartercode.disconnected.sim.run.SchedulerUser;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
@@ -53,7 +52,7 @@ import com.quartercode.disconnected.world.comp.os.OperatingSystem;
  * @see OSModule
  * @see OperatingSystem
  */
-public class ProcessModule extends OSModule implements TickUpdatable {
+public class ProcessModule extends OSModule implements SchedulerUser {
 
     // ----- Properties -----
 
@@ -77,6 +76,12 @@ public class ProcessModule extends OSModule implements TickUpdatable {
      * Returns a {@link List} containing all currently running {@link Process}es.
      */
     public static final FunctionDefinition<Set<Process<?>>> GET_ALL;
+
+    /**
+     * Kills the whole {@link Process} tree immediately.
+     * By default, this function just stops the root process.
+     */
+    public static final FunctionDefinition<Void>            KILL;
 
     static {
 
@@ -134,38 +139,24 @@ public class ProcessModule extends OSModule implements TickUpdatable {
                 // Only invoke on shutdown
                 if (! ((Boolean) arguments[0])) {
                     holder.get(ROOT_PROCESS).get().get(Process.INTERRUPT).invoke();
-                    // Stop the root process after 5 seconds
-                    holder.get(TICK_UPDATE).getExecutor("stopRootProcess").setLocked(false);
+                    // Kill the process tree after 5 seconds
+                    holder.get(SCHEDULER).schedule(new FunctionCallScheduleTask(KILL, ProcessModule.class), Ticker.DEFAULT_TICKS_PER_SECOND * 5);
                 }
 
                 return invocation.next(arguments);
             }
 
         });
-        TICK_UPDATE.addExecutor("stopRootProcess", RootProcess.class, new FunctionExecutor<Void>() {
+
+        KILL = FunctionDefinitionFactory.create("kill", ProcessModule.class, new FunctionExecutor<Void>() {
 
             @Override
-            // 5 seconds delay after interrupt
-            @Delay (firstDelay = Ticker.DEFAULT_TICKS_PER_SECOND * 5)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 FeatureHolder holder = invocation.getHolder();
                 holder.get(ROOT_PROCESS).get().get(Process.STOP).invoke();
                 holder.get(ROOT_PROCESS).set(null);
 
-                invocation.getHolder().get(TICK_UPDATE).getExecutor("stopAfterDelay").setLocked(true);
-                return invocation.next(arguments);
-            }
-
-        });
-
-        TICK_UPDATE.addExecutor("lockDefaults", RootProcess.class, new FunctionExecutor<Void>() {
-
-            @Override
-            @Prioritized (Prioritized.LEVEL_7)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
-
-                invocation.getHolder().get(TICK_UPDATE).getExecutor("stopRootProcess").setLocked(true);
                 return invocation.next(arguments);
             }
 

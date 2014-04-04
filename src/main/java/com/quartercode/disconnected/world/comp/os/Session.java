@@ -28,7 +28,6 @@ import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Limit;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ReferenceProperty;
@@ -99,11 +98,10 @@ public class Session extends ProgramExecutor {
 
         });
 
-        TICK_UPDATE.addExecutor("setUserFromArgument", Session.class, new FunctionExecutor<Void>() {
+        RUN.addExecutor("setUserFromArgument", Session.class, new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_7)
-            @Limit (1)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 FeatureHolder holder = invocation.getHolder();
@@ -132,11 +130,10 @@ public class Session extends ProgramExecutor {
 
         });
 
-        TICK_UPDATE.addExecutor("checkPassword", Session.class, new FunctionExecutor<Void>() {
+        RUN.addExecutor("checkPassword", Session.class, new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_5)
-            @Limit (1)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 FeatureHolder holder = invocation.getHolder();

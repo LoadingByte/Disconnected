@@ -18,16 +18,10 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.extra.Delay;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
-import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.sim.run.TickSimulator.TickUpdatable;
-import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 
 /**
@@ -35,55 +29,11 @@ import com.quartercode.disconnected.world.comp.os.OperatingSystem;
  * 
  * @see Process
  */
-public class RootProcess extends Process<OperatingSystem> implements TickUpdatable {
+public class RootProcess extends Process<OperatingSystem> {
 
     // ----- Functions -----
 
-    /**
-     * Waits 5 seconds (5 times the default amount of ticks per second) and then stops the root process.
-     */
-    public static final FunctionDefinition<Void> WAIT_AND_STOP;
-
     static {
-
-        WAIT_AND_STOP = FunctionDefinitionFactory.create("waitAndStop", RootProcess.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
-
-                invocation.getHolder().get(TICK_UPDATE).getExecutor("stopAfterDelay").setLocked(false);
-                return invocation.next(arguments);
-            }
-
-        });
-
-        TICK_UPDATE.addExecutor("lockDefaults", RootProcess.class, new FunctionExecutor<Void>() {
-
-            @Override
-            @Prioritized (Prioritized.LEVEL_7)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
-
-                invocation.getHolder().get(TICK_UPDATE).getExecutor("stopAfterDelay").setLocked(true);
-                return invocation.next(arguments);
-            }
-
-        });
-        TICK_UPDATE.addExecutor("stopAfterDelay", RootProcess.class, new FunctionExecutor<Void>() {
-
-            @Override
-            // 5 seconds delay after interrupt
-            @Delay (firstDelay = Ticker.DEFAULT_TICKS_PER_SECOND * 5)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
-
-                FeatureHolder holder = invocation.getHolder();
-                holder.get(Process.STOP).invoke();
-                holder.get(ProcessModule.ROOT_PROCESS).set(null);
-
-                invocation.getHolder().get(TICK_UPDATE).getExecutor("stopAfterDelay").setLocked(true);
-                return invocation.next(arguments);
-            }
-
-        });
 
         GET_ROOT.addExecutor("returnThis", RootProcess.class, new FunctionExecutor<RootProcess>() {
 

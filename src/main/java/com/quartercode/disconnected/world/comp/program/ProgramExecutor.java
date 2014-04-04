@@ -34,7 +34,8 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.extra.def.ReferenceCollectionProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.sim.run.TickSimulator.TickUpdatable;
+import com.quartercode.disconnected.sim.run.Scheduler;
+import com.quartercode.disconnected.sim.run.SchedulerUser;
 import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.program.ArgumentException.MissingArgumentException;
@@ -53,13 +54,13 @@ import com.quartercode.disconnected.world.event.QueueEventListener;
  * @see Process
  * @see PacketListener
  */
-public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>> implements TickUpdatable, EventListener {
+public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>> implements SchedulerUser, EventListener {
 
     // ----- Properties -----
 
     /**
      * The initial arguments the program executor needs to operate.
-     * They should be used from inside the {@link #TICK_UPDATE} method.
+     * They should be used from inside the updating procedures.
      * The arguments are validated against the {@link Parameter}s provided by {@link #GET_PARAMETERS} by {@link #SET_ARGUMENTS}.<br>
      * <br>
      * Exceptions that can occur when setting:
@@ -214,11 +215,10 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
     public static final FunctionDefinition<Event>                                          NEXT_EVENT;
 
     /**
-     * Executes a tick update in the program executor.
-     * Every program is written using the tick system.
-     * You can add {@link FunctionExecutor}s to the definition which actually execute a program tick.
+     * This callback is executed once when the program executor should start running.
+     * For example, this method could schedule tasks using the {@link Scheduler}.
      */
-    public static final FunctionDefinition<Void>                                           TICK_UPDATE = TickUpdatable.TICK_UPDATE;
+    public static final FunctionDefinition<Void>                                           RUN;
 
     static {
 
@@ -265,6 +265,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
 
         });
 
+        // Prevent the scheduler from updating if the current process state isn't an active one
         TICK_UPDATE.addExecutor("checkAllowTick", ProgramExecutor.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -279,6 +280,8 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
             }
 
         });
+
+        RUN = FunctionDefinitionFactory.create("run");
 
     }
 
