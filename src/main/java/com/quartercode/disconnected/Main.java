@@ -205,6 +205,7 @@ public class Main {
 
         registry.registerContextPathEntry(Classmod.CONTEXT_PATH);
 
+        registry.registerContextPathEntry("com.quartercode.disconnected.sim.run");
         registry.registerContextPathEntry("com.quartercode.disconnected.world");
         registry.registerContextPathEntry("com.quartercode.disconnected.world.comp");
         registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.attack");

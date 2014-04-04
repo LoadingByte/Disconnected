@@ -72,7 +72,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
          * The execution is interrupted friendly and should be stopped soon.
          * If a process notes this state, it should try to execute last activities and then stop the execution.
          */
-        INTERRUPTED (false),
+        INTERRUPTED (true),
         /**
          * The execution is permanently stopped.
          * If a process is stopped, it won't be able to start again.
