@@ -18,29 +18,17 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
-import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
+import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.extra.def.ReferenceProperty;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.classmod.util.PropertyAccessorFactory;
-import com.quartercode.disconnected.util.NullPreventer;
-import com.quartercode.disconnected.world.comp.file.ContentFile;
-import com.quartercode.disconnected.world.comp.file.File;
-import com.quartercode.disconnected.world.comp.file.FileSystemModule;
-import com.quartercode.disconnected.world.comp.os.Configuration.ConfigurationEntry;
 import com.quartercode.disconnected.world.comp.program.ChildProcess;
-import com.quartercode.disconnected.world.comp.program.Parameter;
-import com.quartercode.disconnected.world.comp.program.Parameter.ArgumentType;
 import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 
@@ -61,11 +49,19 @@ public class Session extends ProgramExecutor {
      * The {@link User} the session is running under.
      * Every {@link ChildProcess} of the session can use the rights provided by the session.
      */
-    protected static final PropertyDefinition<User> USER;
+    public static final PropertyDefinition<User>   USER;
+
+    /**
+     * The password of the set {@link #USER}.
+     * It is used to verify that opening the new session is authorized and can be null if the parent session is null or a root session.
+     * This password must be supplied in <b>raw form</b> and may not be hashed!
+     */
+    public static final PropertyDefinition<String> PASSWORD;
 
     static {
 
         USER = ReferenceProperty.createDefinition("user");
+        PASSWORD = ObjectProperty.createDefinition("password");
 
     }
 
@@ -73,59 +69,17 @@ public class Session extends ProgramExecutor {
 
     // ----- Functions -----
 
-    /**
-     * Returns the {@link User} the session is running under.
-     * Every {@link ChildProcess} of the session can use the rights provided by the session.
-     */
-    public static final FunctionDefinition<User>    GET_USER;
-
     static {
 
-        GET_USER = FunctionDefinitionFactory.create("getUser", Session.class, PropertyAccessorFactory.createGet(USER));
-
-        GET_PARAMETERS.addExecutor("default", Session.class, new FunctionExecutor<List<Parameter>>() {
-
-            @Override
-            public List<Parameter> invoke(FunctionInvocation<List<Parameter>> invocation, Object... arguments) throws ExecutorInvocationException {
-
-                List<Parameter> parameters = new ArrayList<Parameter>();
-
-                parameters.add(Parameter.createArgument("user", "u", ArgumentType.STRING, false, true));
-
-                parameters.addAll(NullPreventer.prevent(invocation.next(arguments)));
-                return parameters;
-            }
-
-        });
-
-        RUN.addExecutor("setUserFromArgument", Session.class, new FunctionExecutor<Void>() {
+        RUN.addExecutor("checkUser", Session.class, new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                FeatureHolder holder = invocation.getHolder();
-                @SuppressWarnings ("unchecked")
-                Map<String, Object> programArguments = (Map<String, Object>) arguments[0];
-                String username = (String) programArguments.get("user");
+                Validate.notNull(invocation.getHolder().get(USER).get(), "Session user cannot be null");
 
-                // This program is always allowed to read the user configuration file
-                FileSystemModule fsModule = ((Session) holder).getParent().get(Process.GET_OPERATING_SYSTEM).invoke().get(OperatingSystem.GET_FS_MODULE).invoke();
-                File<?> userConfigFile = fsModule.get(FileSystemModule.GET_FILE).invoke(CommonFiles.USER_CONFIG);
-                if (! (userConfigFile instanceof ContentFile) || userConfigFile.get(ContentFile.CONTENT).get() == null) {
-                    throw new IllegalStateException("User configuration file doesn't exist under '" + CommonFiles.USER_CONFIG + "'");
-                }
-                Configuration userConfig = (Configuration) userConfigFile.get(ContentFile.CONTENT).get();
-
-                for (ConfigurationEntry entry : userConfig.get(Configuration.ENTRIES).get()) {
-                    if (entry instanceof User && ((User) entry).get(User.NAME).get().equals(username)) {
-                        holder.get(USER).set((User) entry);
-                        // Continue with the update
-                        return invocation.next(arguments);
-                    }
-                }
-
-                throw new IllegalArgumentException("Unknown user");
+                return invocation.next(arguments);
             }
 
         });
@@ -138,18 +92,19 @@ public class Session extends ProgramExecutor {
 
                 FeatureHolder holder = invocation.getHolder();
 
-                // Check for no parent session or a parent root session
+                // Determine whether a check is required (parent session != null or parent session user != root)
                 Session parentSession = ((Session) holder).getParent().get(Process.GET_SESSION).invoke();
-                if (parentSession != null && !parentSession.get(GET_USER).invoke().get(User.IS_SUPERUSER).invoke()) {
-                    @SuppressWarnings ("unchecked")
-                    Map<String, Object> programArguments = (Map<String, Object>) arguments[0];
-                    String rawPassword = (String) programArguments.get("password");
+                boolean checkRequired = parentSession != null && !parentSession.get(USER).get().get(User.IS_SUPERUSER).invoke();
 
-                    String hashedPassword = DigestUtils.sha256Hex(rawPassword);
-                    Validate.isTrue(holder.get(GET_USER).invoke().get(User.PASSWORD).get().equals(hashedPassword), "Wrong password");
+                if (checkRequired) {
+                    String password = holder.get(PASSWORD).get();
+                    Validate.notNull(password, "Password for session user cannot be null (authorization required)");
+                    String hashedPassword = DigestUtils.sha256Hex(password);
+
+                    String correctPassword = holder.get(USER).get().get(User.PASSWORD).get();
+                    Validate.isTrue(correctPassword.equals(hashedPassword), "Wrong password (authorization required)");
                 }
 
-                // Continue with the update
                 return invocation.next(arguments);
             }
 

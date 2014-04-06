@@ -132,6 +132,9 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
     /**
      * The {@link ProgramExecutor} which contains the logic of the process.
+     * This value is only available after an {@link #INITIALIZE} call.<br>
+     * Argument properties should be passed to this object.<br>
+     * The {@link ProgramExecutor#RUN} method on the stored value finally starts the process.
      */
     public static final PropertyDefinition<ProgramExecutor>                       EXECUTOR;
 
@@ -353,36 +356,11 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
     public static final FunctionDefinition<User>                                  GET_USER;
 
     /**
-     * Launches a new process using the {@link Program} stored in the set source {@link ContentFile}.
-     * The given argument map is handed over to the new {@link ProgramExecutor}.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Map}&lt;{@link String}, {@link Object}&gt;</td>
-     * <td>arguments</td>
-     * <td>Some arguments the {@link ProgramExecutor} which is running the process needs to operate.</td>
-     * </tr>
-     * </table>
-     * 
-     * <table>
-     * <tr>
-     * <th>Exception</th>
-     * <th>When?</th>
-     * </tr>
-     * <tr>
-     * <td>{@link ArgumentException}</td>
-     * <td>The input arguments don't match the parameters provided by {@link ProgramExecutor#GET_PARAMETERS}.</td>
-     * </tr>
-     * </table>
+     * Initializes the process using the {@link Program} that is stored in the set source {@link ContentFile}.
+     * Initialization means setting the {@link #PID} and creating a {@link ProgramExecutor} instance.
+     * Please note that the process needs to be launched using the {@link ProgramExecutor#RUN} method on the {@link #EXECUTOR} after intialization.
      */
-    public static final FunctionDefinition<Void>                                  LAUNCH;
+    public static final FunctionDefinition<Void>                                  INITIALIZE;
 
     static {
 
@@ -606,15 +584,15 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public User invoke(FunctionInvocation<User> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                User user = invocation.getHolder().get(GET_SESSION).invoke().get(Session.GET_USER).invoke();
+                User user = invocation.getHolder().get(GET_SESSION).invoke().get(Session.USER).get();
                 invocation.next(arguments);
                 return user;
             }
 
         });
 
-        LAUNCH = FunctionDefinitionFactory.create("launch", Map.class);
-        LAUNCH.addExecutor("setPid", Process.class, new FunctionExecutor<Void>() {
+        INITIALIZE = FunctionDefinitionFactory.create("initialize", Map.class);
+        INITIALIZE.addExecutor("setPid", Process.class, new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_7)
@@ -639,7 +617,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             }
 
         });
-        LAUNCH.addExecutor("launchExecutor", Process.class, new FunctionExecutor<Void>() {
+        INITIALIZE.addExecutor("setExecutor", Process.class, new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_5)
@@ -651,34 +629,8 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 Program program = (Program) holder.get(SOURCE).get().get(ContentFile.CONTENT).get();
                 ProgramExecutor executor = program.get(Program.CREATE_EXECUTOR).invoke();
 
-                // Initialize new executor
-                executor.setParent((Process<?>) holder);
-                // Trust the user at this point
-                @SuppressWarnings ("unchecked")
-                Map<String, Object> executorArguments = (Map<String, Object>) arguments[0];
-                executor.get(ProgramExecutor.ARGUMENTS).set(executorArguments);
-
                 // Set new executor
                 holder.get(EXECUTOR).set(executor);
-
-                return invocation.next(arguments);
-            }
-
-        });
-        LAUNCH.addExecutor("checkArguments", Process.class, new FunctionExecutor<Void>() {
-
-            @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_2)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
-
-                FeatureHolder holder = invocation.getHolder();
-
-                // Check for wrong arguments
-                if (holder.get(EXECUTOR).get().get(ProgramExecutor.ARGUMENTS).get() == null) {
-                    // Stop process
-                    holder.get(EXECUTOR).set(null);
-                    holder.get(STOP).invoke(false);
-                }
 
                 return invocation.next(arguments);
             }

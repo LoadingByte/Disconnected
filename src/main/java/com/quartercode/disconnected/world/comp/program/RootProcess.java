@@ -48,10 +48,10 @@ public class RootProcess extends Process<OperatingSystem> {
         });
 
         // Stop the execution after the setting of the pid
-        LAUNCH.addExecutor("cancel", RootProcess.class, new FunctionExecutor<Void>() {
+        INITIALIZE.addExecutor("cancel", RootProcess.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_5)
+            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 return null;

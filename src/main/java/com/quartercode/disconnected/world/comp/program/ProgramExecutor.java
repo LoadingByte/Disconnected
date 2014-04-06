@@ -18,10 +18,7 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
@@ -36,11 +33,7 @@ import com.quartercode.classmod.extra.def.ReferenceCollectionProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.sim.run.Scheduler;
 import com.quartercode.disconnected.sim.run.SchedulerUser;
-import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
-import com.quartercode.disconnected.world.comp.program.ArgumentException.MissingArgumentException;
-import com.quartercode.disconnected.world.comp.program.ArgumentException.MissingParameterException;
-import com.quartercode.disconnected.world.comp.program.ArgumentException.WrongArgumentTypeException;
 import com.quartercode.disconnected.world.event.Event;
 import com.quartercode.disconnected.world.event.EventListener;
 import com.quartercode.disconnected.world.event.EventMatcher;
@@ -59,26 +52,6 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
     // ----- Properties -----
 
     /**
-     * The initial arguments the program executor needs to operate.
-     * They should be used from inside the updating procedures.
-     * The arguments are validated against the {@link Parameter}s provided by {@link #GET_PARAMETERS} by {@link #SET_ARGUMENTS}.<br>
-     * <br>
-     * Exceptions that can occur when setting:
-     * 
-     * <table>
-     * <tr>
-     * <th>Exception</th>
-     * <th>When?</th>
-     * </tr>
-     * <tr>
-     * <td>{@link ArgumentException}</td>
-     * <td>The arguments don't match the parameters provided by {@link #GET_PARAMETERS}.</td>
-     * </tr>
-     * </table>
-     */
-    public static final PropertyDefinition<Map<String, Object>>                            ARGUMENTS;
-
-    /**
      * The {@link EventListener} all incoming {@link Event}s are delegated to.
      * In the current implementation, this is just a {@link QueueEventListener} that stores incoming events for the next update call.
      */
@@ -91,54 +64,6 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
 
     static {
 
-        ARGUMENTS = ObjectProperty.createDefinition("arguments");
-        ARGUMENTS.addSetterExecutor("checkArgumentsAgainstParameters", ProgramExecutor.class, new FunctionExecutor<Void>() {
-
-            @Override
-            @SuppressWarnings ("unchecked")
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
-
-                // Create a new map with the contents of the old one (it will be modified)
-                Map<String, Object> programArguments = new HashMap<String, Object>(NullPreventer.prevent((Map<String, Object>) arguments[0]));
-                List<Parameter> parameters = invocation.getHolder().get(GET_PARAMETERS).invoke();
-
-                try {
-                    for (Parameter parameter : parameters) {
-                        if (parameter.isSwitch()) {
-                            // Put switch object if it's not set
-                            if (!programArguments.containsKey(parameter.getName()) || ! (programArguments.get(parameter.getName()) instanceof Boolean)) {
-                                programArguments.put(parameter.getName(), false);
-                            }
-                        } else if (parameter.isArgument()) {
-                            // Throw exception if argument parameter is required, but not set
-                            if (parameter.isRequired() && !programArguments.containsKey(parameter.getName())) {
-                                throw new MissingParameterException(parameter);
-                            }
-                            // Throw exception if argument is required, but not set
-                            else if (programArguments.containsKey(parameter.getName()) && parameter.isArgumentRequired() && programArguments.get(parameter.getName()) == null) {
-                                throw new MissingArgumentException(parameter);
-                            }
-                            // Throw exception if argument has the wrong type
-                            else if (programArguments.get(parameter.getName()) != null && !parameter.getType().getType().isAssignableFrom(programArguments.get(parameter.getName()).getClass())) {
-                                throw new WrongArgumentTypeException(parameter, programArguments.get(parameter.getName()).toString());
-                            }
-                        } else if (parameter.isRest()) {
-                            // Throw exception if rest is required, but not set
-                            if (parameter.isRequired() && (!programArguments.containsKey(parameter.getName()) || ((String[]) programArguments.get(parameter.getName())).length == 0)) {
-                                throw new MissingParameterException(parameter);
-                            }
-                        }
-                    }
-                } catch (ArgumentException e) {
-                    throw new ExecutorInvocationException("Illegal program arguments", e);
-                }
-
-                return invocation.next(arguments);
-            }
-
-        });
-
         IN_EVENT_LISTENER = ObjectProperty.createDefinition("inEventListener", new QueueEventListener());
         OUT_EVENT_LISTENERS = ReferenceCollectionProperty.createDefinition("outEventListeners", new HashSet<EventListener>());
 
@@ -147,34 +72,6 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
     // ----- Properties End -----
 
     // ----- Functions -----
-
-    /**
-     * Returns the possible or required execution {@link Parameter}s.
-     * The function should be implemented by the actual program class.
-     * For more detail on the parameters, see the {@link Parameter} class.
-     */
-    public static final FunctionDefinition<List<Parameter>>                                GET_PARAMETERS;
-
-    /**
-     * Returns the execution {@link Parameter} with the given name (or null if there's no such {@link Parameter}).
-     * For more detail on the parameters, see the {@link Parameter} class.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link String}</td>
-     * <td>name</td>
-     * <td>The name of the returned {@link Parameter}.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Parameter>                                      GET_PARAMETER_BY_NAME;
 
     /**
      * Returns the next received {@link Event} from the {@link Queue} which matches the criteria of the given {@link EventMatcher}.
@@ -221,26 +118,6 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
     public static final FunctionDefinition<Void>                                           RUN;
 
     static {
-
-        GET_PARAMETERS = FunctionDefinitionFactory.create("getParameters");
-        GET_PARAMETER_BY_NAME = FunctionDefinitionFactory.create("getParameterByName", ProgramExecutor.class, new FunctionExecutor<Parameter>() {
-
-            @Override
-            public Parameter invoke(FunctionInvocation<Parameter> invocation, Object... arguments) throws ExecutorInvocationException {
-
-                Parameter result = null;
-                for (Parameter parameter : invocation.getHolder().get(GET_PARAMETERS).invoke()) {
-                    if (parameter.getName().equals(arguments[0])) {
-                        result = parameter;
-                        break;
-                    }
-                }
-
-                invocation.next(arguments);
-                return result;
-            }
-
-        });
 
         NEXT_EVENT = FunctionDefinitionFactory.create("nextEvent", ProgramExecutor.class, new FunctionExecutor<Event>() {
 

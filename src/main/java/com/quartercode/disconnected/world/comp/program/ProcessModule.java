@@ -121,7 +121,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                     }
                     root.get(Process.ENVIRONMENT).set(environment);
 
-                    root.get(Process.LAUNCH).invoke(new HashMap<String, Object>());
+                    root.get(Process.INITIALIZE).invoke();
                     holder.get(ROOT_PROCESS).set(root);
                 }
 
