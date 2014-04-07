@@ -18,8 +18,10 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang.Validate;
@@ -142,7 +144,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * The child processes the process launched.<br>
      * Note that using the {@link #CREATE_CHILD} method is preferred over directly accessing the property.
      */
-    public static final CollectionPropertyDefinition<Process<?>, Set<Process<?>>> CHILDREN;
+    public static final CollectionPropertyDefinition<Process<?>, List<Process<?>>> CHILDREN;
 
     static {
 
@@ -164,7 +166,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         ENVIRONMENT = ObjectProperty.<Map<String, String>> createDefinition("environment", new HashMap<String, String>());
         STATE = ObjectProperty.createDefinition("state", ProcessState.RUNNING);
         EXECUTOR = ObjectProperty.createDefinition("executor");
-        CHILDREN = ObjectCollectionProperty.createDefinition("children", new HashSet<Process<?>>());
+        CHILDREN = ObjectCollectionProperty.createDefinition("children", new ArrayList<Process<?>>());
 
     }
 
@@ -319,7 +321,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * Returns all child processes the process launched.
      * That includes all children which are present in the child datastructure of this object, all child objects etc.
      */
-    public static final FunctionDefinition<Set<Process<?>>>                       GET_ALL_CHILDREN;
+    public static final FunctionDefinition<List<Process<?>>>                       GET_ALL_CHILDREN;
 
     /**
      * Creates a new empty {@link ChildProcess} which uses the same environment variables as this one.
@@ -471,19 +473,19 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         }, Boolean.class);
 
-        GET_ALL_CHILDREN = FunctionDefinitionFactory.create("getAllChildren", Process.class, new FunctionExecutor<Set<Process<?>>>() {
+        GET_ALL_CHILDREN = FunctionDefinitionFactory.create("getAllChildren", Process.class, new FunctionExecutor<List<Process<?>>>() {
 
             @Override
-            public Set<Process<?>> invoke(FunctionInvocation<Set<Process<?>>> invocation, Object... arguments) throws ExecutorInvocationException {
+            public List<Process<?>> invoke(FunctionInvocation<List<Process<?>>> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                Set<Process<?>> children = getAllChildren((Process<?>) invocation.getHolder());
+                List<Process<?>> children = getAllChildren((Process<?>) invocation.getHolder());
                 invocation.next(arguments);
                 return children;
             }
 
-            private Set<Process<?>> getAllChildren(Process<?> parent) throws ExecutorInvocationException {
+            private List<Process<?>> getAllChildren(Process<?> parent) throws ExecutorInvocationException {
 
-                Set<Process<?>> allChildren = new HashSet<Process<?>>();
+                List<Process<?>> allChildren = new ArrayList<Process<?>>();
                 for (Process<?> directChild : parent.get(CHILDREN).get()) {
                     allChildren.addAll(directChild.get(GET_ALL_CHILDREN).invoke());
                 }

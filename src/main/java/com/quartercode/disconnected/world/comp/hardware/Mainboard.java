@@ -22,8 +22,8 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -50,11 +50,11 @@ public class Mainboard extends Hardware {
      * The {@link MainboardSlot}s the mainboard offers.
      * The slots could have a content on them, you have to check before you set the content to a new one.
      */
-    public static final CollectionPropertyDefinition<MainboardSlot, Set<MainboardSlot>> SLOTS;
+    public static final CollectionPropertyDefinition<MainboardSlot, List<MainboardSlot>> SLOTS;
 
     static {
 
-        SLOTS = ObjectCollectionProperty.createDefinition("slots", new HashSet<MainboardSlot>());
+        SLOTS = ObjectCollectionProperty.createDefinition("slots", new ArrayList<MainboardSlot>());
 
     }
 
@@ -80,7 +80,7 @@ public class Mainboard extends Hardware {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Set<MainboardSlot>>                          GET_SLOTS_BY_CONTENT_TYPE;
+    public static final FunctionDefinition<List<MainboardSlot>>                          GET_SLOTS_BY_CONTENT_TYPE;
 
     static {
 

@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
-import java.util.Set;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -55,17 +55,17 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
      * The {@link EventListener} all incoming {@link Event}s are delegated to.
      * In the current implementation, this is just a {@link QueueEventListener} that stores incoming events for the next update call.
      */
-    protected static final PropertyDefinition<QueueEventListener>                          IN_EVENT_LISTENER;
+    protected static final PropertyDefinition<QueueEventListener>                           IN_EVENT_LISTENER;
 
     /**
-     * This set stores all {@link EventListener}s that are registered and want to receive any {@link Event}s sent by this executor.
+     * This list stores all {@link EventListener}s that are registered and want to receive any {@link Event}s sent by this executor.
      */
-    protected static final CollectionPropertyDefinition<EventListener, Set<EventListener>> OUT_EVENT_LISTENERS;
+    protected static final CollectionPropertyDefinition<EventListener, List<EventListener>> OUT_EVENT_LISTENERS;
 
     static {
 
         IN_EVENT_LISTENER = ObjectProperty.createDefinition("inEventListener", new QueueEventListener());
-        OUT_EVENT_LISTENERS = ReferenceCollectionProperty.createDefinition("outEventListeners", new HashSet<EventListener>());
+        OUT_EVENT_LISTENERS = ReferenceCollectionProperty.createDefinition("outEventListeners", new ArrayList<EventListener>());
 
     }
 
@@ -109,13 +109,13 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
      * 
      * @see QueueEventListener#NEXT_EVENT
      */
-    public static final FunctionDefinition<Event>                                          NEXT_EVENT;
+    public static final FunctionDefinition<Event>                                           NEXT_EVENT;
 
     /**
      * This callback is executed once when the program executor should start running.
      * For example, this method could schedule tasks using the {@link Scheduler}.
      */
-    public static final FunctionDefinition<Void>                                           RUN;
+    public static final FunctionDefinition<Void>                                            RUN;
 
     static {
 

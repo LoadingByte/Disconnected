@@ -18,8 +18,8 @@
 
 package com.quartercode.disconnected.world.comp;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
@@ -48,7 +48,7 @@ public class Computer extends WorldChildFeatureHolder<World> {
     /**
      * The {@link Hardware} parts the computer contains.
      */
-    public static final CollectionPropertyDefinition<Hardware, Set<Hardware>> HARDWARE;
+    public static final CollectionPropertyDefinition<Hardware, List<Hardware>> HARDWARE;
 
     /**
      * The active {@link OperatingSystem} instance which is currently running the computer.
@@ -58,7 +58,7 @@ public class Computer extends WorldChildFeatureHolder<World> {
     static {
 
         LOCATION = ObjectProperty.createDefinition("location");
-        HARDWARE = ObjectCollectionProperty.createDefinition("hardware", new HashSet<Hardware>());
+        HARDWARE = ObjectCollectionProperty.createDefinition("hardware", new ArrayList<Hardware>());
         OS = ObjectProperty.createDefinition("operatingSystem");
 
     }

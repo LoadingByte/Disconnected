@@ -18,11 +18,10 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -75,7 +74,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
     /**
      * Returns a {@link List} containing all currently running {@link Process}es.
      */
-    public static final FunctionDefinition<Set<Process<?>>> GET_ALL;
+    public static final FunctionDefinition<List<Process<?>>> GET_ALL;
 
     /**
      * Kills the whole {@link Process} tree immediately.
@@ -85,12 +84,12 @@ public class ProcessModule extends OSModule implements SchedulerUser {
 
     static {
 
-        GET_ALL = FunctionDefinitionFactory.create("getAll", ProcessModule.class, new FunctionExecutor<Set<Process<?>>>() {
+        GET_ALL = FunctionDefinitionFactory.create("getAll", ProcessModule.class, new FunctionExecutor<List<Process<?>>>() {
 
             @Override
-            public Set<Process<?>> invoke(FunctionInvocation<Set<Process<?>>> invocation, Object... arguments) throws ExecutorInvocationException {
+            public List<Process<?>> invoke(FunctionInvocation<List<Process<?>>> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                Set<Process<?>> processes = new HashSet<Process<?>>();
+                List<Process<?>> processes = new ArrayList<Process<?>>();
                 RootProcess root = invocation.getHolder().get(ROOT_PROCESS).get();
                 processes.add(root);
                 processes.addAll(root.get(Process.GET_ALL_CHILDREN).invoke());
@@ -121,8 +120,9 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                     }
                     root.get(Process.ENVIRONMENT).set(environment);
 
-                    root.get(Process.INITIALIZE).invoke();
                     holder.get(ROOT_PROCESS).set(root);
+                    root.get(Process.INITIALIZE).invoke();
+                    root.get(Process.EXECUTOR).get().get(ProgramExecutor.RUN).invoke();
                 }
 
                 return invocation.next(arguments);

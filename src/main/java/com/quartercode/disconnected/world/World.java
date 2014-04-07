@@ -18,8 +18,8 @@
 
 package com.quartercode.disconnected.world;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
@@ -41,29 +41,29 @@ public class World extends DefaultFeatureHolder {
     /**
      * The {@link Member}s who are present in the world.
      */
-    public static final CollectionPropertyDefinition<Member, Set<Member>>           MEMBERS;
+    public static final CollectionPropertyDefinition<Member, List<Member>>           MEMBERS;
 
     /**
      * The {@link MemberGroup}s which are present in the world.
      */
-    public static final CollectionPropertyDefinition<MemberGroup, Set<MemberGroup>> GROUPS;
+    public static final CollectionPropertyDefinition<MemberGroup, List<MemberGroup>> GROUPS;
 
     /**
      * The {@link Computer}s which are present in the world.
      */
-    public static final CollectionPropertyDefinition<Computer, Set<Computer>>       COMPUTERS;
+    public static final CollectionPropertyDefinition<Computer, List<Computer>>       COMPUTERS;
 
     static {
 
-        MEMBERS = ObjectCollectionProperty.createDefinition("members", new HashSet<Member>());
-        GROUPS = ObjectCollectionProperty.createDefinition("memberGroups", new HashSet<MemberGroup>());
-        COMPUTERS = ObjectCollectionProperty.createDefinition("computers", new HashSet<Computer>());
+        MEMBERS = ObjectCollectionProperty.createDefinition("members", new ArrayList<Member>());
+        GROUPS = ObjectCollectionProperty.createDefinition("memberGroups", new ArrayList<MemberGroup>());
+        COMPUTERS = ObjectCollectionProperty.createDefinition("computers", new ArrayList<Computer>());
 
     }
 
     // ----- Properties End -----
 
-    private Simulation                                                              simulation;
+    private Simulation                                                               simulation;
 
     /**
      * Creates a new empty world.
