@@ -18,8 +18,8 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.Feature;
 import com.quartercode.classmod.base.FeatureHolder;
@@ -61,11 +61,11 @@ public class FileSystemModule extends OSModule {
      * The {@link FileSystem}s which are associated with a known mountpoint (e.g. "system") and can be mounted.
      * These representation objects are called {@link KnownFileSystem}s.
      */
-    public static final CollectionPropertyDefinition<KnownFileSystem, Set<KnownFileSystem>> KNOWN_FS;
+    public static final CollectionPropertyDefinition<KnownFileSystem, List<KnownFileSystem>> KNOWN_FS;
 
     static {
 
-        KNOWN_FS = ObjectCollectionProperty.createDefinition("knownFs", new HashSet<KnownFileSystem>());
+        KNOWN_FS = ObjectCollectionProperty.createDefinition("knownFs", new ArrayList<KnownFileSystem>());
         KNOWN_FS.addAdderExecutor("checkNotMounted", FileSystemModule.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -86,10 +86,10 @@ public class FileSystemModule extends OSModule {
     // ----- Functions -----
 
     /**
-     * Returns a {@link Set} containing all available {@link FileSystem}s which are connected to the computer.
+     * Returns a {@link List} containing all available {@link FileSystem}s which are connected to the computer.
      * This uses different resources to collect the {@link FileSystem}s.
      */
-    public static final FunctionDefinition<Set<FileSystem>>                                 GET_AVAILABLE;
+    public static final FunctionDefinition<List<FileSystem>>                                 GET_AVAILABLE;
 
     /**
      * Returns the {@link KnownFileSystem} object representing the given {@link FileSystem}.
@@ -109,14 +109,14 @@ public class FileSystemModule extends OSModule {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<KnownFileSystem>                                 GET_KNOWN_BY_FILESYSTEM;
+    public static final FunctionDefinition<KnownFileSystem>                                  GET_KNOWN_BY_FILESYSTEM;
 
     /**
-     * Returns a {@link Set} containing all mounted {@link KnownFileSystem}s.
+     * Returns a {@link List} containing all mounted {@link KnownFileSystem}s.
      * Only the {@link File}s of currently mounted file systems can be accessed.
      * If you want to get all {@link KnownFileSystem}s, take a look at {@link #GET_KNOWN}.
      */
-    public static final FunctionDefinition<Set<KnownFileSystem>>                            GET_MOUNTED;
+    public static final FunctionDefinition<List<KnownFileSystem>>                            GET_MOUNTED;
 
     /**
      * Returns the mounted {@link KnownFileSystem} which is associated with the given mountpoint.
@@ -137,7 +137,7 @@ public class FileSystemModule extends OSModule {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<KnownFileSystem>                                 GET_MOUNTED_BY_MOUNTPOINT;
+    public static final FunctionDefinition<KnownFileSystem>                                  GET_MOUNTED_BY_MOUNTPOINT;
 
     /**
      * Returns the {@link File} which is stored on a mounted {@link FileSystem} under the given path.
@@ -159,7 +159,7 @@ public class FileSystemModule extends OSModule {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<File<?>>                                         GET_FILE;
+    public static final FunctionDefinition<File<?>>                                          GET_FILE;
 
     /**
      * Adds the given {@link File} to a mounted {@link FileSystem} and locates it under the given path.
@@ -206,16 +206,16 @@ public class FileSystemModule extends OSModule {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                            ADD_FILE;
+    public static final FunctionDefinition<Void>                                             ADD_FILE;
 
     static {
 
-        GET_AVAILABLE = FunctionDefinitionFactory.create("getAvailable", FileSystemModule.class, new FunctionExecutor<Set<FileSystem>>() {
+        GET_AVAILABLE = FunctionDefinitionFactory.create("getAvailable", FileSystemModule.class, new FunctionExecutor<List<FileSystem>>() {
 
             @Override
-            public Set<FileSystem> invoke(FunctionInvocation<Set<FileSystem>> invocation, Object... arguments) throws ExecutorInvocationException {
+            public List<FileSystem> invoke(FunctionInvocation<List<FileSystem>> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                Set<FileSystem> available = new HashSet<FileSystem>();
+                List<FileSystem> available = new ArrayList<FileSystem>();
                 Computer computer = ((FileSystemModule) invocation.getHolder()).getParent().get(Process.GET_ROOT).invoke().getParent().getParent();
                 for (Hardware hardware : computer.get(Computer.HARDWARE).get()) {
                     for (Feature feature : hardware) {

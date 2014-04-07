@@ -18,8 +18,8 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
@@ -61,11 +61,11 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
      * </tr>
      * </table>
      */
-    public static final CollectionPropertyDefinition<File<ParentFile<?>>, Set<File<ParentFile<?>>>> CHILDREN;
+    public static final CollectionPropertyDefinition<File<ParentFile<?>>, List<File<ParentFile<?>>>> CHILDREN;
 
     static {
 
-        CHILDREN = ObjectCollectionProperty.createDefinition("children", new HashSet<File<ParentFile<?>>>());
+        CHILDREN = ObjectCollectionProperty.createDefinition("children", new ArrayList<File<ParentFile<?>>>());
         CHILDREN.addAdderExecutor("checkSize", ParentFile.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -110,7 +110,7 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<File<ParentFile<?>>>                                     GET_CHILD_BY_NAME;
+    public static final FunctionDefinition<File<ParentFile<?>>>                                      GET_CHILD_BY_NAME;
 
     static {
 

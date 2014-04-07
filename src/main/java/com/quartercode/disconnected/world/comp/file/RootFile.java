@@ -32,7 +32,7 @@ import com.quartercode.classmod.extra.Prioritized;
  */
 public class RootFile extends ParentFile<FileSystem> {
 
-    // ----- Functions -----
+    // ----- Properties -----
 
     static {
 
@@ -56,6 +56,14 @@ public class RootFile extends ParentFile<FileSystem> {
             }
 
         });
+
+    }
+
+    // ----- Properties End -----
+
+    // ----- Functions -----
+
+    static {
 
         GET_PATH.addExecutor("returnStatic", RootFile.class, new FunctionExecutor<String>() {
 
@@ -85,6 +93,17 @@ public class RootFile extends ParentFile<FileSystem> {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 return null;
+            }
+
+        });
+
+        // The root file has no name size
+        GET_SIZE.addExecutor("name", RootFile.class, new FunctionExecutor<Long>() {
+
+            @Override
+            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
+
+                return 0L;
             }
 
         });

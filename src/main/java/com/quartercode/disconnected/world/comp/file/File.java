@@ -251,7 +251,6 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
         });
 
         GET_SIZE.addExecutor("name", File.class, SizeUtil.createGetSize(NAME));
-        GET_SIZE.addExecutor("rights", File.class, SizeUtil.createGetSize(RIGHTS));
 
     }
 

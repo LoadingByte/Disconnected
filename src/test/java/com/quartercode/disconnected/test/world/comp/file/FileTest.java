@@ -64,11 +64,11 @@ public class FileTest {
     @Test
     public void testSetName() throws ExecutorInvocationException {
 
-        testFile.get(File.NAME).set("test2.txt");
+        testFile.get(File.NAME).set("test3.txt");
 
-        Assert.assertTrue("Renamed file doesn't exist", testFile.equals(fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test2.txt")));
+        Assert.assertTrue("Renamed file doesn't exist", testFile.equals(fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test3.txt")));
         Assert.assertTrue("Removed file does exist", fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test.txt") == null);
-        Assert.assertEquals("Path of renamed file", "/test1/test2/test2.txt", testFile.get(File.GET_PATH).invoke());
+        Assert.assertEquals("Path of renamed file", "/test1/test2/test3.txt", testFile.get(File.GET_PATH).invoke());
     }
 
     @Test

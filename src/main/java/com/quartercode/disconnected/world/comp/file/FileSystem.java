@@ -47,12 +47,12 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
     /**
      * The size of the file system, given in bytes.
      */
-    public static final PropertyDefinition<Long>        SIZE;
+    public static final PropertyDefinition<Long>     SIZE;
 
     /**
      * The {@link RootFile} every other {@link File} branches of somehow.
      */
-    protected static final PropertyDefinition<RootFile> ROOT;
+    public static final PropertyDefinition<RootFile> ROOT;
 
     static {
 
@@ -77,11 +77,6 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
     // ----- Functions -----
 
     /**
-     * Returns the {@link RootFile} every other {@link File} branches of somehow.
-     */
-    public static final FunctionDefinition<RootFile>    GET_ROOT;
-
-    /**
      * Returns the {@link File} which is stored under the given path.
      * A path is a collection of {@link File}s seperated by a separator.
      * This will look up the {@link File} using a local file system path.
@@ -101,7 +96,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<File<?>>     GET_FILE;
+    public static final FunctionDefinition<File<?>>  GET_FILE;
 
     /**
      * Adds the given {@link File} to the file system.
@@ -144,21 +139,19 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>        ADD_FILE;
+    public static final FunctionDefinition<Void>     ADD_FILE;
 
     /**
      * Returns the total amount of bytes which are occupied by {@link File}s on the file system.
      */
-    public static final FunctionDefinition<Long>        GET_FILLED;
+    public static final FunctionDefinition<Long>     GET_FILLED;
 
     /**
      * Returns the total amount of bytes which are not occupied by {@link File}s on the file system.
      */
-    public static final FunctionDefinition<Long>        GET_FREE;
+    public static final FunctionDefinition<Long>     GET_FREE;
 
     static {
-
-        GET_ROOT = FunctionDefinitionFactory.create("getRoot", FileSystem.class, PropertyAccessorFactory.createGet(ROOT));
 
         GET_FILE = FunctionDefinitionFactory.create("getFile", FileSystem.class, new FunctionExecutor<File<?>>() {
 
@@ -166,7 +159,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
             public File<?> invoke(FunctionInvocation<File<?>> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 String[] parts = ((String) arguments[0]).split(File.SEPARATOR);
-                File<?> current = invocation.getHolder().get(GET_ROOT).invoke();
+                File<?> current = invocation.getHolder().get(ROOT).get();
                 for (String part : parts) {
                     if (!part.isEmpty()) {
                         if (current instanceof ParentFile) {
@@ -191,7 +184,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 String[] parts = ((String) arguments[1]).split(File.SEPARATOR);
-                File<?> current = invocation.getHolder().get(GET_ROOT).invoke();
+                File<?> current = invocation.getHolder().get(ROOT).get();
                 File<ParentFile<?>> file = (File<ParentFile<?>>) arguments[0];
                 for (int counter = 0; counter < parts.length; counter++) {
                     String part = parts[counter];
@@ -226,7 +219,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                long filled = SizeUtil.getSize(invocation.getHolder().get(GET_ROOT).invoke());
+                long filled = SizeUtil.getSize(invocation.getHolder().get(ROOT).get());
                 invocation.next(arguments);
                 return filled;
             }
