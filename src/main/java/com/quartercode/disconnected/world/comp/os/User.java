@@ -206,7 +206,8 @@ public class User extends ConfigurationEntry {
             @Override
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                boolean result = invocation.getHolder().get(NAME).get().equals(SUPERUSER_NAME);
+                String name = invocation.getHolder().get(NAME).get();
+                boolean result = name != null && name.equals(SUPERUSER_NAME);
                 invocation.next(arguments);
                 return result;
             }
