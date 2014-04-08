@@ -22,6 +22,7 @@ import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
+import com.quartercode.disconnected.util.NullPreventer;
 
 /**
  * This class represents the root file of a {@link FileSystem}.
@@ -103,7 +104,7 @@ public class RootFile extends ParentFile<FileSystem> {
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                return 0L;
+                return 0L + NullPreventer.prevent(invocation.next(arguments));
             }
 
         });

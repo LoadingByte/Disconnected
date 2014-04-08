@@ -19,8 +19,7 @@
 package com.quartercode.disconnected.test.world.comp.file;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -73,7 +72,7 @@ public class FileSystemModuleTest {
     @Test
     public void testGetKnown() throws ExecutorInvocationException {
 
-        Set<KnownFileSystem> expected = new HashSet<KnownFileSystem>(Arrays.asList(knownFileSystems));
+        List<KnownFileSystem> expected = Arrays.asList(knownFileSystems);
         Assert.assertEquals("Known file systems", expected, fsModule.get(FileSystemModule.KNOWN_FS).get());
     }
 
