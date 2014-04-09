@@ -164,6 +164,9 @@ public class Launcher {
      */
     public void launch() {
 
+        LOGGER.info("Creating working directory " + directory.getAbsolutePath());
+        directory.mkdirs();
+
         LOGGER.info("Launching main class " + mainClass);
 
         try {

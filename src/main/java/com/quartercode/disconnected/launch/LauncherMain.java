@@ -38,7 +38,7 @@ public class LauncherMain {
 
         String mainClass = Main.class.getName();
         String[] vmArguments = { "-Djava.library.path=" + new File(".").getAbsolutePath() + "/lib/natives" };
-        File directory = new File(".");
+        File directory = new File(System.getProperty("user.home"), ".disconnected");
 
         if (args.length > 0 && new File(args[0]).exists()) {
             directory = new File(args[0]);
