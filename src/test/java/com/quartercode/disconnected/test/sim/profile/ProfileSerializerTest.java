@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.io.output.WriterOutputStream;
@@ -69,7 +69,6 @@ public class ProfileSerializerTest {
         StringWriter serialized = new StringWriter();
         WriterOutputStream outputStream = new WriterOutputStream(serialized);
         ProfileSerializer.serializeWorld(outputStream, world);
-        outputStream.close();
 
         World copy = ProfileSerializer.deserializeWorld(new ReaderInputStream(new StringReader(serialized.toString())));
         Assert.assertEquals("Serialized-deserialized copy of world equals original", equalsPersistent(world, copy));
@@ -80,8 +79,8 @@ public class ProfileSerializerTest {
      */
     private boolean equalsPersistent(DefaultFeatureHolder holder1, DefaultFeatureHolder holder2) throws ExecutorInvocationException {
 
-        Set<Feature> features1 = holder1.getPersistentFeatures();
-        Set<Feature> features2 = holder2.getPersistentFeatures();
+        List<Feature> features1 = holder1.getPersistentFeatures();
+        List<Feature> features2 = holder2.getPersistentFeatures();
 
         if (features1.size() != features2.size()) {
             return false;
