@@ -197,4 +197,12 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
     // ----- Foreign Content End -----
 
+    /**
+     * Creates a new operating system.
+     */
+    public OperatingSystem() {
+
+        setParentType(Computer.class);
+    }
+
 }

@@ -72,6 +72,7 @@ public class Computer extends WorldChildFeatureHolder<World> {
      */
     public Computer() {
 
+        setParentType(World.class);
     }
 
 }

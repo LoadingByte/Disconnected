@@ -80,6 +80,7 @@ public class ContentFile extends File<ParentFile<?>> {
      */
     public ContentFile() {
 
+        setParentType(ParentFile.class);
     }
 
 }

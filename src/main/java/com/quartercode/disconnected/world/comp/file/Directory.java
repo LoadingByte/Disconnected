@@ -33,6 +33,7 @@ public class Directory extends ParentFile<ParentFile<?>> {
      */
     public Directory() {
 
+        setParentType(ParentFile.class);
     }
 
 }

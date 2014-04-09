@@ -143,6 +143,7 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
          */
         public ConfigurationEntry() {
 
+            setParentType(Configuration.class);
         }
 
     }

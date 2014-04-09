@@ -169,6 +169,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
      */
     public ProgramExecutor() {
 
+        setParentType(Process.class);
     }
 
 }

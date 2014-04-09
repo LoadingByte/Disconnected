@@ -62,6 +62,7 @@ public class Hardware extends WorldChildFeatureHolder<Computer> {
      */
     public Hardware() {
 
+        setParentType(Computer.class);
     }
 
 }

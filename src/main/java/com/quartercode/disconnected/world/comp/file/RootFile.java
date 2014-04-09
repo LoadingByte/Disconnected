@@ -118,6 +118,7 @@ public class RootFile extends ParentFile<FileSystem> {
      */
     public RootFile() {
 
+        setParentType(FileSystem.class);
     }
 
 }

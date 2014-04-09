@@ -32,6 +32,7 @@ public class ChildProcess extends Process<Process<?>> {
      */
     public ChildProcess() {
 
+        setParentType(Process.class);
     }
 
 }

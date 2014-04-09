@@ -69,6 +69,7 @@ public class RootProcess extends Process<OperatingSystem> {
      */
     public RootProcess() {
 
+        setParentType(OperatingSystem.class);
     }
 
 }

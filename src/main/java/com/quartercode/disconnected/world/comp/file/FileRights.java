@@ -418,6 +418,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
      */
     public FileRights() {
 
+        setParentType(File.class);
     }
 
 }

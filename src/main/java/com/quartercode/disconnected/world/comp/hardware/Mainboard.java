@@ -139,6 +139,7 @@ public class Mainboard extends Hardware {
          */
         public MainboardSlot() {
 
+            setParentType(Mainboard.class);
         }
 
     }
