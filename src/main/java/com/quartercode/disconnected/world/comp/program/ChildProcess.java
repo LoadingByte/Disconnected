@@ -28,7 +28,7 @@ public class ChildProcess extends Process<Process<?>> {
 
     /**
      * Creates a new empty child process.
-     * You can start the new process using {@link #LAUNCH}.
+     * You can start the new process using {@link Process#INITIALIZE} and then {@link ProgramExecutor#RUN} on {@link Process#EXECUTOR}.
      */
     public ChildProcess() {
 

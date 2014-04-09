@@ -65,7 +65,6 @@ public class RootProcess extends Process<OperatingSystem> {
 
     /**
      * Creates a new empty root process.
-     * You can start the new process using {@link #LAUNCH}.
      */
     public RootProcess() {
 

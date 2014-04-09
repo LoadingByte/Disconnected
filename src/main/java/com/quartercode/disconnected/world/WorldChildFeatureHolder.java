@@ -27,6 +27,7 @@ import com.quartercode.classmod.extra.def.DefaultChildFeatureHolder;
  * 
  * @param <P> The type the parent {@link FeatureHolder} has to have.
  * @see World
+ * @see DefaultChildFeatureHolder
  */
 public class WorldChildFeatureHolder<P extends FeatureHolder> extends DefaultChildFeatureHolder<P> {
 

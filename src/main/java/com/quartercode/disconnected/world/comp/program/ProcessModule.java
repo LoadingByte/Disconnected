@@ -59,7 +59,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
      * The {@link RootProcess} which is the root of the entire {@link Process} tree.
      * It always has a pid of 0.
      */
-    public static final PropertyDefinition<RootProcess>     ROOT_PROCESS;
+    public static final PropertyDefinition<RootProcess>      ROOT_PROCESS;
 
     static {
 
@@ -80,7 +80,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
      * Kills the whole {@link Process} tree immediately.
      * By default, this function just stops the root process.
      */
-    public static final FunctionDefinition<Void>            KILL;
+    public static final FunctionDefinition<Void>             KILL;
 
     static {
 

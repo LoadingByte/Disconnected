@@ -111,18 +111,18 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * The unique id the process has.
      * It is used to identify the process.
      */
-    public static final PropertyDefinition<Integer>                               PID;
+    public static final PropertyDefinition<Integer>                                PID;
 
     /**
      * The {@link File} which contains the {@link Program} the process runs.
      */
-    public static final PropertyDefinition<ContentFile>                           SOURCE;
+    public static final PropertyDefinition<ContentFile>                            SOURCE;
 
     /**
      * The environment variables that are assigned to the process.
      * See {@link EnvironmentVariable} for more information.
      */
-    public static final PropertyDefinition<Map<String, String>>                   ENVIRONMENT;
+    public static final PropertyDefinition<Map<String, String>>                    ENVIRONMENT;
 
     /**
      * The {@link ProcessState} which defines the global state of the process the os can see.
@@ -130,7 +130,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * Note that using the {@link #APPLY_STATE} or {@link #SUSPEND}/{@link #RESUME}/{@link #INTERRUPT}/{@link #STOP} methods
      * is preferred over directly accessing the property.
      */
-    public static final PropertyDefinition<ProcessState>                          STATE;
+    public static final PropertyDefinition<ProcessState>                           STATE;
 
     /**
      * The {@link ProgramExecutor} which contains the logic of the process.
@@ -138,7 +138,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * Argument properties should be passed to this object.<br>
      * The {@link ProgramExecutor#RUN} method on the stored value finally starts the process.
      */
-    public static final PropertyDefinition<ProgramExecutor>                       EXECUTOR;
+    public static final PropertyDefinition<ProgramExecutor>                        EXECUTOR;
 
     /**
      * The child processes the process launched.<br>
@@ -193,7 +193,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Boolean>                               IS_STATE_APPLIED;
+    public static final FunctionDefinition<Boolean>                                IS_STATE_APPLIED;
 
     /**
      * Changes the {@link ProcessState} which defines the global state of the process the os can see.
@@ -226,7 +226,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * @see #INTERRUPT
      * @see #STOP
      */
-    public static final FunctionDefinition<Void>                                  APPLY_STATE;
+    public static final FunctionDefinition<Void>                                   APPLY_STATE;
 
     /**
      * Suspends the execution temporarily, tick updates will be ignored.
@@ -248,7 +248,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                  SUSPEND;
+    public static final FunctionDefinition<Void>                                   SUSPEND;
 
     /**
      * Resumes a suspended process.
@@ -270,7 +270,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                  RESUME;
+    public static final FunctionDefinition<Void>                                   RESUME;
 
     /**
      * Interrupts the execution friendly and expresses that it should be stopped as soon as possible.
@@ -293,7 +293,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                  INTERRUPT;
+    public static final FunctionDefinition<Void>                                   INTERRUPT;
 
     /**
      * Forces the process to stop the execution.
@@ -315,7 +315,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                  STOP;
+    public static final FunctionDefinition<Void>                                   STOP;
 
     /**
      * Returns all child processes the process launched.
@@ -325,44 +325,44 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
     /**
      * Creates a new empty {@link ChildProcess} which uses the same environment variables as this one.
-     * You can run the returned process after creation using {@link #LAUNCH}.
+     * You can run the returned process after creation using {@link Process#INITIALIZE} and then {@link ProgramExecutor#RUN} on {@link Process#EXECUTOR}.
      */
-    public static final FunctionDefinition<ChildProcess>                          CREATE_CHILD;
+    public static final FunctionDefinition<ChildProcess>                           CREATE_CHILD;
 
     /**
      * Returns the root {@link RootProcess} which is the parent of every other process somewhere in the tree.
      */
-    public static final FunctionDefinition<RootProcess>                           GET_ROOT;
+    public static final FunctionDefinition<RootProcess>                            GET_ROOT;
 
     /**
      * Returns the {@link OperatingSystem} which is hosting the {@link RootProcess} which is the parent of every other process.
      */
-    public static final FunctionDefinition<OperatingSystem>                       GET_OPERATING_SYSTEM;
+    public static final FunctionDefinition<OperatingSystem>                        GET_OPERATING_SYSTEM;
 
     /**
      * Resolves the {@link Session} process this process is running under.
      * This process is running with the rights of that {@link Session}.
      */
-    public static final FunctionDefinition<Process<?>>                            GET_SESSION_PROCESS;
+    public static final FunctionDefinition<Process<?>>                             GET_SESSION_PROCESS;
 
     /**
      * Resolves the actual {@link Session} executor this process is running under.
      * This process is running with the rights of that {@link Session}.
      */
-    public static final FunctionDefinition<Session>                               GET_SESSION;
+    public static final FunctionDefinition<Session>                                GET_SESSION;
 
     /**
      * Resolves the {@link User} this process is running under.
      * This uses the {@link #GET_SESSION} function for resolving the Session} object.
      */
-    public static final FunctionDefinition<User>                                  GET_USER;
+    public static final FunctionDefinition<User>                                   GET_USER;
 
     /**
      * Initializes the process using the {@link Program} that is stored in the set source {@link ContentFile}.
      * Initialization means setting the {@link #PID} and creating a {@link ProgramExecutor} instance.
      * Please note that the process needs to be launched using the {@link ProgramExecutor#RUN} method on the {@link #EXECUTOR} after intialization.
      */
-    public static final FunctionDefinition<Void>                                  INITIALIZE;
+    public static final FunctionDefinition<Void>                                   INITIALIZE;
 
     static {
 
@@ -645,7 +645,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
     /**
      * Creates a new empty process.
-     * You can start the new process using {@link #LAUNCH}.
+     * You can start the new process using {@link Process#INITIALIZE} and then {@link ProgramExecutor#RUN} on {@link Process#EXECUTOR}.
      */
     public Process() {
 

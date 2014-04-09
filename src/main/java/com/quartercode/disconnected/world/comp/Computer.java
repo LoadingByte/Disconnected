@@ -43,7 +43,7 @@ public class Computer extends WorldChildFeatureHolder<World> {
     /**
      * The {@link Location} of the computer.
      */
-    public static final PropertyDefinition<Location>                          LOCATION;
+    public static final PropertyDefinition<Location>                           LOCATION;
 
     /**
      * The {@link Hardware} parts the computer contains.
@@ -53,7 +53,7 @@ public class Computer extends WorldChildFeatureHolder<World> {
     /**
      * The active {@link OperatingSystem} instance which is currently running the computer.
      */
-    public static final PropertyDefinition<OperatingSystem>                   OS;
+    public static final PropertyDefinition<OperatingSystem>                    OS;
 
     static {
 
