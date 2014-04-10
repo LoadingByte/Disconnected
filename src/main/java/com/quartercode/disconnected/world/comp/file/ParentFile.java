@@ -69,7 +69,7 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
         CHILDREN.addAdderExecutor("checkSize", ParentFile.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 FileSystem fileSystem = invocation.getHolder().get(GET_FILE_SYSTEM).invoke();

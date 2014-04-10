@@ -78,7 +78,7 @@ public class User extends ConfigurationEntry {
         NAME.addSetterExecutor("checkNotSuperuser", User.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 if (invocation.getHolder().get(IS_SUPERUSER).invoke()) {
@@ -97,7 +97,7 @@ public class User extends ConfigurationEntry {
         GROUPS.addAdderExecutor("checkAllowed", User.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 FeatureHolder holder = invocation.getHolder();
@@ -113,7 +113,7 @@ public class User extends ConfigurationEntry {
         GROUPS.addRemoverExecutor("checkAllowed", User.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 FeatureHolder holder = invocation.getHolder();

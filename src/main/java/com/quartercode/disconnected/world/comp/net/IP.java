@@ -55,7 +55,7 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
         PARTS.addSetterExecutor("checkQuadRange", IP.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_6)
+            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 Integer[] parts = (Integer[]) arguments[0];

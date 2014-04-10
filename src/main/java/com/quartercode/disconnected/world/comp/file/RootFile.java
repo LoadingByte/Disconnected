@@ -40,7 +40,7 @@ public class RootFile extends ParentFile<FileSystem> {
         NAME.addGetterExecutor("returnStatic", RootFile.class, new FunctionExecutor<String>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_5)
+            @Prioritized (Prioritized.LEVEL_6)
             public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 return "root";
@@ -50,7 +50,7 @@ public class RootFile extends ParentFile<FileSystem> {
         NAME.addSetterExecutor("cancel", RootFile.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_5)
+            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 return null;

@@ -48,7 +48,7 @@ public class ContentFile extends File<ParentFile<?>> {
         CONTENT.addSetterExecutor("checkSize", ContentFile.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 FileSystem fileSystem = invocation.getHolder().get(GET_FILE_SYSTEM).invoke();

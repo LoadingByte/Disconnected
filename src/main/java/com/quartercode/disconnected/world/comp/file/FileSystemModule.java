@@ -69,7 +69,7 @@ public class FileSystemModule extends OSModule {
         KNOWN_FS.addAdderExecutor("checkNotMounted", FileSystemModule.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 KnownFileSystem element = (KnownFileSystem) arguments[0];
@@ -373,7 +373,7 @@ public class FileSystemModule extends OSModule {
             MOUNTPOINT.addSetterExecutor("checkNotMounted", KnownFileSystem.class, new FunctionExecutor<Void>() {
 
                 @Override
-                @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+                @Prioritized (Prioritized.LEVEL_6)
                 public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                     Validate.isTrue(!invocation.getHolder().get(MOUNTED).get(), "Can't change mountpoint of known file system while mounted");
@@ -386,7 +386,7 @@ public class FileSystemModule extends OSModule {
             MOUNTED.addSetterExecutor("checkMountpointNotTaken", KnownFileSystem.class, new FunctionExecutor<Void>() {
 
                 @Override
-                @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+                @Prioritized (Prioritized.LEVEL_6)
                 public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                     FeatureHolder holder = invocation.getHolder();

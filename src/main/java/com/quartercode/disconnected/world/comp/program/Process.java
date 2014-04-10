@@ -154,7 +154,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         SOURCE.addSetterExecutor("checkFileContent", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_4)
+            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 Validate.isTrue( ((ContentFile) arguments[0]).get(ContentFile.CONTENT).get() instanceof Program, "Source must contain a program");

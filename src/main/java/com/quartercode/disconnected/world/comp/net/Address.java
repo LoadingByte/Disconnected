@@ -61,7 +61,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
         PORT.addSetterExecutor("checkRange", Address.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_6)
+            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 int port = (Integer) arguments[0];
