@@ -407,6 +407,7 @@ public class FileSystemModule extends OSModule {
          */
         public KnownFileSystem() {
 
+            setParentType(FileSystemModule.class);
         }
 
     }
