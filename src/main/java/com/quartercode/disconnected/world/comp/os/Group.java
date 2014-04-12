@@ -51,8 +51,6 @@ public class Group extends ConfigurationEntry {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     static {
@@ -89,8 +87,6 @@ public class Group extends ConfigurationEntry {
 
         });
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new group object.

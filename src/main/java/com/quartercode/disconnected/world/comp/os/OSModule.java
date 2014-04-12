@@ -54,8 +54,6 @@ public abstract class OSModule extends DefaultChildFeatureHolder<OperatingSystem
      */
     public static final FunctionDefinition<Void> SET_RUNNING = FunctionDefinitionFactory.create("setRunning", Boolean.class);
 
-    // ----- Functions End -----
-
     /**
      * Creates a new generic {@link OperatingSystem} module.
      */

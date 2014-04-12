@@ -63,10 +63,6 @@ public class Computer extends WorldChildFeatureHolder<World> {
 
     }
 
-    // ----- Properties End -----
-
-    // ----- Functions End -----
-
     /**
      * Creates a new computer.
      */

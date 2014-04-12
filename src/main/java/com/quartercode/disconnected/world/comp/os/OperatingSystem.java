@@ -95,8 +95,6 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -166,8 +164,6 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
     }
 
-    // ----- Functions End -----
-
     // ----- Foreign Content -----
 
     static {
@@ -194,8 +190,6 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
         });
 
     }
-
-    // ----- Foreign Content End -----
 
     /**
      * Creates a new operating system.

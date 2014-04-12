@@ -74,8 +74,6 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -175,8 +173,6 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
         });
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new empty address.

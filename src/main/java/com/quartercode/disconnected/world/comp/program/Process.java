@@ -170,8 +170,6 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -640,8 +638,6 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         });
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new empty process.

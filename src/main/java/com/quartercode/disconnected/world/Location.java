@@ -46,8 +46,6 @@ public class Location extends DefaultFeatureHolder {
 
     }
 
-    // ----- Properties End -----
-
     /**
      * Creates a new relative location.
      */

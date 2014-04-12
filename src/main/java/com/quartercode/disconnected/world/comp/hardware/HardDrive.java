@@ -50,8 +50,6 @@ public class HardDrive extends Hardware {
 
     }
 
-    // ----- Properties End -----
-
     /**
      * Creates a new hard drive.
      */

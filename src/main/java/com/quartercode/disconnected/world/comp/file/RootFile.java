@@ -60,8 +60,6 @@ public class RootFile extends ParentFile<FileSystem> {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     static {
@@ -122,8 +120,6 @@ public class RootFile extends ParentFile<FileSystem> {
         });
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new root file.

@@ -148,8 +148,6 @@ public class QueueEventListener extends DefaultFeatureHolder implements EventLis
 
     }
 
-    // ----- Functions End -----
-
     /**
      * Creates a new queue event listener.
      */

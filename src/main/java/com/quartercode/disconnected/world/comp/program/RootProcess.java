@@ -61,8 +61,6 @@ public class RootProcess extends Process<OperatingSystem> {
 
     }
 
-    // ----- Functions End -----
-
     /**
      * Creates a new empty root process.
      */

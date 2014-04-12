@@ -72,8 +72,6 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -214,8 +212,6 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
         GET_SIZE.addExecutor("fileSystemSize", FileSystem.class, PropertyAccessorFactory.createGet(SIZE));
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new file system.

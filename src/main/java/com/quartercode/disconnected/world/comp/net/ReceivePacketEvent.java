@@ -47,8 +47,6 @@ public class ReceivePacketEvent extends Event implements DerivableSize {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     static {
@@ -56,8 +54,6 @@ public class ReceivePacketEvent extends Event implements DerivableSize {
         GET_SIZE.addExecutor("packet", ReceivePacketEvent.class, SizeUtil.createGetSize(PACKET));
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new receive packet event.

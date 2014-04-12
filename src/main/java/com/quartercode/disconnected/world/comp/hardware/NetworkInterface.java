@@ -61,8 +61,6 @@ public class NetworkInterface extends Hardware {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -96,8 +94,6 @@ public class NetworkInterface extends Hardware {
         SEND_PACKETS = FunctionDefinitionFactory.create("sendPacket", NetworkInterface.class, CollectionPropertyAccessorFactory.createAdd(REMAINING_PACKETS), Packet[].class);
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new network interface.

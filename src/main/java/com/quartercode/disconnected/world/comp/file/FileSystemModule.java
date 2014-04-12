@@ -81,8 +81,6 @@ public class FileSystemModule extends OSModule {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -331,8 +329,6 @@ public class FileSystemModule extends OSModule {
 
     }
 
-    // ----- Functions End -----
-
     /**
      * Creates a new file system module.
      */
@@ -401,8 +397,6 @@ public class FileSystemModule extends OSModule {
             });
 
         }
-
-        // ----- Properties End -----
 
         /**
          * Creates a new known file system representation object.

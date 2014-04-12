@@ -67,8 +67,6 @@ public class EnvironmentVariable extends ConfigurationEntry {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -191,8 +189,6 @@ public class EnvironmentVariable extends ConfigurationEntry {
         });
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new environment variable.

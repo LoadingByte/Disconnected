@@ -69,8 +69,6 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -161,8 +159,6 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
         RUN = FunctionDefinitionFactory.create("run");
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new program executor.

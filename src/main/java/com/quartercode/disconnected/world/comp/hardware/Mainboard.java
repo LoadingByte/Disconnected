@@ -58,8 +58,6 @@ public class Mainboard extends Hardware {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -131,8 +129,6 @@ public class Mainboard extends Hardware {
             CONTENT = ReferenceProperty.createDefinition("contentt");
 
         }
-
-        // ----- Properties End -----
 
         /**
          * Creates a new mainboard slot.

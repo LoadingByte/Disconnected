@@ -50,8 +50,6 @@ public class RAM extends Hardware {
 
     }
 
-    // ----- Properties End -----
-
     /**
      * Creates a new ram module.
      */

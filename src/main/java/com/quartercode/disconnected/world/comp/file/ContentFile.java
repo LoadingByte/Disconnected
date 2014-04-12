@@ -63,8 +63,6 @@ public class ContentFile extends File<ParentFile<?>> {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     static {
@@ -72,8 +70,6 @@ public class ContentFile extends File<ParentFile<?>> {
         GET_SIZE.addExecutor("content", ContentFile.class, SizeUtil.createGetSize(CONTENT));
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new content file.

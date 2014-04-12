@@ -67,8 +67,6 @@ public class ProcessModule extends OSModule implements SchedulerUser {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -163,8 +161,6 @@ public class ProcessModule extends OSModule implements SchedulerUser {
         });
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new process module.

@@ -65,8 +65,6 @@ public class Session extends ProgramExecutor {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     static {
@@ -111,8 +109,6 @@ public class Session extends ProgramExecutor {
         });
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new session program.

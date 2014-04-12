@@ -51,8 +51,6 @@ public class CPU extends Hardware {
 
     }
 
-    // ----- Properties End -----
-
     /**
      * Creates a new cpu.
      */

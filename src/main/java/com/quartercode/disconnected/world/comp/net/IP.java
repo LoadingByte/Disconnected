@@ -71,8 +71,6 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -171,8 +169,6 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
         });
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new empty ip.

@@ -55,8 +55,6 @@ public class Hardware extends WorldChildFeatureHolder<Computer> {
 
     }
 
-    // ----- Properties End -----
-
     /**
      * Creates a new hardware part.
      */

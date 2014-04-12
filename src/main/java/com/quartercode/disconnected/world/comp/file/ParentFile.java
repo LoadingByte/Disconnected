@@ -88,8 +88,6 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -127,8 +125,6 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
         GET_SIZE.addExecutor("children", ParentFile.class, SizeUtil.createGetSize(CHILDREN));
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new parent file.

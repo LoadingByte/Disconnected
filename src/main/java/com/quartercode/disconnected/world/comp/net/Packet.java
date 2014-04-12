@@ -56,8 +56,6 @@ public class Packet extends DefaultFeatureHolder implements DerivableSize {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     static {
@@ -65,8 +63,6 @@ public class Packet extends DefaultFeatureHolder implements DerivableSize {
         GET_SIZE.addExecutor("data", Packet.class, SizeUtil.createGetSize(DATA));
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new packet.

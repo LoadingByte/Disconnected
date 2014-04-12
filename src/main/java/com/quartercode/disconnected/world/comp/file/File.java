@@ -114,8 +114,6 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -294,8 +292,6 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
         GET_SIZE.addExecutor("name", File.class, SizeUtil.createGetSize(NAME));
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new file.

@@ -165,8 +165,6 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -409,8 +407,6 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
         });
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new file rights storage.

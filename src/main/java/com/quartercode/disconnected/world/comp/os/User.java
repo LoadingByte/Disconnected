@@ -129,8 +129,6 @@ public class User extends ConfigurationEntry {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -258,8 +256,6 @@ public class User extends ConfigurationEntry {
         });
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new user.

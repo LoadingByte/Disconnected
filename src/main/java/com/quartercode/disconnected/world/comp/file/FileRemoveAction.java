@@ -54,8 +54,6 @@ public class FileRemoveAction extends DefaultFeatureHolder implements FileAction
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -128,8 +126,6 @@ public class FileRemoveAction extends DefaultFeatureHolder implements FileAction
         });
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new file remove action.

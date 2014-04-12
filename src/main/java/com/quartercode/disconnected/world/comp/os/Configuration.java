@@ -66,8 +66,6 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
 
     }
 
-    // ----- Properties End -----
-
     /**
      * Creates a new configuration object.
      */
@@ -135,8 +133,6 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
             });
 
         }
-
-        // ----- Functions End -----
 
         /**
          * Creates a new configuration entry.

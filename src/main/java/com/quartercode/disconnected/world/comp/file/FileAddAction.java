@@ -83,8 +83,6 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
 
     }
 
-    // ----- Properties End -----
-
     // ----- Functions -----
 
     /**
@@ -214,8 +212,6 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
         });
 
     }
-
-    // ----- Functions End -----
 
     /**
      * Creates a new file add action.

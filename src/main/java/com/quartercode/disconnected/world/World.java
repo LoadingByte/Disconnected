@@ -61,8 +61,6 @@ public class World extends DefaultFeatureHolder {
 
     }
 
-    // ----- Properties End -----
-
     private Simulation                                                               simulation;
 
     /**
