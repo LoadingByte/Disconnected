@@ -134,7 +134,7 @@ public class QueueEventListener extends DefaultFeatureHolder implements EventLis
                 while (!clone.isEmpty()) {
                     Event current = clone.poll();
                     if (matcher.matches(current)) {
-                        holder.get(EVENTS).get().remove(current);
+                        holder.get(EVENTS).remove(current);
                         nextEvent = current;
                         break;
                     }

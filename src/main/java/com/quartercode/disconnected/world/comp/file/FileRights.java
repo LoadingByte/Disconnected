@@ -27,6 +27,7 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.StringRepresentable;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 
@@ -322,7 +323,9 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
 
                 boolean result = false;
                 if (arguments[0] != null) {
-                    result = invocation.getHolder().get(RIGHTS).get()[ ((FileAccessor) arguments[0]).ordinal() * 4 + ((FileRight) arguments[1]).ordinal()];
+                    // The requested array item might be null
+                    Boolean rawResult = invocation.getHolder().get(RIGHTS).get()[ ((FileAccessor) arguments[0]).ordinal() * 4 + ((FileRight) arguments[1]).ordinal()];
+                    result = NullPreventer.prevent(rawResult);
                 }
 
                 invocation.next(arguments);

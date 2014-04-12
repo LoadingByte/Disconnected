@@ -66,6 +66,14 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
 
     }
 
+    // ----- Functions -----
+
+    static {
+
+        GET_SIZE.addExecutor("entries", Configuration.class, SizeUtil.createGetSize(ENTRIES));
+
+    }
+
     /**
      * Creates a new configuration object.
      */

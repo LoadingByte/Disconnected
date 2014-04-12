@@ -73,7 +73,7 @@ public class FileUtilsTest {
         Assert.assertTrue("Owner hasn't read right", FileUtils.hasRight(owner, file, FileRight.READ));
 
         file.get(File.RIGHTS).get().get(FileRights.SET).invoke(FileAccessor.OWNER, FileRight.READ, false);
-        Assert.assertTrue("Owner has read right", FileUtils.hasRight(owner, file, FileRight.READ));
+        Assert.assertFalse("Owner has read right", FileUtils.hasRight(owner, file, FileRight.READ));
     }
 
     @Test

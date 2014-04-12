@@ -129,4 +129,12 @@ public class RootFile extends ParentFile<FileSystem> {
         setParentType(FileSystem.class);
     }
 
+    // Temporary: Disable empty clones in order to make the root file of every file system work
+    // TODO: Find a solution for the root file cloning problem
+    @Override
+    public Object clone() {
+
+        return this;
+    }
+
 }

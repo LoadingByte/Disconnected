@@ -56,7 +56,7 @@ public class SizeUtil {
             return 0; // Nulls have no size
         } else if (object instanceof DerivableSize) {
             // Feature holders which implement DerivableSize have the size provided by DerivableSize.GET_SIZE
-            return ((DerivableSize) object).get(DerivableSize.GET_SIZE).invoke();
+            return NullPreventer.prevent( ((DerivableSize) object).get(DerivableSize.GET_SIZE).invoke());
         } else if (object instanceof Boolean) {
             return 1; // Booleans only need one bit -> one byte
         } else if (object instanceof Character || object instanceof String) {
