@@ -136,7 +136,7 @@ public class FileUtils {
      */
     public static boolean hasRight(User user, File<?> file, FileRight right) throws ExecutorInvocationException {
 
-        if (user.get(User.IS_SUPERUSER).invoke()) {
+        if (user == null || user.get(User.IS_SUPERUSER).invoke()) {
             return true;
         } else if (checkRight(file, FileAccessor.OWNER, right) && file.get(File.OWNER).get().equals(user)) {
             return true;
