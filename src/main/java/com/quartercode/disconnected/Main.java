@@ -201,10 +201,7 @@ public class Main {
      */
     public static void fillRegistry(Registry registry) {
 
-        // ----- Context Path -----
-
         registry.registerContextPathEntry(Classmod.CONTEXT_PATH);
-
         registry.registerContextPathEntry("com.quartercode.disconnected.sim.run");
         registry.registerContextPathEntry("com.quartercode.disconnected.world");
         registry.registerContextPathEntry("com.quartercode.disconnected.world.comp");
@@ -216,15 +213,9 @@ public class Main {
         registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.program");
         registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.program.event");
 
-        // ----- Context Path End -----
-
-        // ----- Themes -----
-
         registry.registerTheme(Main.class.getResource("/ui/default/default.xml"));
         registry.registerTheme(Main.class.getResource("/ui/shell/shell.xml"));
         registry.registerTheme(Main.class.getResource("/ui/desktop/desktop.xml"));
-
-        // ----- Themes End -----
     }
 
     /**
