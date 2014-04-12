@@ -89,6 +89,17 @@ public class Scheduler extends AbstractFeature {
     }
 
     /**
+     * Returns the amount of {@link ScheduleTask}s that are currently running.
+     * Such tasks must have been scheduled with {@link #schedule(ScheduleTask, int)} before.
+     * 
+     * @return The amount of currently running tasks.
+     */
+    public int countTasks() {
+
+        return runningTasks.size();
+    }
+
+    /**
      * Schedules the given {@link ScheduleTask}. It will be executed after the given amount of time units (ticks).
      * 
      * @param task The actual {@link ScheduleTask} that should be scheduled for invocation.
