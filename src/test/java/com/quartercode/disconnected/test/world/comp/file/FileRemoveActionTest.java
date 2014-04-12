@@ -83,7 +83,7 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
     }
 
     @Test
-    public void testFileSystemIsExecutableBy() throws ExecutorInvocationException {
+    public void testFileIsExecutableBy() throws ExecutorInvocationException {
 
         FileAction action = file.get(File.CREATE_REMOVE).invoke();
         actuallyTestIsExecutableBy(action, PATH);

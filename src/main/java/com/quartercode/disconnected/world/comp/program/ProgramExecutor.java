@@ -55,12 +55,12 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
      * The {@link EventListener} all incoming {@link Event}s are delegated to.
      * In the current implementation, this is just a {@link QueueEventListener} that stores incoming events for the next update call.
      */
-    protected static final PropertyDefinition<QueueEventListener>                           IN_EVENT_LISTENER;
+    protected static final PropertyDefinition<QueueEventListener>                        IN_EVENT_LISTENER;
 
     /**
      * This list stores all {@link EventListener}s that are registered and want to receive any {@link Event}s sent by this executor.
      */
-    protected static final CollectionPropertyDefinition<EventListener, List<EventListener>> OUT_EVENT_LISTENERS;
+    public static final CollectionPropertyDefinition<EventListener, List<EventListener>> OUT_EVENT_LISTENERS;
 
     static {
 
@@ -107,13 +107,13 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
      * 
      * @see QueueEventListener#NEXT_EVENT
      */
-    public static final FunctionDefinition<Event>                                           NEXT_EVENT;
+    public static final FunctionDefinition<Event>                                        NEXT_EVENT;
 
     /**
      * This callback is executed once when the program executor should start running.
      * For example, this method could schedule tasks using the {@link Scheduler}.
      */
-    public static final FunctionDefinition<Void>                                            RUN;
+    public static final FunctionDefinition<Void>                                         RUN;
 
     static {
 

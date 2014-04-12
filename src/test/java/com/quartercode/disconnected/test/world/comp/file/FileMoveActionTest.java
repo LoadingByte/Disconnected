@@ -84,7 +84,7 @@ public class FileMoveActionTest extends AbstractFileActionTest {
     }
 
     @Test
-    public void testFileSystemIsExecutableBy() throws ExecutorInvocationException {
+    public void testFileIsExecutableBy() throws ExecutorInvocationException {
 
         FileAction action = file.get(File.CREATE_MOVE).invoke(PATH_2);
         actuallyTestIsExecutableBy(action, PARENT_PATH_2);
