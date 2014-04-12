@@ -25,6 +25,7 @@ import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.ByteUnit;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
+import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
 
 public class FileSystemTest {
@@ -40,7 +41,7 @@ public class FileSystemTest {
 
         testFile = new ContentFile();
         testFile.get(ContentFile.CONTENT).set("Test-Content");
-        fileSystem.get(FileSystem.ADD_FILE).invoke(testFile, "/test1/test2/test.txt");
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(testFile, "/test1/test2/test.txt").get(FileAddAction.EXECUTE).invoke();
     }
 
     @Test

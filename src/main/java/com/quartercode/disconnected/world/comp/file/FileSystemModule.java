@@ -162,9 +162,15 @@ public class FileSystemModule extends OSModule {
     public static final FunctionDefinition<File<?>>                                          GET_FILE;
 
     /**
-     * Adds the given {@link File} to a mounted {@link FileSystem} and locates it under the given path.
-     * If the given path doesn't exist, this creates {@link Directory Directories} to match it.
-     * The name of the {@link File} and the parent object will be changed to match the path.
+     * Returns a {@link FileAction} for adding a file with the given parameters.
+     * In order to actually add the file, the {@link FileAction#EXECUTE} method must be invoked.
+     * Note that that method might throw exceptions if the given file cannot be added.<br>
+     * <br>
+     * The returned action adds the given {@link File} to a mounted {@link FileSystem} under the given path.
+     * If the path does not exist, this method creates directories to match it.<br>
+     * <br>
+     * The name of the file to add is changed to match the path.
+     * Furthermore, newly created directories have the same right settings as the file to add.
      * 
      * <table>
      * <tr>
@@ -175,7 +181,7 @@ public class FileSystemModule extends OSModule {
      * </tr>
      * <tr>
      * <td>0</td>
-     * <td>{@link File}</td>
+     * <td>{@link File}&lt;{@link ParentFile}&lt;?&gt;&gt;</td>
      * <td>file</td>
      * <td>The {@link File} to add under the given path.</td>
      * </tr>
@@ -183,7 +189,7 @@ public class FileSystemModule extends OSModule {
      * <td>1</td>
      * <td>{@link String}</td>
      * <td>path</td>
-     * <td>The path for the new {@link File}. The name of the {@link File} will be changed to the last entry.</td>
+     * <td>The path for the new {@link File}. The name of the file will be changed to the last entry.</td>
      * </tr>
      * </table>
      * 
@@ -193,20 +199,14 @@ public class FileSystemModule extends OSModule {
      * <th>When?</th>
      * </tr>
      * <tr>
-     * <td>{@link IllegalArgumentException}</td>
-     * <td>The given file path isn't valid.</td>
-     * </tr>
-     * <tr>
      * <td>{@link IllegalStateException}</td>
-     * <td>The {@link FileSystem} for the path can't be found.</td>
-     * </tr>
-     * <tr>
-     * <td>{@link OutOfSpaceException}</td>
-     * <td>There is not enough space for the new {@link File}.</td>
+     * <td>The {@link FileSystem} for the path cannot be found or is not mounted.</td>
      * </tr>
      * </table>
+     * 
+     * @see FileAction#EXECUTE
      */
-    public static final FunctionDefinition<Void>                                             ADD_FILE;
+    public static final FunctionDefinition<FileAction>                                       CREATE_ADD_FILE;
 
     static {
 
@@ -284,25 +284,27 @@ public class FileSystemModule extends OSModule {
             }
 
         }, String.class);
-        ADD_FILE = FunctionDefinitionFactory.create("addFile", FileSystemModule.class, new FunctionExecutor<Void>() {
+        CREATE_ADD_FILE = FunctionDefinitionFactory.create("createAddFile", FileSystemModule.class, new FunctionExecutor<FileAction>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 File<?> file = (File<?>) arguments[0];
                 String path = (String) arguments[1];
+                FileAction action = null;
 
                 String[] pathComponents = FileUtils.getComponents(path);
                 Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path");
 
                 FileSystem fileSystem = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]).get(KnownFileSystem.FILE_SYSTEM).get();
                 if (fileSystem != null) {
-                    fileSystem.get(FileSystem.ADD_FILE).invoke(file, pathComponents[1]);
+                    action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, pathComponents[1]);
                 } else {
                     throw new IllegalStateException("No mounted file system with mountpoint '" + pathComponents[0] + "'");
                 }
 
-                return invocation.next(arguments);
+                invocation.next(arguments);
+                return action;
             }
 
         }, File.class, String.class);

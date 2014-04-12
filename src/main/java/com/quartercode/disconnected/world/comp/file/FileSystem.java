@@ -47,12 +47,12 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
     /**
      * The size of the file system, given in bytes.
      */
-    public static final PropertyDefinition<Long>     SIZE;
+    public static final PropertyDefinition<Long>       SIZE;
 
     /**
      * The {@link RootFile} every other {@link File} branches of somehow.
      */
-    public static final PropertyDefinition<RootFile> ROOT;
+    public static final PropertyDefinition<RootFile>   ROOT;
 
     static {
 
@@ -96,12 +96,18 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<File<?>>  GET_FILE;
+    public static final FunctionDefinition<File<?>>    GET_FILE;
 
     /**
-     * Adds the given {@link File} to the file system.
-     * If the given path doesn't exist, this creates directories to match it.
-     * The name of the {@link File} and the parent object will be changed to match the path.
+     * Returns a {@link FileAction} for adding a file with the given parameters.
+     * In order to actually add the file, the {@link FileAction#EXECUTE} method must be invoked.
+     * Note that that method might throw exceptions if the given file cannot be added.<br>
+     * <br>
+     * The returned action adds the given {@link File} to the file system under the given path.
+     * If the path does not exist, this method creates directories to match it.<br>
+     * <br>
+     * The name of the file to add is changed to match the path.
+     * Furthermore, newly created directories have the same right settings as the file to add.
      * 
      * <table>
      * <tr>
@@ -112,7 +118,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
      * </tr>
      * <tr>
      * <td>0</td>
-     * <td>{@link File}</td>
+     * <td>{@link File}&lt;{@link ParentFile}&lt;?&gt;&gt;</td>
      * <td>file</td>
      * <td>The {@link File} to add to the file system.</td>
      * </tr>
@@ -124,32 +130,19 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
      * </tr>
      * </table>
      * 
-     * <table>
-     * <tr>
-     * <th>Exception</th>
-     * <th>When?</th>
-     * </tr>
-     * <tr>
-     * <td>{@link IllegalArgumentException}</td>
-     * <td>The given file path isn't valid.</td>
-     * </tr>
-     * <tr>
-     * <td>{@link OutOfSpaceException}</td>
-     * <td>There is not enough space for the new {@link File}.</td>
-     * </tr>
-     * </table>
+     * @see FileAction#EXECUTE
      */
-    public static final FunctionDefinition<Void>     ADD_FILE;
+    public static final FunctionDefinition<FileAction> CREATE_ADD_FILE;
 
     /**
      * Returns the total amount of bytes which are occupied by {@link File}s on the file system.
      */
-    public static final FunctionDefinition<Long>     GET_FILLED;
+    public static final FunctionDefinition<Long>       GET_FILLED;
 
     /**
      * Returns the total amount of bytes which are not occupied by {@link File}s on the file system.
      */
-    public static final FunctionDefinition<Long>     GET_FREE;
+    public static final FunctionDefinition<Long>       GET_FREE;
 
     static {
 
@@ -177,39 +170,19 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
         }, String.class);
 
-        ADD_FILE = FunctionDefinitionFactory.create("addFile", FileSystem.class, new FunctionExecutor<Void>() {
+        CREATE_ADD_FILE = FunctionDefinitionFactory.create("createAddFile", FileSystem.class, new FunctionExecutor<FileAction>() {
 
             @Override
             @SuppressWarnings ("unchecked")
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                String[] parts = ((String) arguments[1]).split(File.SEPARATOR);
-                File<?> current = invocation.getHolder().get(ROOT).get();
-                File<ParentFile<?>> file = (File<ParentFile<?>>) arguments[0];
-                for (int counter = 0; counter < parts.length; counter++) {
-                    String part = parts[counter];
-                    if (!part.isEmpty()) {
-                        if (current.get(ParentFile.GET_CHILD_BY_NAME).invoke(part) == null) {
-                            if (counter == parts.length - 1) {
-                                file.get(File.NAME).set(part);
-                                current.get(ParentFile.CHILDREN).add(file);
-                                break;
-                            } else {
-                                Directory directory = new Directory();
-                                directory.get(File.NAME).set(part);
-                                directory.get(File.OWNER).set(file.get(File.OWNER).get());
-                                directory.get(File.GROUP).set(file.get(File.GROUP).get());
-                                current.get(ParentFile.CHILDREN).add(directory);
-                            }
-                        }
-                        current = current.get(ParentFile.GET_CHILD_BY_NAME).invoke(part);
-                        if (! (current instanceof ParentFile)) {
-                            throw new IllegalArgumentException("File path '" + arguments[1] + "' isn't valid: A file along the way isn't a parent file");
-                        }
-                    }
-                }
+                FileAddAction action = new FileAddAction();
+                action.get(FileAddAction.FILE_SYSTEM).set((FileSystem) invocation.getHolder());
+                action.get(FileAddAction.FILE).set((File<ParentFile<?>>) arguments[0]);
+                action.get(FileAddAction.PATH).set((String) arguments[1]);
 
-                return invocation.next(arguments);
+                invocation.next(arguments);
+                return action;
             }
 
         }, File.class, String.class);

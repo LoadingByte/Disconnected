@@ -27,6 +27,7 @@ import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.ByteUnit;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
+import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
 import com.quartercode.disconnected.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.world.comp.file.FileSystemModule.KnownFileSystem;
@@ -96,7 +97,7 @@ public class FileSystemModuleTest {
     public void testGetFile() throws ExecutorInvocationException {
 
         File<?> file = new ContentFile();
-        fileSystems[0].get(FileSystem.ADD_FILE).invoke(file, "some/path/to/file");
+        fileSystems[0].get(FileSystem.CREATE_ADD_FILE).invoke(file, "some/path/to/file").get(FileAddAction.EXECUTE).invoke();
 
         Assert.assertEquals("Added file", file, fsModule.get(FileSystemModule.GET_FILE).invoke("/fs1/some/path/to/file"));
         Assert.assertEquals("No added file", null, fsModule.get(FileSystemModule.GET_FILE).invoke("/fs2/some/path/to/file"));
@@ -106,7 +107,7 @@ public class FileSystemModuleTest {
     public void testAddFile() throws ExecutorInvocationException {
 
         File<?> file = new ContentFile();
-        fsModule.get(FileSystemModule.ADD_FILE).invoke(file, "/fs1/some/path/to/file");
+        fsModule.get(FileSystemModule.CREATE_ADD_FILE).invoke(file, "/fs1/some/path/to/file").get(FileAddAction.EXECUTE).invoke();
 
         Assert.assertEquals("Added file", file, fileSystems[0].get(FileSystem.GET_FILE).invoke("some/path/to/file"));
         Assert.assertEquals("No added file", null, fileSystems[1].get(FileSystem.GET_FILE).invoke("some/path/to/file"));

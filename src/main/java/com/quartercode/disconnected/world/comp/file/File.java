@@ -47,7 +47,7 @@ import com.quartercode.disconnected.world.comp.os.User;
  * @see ParentFile
  * @see FileSystem
  */
-public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> implements DerivableSize {
+public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> implements DerivableSize {
 
     private static final Logger                        LOGGER              = Logger.getLogger(File.class.getName());
 
@@ -126,8 +126,13 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
     public static final FunctionDefinition<String>     GET_PATH;
 
     /**
-     * Moves the file to the given local path.
-     * A path is a collection of files seperated by a separator.
+     * Returns a {@link FileAction} that moves the file to a new path on the same {@link FileSystem}.
+     * In order to actually move the file, the {@link FileAction#EXECUTE} method must be invoked.
+     * Note that that method might throw exceptions if the file cannot be moved.<br>
+     * <br>
+     * If the new path does not exist, this method creates directories to match it.
+     * Newly created directories have the same right settings as the file to move.
+     * Furthermore, the name of the file to move is changed to match the new path.
      * 
      * <table>
      * <tr>
@@ -144,28 +149,53 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
      * </tr>
      * </table>
      * 
-     * <table>
-     * <tr>
-     * <th>Exception</th>
-     * <th>When?</th>
-     * </tr>
-     * <tr>
-     * <td>{@link OutOfSpaceException}</td>
-     * <td>There is not enough space for the moved file on the target {@link FileSystem}.</td>
-     * </tr>
-     * <tr>
-     * <td>{@link IllegalStateException}</td>
-     * <td>The given file path isn't valid.</td>
-     * </tr>
-     * </table>
+     * @see FileAction#EXECUTE
      */
-    public static final FunctionDefinition<Void>       SET_PATH;
+    public static final FunctionDefinition<FileAction> CREATE_MOVE;
 
     /**
-     * Removes the file from the {@link FileSystem}.
-     * If this file is a {@link ParentFile}, all child files will also be removed.
+     * Returns a {@link FileAction} that moves the file to a new path on the given {@link FileSystem}.
+     * In order to actually move the file, the {@link FileAction#EXECUTE} method must be invoked.
+     * Note that that method might throw exceptions if the file cannot be moved.<br>
+     * <br>
+     * If the new path does not exist, this method creates directories to match it.
+     * Newly created directories have the same right settings as the file to move.
+     * Furthermore, the name of the file to move is changed to match the new path.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link String}</td>
+     * <td>path</td>
+     * <td>The path the file will be moved to.</td>
+     * </tr>
+     * <tr>
+     * <td>1</td>
+     * <td>{@link FileSystem}</td>
+     * <td>fileSystem</td>
+     * <td>The new file system the file will be moved to. The path is located on this file system.</td>
+     * </tr>
+     * </table>
+     * 
+     * @see FileAction#EXECUTE
      */
-    public static final FunctionDefinition<Void>       REMOVE;
+    public static final FunctionDefinition<FileAction> CREATE_MOVE_TO_OTHER_FS;
+
+    /**
+     * Returns an {@link FileAction} for removing the file.
+     * If the file is a {@link ParentFile}, all child files are also going to be removed.
+     * In order to actually remove the file from its current file system, the {@link FileAction#EXECUTE} method must be invoked.
+     * Note that that method might throw exceptions if the given file cannot be added.
+     * 
+     * @see FileAction#EXECUTE
+     */
+    public static final FunctionDefinition<FileAction> CREATE_REMOVE;
 
     /**
      * Returns the {@link FileSystem} which is hosting the file.
@@ -191,41 +221,52 @@ public class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> im
             }
 
         });
-        SET_PATH = FunctionDefinitionFactory.create("setPath", File.class, new FunctionExecutor<Void>() {
+
+        CREATE_MOVE = FunctionDefinitionFactory.create("createMove", File.class, new FunctionExecutor<FileAction>() {
 
             @Override
-            @SuppressWarnings ("unchecked")
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 FeatureHolder holder = invocation.getHolder();
 
+                String path = (String) arguments[0];
                 FileSystem fileSystem = holder.get(GET_FILE_SYSTEM).invoke();
-                if (fileSystem != null) {
-                    ParentFile<?> oldParent = (ParentFile<?>) ((File<?>) holder).getParent();
-                    String path = FileUtils.resolvePath(holder.get(GET_PATH).invoke(), (String) arguments[0]);
-                    fileSystem.get(FileSystem.ADD_FILE).invoke(holder, path);
-                    FeatureHolder parent = ((File<?>) holder).getParent();
-                    oldParent.get(ParentFile.CHILDREN).remove((File<ParentFile<?>>) holder);
-                    ((File<FeatureHolder>) holder).setParent(parent);
-                }
+                FileAction action = holder.get(CREATE_MOVE_TO_OTHER_FS).invoke(path, fileSystem);
 
-                return invocation.next(arguments);
+                invocation.next(arguments);
+                return action;
             }
 
         }, String.class);
 
-        REMOVE = FunctionDefinitionFactory.create("remove", File.class, new FunctionExecutor<Void>() {
+        CREATE_MOVE_TO_OTHER_FS = FunctionDefinitionFactory.create("createMoveToOtherFs", File.class, new FunctionExecutor<FileAction>() {
+
+            @SuppressWarnings ("unchecked")
+            @Override
+            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) throws ExecutorInvocationException {
+
+                FileMoveAction action = new FileMoveAction();
+                action.get(FileMoveAction.FILE_SYSTEM).set((FileSystem) arguments[1]);
+                action.get(FileMoveAction.FILE).set((File<ParentFile<?>>) invocation.getHolder());
+                action.get(FileMoveAction.PATH).set((String) arguments[0]);
+
+                invocation.next(arguments);
+                return action;
+            }
+
+        }, String.class, FileSystem.class);
+
+        CREATE_REMOVE = FunctionDefinitionFactory.create("createRemove", File.class, new FunctionExecutor<FileAction>() {
 
             @Override
             @SuppressWarnings ("unchecked")
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) throws ExecutorInvocationException {
 
-                FeatureHolder holder = invocation.getHolder();
-                if ( ((File<?>) holder).getParent() instanceof ParentFile) {
-                    ((File<?>) holder).getParent().get(ParentFile.CHILDREN).remove((File<ParentFile<?>>) holder);
-                }
+                FileRemoveAction action = new FileRemoveAction();
+                action.get(FileAddAction.FILE).set((File<ParentFile<?>>) invocation.getHolder());
 
-                return invocation.next(arguments);
+                invocation.next(arguments);
+                return action;
             }
 
         });

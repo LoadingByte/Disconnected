@@ -76,22 +76,34 @@ public class RootFile extends ParentFile<FileSystem> {
             }
 
         });
-        SET_PATH.addExecutor("cancel", RootFile.class, new FunctionExecutor<Void>() {
+
+        CREATE_MOVE.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileAction>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 return null;
             }
 
         });
 
-        REMOVE.addExecutor("cancel", RootFile.class, new FunctionExecutor<Void>() {
+        CREATE_MOVE_TO_OTHER_FS.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileAction>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) throws ExecutorInvocationException {
+
+                return null;
+            }
+
+        });
+
+        CREATE_REMOVE.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileAction>() {
+
+            @Override
+            @Prioritized (Prioritized.LEVEL_5)
+            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) throws ExecutorInvocationException {
 
                 return null;
             }

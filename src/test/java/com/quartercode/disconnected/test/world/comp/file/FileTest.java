@@ -25,6 +25,7 @@ import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.ByteUnit;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
+import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
 
 public class FileTest {
@@ -39,10 +40,7 @@ public class FileTest {
         fileSystem.get(FileSystem.SIZE).set(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
 
         testFile = new ContentFile();
-        fileSystem.get(FileSystem.ADD_FILE).invoke(testFile, "/test1/test2/test.txt");
-
-        ContentFile testFile2 = new ContentFile();
-        fileSystem.get(FileSystem.ADD_FILE).invoke(testFile2, "/test1/test2/test2.txt");
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(testFile, "/test1/test2/test.txt").get(FileAddAction.EXECUTE).invoke();
     }
 
     @Test
@@ -51,16 +49,10 @@ public class FileTest {
         Assert.assertEquals("Path", "/test1/test2/test.txt", testFile.get(File.GET_PATH).invoke());
     }
 
-    @Test
-    public void testSetPath() throws ExecutorInvocationException {
-
-        testFile.get(File.SET_PATH).invoke("../../test3/test4.txt");
-
-        Assert.assertTrue("Moved file doesn't exist", testFile.equals(fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test3/test4.txt")));
-        Assert.assertTrue("Removed file does exist", fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test.txt") == null);
-        Assert.assertEquals("Path of moved file", "/test1/test3/test4.txt", testFile.get(File.GET_PATH).invoke());
-    }
-
+    /*
+     * This test is only here for testing whether setting the name triggers a bug.
+     * In production, a FileMoveAction should be used instead of the direct name setting.
+     */
     @Test
     public void testSetName() throws ExecutorInvocationException {
 
@@ -69,15 +61,6 @@ public class FileTest {
         Assert.assertTrue("Renamed file doesn't exist", testFile.equals(fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test3.txt")));
         Assert.assertTrue("Removed file does exist", fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test.txt") == null);
         Assert.assertEquals("Path of renamed file", "/test1/test2/test3.txt", testFile.get(File.GET_PATH).invoke());
-    }
-
-    @Test
-    public void testRemove() throws ExecutorInvocationException {
-
-        testFile.get(File.REMOVE).invoke();
-
-        Assert.assertNull("Resolved file after removal", fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test.txt"));
-        Assert.assertEquals("Path of removed file (should be null)", null, testFile.get(File.GET_PATH).invoke());
     }
 
 }
