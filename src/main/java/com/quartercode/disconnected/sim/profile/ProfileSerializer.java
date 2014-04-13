@@ -24,14 +24,14 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.util.RandomPool;
@@ -46,7 +46,7 @@ import com.quartercode.disconnected.world.World;
  */
 public class ProfileSerializer {
 
-    private static final Logger LOGGER = Logger.getLogger(ProfileSerializer.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProfileSerializer.class);
 
     /**
      * Serializes the given {@link Profile} to the given {@link OutputStream}.
@@ -124,7 +124,7 @@ public class ProfileSerializer {
         try {
             return JAXBContext.newInstance(contextPathString);
         } catch (JAXBException e) {
-            LOGGER.log(Level.SEVERE, "A JAXB exception occurred while creating context", e);
+            LOGGER.error("A JAXB exception occurred while creating context", e);
         }
 
         return null;

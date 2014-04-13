@@ -23,15 +23,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class can listen on an input stream and write the results to an output stream (must be a print stream).
  */
 public class StreamGobbler extends Thread {
 
-    private static final Logger LOGGER = Logger.getLogger(StreamGobbler.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(StreamGobbler.class);
 
     private final String        prefix;
     private final InputStream   inputStream;
@@ -61,7 +61,7 @@ public class StreamGobbler extends Thread {
                 outputStream.println( (prefix == null ? "" : prefix) + line);
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error while listening on process stream", e);
+            LOGGER.error("Error while listening on process stream", e);
         }
     }
 }

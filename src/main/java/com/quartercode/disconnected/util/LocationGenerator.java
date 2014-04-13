@@ -22,9 +22,9 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.world.Location;
@@ -36,7 +36,7 @@ import com.quartercode.disconnected.world.Location;
  */
 public class LocationGenerator {
 
-    private static final Logger LOGGER = Logger.getLogger(LocationGenerator.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocationGenerator.class);
 
     /**
      * Generates the given amount of locations on an earth map.
@@ -89,7 +89,7 @@ public class LocationGenerator {
 
             return result;
         } catch (ExecutorInvocationException e) {
-            LOGGER.log(Level.SEVERE, "Unknown error while generating locations", e.getCause());
+            LOGGER.error("Unknown error while generating locations", e);
             return null;
         }
     }

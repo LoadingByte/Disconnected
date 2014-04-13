@@ -26,8 +26,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Graphics state descriptors define the properties of {@link GraphicsState}s which can be created out of them with {@link #create()}.
@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  */
 public class GraphicsStateDescriptor {
 
-    private static final Logger                                                   LOGGER  = Logger.getLogger(GraphicsStateDescriptor.class.getName());
+    private static final Logger                                                   LOGGER  = LoggerFactory.getLogger(GraphicsStateDescriptor.class);
 
     private final String                                                          name;
     private final Map<Class<? extends GraphicsModule>, GraphicsModuleInformation> modules = new HashMap<Class<? extends GraphicsModule>, GraphicsModuleInformation>();
@@ -108,7 +108,7 @@ public class GraphicsStateDescriptor {
      */
     public GraphicsState create() {
 
-        LOGGER.info("Creating instance of graphics state '" + name + "'");
+        LOGGER.info("Creating instance of graphics state '{}'", name);
 
         List<GraphicsModule> moduleObjects = new ArrayList<GraphicsModule>();
         // Create module objects
@@ -116,9 +116,9 @@ public class GraphicsStateDescriptor {
             try {
                 moduleObjects.add(moduleClass.newInstance());
             } catch (InstantiationException e) {
-                LOGGER.log(Level.SEVERE, "No no-arg constructor available in '" + moduleClass.getName() + "'; is it an abstract class or interface?", e);
+                LOGGER.error("No no-arg constructor available in '{}'; is it an abstract class or interface?", moduleClass.getName(), e);
             } catch (IllegalAccessException e) {
-                LOGGER.log(Level.SEVERE, "No public no-arg constructor available in '" + moduleClass.getName() + "'", e);
+                LOGGER.error("No public no-arg constructor available in '{}'", moduleClass.getName(), e);
             }
         }
 

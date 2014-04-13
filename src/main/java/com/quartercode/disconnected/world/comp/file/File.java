@@ -18,8 +18,6 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -48,8 +46,6 @@ import com.quartercode.disconnected.world.comp.os.User;
  * @see FileSystem
  */
 public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> implements DerivableSize {
-
-    private static final Logger                        LOGGER              = Logger.getLogger(File.class.getName());
 
     /**
      * The path separator which seperates different files in a path string.
@@ -102,7 +98,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
                 try {
                     rights.get(FileRights.FROM_STRING).invoke(DEFAULT_FILE_RIGHTS);
                 } catch (ExecutorInvocationException e) {
-                    LOGGER.log(Level.SEVERE, "Unexpected exception during creation of default file rights object", e);
+                    throw new RuntimeException("Unexpected exception during creation of default file rights object", e);
                 }
                 return new ObjectProperty<FileRights>(getName(), holder, rights);
             }

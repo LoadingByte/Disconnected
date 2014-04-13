@@ -28,14 +28,14 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.Main;
 import de.matthiasmann.twl.Container;
@@ -52,7 +52,7 @@ import de.matthiasmann.twl.utils.PNGDecoder;
  */
 public class UpdateThread extends Thread {
 
-    private static final Logger   LOGGER   = Logger.getLogger(UpdateThread.class.getName());
+    private static final Logger   LOGGER   = LoggerFactory.getLogger(UpdateThread.class);
 
     private GUI                   gui;
     private ThemeManager          theme;
@@ -107,9 +107,9 @@ public class UpdateThread extends Thread {
             initialize();
             startLoop();
         } catch (LWJGLException e) {
-            LOGGER.log(Level.SEVERE, "Error while creating lwjgl display", e);
+            LOGGER.error("Error while creating lwjgl display", e);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error while loading files", e);
+            LOGGER.error("Error while loading files", e);
         } finally {
             end();
         }

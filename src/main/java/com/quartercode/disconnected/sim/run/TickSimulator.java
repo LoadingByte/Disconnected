@@ -18,8 +18,8 @@
 
 package com.quartercode.disconnected.sim.run;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.GetterSupplier;
@@ -30,7 +30,7 @@ import com.quartercode.disconnected.sim.Simulation;
  */
 public class TickSimulator implements TickAction {
 
-    private static final Logger LOGGER = Logger.getLogger(TickSimulator.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(TickSimulator.class);
 
     private Simulation          simulation;
 
@@ -84,7 +84,7 @@ public class TickSimulator implements TickAction {
                 // Execute world object ticks
                 updateObject(simulation.getWorld());
             } catch (ExecutorInvocationException e) {
-                LOGGER.log(Level.SEVERE, "Unexcpected function execution exception during world tick update", e);
+                LOGGER.error("Unexcpected function execution exception during world tick update", e);
             }
         }
     }

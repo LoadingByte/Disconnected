@@ -23,15 +23,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.util.Classmod;
 import com.quartercode.disconnected.graphics.DefaultStates;
@@ -65,7 +64,7 @@ import com.quartercode.disconnected.world.comp.os.OperatingSystem;
  */
 public class Main {
 
-    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     private static boolean      exitUnderway;
 
@@ -76,19 +75,11 @@ public class Main {
      */
     public static void main(String[] args) {
 
-        // Logging configuration
-        try {
-            LogManager.getLogManager().readConfiguration(Main.class.getResourceAsStream("/config/logging.properties"));
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Can't load logging configuration", e);
-            return;
-        }
-
         // Default exception handler if the vm throws an exception to the entry point of thread (e.g. main() or run())
         Thread.setDefaultUncaughtExceptionHandler(new LogExceptionHandler());
 
         // Print information about the software
-        LOGGER.info("Version " + Disconnected.getVersion());
+        LOGGER.info("Version {}", Disconnected.getVersion());
 
         // Parse command line arguments
         Options options = createCommandLineOptions();
@@ -96,7 +87,7 @@ public class Main {
         try {
             line = new PosixParser().parse(options, args, true);
         } catch (ParseException e) {
-            LOGGER.warning(e.getMessage());
+            LOGGER.warn(e.getMessage());
             new HelpFormatter().printHelp("java -jar disconnected-" + Disconnected.getVersion() + ".jar", options, true);
         }
 
@@ -136,7 +127,7 @@ public class Main {
             Disconnected.setRS(new ResourceStore());
             fillResourceStore(Disconnected.getRS());
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Can't fill resource store", e);
+            LOGGER.error("Can't fill resource store", e);
             return;
         }
 
@@ -168,7 +159,7 @@ public class Main {
                 computer.get(Computer.GET_OS).invoke().get(OperatingSystem.SET_RUNNING).invoke(true);
             }
         } catch (ExecutorInvocationException e) {
-            LOGGER.log(Level.SEVERE, "Unknown error while booting up computers", e.getCause());
+            LOGGER.error("Unknown error while booting up computers", e);
         }
         Profile profile = new Profile("test", simulation);
         Disconnected.getProfileManager().addProfile(profile);

@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the controls for the tick system which then calls several actions.
@@ -33,6 +33,8 @@ import org.apache.commons.lang.Validate;
  * @see TickThread
  */
 public class Ticker {
+
+    private static final Logger    LOGGER                   = LoggerFactory.getLogger(Ticker.class);
 
     /**
      * The amount of milliseconds the ticker will wait from one tick to another by default.
@@ -43,8 +45,6 @@ public class Ticker {
      * The amount of ticks called in one second by default.
      */
     public static final int        DEFAULT_TICKS_PER_SECOND = 1000 / DEFAULT_DELAY;
-
-    private static final Logger    LOGGER                   = Logger.getLogger(Ticker.class.getName());
 
     private TickThread             thread;
     private final List<TickAction> actions                  = new ArrayList<TickAction>();
@@ -219,8 +219,8 @@ public class Ticker {
                     for (TickAction action : new ArrayList<TickAction>(ticker.getActions())) {
                         try {
                             action.update();
-                        } catch (Throwable t) {
-                            LOGGER.log(Level.SEVERE, "An exception occurred while executing tick action update (tick action '" + action.getClass().getName() + "')", t);
+                        } catch (RuntimeException e) {
+                            LOGGER.error("An unexpected exception occurred while the tick action '{}' was updated", action.getClass().getName(), e);
                         }
                     }
 

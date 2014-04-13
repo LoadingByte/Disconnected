@@ -19,9 +19,9 @@
 package com.quartercode.disconnected.graphics;
 
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.OperationNotSupportedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import de.matthiasmann.twl.Container;
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.Widget;
@@ -36,7 +36,7 @@ import de.matthiasmann.twl.Widget;
  */
 public class GraphicsState extends Widget {
 
-    private static final Logger               LOGGER = Logger.getLogger(GraphicsState.class.getName());
+    private static final Logger               LOGGER = LoggerFactory.getLogger(GraphicsState.class);
 
     private final String                      name;
     private final Map<String, GraphicsModule> modules;
@@ -86,7 +86,7 @@ public class GraphicsState extends Widget {
             try {
                 module.add(this);
             } catch (RuntimeException e) {
-                LOGGER.log(Level.SEVERE, "Unexpected exception during graphics state add() (state '" + name + "', module '" + module.getClass().getName() + "'); aborting state", e);
+                LOGGER.error("Unexpected exception during graphics state add() (state '{}', module '{}'); aborting state", name, module.getClass().getName(), e);
                 abort();
                 return;
             }
@@ -102,7 +102,7 @@ public class GraphicsState extends Widget {
             try {
                 module.layout(this);
             } catch (RuntimeException e) {
-                LOGGER.log(Level.SEVERE, "Unexpected exception during graphics state layout() (state '" + name + "', module '" + module.getClass().getName() + "'); aborting state", e);
+                LOGGER.error("Unexpected exception during graphics state layout() (state '{}', module '{}'); aborting state", name, module.getClass().getName(), e);
                 abort();
                 return;
             }
@@ -116,7 +116,7 @@ public class GraphicsState extends Widget {
             try {
                 module.remove(this);
             } catch (RuntimeException e) {
-                LOGGER.log(Level.SEVERE, "Unexpected exception during graphics state remove() (state '" + name + "', module '" + module.getClass().getName() + "'); aborting state", e);
+                LOGGER.error("Unexpected exception during graphics state remove() (state '{}', module '{}'); aborting state", name, module.getClass().getName(), e);
                 abort();
                 return;
             }
@@ -128,7 +128,7 @@ public class GraphicsState extends Widget {
         if (getParent() != null) {
             getParent().removeChild(this);
         } else {
-            LOGGER.warning("Cannot abort graphics state '" + name + "'; no parent widget set");
+            LOGGER.warn("Cannot abort graphics state '{}'; no parent widget set", name);
         }
     }
 

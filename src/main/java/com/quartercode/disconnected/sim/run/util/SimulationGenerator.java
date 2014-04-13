@@ -20,9 +20,9 @@ package com.quartercode.disconnected.sim.run.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.util.LocationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
@@ -76,7 +76,7 @@ import com.quartercode.disconnected.world.member.ai.UserController;
  */
 public class SimulationGenerator {
 
-    private static final Logger LOGGER = Logger.getLogger(SimulationGenerator.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimulationGenerator.class);
 
     /**
      * Generates a new {@link Simulation} with the given settings.
@@ -140,7 +140,7 @@ public class SimulationGenerator {
 
             return world;
         } catch (ExecutorInvocationException e) {
-            LOGGER.log(Level.SEVERE, "Unknown error while generating simulation", e.getCause());
+            LOGGER.error("Unexpected exception while generating simulation", e);
             return null;
         }
 
@@ -267,7 +267,7 @@ public class SimulationGenerator {
 
             return computers;
         } catch (ExecutorInvocationException e) {
-            LOGGER.log(Level.SEVERE, "Unknown error while generating computer", e.getCause());
+            LOGGER.error("Unexpected exception while generating computer", e);
             return null;
         }
     }
@@ -334,8 +334,8 @@ public class SimulationGenerator {
             program.get(Program.SET_VERSION).invoke(version);
             program.get(Program.SET_EXECUTOR_CLASS).invoke(executorClass);
             return program;
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Unexpected exception during the initialization of a new program object", e);
+        } catch (ExecutorInvocationException e) {
+            LOGGER.error("Unexpected exception during the initialization of a new program object", e);
         }
 
         return null;
