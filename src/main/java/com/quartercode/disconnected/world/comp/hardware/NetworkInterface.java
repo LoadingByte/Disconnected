@@ -57,7 +57,7 @@ public class NetworkInterface extends Hardware {
     static {
 
         IP = ObjectProperty.createDefinition("ip");
-        REMAINING_PACKETS = ObjectCollectionProperty.createDefinition("remainingPackets", new LinkedList<Packet>());
+        REMAINING_PACKETS = ObjectCollectionProperty.createDefinition("remainingPackets", new LinkedList<Packet>(), true);
 
     }
 

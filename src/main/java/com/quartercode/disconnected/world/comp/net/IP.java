@@ -51,7 +51,7 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
 
     static {
 
-        PARTS = ObjectProperty.createDefinition("parts", new Integer[4]);
+        PARTS = ObjectProperty.createDefinition("parts", new Integer[4], true);
         PARTS.addSetterExecutor("checkQuadRange", IP.class, new FunctionExecutor<Void>() {
 
             @Override

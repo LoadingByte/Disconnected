@@ -93,7 +93,7 @@ public class User extends ConfigurationEntry {
 
         PASSWORD = ObjectProperty.createDefinition("password");
 
-        GROUPS = ObjectCollectionProperty.createDefinition("groups", new ArrayList<String>());
+        GROUPS = ObjectCollectionProperty.createDefinition("groups", new ArrayList<String>(), true);
         GROUPS.addAdderExecutor("checkAllowed", User.class, new FunctionExecutor<Void>() {
 
             @Override

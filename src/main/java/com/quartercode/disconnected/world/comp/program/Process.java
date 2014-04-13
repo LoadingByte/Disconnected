@@ -163,10 +163,10 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        ENVIRONMENT = ObjectProperty.<Map<String, String>> createDefinition("environment", new HashMap<String, String>());
-        STATE = ObjectProperty.createDefinition("state", ProcessState.RUNNING);
+        ENVIRONMENT = ObjectProperty.<Map<String, String>> createDefinition("environment", new HashMap<String, String>(), true);
+        STATE = ObjectProperty.createDefinition("state", ProcessState.RUNNING, false);
         EXECUTOR = ObjectProperty.createDefinition("executor");
-        CHILDREN = ObjectCollectionProperty.createDefinition("children", new ArrayList<Process<?>>());
+        CHILDREN = ObjectCollectionProperty.createDefinition("children", new ArrayList<Process<?>>(), true);
 
     }
 

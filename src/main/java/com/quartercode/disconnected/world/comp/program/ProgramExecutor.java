@@ -64,8 +64,8 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
 
     static {
 
-        IN_EVENT_LISTENER = ObjectProperty.createDefinition("inEventListener", new QueueEventListener());
-        OUT_EVENT_LISTENERS = ReferenceCollectionProperty.createDefinition("outEventListeners", new ArrayList<EventListener>());
+        IN_EVENT_LISTENER = ObjectProperty.createDefinition("inEventListener", new QueueEventListener(), true);
+        OUT_EVENT_LISTENERS = ReferenceCollectionProperty.createDefinition("outEventListeners", new ArrayList<EventListener>(), true);
 
     }
 

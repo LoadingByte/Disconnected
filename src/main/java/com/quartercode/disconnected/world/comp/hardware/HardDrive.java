@@ -46,7 +46,7 @@ public class HardDrive extends Hardware {
 
     static {
 
-        FILE_SYSTEM = ObjectProperty.createDefinition("fileSystem", new FileSystem());
+        FILE_SYSTEM = ObjectProperty.createDefinition("fileSystem", new FileSystem(), true);
 
     }
 

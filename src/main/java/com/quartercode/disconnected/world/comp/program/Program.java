@@ -67,7 +67,7 @@ public class Program extends DefaultFeatureHolder implements DerivableSize {
     static {
 
         VERSION = ObjectProperty.createDefinition("version");
-        VULNERABILITIES = ObjectCollectionProperty.createDefinition("vulnerabilities", new HashSet<Vulnerability>());
+        VULNERABILITIES = ObjectCollectionProperty.createDefinition("vulnerabilities", new HashSet<Vulnerability>(), true);
         EXECUTOR_CLASS = ObjectProperty.createDefinition("executorClass");
 
     }

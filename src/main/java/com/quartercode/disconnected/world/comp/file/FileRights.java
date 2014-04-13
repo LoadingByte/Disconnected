@@ -162,7 +162,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
 
     static {
 
-        RIGHTS = ObjectProperty.createDefinition("rights", new Boolean[3 * 4]);
+        RIGHTS = ObjectProperty.createDefinition("rights", new Boolean[3 * 4], true);
 
     }
 

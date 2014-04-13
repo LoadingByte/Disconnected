@@ -54,7 +54,7 @@ public class Mainboard extends Hardware {
 
     static {
 
-        SLOTS = ObjectCollectionProperty.createDefinition("slots", new ArrayList<MainboardSlot>());
+        SLOTS = ObjectCollectionProperty.createDefinition("slots", new ArrayList<MainboardSlot>(), true);
 
     }
 

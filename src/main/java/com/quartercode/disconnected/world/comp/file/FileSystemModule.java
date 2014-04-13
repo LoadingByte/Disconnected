@@ -65,7 +65,7 @@ public class FileSystemModule extends OSModule {
 
     static {
 
-        KNOWN_FS = ObjectCollectionProperty.createDefinition("knownFs", new ArrayList<KnownFileSystem>());
+        KNOWN_FS = ObjectCollectionProperty.createDefinition("knownFs", new ArrayList<KnownFileSystem>(), true);
         KNOWN_FS.addAdderExecutor("checkNotMounted", FileSystemModule.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -380,7 +380,7 @@ public class FileSystemModule extends OSModule {
 
             });
 
-            MOUNTED = ObjectProperty.createDefinition("mounted", false);
+            MOUNTED = ObjectProperty.createDefinition("mounted", false, false);
             MOUNTED.addSetterExecutor("checkMountpointNotTaken", KnownFileSystem.class, new FunctionExecutor<Void>() {
 
                 @Override

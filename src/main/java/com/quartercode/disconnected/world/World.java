@@ -55,9 +55,9 @@ public class World extends DefaultFeatureHolder {
 
     static {
 
-        MEMBERS = ObjectCollectionProperty.createDefinition("members", new ArrayList<Member>());
-        GROUPS = ObjectCollectionProperty.createDefinition("memberGroups", new ArrayList<MemberGroup>());
-        COMPUTERS = ObjectCollectionProperty.createDefinition("computers", new ArrayList<Computer>());
+        MEMBERS = ObjectCollectionProperty.createDefinition("members", new ArrayList<Member>(), true);
+        GROUPS = ObjectCollectionProperty.createDefinition("memberGroups", new ArrayList<MemberGroup>(), true);
+        COMPUTERS = ObjectCollectionProperty.createDefinition("computers", new ArrayList<Computer>(), true);
 
     }
 

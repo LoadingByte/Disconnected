@@ -88,10 +88,10 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
         NAME = ObjectProperty.createDefinition("name");
         VERSION = ObjectProperty.createDefinition("version");
-        VULNERABILITIES = ObjectCollectionProperty.createDefinition("vulnerabilities", new HashSet<Vulnerability>());
-        FILE_SYSTEM_MODULE = ObjectProperty.createDefinition("fileSystemModule", new FileSystemModule());
-        PROCESS_MODULE = ObjectProperty.createDefinition("processModule", new ProcessModule());
-        NETWORK_MODULE = ObjectProperty.createDefinition("networkModule", new NetworkModule());
+        VULNERABILITIES = ObjectCollectionProperty.createDefinition("vulnerabilities", new HashSet<Vulnerability>(), true);
+        FILE_SYSTEM_MODULE = ObjectProperty.createDefinition("fileSystemModule", new FileSystemModule(), true);
+        PROCESS_MODULE = ObjectProperty.createDefinition("processModule", new ProcessModule(), true);
+        NETWORK_MODULE = ObjectProperty.createDefinition("networkModule", new NetworkModule(), true);
 
     }
 

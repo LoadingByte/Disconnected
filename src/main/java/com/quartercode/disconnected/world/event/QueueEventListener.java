@@ -54,7 +54,7 @@ public class QueueEventListener extends DefaultFeatureHolder implements EventLis
 
     static {
 
-        EVENTS = ObjectCollectionProperty.createDefinition("events", new LinkedList<Event>());
+        EVENTS = ObjectCollectionProperty.createDefinition("events", new LinkedList<Event>(), true);
 
     }
 
