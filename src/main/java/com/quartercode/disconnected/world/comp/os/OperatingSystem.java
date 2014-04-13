@@ -114,7 +114,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
     /**
      * Returns whether the operating system is running or not.
-     * The state is determinated by the running state of the {@link RootProcess}.
+     * The state is determined by the running state of the {@link RootProcess}.
      */
     public static final FunctionDefinition<Boolean>                                     IS_RUNNING;
 

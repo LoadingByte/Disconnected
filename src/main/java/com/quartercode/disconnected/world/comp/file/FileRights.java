@@ -97,20 +97,20 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
     public static enum FileRight {
 
         /**
-         * The read-right determinates if a user is allowed to read the contents from a file or directory (letter 'r').
+         * The read-right determines if a user is allowed to read the contents from a file or directory (letter 'r').
          */
         READ ('r'),
         /**
-         * The write-right determinates if a user is allowed to write contents into files or create new files in a directory (letter 'w').
+         * The write-right determines if a user is allowed to write contents into files or create new files in a directory (letter 'w').
          */
         WRITE ('w'),
         /**
-         * The delete-right determinates if a user is allowed to delete a file or a directory (letter 'e').
+         * The delete-right determines if a user is allowed to delete a file or a directory (letter 'e').
          * In the case of a directory, the user also needs the delete-right on every file or folder in it.
          */
         DELETE ('d'),
         /**
-         * The execute-right determinates if a user is allowed to execute a file (letter 'x').
+         * The execute-right determines if a user is allowed to execute a file (letter 'x').
          * It cannot be applied to directories.
          */
         EXECUTE ('x');
