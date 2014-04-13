@@ -24,6 +24,7 @@ import java.util.List;
 import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileAccessor;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
+import com.quartercode.disconnected.world.comp.os.Group;
 import com.quartercode.disconnected.world.comp.os.User;
 
 /**
@@ -140,7 +141,7 @@ public class FileUtils {
             return true;
         } else if (checkRight(file, FileAccessor.OWNER, right) && file.get(File.OWNER).get().equals(user)) {
             return true;
-        } else if (checkRight(file, FileAccessor.GROUP, right) && user.get(User.GROUPS).get().contains(file.get(File.GROUP).get())) {
+        } else if (checkRight(file, FileAccessor.GROUP, right) && user.get(User.GROUPS).get().contains(file.get(File.GROUP).get().get(Group.NAME).get())) {
             return true;
         } else if (checkRight(file, FileAccessor.OTHERS, right)) {
             return true;

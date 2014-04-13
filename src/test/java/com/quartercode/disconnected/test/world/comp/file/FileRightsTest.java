@@ -55,8 +55,48 @@ public class FileRightsTest {
     }
 
     @Test
-    public void testFileUtilsHasRight() throws ExecutorInvocationException {
+    public void testFromString() throws ExecutorInvocationException {
 
+        FileRights rights = new FileRights();
+        rights.get(FileRights.FROM_STRING).invoke("rw-x--d-r--x");
+
+        Assert.assertTrue("Owner read right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.READ));
+        Assert.assertTrue("Owner write right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.WRITE));
+        Assert.assertTrue("Owner delete right is set", !rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.DELETE));
+        Assert.assertTrue("Owner execute right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.EXECUTE));
+
+        Assert.assertTrue("Group read right is set", !rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.READ));
+        Assert.assertTrue("Group write right is set", !rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.WRITE));
+        Assert.assertTrue("Group delete right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.DELETE));
+        Assert.assertTrue("Group execute right is set", !rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.EXECUTE));
+
+        Assert.assertTrue("Others read right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.READ));
+        Assert.assertTrue("Others write right is set", !rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.WRITE));
+        Assert.assertTrue("Others delete right is set", !rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.DELETE));
+        Assert.assertTrue("Others execute right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.EXECUTE));
+    }
+
+    @Test
+    public void testToString() throws ExecutorInvocationException {
+
+        FileRights rights = new FileRights();
+
+        rights.get(FileRights.SET).invoke(FileAccessor.OWNER, FileRight.READ, true);
+        rights.get(FileRights.SET).invoke(FileAccessor.OWNER, FileRight.WRITE, true);
+        rights.get(FileRights.SET).invoke(FileAccessor.OWNER, FileRight.DELETE, false);
+        rights.get(FileRights.SET).invoke(FileAccessor.OWNER, FileRight.EXECUTE, true);
+
+        rights.get(FileRights.SET).invoke(FileAccessor.GROUP, FileRight.READ, false);
+        rights.get(FileRights.SET).invoke(FileAccessor.GROUP, FileRight.WRITE, false);
+        rights.get(FileRights.SET).invoke(FileAccessor.GROUP, FileRight.DELETE, true);
+        rights.get(FileRights.SET).invoke(FileAccessor.GROUP, FileRight.EXECUTE, false);
+
+        rights.get(FileRights.SET).invoke(FileAccessor.OTHERS, FileRight.READ, true);
+        rights.get(FileRights.SET).invoke(FileAccessor.OTHERS, FileRight.WRITE, false);
+        rights.get(FileRights.SET).invoke(FileAccessor.OTHERS, FileRight.DELETE, false);
+        rights.get(FileRights.SET).invoke(FileAccessor.OTHERS, FileRight.EXECUTE, true);
+
+        Assert.assertEquals("Generated file right string", "rw-x--d-r--x", rights.get(FileRights.TO_STRING).invoke());
     }
 
 }
