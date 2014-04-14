@@ -67,7 +67,38 @@ public class User extends ConfigurationEntry {
 
     /**
      * The names of all {@link Group}s the user is a member in.
-     * Such {@link Group}s are used to set rights for multiple users.
+     * Such groups are used to set rights for multiple users.<br>
+     * <br>
+     * Exceptions that can occur when adding:
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalArgumentException}</td>
+     * <td>The user the function is invoked on is a superuser.</td>
+     * </tr>
+     * </table>
+     * 
+     * <br>
+     * Exceptions that can occur when removing:
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalArgumentException}</td>
+     * <td>The user the function is invoked on is a superuser.</td>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalStateException}</td>
+     * <td>The group for removal is the primary group of the user.</td>
+     * </tr>
+     * </table>
      */
     public static final CollectionPropertyDefinition<String, List<String>> GROUPS;
 
@@ -93,31 +124,35 @@ public class User extends ConfigurationEntry {
         PASSWORD = ObjectProperty.createDefinition("password");
 
         GROUPS = ObjectCollectionProperty.createDefinition("groups", new ArrayList<String>(), true);
-        GROUPS.addAdderExecutor("checkAllowed", User.class, new FunctionExecutor<Void>() {
+        GROUPS.addAdderExecutor("checkNotSuperuser", User.class, new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
-                Validate.isTrue(!holder.get(IS_SUPERUSER).invoke(), "The superuser can't be a member in any group");
-                if (holder.get(GROUPS).get().contains(arguments[0])) {
-                    throw new IllegalStateException("The user is already a member in that group");
-                }
-
+                Validate.isTrue(!invocation.getHolder().get(IS_SUPERUSER).invoke(), "The superuser can't be a member in any group");
                 return invocation.next(arguments);
             }
 
         });
-        GROUPS.addRemoverExecutor("checkAllowed", User.class, new FunctionExecutor<Void>() {
+        GROUPS.addRemoverExecutor("checkNotSuperuser", User.class, new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
-                Validate.isTrue(!holder.get(IS_SUPERUSER).invoke(), "The superuser can't be a member in any group");
-                if (holder.get(GET_PRIMARY_GROUP).invoke().equals(arguments[0])) {
+                Validate.isTrue(!invocation.getHolder().get(IS_SUPERUSER).invoke(), "The superuser can't be a member in any group");
+                return invocation.next(arguments);
+            }
+
+        });
+        GROUPS.addRemoverExecutor("checkNotPrimaryGroup", User.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.LEVEL_6)
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                if (invocation.getHolder().get(GET_PRIMARY_GROUP).invoke().equals(arguments[0])) {
                     throw new IllegalStateException("Can't remove user from its primary group");
                 }
 

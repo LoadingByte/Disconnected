@@ -74,8 +74,19 @@ public class Program extends DefaultFeatureHolder implements DerivableSize {
     // ----- Functions -----
 
     /**
-     * Creates a new {@link FunctionExecutor} out of the set executor {@link Class}.
-     * The executor {@link Class} must have a default constructor.
+     * Creates a new {@link ProgramExecutor} out of the set executor class.
+     * The executor class must have a default constructor.
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link RuntimeException}</td>
+     * <td>Unexpected exception during the creation of a new program executor instance.</td>
+     * </tr>
+     * </table>
      */
     public static final FunctionDefinition<ProgramExecutor>                             CREATE_EXECUTOR;
 

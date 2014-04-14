@@ -50,6 +50,7 @@ public class FileUtils {
      * @param start The absolute path the algorithm starts at.
      * @param path The "change" path which defines where the start path should change (see above).
      * @return The resolved absolute path.
+     * @throws IllegalArgumentException The start path is not absolute (it does not start with {@link File#SEPARATOR}).
      */
     public static String resolvePath(String start, String path) {
 

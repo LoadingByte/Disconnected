@@ -113,7 +113,20 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
     public static final PropertyDefinition<Integer>                                PID;
 
     /**
-     * The {@link File} which contains the {@link Program} the process runs.
+     * The {@link File} which contains the {@link Program} the process runs.<br>
+     * <br>
+     * Exceptions that can occur when setting:
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalArgumentException}</td>
+     * <td>The provided source file does not contain a program object.</td>
+     * </tr>
+     * </table>
      */
     public static final PropertyDefinition<ContentFile>                            SOURCE;
 

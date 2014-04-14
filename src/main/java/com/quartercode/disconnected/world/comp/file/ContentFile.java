@@ -37,7 +37,20 @@ public class ContentFile extends File<ParentFile<?>> {
     // ----- Properties -----
 
     /**
-     * The content of the content file.
+     * The content of the content file.<br>
+     * <br>
+     * Exceptions that can occur when setting:
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link OutOfSpaceException}</td>
+     * <td>There is not enough space on the current file system for the new file content.</td>
+     * </tr>
+     * </table>
      */
     public static final PropertyDefinition<Object> CONTENT;
 

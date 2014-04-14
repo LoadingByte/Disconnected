@@ -48,7 +48,20 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
     public static final PropertyDefinition<IP>      IP;
 
     /**
-     * The target port which specifies the service.
+     * The target port which specifies the service.<br>
+     * <br>
+     * Exceptions that can occur when setting:
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalArgumentException}</td>
+     * <td>The provided port lesser than 0 or greater than 65535.</td>
+     * </tr>
+     * </table>
      */
     public static final PropertyDefinition<Integer> PORT;
 
@@ -97,13 +110,13 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
 
     /**
      * Returns the stored address as a string.
-     * The string is using the format IP:PORT (e.g. 127.0.0.1:8080).
+     * The string is using the format <code>IP:PORT</code> (e.g. <code>127.0.0.1:8080</code>).
      */
     public static final FunctionDefinition<String>  TO_STRING   = StringRepresentable.TO_STRING;
 
     /**
      * Changes the stored address to the one set by the given string.
-     * The string is using the format IP:PORT (e.g. 127.0.0.1:8080).
+     * The string is using the format <code>IP:PORT</code> (e.g. <code>127.0.0.1:8080</code>).
      * 
      * <table>
      * <tr>
@@ -116,7 +129,18 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
      * <td>0</td>
      * <td>{@link String}</td>
      * <td>address</td>
-     * <td>The new address given in the "IP:PORT" notation.</td>
+     * <td>The new address given in the <code>IP:PORT</code> notation.</td>
+     * </tr>
+     * </table>
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalArgumentException}</td>
+     * <td>The provided string does not match the <code>IP:PORT</code> notation.</td>
      * </tr>
      * </table>
      */

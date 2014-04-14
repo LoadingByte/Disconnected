@@ -58,7 +58,20 @@ public class FileSystemModule extends OSModule {
 
     /**
      * The {@link FileSystem}s which are associated with a known mountpoint (e.g. "system") and can be mounted.
-     * These representation objects are called {@link KnownFileSystem}s.
+     * These representation objects are called {@link KnownFileSystem}s.<br>
+     * <br>
+     * Exceptions that can occur when adding:
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalArgumentException}</td>
+     * <td>The new known file system that should be registered is already mounted.</td>
+     * </tr>
+     * </table>
      */
     public static final CollectionPropertyDefinition<KnownFileSystem, List<KnownFileSystem>> KNOWN_FS;
 
@@ -155,6 +168,17 @@ public class FileSystemModule extends OSModule {
      * <td>The path to search under.</td>
      * </tr>
      * </table>
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalArgumentException}</td>
+     * <td>The provided path is not absolute (it does not start with {@link File#SEPARATOR}).</td>
+     * </tr>
+     * </table>
      */
     public static final FunctionDefinition<File<?>>                                          GET_FILE;
 
@@ -180,13 +204,13 @@ public class FileSystemModule extends OSModule {
      * <td>0</td>
      * <td>{@link File}&lt;{@link ParentFile}&lt;?&gt;&gt;</td>
      * <td>file</td>
-     * <td>The {@link File} to add under the given path.</td>
+     * <td>The file to add under the given path.</td>
      * </tr>
      * <tr>
      * <td>1</td>
      * <td>{@link String}</td>
      * <td>path</td>
-     * <td>The path for the new {@link File}. The name of the file will be changed to the last entry.</td>
+     * <td>The path for the new file. The name of the file will be changed to the last entry.</td>
      * </tr>
      * </table>
      * 
@@ -196,8 +220,12 @@ public class FileSystemModule extends OSModule {
      * <th>When?</th>
      * </tr>
      * <tr>
+     * <td>{@link IllegalArgumentException}</td>
+     * <td>The provided path for new new file is not absolute (it does not start with {@link File#SEPARATOR}).</td>
+     * </tr>
+     * <tr>
      * <td>{@link IllegalStateException}</td>
-     * <td>The {@link FileSystem} for the path cannot be found or is not mounted.</td>
+     * <td>The file system for the path cannot be found or is not mounted.</td>
      * </tr>
      * </table>
      * 
@@ -353,12 +381,38 @@ public class FileSystemModule extends OSModule {
 
         /**
          * The mountpoint the represented {@link FileSystem} is using.
-         * A mountpoint is a string like "system" which defines where you can find the {@link FileSystem}.
+         * A mountpoint is a string like "system" which defines where you can find the {@link FileSystem}.<br>
+         * <br>
+         * Exceptions that can occur when setting:
+         * 
+         * <table>
+         * <tr>
+         * <th>Exception</th>
+         * <th>When?</th>
+         * </tr>
+         * <tr>
+         * <td>{@link IllegalArgumentException}</td>
+         * <td>The known file system is mounted while the mountpoint should be changed.</td>
+         * </tr>
+         * </table>
          */
         public static final PropertyDefinition<String>     MOUNTPOINT;
 
         /**
-         * If the represented {@link FileSystem} is actually mounted to the set {@link #MOUNTPOINT}.
+         * If the represented {@link FileSystem} is actually mounted to the set {@link #MOUNTPOINT}.<br>
+         * <br>
+         * Exceptions that can occur when setting:
+         * 
+         * <table>
+         * <tr>
+         * <th>Exception</th>
+         * <th>When?</th>
+         * </tr>
+         * <tr>
+         * <td>{@link IllegalStateException}</td>
+         * <td>There is another known file system with the same mountpoint already mounted.</td>
+         * </tr>
+         * </table>
          */
         public static final PropertyDefinition<Boolean>    MOUNTED;
 

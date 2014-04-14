@@ -44,7 +44,20 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
     // ----- Properties -----
 
     /**
-     * The 4 numbers to use for the ip (must be in range 0 <= number <= 255).
+     * The 4 numbers to use for the ip (must be in range 0 <= number <= 255).<br>
+     * <br>
+     * Exceptions that can occur when setting:
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalArgumentException}</td>
+     * <td>There provided array does not have 4 parts or one part is not present in the range 0 <= part <= 255.</td>
+     * </tr>
+     * </table>
      */
     public static final PropertyDefinition<Integer[]> PARTS;
 

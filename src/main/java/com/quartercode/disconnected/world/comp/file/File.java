@@ -47,7 +47,7 @@ import com.quartercode.disconnected.world.comp.os.User;
 public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> implements DerivableSize {
 
     /**
-     * The path separator which seperates different files in a path string.
+     * The path separator which seperates different files in a path string ({@value #SEPARATOR}).
      */
     public static final String                         SEPARATOR           = "/";
 

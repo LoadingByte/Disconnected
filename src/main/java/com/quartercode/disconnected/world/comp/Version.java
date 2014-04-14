@@ -32,7 +32,7 @@ import com.quartercode.disconnected.world.StringRepresentable;
 
 /**
  * This class represents a simple version.
- * A version contains a major version, minor version and a patch level.
+ * A version contains a major version, minor version and a revision.
  */
 public class Version extends DefaultFeatureHolder implements StringRepresentable {
 
@@ -85,13 +85,13 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
 
     /**
      * Returns the stored version as a string.
-     * The string is using the format MAJOR.MINOR.PATCHLEVEL (e.g. 1.2.5).
+     * The string is using the format <code>MAJOR.MINOR.REVISION</code> (e.g. <code>1.2.5</code>).
      */
     public static final FunctionDefinition<String>  TO_STRING   = StringRepresentable.TO_STRING;
 
     /**
      * Changes the stored version to the ones stored in the given version string.
-     * The string is using the format MAJOR.MINOR.PATCHLEVEL (e.g. 1.2.5).
+     * The string is using the format <code>MAJOR.MINOR.REVISION</code> (e.g. <code>1.2.5</code>).
      * 
      * <table>
      * <tr>
@@ -105,6 +105,17 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
      * <td>{@link String}</td>
      * <td>version</td>
      * <td>The new version to parse.</td>
+     * </tr>
+     * </table>
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalArgumentException}</td>
+     * <td>The provided string does not match the <code>MAJOR.MINOR.REVISION</code> pattern.</td>
      * </tr>
      * </table>
      */
