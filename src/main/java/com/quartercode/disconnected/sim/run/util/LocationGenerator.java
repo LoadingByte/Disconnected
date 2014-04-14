@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.util;
+package com.quartercode.disconnected.sim.run.util;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.Validate;
 import com.quartercode.disconnected.Disconnected;
+import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.Location;
 
 /**

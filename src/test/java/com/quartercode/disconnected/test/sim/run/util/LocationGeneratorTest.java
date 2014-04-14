@@ -16,12 +16,12 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.test.util;
+package com.quartercode.disconnected.test.sim.run.util;
 
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
-import com.quartercode.disconnected.util.LocationGenerator;
+import com.quartercode.disconnected.sim.run.util.LocationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.Location;
 

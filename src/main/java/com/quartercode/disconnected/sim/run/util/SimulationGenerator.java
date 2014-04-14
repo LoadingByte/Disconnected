@@ -24,7 +24,6 @@ import com.quartercode.disconnected.mocl.extra.FunctionExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.util.LocationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.Location;
 import com.quartercode.disconnected.world.World;

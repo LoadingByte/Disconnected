@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.test.util;
+package com.quartercode.disconnected.test.launch;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import com.quartercode.disconnected.util.StreamGobbler;
+import com.quartercode.disconnected.launch.StreamGobbler;
 
 @RunWith (Parameterized.class)
 public class StreamGobblerTest {
