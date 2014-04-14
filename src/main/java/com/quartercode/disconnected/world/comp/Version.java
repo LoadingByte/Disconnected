@@ -22,7 +22,6 @@ import java.util.Arrays;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -116,7 +115,7 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
         FROM_OBJECT = FunctionDefinitionFactory.create("fromObject", Version.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 holder.get(MAJOR).set( ((Version) arguments[0]).get(MAJOR).get());
@@ -131,7 +130,7 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
         TO_STRING.addExecutor("default", Version.class, new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
+            public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 String string = holder.get(MAJOR).get() + "." + holder.get(MINOR).get() + "." + holder.get(REVISION).get();
@@ -144,7 +143,7 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
         FROM_STRING.addExecutor("default", Version.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 String[] versionParts = ((String) arguments[0]).split("\\.");
                 Validate.isTrue(versionParts.length == 3, "The version string must be splitted in 3 parts by dots (e.g. 1.2.5): ", Arrays.toString(versionParts));

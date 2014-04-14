@@ -19,7 +19,6 @@
 package com.quartercode.disconnected.world.comp.file;
 
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -95,11 +94,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
             public Property<FileRights> create(FeatureHolder holder) {
 
                 FileRights rights = new FileRights();
-                try {
-                    rights.get(FileRights.FROM_STRING).invoke(DEFAULT_FILE_RIGHTS);
-                } catch (ExecutorInvocationException e) {
-                    throw new RuntimeException("Unexpected exception during creation of default file rights object", e);
-                }
+                rights.get(FileRights.FROM_STRING).invoke(DEFAULT_FILE_RIGHTS);
                 return new ObjectProperty<FileRights>(getName(), holder, rights);
             }
 
@@ -201,7 +196,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
         GET_PATH = FunctionDefinitionFactory.create("getPath", File.class, new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
+            public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 String path = null;
@@ -219,7 +214,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
         CREATE_MOVE = FunctionDefinitionFactory.create("createMove", File.class, new FunctionExecutor<FileAction>() {
 
             @Override
-            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) throws ExecutorInvocationException {
+            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
 
@@ -237,7 +232,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
             @SuppressWarnings ("unchecked")
             @Override
-            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) throws ExecutorInvocationException {
+            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
 
                 FileMoveAction action = new FileMoveAction();
                 action.get(FileMoveAction.FILE_SYSTEM).set((FileSystem) arguments[1]);
@@ -254,7 +249,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
             @Override
             @SuppressWarnings ("unchecked")
-            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) throws ExecutorInvocationException {
+            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
 
                 FileRemoveAction action = new FileRemoveAction();
                 action.get(FileAddAction.FILE).set((File<ParentFile<?>>) invocation.getHolder());
@@ -268,7 +263,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
         GET_FILE_SYSTEM = FunctionDefinitionFactory.create("getFileSystem", File.class, new FunctionExecutor<FileSystem>() {
 
             @Override
-            public FileSystem invoke(FunctionInvocation<FileSystem> invocation, Object... arguments) throws ExecutorInvocationException {
+            public FileSystem invoke(FunctionInvocation<FileSystem> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
 

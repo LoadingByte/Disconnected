@@ -18,7 +18,6 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
@@ -49,11 +48,11 @@ public class ContentFile extends File<ParentFile<?>> {
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FileSystem fileSystem = invocation.getHolder().get(GET_FILE_SYSTEM).invoke();
                 if (fileSystem != null && SizeUtil.getSize(arguments[0]) > fileSystem.get(FileSystem.GET_FREE).invoke()) {
-                    throw new ExecutorInvocationException(new OutOfSpaceException(fileSystem, SizeUtil.getSize(arguments[0])));
+                    throw new OutOfSpaceException(fileSystem, SizeUtil.getSize(arguments[0]));
                 }
 
                 return invocation.next(arguments);

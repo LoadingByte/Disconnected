@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -85,7 +84,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
         GET_ALL = FunctionDefinitionFactory.create("getAll", ProcessModule.class, new FunctionExecutor<List<Process<?>>>() {
 
             @Override
-            public List<Process<?>> invoke(FunctionInvocation<List<Process<?>>> invocation, Object... arguments) throws ExecutorInvocationException {
+            public List<Process<?>> invoke(FunctionInvocation<List<Process<?>>> invocation, Object... arguments) {
 
                 List<Process<?>> processes = new ArrayList<Process<?>>();
                 RootProcess root = invocation.getHolder().get(ROOT_PROCESS).get();
@@ -101,7 +100,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
         SET_RUNNING.addExecutor("startRootProcess", ProcessModule.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
 
@@ -130,7 +129,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
         SET_RUNNING.addExecutor("interruptRootProcess", OperatingSystem.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
 
@@ -149,7 +148,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
         KILL = FunctionDefinitionFactory.create("kill", ProcessModule.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 holder.get(ROOT_PROCESS).get().get(Process.STOP).invoke();

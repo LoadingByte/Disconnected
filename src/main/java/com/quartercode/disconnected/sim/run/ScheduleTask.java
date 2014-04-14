@@ -19,7 +19,6 @@
 package com.quartercode.disconnected.sim.run;
 
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 
 /**
  * A schedule task is a unit that can be called by a {@link Scheduler}.
@@ -38,9 +37,7 @@ public interface ScheduleTask {
      * This method should only be used by the {@link Scheduler} in order to execute a task.
      * 
      * @param holder The {@link FeatureHolder} where the {@link Scheduler} that calls the method is used in.
-     * @throws ExecutorInvocationException Something goes wrong while executing the method.
-     *         Please not that these exceptions may cause errors because the scheduler just throws them up the stack.
      */
-    public abstract void execute(FeatureHolder holder) throws ExecutorInvocationException;
+    public abstract void execute(FeatureHolder holder);
 
 }

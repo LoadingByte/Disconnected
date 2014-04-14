@@ -27,7 +27,6 @@ import java.util.Set;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -155,7 +154,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Validate.isTrue( ((ContentFile) arguments[0]).get(ContentFile.CONTENT).get() instanceof Program, "Source must contain a program");
                 return invocation.next(arguments);
@@ -367,7 +366,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         IS_STATE_APPLIED = FunctionDefinitionFactory.create("isStateApplied", Process.class, new FunctionExecutor<Boolean>() {
 
             @Override
-            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 boolean stateApplied = true;
@@ -391,7 +390,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         APPLY_STATE = FunctionDefinitionFactory.create("setState", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
 
@@ -409,7 +408,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         SUSPEND = FunctionDefinitionFactory.create("suspend", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
 
@@ -424,7 +423,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         RESUME = FunctionDefinitionFactory.create("resume", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
 
@@ -439,7 +438,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         INTERRUPT = FunctionDefinitionFactory.create("interrupt", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
 
@@ -454,7 +453,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         STOP = FunctionDefinitionFactory.create("stop", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
 
@@ -474,14 +473,14 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         GET_ALL_CHILDREN = FunctionDefinitionFactory.create("getAllChildren", Process.class, new FunctionExecutor<List<Process<?>>>() {
 
             @Override
-            public List<Process<?>> invoke(FunctionInvocation<List<Process<?>>> invocation, Object... arguments) throws ExecutorInvocationException {
+            public List<Process<?>> invoke(FunctionInvocation<List<Process<?>>> invocation, Object... arguments) {
 
                 List<Process<?>> children = getAllChildren((Process<?>) invocation.getHolder());
                 invocation.next(arguments);
                 return children;
             }
 
-            private List<Process<?>> getAllChildren(Process<?> parent) throws ExecutorInvocationException {
+            private List<Process<?>> getAllChildren(Process<?> parent) {
 
                 List<Process<?>> allChildren = new ArrayList<Process<?>>();
                 for (Process<?> directChild : parent.get(CHILDREN).get()) {
@@ -496,7 +495,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         CREATE_CHILD = FunctionDefinitionFactory.create("createChild", Process.class, new FunctionExecutor<ChildProcess>() {
 
             @Override
-            public ChildProcess invoke(FunctionInvocation<ChildProcess> invocation, Object... arguments) throws ExecutorInvocationException {
+            public ChildProcess invoke(FunctionInvocation<ChildProcess> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
 
@@ -514,7 +513,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         GET_ROOT = FunctionDefinitionFactory.create("getRoot", Process.class, new FunctionExecutor<RootProcess>() {
 
             @Override
-            public RootProcess invoke(FunctionInvocation<RootProcess> invocation, Object... arguments) throws ExecutorInvocationException {
+            public RootProcess invoke(FunctionInvocation<RootProcess> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 RootProcess root = null;
@@ -534,7 +533,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         GET_OPERATING_SYSTEM = FunctionDefinitionFactory.create("getOperatingSystem", Process.class, new FunctionExecutor<OperatingSystem>() {
 
             @Override
-            public OperatingSystem invoke(FunctionInvocation<OperatingSystem> invocation, Object... arguments) throws ExecutorInvocationException {
+            public OperatingSystem invoke(FunctionInvocation<OperatingSystem> invocation, Object... arguments) {
 
                 OperatingSystem operatingSystem = invocation.getHolder().get(GET_ROOT).invoke().getParent();
                 invocation.next(arguments);
@@ -546,7 +545,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         GET_SESSION_PROCESS = FunctionDefinitionFactory.create("getSessionProcess", Process.class, new FunctionExecutor<Process<?>>() {
 
             @Override
-            public Process<?> invoke(FunctionInvocation<Process<?>> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Process<?> invoke(FunctionInvocation<Process<?>> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 Process<?> sessionProcess = null;
@@ -570,7 +569,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         GET_SESSION = FunctionDefinitionFactory.create("getSession", Process.class, new FunctionExecutor<Session>() {
 
             @Override
-            public Session invoke(FunctionInvocation<Session> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Session invoke(FunctionInvocation<Session> invocation, Object... arguments) {
 
                 Session session = (Session) invocation.getHolder().get(GET_SESSION_PROCESS).invoke().get(EXECUTOR).get();
                 invocation.next(arguments);
@@ -582,7 +581,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         GET_USER = FunctionDefinitionFactory.create("getUser", Process.class, new FunctionExecutor<User>() {
 
             @Override
-            public User invoke(FunctionInvocation<User> invocation, Object... arguments) throws ExecutorInvocationException {
+            public User invoke(FunctionInvocation<User> invocation, Object... arguments) {
 
                 User user = invocation.getHolder().get(GET_SESSION).invoke().get(Session.USER).get();
                 invocation.next(arguments);
@@ -596,7 +595,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
             @Override
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_7)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
 
@@ -621,7 +620,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
             @Override
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_5)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
 

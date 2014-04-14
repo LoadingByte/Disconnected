@@ -20,7 +20,6 @@ package com.quartercode.disconnected.world.comp.file;
 
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -79,7 +78,7 @@ public class FileRemoveAction extends DefaultFeatureHolder implements FileAction
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 File<ParentFile<?>> removeFile = holder.get(FILE).get();
@@ -98,7 +97,7 @@ public class FileRemoveAction extends DefaultFeatureHolder implements FileAction
         IS_EXECUTABLE_BY.addExecutor("checkRemoveRight", FileRemoveAction.class, new FunctionExecutor<Boolean>() {
 
             @Override
-            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
 
                 User executor = (User) arguments[0];
                 File<ParentFile<?>> removeFile = invocation.getHolder().get(FILE).get();
@@ -108,7 +107,7 @@ public class FileRemoveAction extends DefaultFeatureHolder implements FileAction
                 return result;
             }
 
-            private boolean checkFile(User executor, File<?> file) throws ExecutorInvocationException {
+            private boolean checkFile(User executor, File<?> file) {
 
                 if (!FileUtils.hasRight(executor, file, FileRight.DELETE)) {
                     return false;

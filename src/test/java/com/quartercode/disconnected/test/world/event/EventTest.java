@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Assert;
 import org.junit.Test;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
@@ -34,7 +33,7 @@ import com.quartercode.disconnected.world.event.EventListener;
 public class EventTest {
 
     @Test
-    public void testSend() throws ExecutorInvocationException {
+    public void testSend() {
 
         TestEvent event = new TestEvent();
         event.get(TestEvent.TEST_DATA).set("test");
@@ -43,7 +42,7 @@ public class EventTest {
         EventListener.HANDLE_EVENT.addExecutor("default", SendListener.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 receivedEvent.set((Event) arguments[0]);
                 return invocation.next(arguments);

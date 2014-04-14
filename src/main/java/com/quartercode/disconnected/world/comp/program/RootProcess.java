@@ -18,7 +18,6 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
@@ -39,7 +38,7 @@ public class RootProcess extends Process<OperatingSystem> {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
-            public RootProcess invoke(FunctionInvocation<RootProcess> invocation, Object... arguments) throws ExecutorInvocationException {
+            public RootProcess invoke(FunctionInvocation<RootProcess> invocation, Object... arguments) {
 
                 invocation.next(arguments);
                 return (RootProcess) invocation.getHolder();
@@ -52,7 +51,7 @@ public class RootProcess extends Process<OperatingSystem> {
 
             @Override
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 return null;
             }

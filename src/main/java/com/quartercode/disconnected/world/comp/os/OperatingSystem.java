@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Set;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -150,7 +149,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
         IS_RUNNING = FunctionDefinitionFactory.create("isRunning", OperatingSystem.class, new FunctionExecutor<Boolean>() {
 
             @Override
-            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 boolean running = holder.get(GET_PROC_MODULE).invoke().get(ProcessModule.ROOT_PROCESS).get().get(Process.STATE).get() != ProcessState.STOPPED;
@@ -171,7 +170,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
         SET_RUNNING.addExecutor("fileSystemModule", OperatingSystem.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 invocation.getHolder().get(GET_FS_MODULE).invoke().get(OSModule.SET_RUNNING).invoke(arguments);
                 return invocation.next(arguments);
@@ -181,7 +180,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
         SET_RUNNING.addExecutor("processModule", OperatingSystem.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 invocation.getHolder().get(GET_PROC_MODULE).invoke().get(OSModule.SET_RUNNING).invoke(arguments);
                 return invocation.next(arguments);

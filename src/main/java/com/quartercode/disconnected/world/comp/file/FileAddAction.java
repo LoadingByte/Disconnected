@@ -20,7 +20,6 @@ package com.quartercode.disconnected.world.comp.file;
 
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -73,7 +72,7 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 String normalizedPath = FileUtils.resolvePath("/", (String) arguments[0]);
                 return invocation.next(normalizedPath);
@@ -115,7 +114,7 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 File<ParentFile<?>> addFile = holder.get(FILE).get();
@@ -152,7 +151,7 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
         EXECUTE.addExecutor("addFile", FileAddAction.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
 
@@ -173,7 +172,7 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
         IS_EXECUTABLE_BY.addExecutor("checkFirstUnexisting", FileAddAction.class, new FunctionExecutor<Boolean>() {
 
             @Override
-            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
 
                 User executor = (User) arguments[0];
                 boolean result = true;

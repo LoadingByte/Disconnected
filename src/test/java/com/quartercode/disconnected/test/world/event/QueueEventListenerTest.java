@@ -22,7 +22,6 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.disconnected.world.event.Event;
@@ -43,7 +42,7 @@ public class QueueEventListenerTest {
     }
 
     @Test
-    public void testNextPoll() throws ExecutorInvocationException {
+    public void testNextPoll() {
 
         TestEvent event = sendTestEvent("testString", listener);
 
@@ -53,7 +52,7 @@ public class QueueEventListenerTest {
     }
 
     @Test
-    public void testNextSelect() throws ExecutorInvocationException {
+    public void testNextSelect() {
 
         TestEvent event1 = sendTestEvent("testString1", listener);
         TestEvent event2 = sendTestEvent("testString2", listener);
@@ -64,7 +63,7 @@ public class QueueEventListenerTest {
         Assert.assertEquals("Third queued event", event3, listener.get(QueueEventListener.NEXT_EVENT).invoke(new TrueEventMatcher()));
     }
 
-    private TestEvent sendTestEvent(String testData, EventListener listener) throws ExecutorInvocationException {
+    private TestEvent sendTestEvent(String testData, EventListener listener) {
 
         TestEvent event = new TestEvent();
         event.get(TestEvent.TEST_DATA).set(testData);
@@ -88,7 +87,7 @@ public class QueueEventListenerTest {
         }
 
         @Override
-        public boolean matches(Event event) throws ExecutorInvocationException {
+        public boolean matches(Event event) {
 
             return new TypeEventMatcher(TestEvent.class).matches(event) && event.get(TestEvent.TEST_DATA).get().equals(testDataValue);
         }

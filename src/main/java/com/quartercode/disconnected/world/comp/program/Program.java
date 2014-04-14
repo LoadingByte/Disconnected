@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Set;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -85,14 +84,14 @@ public class Program extends DefaultFeatureHolder implements DerivableSize {
         CREATE_EXECUTOR = FunctionDefinitionFactory.create("createExecutor", Program.class, new FunctionExecutor<ProgramExecutor>() {
 
             @Override
-            public ProgramExecutor invoke(FunctionInvocation<ProgramExecutor> invocation, Object... arguments) throws ExecutorInvocationException {
+            public ProgramExecutor invoke(FunctionInvocation<ProgramExecutor> invocation, Object... arguments) {
 
                 Class<? extends ProgramExecutor> executorClass = invocation.getHolder().get(EXECUTOR_CLASS).get();
 
                 try {
                     return executorClass.newInstance();
                 } catch (Exception e) {
-                    throw new ExecutorInvocationException("Unexpected exception during initialization of new program executor (class '" + executorClass.getName() + "'", e);
+                    throw new RuntimeException("Unexpected exception during initialization of new program executor (class '" + executorClass.getName() + "'", e);
                 }
             }
 
@@ -101,7 +100,7 @@ public class Program extends DefaultFeatureHolder implements DerivableSize {
         GET_SIZE.addExecutor("executor", Program.class, new FunctionExecutor<Long>() {
 
             @Override
-            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
                 // TODO: Make something related to the size
                 return 0 + NullPreventer.prevent(invocation.next(arguments));

@@ -24,7 +24,6 @@ import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.Feature;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -70,7 +69,7 @@ public class FileSystemModule extends OSModule {
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 KnownFileSystem element = (KnownFileSystem) arguments[0];
                 Validate.isTrue(!element.get(KnownFileSystem.MOUNTED).get(), "Can't register known file system while mounted");
@@ -211,7 +210,7 @@ public class FileSystemModule extends OSModule {
         GET_AVAILABLE = FunctionDefinitionFactory.create("getAvailable", FileSystemModule.class, new FunctionExecutor<List<FileSystem>>() {
 
             @Override
-            public List<FileSystem> invoke(FunctionInvocation<List<FileSystem>> invocation, Object... arguments) throws ExecutorInvocationException {
+            public List<FileSystem> invoke(FunctionInvocation<List<FileSystem>> invocation, Object... arguments) {
 
                 List<FileSystem> available = new ArrayList<FileSystem>();
                 Computer computer = ((FileSystemModule) invocation.getHolder()).getParent().get(Process.GET_ROOT).invoke().getParent().getParent();
@@ -236,7 +235,7 @@ public class FileSystemModule extends OSModule {
         GET_KNOWN_BY_FILESYSTEM = FunctionDefinitionFactory.create("getKnownByFilesystem", FileSystemModule.class, CollectionPropertyAccessorFactory.createGetSingle(KNOWN_FS, new CriteriumMatcher<KnownFileSystem>() {
 
             @Override
-            public boolean matches(KnownFileSystem element, Object... arguments) throws ExecutorInvocationException {
+            public boolean matches(KnownFileSystem element, Object... arguments) {
 
                 return element.get(KnownFileSystem.FILE_SYSTEM).get().equals(arguments[0]);
             }
@@ -246,7 +245,7 @@ public class FileSystemModule extends OSModule {
         GET_MOUNTED = FunctionDefinitionFactory.create("getMounted", FileSystemModule.class, CollectionPropertyAccessorFactory.createGet(KNOWN_FS, new CriteriumMatcher<KnownFileSystem>() {
 
             @Override
-            public boolean matches(KnownFileSystem element, Object... arguments) throws ExecutorInvocationException {
+            public boolean matches(KnownFileSystem element, Object... arguments) {
 
                 return element.get(KnownFileSystem.MOUNTED).get();
             }
@@ -255,7 +254,7 @@ public class FileSystemModule extends OSModule {
         GET_MOUNTED_BY_MOUNTPOINT = FunctionDefinitionFactory.create("getMountedByMountpoint", FileSystemModule.class, CollectionPropertyAccessorFactory.createGetSingle(KNOWN_FS, new CriteriumMatcher<KnownFileSystem>() {
 
             @Override
-            public boolean matches(KnownFileSystem element, Object... arguments) throws ExecutorInvocationException {
+            public boolean matches(KnownFileSystem element, Object... arguments) {
 
                 return element.get(KnownFileSystem.MOUNTED).get() && element.get(KnownFileSystem.MOUNTPOINT).get().equals(arguments[0]);
             }
@@ -265,7 +264,7 @@ public class FileSystemModule extends OSModule {
         GET_FILE = FunctionDefinitionFactory.create("getFile", FileSystemModule.class, new FunctionExecutor<File<?>>() {
 
             @Override
-            public File<?> invoke(FunctionInvocation<File<?>> invocation, Object... arguments) throws ExecutorInvocationException {
+            public File<?> invoke(FunctionInvocation<File<?>> invocation, Object... arguments) {
 
                 String path = (String) arguments[0];
                 String[] pathComponents = FileUtils.getComponents(path);
@@ -285,7 +284,7 @@ public class FileSystemModule extends OSModule {
         CREATE_ADD_FILE = FunctionDefinitionFactory.create("createAddFile", FileSystemModule.class, new FunctionExecutor<FileAction>() {
 
             @Override
-            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) throws ExecutorInvocationException {
+            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
 
                 File<?> file = (File<?>) arguments[0];
                 String path = (String) arguments[1];
@@ -310,7 +309,7 @@ public class FileSystemModule extends OSModule {
         SET_RUNNING.addExecutor("mountSystemFs", FileSystemModule.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 // Only invoke on bootstrap
                 if ((Boolean) arguments[0]) {
@@ -372,7 +371,7 @@ public class FileSystemModule extends OSModule {
 
                 @Override
                 @Prioritized (Prioritized.LEVEL_6)
-                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                     Validate.isTrue(!invocation.getHolder().get(MOUNTED).get(), "Can't change mountpoint of known file system while mounted");
                     return invocation.next(arguments);
@@ -385,11 +384,13 @@ public class FileSystemModule extends OSModule {
 
                 @Override
                 @Prioritized (Prioritized.LEVEL_6)
-                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                     FeatureHolder holder = invocation.getHolder();
                     FileSystemModule parent = ((KnownFileSystem) holder).getParent();
-                    Validate.isTrue(parent.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke(holder.get(MOUNTPOINT).get()) == null, "Other known file system with same mountpoint already mounted");
+                    if ((Boolean) arguments[0] && parent.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke(holder.get(MOUNTPOINT).get()) != null) {
+                        throw new IllegalStateException("Other known file system with same mountpoint already mounted");
+                    }
 
                     return invocation.next(arguments);
                 }

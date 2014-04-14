@@ -19,7 +19,6 @@
 package com.quartercode.disconnected.test.world.comp.file;
 
 import org.junit.Before;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.ByteUnit;
 import com.quartercode.disconnected.world.comp.file.Directory;
 import com.quartercode.disconnected.world.comp.file.File;
@@ -33,7 +32,7 @@ public abstract class AbstractFileActionTest {
     protected User       user;
 
     @Before
-    public void setUp() throws ExecutorInvocationException {
+    public void setUp() {
 
         fileSystem = new FileSystem();
         fileSystem.get(FileSystem.SIZE).set(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));

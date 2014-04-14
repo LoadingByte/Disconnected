@@ -21,7 +21,6 @@ package com.quartercode.disconnected.world.comp.os;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
@@ -73,7 +72,7 @@ public class Session extends ProgramExecutor {
 
             @Override
             @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_7)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Validate.notNull(invocation.getHolder().get(USER).get(), "Session user cannot be null");
 
@@ -86,7 +85,7 @@ public class Session extends ProgramExecutor {
 
             @Override
             @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_5)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
 

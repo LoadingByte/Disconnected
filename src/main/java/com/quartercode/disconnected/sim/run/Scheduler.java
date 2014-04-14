@@ -31,7 +31,6 @@ import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.Persistent;
 import com.quartercode.classmod.base.def.AbstractFeature;
 import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 
 /**
  * The scheduler is a {@link Feature} that allows executing delayed actions.<br>
@@ -120,11 +119,8 @@ public class Scheduler extends AbstractFeature {
      * <br>
      * If a {@link ScheduleTask} throws an exception, it is given up the stack to the update caller.
      * The exception might cause an error there because no one can handle it, so exceptions should be handled in the task classes.
-     * 
-     * @throws ExecutorInvocationException Something goes wrong while executing a {@link ScheduleTask}.
-     *         This exception may cause errors because the update caller cannot know what to do.
      */
-    public void update() throws ExecutorInvocationException {
+    public void update() {
 
         Iterator<ScheduleTaskContext> iterator = runningTasks.iterator();
         while (iterator.hasNext()) {

@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -118,7 +117,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
         GET_VALUE_LIST = FunctionDefinitionFactory.create("getValueList", EnvironmentVariable.class, new FunctionExecutor<List<String>>() {
 
             @Override
-            public List<String> invoke(FunctionInvocation<List<String>> invocation, Object... arguments) throws ExecutorInvocationException {
+            public List<String> invoke(FunctionInvocation<List<String>> invocation, Object... arguments) {
 
                 String value = invocation.getHolder().get(VALUE).get();
                 List<String> valueList = new ArrayList<String>();
@@ -137,7 +136,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
         SET_VALUE_LIST = FunctionDefinitionFactory.create("setValueList", EnvironmentVariable.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 // Trust the user of the method
                 @SuppressWarnings ("unchecked")
@@ -157,7 +156,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
         GET_COLUMNS.addExecutor("default", EnvironmentVariable.class, new FunctionExecutor<Map<String, Object>>() {
 
             @Override
-            public Map<String, Object> invoke(FunctionInvocation<Map<String, Object>> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Map<String, Object> invoke(FunctionInvocation<Map<String, Object>> invocation, Object... arguments) {
 
                 Map<String, Object> columns = new HashMap<String, Object>();
                 FeatureHolder holder = invocation.getHolder();
@@ -173,7 +172,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
         SET_COLUMNS.addExecutor("default", EnvironmentVariable.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 // Trust the user of the method
                 @SuppressWarnings ("unchecked")

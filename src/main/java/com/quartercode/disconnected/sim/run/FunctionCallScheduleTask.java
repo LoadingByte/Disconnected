@@ -21,7 +21,6 @@ package com.quartercode.disconnected.sim.run;
 import java.lang.reflect.Field;
 import javax.xml.bind.annotation.XmlElement;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.Function;
 import com.quartercode.classmod.extra.FunctionDefinition;
 
@@ -108,7 +107,7 @@ public class FunctionCallScheduleTask implements ScheduleTask {
     }
 
     @Override
-    public void execute(FeatureHolder holder) throws ExecutorInvocationException {
+    public void execute(FeatureHolder holder) {
 
         if (functionDefinition == null) {
             functionDefinition = resolveDefinition();

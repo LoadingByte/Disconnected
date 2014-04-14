@@ -23,7 +23,7 @@ package com.quartercode.disconnected.world.comp.file;
  * 
  * @see FileSystem
  */
-public class OutOfSpaceException extends Exception {
+public class OutOfSpaceException extends RuntimeException {
 
     private static final long serialVersionUID = 6091324719748985758L;
 

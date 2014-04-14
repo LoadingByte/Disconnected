@@ -23,9 +23,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.world.Location;
 
@@ -35,8 +32,6 @@ import com.quartercode.disconnected.world.Location;
  * @see Location
  */
 public class LocationGenerator {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(LocationGenerator.class);
 
     /**
      * Generates the given amount of locations on an earth map.
@@ -71,27 +66,22 @@ public class LocationGenerator {
         int width = map.getWidth();
         int height = map.getHeight();
 
-        try {
-            List<Location> result = new ArrayList<Location>();
-            int blackRGB = Color.BLACK.getRGB();
-            while (result.size() < amount) {
-                int x = random.nextInt(width);
-                int y = random.nextInt(height);
-                if (map.getRGB(x, y) == blackRGB) {
-                    Location location = new Location();
-                    location.get(Location.X).set((float) x / (float) width);
-                    location.get(Location.Y).set((float) y / (float) height);
-                    if (!ignore.contains(location) && !result.contains(location)) {
-                        result.add(location);
-                    }
+        List<Location> result = new ArrayList<Location>();
+        int blackRGB = Color.BLACK.getRGB();
+        while (result.size() < amount) {
+            int x = random.nextInt(width);
+            int y = random.nextInt(height);
+            if (map.getRGB(x, y) == blackRGB) {
+                Location location = new Location();
+                location.get(Location.X).set((float) x / (float) width);
+                location.get(Location.Y).set((float) y / (float) height);
+                if (!ignore.contains(location) && !result.contains(location)) {
+                    result.add(location);
                 }
             }
-
-            return result;
-        } catch (ExecutorInvocationException e) {
-            LOGGER.error("Unknown error while generating locations", e);
-            return null;
         }
+
+        return result;
     }
 
     private LocationGenerator() {

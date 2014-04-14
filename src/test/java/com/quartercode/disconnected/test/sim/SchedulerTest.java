@@ -33,7 +33,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.sim.run.ScheduleTask;
 import com.quartercode.disconnected.sim.run.Scheduler;
 
@@ -72,12 +71,12 @@ public class SchedulerTest {
     }
 
     @Test
-    public void testSchedule() throws ExecutorInvocationException {
+    public void testSchedule() {
 
         scheduler.schedule(new ScheduleTask() {
 
             @Override
-            public void execute(FeatureHolder holder) throws ExecutorInvocationException {
+            public void execute(FeatureHolder holder) {
 
                 executedScheduleTask = true;
             }
@@ -91,7 +90,7 @@ public class SchedulerTest {
     }
 
     @Test
-    public void testScheduleWithPersistence() throws JAXBException, ExecutorInvocationException {
+    public void testScheduleWithPersistence() throws JAXBException {
 
         scheduler.schedule(new TestScheduleTask(), delay);
 
@@ -110,7 +109,7 @@ public class SchedulerTest {
     private static class TestScheduleTask implements ScheduleTask {
 
         @Override
-        public void execute(FeatureHolder holder) throws ExecutorInvocationException {
+        public void execute(FeatureHolder holder) {
 
             executedScheduleTask = true;
         }

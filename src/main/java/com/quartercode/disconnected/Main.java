@@ -31,7 +31,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.util.Classmod;
 import com.quartercode.disconnected.graphics.DefaultStates;
 import com.quartercode.disconnected.graphics.GraphicsManager;
@@ -153,14 +152,10 @@ public class Main {
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG-ACTION: Generating new simulation");
         Simulation simulation = SimulationGenerator.generateSimulation(10, 2, new RandomPool(Simulation.RANDOM_POOL_SIZE));
-
-        try {
-            for (Computer computer : simulation.getWorld().get(World.GET_COMPUTERS).invoke()) {
-                computer.get(Computer.GET_OS).invoke().get(OperatingSystem.SET_RUNNING).invoke(true);
-            }
-        } catch (ExecutorInvocationException e) {
-            LOGGER.error("Unknown error while booting up computers", e);
+        for (Computer computer : simulation.getWorld().get(World.COMPUTERS).get()) {
+            computer.get(Computer.OS).get().get(OperatingSystem.SET_RUNNING).invoke(true);
         }
+
         Profile profile = new Profile("test", simulation);
         Disconnected.getProfileManager().addProfile(profile);
         try {

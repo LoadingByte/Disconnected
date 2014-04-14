@@ -21,7 +21,6 @@ package com.quartercode.disconnected.world.comp.net;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -62,10 +61,10 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 int port = (Integer) arguments[0];
-                Validate.isTrue(port >= 0 || port <= 65535, "The port must be in range 0 <= port <= 65535 (e.g. 8080): ", port);
+                Validate.isTrue(port >= 0 && port <= 65535, "The port must be in range 0 <= port <= 65535 (e.g. 8080): ", port);
 
                 return invocation.next(arguments);
             }
@@ -128,7 +127,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
         FROM_OBJECT = FunctionDefinitionFactory.create("fromObject", Address.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
 
@@ -146,7 +145,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
         TO_STRING.addExecutor("default", Address.class, new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
+            public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 String result = holder.get(IP).get().get(com.quartercode.disconnected.world.comp.net.IP.TO_STRING).invoke() + ":" + holder.get(PORT).get();
@@ -158,7 +157,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
         FROM_STRING.addExecutor("default", Address.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 String[] parts = ((String) arguments[0]).split(":");
                 Validate.isTrue(parts.length == 2, "Address must have the format IP:PORT: ", arguments[0]);

@@ -20,7 +20,6 @@ package com.quartercode.disconnected.test.world.comp.file;
 
 import org.junit.Assert;
 import org.junit.Test;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.file.Directory;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAction;
@@ -34,7 +33,7 @@ public class FileAddActionTest extends AbstractFileActionTest {
     private static final String PARENT_PATH = "/test1/test2";
     private static final String PATH        = PARENT_PATH + "/test.txt";
 
-    private FileAddAction createAction(File<ParentFile<?>> file, String path) throws ExecutorInvocationException {
+    private FileAddAction createAction(File<ParentFile<?>> file, String path) {
 
         FileAddAction action = new FileAddAction();
         action.get(FileAddAction.FILE_SYSTEM).set(fileSystem);
@@ -44,40 +43,40 @@ public class FileAddActionTest extends AbstractFileActionTest {
     }
 
     @Test
-    public void testExecute() throws ExecutorInvocationException {
+    public void testExecute() {
 
         FileAddAction action = createAction(file, PATH);
         actuallyTestExecute(action, PATH);
     }
 
     @Test
-    public void testFileSystemExecute() throws ExecutorInvocationException {
+    public void testFileSystemExecute() {
 
         FileAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, PATH);
         actuallyTestExecute(action, PATH);
     }
 
-    private void actuallyTestExecute(FileAction action, String filePath) throws ExecutorInvocationException {
+    private void actuallyTestExecute(FileAction action, String filePath) {
 
         action.get(FileAction.EXECUTE).invoke();
         Assert.assertEquals("Resolved file", file, fileSystem.get(FileSystem.GET_FILE).invoke(filePath));
     }
 
     @Test
-    public void testIsExecutableBy() throws ExecutorInvocationException {
+    public void testIsExecutableBy() {
 
         FileAddAction action = createAction(file, PATH);
         actuallyTestIsExecutableBy(action, PARENT_PATH);
     }
 
     @Test
-    public void testFileSystemIsExecutableBy() throws ExecutorInvocationException {
+    public void testFileSystemIsExecutableBy() {
 
         FileAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, PATH);
         actuallyTestIsExecutableBy(action, PARENT_PATH);
     }
 
-    private void actuallyTestIsExecutableBy(FileAction action, String parentFilePath) throws ExecutorInvocationException {
+    private void actuallyTestIsExecutableBy(FileAction action, String parentFilePath) {
 
         // Add the directory that would hold the actual file (we need to modify its rights later on)
         Directory parentFile = new Directory();

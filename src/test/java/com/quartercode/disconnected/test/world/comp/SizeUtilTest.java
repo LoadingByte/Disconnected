@@ -28,7 +28,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.disconnected.util.NullPreventer;
@@ -74,7 +73,7 @@ public class SizeUtilTest {
         DerivableSize.GET_SIZE.addExecutor("test1", TestFeatureHolder.class, new FunctionExecutor<Long>() {
 
             @Override
-            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
                 return 100L + NullPreventer.prevent(invocation.next(arguments));
             }
@@ -82,7 +81,7 @@ public class SizeUtilTest {
         DerivableSize.GET_SIZE.addExecutor("test2", TestFeatureHolder.class, new FunctionExecutor<Long>() {
 
             @Override
-            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
                 return 500L + NullPreventer.prevent(invocation.next(arguments));
             }
@@ -106,7 +105,7 @@ public class SizeUtilTest {
     }
 
     @Test
-    public void testGetSize() throws ExecutorInvocationException {
+    public void testGetSize() {
 
         Assert.assertEquals("Calculated Size", expectedSize, SizeUtil.getSize(object));
     }

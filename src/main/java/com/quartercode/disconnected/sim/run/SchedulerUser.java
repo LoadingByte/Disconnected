@@ -20,7 +20,6 @@ package com.quartercode.disconnected.sim.run;
 
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.Function;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -56,7 +55,7 @@ public interface SchedulerUser extends FeatureHolder, TickUpdatable {
             definition.addExecutor("updateScheduler", SchedulerUser.class, new FunctionExecutor<Void>() {
 
                 @Override
-                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                     invocation.getHolder().get(SchedulerUser.SCHEDULER).update();
                     return invocation.next(arguments);

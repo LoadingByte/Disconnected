@@ -21,7 +21,6 @@ package com.quartercode.disconnected.test.world.comp.file;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.file.Directory;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAction;
@@ -39,12 +38,12 @@ public class FileMoveActionTest extends AbstractFileActionTest {
     private static final String PATH_2        = PARENT_PATH_2 + "/test5.txt";
 
     @Before
-    public void setUp2() throws ExecutorInvocationException {
+    public void setUp2() {
 
         fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, PATH_1).get(FileAddAction.EXECUTE).invoke();
     }
 
-    private FileMoveAction createAction(File<ParentFile<?>> file, String newPath) throws ExecutorInvocationException {
+    private FileMoveAction createAction(File<ParentFile<?>> file, String newPath) {
 
         FileMoveAction action = new FileMoveAction();
         action.get(FileMoveAction.FILE_SYSTEM).set(fileSystem);
@@ -54,20 +53,20 @@ public class FileMoveActionTest extends AbstractFileActionTest {
     }
 
     @Test
-    public void testExecute() throws ExecutorInvocationException {
+    public void testExecute() {
 
         FileMoveAction action = createAction(file, PATH_2);
         actuallyTestExecute(action, PATH_1, PATH_2);
     }
 
     @Test
-    public void testFileExecute() throws ExecutorInvocationException {
+    public void testFileExecute() {
 
         FileAction action = file.get(File.CREATE_MOVE).invoke(PATH_2);
         actuallyTestExecute(action, PATH_1, PATH_2);
     }
 
-    private void actuallyTestExecute(FileAction action, String oldFilePath, String newFilePath) throws ExecutorInvocationException {
+    private void actuallyTestExecute(FileAction action, String oldFilePath, String newFilePath) {
 
         action.get(FileAction.EXECUTE).invoke();
 
@@ -77,20 +76,20 @@ public class FileMoveActionTest extends AbstractFileActionTest {
     }
 
     @Test
-    public void testIsExecutableBy() throws ExecutorInvocationException {
+    public void testIsExecutableBy() {
 
         FileMoveAction action = createAction(file, PATH_2);
         actuallyTestIsExecutableBy(action, PARENT_PATH_2);
     }
 
     @Test
-    public void testFileIsExecutableBy() throws ExecutorInvocationException {
+    public void testFileIsExecutableBy() {
 
         FileAction action = file.get(File.CREATE_MOVE).invoke(PATH_2);
         actuallyTestIsExecutableBy(action, PARENT_PATH_2);
     }
 
-    private void actuallyTestIsExecutableBy(FileAction action, String newParentPath) throws ExecutorInvocationException {
+    private void actuallyTestIsExecutableBy(FileAction action, String newParentPath) {
 
         // Add the directory that would hold the actual file (we need to modify its rights later on)
         Directory newParentFile = new Directory();

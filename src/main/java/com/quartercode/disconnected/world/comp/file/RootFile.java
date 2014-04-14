@@ -18,7 +18,6 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
@@ -41,7 +40,7 @@ public class RootFile extends ParentFile<FileSystem> {
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
-            public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
+            public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
                 return "root";
             }
@@ -51,7 +50,7 @@ public class RootFile extends ParentFile<FileSystem> {
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 return null;
             }
@@ -68,7 +67,7 @@ public class RootFile extends ParentFile<FileSystem> {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
-            public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
+            public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
                 return "";
             }
@@ -79,7 +78,7 @@ public class RootFile extends ParentFile<FileSystem> {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
-            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) throws ExecutorInvocationException {
+            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
 
                 return null;
             }
@@ -90,7 +89,7 @@ public class RootFile extends ParentFile<FileSystem> {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
-            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) throws ExecutorInvocationException {
+            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
 
                 return null;
             }
@@ -101,7 +100,7 @@ public class RootFile extends ParentFile<FileSystem> {
 
             @Override
             @Prioritized (Prioritized.LEVEL_5)
-            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) throws ExecutorInvocationException {
+            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
 
                 return null;
             }
@@ -112,7 +111,7 @@ public class RootFile extends ParentFile<FileSystem> {
         GET_SIZE.addExecutor("name", RootFile.class, new FunctionExecutor<Long>() {
 
             @Override
-            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
                 return 0L + NullPreventer.prevent(invocation.next(arguments));
             }

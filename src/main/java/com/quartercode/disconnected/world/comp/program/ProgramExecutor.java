@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -120,7 +119,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
         NEXT_EVENT = FunctionDefinitionFactory.create("nextEvent", ProgramExecutor.class, new FunctionExecutor<Event>() {
 
             @Override
-            public Event invoke(FunctionInvocation<Event> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Event invoke(FunctionInvocation<Event> invocation, Object... arguments) {
 
                 Event nextEvent = invocation.getHolder().get(IN_EVENT_LISTENER).get().get(QueueEventListener.NEXT_EVENT).invoke(arguments);
                 invocation.next(arguments);
@@ -132,7 +131,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
         HANDLE_EVENT.addExecutor("delegate", ProgramExecutor.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 invocation.getHolder().get(IN_EVENT_LISTENER).get().get(EventListener.HANDLE_EVENT).invoke(arguments);
                 return invocation.next(arguments);
@@ -145,7 +144,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
 
             @Override
             @Prioritized (Prioritized.LEVEL_9)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 if ( ((ProgramExecutor) invocation.getHolder()).getParent().get(Process.STATE).get().isTickState()) {
                     invocation.next(arguments);

@@ -20,7 +20,6 @@ package com.quartercode.disconnected.test.world.comp.file;
 
 import org.junit.Assert;
 import org.junit.Test;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileRights;
@@ -55,14 +54,14 @@ public class FileUtilsTest {
         Assert.assertArrayEquals("Resolved components", new String[] { null, "etc/test/" }, FileUtils.getComponents("etc/test/"));
     }
 
-    private User createUser(String name) throws ExecutorInvocationException {
+    private User createUser(String name) {
 
         User user = new User();
         user.get(User.NAME).set(name);
         return user;
     }
 
-    private Group createGroup(String name) throws ExecutorInvocationException {
+    private Group createGroup(String name) {
 
         Group group = new Group();
         group.get(Group.NAME).set(name);
@@ -70,7 +69,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testHasRight() throws ExecutorInvocationException {
+    public void testHasRight() {
 
         ContentFile file = new ContentFile();
         User owner = createUser("owner");
@@ -102,7 +101,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testCanChangeRights() throws ExecutorInvocationException {
+    public void testCanChangeRights() {
 
         ContentFile file = new ContentFile();
         User owner = createUser("owner");

@@ -20,7 +20,6 @@ package com.quartercode.disconnected.world.event;
 
 import java.util.Collection;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -62,7 +61,7 @@ public abstract class Event extends DefaultFeatureHolder {
         SEND = FunctionDefinitionFactory.create("send", Event.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 // Trust the user here
                 @SuppressWarnings ("unchecked")

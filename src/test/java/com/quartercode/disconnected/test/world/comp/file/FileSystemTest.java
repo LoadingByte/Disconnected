@@ -21,7 +21,6 @@ package com.quartercode.disconnected.test.world.comp.file;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.ByteUnit;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
@@ -34,7 +33,7 @@ public class FileSystemTest {
     private ContentFile testFile;
 
     @Before
-    public void setUp() throws ExecutorInvocationException {
+    public void setUp() {
 
         fileSystem = new FileSystem();
         fileSystem.get(FileSystem.SIZE).set(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
@@ -45,13 +44,13 @@ public class FileSystemTest {
     }
 
     @Test
-    public void testGetFile() throws ExecutorInvocationException {
+    public void testGetFile() {
 
         Assert.assertEquals("Resolved file", testFile, fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test.txt"));
     }
 
     @Test
-    public void testCalcSpace() throws ExecutorInvocationException {
+    public void testCalcSpace() {
 
         long contentSize = 30;
         long filled = fileSystem.get(FileSystem.GET_FILLED).invoke();

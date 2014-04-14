@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -70,14 +69,14 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FileSystem fileSystem = invocation.getHolder().get(GET_FILE_SYSTEM).invoke();
                 if (fileSystem != null) {
                     int totalSize = 0;
                     totalSize += SizeUtil.getSize(arguments[0]);
                     if (totalSize > fileSystem.get(FileSystem.GET_FREE).invoke()) {
-                        throw new ExecutorInvocationException(new OutOfSpaceException(fileSystem, totalSize));
+                        new OutOfSpaceException(fileSystem, totalSize);
                     }
                 }
 
@@ -115,7 +114,7 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
         GET_CHILD_BY_NAME = FunctionDefinitionFactory.create("getChildByName", ParentFile.class, CollectionPropertyAccessorFactory.createGetSingle(CHILDREN, new CriteriumMatcher<File<ParentFile<?>>>() {
 
             @Override
-            public boolean matches(File<ParentFile<?>> element, Object... arguments) throws ExecutorInvocationException {
+            public boolean matches(File<ParentFile<?>> element, Object... arguments) {
 
                 return element.get(NAME).get().equals(arguments[0]);
             }

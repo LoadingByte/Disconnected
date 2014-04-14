@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -133,7 +132,7 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
             GET_SIZE.addExecutor("columns", ConfigurationEntry.class, new FunctionExecutor<Long>() {
 
                 @Override
-                public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
+                public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
                     return SizeUtil.getSize(invocation.getHolder().get(GET_COLUMNS).invoke()) + NullPreventer.prevent(invocation.next(arguments));
                 }

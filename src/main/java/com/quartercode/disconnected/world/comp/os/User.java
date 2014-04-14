@@ -25,7 +25,6 @@ import java.util.Map;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -79,7 +78,7 @@ public class User extends ConfigurationEntry {
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 if (invocation.getHolder().get(IS_SUPERUSER).invoke()) {
                     // Cancel invocation
@@ -98,7 +97,7 @@ public class User extends ConfigurationEntry {
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 Validate.isTrue(!holder.get(IS_SUPERUSER).invoke(), "The superuser can't be a member in any group");
@@ -114,7 +113,7 @@ public class User extends ConfigurationEntry {
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 Validate.isTrue(!holder.get(IS_SUPERUSER).invoke(), "The superuser can't be a member in any group");
@@ -170,7 +169,7 @@ public class User extends ConfigurationEntry {
         GET_PRIMARY_GROUP = FunctionDefinitionFactory.create("getPrimaryGroup", User.class, new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
+            public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 String primaryGroup = null;
@@ -186,7 +185,7 @@ public class User extends ConfigurationEntry {
         SET_PRIMARY_GROUP = FunctionDefinitionFactory.create("setPrimaryGroup", User.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 if (holder.get(GROUPS).get().contains(arguments[0])) {
@@ -202,7 +201,7 @@ public class User extends ConfigurationEntry {
         IS_SUPERUSER = FunctionDefinitionFactory.create("isSuperuser", User.class, new FunctionExecutor<Boolean>() {
 
             @Override
-            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
 
                 String name = invocation.getHolder().get(NAME).get();
                 boolean result = name != null && name.equals(SUPERUSER_NAME);
@@ -214,7 +213,7 @@ public class User extends ConfigurationEntry {
         GET_COLUMNS.addExecutor("default", User.class, new FunctionExecutor<Map<String, Object>>() {
 
             @Override
-            public Map<String, Object> invoke(FunctionInvocation<Map<String, Object>> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Map<String, Object> invoke(FunctionInvocation<Map<String, Object>> invocation, Object... arguments) {
 
                 Map<String, Object> columns = new HashMap<String, Object>();
                 FeatureHolder holder = invocation.getHolder();
@@ -230,7 +229,7 @@ public class User extends ConfigurationEntry {
         SET_COLUMNS.addExecutor("default", User.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 // Trust the user of the method
                 @SuppressWarnings ("unchecked")

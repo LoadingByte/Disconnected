@@ -18,8 +18,6 @@
 
 package com.quartercode.disconnected.world.event;
 
-import com.quartercode.classmod.extra.ExecutorInvocationException;
-
 /**
  * The {@link #matches(Event)} method of every true event matcher just always returns <code>true</code>.
  * For example, it could be used to make the {@link QueueEventListener#NEXT_EVENT} method return the last received {@link Event}.
@@ -37,7 +35,7 @@ public class TrueEventMatcher implements EventMatcher {
     }
 
     @Override
-    public boolean matches(Event event) throws ExecutorInvocationException {
+    public boolean matches(Event event) {
 
         return true;
     }

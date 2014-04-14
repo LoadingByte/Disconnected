@@ -35,7 +35,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -80,7 +79,7 @@ public class FunctionCallScheduleTaskTest {
     }
 
     @Test
-    public void testSchedule() throws ExecutorInvocationException {
+    public void testSchedule() {
 
         scheduler.schedule(new FunctionCallScheduleTask(TestFeatureHolder.TEST_FUNCTION_WITH_COMPLEX_NAME, TestFeatureHolder.class), delay);
 
@@ -92,7 +91,7 @@ public class FunctionCallScheduleTaskTest {
     }
 
     @Test
-    public void testScheduleWithPersistence() throws JAXBException, ExecutorInvocationException {
+    public void testScheduleWithPersistence() throws JAXBException {
 
         scheduler.schedule(new FunctionCallScheduleTask(TestFeatureHolder.TEST_FUNCTION_WITH_COMPLEX_NAME, TestFeatureHolder.class), delay);
 
@@ -122,7 +121,7 @@ public class FunctionCallScheduleTaskTest {
             TEST_FUNCTION_WITH_COMPLEX_NAME = FunctionDefinitionFactory.create("testFunctionWithComplexName", TestFeatureHolder.class, new FunctionExecutor<String>() {
 
                 @Override
-                public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
+                public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
                     executedTestFunction = true;
                     return invocation.next(arguments);

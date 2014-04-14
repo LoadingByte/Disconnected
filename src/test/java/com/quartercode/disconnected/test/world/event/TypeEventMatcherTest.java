@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.event.Event;
 import com.quartercode.disconnected.world.event.TypeEventMatcher;
 
@@ -65,7 +64,7 @@ public class TypeEventMatcherTest {
     }
 
     @Test
-    public void testMatches() throws ExecutorInvocationException {
+    public void testMatches() {
 
         TypeEventMatcher matcher = new TypeEventMatcher(type);
         Assert.assertEquals("Result for event of type " + event.getClass().getName() + " and matching type " + type.getName(), result, matcher.matches(event));

@@ -21,7 +21,6 @@ package com.quartercode.disconnected.test.world.comp.file;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAction;
@@ -39,7 +38,7 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
     private File<ParentFile<?>> childFile;
 
     @Before
-    public void setUp2() throws ExecutorInvocationException {
+    public void setUp2() {
 
         fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, PATH).get(FileAddAction.EXECUTE).invoke();
 
@@ -48,7 +47,7 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
         fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(childFile, CHILD_PATH).get(FileAddAction.EXECUTE).invoke();
     }
 
-    private FileRemoveAction createAction(File<ParentFile<?>> file) throws ExecutorInvocationException {
+    private FileRemoveAction createAction(File<ParentFile<?>> file) {
 
         FileRemoveAction action = new FileRemoveAction();
         action.get(FileAddAction.FILE).set(file);
@@ -56,40 +55,40 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
     }
 
     @Test
-    public void testExecute() throws ExecutorInvocationException {
+    public void testExecute() {
 
         FileRemoveAction action = createAction(file);
         actuallyTestExecute(action, PATH);
     }
 
     @Test
-    public void testFileExecute() throws ExecutorInvocationException {
+    public void testFileExecute() {
 
         FileAction action = file.get(File.CREATE_REMOVE).invoke();
         actuallyTestExecute(action, PATH);
     }
 
-    private void actuallyTestExecute(FileAction action, String oldFilePath) throws ExecutorInvocationException {
+    private void actuallyTestExecute(FileAction action, String oldFilePath) {
 
         action.get(FileAddAction.EXECUTE).invoke();
         Assert.assertEquals("Resolved file for deleted file", null, fileSystem.get(FileSystem.GET_FILE).invoke(oldFilePath));
     }
 
     @Test
-    public void testIsExecutableBy() throws ExecutorInvocationException {
+    public void testIsExecutableBy() {
 
         FileRemoveAction action = createAction(file);
         actuallyTestIsExecutableBy(action, PATH);
     }
 
     @Test
-    public void testFileIsExecutableBy() throws ExecutorInvocationException {
+    public void testFileIsExecutableBy() {
 
         FileAction action = file.get(File.CREATE_REMOVE).invoke();
         actuallyTestIsExecutableBy(action, PATH);
     }
 
-    private void actuallyTestIsExecutableBy(FileAction action, String oldFilePath) throws ExecutorInvocationException {
+    private void actuallyTestIsExecutableBy(FileAction action, String oldFilePath) {
 
         boolean[] executable = new boolean[4];
 

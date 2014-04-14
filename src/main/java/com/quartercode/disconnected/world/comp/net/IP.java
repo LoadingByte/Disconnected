@@ -22,7 +22,6 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -56,7 +55,7 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Integer[] parts = (Integer[]) arguments[0];
                 Validate.isTrue(parts.length == 4, "The ip must have 4 parts (e.g. [127, 0, 0, 1]): ", Arrays.toString(parts));
@@ -127,7 +126,7 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
         FROM_OBJECT = FunctionDefinitionFactory.create("fromObject", IP.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 invocation.getHolder().get(PARTS).set(Arrays.copyOf( ((IP) arguments[0]).get(PARTS).get(), 4));
 
@@ -139,7 +138,7 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
         TO_STRING.addExecutor("default", IP.class, new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
+            public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
                 StringBuilder parts = new StringBuilder();
                 for (int part : invocation.getHolder().get(PARTS).get()) {
@@ -154,7 +153,7 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
         FROM_STRING.addExecutor("default", IP.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Integer[] parts = new Integer[4];
                 String[] stringParts = ((String) arguments[0]).split("\\.");

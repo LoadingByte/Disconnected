@@ -19,7 +19,6 @@
 package com.quartercode.disconnected.world.event;
 
 import org.apache.commons.lang.Validate;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 
 /**
  * The type event matcher only accepts {@link Event}s that derive from a given supertype or superinterface or are equal to a provided type.
@@ -44,7 +43,7 @@ public class TypeEventMatcher implements EventMatcher {
     }
 
     @Override
-    public boolean matches(Event event) throws ExecutorInvocationException {
+    public boolean matches(Event event) {
 
         return type.isAssignableFrom(event.getClass());
     }

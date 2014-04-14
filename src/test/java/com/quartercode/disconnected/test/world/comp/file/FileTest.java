@@ -21,7 +21,6 @@ package com.quartercode.disconnected.test.world.comp.file;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.disconnected.world.comp.ByteUnit;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
@@ -34,7 +33,7 @@ public class FileTest {
     private ContentFile testFile;
 
     @Before
-    public void setUp() throws ExecutorInvocationException {
+    public void setUp() {
 
         fileSystem = new FileSystem();
         fileSystem.get(FileSystem.SIZE).set(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
@@ -44,7 +43,7 @@ public class FileTest {
     }
 
     @Test
-    public void testGetPath() throws ExecutorInvocationException {
+    public void testGetPath() {
 
         Assert.assertEquals("Path", "/test1/test2/test.txt", testFile.get(File.GET_PATH).invoke());
     }
@@ -54,7 +53,7 @@ public class FileTest {
      * In production, a FileMoveAction should be used instead of the direct name setting.
      */
     @Test
-    public void testSetName() throws ExecutorInvocationException {
+    public void testSetName() {
 
         testFile.get(File.NAME).set("test3.txt");
 

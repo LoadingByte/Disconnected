@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionProperty;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -48,9 +47,8 @@ public class SizeUtil {
      * 
      * @param object The object to calculate the size of.
      * @return The size of the object in bytes (of course, it's a fictitious size).
-     * @throws ExecutorInvocationException The object is a {@link FeatureHolder} and an exception occurres during deriving.
      */
-    public static long getSize(Object object) throws ExecutorInvocationException {
+    public static long getSize(Object object) {
 
         if (object == null) {
             return 0; // Nulls have no size
@@ -101,7 +99,7 @@ public class SizeUtil {
         return new FunctionExecutor<Long>() {
 
             @Override
-            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
                 return SizeUtil.getSize(invocation.getHolder().get(propertyDefinition).get()) + NullPreventer.prevent(invocation.next(arguments));
             }
@@ -121,7 +119,7 @@ public class SizeUtil {
         return new FunctionExecutor<Long>() {
 
             @Override
-            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
                 return SizeUtil.getSize(invocation.getHolder().get(propertyDefinition).get()) + NullPreventer.prevent(invocation.next(arguments));
             }

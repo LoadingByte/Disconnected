@@ -21,7 +21,6 @@ package com.quartercode.disconnected.world.comp.os;
 import java.util.HashMap;
 import java.util.Map;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
@@ -58,7 +57,7 @@ public class Group extends ConfigurationEntry {
         GET_COLUMNS.addExecutor("default", User.class, new FunctionExecutor<Map<String, Object>>() {
 
             @Override
-            public Map<String, Object> invoke(FunctionInvocation<Map<String, Object>> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Map<String, Object> invoke(FunctionInvocation<Map<String, Object>> invocation, Object... arguments) {
 
                 Map<String, Object> columns = new HashMap<String, Object>();
                 FeatureHolder holder = invocation.getHolder();
@@ -73,7 +72,7 @@ public class Group extends ConfigurationEntry {
         SET_COLUMNS.addExecutor("default", User.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 // Trust the user of the method
                 @SuppressWarnings ("unchecked")

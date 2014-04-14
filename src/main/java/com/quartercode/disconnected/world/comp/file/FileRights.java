@@ -20,7 +20,6 @@ package com.quartercode.disconnected.world.comp.file;
 
 import java.util.Arrays;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -319,7 +318,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
         GET = FunctionDefinitionFactory.create("get", FileRights.class, new FunctionExecutor<Boolean>() {
 
             @Override
-            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
 
                 boolean result = false;
                 if (arguments[0] != null) {
@@ -337,7 +336,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
         SET = FunctionDefinitionFactory.create("set", FileRights.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 if (arguments[0] == null) {
@@ -356,7 +355,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
         FROM_OBJECT = FunctionDefinitionFactory.create("fromObject", FileRights.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 invocation.getHolder().get(RIGHTS).set(Arrays.copyOf( ((FileRights) arguments[0]).get(RIGHTS).get(), 3 * 4));
 
@@ -368,7 +367,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
         TO_STRING.addExecutor("default", FileRights.class, new FunctionExecutor<String>() {
 
             @Override
-            public String invoke(FunctionInvocation<String> invocation, Object... arguments) throws ExecutorInvocationException {
+            public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
                 String rights = "";
                 for (int index = 0; index < 3 * 4; index++) {
@@ -397,7 +396,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
         FROM_STRING.addExecutor("default", FileRights.class, new FunctionExecutor<Void>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 char[] rights = ((String) arguments[0]).toCharArray();
                 for (int index = 0; index < 3 * 4; index++) {

@@ -23,7 +23,6 @@ import java.util.Queue;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.ExecutorInvocationException;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -124,7 +123,7 @@ public class QueueEventListener extends DefaultFeatureHolder implements EventLis
         NEXT_EVENT = FunctionDefinitionFactory.create("nextEvent", QueueEventListener.class, new FunctionExecutor<Event>() {
 
             @Override
-            public Event invoke(FunctionInvocation<Event> invocation, Object... arguments) throws ExecutorInvocationException {
+            public Event invoke(FunctionInvocation<Event> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
                 EventMatcher matcher = (EventMatcher) arguments[0];
