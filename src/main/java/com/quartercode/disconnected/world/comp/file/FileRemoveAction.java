@@ -23,7 +23,6 @@ import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ReferenceProperty;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
@@ -77,7 +76,6 @@ public class FileRemoveAction extends DefaultFeatureHolder implements FileAction
         EXECUTE.addExecutor("removeFile", FileRemoveAction.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_5)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();

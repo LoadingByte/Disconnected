@@ -132,7 +132,6 @@ public class FileMoveAction extends DefaultFeatureHolder implements FileAction {
         EXECUTE.addExecutor("moveFile", FileMoveAction.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_5)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();

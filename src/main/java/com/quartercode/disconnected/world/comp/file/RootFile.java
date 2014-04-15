@@ -66,7 +66,7 @@ public class RootFile extends ParentFile<FileSystem> {
         GET_PATH.addExecutor("returnStatic", RootFile.class, new FunctionExecutor<String>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_5)
+            @Prioritized (Prioritized.LEVEL_6)
             public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
                 return "";
@@ -77,7 +77,7 @@ public class RootFile extends ParentFile<FileSystem> {
         CREATE_MOVE.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileAction>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_5)
+            @Prioritized (Prioritized.LEVEL_6)
             public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
 
                 return null;
@@ -88,7 +88,7 @@ public class RootFile extends ParentFile<FileSystem> {
         CREATE_MOVE_TO_OTHER_FS.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileAction>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_5)
+            @Prioritized (Prioritized.LEVEL_6)
             public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
 
                 return null;
@@ -99,7 +99,7 @@ public class RootFile extends ParentFile<FileSystem> {
         CREATE_REMOVE.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileAction>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_5)
+            @Prioritized (Prioritized.LEVEL_6)
             public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
 
                 return null;

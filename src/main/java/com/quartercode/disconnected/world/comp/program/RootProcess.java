@@ -37,7 +37,7 @@ public class RootProcess extends Process<OperatingSystem> {
         GET_ROOT.addExecutor("returnThis", RootProcess.class, new FunctionExecutor<RootProcess>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_5)
+            @Prioritized (Prioritized.LEVEL_6)
             public RootProcess invoke(FunctionInvocation<RootProcess> invocation, Object... arguments) {
 
                 invocation.next(arguments);
