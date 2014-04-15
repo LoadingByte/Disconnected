@@ -25,11 +25,11 @@ import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.Version;
@@ -71,45 +71,63 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
     /**
      * The {@link FileSystemModule} for managing and accessing {@link FileSystem}s.
      */
-    protected static final PropertyDefinition<FileSystemModule>                         FILE_SYSTEM_MODULE;
+    public static final PropertyDefinition<FileSystemModule>                            FS_MODULE;
 
     /**
      * The {@link ProcessModule} which manages the {@link RootProcess}.
      */
-    protected static final PropertyDefinition<ProcessModule>                            PROCESS_MODULE;
+    public static final PropertyDefinition<ProcessModule>                               PROC_MODULE;
 
     /**
-     * The {@link NetworkManager} which takes care of sending and receiving {@link Packet}s.
+     * The {@link NetworkModule} which takes care of sending and receiving {@link Packet}s.
      */
-    protected static final PropertyDefinition<NetworkModule>                            NETWORK_MODULE;
+    public static final PropertyDefinition<NetworkModule>                               NET_MODULE;
 
     static {
 
         NAME = ObjectProperty.createDefinition("name");
         VERSION = ObjectProperty.createDefinition("version");
         VULNERABILITIES = ObjectCollectionProperty.createDefinition("vulnerabilities", new HashSet<Vulnerability>(), true);
-        FILE_SYSTEM_MODULE = ObjectProperty.createDefinition("fileSystemModule", new FileSystemModule(), true);
-        PROCESS_MODULE = ObjectProperty.createDefinition("processModule", new ProcessModule(), true);
-        NETWORK_MODULE = ObjectProperty.createDefinition("networkModule", new NetworkModule(), true);
+
+        FS_MODULE = ObjectProperty.createDefinition("fileSystemModule", new FileSystemModule(), true);
+        FS_MODULE.addSetterExecutor("cancel", OperatingSystem.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.LEVEL_6)
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                return null;
+            }
+
+        });
+
+        PROC_MODULE = ObjectProperty.createDefinition("processModule", new ProcessModule(), true);
+        PROC_MODULE.addSetterExecutor("cancel", OperatingSystem.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.LEVEL_6)
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                return null;
+            }
+
+        });
+
+        NET_MODULE = ObjectProperty.createDefinition("networkModule", new NetworkModule(), true);
+        NET_MODULE.addSetterExecutor("cancel", OperatingSystem.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.LEVEL_6)
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                return null;
+            }
+
+        });
 
     }
 
     // ----- Functions -----
-
-    /**
-     * Returns the {@link FileSystemModule} for managing and accessing {@link FileSystem}s.
-     */
-    public static final FunctionDefinition<FileSystemModule>                            GET_FS_MODULE;
-
-    /**
-     * Returns the {@link FileSystemModule} for managing and accessing {@link FileSystem}s.
-     */
-    public static final FunctionDefinition<ProcessModule>                               GET_PROC_MODULE;
-
-    /**
-     * Returns the {@link NetworkManager} which takes care of sending and receiving {@link Packet}s.
-     */
-    public static final FunctionDefinition<NetworkModule>                               GET_NET_MODULE;
 
     /**
      * Returns whether the operating system is running or not.
@@ -142,17 +160,13 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
     static {
 
-        GET_FS_MODULE = FunctionDefinitionFactory.create("getFsModule", OperatingSystem.class, PropertyAccessorFactory.createGet(FILE_SYSTEM_MODULE));
-        GET_PROC_MODULE = FunctionDefinitionFactory.create("getProcModule", OperatingSystem.class, PropertyAccessorFactory.createGet(PROCESS_MODULE));
-        GET_NET_MODULE = FunctionDefinitionFactory.create("getNetModule", OperatingSystem.class, PropertyAccessorFactory.createGet(NETWORK_MODULE));
-
         IS_RUNNING = FunctionDefinitionFactory.create("isRunning", OperatingSystem.class, new FunctionExecutor<Boolean>() {
 
             @Override
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
-                boolean running = holder.get(GET_PROC_MODULE).invoke().get(ProcessModule.ROOT_PROCESS).get().get(Process.STATE).get() != ProcessState.STOPPED;
+                boolean running = holder.get(PROC_MODULE).get().get(ProcessModule.ROOT_PROCESS).get().get(Process.STATE).get() != ProcessState.STOPPED;
 
                 invocation.next(arguments);
                 return running;
@@ -172,7 +186,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                invocation.getHolder().get(GET_FS_MODULE).invoke().get(OSModule.SET_RUNNING).invoke(arguments);
+                invocation.getHolder().get(FS_MODULE).get().get(OSModule.SET_RUNNING).invoke(arguments);
                 return invocation.next(arguments);
             }
 
@@ -182,7 +196,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                invocation.getHolder().get(GET_PROC_MODULE).invoke().get(OSModule.SET_RUNNING).invoke(arguments);
+                invocation.getHolder().get(PROC_MODULE).get().get(OSModule.SET_RUNNING).invoke(arguments);
                 return invocation.next(arguments);
             }
 

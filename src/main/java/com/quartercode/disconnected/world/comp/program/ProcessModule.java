@@ -108,7 +108,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                 if ((Boolean) arguments[0]) {
                     RootProcess root = new RootProcess();
 
-                    FileSystemModule fsModule = ((ProcessModule) holder).getParent().get(OperatingSystem.GET_FS_MODULE).invoke();
+                    FileSystemModule fsModule = ((ProcessModule) holder).getParent().get(OperatingSystem.FS_MODULE).get();
                     File<?> environmentFile = fsModule.get(FileSystemModule.GET_FILE).invoke(CommonFiles.ENVIRONMENT_CONFIG);
                     Configuration environmentConfig = (Configuration) environmentFile.get(ContentFile.CONTENT).get();
                     Map<String, String> environment = new HashMap<String, String>();
