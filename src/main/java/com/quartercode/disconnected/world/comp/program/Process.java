@@ -584,9 +584,14 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public Session invoke(FunctionInvocation<Session> invocation, Object... arguments) {
 
-                Session session = (Session) invocation.getHolder().get(GET_SESSION_PROCESS).invoke().get(EXECUTOR).get();
-                invocation.next(arguments);
-                return session;
+                Process<?> sessionProcess = invocation.getHolder().get(GET_SESSION_PROCESS).invoke();
+                if (sessionProcess == null) {
+                    return null;
+                } else {
+                    Session session = (Session) sessionProcess.get(EXECUTOR).get();
+                    invocation.next(arguments);
+                    return session;
+                }
             }
 
         });
@@ -603,7 +608,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        INITIALIZE = FunctionDefinitionFactory.create("initialize", Map.class);
+        INITIALIZE = FunctionDefinitionFactory.create("initialize");
         INITIALIZE.addExecutor("setPid", Process.class, new FunctionExecutor<Void>() {
 
             @Override
