@@ -93,7 +93,7 @@ public class Session extends ProgramExecutor {
                 Session parentSession = ((Session) holder).getParent().get(Process.GET_SESSION).invoke();
                 boolean checkRequired = parentSession != null && !parentSession.get(USER).get().get(User.IS_SUPERUSER).invoke();
 
-                if (checkRequired) {
+                if (checkRequired && holder.get(USER).get().get(User.PASSWORD).get() != null) {
                     String password = holder.get(PASSWORD).get();
                     Validate.notNull(password, "Password for session user cannot be null (authorization required)");
                     String hashedPassword = DigestUtils.sha256Hex(password);
