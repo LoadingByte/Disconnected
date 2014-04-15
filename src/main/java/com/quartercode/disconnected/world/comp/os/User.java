@@ -20,6 +20,7 @@ package com.quartercode.disconnected.world.comp.os;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
@@ -254,35 +255,35 @@ public class User extends ConfigurationEntry {
             }
         });
 
-        GET_COLUMNS.addExecutor("name", User.class, new FunctionExecutor<List<ValueSupplierDefinition<?, ?>>>() {
+        GET_COLUMNS.addExecutor("name", User.class, new FunctionExecutor<Map<ValueSupplierDefinition<?, ?>, Class<?>>>() {
 
             @Override
-            public List<ValueSupplierDefinition<?, ?>> invoke(FunctionInvocation<List<ValueSupplierDefinition<?, ?>>> invocation, Object... arguments) {
+            public Map<ValueSupplierDefinition<?, ?>, Class<?>> invoke(FunctionInvocation<Map<ValueSupplierDefinition<?, ?>, Class<?>>> invocation, Object... arguments) {
 
-                List<ValueSupplierDefinition<?, ?>> columns = NullPreventer.prevent(invocation.next(arguments));
-                columns.add(NAME);
+                Map<ValueSupplierDefinition<?, ?>, Class<?>> columns = NullPreventer.prevent(invocation.next(arguments));
+                columns.put(NAME, String.class);
                 return columns;
             }
 
         });
-        GET_COLUMNS.addExecutor("password", User.class, new FunctionExecutor<List<ValueSupplierDefinition<?, ?>>>() {
+        GET_COLUMNS.addExecutor("password", User.class, new FunctionExecutor<Map<ValueSupplierDefinition<?, ?>, Class<?>>>() {
 
             @Override
-            public List<ValueSupplierDefinition<?, ?>> invoke(FunctionInvocation<List<ValueSupplierDefinition<?, ?>>> invocation, Object... arguments) {
+            public Map<ValueSupplierDefinition<?, ?>, Class<?>> invoke(FunctionInvocation<Map<ValueSupplierDefinition<?, ?>, Class<?>>> invocation, Object... arguments) {
 
-                List<ValueSupplierDefinition<?, ?>> columns = NullPreventer.prevent(invocation.next(arguments));
-                columns.add(PASSWORD);
+                Map<ValueSupplierDefinition<?, ?>, Class<?>> columns = NullPreventer.prevent(invocation.next(arguments));
+                columns.put(PASSWORD, String.class);
                 return columns;
             }
 
         });
-        GET_COLUMNS.addExecutor("groups", User.class, new FunctionExecutor<List<ValueSupplierDefinition<?, ?>>>() {
+        GET_COLUMNS.addExecutor("groups", User.class, new FunctionExecutor<Map<ValueSupplierDefinition<?, ?>, Class<?>>>() {
 
             @Override
-            public List<ValueSupplierDefinition<?, ?>> invoke(FunctionInvocation<List<ValueSupplierDefinition<?, ?>>> invocation, Object... arguments) {
+            public Map<ValueSupplierDefinition<?, ?>, Class<?>> invoke(FunctionInvocation<Map<ValueSupplierDefinition<?, ?>, Class<?>>> invocation, Object... arguments) {
 
-                List<ValueSupplierDefinition<?, ?>> columns = NullPreventer.prevent(invocation.next(arguments));
-                columns.add(GROUPS);
+                Map<ValueSupplierDefinition<?, ?>, Class<?>> columns = NullPreventer.prevent(invocation.next(arguments));
+                columns.put(GROUPS, Group.class);
                 return columns;
             }
 

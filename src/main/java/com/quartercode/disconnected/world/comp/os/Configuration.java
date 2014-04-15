@@ -20,6 +20,7 @@ package com.quartercode.disconnected.world.comp.os;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
@@ -96,11 +97,11 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
         // ----- Functions -----
 
         /**
-         * Returns the definitions of the features which define the different columns of the entry.
+         * Returns the definitions of the features which define the different columns of the entry, along with the types of the columns.
          * Each definition needs to be a {@link ValueSupplierDefinition}, so the value of the defined feature can be retrieved.
          * Moreover, each definition must define a property or a collection property because the column values must be changeable.
          */
-        public static final FunctionDefinition<List<ValueSupplierDefinition<?, ?>>> GET_COLUMNS;
+        public static final FunctionDefinition<Map<ValueSupplierDefinition<?, ?>, Class<?>>> GET_COLUMNS;
 
         static {
 
@@ -114,7 +115,7 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
                     FeatureHolder holder = invocation.getHolder();
 
                     long size = 0;
-                    for (ValueSupplierDefinition<?, ?> column : holder.get(GET_COLUMNS).invoke()) {
+                    for (ValueSupplierDefinition<?, ?> column : holder.get(GET_COLUMNS).invoke().keySet()) {
                         Object columnValue = holder.get(column).get();
                         size += SizeUtil.getSize(columnValue);
                     }

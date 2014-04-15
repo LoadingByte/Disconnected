@@ -21,6 +21,7 @@ package com.quartercode.disconnected.world.comp.os;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -151,24 +152,24 @@ public class EnvironmentVariable extends ConfigurationEntry {
 
         }, List.class);
 
-        GET_COLUMNS.addExecutor("name", EnvironmentVariable.class, new FunctionExecutor<List<ValueSupplierDefinition<?, ?>>>() {
+        GET_COLUMNS.addExecutor("name", EnvironmentVariable.class, new FunctionExecutor<Map<ValueSupplierDefinition<?, ?>, Class<?>>>() {
 
             @Override
-            public List<ValueSupplierDefinition<?, ?>> invoke(FunctionInvocation<List<ValueSupplierDefinition<?, ?>>> invocation, Object... arguments) {
+            public Map<ValueSupplierDefinition<?, ?>, Class<?>> invoke(FunctionInvocation<Map<ValueSupplierDefinition<?, ?>, Class<?>>> invocation, Object... arguments) {
 
-                List<ValueSupplierDefinition<?, ?>> columns = NullPreventer.prevent(invocation.next(arguments));
-                columns.add(NAME);
+                Map<ValueSupplierDefinition<?, ?>, Class<?>> columns = NullPreventer.prevent(invocation.next(arguments));
+                columns.put(NAME, String.class);
                 return columns;
             }
 
         });
-        GET_COLUMNS.addExecutor("value", EnvironmentVariable.class, new FunctionExecutor<List<ValueSupplierDefinition<?, ?>>>() {
+        GET_COLUMNS.addExecutor("value", EnvironmentVariable.class, new FunctionExecutor<Map<ValueSupplierDefinition<?, ?>, Class<?>>>() {
 
             @Override
-            public List<ValueSupplierDefinition<?, ?>> invoke(FunctionInvocation<List<ValueSupplierDefinition<?, ?>>> invocation, Object... arguments) {
+            public Map<ValueSupplierDefinition<?, ?>, Class<?>> invoke(FunctionInvocation<Map<ValueSupplierDefinition<?, ?>, Class<?>>> invocation, Object... arguments) {
 
-                List<ValueSupplierDefinition<?, ?>> columns = NullPreventer.prevent(invocation.next(arguments));
-                columns.add(VALUE);
+                Map<ValueSupplierDefinition<?, ?>, Class<?>> columns = NullPreventer.prevent(invocation.next(arguments));
+                columns.put(VALUE, String.class);
                 return columns;
             }
 

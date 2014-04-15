@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
-import java.util.List;
+import java.util.Map;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
@@ -53,13 +53,13 @@ public class Group extends ConfigurationEntry {
 
     static {
 
-        GET_COLUMNS.addExecutor("name", Group.class, new FunctionExecutor<List<ValueSupplierDefinition<?, ?>>>() {
+        GET_COLUMNS.addExecutor("name", Group.class, new FunctionExecutor<Map<ValueSupplierDefinition<?, ?>, Class<?>>>() {
 
             @Override
-            public List<ValueSupplierDefinition<?, ?>> invoke(FunctionInvocation<List<ValueSupplierDefinition<?, ?>>> invocation, Object... arguments) {
+            public Map<ValueSupplierDefinition<?, ?>, Class<?>> invoke(FunctionInvocation<Map<ValueSupplierDefinition<?, ?>, Class<?>>> invocation, Object... arguments) {
 
-                List<ValueSupplierDefinition<?, ?>> columns = NullPreventer.prevent(invocation.next(arguments));
-                columns.add(NAME);
+                Map<ValueSupplierDefinition<?, ?>, Class<?>> columns = NullPreventer.prevent(invocation.next(arguments));
+                columns.put(NAME, String.class);
                 return columns;
             }
 
