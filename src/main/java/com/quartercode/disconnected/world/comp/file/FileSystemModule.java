@@ -38,7 +38,6 @@ import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.Criterium
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.hardware.Hardware;
-import com.quartercode.disconnected.world.comp.os.CommonFiles;
 import com.quartercode.disconnected.world.comp.os.OSModule;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.program.Process;
@@ -348,10 +347,11 @@ public class FileSystemModule extends OSModule {
                 // Only invoke on bootstrap
                 if ((Boolean) arguments[0]) {
                     for (KnownFileSystem fileSystem : invocation.getHolder().get(KNOWN_FS).get()) {
-                        if (fileSystem.get(KnownFileSystem.MOUNTPOINT).get().equals(CommonFiles.SYSTEM_MOUNTPOINT)) {
-                            fileSystem.get(KnownFileSystem.MOUNTED).set(true);
-                            break;
-                        }
+                        // TODO: Temp: Mount every available file system until a fs table is implemented
+                        // if (fileSystem.get(KnownFileSystem.MOUNTPOINT).get().equals(CommonFiles.SYSTEM_MOUNTPOINT)) {
+                        fileSystem.get(KnownFileSystem.MOUNTED).set(true);
+                        // break;
+                        // }
                     }
                 }
 
