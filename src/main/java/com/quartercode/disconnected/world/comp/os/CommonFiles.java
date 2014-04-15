@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
-import com.quartercode.disconnected.world.comp.file.Directory;
+import static com.quartercode.disconnected.world.comp.file.File.SEPARATOR;
 import com.quartercode.disconnected.world.comp.file.File;
-import com.quartercode.disconnected.world.comp.file.FileSystem;
+import com.quartercode.disconnected.world.comp.program.Program;
 
 /**
  * This class offers some constants which represent commonly used {@link File}s.
@@ -30,30 +30,63 @@ import com.quartercode.disconnected.world.comp.file.FileSystem;
  */
 public class CommonFiles {
 
+    // ----- Mountpoints -----
+
     /**
-     * The {@link FileSystem} which has the system mountpoint houses all files that are directly related to the system (e.g. system configs).
+     * The mountpoint of the file system which houses all files that are related to the system and shouldn't be changed.
+     * There may not be any configuration files here, just binaries.<br>
+     * That way, the system can be updated by just replacing all the contents of this file system.
      */
     public static final String SYSTEM_MOUNTPOINT  = "system";
 
     /**
-     * The configuration {@link Directory} which contains all of the program's configurations.
+     * The mountpoint of the file system which houses all config files, custom programs and home directories.
      */
-    public static final String CONFIG_DIR         = "/" + SYSTEM_MOUNTPOINT + "/etc";
+    public static final String USER_MOUNTPOINT    = "user";
+
+    // ----- System Paths -----
 
     /**
-     * The {@link Configuration} {@link File} which stores the {@link User}s of a system must always be available under this path.
+     * The path of the binary directory which stores all programs that come with a system.
+     * 
+     * @see Program
      */
-    public static final String USER_CONFIG        = CONFIG_DIR + "/users.cfg";
+    public static final String SYS_BIN_DIR        = SEPARATOR + SYSTEM_MOUNTPOINT + SEPARATOR + "bin";
+
+    // ----- User Paths -----
 
     /**
-     * The {@link Configuration} {@link File} which stores the {@link Group}s of a system must always be available under this path.
+     * The path of the binary directory which stores all custom programs that are added by the users.
+     * 
+     * @see Program
      */
-    public static final String GROUP_CONFIG       = CONFIG_DIR + "/groups.cfg";
+    public static final String USER_BIN_DIR       = SEPARATOR + USER_MOUNTPOINT + SEPARATOR + "bin";
 
     /**
-     * The {@link Configuration} {@link File} which stores the default {@link EnvironmentVariable}s every new process gets assigned.
+     * The path of the config directory which contains all global configuration files for system and user programs.
      */
-    public static final String ENVIRONMENT_CONFIG = CONFIG_DIR + "/environment.cfg";
+    public static final String CONFIG_DIR         = SEPARATOR + USER_MOUNTPOINT + SEPARATOR + "etc";
+
+    /**
+     * The path of the config file which stores the users of a system.
+     * 
+     * @see User
+     */
+    public static final String USER_CONFIG        = CONFIG_DIR + SEPARATOR + "users.cfg";
+
+    /**
+     * The path of the config file which stores the groups of a system.
+     * 
+     * @see Group
+     */
+    public static final String GROUP_CONFIG       = CONFIG_DIR + SEPARATOR + "groups.cfg";
+
+    /**
+     * The config file which stores the default environment variables that are assigned to every new process.
+     * 
+     * @see EnvironmentVariable
+     */
+    public static final String ENVIRONMENT_CONFIG = CONFIG_DIR + SEPARATOR + "environment.cfg";
 
     private CommonFiles() {
 
