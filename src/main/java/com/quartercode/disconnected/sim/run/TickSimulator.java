@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.sim.run;
 
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.extra.GetterSupplier;
+import com.quartercode.classmod.extra.ValueSupplier;
 import com.quartercode.disconnected.sim.Simulation;
 
 /**
@@ -90,8 +90,8 @@ public class TickSimulator implements TickAction {
             for (Object child : (FeatureHolder) object) {
                 updateObject(child);
             }
-        } else if (object instanceof GetterSupplier) {
-            updateObject( ((GetterSupplier<?>) object).get());
+        } else if (object instanceof ValueSupplier) {
+            updateObject( ((ValueSupplier<?>) object).get());
         }
     }
 
