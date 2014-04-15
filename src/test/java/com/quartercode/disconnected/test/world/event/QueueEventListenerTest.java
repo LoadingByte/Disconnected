@@ -47,8 +47,8 @@ public class QueueEventListenerTest {
         TestEvent event = sendTestEvent("testString", listener);
 
         // Note that we rely on the TrueEventMatcher here
-        Assert.assertEquals("Queued event", event, listener.get(QueueEventListener.NEXT_EVENT).invoke(new TrueEventMatcher()));
-        Assert.assertNull("Next event after all events were polled", listener.get(QueueEventListener.NEXT_EVENT).invoke(new TrueEventMatcher()));
+        Assert.assertEquals("Queued event", event, listener.get(QueueEventListener.NEXT_EVENT).invoke(TrueEventMatcher.INSTANCE));
+        Assert.assertNull("Next event after all events were polled", listener.get(QueueEventListener.NEXT_EVENT).invoke(TrueEventMatcher.INSTANCE));
     }
 
     @Test
@@ -59,8 +59,8 @@ public class QueueEventListenerTest {
         TestEvent event3 = sendTestEvent("testString3", listener);
 
         Assert.assertEquals("First queued event with 'testString2'", event2, listener.get(QueueEventListener.NEXT_EVENT).invoke(new TestDataEventMatcher("testString2")));
-        Assert.assertEquals("Second queued event", event1, listener.get(QueueEventListener.NEXT_EVENT).invoke(new TrueEventMatcher()));
-        Assert.assertEquals("Third queued event", event3, listener.get(QueueEventListener.NEXT_EVENT).invoke(new TrueEventMatcher()));
+        Assert.assertEquals("Second queued event", event1, listener.get(QueueEventListener.NEXT_EVENT).invoke(TrueEventMatcher.INSTANCE));
+        Assert.assertEquals("Third queued event", event3, listener.get(QueueEventListener.NEXT_EVENT).invoke(TrueEventMatcher.INSTANCE));
     }
 
     private TestEvent sendTestEvent(String testData, EventListener listener) {

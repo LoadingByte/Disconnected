@@ -28,7 +28,7 @@ public class TrueEventMatcherTest {
     @Test
     public void testMatches() {
 
-        TrueEventMatcher matcher = new TrueEventMatcher();
+        TrueEventMatcher matcher = TrueEventMatcher.INSTANCE;
         Assert.assertEquals("True event matcher's result", true, matcher.matches(new TestEvent()));
         Assert.assertEquals("True event matcher's result", true, matcher.matches(null));
     }

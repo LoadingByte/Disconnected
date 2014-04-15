@@ -28,9 +28,11 @@ package com.quartercode.disconnected.world.event;
 public class TrueEventMatcher implements EventMatcher {
 
     /**
-     * Creates a new true event matcher that just always returns <code>true</code> in the {@link #matches(Event)} method.
+     * The singleton instance of the true event matcher that just always returns <code>true</code> in the {@link #matches(Event)} method.
      */
-    public TrueEventMatcher() {
+    public static final TrueEventMatcher INSTANCE = new TrueEventMatcher();
+
+    private TrueEventMatcher() {
 
     }
 
