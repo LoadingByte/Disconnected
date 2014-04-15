@@ -188,12 +188,8 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
 
                     // Check whether the current file exists
                     if (newCurrent == null) {
-                        // Don't check root files
-                        if (current instanceof RootFile) {
-                            continue;
-                        }
                         // Not-parent file along the path
-                        else if (! (current instanceof ParentFile)) {
+                        if (! (current instanceof ParentFile)) {
                             result = false;
                         }
                         // Executor user hasn't rights to create the new file

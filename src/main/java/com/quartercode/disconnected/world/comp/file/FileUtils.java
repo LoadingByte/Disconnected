@@ -137,6 +137,9 @@ public class FileUtils {
 
         if (user == null || user.get(User.IS_SUPERUSER).invoke()) {
             return true;
+        } else if (file instanceof RootFile) {
+            // Only superusers (filtered out by the previous check) can add files to the root file
+            return false;
         } else if (checkRight(file, FileAccessor.OWNER, right) && file.get(File.OWNER).get().equals(user)) {
             return true;
         } else if (checkRight(file, FileAccessor.GROUP, right) && user.get(User.GROUPS).get().contains(file.get(File.GROUP).get())) {
