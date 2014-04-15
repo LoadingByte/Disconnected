@@ -531,10 +531,10 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 FeatureHolder holder = invocation.getHolder();
                 RootProcess root = null;
 
-                if ( ((Process<?>) holder).getParent() == null) {
+                if (holder instanceof RootProcess) {
                     root = (RootProcess) holder;
                 } else {
-                    root = ((RootProcess) holder).getParent().get(GET_ROOT).invoke();
+                    root = ((Process<?>) holder).getParent().get(GET_ROOT).invoke();
                 }
 
                 invocation.next(arguments);
@@ -548,7 +548,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public OperatingSystem invoke(FunctionInvocation<OperatingSystem> invocation, Object... arguments) {
 
-                OperatingSystem operatingSystem = invocation.getHolder().get(GET_ROOT).invoke().getParent();
+                OperatingSystem operatingSystem = invocation.getHolder().get(GET_ROOT).invoke().getParent().getParent();
                 invocation.next(arguments);
                 return operatingSystem;
             }

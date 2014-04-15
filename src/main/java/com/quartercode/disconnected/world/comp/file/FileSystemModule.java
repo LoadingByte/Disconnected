@@ -241,7 +241,7 @@ public class FileSystemModule extends OSModule {
             public List<FileSystem> invoke(FunctionInvocation<List<FileSystem>> invocation, Object... arguments) {
 
                 List<FileSystem> available = new ArrayList<FileSystem>();
-                Computer computer = ((FileSystemModule) invocation.getHolder()).getParent().get(Process.GET_ROOT).invoke().getParent().getParent();
+                Computer computer = ((FileSystemModule) invocation.getHolder()).getParent().get(Process.GET_OPERATING_SYSTEM).invoke().getParent();
                 for (Hardware hardware : computer.get(Computer.HARDWARE).get()) {
                     for (Feature feature : hardware) {
                         if (feature instanceof Iterable) {

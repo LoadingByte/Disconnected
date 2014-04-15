@@ -21,14 +21,13 @@ package com.quartercode.disconnected.world.comp.program;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
-import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 
 /**
  * The root process is a simple {@link Process} which can be only used as root for the process tree.
  * 
  * @see Process
  */
-public class RootProcess extends Process<OperatingSystem> {
+public class RootProcess extends Process<ProcessModule> {
 
     // ----- Functions -----
 
@@ -65,7 +64,7 @@ public class RootProcess extends Process<OperatingSystem> {
      */
     public RootProcess() {
 
-        setParentType(OperatingSystem.class);
+        setParentType(ProcessModule.class);
     }
 
 }
