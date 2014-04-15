@@ -59,6 +59,7 @@ public abstract class OSModule extends DefaultChildFeatureHolder<OperatingSystem
      */
     public OSModule() {
 
+        setParentType(OperatingSystem.class);
     }
 
 }
