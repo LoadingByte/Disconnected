@@ -468,13 +468,13 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                Process<?> holder = (Process<?>) invocation.getHolder();
 
                 if (holder.get(STATE).get() != ProcessState.STOPPED) {
                     holder.get(APPLY_STATE).invoke(ProcessState.STOPPED, arguments[0]);
                     // Unregister stopped process from parent
-                    if ( ((Process<?>) holder).getParent() != null) {
-                        ((Process<?>) holder).getParent().get(CHILDREN).get().remove(holder);
+                    if (holder.getParent() != null) {
+                        holder.getParent().get(CHILDREN).remove(holder);
                     }
                 }
 

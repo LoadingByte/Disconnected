@@ -22,6 +22,7 @@ import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.disconnected.util.NullPreventer;
+import com.quartercode.disconnected.world.comp.os.User;
 
 /**
  * This class represents the root file of a {@link FileSystem}.
@@ -42,7 +43,7 @@ public class RootFile extends ParentFile<FileSystem> {
             @Prioritized (Prioritized.LEVEL_6)
             public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
-                return "root";
+                return User.SUPERUSER_NAME;
             }
 
         });
