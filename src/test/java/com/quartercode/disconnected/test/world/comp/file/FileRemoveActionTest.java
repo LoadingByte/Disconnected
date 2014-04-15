@@ -32,7 +32,7 @@ import com.quartercode.disconnected.world.comp.file.ParentFile;
 
 public class FileRemoveActionTest extends AbstractFileActionTest {
 
-    private static final String PATH       = "/test1/test2";
+    private static final String PATH       = "test1/test2";
     private static final String CHILD_PATH = PATH + "/test.txt";
 
     private File<ParentFile<?>> childFile;

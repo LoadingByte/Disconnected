@@ -40,13 +40,13 @@ public class FileSystemTest {
 
         testFile = new ContentFile();
         testFile.get(ContentFile.CONTENT).set("Test-Content");
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(testFile, "/test1/test2/test.txt").get(FileAddAction.EXECUTE).invoke();
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(testFile, "test1/test2/test.txt").get(FileAddAction.EXECUTE).invoke();
     }
 
     @Test
     public void testGetFile() {
 
-        Assert.assertEquals("Resolved file", testFile, fileSystem.get(FileSystem.GET_FILE).invoke("/test1/test2/test.txt"));
+        Assert.assertEquals("Resolved file", testFile, fileSystem.get(FileSystem.GET_FILE).invoke("test1/test2/test.txt"));
     }
 
     @Test

@@ -198,11 +198,12 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
             @Override
             public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                File<?> holder = (File<?>) invocation.getHolder();
                 String path = null;
                 // Check for removed files
-                if ( ((File<?>) holder).getParent() != null) {
-                    path = ((File<?>) holder).getParent().get(GET_PATH).invoke() + File.SEPARATOR + holder.get(NAME).get();
+                if (holder.getParent() != null) {
+                    String parentPath = holder.getParent().get(GET_PATH).invoke();
+                    path = parentPath + (parentPath.isEmpty() ? "" : File.SEPARATOR) + holder.get(NAME).get();
                 }
 
                 invocation.next(arguments);

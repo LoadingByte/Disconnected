@@ -75,6 +75,9 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 String normalizedPath = FileUtils.resolvePath("/", (String) arguments[0]);
+                if (!normalizedPath.isEmpty()) {
+                    normalizedPath = normalizedPath.substring(1);
+                }
                 return invocation.next(normalizedPath);
             }
 

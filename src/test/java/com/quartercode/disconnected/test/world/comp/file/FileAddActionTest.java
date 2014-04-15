@@ -30,7 +30,7 @@ import com.quartercode.disconnected.world.comp.file.ParentFile;
 
 public class FileAddActionTest extends AbstractFileActionTest {
 
-    private static final String PARENT_PATH = "/test1/test2";
+    private static final String PARENT_PATH = "test1/test2";
     private static final String PATH        = PARENT_PATH + "/test.txt";
 
     private FileAddAction createAction(File<ParentFile<?>> file, String path) {

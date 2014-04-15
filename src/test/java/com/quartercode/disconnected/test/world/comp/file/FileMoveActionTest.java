@@ -32,9 +32,9 @@ import com.quartercode.disconnected.world.comp.file.ParentFile;
 
 public class FileMoveActionTest extends AbstractFileActionTest {
 
-    private static final String PARENT_PATH_1 = "/test1/test2";
+    private static final String PARENT_PATH_1 = "test1/test2";
     private static final String PATH_1        = PARENT_PATH_1 + "/test.txt";
-    private static final String PARENT_PATH_2 = "/test3/test4";
+    private static final String PARENT_PATH_2 = "test3/test4";
     private static final String PATH_2        = PARENT_PATH_2 + "/test5.txt";
 
     @Before
