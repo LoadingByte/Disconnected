@@ -20,12 +20,13 @@ package com.quartercode.disconnected.world.comp.os;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.ValueSupplierDefinition;
 import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.util.NullPreventer;
@@ -95,46 +96,30 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
         // ----- Functions -----
 
         /**
-         * Returns the column names of the entry along with their current values.
-         * The values should be {@link String}s or {@link List}s.
-         * Every returned column map of every invoked {@link FunctionExecutor} will be used.
-         * This method should be implemented by different subclasses for different purposes.
+         * Returns the definitions of the features which define the different columns of the entry.
+         * Each definition needs to be a {@link ValueSupplierDefinition}, so the value of the defined feature can be retrieved.
+         * Moreover, each definition must define a property or a collection property because the column values must be changeable.
          */
-        public static final FunctionDefinition<Map<String, Object>> GET_COLUMNS;
-
-        /**
-         * Changes the column values to the ones set in the given value map.
-         * The values are be {@link String}s or {@link List}s.
-         * This method should be implemented by different subclasses for different purposes.
-         * 
-         * <table>
-         * <tr>
-         * <th>Index</th>
-         * <th>Type</th>
-         * <th>Parameter</th>
-         * <th>Description</th>
-         * </tr>
-         * <tr>
-         * <td>0</td>
-         * <td>{@link Map}&lt;{@link String}, {@link Object}&gt;</td>
-         * <td>columns</td>
-         * <td>The new column values ({@link String}s or {@link List}s) assigned to their names.</td>
-         * </tr>
-         * </table>
-         */
-        public static final FunctionDefinition<Void>                SET_COLUMNS;
+        public static final FunctionDefinition<List<ValueSupplierDefinition<?, ?>>> GET_COLUMNS;
 
         static {
 
             GET_COLUMNS = FunctionDefinitionFactory.create("getColumns");
-            SET_COLUMNS = FunctionDefinitionFactory.create("setColumns", Map.class);
 
             GET_SIZE.addExecutor("columns", ConfigurationEntry.class, new FunctionExecutor<Long>() {
 
                 @Override
                 public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
-                    return SizeUtil.getSize(invocation.getHolder().get(GET_COLUMNS).invoke()) + NullPreventer.prevent(invocation.next(arguments));
+                    FeatureHolder holder = invocation.getHolder();
+
+                    long size = 0;
+                    for (ValueSupplierDefinition<?, ?> column : holder.get(GET_COLUMNS).invoke()) {
+                        Object columnValue = holder.get(column).get();
+                        size += SizeUtil.getSize(columnValue);
+                    }
+
+                    return size + NullPreventer.prevent(invocation.next(arguments));
                 }
 
             });

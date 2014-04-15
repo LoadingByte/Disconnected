@@ -19,9 +19,7 @@
 package com.quartercode.disconnected.world.comp.os;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang.Validate;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
@@ -31,6 +29,7 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
+import com.quartercode.classmod.extra.ValueSupplierDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.util.NullPreventer;
@@ -245,46 +244,36 @@ public class User extends ConfigurationEntry {
             }
         });
 
-        GET_COLUMNS.addExecutor("default", User.class, new FunctionExecutor<Map<String, Object>>() {
+        GET_COLUMNS.addExecutor("name", User.class, new FunctionExecutor<List<ValueSupplierDefinition<?, ?>>>() {
 
             @Override
-            public Map<String, Object> invoke(FunctionInvocation<Map<String, Object>> invocation, Object... arguments) {
+            public List<ValueSupplierDefinition<?, ?>> invoke(FunctionInvocation<List<ValueSupplierDefinition<?, ?>>> invocation, Object... arguments) {
 
-                Map<String, Object> columns = new HashMap<String, Object>();
-                FeatureHolder holder = invocation.getHolder();
-
-                columns.put("name", holder.get(NAME).get());
-                columns.put("groups", holder.get(GROUPS).get());
-
-                columns.putAll(NullPreventer.prevent(invocation.next(arguments)));
+                List<ValueSupplierDefinition<?, ?>> columns = NullPreventer.prevent(invocation.next(arguments));
+                columns.add(NAME);
                 return columns;
             }
 
         });
-        SET_COLUMNS.addExecutor("default", User.class, new FunctionExecutor<Void>() {
+        GET_COLUMNS.addExecutor("password", User.class, new FunctionExecutor<List<ValueSupplierDefinition<?, ?>>>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+            public List<ValueSupplierDefinition<?, ?>> invoke(FunctionInvocation<List<ValueSupplierDefinition<?, ?>>> invocation, Object... arguments) {
 
-                // Trust the user of the method
-                @SuppressWarnings ("unchecked")
-                Map<String, Object> columns = (Map<String, Object>) arguments[0];
-                FeatureHolder holder = invocation.getHolder();
+                List<ValueSupplierDefinition<?, ?>> columns = NullPreventer.prevent(invocation.next(arguments));
+                columns.add(PASSWORD);
+                return columns;
+            }
 
-                holder.get(NAME).set((String) columns.get("name"));
+        });
+        GET_COLUMNS.addExecutor("groups", User.class, new FunctionExecutor<List<ValueSupplierDefinition<?, ?>>>() {
 
-                Validate.isTrue(columns.get("groups") instanceof List, "Groups must be a list");
-                // Trust the user again
-                @SuppressWarnings ("unchecked")
-                List<String> groups = (List<String>) columns.get("groups");
-                if (groups.size() > 0) {
-                    for (String group : groups) {
-                        holder.get(GROUPS).add(group);
-                    }
-                    holder.get(SET_PRIMARY_GROUP).invoke(groups.get(0));
-                }
+            @Override
+            public List<ValueSupplierDefinition<?, ?>> invoke(FunctionInvocation<List<ValueSupplierDefinition<?, ?>>> invocation, Object... arguments) {
 
-                return invocation.next(arguments);
+                List<ValueSupplierDefinition<?, ?>> columns = NullPreventer.prevent(invocation.next(arguments));
+                columns.add(GROUPS);
+                return columns;
             }
 
         });

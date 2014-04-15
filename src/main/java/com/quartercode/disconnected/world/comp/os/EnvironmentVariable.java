@@ -20,14 +20,12 @@ package com.quartercode.disconnected.world.comp.os;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
+import com.quartercode.classmod.extra.ValueSupplierDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.util.NullPreventer;
@@ -153,36 +151,25 @@ public class EnvironmentVariable extends ConfigurationEntry {
 
         }, List.class);
 
-        GET_COLUMNS.addExecutor("default", EnvironmentVariable.class, new FunctionExecutor<Map<String, Object>>() {
+        GET_COLUMNS.addExecutor("name", EnvironmentVariable.class, new FunctionExecutor<List<ValueSupplierDefinition<?, ?>>>() {
 
             @Override
-            public Map<String, Object> invoke(FunctionInvocation<Map<String, Object>> invocation, Object... arguments) {
+            public List<ValueSupplierDefinition<?, ?>> invoke(FunctionInvocation<List<ValueSupplierDefinition<?, ?>>> invocation, Object... arguments) {
 
-                Map<String, Object> columns = new HashMap<String, Object>();
-                FeatureHolder holder = invocation.getHolder();
-
-                columns.put("name", holder.get(NAME).get());
-                columns.put("value", holder.get(VALUE).get());
-
-                columns.putAll(NullPreventer.prevent(invocation.next(arguments)));
+                List<ValueSupplierDefinition<?, ?>> columns = NullPreventer.prevent(invocation.next(arguments));
+                columns.add(NAME);
                 return columns;
             }
 
         });
-        SET_COLUMNS.addExecutor("default", EnvironmentVariable.class, new FunctionExecutor<Void>() {
+        GET_COLUMNS.addExecutor("value", EnvironmentVariable.class, new FunctionExecutor<List<ValueSupplierDefinition<?, ?>>>() {
 
             @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+            public List<ValueSupplierDefinition<?, ?>> invoke(FunctionInvocation<List<ValueSupplierDefinition<?, ?>>> invocation, Object... arguments) {
 
-                // Trust the user of the method
-                @SuppressWarnings ("unchecked")
-                Map<String, Object> columns = (Map<String, Object>) arguments[0];
-                FeatureHolder holder = invocation.getHolder();
-
-                holder.get(NAME).set((String) columns.get("name"));
-                holder.get(VALUE).set((String) columns.get("value"));
-
-                return invocation.next(arguments);
+                List<ValueSupplierDefinition<?, ?>> columns = NullPreventer.prevent(invocation.next(arguments));
+                columns.add(VALUE);
+                return columns;
             }
 
         });

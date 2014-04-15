@@ -18,12 +18,11 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
-import java.util.HashMap;
-import java.util.Map;
-import com.quartercode.classmod.base.FeatureHolder;
+import java.util.List;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
+import com.quartercode.classmod.extra.ValueSupplierDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.comp.os.Configuration.ConfigurationEntry;
@@ -54,37 +53,18 @@ public class Group extends ConfigurationEntry {
 
     static {
 
-        GET_COLUMNS.addExecutor("default", User.class, new FunctionExecutor<Map<String, Object>>() {
+        GET_COLUMNS.addExecutor("name", Group.class, new FunctionExecutor<List<ValueSupplierDefinition<?, ?>>>() {
 
             @Override
-            public Map<String, Object> invoke(FunctionInvocation<Map<String, Object>> invocation, Object... arguments) {
+            public List<ValueSupplierDefinition<?, ?>> invoke(FunctionInvocation<List<ValueSupplierDefinition<?, ?>>> invocation, Object... arguments) {
 
-                Map<String, Object> columns = new HashMap<String, Object>();
-                FeatureHolder holder = invocation.getHolder();
-
-                columns.put("name", holder.get(NAME).get());
-
-                columns.putAll(NullPreventer.prevent(invocation.next(arguments)));
+                List<ValueSupplierDefinition<?, ?>> columns = NullPreventer.prevent(invocation.next(arguments));
+                columns.add(NAME);
                 return columns;
             }
 
         });
-        SET_COLUMNS.addExecutor("default", User.class, new FunctionExecutor<Void>() {
 
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                // Trust the user of the method
-                @SuppressWarnings ("unchecked")
-                Map<String, Object> columns = (Map<String, Object>) arguments[0];
-                FeatureHolder holder = invocation.getHolder();
-
-                holder.get(NAME).set((String) columns.get("name"));
-
-                return invocation.next(arguments);
-            }
-
-        });
     }
 
     /**
