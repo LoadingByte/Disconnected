@@ -178,6 +178,10 @@ public class FileSystemModule extends OSModule {
      * <td>{@link IllegalArgumentException}</td>
      * <td>The provided path is not absolute (it does not start with {@link File#SEPARATOR}).</td>
      * </tr>
+     * <tr>
+     * <td>{@link IllegalStateException}</td>
+     * <td>The file system for the path cannot be found or is not mounted.</td>
+     * </tr>
      * </table>
      */
     public static final FunctionDefinition<File<?>>                                          GET_FILE;
@@ -298,11 +302,13 @@ public class FileSystemModule extends OSModule {
                 String[] pathComponents = FileUtils.getComponents(path);
                 Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path");
 
-                FileSystem fileSystem = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]).get(KnownFileSystem.FILE_SYSTEM).get();
-                File<?> result = null;
-                if (fileSystem != null) {
-                    result = fileSystem.get(FileSystem.GET_FILE).invoke(pathComponents[1]);
+                KnownFileSystem knownFs = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]);
+                if (knownFs == null) {
+                    throw new IllegalStateException("No mounted file system with mountpoint '" + pathComponents[0] + "'");
                 }
+
+                FileSystem fileSystem = knownFs.get(KnownFileSystem.FILE_SYSTEM).get();
+                File<?> result = fileSystem.get(FileSystem.GET_FILE).invoke(pathComponents[1]);
 
                 invocation.next(arguments);
                 return result;
@@ -316,17 +322,17 @@ public class FileSystemModule extends OSModule {
 
                 File<?> file = (File<?>) arguments[0];
                 String path = (String) arguments[1];
-                FileAction action = null;
 
                 String[] pathComponents = FileUtils.getComponents(path);
                 Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path");
 
-                FileSystem fileSystem = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]).get(KnownFileSystem.FILE_SYSTEM).get();
-                if (fileSystem != null) {
-                    action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, pathComponents[1]);
-                } else {
+                KnownFileSystem knownFs = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]);
+                if (knownFs == null) {
                     throw new IllegalStateException("No mounted file system with mountpoint '" + pathComponents[0] + "'");
                 }
+
+                FileSystem fileSystem = knownFs.get(KnownFileSystem.FILE_SYSTEM).get();
+                FileAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, pathComponents[1]);
 
                 invocation.next(arguments);
                 return action;
