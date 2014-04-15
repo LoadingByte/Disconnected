@@ -76,8 +76,8 @@ public class FileUtilsTest {
         User groupuser = createUser("groupusers");
 
         Group group = createGroup("group");
-        owner.get(User.GROUPS).add(group.get(Group.NAME).get());
-        groupuser.get(User.GROUPS).add(group.get(Group.NAME).get());
+        owner.get(User.GROUPS).add(group);
+        groupuser.get(User.GROUPS).add(group);
 
         file.get(File.OWNER).set(owner);
         file.get(File.GROUP).set(group);

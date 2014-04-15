@@ -28,9 +28,9 @@ import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
 import com.quartercode.classmod.extra.ValueSupplierDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.def.ReferenceCollectionProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.comp.os.Configuration.ConfigurationEntry;
@@ -48,7 +48,7 @@ public class User extends ConfigurationEntry {
      * The superuser of a system can do everything without having the rights applied for doing it.
      * You can check if a user is the superuser by using {@link #IS_SUPERUSER}.
      */
-    public static final String                                             SUPERUSER_NAME = "root";
+    public static final String                                           SUPERUSER_NAME = "root";
 
     // ----- Properties -----
 
@@ -56,16 +56,16 @@ public class User extends ConfigurationEntry {
      * The name of the user.
      * The name is used for recognizing a user on the os-level.
      */
-    public static final PropertyDefinition<String>                         NAME;
+    public static final PropertyDefinition<String>                       NAME;
 
     /**
      * The hashed password of the user.
      * It is hashed using the SHA-256 algorithm and can be used to authenticate as the user.
      */
-    public static final PropertyDefinition<String>                         PASSWORD;
+    public static final PropertyDefinition<String>                       PASSWORD;
 
     /**
-     * The names of all {@link Group}s the user is a member in.
+     * All {@link Group}s the user is a member in.
      * Such groups are used to set rights for multiple users.<br>
      * <br>
      * Exceptions that can occur when adding:
@@ -99,7 +99,7 @@ public class User extends ConfigurationEntry {
      * </tr>
      * </table>
      */
-    public static final CollectionPropertyDefinition<String, List<String>> GROUPS;
+    public static final CollectionPropertyDefinition<Group, List<Group>> GROUPS;
 
     static {
 
@@ -122,7 +122,7 @@ public class User extends ConfigurationEntry {
 
         PASSWORD = ObjectProperty.createDefinition("password");
 
-        GROUPS = ObjectCollectionProperty.createDefinition("groups", new ArrayList<String>(), true);
+        GROUPS = ReferenceCollectionProperty.createDefinition("groups", new ArrayList<Group>(), true);
         GROUPS.addAdderExecutor("checkNotSuperuser", User.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -166,14 +166,14 @@ public class User extends ConfigurationEntry {
 
     /**
      * Returns the name of the primary {@link Group} of the user.
-     * The primary {@link Group} is the first {@link Group} in the {@link #GET_GROUPS} list and is used when new rights are applied.
+     * The primary group is the first group in the {@link #GROUPS} list and is used when new rights are applied.
      */
-    public static final FunctionDefinition<String>                         GET_PRIMARY_GROUP;
+    public static final FunctionDefinition<Group>                        GET_PRIMARY_GROUP;
 
     /**
      * Changes the primary {@link Group} of the user to the one which has the given name.
-     * The user must already be a member of the {@link Group}.
-     * The primary {@link Group} is the first {@link Group} in the {@link #GET_GROUPS} list and is used when new rights are applied.
+     * The user must already be a member of the group.
+     * The primary group is the first group in the {@link #GROUPS} list and is used when new rights are applied.
      * 
      * <table>
      * <tr>
@@ -184,29 +184,29 @@ public class User extends ConfigurationEntry {
      * </tr>
      * <tr>
      * <td>0</td>
-     * <td>{@link String}</td>
+     * <td>{@link Group}</td>
      * <td>primaryGroup</td>
-     * <td>The name of the new primary {@link Group} of the user.</td>
+     * <td>The name of the new primary group of the user.</td>
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                           SET_PRIMARY_GROUP;
+    public static final FunctionDefinition<Void>                         SET_PRIMARY_GROUP;
 
     /**
      * Returns true if the user is a superuser.
      * The superuser of a system can do everything without having the rights applied for doing it.
      */
-    public static final FunctionDefinition<Boolean>                        IS_SUPERUSER;
+    public static final FunctionDefinition<Boolean>                      IS_SUPERUSER;
 
     static {
 
-        GET_PRIMARY_GROUP = FunctionDefinitionFactory.create("getPrimaryGroup", User.class, new FunctionExecutor<String>() {
+        GET_PRIMARY_GROUP = FunctionDefinitionFactory.create("getPrimaryGroup", User.class, new FunctionExecutor<Group>() {
 
             @Override
-            public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
+            public Group invoke(FunctionInvocation<Group> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
-                String primaryGroup = null;
+                Group primaryGroup = null;
                 if (holder.get(GROUPS).get().size() > 0) {
                     primaryGroup = holder.get(GROUPS).get().get(0);
                 }
@@ -222,9 +222,19 @@ public class User extends ConfigurationEntry {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
-                if (holder.get(GROUPS).get().contains(arguments[0])) {
-                    holder.get(GROUPS).get().remove(arguments[0]);
-                    holder.get(GROUPS).get().add(0, (String) arguments[0]);
+                Group primaryGroup = (Group) arguments[0];
+
+                if (holder.get(GROUPS).get().contains(primaryGroup)) {
+                    // Put the new primary group at the front of the list
+                    List<Group> groups = holder.get(GROUPS).get();
+                    groups.remove(primaryGroup);
+
+                    for (Group group : groups) {
+                        holder.get(GROUPS).remove(group);
+                    }
+                    for (Group group : groups) {
+                        holder.get(GROUPS).add(group);
+                    }
                 }
 
                 return invocation.next(arguments);
