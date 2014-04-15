@@ -26,6 +26,7 @@ import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
@@ -41,6 +42,8 @@ import com.quartercode.disconnected.world.comp.os.Configuration.ConfigurationEnt
 import com.quartercode.disconnected.world.comp.os.EnvironmentVariable;
 import com.quartercode.disconnected.world.comp.os.OSModule;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.world.comp.os.Session;
+import com.quartercode.disconnected.world.comp.os.User;
 
 /**
  * This class represents an {@link OperatingSystem} module which is used to manage the {@link RootProcess}.
@@ -100,6 +103,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
         SET_RUNNING.addExecutor("startRootProcess", ProcessModule.class, new FunctionExecutor<Void>() {
 
             @Override
+            @Prioritized (Prioritized.LEVEL_5 + Prioritized.SUBLEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
@@ -109,17 +113,41 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                     RootProcess root = new RootProcess();
 
                     FileSystemModule fsModule = ((ProcessModule) holder).getParent().get(OperatingSystem.FS_MODULE).get();
-                    File<?> environmentFile = fsModule.get(FileSystemModule.GET_FILE).invoke(CommonFiles.ENVIRONMENT_CONFIG);
-                    Configuration environmentConfig = (Configuration) environmentFile.get(ContentFile.CONTENT).get();
+
+                    // Get environment
                     Map<String, String> environment = new HashMap<String, String>();
-                    for (ConfigurationEntry variable : environmentConfig.get(Configuration.ENTRIES).get()) {
-                        environment.put(variable.get(EnvironmentVariable.NAME).get(), variable.get(EnvironmentVariable.VALUE).get());
+                    File<?> environmentFile = fsModule.get(FileSystemModule.GET_FILE).invoke(CommonFiles.ENVIRONMENT_CONFIG);
+                    if (environmentFile != null) {
+                        Configuration environmentConfig = (Configuration) environmentFile.get(ContentFile.CONTENT).get();
+                        for (ConfigurationEntry variable : environmentConfig.get(Configuration.ENTRIES).get()) {
+                            environment.put(variable.get(EnvironmentVariable.NAME).get(), variable.get(EnvironmentVariable.VALUE).get());
+                        }
                     }
                     root.get(Process.ENVIRONMENT).set(environment);
 
+                    // Get session program
+                    ContentFile sessionProgramFile = (ContentFile) fsModule.get(FileSystemModule.GET_FILE).invoke(CommonFiles.SYS_BIN_DIR + File.SEPARATOR + "session.exe");
+                    if (sessionProgramFile == null) {
+                        throw new IllegalStateException("Cannot start process module: Session program not found");
+                    }
+                    root.get(Process.SOURCE).set(sessionProgramFile);
+
+                    // Get superuser
+                    File<?> userConfigFile = fsModule.get(FileSystemModule.GET_FILE).invoke(CommonFiles.USER_CONFIG);
+                    Configuration userConfig = (Configuration) userConfigFile.get(ContentFile.CONTENT).get();
+                    User superuser = null;
+                    for (ConfigurationEntry entry : userConfig.get(Configuration.ENTRIES).get()) {
+                        if (entry instanceof User && ((User) entry).get(User.NAME).get().equals(User.SUPERUSER_NAME)) {
+                            superuser = (User) entry;
+                        }
+                    }
+
+                    // Start root process
                     holder.get(ROOT_PROCESS).set(root);
                     root.get(Process.INITIALIZE).invoke();
-                    root.get(Process.EXECUTOR).get().get(ProgramExecutor.RUN).invoke();
+                    ProgramExecutor rootProgram = root.get(Process.EXECUTOR).get();
+                    rootProgram.get(Session.USER).set(superuser);
+                    rootProgram.get(ProgramExecutor.RUN).invoke();
                 }
 
                 return invocation.next(arguments);
@@ -129,6 +157,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
         SET_RUNNING.addExecutor("interruptRootProcess", OperatingSystem.class, new FunctionExecutor<Void>() {
 
             @Override
+            @Prioritized (Prioritized.LEVEL_5 + Prioritized.SUBLEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();

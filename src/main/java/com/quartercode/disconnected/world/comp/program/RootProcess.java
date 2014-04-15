@@ -45,18 +45,6 @@ public class RootProcess extends Process<ProcessModule> {
 
         });
 
-        // Stop the execution after the setting of the pid
-        INITIALIZE.addExecutor("cancel", RootProcess.class, new FunctionExecutor<Void>() {
-
-            @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                return null;
-            }
-
-        });
-
     }
 
     /**
