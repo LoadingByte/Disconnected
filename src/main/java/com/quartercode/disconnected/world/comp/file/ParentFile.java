@@ -73,10 +73,9 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
 
                 FileSystem fileSystem = invocation.getHolder().get(GET_FILE_SYSTEM).invoke();
                 if (fileSystem != null) {
-                    int totalSize = 0;
-                    totalSize += SizeUtil.getSize(arguments[0]);
-                    if (totalSize > fileSystem.get(FileSystem.GET_FREE).invoke()) {
-                        new OutOfSpaceException(fileSystem, totalSize);
+                    long fileSize = SizeUtil.getSize(arguments[0]);
+                    if (fileSize > fileSystem.get(FileSystem.GET_FREE).invoke()) {
+                        throw new OutOfSpaceException(fileSystem, fileSize);
                     }
                 }
 
