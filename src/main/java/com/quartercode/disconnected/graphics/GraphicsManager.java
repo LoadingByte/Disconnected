@@ -24,8 +24,8 @@ package com.quartercode.disconnected.graphics;
  */
 public class GraphicsManager {
 
-    private UpdateThread  updateThread;
-    private GraphicsState state;
+    private GraphicsThread thread;
+    private GraphicsState  state;
 
     /**
      * Creates a new graphics manager.
@@ -41,7 +41,7 @@ public class GraphicsManager {
      */
     public boolean isRunning() {
 
-        return updateThread != null && updateThread.isAlive();
+        return thread != null && thread.isAlive();
     }
 
     /**
@@ -53,12 +53,12 @@ public class GraphicsManager {
     public void setRunning(boolean running) {
 
         if (running && !isRunning()) {
-            updateThread = new UpdateThread();
-            updateThread.changeState(state);
-            updateThread.start();
+            thread = new GraphicsThread();
+            thread.changeState(state);
+            thread.start();
         } else if (!running && isRunning()) {
-            updateThread.exit();
-            updateThread = null;
+            thread.exit();
+            thread = null;
         }
     }
 
@@ -68,9 +68,9 @@ public class GraphicsManager {
      * 
      * @return The current update thread which keeps the lwjgl display alive.
      */
-    public UpdateThread getUpdateThread() {
+    public GraphicsThread getGraphicsThread() {
 
-        return updateThread;
+        return thread;
     }
 
     /**
@@ -94,8 +94,8 @@ public class GraphicsManager {
 
         this.state = state;
 
-        if (updateThread != null) {
-            updateThread.changeState(state);
+        if (thread != null) {
+            thread.changeState(state);
         }
     }
 
@@ -106,7 +106,7 @@ public class GraphicsManager {
      */
     public void invoke(Runnable runnable) {
 
-        updateThread.invoke(runnable);
+        thread.invoke(runnable);
     }
 
 }

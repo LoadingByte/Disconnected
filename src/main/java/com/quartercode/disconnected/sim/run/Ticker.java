@@ -23,8 +23,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the controls for the tick system which then calls several actions.
@@ -33,8 +31,6 @@ import org.slf4j.LoggerFactory;
  * @see TickThread
  */
 public class Ticker {
-
-    private static final Logger    LOGGER                   = LoggerFactory.getLogger(Ticker.class);
 
     /**
      * The amount of milliseconds the ticker will wait from one tick to another by default.
@@ -179,61 +175,6 @@ public class Ticker {
     public TickThread getTickThread() {
 
         return thread;
-    }
-
-    /**
-     * This thread calls the tick update on several tick actions.
-     * It's an independent utility.
-     */
-    public static class TickThread extends Thread {
-
-        private final Ticker ticker;
-
-        /**
-         * Creates a new tick thread and sets the ticker to use the informations from.
-         * 
-         * @param ticker The ticker to use the informations for the actions and the delay from.
-         */
-        public TickThread(Ticker ticker) {
-
-            super("tick");
-
-            this.ticker = ticker;
-        }
-
-        /**
-         * Returns the ticker to use the informations for the actions and the delay from.
-         * 
-         * @return The ticker to use the informations for the actions and the delay from.
-         */
-        public Ticker getTicker() {
-
-            return ticker;
-        }
-
-        @Override
-        public void run() {
-
-            while (!isInterrupted()) {
-                synchronized (this) {
-                    for (TickAction action : new ArrayList<TickAction>(ticker.getActions())) {
-                        try {
-                            action.update();
-                        } catch (RuntimeException e) {
-                            LOGGER.error("An unexpected exception occurred while the tick action '{}' was updated", action.getClass().getName(), e);
-                        }
-                    }
-
-                    try {
-                        Thread.sleep(ticker.getDelay());
-                    } catch (InterruptedException e) {
-                        // Interruption -> Exit thread
-                        break;
-                    }
-                }
-            }
-        }
-
     }
 
 }

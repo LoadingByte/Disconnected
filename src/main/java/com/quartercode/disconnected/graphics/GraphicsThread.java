@@ -50,9 +50,9 @@ import de.matthiasmann.twl.utils.PNGDecoder;
  * 
  * @see GraphicsManager
  */
-public class UpdateThread extends Thread {
+public class GraphicsThread extends Thread {
 
-    private static final Logger   LOGGER   = LoggerFactory.getLogger(UpdateThread.class);
+    private static final Logger   LOGGER   = LoggerFactory.getLogger(GraphicsThread.class);
 
     private GUI                   gui;
     private ThemeManager          theme;
@@ -63,9 +63,9 @@ public class UpdateThread extends Thread {
     private boolean               exit;
 
     /**
-     * Creates a new update thread.
+     * Creates a new graphics update thread.
      */
-    public UpdateThread() {
+    public GraphicsThread() {
 
         super("graphis");
     }
@@ -84,7 +84,7 @@ public class UpdateThread extends Thread {
     /**
      * Invokes the given {@link Runnable} in the graphics update thread.
      * 
-     * @param runnable The runnable to invoke in the update thread.
+     * @param runnable The runnable to invoke in the graphics update thread.
      */
     protected void invoke(Runnable runnable) {
 
@@ -92,7 +92,7 @@ public class UpdateThread extends Thread {
     }
 
     /**
-     * Tells the update thread to exit after the current loop cycle.
+     * Tells the graphics update thread to exit after the current loop cycle.
      * This method has to be used instead of {@link #interrupt()} because the interrupt system is blocked by LWJGL.
      */
     protected void exit() {
