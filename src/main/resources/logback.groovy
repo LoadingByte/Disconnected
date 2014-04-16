@@ -8,13 +8,13 @@ def logName = System.getProperty("logName", logNameDefault)
 
 // Console appender
 appender("STDOUT", ConsoleAppender) {
-    encoder(PatternLayoutEncoder) { pattern = "<$logName> %date{HH:mm:ss.SSS} %level ['%thread' %file:%line] - %msg%n" }
+    encoder(PatternLayoutEncoder) { pattern = "<$logName> %-22(%date{\"HH:mm:ss,SSS\"} [%thread]) %-5level %-31logger{32} - %msg%n" }
 }
 
 // Log file appender
 appender("FILE", FileAppender) {
     file = "${logName}.log"
-    encoder(PatternLayoutEncoder) { pattern = "%date %level ['%thread' %file:%line] - %msg%n" }
+    encoder(PatternLayoutEncoder) { pattern = "%-33(%date [%thread]) %-5level %-31logger{32} - %msg%n" }
 }
 
 // Every part of the application (launcher and main application) uses the same settings
