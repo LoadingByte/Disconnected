@@ -22,7 +22,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
+import com.quartercode.disconnected.world.comp.file.FileAction;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
+import com.quartercode.disconnected.world.comp.file.FileUtils;
 import com.quartercode.disconnected.world.comp.os.CommonFiles;
 import com.quartercode.disconnected.world.comp.os.Session;
 import com.quartercode.disconnected.world.comp.os.User;
@@ -38,19 +40,22 @@ import com.quartercode.disconnected.world.event.TrueEventMatcher;
 
 public class FileCreateProgramTest extends AbstractProgramTest {
 
+    private static final String PARENT_PATH = "/" + CommonFiles.SYSTEM_MOUNTPOINT + "/test1/test2";
+    private static final String PATH        = PARENT_PATH + "/test.txt";
+
     public FileCreateProgramTest() {
 
         super(CommonFiles.SYSTEM_MOUNTPOINT);
     }
 
-    private void executeProgram(Process<?> parentProcess, EventListener eventListener) {
+    private void executeProgram(Process<?> parentProcess, String path, EventListener eventListener) {
 
         ChildProcess process = parentProcess.get(Process.CREATE_CHILD).invoke();
         process.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke("bin/filecreate.exe"));
         process.get(Process.INITIALIZE).invoke();
 
         ProgramExecutor program = process.get(Process.EXECUTOR).get();
-        program.get(FileCreateProgram.PATH).set("/user/test1/test2/test.txt");
+        program.get(FileCreateProgram.PATH).set(path);
         program.get(FileCreateProgram.FILE_TYPE).set(ContentFile.class);
         program.get(ProgramExecutor.OUT_EVENT_LISTENERS).add(eventListener);
         program.get(ProgramExecutor.RUN).invoke();
@@ -60,16 +65,27 @@ public class FileCreateProgramTest extends AbstractProgramTest {
     public void testSuccess() {
 
         QueueEventListener eventListener = new QueueEventListener();
-        executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), eventListener);
+        executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH, eventListener);
 
         Event event = eventListener.get(QueueEventListener.NEXT_EVENT).invoke(TrueEventMatcher.INSTANCE);
         Assert.assertTrue("File create program did not send SuccessEvent", event instanceof FileCreateProgram.SuccessEvent);
         File<?> file = event.get(FileCreateProgram.SuccessEvent.FILE).get();
         Assert.assertTrue("Created file is not a content file", file instanceof ContentFile);
-        Assert.assertEquals("Name of created file", "test.txt", file.get(File.NAME).get());
-        Assert.assertEquals("Path of created file", "test1/test2/test.txt", file.get(File.GET_PATH).invoke());
+        Assert.assertEquals("Name of created file", PATH.substring(PATH.lastIndexOf("/") + 1), file.get(File.NAME).get());
+        Assert.assertEquals("Path of created file", FileUtils.getComponents(PATH)[1], file.get(File.GET_PATH).invoke());
         Assert.assertEquals("Owner of created file", User.SUPERUSER_NAME, file.get(File.OWNER).get().get(User.NAME).get());
         Assert.assertEquals("Group of created file", null, file.get(File.GROUP).get());
+    }
+
+    @Test
+    public void testUnknownMountpoint() {
+
+        QueueEventListener eventListener = new QueueEventListener();
+        executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), "/testunknown/" + FileUtils.getComponents(PATH)[1], eventListener);
+
+        Event event = eventListener.get(QueueEventListener.NEXT_EVENT).invoke(TrueEventMatcher.INSTANCE);
+        Assert.assertTrue("File create program did not send UnknownMountpointEvent", event instanceof FileCreateProgram.UnknownMountpointEvent);
+        Assert.assertEquals("Unknown mountpoint", "testunknown", event.get(FileCreateProgram.UnknownMountpointEvent.MOUNTPOINT).get());
     }
 
     @Test
@@ -86,10 +102,39 @@ public class FileCreateProgramTest extends AbstractProgramTest {
         session.get(ProgramExecutor.RUN).invoke();
 
         QueueEventListener eventListener = new QueueEventListener();
-        executeProgram(sessionProcess, eventListener);
+        executeProgram(sessionProcess, PATH, eventListener);
 
         Event event = eventListener.get(QueueEventListener.NEXT_EVENT).invoke(TrueEventMatcher.INSTANCE);
-        Assert.assertTrue("File create program did not send MissingRightsEvent", event instanceof FileCreateProgram.MissingRightEvent);
+        Assert.assertTrue("File create program did not send MissingRightsEvent", event instanceof FileCreateProgram.MissingRightsEvent);
+    }
+
+    @Test
+    public void testInvalidPath() {
+
+        // Add content file that makes the path invalid
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), FileUtils.getComponents(PARENT_PATH)[1]).get(FileAction.EXECUTE).invoke();
+
+        QueueEventListener eventListener = new QueueEventListener();
+        executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH, eventListener);
+
+        Event event = eventListener.get(QueueEventListener.NEXT_EVENT).invoke(TrueEventMatcher.INSTANCE);
+        Assert.assertTrue("File create program did not send InvalidPathEvent", event instanceof FileCreateProgram.InvalidPathEvent);
+        Assert.assertEquals("Invalid path", PATH, event.get(FileCreateProgram.InvalidPathEvent.PATH).get());
+    }
+
+    @Test
+    public void testOutOfSpace() {
+
+        // Set size of the file system to something very small
+        fileSystem.get(FileSystem.SIZE).set(40L);
+
+        QueueEventListener eventListener = new QueueEventListener();
+        executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH, eventListener);
+
+        Event event = eventListener.get(QueueEventListener.NEXT_EVENT).invoke(TrueEventMatcher.INSTANCE);
+        Assert.assertTrue("File create program did not send OutOfSpaceEvent", event instanceof FileCreateProgram.OutOfSpaceEvent);
+        Assert.assertEquals("File system which is out of space", fileSystem, event.get(FileCreateProgram.OutOfSpaceEvent.FILE_SYSTEM).get());
+        Assert.assertTrue("Required space for a new file is greater than 0", event.get(FileCreateProgram.OutOfSpaceEvent.REQUIRED_SPACE).get() > 0);
     }
 
 }
