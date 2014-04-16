@@ -46,6 +46,9 @@ public class Ticker {
     private final List<TickAction> actions                  = new ArrayList<TickAction>();
     private int                    delay                    = DEFAULT_DELAY;
 
+    // Performance: Object cache
+    private List<TickAction>       unmodifiableActions      = Collections.unmodifiableList(actions);
+
     /**
      * Creates a new ticker without any tick actions.
      */
@@ -70,7 +73,7 @@ public class Ticker {
      */
     public List<TickAction> getActions() {
 
-        return Collections.unmodifiableList(actions);
+        return unmodifiableActions;
     }
 
     /**
@@ -106,6 +109,7 @@ public class Ticker {
         }
 
         actions.add(action);
+        unmodifiableActions = Collections.unmodifiableList(actions);
     }
 
     /**
@@ -116,6 +120,7 @@ public class Ticker {
     public void removeAction(TickAction action) {
 
         actions.remove(action);
+        unmodifiableActions = Collections.unmodifiableList(actions);
     }
 
     /**
