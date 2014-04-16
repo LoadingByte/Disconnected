@@ -188,12 +188,8 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
 
                     // Check whether the current file exists
                     if (newCurrent == null) {
-                        // Non-parent file along the path
-                        if (! (current instanceof ParentFile)) {
-                            result = false;
-                        }
                         // Executor user hasn't rights to create the new file
-                        else if (!FileUtils.hasRight(executor, current, FileRight.WRITE)) {
+                        if (!FileUtils.hasRight(executor, current, FileRight.WRITE)) {
                             result = false;
                         }
                         break;
