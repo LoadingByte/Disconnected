@@ -91,7 +91,7 @@ public class GraphicsManager {
     /**
      * Invokes the given {@link Runnable} in the graphics update thread.
      * 
-     * @param runnable The runnable to invoke in the update thread.
+     * @param runnable The runnable to invoke in the graphics update thread.
      */
     public void invoke(Runnable runnable) {
 

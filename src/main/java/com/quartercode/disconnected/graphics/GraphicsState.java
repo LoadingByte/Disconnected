@@ -29,7 +29,7 @@ import de.matthiasmann.twl.Widget;
 /**
  * Graphics state widgets are like categories for deciding what should be drawn.
  * They contain {@link GraphicsModule}s which access the graphics state widgets for managing TWL {@link Widget}s.
- * The objects are used as top level child widgets for the root {@link Container} by the {@link UpdateThread}.
+ * The objects are used as top level child widgets for the root {@link Container} by the {@link GraphicsThread}.
  * 
  * @see GraphicsStateDescriptor
  * @see GraphicsModule
