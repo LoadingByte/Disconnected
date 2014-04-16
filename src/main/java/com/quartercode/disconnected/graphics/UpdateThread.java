@@ -67,7 +67,7 @@ public class UpdateThread extends Thread {
      */
     public UpdateThread() {
 
-        super("graphis-update");
+        super("graphis");
     }
 
     /**
