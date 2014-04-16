@@ -166,15 +166,4 @@ public class Ticker {
         }
     }
 
-    /**
-     * Returns the current tick thread which executes the actual tick update.
-     * If the update is not running, this returns null.
-     * 
-     * @return The current tick thread which executes the actual tick update.
-     */
-    public TickThread getTickThread() {
-
-        return thread;
-    }
-
 }

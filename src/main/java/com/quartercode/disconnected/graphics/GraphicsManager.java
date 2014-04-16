@@ -63,17 +63,6 @@ public class GraphicsManager {
     }
 
     /**
-     * Returns the current update thread which keeps the lwjgl display alive.
-     * If the graphics manager is not running, this returns null.
-     * 
-     * @return The current update thread which keeps the lwjgl display alive.
-     */
-    public GraphicsThread getGraphicsThread() {
-
-        return thread;
-    }
-
-    /**
      * Returns the current top-level child widget.
      * It represents the state which defines what should be drawn.
      * 
