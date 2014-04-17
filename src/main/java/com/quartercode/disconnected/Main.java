@@ -152,7 +152,7 @@ public class Main {
 
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG-ACTION: Generating new simulation");
-        Simulation simulation = SimulationGenerator.generateSimulation(10, 2, new RandomPool(Simulation.RANDOM_POOL_SIZE));
+        Simulation simulation = SimulationGenerator.generateSimulation(10, new RandomPool(Simulation.RANDOM_POOL_SIZE));
         for (Computer computer : simulation.getWorld().get(World.COMPUTERS).get()) {
             computer.get(Computer.OS).get().get(OperatingSystem.SET_RUNNING).invoke(true);
         }

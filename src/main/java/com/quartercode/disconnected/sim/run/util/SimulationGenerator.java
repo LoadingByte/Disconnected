@@ -66,14 +66,13 @@ public class SimulationGenerator {
      * This basically uses {@link #generateWorld(int, int, Simulation, RandomPool)} for creating a new world.
      * 
      * @param computers The amount of {@link Computer}s the generator should generate.
-     * @param groups The amount of {@link MemberGroup}s generator should generate.
      * @param random The {@link RandomPool} to use for the new {@link Simulation}.
      * @return The generated {@link Simulation} object.
      */
-    public static Simulation generateSimulation(int computers, int groups, RandomPool random) {
+    public static Simulation generateSimulation(int computers, RandomPool random) {
 
         Simulation simulation = new Simulation(random);
-        simulation.setWorld(generateWorld(computers, groups, simulation, random));
+        simulation.setWorld(generateWorld(computers, simulation, random));
         return simulation;
     }
 
@@ -82,16 +81,15 @@ public class SimulationGenerator {
      * If you don't want to use the {@link World} in a simulation, you can set it to null.
      * 
      * @param computers The amount of {@link Computer}s the generator should generate.
-     * @param groups The amount of {@link MemberGroup}s generator should generate.
      * @param simulation The {@link Simulation} the new {@link World} is generated for. This can be null.
      * @param random The {@link RandomPool} which is used for generating the {@link World}.
      * @return The generated {@link World} object.
      */
-    public static World generateWorld(int computers, int groups, Simulation simulation, RandomPool random) {
+    public static World generateWorld(int computers, Simulation simulation, RandomPool random) {
 
         World world = new World(simulation);
 
-        for (Computer computer : generateComputers(world, computers, random)) {
+        for (Computer computer : generateComputers(computers, random)) {
             world.get(World.COMPUTERS).add(computer);
         }
 
@@ -101,26 +99,24 @@ public class SimulationGenerator {
     /**
      * Generates the given amount of {@link Computer}s randomly.
      * 
-     * @param world The {@link World} the new {@link Computer}s will be in.
      * @param amount The amount of {@link Computer}s the generator should generate.
      * @param random The {@link RandomPool} which is used for generating the {@link Computer}s.
      * @return The generated list of {@link Computer}s.
      */
-    public static List<Computer> generateComputers(World world, int amount, RandomPool random) {
+    public static List<Computer> generateComputers(int amount, RandomPool random) {
 
-        return generateComputers(world, amount, null, random);
+        return generateComputers(amount, null, random);
     }
 
     /**
      * Generates the given amount of {@link Computer}s randomly ignoring the {@link Location}s of the given {@link Computer}s.
      * 
-     * @param world The {@link World} the new {@link Computer}s will be in.
      * @param amount The amount of {@link Computer}s the generator should generate.
      * @param ignore There won't be any {@link Computer}s with one of those {@link Location}s.
      * @param random The {@link RandomPool} which is used for generating the {@link Computer}s.
      * @return The generated list of {@link Computer}s.
      */
-    public static List<Computer> generateComputers(World world, int amount, List<Computer> ignore, RandomPool random) {
+    public static List<Computer> generateComputers(int amount, List<Computer> ignore, RandomPool random) {
 
         List<Computer> computers = new ArrayList<Computer>();
 

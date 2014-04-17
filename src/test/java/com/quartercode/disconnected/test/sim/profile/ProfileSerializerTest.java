@@ -59,7 +59,7 @@ public class ProfileSerializerTest {
     @Before
     public void setUp() {
 
-        world = SimulationGenerator.generateWorld(10, 2, null, new RandomPool(100));
+        world = SimulationGenerator.generateWorld(10, null, new RandomPool(100));
     }
 
     @Test
