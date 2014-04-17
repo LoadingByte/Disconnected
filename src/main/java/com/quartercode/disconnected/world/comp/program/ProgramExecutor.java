@@ -44,7 +44,6 @@ import com.quartercode.disconnected.world.event.QueueEventListener;
  * 
  * @see Program
  * @see Process
- * @see PacketListener
  */
 public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>> implements SchedulerUser, EventListener {
 

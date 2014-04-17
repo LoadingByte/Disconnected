@@ -184,7 +184,7 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
 
     /**
      * Creates a new empty ip.
-     * You should fill it using {@link #SET_PARTS} after creation.
+     * You should fill the {@link #PARTS} property after creation.
      */
     public IP() {
 

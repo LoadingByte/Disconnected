@@ -40,7 +40,7 @@ public class SizeUtil {
 
     /**
      * Returns the size of an object in bytes (of course, it's a fictional size).
-     * If the object is a {@link FeatureHolder}, the size can be derived using the "getSize" method whose definition can be aquired with {@link #createDefinition()}.
+     * If the object is a {@link FeatureHolder}, the size can be derived using the {@link DerivableSize#GET_SIZE} function.
      * In the case of a {@link String}, the size is equally to the length.
      * A {@link Boolean} always has a size of 1, a {@link Number} needs a bit for every digit (ceil rounding to bytes).
      * If the object is an {@link Iterable}, every entry of the collection will add to the size.

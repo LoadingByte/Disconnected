@@ -123,7 +123,7 @@ public class FileSystemModule extends OSModule {
     /**
      * Returns a {@link List} containing all mounted {@link KnownFileSystem}s.
      * Only the {@link File}s of currently mounted file systems can be accessed.
-     * If you want to get all {@link KnownFileSystem}s, take a look at {@link #GET_KNOWN}.
+     * If you want to get all {@link KnownFileSystem}s, take a look at {@link #KNOWN_FS}.
      */
     public static final FunctionDefinition<List<KnownFileSystem>>                            GET_MOUNTED;
 

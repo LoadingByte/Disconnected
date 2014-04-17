@@ -199,7 +199,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
 
     /**
      * Creates a new empty address.
-     * You should fill it using {@link #SET_IP} and {@link #SET_PORT} after creation.
+     * You should fill the {@link #IP} and {@link #PORT} properties after creation.
      */
     public Address() {
 

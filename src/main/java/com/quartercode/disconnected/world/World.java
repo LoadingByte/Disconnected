@@ -29,8 +29,8 @@ import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.world.comp.Computer;
 
 /**
- * A world is a space which contains {@link DefaultFeatureHolder}s.
- * The actual world class contains first level {@link DefaultFeatureHolder}s.
+ * A world is a space which contains one "game ecosystem".
+ * It basically is the root of all logic objects the game uses.
  */
 @XmlRootElement (namespace = "http://quartercode.com/")
 public class World extends DefaultFeatureHolder {
@@ -61,7 +61,7 @@ public class World extends DefaultFeatureHolder {
     /**
      * Creates a new world which is placed in the given {@link Simulation}.
      * 
-     * @param simulation The {@link Simulation} the new world is placed in.
+     * @param simulation The simulation the new world is placed in.
      */
     public World(Simulation simulation) {
 
@@ -71,7 +71,7 @@ public class World extends DefaultFeatureHolder {
     /**
      * Returns the {@link Simulation} the world is placed in.
      * 
-     * @return The world's {@link Simulation}.
+     * @return The world's simulation.
      */
     @XmlTransient
     public Simulation getSimulation() {

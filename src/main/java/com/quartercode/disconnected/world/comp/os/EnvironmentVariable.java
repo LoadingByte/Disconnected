@@ -68,7 +68,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
     // ----- Functions -----
 
     /**
-     * Returns the value you can retrieve with {@link #GET_VALUE} as a {@link List}.
+     * Returns the content of the {@link #VALUE} property as a {@link List}.
      * Such a list is a collection of entries separated by the character {@value #LIST_SEPARATOR}.
      * Example:
      * 
@@ -82,7 +82,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
     public static final FunctionDefinition<List<String>> GET_VALUE_LIST;
 
     /**
-     * Changes the value of the environment variable to the given {@link List}.
+     * Changes the {@link #VALUE} of the environment variable to the given {@link List}.
      * Such a list is a collection of entries separated by the character {@value #LIST_SEPARATOR}.
      * Example:
      * 

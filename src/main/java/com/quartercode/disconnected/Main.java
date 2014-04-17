@@ -237,6 +237,10 @@ public class Main {
 
     }
 
+    /**
+     * Exits the application by shutting down all threads that keep it alive.
+     * Please note that the functionality of this method is only executed once.
+     */
     public static synchronized void exit() {
 
         if (!exitUnderway) {
