@@ -115,14 +115,14 @@ public class Main {
             Locale.setDefault(new Locale(language, country, variant));
         }
 
-        // Initialize & fill registry
-        LOGGER.info("Initializing & filling class registry");
+        // Fill registry
+        LOGGER.info("Filling class registry");
         Disconnected.setRegistry(new Registry());
         fillRegistry(Disconnected.getRegistry());
 
-        // Initialize & fill resource store
+        // Fill resource store
         try {
-            LOGGER.info("Initializing & filling resource store");
+            LOGGER.info("Filling resource store");
             Disconnected.setRS(new ResourceStore());
             fillResourceStore(Disconnected.getRS());
         } catch (Exception e) {
@@ -130,25 +130,24 @@ public class Main {
             return;
         }
 
-        // Initialize default graphics states
-        LOGGER.info("Initializing default graphics states");
+        // Fill default graphics states
+        LOGGER.info("Filling default graphics states");
         initializeDefaultGraphicsStates();
-        fillDefaultDesktopPrograms();
 
         // Initialize profile manager and load stored profiles
         LOGGER.info("Initializing profile manager");
         Disconnected.setProfileManager(new ProfileManager(new File("profiles")));
-
-        // Initialize graphics manager and start it
-        LOGGER.info("Initializing & starting graphics manager");
-        Disconnected.setGraphicsManager(new GraphicsManager());
-        Disconnected.getGraphicsManager().setRunning(true);
 
         // Initialize ticker
         LOGGER.info("Initializing ticker");
         List<TickAction> tickActions = new ArrayList<TickAction>();
         tickActions.add(new TickSimulator());
         Disconnected.setTicker(new Ticker(tickActions.toArray(new TickAction[tickActions.size()])));
+
+        // Initialize graphics manager and start it
+        LOGGER.info("Initializing graphics manager");
+        Disconnected.setGraphicsManager(new GraphicsManager());
+        Disconnected.getGraphicsManager().setRunning(true);
 
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG-ACTION: Generating new simulation");
@@ -226,6 +225,8 @@ public class Main {
         DefaultStates.DESKTOP.addModule(DesktopLaunchButtonModule.class, "launchButton", 80);
         DefaultStates.DESKTOP.addModule(DesktopTaskbarModule.class, "taskbar", 80);
         DefaultStates.DESKTOP.addModule(DefaultDesktopProgramManager.class, "programManager", 0);
+
+        fillDefaultDesktopPrograms();
     }
 
     /**
