@@ -30,6 +30,7 @@ import com.quartercode.classmod.extra.def.ReferenceProperty;
 import com.quartercode.disconnected.world.comp.program.ChildProcess;
 import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
+import com.quartercode.disconnected.world.event.Event;
 
 /**
  * This class represents a program which opens a session.
@@ -95,12 +96,38 @@ public class Session extends ProgramExecutor {
 
                 if (checkRequired && holder.get(USER).get().get(User.PASSWORD).get() != null) {
                     String password = holder.get(PASSWORD).get();
-                    Validate.notNull(password, "Password for session user cannot be null (authorization required)");
+                    if (password == null) {
+                        fireWrongPasswordEvent(holder, password);
+                        return null;
+                    }
                     String hashedPassword = DigestUtils.sha256Hex(password);
 
                     String correctPassword = holder.get(USER).get().get(User.PASSWORD).get();
-                    Validate.isTrue(correctPassword.equals(hashedPassword), "Wrong password (authorization required)");
+                    if (!correctPassword.equals(hashedPassword)) {
+                        fireWrongPasswordEvent(holder, password);
+                        return null;
+                    }
                 }
+
+                return invocation.next(arguments);
+            }
+
+            private void fireWrongPasswordEvent(FeatureHolder holder, String wrongPassword) {
+
+                WrongPasswordEvent wrongPasswordEvent = new WrongPasswordEvent();
+                wrongPasswordEvent.get(WrongPasswordEvent.WRONG_PASSWORD).set(wrongPassword);
+                wrongPasswordEvent.get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());
+            }
+
+        });
+
+        RUN.addExecutor("fireFinishStart", Session.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.LEVEL_7)
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                new FinishStartEvent().get(Event.SEND).invoke(invocation.getHolder().get(OUT_EVENT_LISTENERS).get());
 
                 return invocation.next(arguments);
             }
@@ -113,6 +140,51 @@ public class Session extends ProgramExecutor {
      * Creates a new session program.
      */
     public Session() {
+
+    }
+
+    /**
+     * The success event is fired by the {@link Session} when the startup process is finished.<br>
+     * <br>
+     * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.
+     * For example, an instanceof check should look like this:
+     * 
+     * <pre>
+     * if ( event instanceof <b>Session.</b>FinishStartEvent )
+     * </pre>
+     * 
+     * @see Session
+     */
+    public static class FinishStartEvent extends Event {
+
+    }
+
+    /**
+     * The wrong password event is fired by the {@link Session} when a password is required and the provided password is not correct.<br>
+     * <br>
+     * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.
+     * For example, an instanceof check should look like this:
+     * 
+     * <pre>
+     * if ( event instanceof <b>Session.</b>WrongPasswordEvent )
+     * </pre>
+     * 
+     * @see Session
+     */
+    public static class WrongPasswordEvent extends Event {
+
+        // ----- Properties -----
+
+        /**
+         * The provided password that is not correct (may be <code>null</code>).
+         */
+        public static final PropertyDefinition<String> WRONG_PASSWORD;
+
+        static {
+
+            WRONG_PASSWORD = ObjectProperty.createDefinition("wrongPassword");
+
+        }
 
     }
 
