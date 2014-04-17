@@ -19,7 +19,7 @@
 package com.quartercode.disconnected;
 
 import com.quartercode.disconnected.graphics.GraphicsManager;
-import com.quartercode.disconnected.profile.ProfileManager;
+import com.quartercode.disconnected.sim.profile.ProfileManager;
 import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.util.ResourceStore;

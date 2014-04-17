@@ -18,13 +18,9 @@
 
 package com.quartercode.disconnected.sim.run;
 
-import java.util.ArrayList;
+import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.ValueSupplier;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.comp.Computer;
-import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
-import com.quartercode.disconnected.sim.comp.net.Packet;
-import com.quartercode.disconnected.sim.comp.program.Process;
-import com.quartercode.disconnected.sim.comp.program.Process.ProcessState;
 
 /**
  * This class implements the root tick update mechanisms for the entire simulation.
@@ -79,102 +75,23 @@ public class TickSimulator implements TickAction {
     public void update() {
 
         if (simulation != null) {
-            // Execute process ticks
-            for (Computer computer : simulation.getComputers()) {
-                if (computer.getOperatingSystem().isRunning()) {
-                    for (Process process : new ArrayList<Process>(computer.getOperatingSystem().getProcessManager().getAllProcesses())) {
-                        if (process.getState() == ProcessState.RUNNING || process.getState() == ProcessState.INTERRUPTED) {
-                            process.getExecutor().updateTasks();
-                        } else if (process.isCompletelyStopped()) {
-                            process.getParent().unregisterChild(process);
-                        }
-                    }
-                }
-            }
+            // Execute world object ticks
+            updateObject(simulation.getWorld());
+        }
+    }
 
-            // Send remaining packets from network interfaces
-            for (Computer computer : simulation.getComputers()) {
-                for (NetworkInterface networkInterface : computer.getHardware(NetworkInterface.class)) {
-                    Packet packet = null;
-                    while ( (packet = networkInterface.nextDeliveryPacket(true)) != null) {
-                        packet.getReceiver().getIp().getHost().receivePacket(packet);
-                    }
-                }
-            }
+    private void updateObject(Object object) {
 
-            // TEMPDIS
-            // // Generate new members and computers
-            // int newComputers = simulation.RANDOM.nextInt(ProbabilityUtil.gen(0.008F, simulation.RANDOM) ? 50 : 8) - 5;
-            // if (newComputers > 0) {
-            // List<Computer> computers = SimulationGenerator.generateComputers(simulation, newComputers, simulation.getComputers());
-            // for (Computer computer : computers) {
-            // simulation.addComputer(computer);
-            // }
-            // for (Member member : SimulationGenerator.generateMembers(simulation, computers, simulation.getGroups())) {
-            // simulation.addMember(member);
-            // }
-            // }
-            //
-            // // Clean interests
-            // for (MemberGroup group : simulation.getGroups()) {
-            // for (Interest interest : new ArrayList<Interest>(group.getInterests())) {
-            // if (interest instanceof HasTarget && !simulation.getMembers().contains( ((HasTarget) interest).getTarget())) {
-            // group.removeInterest(interest);
-            // }
-            // }
-            // }
-            // for (Member member : simulation.getMembers()) {
-            // for (Interest interest : new ArrayList<Interest>(member.getBrainData(Interest.class))) {
-            // if (interest instanceof HasTarget && !simulation.getMembers().contains( ((HasTarget) interest).getTarget())) {
-            // member.removeBrainData(interest);
-            // }
-            // }
-            // }
-            //
-            // // Generate global group interests against members with bad reputation
-            // for (MemberGroup group : simulation.getGroups()) {
-            // targetLoop:
-            // for (Member target : simulation.getMembers()) {
-            // for (Interest interest : group.getInterests()) {
-            // if (interest instanceof HasTarget && ((HasTarget) interest).getTarget().equals(target)) {
-            // continue targetLoop;
-            // }
-            // }
-            //
-            // if (group.getReputation(target).getValue() <= -10) {
-            // if (ProbabilityUtil.genPseudo(-group.getReputation(target).getValue() / 20F, simulation.RANDOM)) {
-            // float priority = -group.getReputation(target).getValue() / 400F;
-            // if (priority > 1) {
-            // priority = 1;
-            // }
-            // group.addInterest(new DestroyInterest(priority, target));
-            // }
-            // }
-            // }
-            // }
-            //
-            // // Execute global group interests
-            // for (MemberGroup group : simulation.getGroups()) {
-            // for (Interest interest : new ArrayList<Interest>(group.getInterests())) {
-            // for (Member member : simulation.getMembers()) {
-            // Action action = interest.getAction(simulation, member);
-            // if (action != null) {
-            // if (action.execute(simulation, member)) {
-            // group.removeInterest(interest);
-            // }
-            //
-            // break;
-            // }
-            // }
-            // }
-            // }
-            //
-            // // Simulate members
-            // for (Member member : new ArrayList<Member>(simulation.getMembers())) {
-            // if (member.getAiController() != null) {
-            // member.getAiController().update(simulation);
-            // }
-            // }
+        if (object instanceof TickUpdatable) {
+            ((TickUpdatable) object).get(TickUpdatable.TICK_UPDATE).invoke();
+        }
+
+        if (object instanceof FeatureHolder) {
+            for (Object child : (FeatureHolder) object) {
+                updateObject(child);
+            }
+        } else if (object instanceof ValueSupplier) {
+            updateObject( ((ValueSupplier<?>) object).get());
         }
     }
 

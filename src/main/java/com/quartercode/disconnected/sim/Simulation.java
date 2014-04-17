@@ -18,60 +18,30 @@
 
 package com.quartercode.disconnected.sim;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-import com.quartercode.disconnected.sim.comp.Computer;
-import com.quartercode.disconnected.sim.member.Member;
-import com.quartercode.disconnected.sim.member.MemberGroup;
-import com.quartercode.disconnected.sim.member.ai.AIController;
-import com.quartercode.disconnected.sim.member.ai.PlayerController;
-import com.quartercode.disconnected.util.InfoString;
+import com.quartercode.disconnected.sim.run.TickSimulator;
+import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.util.RandomPool;
+import com.quartercode.disconnected.world.World;
 
 /**
- * This clas represents a simulation which stores information about the members, member groups and computers.
- * To actually run the simulation, you need to run a tick simulator.
+ * This class represents a simulation which stores information about the simulated {@link World} and a generic {@link RandomPool}.
+ * To actually run the simulation, you need to run a {@link TickSimulator} inside of a {@link Ticker}.
  * 
- * @see Member
- * @see MemberGroup
- * @see Computer
+ * @see World
+ * @see RandomPool
  */
-@XmlRootElement (namespace = "http://quartercode.com/")
-public class Simulation implements InfoString {
+public class Simulation {
 
     /**
      * The default size a random pool which is used for a simulation should have.
      */
-    public static final int         RANDOM_POOL_SIZE = 1000;
+    public static final int  RANDOM_POOL_SIZE = 1000;
 
-    private RandomPool              random;
-
-    @XmlElementWrapper (name = "members")
-    @XmlElement (name = "member")
-    private final List<Member>      members          = new CopyOnWriteArrayList<Member>();
-    private Member                  localPlayerCache;
-    @XmlElementWrapper (name = "groups")
-    @XmlElement (name = "group")
-    private final List<MemberGroup> groups           = new CopyOnWriteArrayList<MemberGroup>();
-    @XmlElementWrapper (name = "computers")
-    @XmlElement (name = "computer")
-    private final List<Computer>    computers        = new CopyOnWriteArrayList<Computer>();
+    private World            world;
+    private final RandomPool random;
 
     /**
-     * Creates a new empty simulation.
-     * This is only recommended for direct field access (e.g. for serialization).
-     */
-    protected Simulation() {
-
-    }
-
-    /**
-     * Creates a new empty simulation using the given random pool.
+     * Creates a new empty simulation using the given {@link RandomPool}.
      * 
      * @param random The random pool to use for generating anything inside the simulation.
      */
@@ -81,203 +51,33 @@ public class Simulation implements InfoString {
     }
 
     /**
-     * Returns the random pool to use for generating anything inside the simulation.
+     * Returns the {@link World} which is used for the simulation.
      * 
-     * @return The random pool for the simulation.
+     * @return The simulated {@link World}.
+     */
+    public World getWorld() {
+
+        return world;
+    }
+
+    /**
+     * Changes the {@link World} which is used for the simulation.
+     * 
+     * @param world The new simulated world.
+     */
+    public void setWorld(World world) {
+
+        this.world = world;
+    }
+
+    /**
+     * Returns the {@link RandomPool} to use for generating anything inside the simulation.
+     * 
+     * @return The {@link RandomPool} for the simulation.
      */
     public RandomPool getRandom() {
 
         return random;
-    }
-
-    /**
-     * Changes the random pool which is used for generating anything inside the simulation.
-     * This shouldn't be used on a running simulation.
-     * 
-     * @param random The new random pool.
-     */
-    public void setRandom(RandomPool random) {
-
-        this.random = random;
-    }
-
-    /**
-     * Returns all members of the simulation.
-     * 
-     * @return All members of the simulation.
-     */
-    public List<Member> getMembers() {
-
-        return Collections.unmodifiableList(members);
-    }
-
-    /**
-     * Returns the member of this simulation which has the given name.
-     * Returns null if there's no member with the given name.
-     * 
-     * @param name The name of the member to return.
-     * @return The member of this simulation which has the given name.
-     */
-    public Member getMember(String name) {
-
-        for (Member member : members) {
-            if (member.getName().equals(name)) {
-                return member;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the members of the simulation which have an {@link AIController} with the given type as a superclass.
-     * 
-     * @param controllerType The type to use for the {@link AIController}-selection.
-     * @return The members of the simulation which have an {@link AIController} with the given type as a superclass.
-     */
-    public List<Member> getMembersByController(Class<? extends AIController> controllerType) {
-
-        List<Member> members = new ArrayList<Member>();
-        for (Member member : this.members) {
-            if (controllerType.isAssignableFrom(member.getAiController().getClass())) {
-                members.add(member);
-            }
-        }
-        return members;
-    }
-
-    /**
-     * Returns the member of this simulation which controls the given computer.
-     * Returns null if the given computer isn't controlled by any member.
-     * 
-     * @param computer The computer which is controlled by the member to return.
-     * @return The member of this simulation which controls the given computer.
-     */
-    public Member getMember(Computer computer) {
-
-        for (Member member : members) {
-            if (member.getComputer().equals(computer)) {
-                return member;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the player who is interacting with the computer this program runs on.
-     * 
-     * @return the player on the real local computer.
-     */
-    public Member getLocalPlayer() {
-
-        if (localPlayerCache == null) {
-            for (Member member : getMembersByController(PlayerController.class)) {
-                if ( ((PlayerController) member.getAiController()).isLocal()) {
-                    localPlayerCache = member;
-                    break;
-                }
-            }
-        }
-        return localPlayerCache;
-    }
-
-    /**
-     * Adds a member to the simulation.
-     * 
-     * @param member The member to add to the simulation.
-     */
-    public void addMember(Member member) {
-
-        members.add(member);
-    }
-
-    /**
-     * Removes a member from the simulation.
-     * 
-     * @param member The member to remove from the simulation.
-     */
-    public void removeMember(Member member) {
-
-        members.remove(member);
-    }
-
-    /**
-     * Returns all member groups of the simulation.
-     * 
-     * @return All member groups of the simulation.
-     */
-    public List<MemberGroup> getGroups() {
-
-        return Collections.unmodifiableList(groups);
-    }
-
-    /**
-     * Returns the member group of this simulation which contains the given member.
-     * Returns null if the given member isn't set into any group.
-     * 
-     * @param member The member which is set into the member group to return.
-     * @return The member group of this simulation which contains the given member.
-     */
-    public MemberGroup getGroup(Member member) {
-
-        for (MemberGroup group : groups) {
-            if (group.getMembers().contains(member)) {
-                return group;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Adds a member group to the simulation.
-     * 
-     * @param group The member group to add to the simulation.
-     */
-    public void addGroup(MemberGroup group) {
-
-        groups.add(group);
-    }
-
-    /**
-     * Removes a member group from the simulation.
-     * 
-     * @param group The member group to remove from the simulation.
-     */
-    public void removeGroup(MemberGroup group) {
-
-        groups.remove(group);
-    }
-
-    /**
-     * Returns all computers of the simulation.
-     * 
-     * @return All computers of the simulation.
-     */
-    public List<Computer> getComputers() {
-
-        return Collections.unmodifiableList(computers);
-    }
-
-    /**
-     * Adds a computer to the simulation.
-     * 
-     * @param computer The computer to add to the simulation.
-     */
-    public void addComputer(Computer computer) {
-
-        computers.add(computer);
-    }
-
-    /**
-     * Removes a computer from the simulation.
-     * 
-     * @param computer The computer to remove from the simulation.
-     */
-    public void removeComputer(Computer computer) {
-
-        computers.remove(computer);
     }
 
     @Override
@@ -285,9 +85,8 @@ public class Simulation implements InfoString {
 
         final int prime = 31;
         int result = 1;
-        result = prime * result + (computers == null ? 0 : computers.hashCode());
-        result = prime * result + (groups == null ? 0 : groups.hashCode());
-        result = prime * result + (members == null ? 0 : members.hashCode());
+        result = prime * result + (random == null ? 0 : random.hashCode());
+        result = prime * result + (world == null ? 0 : world.hashCode());
         return result;
     }
 
@@ -304,40 +103,27 @@ public class Simulation implements InfoString {
             return false;
         }
         Simulation other = (Simulation) obj;
-        if (computers == null) {
-            if (other.computers != null) {
+        if (random == null) {
+            if (other.random != null) {
                 return false;
             }
-        } else if (!computers.equals(other.computers)) {
+        } else if (!random.equals(other.random)) {
             return false;
         }
-        if (groups == null) {
-            if (other.groups != null) {
+        if (world == null) {
+            if (other.world != null) {
                 return false;
             }
-        } else if (!groups.equals(other.groups)) {
-            return false;
-        }
-        if (members == null) {
-            if (other.members != null) {
-                return false;
-            }
-        } else if (!members.equals(other.members)) {
+        } else if (!world.equals(other.world)) {
             return false;
         }
         return true;
     }
 
     @Override
-    public String toInfoString() {
-
-        return members.size() + " members, " + groups.size() + " groups, " + computers.size() + " computers";
-    }
-
-    @Override
     public String toString() {
 
-        return getClass().getName() + " [" + toInfoString() + "]";
+        return getClass().getName() + " [random=" + random + "]";
     }
 
 }

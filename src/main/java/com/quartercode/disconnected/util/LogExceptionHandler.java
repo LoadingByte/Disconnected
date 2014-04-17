@@ -19,15 +19,15 @@
 package com.quartercode.disconnected.util;
 
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class catches all uncaught throwables in all threads and logs them.
  */
 public class LogExceptionHandler implements UncaughtExceptionHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(LogExceptionHandler.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogExceptionHandler.class);
 
     /**
      * Returns the used logger for logging the exceptions.
@@ -49,7 +49,7 @@ public class LogExceptionHandler implements UncaughtExceptionHandler {
     @Override
     public void uncaughtException(Thread thread, Throwable t) {
 
-        LOGGER.log(Level.SEVERE, "Uncaught exception in thread \"" + thread.getName() + "\" (id " + thread.getId() + ")", t);
+        LOGGER.error("Uncaught exception in thread '{}' (id {})", thread.getName(), thread.getId(), t);
     }
 
 }

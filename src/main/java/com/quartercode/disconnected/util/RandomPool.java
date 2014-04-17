@@ -35,7 +35,7 @@ import java.util.Random;
  */
 public class RandomPool implements Serializable {
 
-    private static final long  serialVersionUID = 4448882577260750865L;
+    private static final long  serialVersionUID = 1187445181932361744L;
 
     private final List<Random> randoms          = new ArrayList<Random>();
     private int                currentIndex;
@@ -242,6 +242,44 @@ public class RandomPool implements Serializable {
     public double nextGaussian() {
 
         return nextRandom().nextGaussian();
+    }
+
+    @Override
+    public int hashCode() {
+
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (randoms == null ? 0 : randoms.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        RandomPool other = (RandomPool) obj;
+        if (randoms == null) {
+            if (other.randoms != null) {
+                return false;
+            }
+        } else if (!randoms.equals(other.randoms)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+
+        return getClass().getName() + " [" + randoms.size() + " randoms]";
     }
 
 }

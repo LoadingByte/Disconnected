@@ -23,41 +23,29 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.quartercode.classmod.util.Classmod;
+import com.quartercode.disconnected.graphics.DefaultStates;
 import com.quartercode.disconnected.graphics.GraphicsManager;
-import com.quartercode.disconnected.graphics.session.DesktopState;
-import com.quartercode.disconnected.profile.Profile;
-import com.quartercode.disconnected.profile.ProfileManager;
+import com.quartercode.disconnected.graphics.GraphicsModule;
+import com.quartercode.disconnected.graphics.GraphicsState;
+import com.quartercode.disconnected.graphics.desktop.DefaultDesktopProgramManager;
+import com.quartercode.disconnected.graphics.desktop.DesktopLaunchButtonModule;
+import com.quartercode.disconnected.graphics.desktop.DesktopProgramDescriptor;
+import com.quartercode.disconnected.graphics.desktop.DesktopPrograms;
+import com.quartercode.disconnected.graphics.desktop.DesktopTaskbarModule;
+import com.quartercode.disconnected.graphics.desktop.DesktopWidgetModule;
+import com.quartercode.disconnected.graphics.desktop.DesktopWindowAreaModule;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.comp.Computer;
-import com.quartercode.disconnected.sim.comp.file.StringContent;
-import com.quartercode.disconnected.sim.comp.hardware.CPU;
-import com.quartercode.disconnected.sim.comp.hardware.HardDrive;
-import com.quartercode.disconnected.sim.comp.hardware.Mainboard;
-import com.quartercode.disconnected.sim.comp.hardware.NetworkInterface;
-import com.quartercode.disconnected.sim.comp.hardware.RAM;
-import com.quartercode.disconnected.sim.comp.program.KernelProgram;
-import com.quartercode.disconnected.sim.comp.program.desktop.SystemViewerProgram;
-import com.quartercode.disconnected.sim.comp.program.desktop.TerminalProgram;
-import com.quartercode.disconnected.sim.comp.program.shell.ChangeDirectoryProgram;
-import com.quartercode.disconnected.sim.comp.program.shell.DeleteFileProgram;
-import com.quartercode.disconnected.sim.comp.program.shell.FileContentProgram;
-import com.quartercode.disconnected.sim.comp.program.shell.FileRightsProgram;
-import com.quartercode.disconnected.sim.comp.program.shell.ListFilesProgram;
-import com.quartercode.disconnected.sim.comp.program.shell.MakeFileProgram;
-import com.quartercode.disconnected.sim.comp.session.DesktopSessionProgram;
-import com.quartercode.disconnected.sim.comp.session.ShellSessionProgram;
-import com.quartercode.disconnected.sim.member.ai.PlayerController;
-import com.quartercode.disconnected.sim.member.ai.UserController;
-import com.quartercode.disconnected.sim.member.interest.DestroyInterest;
+import com.quartercode.disconnected.sim.profile.Profile;
+import com.quartercode.disconnected.sim.profile.ProfileManager;
 import com.quartercode.disconnected.sim.run.TickAction;
 import com.quartercode.disconnected.sim.run.TickSimulator;
 import com.quartercode.disconnected.sim.run.Ticker;
@@ -66,13 +54,18 @@ import com.quartercode.disconnected.util.LogExceptionHandler;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.util.ResourceStore;
+import com.quartercode.disconnected.world.World;
+import com.quartercode.disconnected.world.comp.Computer;
+import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 
 /**
  * The main class which initializes the whole game.
  */
 public class Main {
 
-    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
+    private static boolean      exitUnderway;
 
     /**
      * The main method which initializes the whole game.
@@ -81,19 +74,11 @@ public class Main {
      */
     public static void main(String[] args) {
 
-        // Logging configuration
-        try {
-            LogManager.getLogManager().readConfiguration(Main.class.getResourceAsStream("/config/logging.properties"));
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Can't load logging configuration", e);
-            return;
-        }
-
         // Default exception handler if the vm throws an exception to the entry point of thread (e.g. main() or run())
         Thread.setDefaultUncaughtExceptionHandler(new LogExceptionHandler());
 
         // Print information about the software
-        LOGGER.info("Version " + Disconnected.getVersion());
+        LOGGER.info("Version {}", Disconnected.getVersion());
 
         // Parse command line arguments
         Options options = createCommandLineOptions();
@@ -101,7 +86,7 @@ public class Main {
         try {
             line = new PosixParser().parse(options, args, true);
         } catch (ParseException e) {
-            LOGGER.warning(e.getMessage());
+            LOGGER.warn(e.getMessage());
             new HelpFormatter().printHelp("java -jar disconnected-" + Disconnected.getVersion() + ".jar", options, true);
         }
 
@@ -141,9 +126,14 @@ public class Main {
             Disconnected.setRS(new ResourceStore());
             fillResourceStore(Disconnected.getRS());
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Can't fill resource store", e);
+            LOGGER.error("Can't fill resource store", e);
             return;
         }
+
+        // Initialize default graphics states
+        LOGGER.info("Initializing default graphics states");
+        initializeDefaultGraphicsStates();
+        fillDefaultDesktopPrograms();
 
         // Initialize profile manager and load stored profiles
         LOGGER.info("Initializing profile manager");
@@ -163,22 +153,23 @@ public class Main {
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG-ACTION: Generating new simulation");
         Simulation simulation = SimulationGenerator.generateSimulation(10, 2, new RandomPool(Simulation.RANDOM_POOL_SIZE));
-        for (Computer computer : simulation.getComputers()) {
-            computer.getOperatingSystem().setRunning(true);
+        for (Computer computer : simulation.getWorld().get(World.COMPUTERS).get()) {
+            computer.get(Computer.OS).get().get(OperatingSystem.SET_RUNNING).invoke(true);
         }
+
         Profile profile = new Profile("test", simulation);
         Disconnected.getProfileManager().addProfile(profile);
         try {
             Disconnected.getProfileManager().setActive(profile);
         } catch (Exception e) {
             e.printStackTrace();
-            // Wont ever happen (we created a new profile)
+            // Won't ever happen (we just created a new profile)
         }
 
         // DEBUG: Start "game" with current simulation
         LOGGER.info("DEBUG-ACTION: Starting test-game with current simulation");
         Disconnected.getTicker().setRunning(true);
-        Disconnected.getGraphicsManager().setState(new DesktopState(profile.getSimulation()));
+        Disconnected.getGraphicsManager().setState(DefaultStates.DESKTOP.create());
     }
 
     @SuppressWarnings ("static-access")
@@ -191,53 +182,31 @@ public class Main {
     }
 
     /**
-     * Fills the given registry with the default values which are needed for running vanilla disconnected.
+     * Fills the given registry with the default values which are needed for running Disconnected.
      * 
      * @param registry The registry to fill.
      */
     public static void fillRegistry(Registry registry) {
 
-        // Hardware
-        registry.registerClass(Mainboard.class);
-        registry.registerClass(CPU.class);
-        registry.registerClass(RAM.class);
-        registry.registerClass(HardDrive.class);
-        registry.registerClass(NetworkInterface.class);
+        registry.registerContextPathEntry(Classmod.CONTEXT_PATH);
+        registry.registerContextPathEntry("com.quartercode.disconnected.sim.run");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.attack");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.file");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.hardware");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.net");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.os");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.program");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.program.general");
 
-        // Programs
-        registry.registerClass(KernelProgram.class);
-
-        registry.registerClass(ShellSessionProgram.class);
-        registry.registerClass(DesktopSessionProgram.class);
-
-        registry.registerClass(ChangeDirectoryProgram.class);
-        registry.registerClass(ListFilesProgram.class);
-        registry.registerClass(FileRightsProgram.class);
-        registry.registerClass(FileContentProgram.class);
-        registry.registerClass(MakeFileProgram.class);
-        registry.registerClass(DeleteFileProgram.class);
-
-        registry.registerClass(TerminalProgram.class);
-        registry.registerClass(SystemViewerProgram.class);
-
-        // Mixed computer stuff
-        registry.registerClass(StringContent.class);
-
-        // AI Controllers
-        registry.registerClass(PlayerController.class);
-        registry.registerClass(UserController.class);
-
-        // Interests
-        registry.registerClass(DestroyInterest.class);
-
-        // Themes
         registry.registerTheme(Main.class.getResource("/ui/default/default.xml"));
         registry.registerTheme(Main.class.getResource("/ui/shell/shell.xml"));
         registry.registerTheme(Main.class.getResource("/ui/desktop/desktop.xml"));
     }
 
     /**
-     * Fills the given resource store with the default resource objects which are needed for running vanilla disconnected.
+     * Fills the given resource store with the default resource objects which are needed for running Disconnected.
      * 
      * @param resourceStore The resource store to fill.
      * @throws IOException Something goes wrong while reading from a jar file or resource.
@@ -245,6 +214,37 @@ public class Main {
     public static void fillResourceStore(ResourceStore resourceStore) throws IOException {
 
         resourceStore.loadFromClasspath("/data");
+    }
+
+    /**
+     * Adds the default {@link GraphicsModule}s to the default {@link GraphicsState}s declared in {@link DefaultStates}.
+     */
+    public static void initializeDefaultGraphicsStates() {
+
+        DefaultStates.DESKTOP.addModule(DesktopWidgetModule.class, "desktopWidget", 100);
+        DefaultStates.DESKTOP.addModule(DesktopWindowAreaModule.class, "windowArea", 80);
+        DefaultStates.DESKTOP.addModule(DesktopLaunchButtonModule.class, "launchButton", 80);
+        DefaultStates.DESKTOP.addModule(DesktopTaskbarModule.class, "taskbar", 80);
+        DefaultStates.DESKTOP.addModule(DefaultDesktopProgramManager.class, "programManager", 0);
+    }
+
+    /**
+     * Adds the default {@link DesktopProgramDescriptor}s to the {@link DesktopPrograms} list.
+     * 
+     * @see DesktopPrograms
+     */
+    public static void fillDefaultDesktopPrograms() {
+
+    }
+
+    public static synchronized void exit() {
+
+        if (!exitUnderway) {
+            exitUnderway = true;
+
+            Disconnected.getGraphicsManager().setRunning(false);
+            Disconnected.getTicker().setRunning(false);
+        }
     }
 
     private Main() {

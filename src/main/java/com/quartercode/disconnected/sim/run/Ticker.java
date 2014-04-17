@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the controls for the tick system which then calls several actions.
@@ -33,6 +33,8 @@ import org.apache.commons.lang.Validate;
  * @see TickThread
  */
 public class Ticker {
+
+    private static final Logger    LOGGER                   = LoggerFactory.getLogger(Ticker.class);
 
     /**
      * The amount of milliseconds the ticker will wait from one tick to another by default.
@@ -44,11 +46,12 @@ public class Ticker {
      */
     public static final int        DEFAULT_TICKS_PER_SECOND = 1000 / DEFAULT_DELAY;
 
-    private static final Logger    LOGGER                   = Logger.getLogger(Ticker.class.getName());
-
     private TickThread             thread;
     private final List<TickAction> actions                  = new ArrayList<TickAction>();
     private int                    delay                    = DEFAULT_DELAY;
+
+    // Performance: Object cache
+    private List<TickAction>       unmodifiableActions      = Collections.unmodifiableList(actions);
 
     /**
      * Creates a new ticker without any tick actions.
@@ -74,7 +77,7 @@ public class Ticker {
      */
     public List<TickAction> getActions() {
 
-        return Collections.unmodifiableList(actions);
+        return unmodifiableActions;
     }
 
     /**
@@ -110,6 +113,7 @@ public class Ticker {
         }
 
         actions.add(action);
+        unmodifiableActions = Collections.unmodifiableList(actions);
     }
 
     /**
@@ -120,6 +124,7 @@ public class Ticker {
     public void removeAction(TickAction action) {
 
         actions.remove(action);
+        unmodifiableActions = Collections.unmodifiableList(actions);
     }
 
     /**
@@ -139,7 +144,7 @@ public class Ticker {
      */
     public void setDelay(int delay) {
 
-        Validate.isTrue(delay > 0, "Delay must be > 0: ", delay);
+        Validate.isTrue(delay > 0, "Delay (%d) must be > 0", delay);
         this.delay = delay;
     }
 
@@ -162,77 +167,14 @@ public class Ticker {
     public void setRunning(boolean running) {
 
         if (running && !isRunning()) {
+            LOGGER.info("Starting up tick thread");
             thread = new TickThread(this);
             thread.start();
         } else if (!running && isRunning()) {
+            LOGGER.info("Shutting down tick thread");
             thread.interrupt();
             thread = null;
         }
-    }
-
-    /**
-     * Returns the current tick thread which executes the actual tick update.
-     * If the update is not running, this returns null.
-     * 
-     * @return The current tick thread which executes the actual tick update.
-     */
-    public TickThread getThread() {
-
-        return thread;
-    }
-
-    /**
-     * This thread calls the tick update on several tick actions.
-     * It's an independent utility.
-     */
-    public static class TickThread extends Thread {
-
-        private final Ticker ticker;
-
-        /**
-         * Creates a new tick thread and sets the ticker to use the informations from.
-         * 
-         * @param ticker The ticker to use the informations for the actions and the delay from.
-         */
-        public TickThread(Ticker ticker) {
-
-            super("tick");
-
-            this.ticker = ticker;
-        }
-
-        /**
-         * Returns the ticker to use the informations for the actions and the delay from.
-         * 
-         * @return The ticker to use the informations for the actions and the delay from.
-         */
-        public Ticker getTicker() {
-
-            return ticker;
-        }
-
-        @Override
-        public void run() {
-
-            while (!isInterrupted()) {
-                synchronized (this) {
-                    for (TickAction action : new ArrayList<TickAction>(ticker.getActions())) {
-                        try {
-                            action.update();
-                        } catch (Throwable t) {
-                            LOGGER.log(Level.SEVERE, "An exception occurred while executing tick action update (tick action " + action.getClass().getName() + ")", t);
-                        }
-                    }
-
-                    try {
-                        Thread.sleep(ticker.getDelay());
-                    } catch (InterruptedException e) {
-                        LOGGER.log(Level.SEVERE, "Tick thread has been interrupted", e);
-                    }
-                }
-            }
-        }
-
     }
 
 }

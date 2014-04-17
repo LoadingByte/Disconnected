@@ -18,51 +18,29 @@
 
 package com.quartercode.disconnected.util;
 
-import java.util.ResourceBundle;
-
 /**
- * This is a simple class which enumerates some important resource bundles as constants.
+ * This is a simple class which enumerates some important {@link ResourceBundleGroup}s as constants.
+ * It also enables quick access to typical bundle groups like desktop program resources.
+ * 
+ * @see ResourceBundleGroup
  */
 public class ResourceBundles {
-
-    /**
-     * The ui bundle contains all objects related to the basic game ui (menus etc.).
-     * This does not contain anything related to desktop programs or the desktop itself.
-     */
-    public static final ResourceBundle UI      = getBundle("ui");
-
-    /**
-     * The kernel bundle contains all objects related to the operating system kernel.
-     * This does not contain anything like sessions etc.
-     */
-    public static final ResourceBundle KERNEL  = getBundle("kernel");
-
-    /**
-     * The shell bundle contains all objects related to the shell interface.
-     * This does not contain anything related to shell programs.
-     */
-    public static final ResourceBundle SHELL   = getBundle("shell");
 
     /**
      * The desktop bundle contains all objects related to the desktop ui (launch menu etc.).
      * This does not contain anything related to desktop programs.
      */
-    public static final ResourceBundle DESKTOP = getBundle("desktop");
+    public static final ResourceBundleGroup DESKTOP = new ResourceBundleGroup("desktop");
 
     /**
-     * This returns the bundle of the program with the given name.
+     * Returns the {@link ResourceBundleGroup} of the desktop program with the given name.
      * 
-     * @param name The name of the program the returned bundle belongs to.
-     * @return The bundle of the program with the given name.
+     * @param name The name of the desktop program the returned bundle group belongs to.
+     * @return The {@link ResourceBundleGroup} of the desktop program which has the given name.
      */
-    public static ResourceBundle PROGRAM(String name) {
+    public static ResourceBundleGroup forProgram(String name) {
 
-        return getBundle("program-" + name);
-    }
-
-    private static ResourceBundle getBundle(String name) {
-
-        return ResourceBundle.getBundle("i18n." + name + "." + name);
+        return new ResourceBundleGroup("program-" + name);
     }
 
     private ResourceBundles() {

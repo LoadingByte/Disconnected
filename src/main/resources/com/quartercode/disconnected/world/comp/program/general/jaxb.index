@@ -1,0 +1,6 @@
+FileCreateProgram$SuccessEvent
+FileCreateProgram$ErrorEvent
+FileCreateProgram$UnknownMountpointEvent
+FileCreateProgram$MissingRightsEvent
+FileCreateProgram$InvalidPathEvent
+FileCreateProgram$OutOfSpaceEvent

@@ -18,7 +18,8 @@
 
 package com.quartercode.disconnected.graphics;
 
-import com.quartercode.disconnected.graphics.component.GraphicsState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the main manager of the graphics system.
@@ -26,7 +27,10 @@ import com.quartercode.disconnected.graphics.component.GraphicsState;
  */
 public class GraphicsManager {
 
-    private UpdateThread updateThread;
+    private static final Logger LOGGER = LoggerFactory.getLogger(GraphicsManager.class);
+
+    private GraphicsThread      thread;
+    private GraphicsState       state;
 
     /**
      * Creates a new graphics manager.
@@ -42,7 +46,7 @@ public class GraphicsManager {
      */
     public boolean isRunning() {
 
-        return updateThread != null && updateThread.isAlive();
+        return thread != null && thread.isAlive();
     }
 
     /**
@@ -54,24 +58,15 @@ public class GraphicsManager {
     public void setRunning(boolean running) {
 
         if (running && !isRunning()) {
-            updateThread = new UpdateThread();
-            updateThread.start();
+            LOGGER.info("Starting up graphics thread");
+            thread = new GraphicsThread();
+            thread.changeState(state);
+            thread.start();
         } else if (!running && isRunning()) {
-            updateThread.interrupt();
-            updateThread = null;
+            LOGGER.info("Shutting down graphics thread");
+            thread.exit();
+            thread = null;
         }
-    }
-
-    /**
-     * Returns the current update thread which keeps the lwjgl display alive.
-     * The update thread stores all interesting graphics information, like the main widget or the twl gui object.
-     * If the graphics manager is not running, this returns null.
-     * 
-     * @return The current update thread which keeps the lwjgl display alive.
-     */
-    public UpdateThread getUpdateThread() {
-
-        return updateThread;
     }
 
     /**
@@ -82,7 +77,7 @@ public class GraphicsManager {
      */
     public GraphicsState getState() {
 
-        return updateThread.getRoot().getState();
+        return state;
     }
 
     /**
@@ -93,17 +88,21 @@ public class GraphicsManager {
      */
     public void setState(GraphicsState state) {
 
-        updateThread.getRoot().setState(state);
+        this.state = state;
+
+        if (thread != null) {
+            thread.changeState(state);
+        }
     }
 
     /**
      * Invokes the given {@link Runnable} in the graphics update thread.
      * 
-     * @param runnable The runnable to invoke in the update thread.
+     * @param runnable The runnable to invoke in the graphics update thread.
      */
     public void invoke(Runnable runnable) {
 
-        updateThread.invoke(runnable);
+        thread.invoke(runnable);
     }
 
 }

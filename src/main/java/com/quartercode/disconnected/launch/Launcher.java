@@ -24,9 +24,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import com.quartercode.disconnected.util.StreamGobbler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class launches another main method inside the same jar using a second vm.
@@ -34,7 +33,7 @@ import com.quartercode.disconnected.util.StreamGobbler;
  */
 public class Launcher {
 
-    private static final Logger LOGGER = Logger.getLogger(Launcher.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(Launcher.class);
 
     private String              mainClass;
     private String[]            vmArguments;
@@ -164,16 +163,19 @@ public class Launcher {
      */
     public void launch() {
 
-        LOGGER.info("Launching main class " + mainClass);
+        LOGGER.info("Creating working directory '{}'", directory.getAbsolutePath());
+        directory.mkdirs();
+
+        LOGGER.info("Launching main class '{}'", mainClass);
 
         try {
             File file = new File(Launcher.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 
             List<String> command = new ArrayList<String>();
             command.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
-            LOGGER.info("Java Binary: " + command.get(0));
+            LOGGER.info("Java Binary: '{}'", command.get(0));
             if (vmArguments != null && vmArguments.length > 0) {
-                LOGGER.info("VM Arguments: " + Arrays.toString(vmArguments));
+                LOGGER.info("VM Arguments: {}", Arrays.toString(vmArguments));
                 for (String vmArgument : vmArguments) {
                     command.add(vmArgument);
                 }
@@ -182,7 +184,7 @@ public class Launcher {
             command.add(file.getAbsolutePath());
             command.add(mainClass);
             if (programArguments != null && programArguments.length > 0) {
-                LOGGER.info("Program Arguments: " + Arrays.toString(programArguments));
+                LOGGER.info("Program Arguments: {}", Arrays.toString(programArguments));
                 for (String programArgument : programArguments) {
                     command.add(programArgument);
                 }
@@ -203,11 +205,11 @@ public class Launcher {
             outputGobbler.interrupt();
             errorGobbler.interrupt();
         } catch (URISyntaxException e) {
-            LOGGER.log(Level.SEVERE, "Can't find jar file", e);
+            LOGGER.error("Can't find jar file", e);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Can't build process/read process output", e);
+            LOGGER.error("Can't build process/read process output", e);
         } catch (InterruptedException e) {
-            LOGGER.log(Level.SEVERE, "Interrupted while waiting for launched process", e);
+            LOGGER.error("Interrupted while waiting for launched process", e);
         }
 
         LOGGER.info("Launcher terminated");
