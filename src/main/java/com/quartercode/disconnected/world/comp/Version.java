@@ -18,8 +18,7 @@
 
 package com.quartercode.disconnected.world.comp;
 
-import java.util.Arrays;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -157,7 +156,7 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 String[] versionParts = ((String) arguments[0]).split("\\.");
-                Validate.isTrue(versionParts.length == 3, "The version string must be splitted in 3 parts by dots (e.g. 1.2.5): ", Arrays.toString(versionParts));
+                Validate.isTrue(versionParts.length == 3, "The version string (%s) must be splitted in 3 parts by dots (e.g. 1.2.5)", arguments[0]);
 
                 FeatureHolder holder = invocation.getHolder();
                 holder.get(MAJOR).set(Integer.parseInt(versionParts[0]));

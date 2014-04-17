@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.world.member.interest;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.world.member.BrainData;
 import com.quartercode.disconnected.world.member.Member;
@@ -75,7 +75,7 @@ public abstract class Interest extends BrainData implements ReputationChangeProv
      */
     public void setPriority(float priority) {
 
-        Validate.isTrue(priority >= 0 && priority <= 1, "Priority must be in range 0 <= priority <= 1: " + priority);
+        Validate.isTrue(priority >= 0 && priority <= 1, "Priority (%d) must be in range 0 <= priority <= 1", priority);
         this.priority = priority;
     }
 

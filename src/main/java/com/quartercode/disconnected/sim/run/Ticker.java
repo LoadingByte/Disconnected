@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 /**
  * This class implements the controls for the tick system which then calls several actions.
@@ -140,7 +140,7 @@ public class Ticker {
      */
     public void setDelay(int delay) {
 
-        Validate.isTrue(delay > 0, "Delay must be > 0: ", delay);
+        Validate.isTrue(delay > 0, "Delay (%d) must be > 0", delay);
         this.delay = delay;
     }
 

@@ -20,7 +20,7 @@ package com.quartercode.disconnected.world.comp.net;
 
 import java.net.InetAddress;
 import java.util.Arrays;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -71,9 +71,9 @@ public class IP extends DefaultFeatureHolder implements StringRepresentable {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Integer[] parts = (Integer[]) arguments[0];
-                Validate.isTrue(parts.length == 4, "The ip must have 4 parts (e.g. [127, 0, 0, 1]): ", Arrays.toString(parts));
+                Validate.isTrue(parts.length == 4, "The ip (%s) must have 4 parts (e.g. [127, 0, 0, 1])", Arrays.toString(parts));
                 for (int part : parts) {
-                    Validate.isTrue(part >= 0 || part <= 255, "Every ip part must be in range 0 <= part <= 255 (e.g. [127, 0, 0, 1]): ", Arrays.toString(parts));
+                    Validate.isTrue(part >= 0 || part <= 255, "Every ip part must be in range 0 <= part <= 255 (e.g. [127, 0, 0, 1]; %s is invalid)", Arrays.toString(parts));
                 }
 
                 return invocation.next(arguments);

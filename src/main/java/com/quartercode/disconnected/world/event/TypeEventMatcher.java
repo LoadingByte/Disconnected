@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.world.event;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 /**
  * The type event matcher only accepts {@link Event}s that derive from a given supertype or superinterface or are equal to a provided type.

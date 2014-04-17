@@ -22,7 +22,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.Location;
@@ -56,7 +56,7 @@ public class LocationGenerator {
      */
     public static List<Location> generateLocations(int amount, List<Location> ignore, RandomPool random) {
 
-        Validate.isTrue(amount > 0, "Generation amount must be > 0: ", amount);
+        Validate.isTrue(amount > 0, "Generation amount (%d) must be > 0", amount);
 
         BufferedImage map = (BufferedImage) Disconnected.getRS().get("map.png");
 

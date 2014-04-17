@@ -24,7 +24,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.base.Feature;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
@@ -108,7 +108,7 @@ public class Scheduler extends AbstractFeature {
     public void schedule(ScheduleTask task, int delay) {
 
         Validate.notNull(task, "Cannot schedule null task");
-        Validate.isTrue(delay > 0, "Delay must be greater than 0");
+        Validate.isTrue(delay > 0, "Delay (%d) must be > 0", delay);
 
         runningTasks.add(new ScheduleTaskContext(task, delay));
     }

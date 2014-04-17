@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.world.comp.net;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -77,7 +77,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 int port = (Integer) arguments[0];
-                Validate.isTrue(port >= 0 && port <= 65535, "The port must be in range 0 <= port <= 65535 (e.g. 8080): ", port);
+                Validate.isTrue(port >= 0 && port <= 65535, "The port (%d) must be in range 0 <= port <= 65535 (e.g. 8080)", port);
 
                 return invocation.next(arguments);
             }
@@ -184,7 +184,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 String[] parts = ((String) arguments[0]).split(":");
-                Validate.isTrue(parts.length == 2, "Address must have the format IP:PORT: ", arguments[0]);
+                Validate.isTrue(parts.length == 2, "Address (%s) must have the format IP:PORT", arguments[0]);
                 IP ip = new IP();
                 ip.get(com.quartercode.disconnected.world.comp.net.IP.FROM_STRING).invoke(parts[0]);
                 invocation.getHolder().get(IP).set(ip);

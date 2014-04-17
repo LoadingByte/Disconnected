@@ -20,7 +20,7 @@ package com.quartercode.disconnected.world.comp.file;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.base.Feature;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
@@ -84,7 +84,7 @@ public class FileSystemModule extends OSModule {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 KnownFileSystem element = (KnownFileSystem) arguments[0];
-                Validate.isTrue(!element.get(KnownFileSystem.MOUNTED).get(), "Can't register known file system while mounted");
+                Validate.isTrue(!element.get(KnownFileSystem.MOUNTED).get(), "Can't register known file system '%s' while it is mounted", element.get(KnownFileSystem.MOUNTPOINT).get());
                 return invocation.next(arguments);
             }
 
@@ -299,7 +299,7 @@ public class FileSystemModule extends OSModule {
 
                 String path = (String) arguments[0];
                 String[] pathComponents = FileUtils.getComponents(path);
-                Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path");
+                Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path ('%s' is invalid)", path);
 
                 KnownFileSystem knownFs = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]);
                 if (knownFs == null) {
@@ -323,7 +323,7 @@ public class FileSystemModule extends OSModule {
                 String path = (String) arguments[1];
 
                 String[] pathComponents = FileUtils.getComponents(path);
-                Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path");
+                Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path ('%s' is invalid)", path);
 
                 KnownFileSystem knownFs = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]);
                 if (knownFs == null) {
@@ -433,7 +433,8 @@ public class FileSystemModule extends OSModule {
                 @Prioritized (Prioritized.LEVEL_6)
                 public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                    Validate.isTrue(!invocation.getHolder().get(MOUNTED).get(), "Can't change mountpoint of known file system while mounted");
+                    FeatureHolder holder = invocation.getHolder();
+                    Validate.isTrue(!holder.get(MOUNTED).get(), "Can't change mountpoint of known file system '%s' while mounted", holder.get(MOUNTPOINT).get());
                     return invocation.next(arguments);
                 }
 

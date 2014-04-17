@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.world.comp.os;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;

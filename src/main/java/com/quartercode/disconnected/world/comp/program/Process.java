@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -169,7 +169,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Validate.isTrue( ((ContentFile) arguments[0]).get(ContentFile.CONTENT).get() instanceof Program, "Source must contain a program");
+                Validate.isInstanceOf(Program.class, ((ContentFile) arguments[0]).get(ContentFile.CONTENT).get(), "Source must contain a program");
                 return invocation.next(arguments);
             }
 
