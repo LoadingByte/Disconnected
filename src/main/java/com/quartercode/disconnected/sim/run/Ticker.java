@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the controls for the tick system which then calls several actions.
@@ -31,6 +33,8 @@ import org.apache.commons.lang3.Validate;
  * @see TickThread
  */
 public class Ticker {
+
+    private static final Logger    LOGGER                   = LoggerFactory.getLogger(Ticker.class);
 
     /**
      * The amount of milliseconds the ticker will wait from one tick to another by default.
@@ -163,9 +167,11 @@ public class Ticker {
     public void setRunning(boolean running) {
 
         if (running && !isRunning()) {
+            LOGGER.info("Starting up tick thread");
             thread = new TickThread(this);
             thread.start();
         } else if (!running && isRunning()) {
+            LOGGER.info("Shutting down tick thread");
             thread.interrupt();
             thread = null;
         }

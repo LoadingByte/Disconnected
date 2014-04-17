@@ -240,10 +240,7 @@ public class Main {
         if (!exitUnderway) {
             exitUnderway = true;
 
-            LOGGER.info("Shutting down graphics thread");
             Disconnected.getGraphicsManager().setRunning(false);
-
-            LOGGER.info("Shutting down ticker");
             Disconnected.getTicker().setRunning(false);
         }
     }

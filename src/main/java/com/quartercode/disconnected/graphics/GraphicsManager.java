@@ -18,14 +18,19 @@
 
 package com.quartercode.disconnected.graphics;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This is the main manager of the graphics system.
  * The manager can create or destroy the lwjgl context and keeps track of all important twl internals.
  */
 public class GraphicsManager {
 
-    private GraphicsThread thread;
-    private GraphicsState  state;
+    private static final Logger LOGGER = LoggerFactory.getLogger(GraphicsManager.class);
+
+    private GraphicsThread      thread;
+    private GraphicsState       state;
 
     /**
      * Creates a new graphics manager.
@@ -53,10 +58,12 @@ public class GraphicsManager {
     public void setRunning(boolean running) {
 
         if (running && !isRunning()) {
+            LOGGER.info("Starting up graphics thread");
             thread = new GraphicsThread();
             thread.changeState(state);
             thread.start();
         } else if (!running && isRunning()) {
+            LOGGER.info("Shutting down graphics thread");
             thread.exit();
             thread = null;
         }
