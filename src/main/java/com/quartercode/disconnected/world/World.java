@@ -21,6 +21,7 @@ package com.quartercode.disconnected.world;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
@@ -72,9 +73,20 @@ public class World extends DefaultFeatureHolder {
      * 
      * @return The world's {@link Simulation}.
      */
+    @XmlTransient
     public Simulation getSimulation() {
 
         return simulation;
+    }
+
+    /**
+     * Changes the {@link Simulation} the world is placed in.
+     * 
+     * @param simulation The new simulation that uses the world.
+     */
+    public void setSimulation(Simulation simulation) {
+
+        this.simulation = simulation;
     }
 
 }

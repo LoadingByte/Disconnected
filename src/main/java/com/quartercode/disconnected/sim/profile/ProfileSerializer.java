@@ -102,6 +102,7 @@ public class ProfileSerializer {
         if (world != null && random != null) {
             Simulation simulation = new Simulation(random);
             simulation.setWorld(world);
+            world.setSimulation(simulation);
             return simulation;
         } else {
             return null;
