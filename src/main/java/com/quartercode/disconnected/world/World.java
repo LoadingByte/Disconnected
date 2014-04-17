@@ -26,8 +26,6 @@ import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
 import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.world.comp.Computer;
-import com.quartercode.disconnected.world.member.Member;
-import com.quartercode.disconnected.world.member.MemberGroup;
 
 /**
  * A world is a space which contains {@link DefaultFeatureHolder}s.
@@ -39,29 +37,17 @@ public class World extends DefaultFeatureHolder {
     // ----- Properties -----
 
     /**
-     * The {@link Member}s who are present in the world.
-     */
-    public static final CollectionPropertyDefinition<Member, List<Member>>           MEMBERS;
-
-    /**
-     * The {@link MemberGroup}s which are present in the world.
-     */
-    public static final CollectionPropertyDefinition<MemberGroup, List<MemberGroup>> GROUPS;
-
-    /**
      * The {@link Computer}s which are present in the world.
      */
-    public static final CollectionPropertyDefinition<Computer, List<Computer>>       COMPUTERS;
+    public static final CollectionPropertyDefinition<Computer, List<Computer>> COMPUTERS;
 
     static {
 
-        MEMBERS = ObjectCollectionProperty.createDefinition("members", new ArrayList<Member>(), true);
-        GROUPS = ObjectCollectionProperty.createDefinition("memberGroups", new ArrayList<MemberGroup>(), true);
         COMPUTERS = ObjectCollectionProperty.createDefinition("computers", new ArrayList<Computer>(), true);
 
     }
 
-    private Simulation                                                               simulation;
+    private Simulation                                                         simulation;
 
     /**
      * Creates a new empty world.
