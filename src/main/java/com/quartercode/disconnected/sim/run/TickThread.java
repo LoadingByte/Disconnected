@@ -59,18 +59,23 @@ public class TickThread extends Thread {
     @Override
     public void run() {
 
-        while (!isInterrupted()) {
-            synchronized (this) {
-                for (TickAction action : new ArrayList<TickAction>(ticker.getActions())) {
-                    try {
-                        action.update();
-                    } catch (RuntimeException e) {
-                        LOGGER.error("An unexpected exception occurred while the tick action '{}' was updated", action.getClass().getName(), e);
-                    }
-                }
+        long delay = ticker.getDelay();
+        long next = System.currentTimeMillis();
 
+        while (!isInterrupted()) {
+            for (TickAction action : new ArrayList<TickAction>(ticker.getActions())) {
                 try {
-                    Thread.sleep(ticker.getDelay());
+                    action.update();
+                } catch (RuntimeException e) {
+                    LOGGER.error("An unexpected exception occurred while the tick action '{}' was updated", action.getClass().getName(), e);
+                }
+            }
+
+            next += delay;
+            long sleep = next - System.currentTimeMillis();
+            if (sleep > 0) {
+                try {
+                    Thread.sleep(sleep);
                 } catch (InterruptedException e) {
                     // Interruption -> Exit thread
                     break;
