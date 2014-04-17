@@ -95,13 +95,13 @@ public class FileUtils {
      * 
      * <pre>
      * Path: /system/etc/test
-     * => [system, etc/test]
+     * =&gt; [system, etc/test]
      * 
      * Path: /user
-     * => [user, null]
+     * =&gt; [user, null]
      * 
      * Path: home/user1/file
-     * => [null, home/user1/file]
+     * =&gt; [null, home/user1/file]
      * </pre>
      * 
      * @param path The path which should be splitted into its compontents.

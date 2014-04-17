@@ -159,7 +159,7 @@ public class SimulationGenerator {
     }
 
     /**
-     * Generates the given amount of {@link Computer} randomly ignoring the {@link Location}s of the given {@link Computer}s.
+     * Generates the given amount of {@link Computer}s randomly ignoring the {@link Location}s of the given {@link Computer}s.
      * 
      * @param world The {@link World} the new {@link Computer}s will be in.
      * @param amount The amount of {@link Computer}s the generator should generate.

@@ -74,7 +74,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
      * 
      * <pre>
      * subvalue1:subvalue2:subvalue3
-     * > Returns [subvalue1, subvalue2, subvalue3]
+     * =&gt; Returns [subvalue1, subvalue2, subvalue3]
      * </pre>
      * 
      * Modifications to the returned {@link List} object do not apply to the variable.
@@ -88,7 +88,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
      * 
      * <pre>
      * [subvalue1, subvalue2, subvalue3]
-     * > Sets subvalue1:subvalue2:subvalue3
+     * =&gt; Sets subvalue1:subvalue2:subvalue3
      * </pre>
      * 
      * Modifications to the input {@link List} object do not apply to the variable.

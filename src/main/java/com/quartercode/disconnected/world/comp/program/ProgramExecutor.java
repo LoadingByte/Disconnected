@@ -80,13 +80,13 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
      * Queue:  A[1], A[2], B[3], A[4], B[5], B[6]
      * 
      * NEXT_EVENT (matcher for A) returns A[1]
-     * => A[2], B[3], A[4], B[5], B[6]
+     * =&gt; A[2], B[3], A[4], B[5], B[6]
      * 
      * NEXT_EVENT (matcher for B) returns B[3]
-     * => A[2], A[4], B[5], B[6]
+     * =&gt; A[2], A[4], B[5], B[6]
      * 
      * NEXT_EVENT (matcher for A) returns A[2]
-     * => A[4], B[5], B[6]
+     * =&gt; A[4], B[5], B[6]
      * </pre>
      * 
      * <table>
