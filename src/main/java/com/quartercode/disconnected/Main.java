@@ -197,6 +197,7 @@ public class Main {
         registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.net");
         registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.os");
         registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.program");
+        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.program.general");
 
         registry.registerTheme(Main.class.getResource("/ui/default/default.xml"));
         registry.registerTheme(Main.class.getResource("/ui/shell/shell.xml"));
