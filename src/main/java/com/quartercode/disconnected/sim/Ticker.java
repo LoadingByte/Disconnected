@@ -16,10 +16,9 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.run;
+package com.quartercode.disconnected.sim;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -35,6 +34,11 @@ import org.slf4j.LoggerFactory;
 public class Ticker {
 
     private static final Logger    LOGGER                   = LoggerFactory.getLogger(Ticker.class);
+
+    /**
+     * The singleton instance of ticker.
+     */
+    public static final Ticker     INSTANCE                 = new Ticker();
 
     /**
      * The amount of milliseconds the ticker will wait from one tick to another by default.
@@ -53,21 +57,8 @@ public class Ticker {
     // Performance: Object cache
     private List<TickAction>       unmodifiableActions      = Collections.unmodifiableList(actions);
 
-    /**
-     * Creates a new ticker without any tick actions.
-     */
-    public Ticker() {
+    private Ticker() {
 
-    }
-
-    /**
-     * Creates a new ticker and initializes some default tick actions.
-     * 
-     * @param actions A list of default tick actions which get called on every tick.
-     */
-    public Ticker(TickAction... actions) {
-
-        this.actions.addAll(Arrays.asList(actions));
     }
 
     /**

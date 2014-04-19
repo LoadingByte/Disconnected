@@ -20,8 +20,6 @@ package com.quartercode.disconnected;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -43,13 +41,15 @@ import com.quartercode.disconnected.graphics.desktop.DesktopPrograms;
 import com.quartercode.disconnected.graphics.desktop.DesktopTaskbarModule;
 import com.quartercode.disconnected.graphics.desktop.DesktopWidgetModule;
 import com.quartercode.disconnected.graphics.desktop.DesktopWindowAreaModule;
+import com.quartercode.disconnected.sim.Profile;
+import com.quartercode.disconnected.sim.ProfileManager;
 import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.profile.Profile;
-import com.quartercode.disconnected.sim.profile.ProfileManager;
-import com.quartercode.disconnected.sim.run.TickAction;
-import com.quartercode.disconnected.sim.run.TickSimulator;
-import com.quartercode.disconnected.sim.run.Ticker;
-import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
+import com.quartercode.disconnected.sim.TickSimulator;
+import com.quartercode.disconnected.sim.Ticker;
+import com.quartercode.disconnected.sim.gen.SimulationGenerator;
+import com.quartercode.disconnected.util.ApplicationInfo;
+import com.quartercode.disconnected.util.ExitUtil;
+import com.quartercode.disconnected.util.ExitUtil.ExitProcessor;
 import com.quartercode.disconnected.util.LogExceptionHandler;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.Registry;
@@ -65,13 +65,23 @@ public class Main {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-    private static boolean      exitUnderway;
     private static final String JAR_NAME;
 
     static {
 
         String jarName = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
         JAR_NAME = jarName.endsWith(".jar") ? jarName : null;
+
+        // Inject exit processor
+        ExitUtil.injectProcessor(new ExitProcessor() {
+
+            @Override
+            public void exit() {
+
+                GraphicsManager.INSTANCE.setRunning(false);
+                Ticker.INSTANCE.setRunning(false);
+            }
+        });
 
     }
 
@@ -86,7 +96,7 @@ public class Main {
         Thread.setDefaultUncaughtExceptionHandler(new LogExceptionHandler());
 
         // Print information about the software
-        LOGGER.info("Version {}", Disconnected.getVersion());
+        LOGGER.info("Version {}", ApplicationInfo.VERSION);
 
         // Parse command line arguments
         Options options = createCommandLineOptions();
@@ -126,14 +136,12 @@ public class Main {
 
         // Fill registry
         LOGGER.info("Filling class registry");
-        Disconnected.setRegistry(new Registry());
-        fillRegistry(Disconnected.getRegistry());
+        fillRegistry();
 
         // Fill resource store
         try {
             LOGGER.info("Filling resource store");
-            Disconnected.setRS(new ResourceStore());
-            fillResourceStore(Disconnected.getRS());
+            fillResourceStore();
         } catch (Exception e) {
             LOGGER.error("Can't fill resource store", e);
             return;
@@ -141,22 +149,15 @@ public class Main {
 
         // Fill default graphics states
         LOGGER.info("Filling default graphics states");
-        initializeDefaultGraphicsStates();
-
-        // Initialize profile manager and load stored profiles
-        LOGGER.info("Initializing profile manager");
-        Disconnected.setProfileManager(new ProfileManager(new File("profiles")));
+        fillDefaultGraphicsStates();
 
         // Initialize ticker
         LOGGER.info("Initializing ticker");
-        List<TickAction> tickActions = new ArrayList<TickAction>();
-        tickActions.add(new TickSimulator());
-        Disconnected.setTicker(new Ticker(tickActions.toArray(new TickAction[tickActions.size()])));
+        Ticker.INSTANCE.addAction(new TickSimulator());
 
         // Initialize graphics manager and start it
         LOGGER.info("Initializing graphics manager");
-        Disconnected.setGraphicsManager(new GraphicsManager());
-        Disconnected.getGraphicsManager().setRunning(true);
+        GraphicsManager.INSTANCE.setRunning(true);
 
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG-ACTION: Generating new simulation");
@@ -166,9 +167,9 @@ public class Main {
         }
 
         Profile profile = new Profile("test", simulation);
-        Disconnected.getProfileManager().addProfile(profile);
+        ProfileManager.INSTANCE.addProfile(profile);
         try {
-            Disconnected.getProfileManager().setActive(profile);
+            ProfileManager.INSTANCE.setActive(profile);
         } catch (Exception e) {
             e.printStackTrace();
             // Won't ever happen (we just created a new profile)
@@ -176,8 +177,8 @@ public class Main {
 
         // DEBUG: Start "game" with current simulation
         LOGGER.info("DEBUG-ACTION: Starting test-game with current simulation");
-        Disconnected.getTicker().setRunning(true);
-        Disconnected.getGraphicsManager().setState(DefaultStates.DESKTOP.create());
+        Ticker.INSTANCE.setRunning(true);
+        GraphicsManager.INSTANCE.setState(DefaultStates.DESKTOP.create());
     }
 
     @SuppressWarnings ("static-access")
@@ -190,44 +191,41 @@ public class Main {
     }
 
     /**
-     * Fills the given registry with the default values which are needed for running Disconnected.
-     * 
-     * @param registry The registry to fill.
+     * Fills the global {@link Registry#INSTANCE} with the default values which are needed for running Disconnected.
      */
-    public static void fillRegistry(Registry registry) {
+    public static void fillRegistry() {
 
-        registry.registerContextPathEntry(Classmod.CONTEXT_PATH);
-        registry.registerContextPathEntry("com.quartercode.disconnected.sim.run");
-        registry.registerContextPathEntry("com.quartercode.disconnected.world");
-        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp");
-        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.attack");
-        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.file");
-        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.hardware");
-        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.net");
-        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.os");
-        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.program");
-        registry.registerContextPathEntry("com.quartercode.disconnected.world.comp.program.general");
+        Registry.INSTANCE.registerContextPathEntry(Classmod.CONTEXT_PATH);
+        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.sim.scheduler");
+        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world");
+        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world.comp");
+        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world.comp.attack");
+        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world.comp.file");
+        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world.comp.hardware");
+        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world.comp.net");
+        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world.comp.os");
+        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world.comp.program");
+        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world.comp.program.general");
 
-        registry.registerTheme(Main.class.getResource("/ui/default/default.xml"));
-        registry.registerTheme(Main.class.getResource("/ui/shell/shell.xml"));
-        registry.registerTheme(Main.class.getResource("/ui/desktop/desktop.xml"));
+        Registry.INSTANCE.registerTheme(Main.class.getResource("/ui/default/default.xml"));
+        Registry.INSTANCE.registerTheme(Main.class.getResource("/ui/shell/shell.xml"));
+        Registry.INSTANCE.registerTheme(Main.class.getResource("/ui/desktop/desktop.xml"));
     }
 
     /**
-     * Fills the given resource store with the default resource objects which are needed for running Disconnected.
+     * Fills the global {@link ResourceStore#INSTANCE} with the default resource objects which are needed for running Disconnected.
      * 
-     * @param resourceStore The resource store to fill.
      * @throws IOException Something goes wrong while reading from a jar file or resource.
      */
-    public static void fillResourceStore(ResourceStore resourceStore) throws IOException {
+    public static void fillResourceStore() throws IOException {
 
-        resourceStore.loadFromClasspath("/data");
+        ResourceStore.INSTANCE.loadFromClasspath("/data");
     }
 
     /**
      * Adds the default {@link GraphicsModule}s to the default {@link GraphicsState}s declared in {@link DefaultStates}.
      */
-    public static void initializeDefaultGraphicsStates() {
+    public static void fillDefaultGraphicsStates() {
 
         DefaultStates.DESKTOP.addModule(DesktopWidgetModule.class, "desktopWidget", 100);
         DefaultStates.DESKTOP.addModule(DesktopWindowAreaModule.class, "windowArea", 80);
@@ -245,20 +243,6 @@ public class Main {
      */
     public static void fillDefaultDesktopPrograms() {
 
-    }
-
-    /**
-     * Exits the application by shutting down all threads that keep it alive.
-     * Please note that the functionality of this method is only executed once.
-     */
-    public static synchronized void exit() {
-
-        if (!exitUnderway) {
-            exitUnderway = true;
-
-            Disconnected.getGraphicsManager().setRunning(false);
-            Disconnected.getTicker().setRunning(false);
-        }
     }
 
     private Main() {

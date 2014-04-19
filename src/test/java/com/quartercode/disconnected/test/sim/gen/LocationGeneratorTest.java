@@ -16,19 +16,16 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.test.sim.run.util;
+package com.quartercode.disconnected.test.sim.gen;
 
 import java.io.IOException;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.Main;
-import com.quartercode.disconnected.sim.run.util.LocationGenerator;
+import com.quartercode.disconnected.sim.gen.LocationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
-import com.quartercode.disconnected.util.Registry;
-import com.quartercode.disconnected.util.ResourceStore;
 import com.quartercode.disconnected.world.Location;
 
 public class LocationGeneratorTest {
@@ -36,11 +33,8 @@ public class LocationGeneratorTest {
     @BeforeClass
     public static void setUpBeforeClass() throws IOException {
 
-        Disconnected.setRegistry(new Registry());
-        Main.fillRegistry(Disconnected.getRegistry());
-
-        Disconnected.setRS(new ResourceStore());
-        Main.fillResourceStore(Disconnected.getRS());
+        Main.fillRegistry();
+        Main.fillResourceStore();
     }
 
     @Test

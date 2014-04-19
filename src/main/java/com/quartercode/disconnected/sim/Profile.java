@@ -16,9 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.profile;
-
-import com.quartercode.disconnected.sim.Simulation;
+package com.quartercode.disconnected.sim;
 
 /**
  * A profile has a name and an associated simulation.

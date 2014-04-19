@@ -31,13 +31,15 @@ import java.util.List;
  */
 public class Registry {
 
-    private final List<String> contextPath = new ArrayList<String>();
-    private final List<URL>    themes      = new ArrayList<URL>();
-
     /**
-     * Creates a new empty registry.
+     * The singleton instance of registry.
      */
-    public Registry() {
+    public static final Registry INSTANCE    = new Registry();
+
+    private final List<String>   contextPath = new ArrayList<String>();
+    private final List<URL>      themes      = new ArrayList<URL>();
+
+    private Registry() {
 
     }
 

@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.run.util;
+package com.quartercode.disconnected.sim.gen;
 
 import java.util.ArrayList;
 import java.util.List;

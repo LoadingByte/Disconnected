@@ -16,15 +16,15 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.run.util;
+package com.quartercode.disconnected.sim.gen;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
-import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.util.RandomPool;
+import com.quartercode.disconnected.util.ResourceStore;
 import com.quartercode.disconnected.world.Location;
 
 /**
@@ -58,7 +58,7 @@ public class LocationGenerator {
 
         Validate.isTrue(amount > 0, "Generation amount (%d) must be > 0", amount);
 
-        BufferedImage map = (BufferedImage) Disconnected.getRS().get("map.png");
+        BufferedImage map = (BufferedImage) ResourceStore.INSTANCE.get("map.png");
 
         if (ignore == null) {
             ignore = new ArrayList<Location>();

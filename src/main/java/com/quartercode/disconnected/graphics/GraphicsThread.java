@@ -36,8 +36,9 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.quartercode.disconnected.Disconnected;
-import com.quartercode.disconnected.Main;
+import com.quartercode.disconnected.util.ApplicationInfo;
+import com.quartercode.disconnected.util.ExitUtil;
+import com.quartercode.disconnected.util.Registry;
 import de.matthiasmann.twl.Container;
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.renderer.Renderer;
@@ -128,7 +129,7 @@ public class GraphicsThread extends Thread {
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         Display.setDisplayMode(new DisplayMode((int) (screenSize.width * 0.75F), (int) (screenSize.height * 0.75F)));
-        Display.setTitle("Disconnected " + Disconnected.getVersion());
+        Display.setTitle("Disconnected " + ApplicationInfo.VERSION);
         Display.setIcon(loadIcons());
         Display.setVSyncEnabled(true);
         Display.create();
@@ -187,7 +188,7 @@ public class GraphicsThread extends Thread {
             themeFileWriter.println("<!DOCTYPE themes PUBLIC \"-//www.matthiasmann.de//TWL-Theme//EN\"");
             themeFileWriter.println("\"http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd\">");
             themeFileWriter.println("<themes>");
-            for (URL themeURL : Disconnected.getRegistry().getThemes()) {
+            for (URL themeURL : Registry.INSTANCE.getThemes()) {
                 themeFileWriter.println("<include filename=\"" + themeURL + "\"/>");
             }
             themeFileWriter.println("</themes>");
@@ -247,7 +248,7 @@ public class GraphicsThread extends Thread {
         Display.destroy();
 
         // Try to exit (the exit method blocks the call if it was already called)
-        Main.exit();
+        ExitUtil.exit();
     }
 
 }

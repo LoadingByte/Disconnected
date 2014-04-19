@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.profile;
+package com.quartercode.disconnected.sim;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,9 +26,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBException;
-import com.quartercode.disconnected.Disconnected;
-import com.quartercode.disconnected.sim.Simulation;
-import com.quartercode.disconnected.sim.run.TickSimulator;
 
 /**
  * This class manages different progiles which store simulations and random objects.
@@ -39,18 +36,17 @@ import com.quartercode.disconnected.sim.run.TickSimulator;
  */
 public class ProfileManager {
 
-    private final File          directory;
-
-    private final List<Profile> profiles = new ArrayList<Profile>();
-    private Profile             active;
-
     /**
-     * Creates a new profile manager which stores its profiles in the given directory.
-     * The constructor also loads all profile as trunks which are present in the given directory.
-     * 
-     * @param directory The directory the new manager will store its profiles in.
+     * The singleton instance of profile manager.
      */
-    public ProfileManager(File directory) {
+    public static final ProfileManager INSTANCE = new ProfileManager(new File("profiles"));
+
+    private final File                 directory;
+
+    private final List<Profile>        profiles = new ArrayList<Profile>();
+    private Profile                    active;
+
+    private ProfileManager(File directory) {
 
         this.directory = directory;
 
@@ -180,8 +176,9 @@ public class ProfileManager {
             }
         }
 
-        if (Disconnected.getTicker() != null) {
-            Disconnected.getTicker().getAction(TickSimulator.class).setSimulation(profile == null ? null : profile.getSimulation());
+        TickSimulator simulator = Ticker.INSTANCE.getAction(TickSimulator.class);
+        if (simulator != null) {
+            simulator.setSimulation(profile == null ? null : profile.getSimulation());
         }
     }
 

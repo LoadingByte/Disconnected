@@ -30,8 +30,7 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.extra.def.ReferenceCollectionProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.sim.run.Scheduler;
-import com.quartercode.disconnected.sim.run.SchedulerUser;
+import com.quartercode.disconnected.sim.SchedulerUser;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.event.Event;
 import com.quartercode.disconnected.world.event.EventListener;
@@ -109,7 +108,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
 
     /**
      * This callback is executed once when the program executor should start running.
-     * For example, this method could schedule tasks using the {@link Scheduler}.
+     * For example, this method could schedule tasks using the scheduler.
      */
     public static final FunctionDefinition<Void>                                         RUN;
 

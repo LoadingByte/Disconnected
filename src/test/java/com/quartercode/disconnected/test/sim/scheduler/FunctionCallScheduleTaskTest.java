@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.test.sim;
+package com.quartercode.disconnected.test.sim.scheduler;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -39,8 +39,8 @@ import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.sim.run.FunctionCallScheduleTask;
-import com.quartercode.disconnected.sim.run.Scheduler;
+import com.quartercode.disconnected.sim.scheduler.FunctionCallScheduleTask;
+import com.quartercode.disconnected.sim.scheduler.Scheduler;
 
 @RunWith (Parameterized.class)
 public class FunctionCallScheduleTaskTest {

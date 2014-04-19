@@ -30,13 +30,11 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.world.StringRepresentable;
-import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
 
 /**
  * This class represents an ip address which is used to define the "location of a computer in the internet".
  * For an exact breakdown of ip addresses, use the javadoc of {@link InetAddress}.
  * 
- * @see NetworkInterface
  * @see Address
  */
 public class IP extends DefaultFeatureHolder implements StringRepresentable {

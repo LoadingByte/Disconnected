@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.profile;
+package com.quartercode.disconnected.sim;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -32,9 +32,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.quartercode.disconnected.Disconnected;
-import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.util.RandomPool;
+import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.world.World;
 
 /**
@@ -117,7 +116,7 @@ public class ProfileSerializer {
     public static JAXBContext createWorldContext() {
 
         StringBuilder contextPathStringBuilder = new StringBuilder();
-        for (String contextPathEntry : Disconnected.getRegistry().getContextPath()) {
+        for (String contextPathEntry : Registry.INSTANCE.getContextPath()) {
             contextPathStringBuilder.append(":").append(contextPathEntry);
         }
         String contextPathString = contextPathStringBuilder.length() > 0 ? contextPathStringBuilder.substring(1) : "";

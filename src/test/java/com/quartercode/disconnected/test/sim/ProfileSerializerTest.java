@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.test.sim.profile;
+package com.quartercode.disconnected.test.sim;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -33,13 +33,10 @@ import org.junit.Test;
 import com.quartercode.classmod.base.Feature;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.Property;
-import com.quartercode.disconnected.Disconnected;
 import com.quartercode.disconnected.Main;
-import com.quartercode.disconnected.sim.profile.ProfileSerializer;
-import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
+import com.quartercode.disconnected.sim.ProfileSerializer;
+import com.quartercode.disconnected.sim.gen.SimulationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
-import com.quartercode.disconnected.util.Registry;
-import com.quartercode.disconnected.util.ResourceStore;
 import com.quartercode.disconnected.world.World;
 
 public class ProfileSerializerTest {
@@ -49,17 +46,14 @@ public class ProfileSerializerTest {
     @BeforeClass
     public static void setUpBeforeClass() throws IOException {
 
-        Disconnected.setRegistry(new Registry());
-        Main.fillRegistry(Disconnected.getRegistry());
-
-        Disconnected.setRS(new ResourceStore());
-        Main.fillResourceStore(Disconnected.getRS());
+        Main.fillRegistry();
+        Main.fillResourceStore();
     }
 
     @Before
     public void setUp() {
 
-        world = SimulationGenerator.generateWorld(10, null, new RandomPool(100));
+        world = SimulationGenerator.generateWorld(10, null, new RandomPool(10));
     }
 
     @Test

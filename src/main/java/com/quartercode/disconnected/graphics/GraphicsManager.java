@@ -27,15 +27,17 @@ import org.slf4j.LoggerFactory;
  */
 public class GraphicsManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GraphicsManager.class);
-
-    private GraphicsThread      thread;
-    private GraphicsState       state;
+    private static final Logger         LOGGER   = LoggerFactory.getLogger(GraphicsManager.class);
 
     /**
-     * Creates a new graphics manager.
+     * The singleton instance of profile manager.
      */
-    public GraphicsManager() {
+    public static final GraphicsManager INSTANCE = new GraphicsManager();
+
+    private GraphicsThread              thread;
+    private GraphicsState               state;
+
+    private GraphicsManager() {
 
     }
 

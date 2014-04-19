@@ -16,11 +16,10 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.run;
+package com.quartercode.disconnected.sim;
 
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.ValueSupplier;
-import com.quartercode.disconnected.sim.Simulation;
 
 /**
  * This class implements the root tick update mechanisms for the entire simulation.

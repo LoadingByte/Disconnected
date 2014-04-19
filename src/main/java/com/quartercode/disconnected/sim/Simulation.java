@@ -18,8 +18,6 @@
 
 package com.quartercode.disconnected.sim;
 
-import com.quartercode.disconnected.sim.run.TickSimulator;
-import com.quartercode.disconnected.sim.run.Ticker;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.World;
 

@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.run;
+package com.quartercode.disconnected.sim.scheduler;
 
 import java.lang.reflect.Field;
 import javax.xml.bind.annotation.XmlElement;

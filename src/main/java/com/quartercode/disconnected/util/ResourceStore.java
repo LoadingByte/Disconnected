@@ -33,12 +33,14 @@ import javax.imageio.ImageIO;
  */
 public class ResourceStore {
 
+    /**
+     * The singleton instance of resource store.
+     */
+    public static final ResourceStore INSTANCE        = new ResourceStore();
+
     private final Map<String, Object> loadedResources = new HashMap<String, Object>();
 
-    /**
-     * Creates a new empty resource store.
-     */
-    public ResourceStore() {
+    private ResourceStore() {
 
     }
 

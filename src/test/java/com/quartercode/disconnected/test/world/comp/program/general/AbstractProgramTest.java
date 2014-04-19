@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.test.world.comp.program.general;
 
 import org.junit.Before;
-import com.quartercode.disconnected.sim.run.util.SimulationGenerator;
+import com.quartercode.disconnected.sim.gen.SimulationGenerator;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.Version;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
