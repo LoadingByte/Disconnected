@@ -18,15 +18,17 @@
 
 package com.quartercode.disconnected.sim;
 
+import java.lang.ref.WeakReference;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.ValueSupplier;
+import com.quartercode.disconnected.world.World;
 
 /**
- * This class implements the root tick update mechanisms for the entire simulation.
+ * This class implements the tick update mechanism for simulating a {@link World}.
  */
 public class TickSimulator implements TickAction {
 
-    private Simulation simulation;
+    private volatile WeakReference<World> world;
 
     /**
      * Creates a new empty tick simulator.
@@ -36,46 +38,35 @@ public class TickSimulator implements TickAction {
     }
 
     /**
-     * Creates a new tick simulator and sets the simulation to simulate.
+     * Returns the {@link World} that is currently simulated by the tick simulator.
      * 
-     * @param simulation The simulation to simulate.
+     * @return The currently simulated world.
      */
-    public TickSimulator(Simulation simulation) {
+    public World getWorld() {
 
-        this.simulation = simulation;
+        return world == null ? null : world.get();
     }
 
     /**
-     * Returns the simulation to simulate.
+     * Changes the {@link World} that is currently simulated by the tick simulator.
+     * The change will take place in the next tick.
      * 
-     * @return The simulation to simulate.
+     * @param world The new world to simulate.
      */
-    public Simulation getSimulation() {
+    public void setWorld(World world) {
 
-        return simulation;
+        this.world = world == null ? null : new WeakReference<World>(world);
     }
 
     /**
-     * Sets the simulation to simulate to a new one.
-     * The action will take place in the next tick.
-     * 
-     * @param simulation The new simulation to simulate.
-     */
-    public void setSimulation(Simulation simulation) {
-
-        this.simulation = simulation;
-    }
-
-    /**
-     * Executes the basic (root) tick update which is called in the same intervals.
-     * This calls some subroutines which actually simulate a tick.
+     * Executes the tick update on all {@link TickUpdatable}s of the set world.
      */
     @Override
     public void update() {
 
-        if (simulation != null) {
+        if (getWorld() != null) {
             // Execute world object ticks
-            updateObject(simulation.getWorld());
+            updateObject(getWorld());
         }
     }
 

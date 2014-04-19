@@ -27,8 +27,8 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.util.NullPreventer;
-import com.quartercode.disconnected.world.StringRepresentable;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
+import com.quartercode.disconnected.world.general.StringRepresentable;
 
 /**
  * File rights control the access to files by users.

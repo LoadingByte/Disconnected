@@ -34,10 +34,11 @@ import com.quartercode.classmod.base.Feature;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.Property;
 import com.quartercode.disconnected.Main;
+import com.quartercode.disconnected.sim.Profile;
 import com.quartercode.disconnected.sim.ProfileSerializer;
-import com.quartercode.disconnected.sim.gen.SimulationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.World;
+import com.quartercode.disconnected.world.gen.WorldGenerator;
 
 public class ProfileSerializerTest {
 
@@ -53,7 +54,7 @@ public class ProfileSerializerTest {
     @Before
     public void setUp() {
 
-        world = SimulationGenerator.generateWorld(10, null, new RandomPool(10));
+        world = WorldGenerator.generateWorld(new RandomPool(Profile.DEFAULT_RANDOM_POOL_SIZE), 10);
     }
 
     @Test

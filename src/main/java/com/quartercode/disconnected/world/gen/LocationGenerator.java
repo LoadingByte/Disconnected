@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.gen;
+package com.quartercode.disconnected.world.gen;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.ResourceStore;
-import com.quartercode.disconnected.world.Location;
+import com.quartercode.disconnected.world.general.Location;
 
 /**
  * This utility class generates random locations on an earth map.

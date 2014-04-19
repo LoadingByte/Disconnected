@@ -24,9 +24,9 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import com.quartercode.disconnected.Main;
-import com.quartercode.disconnected.sim.gen.LocationGenerator;
 import com.quartercode.disconnected.util.RandomPool;
-import com.quartercode.disconnected.world.Location;
+import com.quartercode.disconnected.world.gen.LocationGenerator;
+import com.quartercode.disconnected.world.general.Location;
 
 public class LocationGeneratorTest {
 

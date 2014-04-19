@@ -21,11 +21,10 @@ package com.quartercode.disconnected.world;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
-import com.quartercode.disconnected.sim.Simulation;
+import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.comp.Computer;
 
 /**
@@ -48,45 +47,36 @@ public class World extends DefaultFeatureHolder {
 
     }
 
-    private Simulation                                                         simulation;
+    private RandomPool                                                         random;
 
     /**
      * Creates a new empty world.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * Please note that a {@link RandomPool} must be injected after creation using {@link #injectRandom(RandomPool)}.
      */
-    protected World() {
+    public World() {
 
     }
 
     /**
-     * Creates a new world which is placed in the given {@link Simulation}.
+     * Returns the {@link RandomPool} that can be used by the world.
+     * It is must be injected using {@link #injectRandom(RandomPool)}.
      * 
-     * @param simulation The simulation the new world is placed in.
+     * @return The random pool the world can use.
      */
-    public World(Simulation simulation) {
+    public RandomPool getRandom() {
 
-        this.simulation = simulation;
+        return random;
     }
 
     /**
-     * Returns the {@link Simulation} the world is placed in.
+     * Injects a {@link RandomPool} that can be used by the world.
+     * It can be retrieved with {@link #getRandom()}.
      * 
-     * @return The world's simulation.
+     * @param random The random pool the world can use.
      */
-    @XmlTransient
-    public Simulation getSimulation() {
+    public void injectRandom(RandomPool random) {
 
-        return simulation;
-    }
-
-    /**
-     * Changes the {@link Simulation} the world is placed in.
-     * 
-     * @param simulation The new simulation that uses the world.
-     */
-    public void setSimulation(Simulation simulation) {
-
-        this.simulation = simulation;
+        this.random = random;
     }
 
 }

@@ -16,13 +16,11 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim.gen;
+package com.quartercode.disconnected.world.gen;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.util.RandomPool;
-import com.quartercode.disconnected.world.Location;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.ByteUnit;
 import com.quartercode.disconnected.world.comp.Computer;
@@ -52,44 +50,27 @@ import com.quartercode.disconnected.world.comp.os.User;
 import com.quartercode.disconnected.world.comp.program.Program;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.comp.program.general.FileCreateProgram;
+import com.quartercode.disconnected.world.general.Location;
 
 /**
- * This utility class generates {@link Simulation}s, {@link World}s and parts of worlds.
+ * The world generator utility generates {@link World}s and parts of worlds.
  * 
- * @see Simulation
  * @see World
  */
-public class SimulationGenerator {
+public class WorldGenerator {
 
     /**
-     * Generates a new {@link Simulation} with the given settings.
-     * This basically uses {@link #generateWorld(int, Simulation, RandomPool)} for creating a new world.
+     * Generates a new {@link World} with the given amount of {@link Computer}s using the given {@link RandomPool}.
      * 
-     * @param computers The amount of {@link Computer}s the generator should generate.
-     * @param random The {@link RandomPool} to use for the new simulation.
-     * @return The generated simulation object.
+     * @param random A {@link RandomPool} that is used for randomizing the generation process.
+     * @param computers The amount of computers the generator should generate.
+     * @return The newly generated world object.
      */
-    public static Simulation generateSimulation(int computers, RandomPool random) {
+    public static World generateWorld(RandomPool random, int computers) {
 
-        Simulation simulation = new Simulation(random);
-        simulation.setWorld(generateWorld(computers, simulation, random));
-        return simulation;
-    }
+        World world = new World();
 
-    /**
-     * Generates a new {@link World} with the given settings for the given {@link Simulation}.
-     * If you don't want to use the world in a simulation, you can set it to <code>null</code>.
-     * 
-     * @param computers The amount of {@link Computer}s the generator should generate.
-     * @param simulation The simulation the new world is generated for. This may be <code>null</code>.
-     * @param random The {@link RandomPool} which is used for generating the world.
-     * @return The generated world object.
-     */
-    public static World generateWorld(int computers, Simulation simulation, RandomPool random) {
-
-        World world = new World(simulation);
-
-        for (Computer computer : generateComputers(computers, random)) {
+        for (Computer computer : generateComputers(random, computers)) {
             world.get(World.COMPUTERS).add(computer);
         }
 
@@ -99,24 +80,24 @@ public class SimulationGenerator {
     /**
      * Generates the given amount of {@link Computer}s randomly.
      * 
-     * @param amount The amount of computers the generator should generate.
      * @param random The {@link RandomPool} which is used for generating the computers.
+     * @param amount The amount of computers the generator should generate.
      * @return The generated list of computers.
      */
-    public static List<Computer> generateComputers(int amount, RandomPool random) {
+    public static List<Computer> generateComputers(RandomPool random, int amount) {
 
-        return generateComputers(amount, null, random);
+        return generateComputers(random, amount, null);
     }
 
     /**
      * Generates the given amount of {@link Computer}s randomly while excluding the {@link Location}s of the given computerss.
      * 
+     * @param random The {@link RandomPool} which is used for generating the computers.
      * @param amount The amount of computers the generator should generate.
      * @param ignore There won't be any computers with one of those locations.
-     * @param random The {@link RandomPool} which is used for generating the computers.
      * @return The generated list of computers.
      */
-    public static List<Computer> generateComputers(int amount, List<Computer> ignore, RandomPool random) {
+    public static List<Computer> generateComputers(RandomPool random, int amount, List<Computer> ignore) {
 
         List<Computer> computers = new ArrayList<Computer>();
 
@@ -311,7 +292,7 @@ public class SimulationGenerator {
         return file;
     }
 
-    private SimulationGenerator() {
+    private WorldGenerator() {
 
     }
 

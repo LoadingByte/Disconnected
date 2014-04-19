@@ -18,26 +18,36 @@
 
 package com.quartercode.disconnected.sim;
 
+import com.quartercode.disconnected.util.RandomPool;
+import com.quartercode.disconnected.world.World;
+
 /**
- * A profile has a name and an associated simulation.
+ * A profile has a name and an associated {@link World}.
+ * It also holds a {@link RandomPool}.
  * 
  * @see ProfileManager
  */
 public class Profile {
 
-    private String     name;
-    private Simulation simulation;
+    /**
+     * The default size that a {@link RandomPool}, which is used for a profile, should have.
+     */
+    public static final int DEFAULT_RANDOM_POOL_SIZE = 10;
+
+    private String          name;
+
+    private World           world;
+    private RandomPool      random;
 
     /**
-     * Creates a new profile with the given name and simulation.
+     * Creates a new profile with the given name.
+     * Please note that the {@link World} and the {@link RandomPool} the profile manages must be injected later on.
      * 
      * @param name The name for the new profile.
-     * @param simulation The simulation the new profile will hold.
      */
-    public Profile(String name, Simulation simulation) {
+    public Profile(String name) {
 
         this.name = name;
-        this.simulation = simulation;
     }
 
     /**
@@ -61,71 +71,65 @@ public class Profile {
     }
 
     /**
-     * Returns the simulation which is associated with the name of the profile.
-     * If the simulation object is null, you can use {@link ProfileManager#setActive(Profile)} to deserialize the rest.
+     * Returns the {@link World} which is associated with the name of the profile.
      * 
-     * @return Ther simulation the profile holds.
+     * @return The world the profile holds.
      */
-    public Simulation getSimulation() {
+    public World getWorld() {
 
-        return simulation;
+        return world;
     }
 
     /**
-     * Changes the simulation object which is used in the profile.
-     * This method should only be used by deserialization algorithms.
+     * Changes the {@link World} which is associated with the name of the profile.
+     * This method should only be used by deserialization algorithms.<br>
+     * This method also injects the set {@link RandomPool} into the new world.
      * 
-     * @param simulation The new simulation for the profile.
+     * @param world The new world for the profile.
      */
-    protected void setSimulation(Simulation simulation) {
+    public void setWorld(World world) {
 
-        this.simulation = simulation;
+        // Clear the random from the old world
+        if (this.world != null) {
+            this.world.injectRandom(null);
+        }
+
+        this.world = world;
+
+        // Inject the random into the new world
+        injectRandomIntoWorld();
     }
 
-    @Override
-    public int hashCode() {
+    /**
+     * Returns the {@link RandomPool} that can be used by the stored {@link World}.
+     * 
+     * @return The random pool for the stored world.
+     */
+    public RandomPool getRandom() {
 
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        result = prime * result + (simulation == null ? 0 : simulation.hashCode());
-        return result;
+        return random;
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    /**
+     * Changes the {@link RandomPool} that can be used by the stored {@link World}.
+     * This method should only be used by deserialization algorithms.<br>
+     * This method also injects the new random poll into the current world.
+     * 
+     * @param random The new random pool for the stored world.
+     */
+    public void setRandom(RandomPool random) {
 
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        Profile other = (Profile) obj;
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (simulation == null) {
-            if (other.simulation != null) {
-                return false;
-            }
-        } else if (!simulation.equals(other.simulation)) {
-            return false;
-        }
-        return true;
+        this.random = random;
+
+        // Inject the new random into the current world
+        injectRandomIntoWorld();
     }
 
-    @Override
-    public String toString() {
+    private void injectRandomIntoWorld() {
 
-        return name;
+        if (world != null) {
+            world.injectRandom(random);
+        }
     }
 
 }

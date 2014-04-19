@@ -28,7 +28,7 @@ import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.world.StringRepresentable;
+import com.quartercode.disconnected.world.general.StringRepresentable;
 
 /**
  * This class represents an address which locates a specific service which is available through a specific network interface.

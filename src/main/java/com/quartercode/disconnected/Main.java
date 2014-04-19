@@ -43,10 +43,8 @@ import com.quartercode.disconnected.graphics.desktop.DesktopWidgetModule;
 import com.quartercode.disconnected.graphics.desktop.DesktopWindowAreaModule;
 import com.quartercode.disconnected.sim.Profile;
 import com.quartercode.disconnected.sim.ProfileManager;
-import com.quartercode.disconnected.sim.Simulation;
 import com.quartercode.disconnected.sim.TickSimulator;
 import com.quartercode.disconnected.sim.Ticker;
-import com.quartercode.disconnected.sim.gen.SimulationGenerator;
 import com.quartercode.disconnected.util.ApplicationInfo;
 import com.quartercode.disconnected.util.ExitUtil;
 import com.quartercode.disconnected.util.ExitUtil.ExitProcessor;
@@ -57,6 +55,7 @@ import com.quartercode.disconnected.util.ResourceStore;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.world.gen.WorldGenerator;
 
 /**
  * The main class which initializes the whole game.
@@ -161,12 +160,15 @@ public class Main {
 
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG-ACTION: Generating new simulation");
-        Simulation simulation = SimulationGenerator.generateSimulation(10, new RandomPool(Simulation.RANDOM_POOL_SIZE));
-        for (Computer computer : simulation.getWorld().get(World.COMPUTERS).get()) {
+        RandomPool random = new RandomPool(Profile.DEFAULT_RANDOM_POOL_SIZE);
+        World world = WorldGenerator.generateWorld(random, 10);
+        for (Computer computer : world.get(World.COMPUTERS).get()) {
             computer.get(Computer.OS).get().get(OperatingSystem.SET_RUNNING).invoke(true);
         }
 
-        Profile profile = new Profile("test", simulation);
+        Profile profile = new Profile("test");
+        profile.setWorld(world);
+        profile.setRandom(random);
         ProfileManager.INSTANCE.addProfile(profile);
         try {
             ProfileManager.INSTANCE.setActive(profile);

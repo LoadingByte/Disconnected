@@ -52,7 +52,8 @@ public class ProfileManager {
 
         if (directory.exists()) {
             for (File profileFile : directory.listFiles()) {
-                profiles.add(new Profile(profileFile.getName().substring(0, profileFile.getName().lastIndexOf(".")), null));
+                String profileName = profileFile.getName().substring(0, profileFile.getName().lastIndexOf("."));
+                profiles.add(new Profile(profileName));
             }
         } else {
             directory.mkdirs();
@@ -131,7 +132,7 @@ public class ProfileManager {
     }
 
     /**
-     * Returns the currently active profile which is simulated at the time.
+     * Returns the currently active {@link Profile} which is simulated at the time.
      * 
      * @return The currently active profile.
      */
@@ -141,9 +142,9 @@ public class ProfileManager {
     }
 
     /**
-     * Changes the currently active profile.
+     * Changes the currently active {@link Profile}.
      * By setting a profile active, it will deserialize the data of it.
-     * By seeting a profile inactive, it will unlink the data of it from the memory.
+     * By setting a profile inactive, it will unlink the data of it from the memory.
      * If you want to deactivate the current profile without activating a new one, you can use null.
      * The change will take place in the next tick.
      * 
@@ -151,34 +152,33 @@ public class ProfileManager {
      * @throws IOException Something goes wrong while reading from the profile zip.
      * @throws JAXBException An exception occurres while deserializing the simulation's xml document.
      * @throws ClassNotFoundException A class which is used for the random pool can't be found.
+     * @throws IllegalStateException Either the stored world or the stored random pool is invalid or does not exist.
      */
-    public void setActive(Profile profile) throws IOException, JAXBException, ClassNotFoundException {
+    public void setActive(Profile profile) throws IOException, JAXBException, ClassNotFoundException, IllegalStateException {
 
         if (active != null) {
-            active.setSimulation(null);
+            active.setWorld(null);
+            active.setRandom(null);
         }
 
         active = profile;
 
-        File profileFile = new File(directory, profile.getName() + ".zip");
-        if (profileFile.exists()) {
-            FileInputStream inputStream = null;
-            try {
-                inputStream = new FileInputStream(profileFile);
-                Simulation simulation = ProfileSerializer.deserializeSimulation(inputStream);
-                if (simulation == null) {
-                    profile.setSimulation(simulation);
-                } else {
-                    // TODO: React on deserialization fail
+        if (active != null && (active.getWorld() == null || active.getRandom() == null)) {
+            File profileFile = new File(directory, active.getName() + ".zip");
+            if (profileFile.exists()) {
+                FileInputStream inputStream = null;
+                try {
+                    inputStream = new FileInputStream(profileFile);
+                    ProfileSerializer.deserializeProfile(inputStream, active);
+                } finally {
+                    inputStream.close();
                 }
-            } finally {
-                inputStream.close();
             }
         }
 
         TickSimulator simulator = Ticker.INSTANCE.getAction(TickSimulator.class);
         if (simulator != null) {
-            simulator.setSimulation(profile == null ? null : profile.getSimulation());
+            simulator.setWorld(active == null ? null : active.getWorld());
         }
     }
 

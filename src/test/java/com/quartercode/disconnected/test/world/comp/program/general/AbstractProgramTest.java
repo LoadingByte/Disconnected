@@ -19,7 +19,6 @@
 package com.quartercode.disconnected.test.world.comp.program.general;
 
 import org.junit.Before;
-import com.quartercode.disconnected.sim.gen.SimulationGenerator;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.Version;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
@@ -31,6 +30,7 @@ import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.world.comp.program.Program;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
+import com.quartercode.disconnected.world.gen.WorldGenerator;
 
 public abstract class AbstractProgramTest {
 
@@ -49,7 +49,7 @@ public abstract class AbstractProgramTest {
     @Before
     public void setUp() {
 
-        computer = SimulationGenerator.generateComputer();
+        computer = WorldGenerator.generateComputer();
 
         os = computer.get(Computer.OS).get();
         os.get(OperatingSystem.SET_RUNNING).invoke(true);

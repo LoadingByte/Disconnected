@@ -24,11 +24,11 @@ import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
 import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.disconnected.world.Location;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.world.general.Location;
 
 /**
  * This class stores information about a computer, like the {@link Location} or the {@link Hardware} parts.

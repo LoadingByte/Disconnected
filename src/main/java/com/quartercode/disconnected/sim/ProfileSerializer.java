@@ -30,8 +30,6 @@ import java.util.zip.ZipOutputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.world.World;
@@ -45,44 +43,42 @@ import com.quartercode.disconnected.world.World;
  */
 public class ProfileSerializer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProfileSerializer.class);
-
     /**
      * Serializes the given {@link Profile} to the given {@link OutputStream}.
-     * This writes a zip to the stream which contains the data of the {@link Profile}.
+     * This writes a zip to the stream which contains the data of the profile.
      * 
-     * @param outputStream The {@link OutputStream} for writing.
-     * @param profile The {@link Profile} to serialize to the given {@link OutputStream}.
+     * @param outputStream The output stream to write the result to.
+     * @param profile The profile to serialize to the given output stream.
      * @throws IOException Something goes wrong while writing to the stream.
-     * @throws JAXBException An exception occurres while serializing the {@link World} of the {@link Simulation} as xml.
+     * @throws JAXBException An exception occurres while serializing the {@link World} of the profile as xml.
      */
     public static void serializeProfile(OutputStream outputStream, Profile profile) throws IOException, JAXBException {
 
         ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
 
         zipOutputStream.putNextEntry(new ZipEntry("world.xml"));
-        serializeWorld(zipOutputStream, profile.getSimulation().getWorld());
+        serializeWorld(zipOutputStream, profile.getWorld());
         zipOutputStream.closeEntry();
 
         zipOutputStream.putNextEntry(new ZipEntry("random.ser"));
-        serializeRandom(zipOutputStream, profile.getSimulation().getRandom());
+        serializeRandom(zipOutputStream, profile.getRandom());
         zipOutputStream.closeEntry();
 
         zipOutputStream.close();
     }
 
     /**
-     * Deserializes the data of a {@link Profile} (like the {@link Simulation}) from the given {@link InputStream}.
-     * This reads a zip from the stream which contains the data of the {@link Profile}.
-     * This returns null if the algorithm can't read the required files from the {@link InputStream}.
+     * Deserializes the data of a {@link Profile} (the {@link World} and the {@link RandomPool}) from the given {@link InputStream}.
+     * This reads a zip from the stream which contains the data of the given profile.
      * 
-     * @param inputStream The {@link InputStream} for reading.
-     * @return The deserialized {@link Simulation} object.
+     * @param inputStream The input stream to read the data from.
+     * @param target The profile where the deserialized data should be put into.
      * @throws IOException Something goes wrong while reading from the stream.
-     * @throws JAXBException An exception occurres while deserializing the {@link Simulation}'s xml document.
-     * @throws ClassNotFoundException A class which is used for the {@link RandomPool} can't be found.
+     * @throws JAXBException An exception occurres while deserializing the world's xml document.
+     * @throws ClassNotFoundException A class which is used by the random pool class cannot be found.
+     * @throws IllegalStateException Either the stored world or the stored random pool is invalid or does not exist.
      */
-    public static Simulation deserializeSimulation(InputStream inputStream) throws IOException, JAXBException, ClassNotFoundException {
+    public static void deserializeProfile(InputStream inputStream, Profile target) throws IOException, JAXBException, ClassNotFoundException {
 
         World world = null;
         RandomPool random = null;
@@ -98,22 +94,21 @@ public class ProfileSerializer {
         }
         zipInputStream.close();
 
-        if (world != null && random != null) {
-            Simulation simulation = new Simulation(random);
-            simulation.setWorld(world);
-            world.setSimulation(simulation);
-            return simulation;
-        } else {
-            return null;
+        if (world == null || random == null) {
+            throw new IllegalStateException("No valid world or random pool object found");
         }
+
+        target.setWorld(world);
+        target.setRandom(random);
     }
 
     /**
      * Creates a new {@link JAXBContext} which can be used for {@link World} xml model.
      * 
      * @return A {@link JAXBContext} for the {@link World} model.
+     * @throws JAXBException The world jaxb context cannot be created.
      */
-    public static JAXBContext createWorldContext() {
+    public static JAXBContext createWorldContext() throws JAXBException {
 
         StringBuilder contextPathStringBuilder = new StringBuilder();
         for (String contextPathEntry : Registry.INSTANCE.getContextPath()) {
@@ -121,21 +116,15 @@ public class ProfileSerializer {
         }
         String contextPathString = contextPathStringBuilder.length() > 0 ? contextPathStringBuilder.substring(1) : "";
 
-        try {
-            return JAXBContext.newInstance(contextPathString);
-        } catch (JAXBException e) {
-            LOGGER.error("A JAXB exception occurred while creating context", e);
-        }
-
-        return null;
+        return JAXBContext.newInstance(contextPathString);
     }
 
     /**
-     * Writes a {@link World} as xml to an {@link OutputStream}.
+     * Writes a {@link World} to an {@link OutputStream} as xml.
      * 
-     * @param outputStream The {@link OutputStream} for writing.
-     * @param world The {@link World} to serialize.
-     * @throws JAXBException An exception occurred while serializing the xml document.
+     * @param outputStream The output stream to write the world xml to.
+     * @param world The world to serialize.
+     * @throws JAXBException An exception occurred while serializing the world.
      */
     public static void serializeWorld(OutputStream outputStream, World world) throws JAXBException {
 
@@ -148,9 +137,9 @@ public class ProfileSerializer {
     /**
      * Reads a {@link World} which is saved as xml from an {@link InputStream}.
      * 
-     * @param inputStream The {@link InputStream} for reading.
-     * @return The deserialized {@link World} object.
-     * @throws JAXBException An exception occurred while deserializing the xml document.
+     * @param inputStream The input stream to read the xml from.
+     * @return The deserialized world object.
+     * @throws JAXBException An exception occurred while deserializing the world's xml document.
      */
     public static World deserializeWorld(InputStream inputStream) throws JAXBException {
 
@@ -160,8 +149,8 @@ public class ProfileSerializer {
     /**
      * Serializes the given {@link RandomPool} to the given {@link OutputStream}.
      * 
-     * @param outputStream The {@link OutputStream} for writing.
-     * @param random The {@link RandomPool} to serialize to the given {@link OutputStream}.
+     * @param outputStream The output stream to write the random pool to.
+     * @param random The random pool to serialize to the given output stream.
      * @throws IOException Something goes wrong while writing to the stream.
      */
     public static void serializeRandom(OutputStream outputStream, RandomPool random) throws IOException {
@@ -174,10 +163,10 @@ public class ProfileSerializer {
     /**
      * Deserializes a {@link RandomPool} from the given {@link InputStream}.
      * 
-     * @param inputStream The {@link InputStream} for reading.
-     * @return The deserialized {@link RandomPool}.
+     * @param inputStream The input stream to read the random pool from.
+     * @return The deserialized random pool.
      * @throws IOException Something goes wrong while reading from the stream.
-     * @throws ClassNotFoundException A class which is used in the {@link RandomPool} can't be found.
+     * @throws ClassNotFoundException A class which is used by the random pool can't be found.
      */
     public static RandomPool deserializeRandom(InputStream inputStream) throws IOException, ClassNotFoundException {
 
