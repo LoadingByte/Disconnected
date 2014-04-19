@@ -66,6 +66,14 @@ public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     private static boolean      exitUnderway;
+    private static final String JAR_NAME;
+
+    static {
+
+        String jarName = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
+        JAR_NAME = jarName.endsWith(".jar") ? jarName : null;
+
+    }
 
     /**
      * The main method which initializes the whole game.
@@ -87,13 +95,14 @@ public class Main {
             line = new PosixParser().parse(options, args, true);
         } catch (ParseException e) {
             LOGGER.warn(e.getMessage());
-            new HelpFormatter().printHelp("java -jar disconnected-" + Disconnected.getVersion() + ".jar", options, true);
+            new HelpFormatter().printHelp("java -jar " + JAR_NAME, options, true);
+            return;
         }
 
         // Print help if necessary
         if (line.hasOption("help")) {
             LOGGER.info("Printing help and returning");
-            new HelpFormatter().printHelp("java -jar disconnected-" + Disconnected.getVersion() + ".jar", options, true);
+            new HelpFormatter().printHelp("java -jar " + JAR_NAME, options, true);
             return;
         }
 
