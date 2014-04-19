@@ -25,8 +25,8 @@ package com.quartercode.disconnected.sim;
  */
 public class Profile {
 
-    private final String name;
-    private Simulation   simulation;
+    private String     name;
+    private Simulation simulation;
 
     /**
      * Creates a new profile with the given name and simulation.
@@ -48,6 +48,16 @@ public class Profile {
     public String getName() {
 
         return name;
+    }
+
+    /**
+     * Changes the name of the profile.
+     * 
+     * @param name The new name for the profile.
+     */
+    public void setName(String name) {
+
+        this.name = name;
     }
 
     /**
