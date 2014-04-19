@@ -33,7 +33,7 @@ public class Simulation {
     /**
      * The default size a random pool which is used for a simulation should have.
      */
-    public static final int  RANDOM_POOL_SIZE = 1000;
+    public static final int  RANDOM_POOL_SIZE = 10;
 
     private World            world;
     private final RandomPool random;
