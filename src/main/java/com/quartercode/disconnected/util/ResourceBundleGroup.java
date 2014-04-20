@@ -18,7 +18,10 @@
 
 package com.quartercode.disconnected.util;
 
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A resource bundle group is a simple class that stores the bundle name and creates new {@link ResourceBundle}s on every request.
@@ -28,7 +31,9 @@ import java.util.ResourceBundle;
  */
 public class ResourceBundleGroup {
 
-    private final String name;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceBundleGroup.class);
+
+    private final String        name;
 
     /**
      * Creates a new resource bundle group that accesses the {@link ResourceBundle} with the given name.
@@ -59,7 +64,12 @@ public class ResourceBundleGroup {
      */
     public String getString(String key) {
 
-        return get().getString(key);
+        try {
+            return get().getString(key);
+        } catch (MissingResourceException e) {
+            LOGGER.warn(e.getMessage());
+            return key;
+        }
     }
 
 }
