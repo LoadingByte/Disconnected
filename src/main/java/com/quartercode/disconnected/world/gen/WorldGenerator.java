@@ -20,6 +20,7 @@ package com.quartercode.disconnected.world.gen;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.reflect.TypeUtils;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.ByteUnit;
@@ -167,7 +168,7 @@ public class WorldGenerator {
             Hardware useHardware = null;
             for (Hardware hardware : computer.get(Computer.HARDWARE).get()) {
                 if (!hardware.equals(mainboard)) {
-                    if (hardware.getClass().isAnnotationPresent(NeedsMainboardSlot.class) && slot.get(MainboardSlot.TYPE).get().isAssignableFrom(hardware.getClass())) {
+                    if (hardware.getClass().isAnnotationPresent(NeedsMainboardSlot.class) && TypeUtils.isInstance(hardware, slot.get(MainboardSlot.TYPE).get())) {
                         useHardware = hardware;
                         break;
                     }
@@ -204,7 +205,7 @@ public class WorldGenerator {
 
         List<Hardware> hardwareByType = new ArrayList<Hardware>();
         for (Hardware hardwarePart : availableHardware) {
-            if (type.isAssignableFrom(hardwarePart.getClass())) {
+            if (TypeUtils.isInstance(hardwarePart, type)) {
                 hardwareByType.add(hardwarePart);
             }
         }

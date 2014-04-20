@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.reflect.TypeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +81,7 @@ public class Ticker {
     public <T> T getAction(Class<T> type) {
 
         for (TickAction action : actions) {
-            if (type.isAssignableFrom(action.getClass())) {
+            if (TypeUtils.isInstance(action, type)) {
                 return type.cast(action);
             }
         }

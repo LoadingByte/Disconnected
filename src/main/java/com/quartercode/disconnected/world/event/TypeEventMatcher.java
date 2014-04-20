@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.world.event;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.reflect.TypeUtils;
 
 /**
  * The type event matcher only accepts {@link Event}s that derive from a given supertype or superinterface or are equal to a provided type.
@@ -45,7 +46,7 @@ public class TypeEventMatcher implements EventMatcher {
     @Override
     public boolean matches(Event event) {
 
-        return type.isAssignableFrom(event.getClass());
+        return TypeUtils.isInstance(event, type);
     }
 
 }

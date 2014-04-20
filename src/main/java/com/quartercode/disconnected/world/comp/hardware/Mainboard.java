@@ -24,6 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.reflect.TypeUtils;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.PropertyDefinition;
@@ -86,7 +87,7 @@ public class Mainboard extends Hardware {
             @Override
             public boolean matches(MainboardSlot element, Object... arguments) {
 
-                return ((Class<?>) arguments[0]).isAssignableFrom(element.get(MainboardSlot.TYPE).get());
+                return TypeUtils.isInstance(element.get(MainboardSlot.TYPE).get(), (Class<?>) arguments[0]);
             }
 
         }), Class.class);
