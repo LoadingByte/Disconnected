@@ -601,9 +601,14 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public User invoke(FunctionInvocation<User> invocation, Object... arguments) {
 
-                User user = invocation.getHolder().get(GET_SESSION).invoke().get(Session.USER).get();
-                invocation.next(arguments);
-                return user;
+                Session session = invocation.getHolder().get(GET_SESSION).invoke();
+                if (session == null) {
+                    return null;
+                } else {
+                    User user = session.get(Session.USER).get();
+                    invocation.next(arguments);
+                    return user;
+                }
             }
 
         });
