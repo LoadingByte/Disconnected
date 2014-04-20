@@ -20,6 +20,7 @@ package com.quartercode.disconnected.graphics.desktop;
 
 import com.quartercode.disconnected.graphics.GraphicsState;
 import com.quartercode.disconnected.graphics.component.MultiactionButton;
+import com.quartercode.disconnected.util.ResourceBundleGroup;
 import de.matthiasmann.twl.Event;
 import de.matthiasmann.twl.ResizableFrame;
 
@@ -30,8 +31,9 @@ import de.matthiasmann.twl.ResizableFrame;
  */
 public class DesktopProgramWindow extends ResizableFrame {
 
-    private final GraphicsState     state;
-    private final MultiactionButton taskbarButton;
+    private final DesktopProgramDescriptor descriptor;
+    private final GraphicsState            state;
+    private final MultiactionButton        taskbarButton;
 
     /**
      * Creates a new desktop program window in the given desktop {@link GraphicsState}.
@@ -43,6 +45,7 @@ public class DesktopProgramWindow extends ResizableFrame {
      */
     public DesktopProgramWindow(DesktopProgramDescriptor descriptor, GraphicsState state) {
 
+        this.descriptor = descriptor;
         this.state = state;
 
         setTheme("frame");
@@ -77,6 +80,27 @@ public class DesktopProgramWindow extends ResizableFrame {
         });
 
         setVisible(true);
+    }
+
+    /**
+     * Returns the {@link DesktopProgramDescriptor} that created the window.
+     * It defines all the properties of the window.
+     * 
+     * @return The desktop program descriptor that defines the window.
+     */
+    public DesktopProgramDescriptor getDescriptor() {
+
+        return descriptor;
+    }
+
+    /**
+     * Returns the desktop {@link GraphicsState} the program is running in.
+     * 
+     * @return The graphics state that uses the program.
+     */
+    protected GraphicsState getState() {
+
+        return state;
     }
 
     /**
