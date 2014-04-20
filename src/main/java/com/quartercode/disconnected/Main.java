@@ -30,6 +30,7 @@ import org.apache.commons.cli.PosixParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.quartercode.classmod.util.Classmod;
+import com.quartercode.disconnected.graphics.DefaultGraphicsManager;
 import com.quartercode.disconnected.graphics.DefaultStates;
 import com.quartercode.disconnected.graphics.GraphicsManager;
 import com.quartercode.disconnected.graphics.GraphicsModule;
@@ -41,8 +42,11 @@ import com.quartercode.disconnected.graphics.desktop.DesktopPrograms;
 import com.quartercode.disconnected.graphics.desktop.DesktopTaskbarModule;
 import com.quartercode.disconnected.graphics.desktop.DesktopWidgetModule;
 import com.quartercode.disconnected.graphics.desktop.DesktopWindowAreaModule;
+import com.quartercode.disconnected.sim.DefaultProfileManager;
+import com.quartercode.disconnected.sim.DefaultTicker;
 import com.quartercode.disconnected.sim.Profile;
 import com.quartercode.disconnected.sim.ProfileManager;
+import com.quartercode.disconnected.sim.ProfileSerializationException;
 import com.quartercode.disconnected.sim.TickSimulator;
 import com.quartercode.disconnected.sim.Ticker;
 import com.quartercode.disconnected.util.ApplicationInfo;
@@ -52,6 +56,7 @@ import com.quartercode.disconnected.util.GlobalStorage;
 import com.quartercode.disconnected.util.LogExceptionHandler;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.ResourceStore;
+import com.quartercode.disconnected.util.ServiceRegistry;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
@@ -77,8 +82,8 @@ public class Main {
             @Override
             public void exit() {
 
-                GraphicsManager.INSTANCE.setRunning(false);
-                Ticker.INSTANCE.setRunning(false);
+                ServiceRegistry.lookup(GraphicsManager.class).setRunning(false);
+                ServiceRegistry.lookup(Ticker.class).setRunning(false);
             }
         });
 
@@ -150,13 +155,19 @@ public class Main {
         LOGGER.info("Filling default graphics states");
         fillDefaultGraphicsStates();
 
+        // Initialize profile manager and load stored profiles
+        LOGGER.info("Initializing profile manager");
+        ServiceRegistry.register(ProfileManager.class, new DefaultProfileManager(new File("profiles")));
+
         // Initialize ticker
         LOGGER.info("Initializing ticker");
-        Ticker.INSTANCE.addAction(new TickSimulator());
+        ServiceRegistry.register(Ticker.class, new DefaultTicker());
+        ServiceRegistry.lookup(Ticker.class).addAction(new TickSimulator());
 
         // Initialize graphics manager and start it
         LOGGER.info("Initializing graphics manager");
-        GraphicsManager.INSTANCE.setRunning(true);
+        ServiceRegistry.register(GraphicsManager.class, new DefaultGraphicsManager());
+        ServiceRegistry.lookup(GraphicsManager.class).setRunning(true);
 
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG-ACTION: Generating new simulation");
@@ -169,18 +180,17 @@ public class Main {
         Profile profile = new Profile("test");
         profile.setWorld(world);
         profile.setRandom(random);
-        ProfileManager.INSTANCE.addProfile(profile);
+        ServiceRegistry.lookup(ProfileManager.class).addProfile(profile);
         try {
-            ProfileManager.INSTANCE.setActive(profile);
-        } catch (Exception e) {
-            e.printStackTrace();
+            ServiceRegistry.lookup(ProfileManager.class).setActive(profile);
+        } catch (ProfileSerializationException e) {
             // Won't ever happen (we just created a new profile)
         }
 
         // DEBUG: Start "game" with current simulation
         LOGGER.info("DEBUG-ACTION: Starting test-game with current simulation");
-        Ticker.INSTANCE.setRunning(true);
-        GraphicsManager.INSTANCE.setState(DefaultStates.DESKTOP.create());
+        ServiceRegistry.lookup(Ticker.class).setRunning(true);
+        ServiceRegistry.lookup(GraphicsManager.class).setState(DefaultStates.DESKTOP.create());
     }
 
     @SuppressWarnings ("static-access")

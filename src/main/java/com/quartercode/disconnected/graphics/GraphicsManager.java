@@ -18,38 +18,18 @@
 
 package com.quartercode.disconnected.graphics;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * This is the main manager of the graphics system.
  * The manager can create or destroy the lwjgl context and keeps track of all important twl internals.
  */
-public class GraphicsManager {
-
-    private static final Logger         LOGGER   = LoggerFactory.getLogger(GraphicsManager.class);
-
-    /**
-     * The singleton instance of profile manager.
-     */
-    public static final GraphicsManager INSTANCE = new GraphicsManager();
-
-    private GraphicsThread              thread;
-    private GraphicsState               state;
-
-    private GraphicsManager() {
-
-    }
+public interface GraphicsManager {
 
     /**
      * Returns if the graphics manager is currently running.
      * 
      * @return If the graphics manager is currently running.
      */
-    public boolean isRunning() {
-
-        return thread != null && thread.isAlive();
-    }
+    public boolean isRunning();
 
     /**
      * Changes the status of the graphics manager.
@@ -57,19 +37,7 @@ public class GraphicsManager {
      * 
      * @param running If the graphics manager should run.
      */
-    public void setRunning(boolean running) {
-
-        if (running && !isRunning()) {
-            LOGGER.info("Starting up graphics thread");
-            thread = new GraphicsThread();
-            thread.changeState(state);
-            thread.start();
-        } else if (!running && isRunning()) {
-            LOGGER.info("Shutting down graphics thread");
-            thread.exit();
-            thread = null;
-        }
-    }
+    public void setRunning(boolean running);
 
     /**
      * Returns the current top-level child widget.
@@ -77,10 +45,7 @@ public class GraphicsManager {
      * 
      * @return Returns the current top-level child widget.
      */
-    public GraphicsState getState() {
-
-        return state;
-    }
+    public GraphicsState getState();
 
     /**
      * Sets the current top-level child widget to a new one.
@@ -88,23 +53,13 @@ public class GraphicsManager {
      * 
      * @param state The new top-level child widget.
      */
-    public void setState(GraphicsState state) {
-
-        this.state = state;
-
-        if (thread != null) {
-            thread.changeState(state);
-        }
-    }
+    public void setState(GraphicsState state);
 
     /**
      * Invokes the given {@link Runnable} in the graphics update thread.
      * 
      * @param runnable The runnable to invoke in the graphics update thread.
      */
-    public void invoke(Runnable runnable) {
-
-        thread.invoke(runnable);
-    }
+    public void invoke(Runnable runnable);
 
 }

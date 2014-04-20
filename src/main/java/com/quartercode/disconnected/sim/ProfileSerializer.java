@@ -49,22 +49,29 @@ public class ProfileSerializer {
      * 
      * @param outputStream The output stream to write the result to.
      * @param profile The profile to serialize to the given output stream.
-     * @throws IOException Something goes wrong while writing to the stream.
-     * @throws JAXBException An exception occurres while serializing the {@link World} of the profile as xml.
+     * @throws ProfileSerializationException Something goes wrong while serializing the profile.
      */
-    public static void serializeProfile(OutputStream outputStream, Profile profile) throws IOException, JAXBException {
+    public static void serializeProfile(OutputStream outputStream, Profile profile) throws ProfileSerializationException {
 
         ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
 
-        zipOutputStream.putNextEntry(new ZipEntry("world.xml"));
-        serializeWorld(zipOutputStream, profile.getWorld());
-        zipOutputStream.closeEntry();
+        try {
+            zipOutputStream.putNextEntry(new ZipEntry("world.xml"));
+            serializeWorld(zipOutputStream, profile.getWorld());
+            zipOutputStream.closeEntry();
 
-        zipOutputStream.putNextEntry(new ZipEntry("random.ser"));
-        serializeRandom(zipOutputStream, profile.getRandom());
-        zipOutputStream.closeEntry();
-
-        zipOutputStream.close();
+            zipOutputStream.putNextEntry(new ZipEntry("random.ser"));
+            serializeRandom(zipOutputStream, profile.getRandom());
+            zipOutputStream.closeEntry();
+        } catch (Exception e) {
+            throw new ProfileSerializationException(e, profile);
+        } finally {
+            try {
+                zipOutputStream.close();
+            } catch (IOException e) {
+                // Ignore
+            }
+        }
     }
 
     /**
@@ -73,29 +80,35 @@ public class ProfileSerializer {
      * 
      * @param inputStream The input stream to read the data from.
      * @param target The profile where the deserialized data should be put into.
-     * @throws IOException Something goes wrong while reading from the stream.
-     * @throws JAXBException An exception occurres while deserializing the world's xml document.
-     * @throws ClassNotFoundException A class which is used by the random pool class cannot be found.
-     * @throws IllegalStateException Either the stored world or the stored random pool is invalid or does not exist.
+     * @throws ProfileSerializationException Something goes wrong while deserializing the profile data.
      */
-    public static void deserializeProfile(InputStream inputStream, Profile target) throws IOException, JAXBException, ClassNotFoundException {
+    public static void deserializeProfile(InputStream inputStream, Profile target) throws ProfileSerializationException {
 
         World world = null;
         RandomPool random = null;
 
         ZipInputStream zipInputStream = new ZipInputStream(inputStream);
-        ZipEntry zipEntry = null;
-        while ( (zipEntry = zipInputStream.getNextEntry()) != null) {
-            if (zipEntry.getName().equals("world.xml")) {
-                world = deserializeWorld(zipInputStream);
-            } else if (zipEntry.getName().equals("random.ser")) {
-                random = deserializeRandom(zipInputStream);
+        try {
+            ZipEntry zipEntry = null;
+            while ( (zipEntry = zipInputStream.getNextEntry()) != null) {
+                if (zipEntry.getName().equals("world.xml")) {
+                    world = deserializeWorld(zipInputStream);
+                } else if (zipEntry.getName().equals("random.ser")) {
+                    random = deserializeRandom(zipInputStream);
+                }
+            }
+        } catch (Exception e) {
+            throw new ProfileSerializationException(e, target);
+        } finally {
+            try {
+                zipInputStream.close();
+            } catch (IOException e) {
+                // Ignore
             }
         }
-        zipInputStream.close();
 
         if (world == null || random == null) {
-            throw new IllegalStateException("No valid world or random pool object found");
+            throw new ProfileSerializationException(new IllegalStateException("No valid world or random pool object found"), target);
         }
 
         target.setWorld(world);

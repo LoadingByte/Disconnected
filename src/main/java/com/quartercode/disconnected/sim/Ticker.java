@@ -18,13 +18,7 @@
 
 package com.quartercode.disconnected.sim;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.reflect.TypeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the controls for the tick system which then calls several actions.
@@ -32,45 +26,24 @@ import org.slf4j.LoggerFactory;
  * 
  * @see TickThread
  */
-public class Ticker {
-
-    private static final Logger    LOGGER                   = LoggerFactory.getLogger(Ticker.class);
-
-    /**
-     * The singleton instance of ticker.
-     */
-    public static final Ticker     INSTANCE                 = new Ticker();
+public interface Ticker {
 
     /**
      * The amount of milliseconds the ticker will wait from one tick to another by default.
      */
-    public static final int        DEFAULT_DELAY            = 50;
+    public static final int DEFAULT_DELAY            = 50;
 
     /**
      * The amount of ticks called in one second by default.
      */
-    public static final int        DEFAULT_TICKS_PER_SECOND = 1000 / DEFAULT_DELAY;
-
-    private TickThread             thread;
-    private final List<TickAction> actions                  = new ArrayList<TickAction>();
-    private int                    delay                    = DEFAULT_DELAY;
-
-    // Performance: Object cache
-    private List<TickAction>       unmodifiableActions      = Collections.unmodifiableList(actions);
-
-    private Ticker() {
-
-    }
+    public static final int DEFAULT_TICKS_PER_SECOND = 1000 / DEFAULT_DELAY;
 
     /**
      * Returns a list of tick actions which get called on every tick.
      * 
      * @return A list of tick actions which get called on every tick.
      */
-    public List<TickAction> getActions() {
-
-        return unmodifiableActions;
-    }
+    public List<TickAction> getActions();
 
     /**
      * Returns the tick actions which has the given type as a superclass.
@@ -78,16 +51,7 @@ public class Ticker {
      * @param type The type to use.
      * @return The tick actions which has the given type as a superclass.
      */
-    public <T> T getAction(Class<T> type) {
-
-        for (TickAction action : actions) {
-            if (TypeUtils.isInstance(action, type)) {
-                return type.cast(action);
-            }
-        }
-
-        return null;
-    }
+    public <T> T getAction(Class<T> type);
 
     /**
      * Adds a tick action which gets called on every tick.
@@ -96,59 +60,35 @@ public class Ticker {
      * @param action A tick action which gets called on every tick.
      * @throws IllegalStateException If there is already an other action using the same class.
      */
-    public void addAction(TickAction action) {
-
-        for (TickAction testAction : actions) {
-            if (testAction.getClass().equals(action.getClass())) {
-                throw new IllegalStateException("There is already a tick action using the class " + testAction.getClass().getName());
-            }
-        }
-
-        actions.add(action);
-        unmodifiableActions = Collections.unmodifiableList(actions);
-    }
+    public void addAction(TickAction action);
 
     /**
      * Removes a tick action from the tick thread.
      * 
      * @param action The tick action to remove from the tick thread.
      */
-    public void removeAction(TickAction action) {
-
-        actions.remove(action);
-        unmodifiableActions = Collections.unmodifiableList(actions);
-    }
+    public void removeAction(TickAction action);
 
     /**
      * Returns the delay the thread should wait until the next tick.
      * 
      * @return The delay the thread should wait until the next tick.
      */
-    public int getDelay() {
-
-        return delay;
-    }
+    public int getDelay();
 
     /**
      * Sets the delay the thread should wait until the next tick.
      * 
      * @param delay The delay the thread should wait until the next tick.
      */
-    public void setDelay(int delay) {
-
-        Validate.isTrue(delay > 0, "Delay (%d) must be > 0", delay);
-        this.delay = delay;
-    }
+    public void setDelay(int delay);
 
     /**
      * Returns if the tick thread is currently running.
      * 
      * @return If the tick thread is currently running.
      */
-    public boolean isRunning() {
-
-        return thread != null && thread.isAlive();
-    }
+    public boolean isRunning();
 
     /**
      * Changes the status of the tick thread.
@@ -156,17 +96,6 @@ public class Ticker {
      * 
      * @param running If the tick thread should run.
      */
-    public void setRunning(boolean running) {
-
-        if (running && !isRunning()) {
-            LOGGER.info("Starting up tick thread");
-            thread = new TickThread(this);
-            thread.start();
-        } else if (!running && isRunning()) {
-            LOGGER.info("Shutting down tick thread");
-            thread.interrupt();
-            thread = null;
-        }
-    }
+    public void setRunning(boolean running);
 
 }

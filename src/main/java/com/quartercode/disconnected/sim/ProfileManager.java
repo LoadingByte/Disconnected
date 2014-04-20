@@ -19,13 +19,7 @@
 package com.quartercode.disconnected.sim;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 /**
  * This class manages different progiles which store simulations and random objects.
@@ -34,51 +28,22 @@ import javax.xml.bind.JAXBException;
  * @see Profile
  * @see ProfileSerializer
  */
-public class ProfileManager {
+public interface ProfileManager {
 
     /**
-     * The singleton instance of profile manager.
-     */
-    public static final ProfileManager INSTANCE = new ProfileManager(new File("profiles"));
-
-    private final File                 directory;
-
-    private final List<Profile>        profiles = new ArrayList<Profile>();
-    private Profile                    active;
-
-    private ProfileManager(File directory) {
-
-        this.directory = directory;
-
-        if (directory.exists()) {
-            for (File profileFile : directory.listFiles()) {
-                String profileName = profileFile.getName().substring(0, profileFile.getName().lastIndexOf("."));
-                profiles.add(new Profile(profileName));
-            }
-        } else {
-            directory.mkdirs();
-        }
-    }
-
     /**
      * Returns The directory the profile manager stores its profiles in.
      * 
      * @return The directory the manager uses for its profiles.
      */
-    public File getDirectory() {
-
-        return directory;
-    }
+    public File getDirectory();
 
     /**
      * Returns a list of all loaded profiles.
      * 
      * @return All loaded profiles.
      */
-    public List<Profile> getProfiles() {
-
-        return Collections.unmodifiableList(profiles);
-    }
+    public List<Profile> getProfiles();
 
     /**
      * Adds a new profile object to the storage.
@@ -86,11 +51,7 @@ public class ProfileManager {
      * 
      * @param profile The new profile to add.
      */
-    public void addProfile(Profile profile) {
-
-        removeProfile(profile);
-        profiles.add(profile);
-    }
+    public void addProfile(Profile profile);
 
     /**
      * Removes the given profile object from the storage.
@@ -98,48 +59,22 @@ public class ProfileManager {
      * 
      * @param profile The loaded profile to remove.
      */
-    public void removeProfile(Profile profile) {
-
-        for (Profile existingProfile : new ArrayList<Profile>(profiles)) {
-            if (existingProfile.getName().equalsIgnoreCase(profile.getName())) {
-                profiles.remove(profile);
-                new File(directory, profile.getName() + ".zip").delete();
-            }
-        }
-    }
+    public void removeProfile(Profile profile);
 
     /**
      * Serializes (or "saves") the given profile into the correct zip file in the set directory.
      * 
      * @param profile The profile to serialize.
-     * @throws IOException Something goes wrong while writing the zip file.
-     * @throws JAXBException Something goes wrong while marshaling the simulation's xml.
+     * @throws ProfileSerializationException Something goes wrong while serializing the profile.
      */
-    public void serializeProfile(Profile profile) throws IOException, JAXBException {
-
-        File profileFile = new File(directory, profile.getName() + ".zip");
-        if (profileFile.exists()) {
-            profileFile.delete();
-        }
-
-        FileOutputStream outputStream = null;
-        try {
-            outputStream = new FileOutputStream(profileFile);
-            ProfileSerializer.serializeProfile(outputStream, profile);
-        } finally {
-            outputStream.close();
-        }
-    }
+    public void serializeProfile(Profile profile) throws ProfileSerializationException;
 
     /**
      * Returns the currently active {@link Profile} which is simulated at the time.
      * 
      * @return The currently active profile.
      */
-    public Profile getActive() {
-
-        return active;
-    }
+    public Profile getActive();
 
     /**
      * Changes the currently active {@link Profile}.
@@ -149,37 +84,8 @@ public class ProfileManager {
      * The change will take place in the next tick.
      * 
      * @param profile The new active profile which will be simulated.
-     * @throws IOException Something goes wrong while reading from the profile zip.
-     * @throws JAXBException An exception occurres while deserializing the simulation's xml document.
-     * @throws ClassNotFoundException A class which is used for the random pool can't be found.
-     * @throws IllegalStateException Either the stored world or the stored random pool is invalid or does not exist.
+     * @throws ProfileSerializationException Something goes wrong while deserializing the profile data.
      */
-    public void setActive(Profile profile) throws IOException, JAXBException, ClassNotFoundException, IllegalStateException {
-
-        if (active != null) {
-            active.setWorld(null);
-            active.setRandom(null);
-        }
-
-        active = profile;
-
-        if (active != null && (active.getWorld() == null || active.getRandom() == null)) {
-            File profileFile = new File(directory, active.getName() + ".zip");
-            if (profileFile.exists()) {
-                FileInputStream inputStream = null;
-                try {
-                    inputStream = new FileInputStream(profileFile);
-                    ProfileSerializer.deserializeProfile(inputStream, active);
-                } finally {
-                    inputStream.close();
-                }
-            }
-        }
-
-        TickSimulator simulator = Ticker.INSTANCE.getAction(TickSimulator.class);
-        if (simulator != null) {
-            simulator.setWorld(active == null ? null : active.getWorld());
-        }
-    }
+    public void setActive(Profile profile) throws ProfileSerializationException;
 
 }
