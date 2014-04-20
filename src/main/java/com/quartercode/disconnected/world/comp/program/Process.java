@@ -39,6 +39,8 @@ import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
+import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
+import com.quartercode.disconnected.world.comp.file.FileUtils;
 import com.quartercode.disconnected.world.comp.os.EnvironmentVariable;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.os.Session;
@@ -371,6 +373,17 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * Initializes the process using the {@link Program} that is stored in the set source {@link ContentFile}.
      * Initialization means setting the {@link #PID} and creating a {@link ProgramExecutor} instance.
      * Please note that the process needs to be launched using the {@link ProgramExecutor#RUN} method on the {@link #EXECUTOR} after intialization.
+     * 
+     * <table>
+     * <tr>
+     * <th>Exception</th>
+     * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalStateException}</td>
+     * <td>The {@link User} the process runs under hasn't got the read and execute rights on the {@link #SOURCE} file.</td>
+     * </tr>
+     * </table>
      */
     public static final FunctionDefinition<Void>                                   INITIALIZE;
 
@@ -647,8 +660,15 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
                 FeatureHolder holder = invocation.getHolder();
 
+                // Check read and execution right on source file
+                ContentFile source = holder.get(SOURCE).get();
+                User user = holder.get(GET_USER).invoke();
+                if (!FileUtils.hasRight(user, source, FileRight.READ) || !FileUtils.hasRight(user, source, FileRight.EXECUTE)) {
+                    throw new IllegalStateException("Cannot initialize process: No read right and execute right on file");
+                }
+
                 // Create new executor
-                Program program = (Program) holder.get(SOURCE).get().get(ContentFile.CONTENT).get();
+                Program program = (Program) source.get(ContentFile.CONTENT).get();
                 ProgramExecutor executor = program.get(Program.CREATE_EXECUTOR).invoke();
 
                 // Set new executor
