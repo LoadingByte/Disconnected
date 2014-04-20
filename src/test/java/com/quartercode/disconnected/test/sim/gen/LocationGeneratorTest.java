@@ -33,7 +33,7 @@ public class LocationGeneratorTest {
     @BeforeClass
     public static void setUpBeforeClass() throws IOException {
 
-        Main.fillRegistry();
+        Main.fillGlobalStorage();
         Main.fillResourceStore();
     }
 

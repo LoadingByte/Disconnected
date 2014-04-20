@@ -38,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.util.ApplicationInfo;
 import com.quartercode.disconnected.util.ExitUtil;
-import com.quartercode.disconnected.util.Registry;
+import com.quartercode.disconnected.util.GlobalStorage;
 import de.matthiasmann.twl.Container;
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.renderer.Renderer;
@@ -188,7 +188,7 @@ public class GraphicsThread extends Thread {
             themeFileWriter.println("<!DOCTYPE themes PUBLIC \"-//www.matthiasmann.de//TWL-Theme//EN\"");
             themeFileWriter.println("\"http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd\">");
             themeFileWriter.println("<themes>");
-            for (URL themeURL : Registry.INSTANCE.getThemes()) {
+            for (URL themeURL : GlobalStorage.get("themes", URL.class)) {
                 themeFileWriter.println("<include filename=\"" + themeURL + "\"/>");
             }
             themeFileWriter.println("</themes>");

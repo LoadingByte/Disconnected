@@ -48,9 +48,9 @@ import com.quartercode.disconnected.sim.Ticker;
 import com.quartercode.disconnected.util.ApplicationInfo;
 import com.quartercode.disconnected.util.ExitUtil;
 import com.quartercode.disconnected.util.ExitUtil.ExitProcessor;
+import com.quartercode.disconnected.util.GlobalStorage;
 import com.quartercode.disconnected.util.LogExceptionHandler;
 import com.quartercode.disconnected.util.RandomPool;
-import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.util.ResourceStore;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
@@ -133,9 +133,9 @@ public class Main {
             Locale.setDefault(new Locale(language, country, variant));
         }
 
-        // Fill registry
-        LOGGER.info("Filling class registry");
-        fillRegistry();
+        // Fill global storage
+        LOGGER.info("Filling global storage with common data");
+        fillGlobalStorage();
 
         // Fill resource store
         try {
@@ -193,25 +193,25 @@ public class Main {
     }
 
     /**
-     * Fills the global {@link Registry#INSTANCE} with the default values which are needed for running Disconnected.
+     * Fills the {@link GlobalStorage} with the default values for the context path and default themes.
      */
-    public static void fillRegistry() {
+    public static void fillGlobalStorage() {
 
-        Registry.INSTANCE.registerContextPathEntry(Classmod.CONTEXT_PATH);
-        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.sim.scheduler");
-        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world");
-        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world.comp");
-        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world.comp.attack");
-        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world.comp.file");
-        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world.comp.hardware");
-        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world.comp.net");
-        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world.comp.os");
-        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world.comp.program");
-        Registry.INSTANCE.registerContextPathEntry("com.quartercode.disconnected.world.comp.program.general");
+        GlobalStorage.put("contextPath", Classmod.CONTEXT_PATH);
+        GlobalStorage.put("contextPath", "com.quartercode.disconnected.sim.scheduler");
+        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world");
+        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp");
+        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp.attack");
+        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp.file");
+        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp.hardware");
+        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp.net");
+        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp.os");
+        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp.program");
+        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp.program.general");
 
-        Registry.INSTANCE.registerTheme(Main.class.getResource("/ui/default/default.xml"));
-        Registry.INSTANCE.registerTheme(Main.class.getResource("/ui/shell/shell.xml"));
-        Registry.INSTANCE.registerTheme(Main.class.getResource("/ui/desktop/desktop.xml"));
+        GlobalStorage.put("themes", Main.class.getResource("/ui/default/default.xml"));
+        GlobalStorage.put("themes", Main.class.getResource("/ui/shell/shell.xml"));
+        GlobalStorage.put("themes", Main.class.getResource("/ui/desktop/desktop.xml"));
     }
 
     /**

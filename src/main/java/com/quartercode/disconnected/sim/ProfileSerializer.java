@@ -30,8 +30,8 @@ import java.util.zip.ZipOutputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import com.quartercode.disconnected.util.GlobalStorage;
 import com.quartercode.disconnected.util.RandomPool;
-import com.quartercode.disconnected.util.Registry;
 import com.quartercode.disconnected.world.World;
 
 /**
@@ -111,7 +111,7 @@ public class ProfileSerializer {
     public static JAXBContext createWorldContext() throws JAXBException {
 
         StringBuilder contextPathStringBuilder = new StringBuilder();
-        for (String contextPathEntry : Registry.INSTANCE.getContextPath()) {
+        for (String contextPathEntry : GlobalStorage.get("contextPath", String.class)) {
             contextPathStringBuilder.append(":").append(contextPathEntry);
         }
         String contextPathString = contextPathStringBuilder.length() > 0 ? contextPathStringBuilder.substring(1) : "";
