@@ -59,6 +59,17 @@ public abstract class DesktopProgramDescriptor {
     }
 
     /**
+     * Returns the {@link ResourceBundleGroup} that provides resources for the program descriptor.
+     * It may be used by any provided {@link DesktopProgramWindow}.
+     * 
+     * @return The resource bundle group of the defined program.
+     */
+    public ResourceBundleGroup getResourceBundle() {
+
+        return resourceBundle;
+    }
+
+    /**
      * Creates a new instance of the described desktop program that is running in the given {@link GraphicsState}.
      * The method actually returns a {@link DesktopProgramWindow}.
      * It should be implemented by every desktop program for keeping type-safety.
