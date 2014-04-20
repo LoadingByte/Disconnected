@@ -225,13 +225,13 @@ public class Main {
     }
 
     /**
-     * Fills the global {@link ResourceStore#INSTANCE} with the default resource objects which are needed for running Disconnected.
+     * Fills the global {@link ResourceStore} with the default resource objects which are needed for running Disconnected.
      * 
      * @throws IOException Something goes wrong while reading from a jar file or resource.
      */
     public static void fillResourceStore() throws IOException {
 
-        ResourceStore.INSTANCE.loadFromClasspath("/data");
+        ResourceStore.loadFromClasspath("/data");
     }
 
     /**

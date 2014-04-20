@@ -33,23 +33,14 @@ import javax.imageio.ImageIO;
  */
 public class ResourceStore {
 
-    /**
-     * The singleton instance of resource store.
-     */
-    public static final ResourceStore INSTANCE        = new ResourceStore();
-
-    private final Map<String, Object> loadedResources = new HashMap<String, Object>();
-
-    private ResourceStore() {
-
-    }
+    private static final Map<String, Object> loadedResources = new HashMap<String, Object>();
 
     /**
      * Returns all resource objects which are currently loaded into the resource store.
      * 
      * @return All resource objects which are currently loaded into the resource store.
      */
-    public Map<String, Object> getAll() {
+    public static Map<String, Object> getAll() {
 
         return Collections.unmodifiableMap(loadedResources);
     }
@@ -60,15 +51,15 @@ public class ResourceStore {
      * @param path The path to use for the selection.
      * @return The loaded resource object which was stored under the given path.
      */
-    public Object get(String path) {
+    public static Object get(String path) {
 
         return loadedResources.get(path);
     }
 
     /**
      * Loads resource objects recursively from the given path.
-     * The path should be located in the classpath.
-     * 
+     * The path should be located in the classpath.<br>
+     * <br>
      * Example:
      * If you load resources from /data, a file located under /data/test.png will be assigned to the path test.png.
      * A file located under /data/test/test.png will be assigned to the path test/test.png.
@@ -76,7 +67,7 @@ public class ResourceStore {
      * @param path The path to load the resources from.
      * @throws IOException Something goes wrong while reading from a jar file or resource.
      */
-    public void loadFromClasspath(String path) throws IOException {
+    public static void loadFromClasspath(String path) throws IOException {
 
         for (String resourcePath : ResourceLister.getResources(path, false)) {
             URL resource = ResourceStore.class.getResource(resourcePath);
@@ -98,6 +89,10 @@ public class ResourceStore {
                 loadedResources.put(name, resourceObject);
             }
         }
+    }
+
+    private ResourceStore() {
+
     }
 
 }

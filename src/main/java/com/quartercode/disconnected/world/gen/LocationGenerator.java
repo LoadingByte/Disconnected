@@ -58,7 +58,7 @@ public class LocationGenerator {
 
         Validate.isTrue(amount > 0, "Generation amount (%d) must be > 0", amount);
 
-        BufferedImage map = (BufferedImage) ResourceStore.INSTANCE.get("map.png");
+        BufferedImage map = (BufferedImage) ResourceStore.get("map.png");
 
         if (ignore == null) {
             ignore = new ArrayList<Location>();
