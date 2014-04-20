@@ -19,39 +19,39 @@
 package com.quartercode.disconnected.graphics;
 
 /**
- * This is the main manager of the graphics system.
+ * This service is the main manager of the graphics system.
  * The manager can create or destroy the lwjgl context and keeps track of all important twl internals.
  */
 public interface GraphicsManager {
 
     /**
-     * Returns if the graphics manager is currently running.
+     * Returns whether the graphics manager is currently running.
      * 
-     * @return If the graphics manager is currently running.
+     * @return The running state of the graphics manager.
      */
     public boolean isRunning();
 
     /**
      * Changes the status of the graphics manager.
-     * This can start and stop the graphics manager.
+     * This method starts and stops the graphics manager.
      * 
-     * @param running If the graphics manager should run.
+     * @param running Whether the graphics manager should run.
      */
     public void setRunning(boolean running);
 
     /**
-     * Returns the current top-level child widget.
+     * Returns the current top-level child widget ({@link GraphicsState}).
      * It represents the state which defines what should be drawn.
      * 
-     * @return Returns the current top-level child widget.
+     * @return Returns the current active graphics state.
      */
     public GraphicsState getState();
 
     /**
-     * Sets the current top-level child widget to a new one.
+     * Sets the current top-level child widget ({@link GraphicsState}) to a new one.
      * It represents the state which defines what should be drawn.
      * 
-     * @param state The new top-level child widget.
+     * @param state The new active graphics state.
      */
     public void setState(GraphicsState state);
 

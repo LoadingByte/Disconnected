@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This thread calls the tick update on several tick actions.
+ * This thread calls the tick update on several {@link TickAction}s.
  * It's an independent utility.
  * 
  * @see Ticker
@@ -35,9 +35,9 @@ public class TickThread extends Thread {
     private final Ticker        ticker;
 
     /**
-     * Creates a new tick thread and sets the ticker to use the informations from.
+     * Creates a new tick thread that will use the given {@link Ticker}.
      * 
-     * @param ticker The ticker to use the informations for the actions and the delay from.
+     * @param ticker The ticker to retrieve the tick data from.
      */
     public TickThread(Ticker ticker) {
 
@@ -47,9 +47,9 @@ public class TickThread extends Thread {
     }
 
     /**
-     * Returns the ticker to use the informations for the actions and the delay from.
+     * Returns the {@link Ticker} that is used to retrieve tick data from.
      * 
-     * @return The ticker to use the informations for the actions and the delay from.
+     * @return The assigned ticker.
      */
     public Ticker getTicker() {
 

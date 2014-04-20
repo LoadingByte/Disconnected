@@ -21,10 +21,10 @@ package com.quartercode.disconnected.sim;
 import java.util.List;
 
 /**
- * This class implements the controls for the tick system which then calls several actions.
+ * This service implements the controls for the tick system which then calls several actions.
  * It's like a central hub for controlling the activity of the tick thread.
  * 
- * @see TickThread
+ * @see TickAction
  */
 public interface Ticker {
 
@@ -39,62 +39,62 @@ public interface Ticker {
     public static final int DEFAULT_TICKS_PER_SECOND = 1000 / DEFAULT_DELAY;
 
     /**
-     * Returns a list of tick actions which get called on every tick.
+     * Returns a list of {@link TickAction}s which are called on every tick.
      * 
-     * @return A list of tick actions which get called on every tick.
+     * @return The registered tick actions.
      */
     public List<TickAction> getActions();
 
     /**
-     * Returns the tick actions which has the given type as a superclass.
+     * Returns the {@link TickAction} which has the given type as a superclass.
      * 
-     * @param type The type to use.
-     * @return The tick actions which has the given type as a superclass.
+     * @param type The type to use for the check.
+     * @return The tick action which has the given type as a superclass.
      */
     public <T> T getAction(Class<T> type);
 
     /**
-     * Adds a tick action which gets called on every tick.
-     * You can only add actions if there no other action using the same class.
+     * Adds a {@link TickAction} which is called on every tick.
+     * You can only add actions if there is no other action of the same type already registered.
      * 
-     * @param action A tick action which gets called on every tick.
-     * @throws IllegalStateException If there is already an other action using the same class.
+     * @param action The tick action to add.
+     * @throws IllegalStateException If there is another action of the same type already registered.
      */
     public void addAction(TickAction action);
 
     /**
-     * Removes a tick action from the tick thread.
+     * Removes a {@link TickAction} from the ticker.
      * 
-     * @param action The tick action to remove from the tick thread.
+     * @param action The tick action to remove.
      */
     public void removeAction(TickAction action);
 
     /**
-     * Returns the delay the thread should wait until the next tick.
+     * Returns the delay the ticker should wait between two ticks.
      * 
-     * @return The delay the thread should wait until the next tick.
+     * @return The tick delay.
      */
     public int getDelay();
 
     /**
-     * Sets the delay the thread should wait until the next tick.
+     * Sets the delay the thread should wait between two ticks.
      * 
-     * @param delay The delay the thread should wait until the next tick.
+     * @param delay The new tick delay.
      */
     public void setDelay(int delay);
 
     /**
-     * Returns if the tick thread is currently running.
+     * Returns whether the ticker is currently running.
      * 
-     * @return If the tick thread is currently running.
+     * @return The current running state of the ticker.
      */
     public boolean isRunning();
 
     /**
-     * Changes the status of the tick thread.
-     * This can start and stop the tick update.
+     * Changes the running state of the ticker.
+     * This method starts and stops the tick update.
      * 
-     * @param running If the tick thread should run.
+     * @param running Whether the ticker should run.
      */
     public void setRunning(boolean running);
 

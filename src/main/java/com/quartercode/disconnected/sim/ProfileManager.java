@@ -22,8 +22,8 @@ import java.io.File;
 import java.util.List;
 
 /**
- * This class manages different progiles which store simulations and random objects.
- * For loading or saving profiles, you need to use the profile serializer.
+ * This service manages different {@link Profile}s which store simulations and random objects.
+ * For loading or saving profiles, you need to use the {@link ProfileSerializer}.
  * 
  * @see Profile
  * @see ProfileSerializer
@@ -31,22 +31,21 @@ import java.util.List;
 public interface ProfileManager {
 
     /**
-    /**
-     * Returns The directory the profile manager stores its profiles in.
+     * Returns The directory the profile manager stores its {@link Profile}s in.
      * 
-     * @return The directory the manager uses for its profiles.
+     * @return The directory the manager uses as storage.
      */
     public File getDirectory();
 
     /**
-     * Returns a list of all loaded profiles.
+     * Returns a list of all loaded {@link Profile}s.
      * 
      * @return All loaded profiles.
      */
     public List<Profile> getProfiles();
 
     /**
-     * Adds a new profile object to the storage.
+     * Adds a new {@link Profile} object to the storage.
      * If there's already a profile with the same name (ignoring case), the old one will be deleted.
      * 
      * @param profile The new profile to add.
@@ -54,7 +53,7 @@ public interface ProfileManager {
     public void addProfile(Profile profile);
 
     /**
-     * Removes the given profile object from the storage.
+     * Removes the given {@link Profile} object from the storage.
      * This actually removes any profile with the same name as the given one (ignoring case).
      * 
      * @param profile The loaded profile to remove.
@@ -62,7 +61,7 @@ public interface ProfileManager {
     public void removeProfile(Profile profile);
 
     /**
-     * Serializes (or "saves") the given profile into the correct zip file in the set directory.
+     * Serializes (or "saves") the given {@link Profile} into the correct zip file in the set directory.
      * 
      * @param profile The profile to serialize.
      * @throws ProfileSerializationException Something goes wrong while serializing the profile.
@@ -70,17 +69,18 @@ public interface ProfileManager {
     public void serializeProfile(Profile profile) throws ProfileSerializationException;
 
     /**
-     * Returns the currently active {@link Profile} which is simulated at the time.
+     * Returns the current active {@link Profile} which is simulated at the time.
      * 
-     * @return The currently active profile.
+     * @return The current active profile.
      */
     public Profile getActive();
 
     /**
      * Changes the currently active {@link Profile}.
      * By setting a profile active, it will deserialize the data of it.
-     * By setting a profile inactive, it will unlink the data of it from the memory.
-     * If you want to deactivate the current profile without activating a new one, you can use null.
+     * By setting a profile inactive, it will unlink the data of it from the memory.<br>
+     * <br>
+     * If you want to deactivate the current profile without activating a new one, you can use <code>null</code>.
      * The change will take place in the next tick.
      * 
      * @param profile The new active profile which will be simulated.

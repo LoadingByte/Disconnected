@@ -35,11 +35,9 @@ import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.World;
 
 /**
- * This utility class loads a saves stored {@link Profile}s for serializing {@link Simulation}s.
+ * This utility class loads a saves {@link Profile}s.
  * 
  * @see Profile
- * @see ProfileManager
- * @see Simulation
  */
 public class ProfileSerializer {
 
