@@ -138,4 +138,17 @@ public class DesktopProgramWindow extends ResizableFrame {
         ((DesktopProgramManager) state.getModule("programManager")).removeWindow(state, this);
     }
 
+    // ----- Utility -----
+
+    /**
+     * Returns the i18n string that is associated with the given key in the {@link ResourceBundleGroup} of the descriptor.
+     * 
+     * @param key The key the returned value is associated with.
+     * @return The i18n string which is associated with the given key.
+     */
+    public String getString(String key) {
+
+        return descriptor.getResourceBundle().getString(key);
+    }
+
 }
