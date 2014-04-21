@@ -226,7 +226,7 @@
                 <version>2.17</version>
                 <configuration>
                     <workingDirectory>${basedir}/target/test-working</workingDirectory>
-                    <argLine>-Djava.library.path=${project.build.directory}/natives</argLine>
+                    <argLine>-DlogName=test -Djava.library.path=${project.build.directory}/natives</argLine>
                 </configuration>
             </plugin>
 
