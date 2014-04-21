@@ -299,7 +299,7 @@ public class FileSystemModule extends OSModule {
 
                 String path = FileUtils.normalizePath((String) arguments[0]);
                 String[] pathComponents = FileUtils.getComponents(path);
-                Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path ('%s' is invalid)", path);
+                Validate.isTrue(pathComponents[0] != null, "Must provide a path containing a mountpoint ('%s' is invalid)", path);
 
                 KnownFileSystem knownFs = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]);
                 if (knownFs == null) {
@@ -307,7 +307,7 @@ public class FileSystemModule extends OSModule {
                 }
 
                 FileSystem fileSystem = knownFs.get(KnownFileSystem.FILE_SYSTEM).get();
-                File<?> result = fileSystem.get(FileSystem.GET_FILE).invoke(pathComponents[1]);
+                File<?> result = fileSystem.get(FileSystem.GET_FILE).invoke(pathComponents[1] == null ? "" : pathComponents[1]);
 
                 invocation.next(arguments);
                 return result;
