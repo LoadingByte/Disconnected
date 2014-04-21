@@ -36,6 +36,8 @@ public class LauncherMain {
      */
     public static void main(String[] args) {
 
+        System.setProperty("logName", "launcher");
+
         String mainClass = Main.class.getName();
         String[] vmArguments = { "-DlogName=disconnected", "-Djava.library.path=" + new File(".").getAbsolutePath() + "/lib/natives" };
         File directory = new File(System.getProperty("user.home"), ".disconnected");

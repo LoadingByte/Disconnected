@@ -1,0 +1,25 @@
+<configuration>
+    <!-- This part of the pattern is used by every appender -->
+    <property name="commonPattern" value="%-33(%date [%thread]) %-5level %-31logger{32} - %msg%n" />
+
+    <!-- Console appender -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>&lt;${logName}&gt; ${commonPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Log file appender -->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${logName}.log</file>
+        <encoder>
+            <pattern>${commonPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Every part of the application (launcher and main application) uses the same settings -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>
