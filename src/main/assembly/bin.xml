@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<assembly
-    xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
     <id>bin</id>
@@ -10,47 +9,49 @@
     </formats>
 
     <fileSets>
-        <!-- Jar -->
-        <fileSet>
-            <directory>${project.build.directory}</directory>
-            <outputDirectory>.</outputDirectory>
-            <includes>
-                <include>${finalName}.jar</include>
-            </includes>
-        </fileSet>
-
         <!-- Information -->
         <fileSet>
             <directory>${project.basedir}</directory>
-            <outputDirectory>.</outputDirectory>
             <includes>
-                <include>README.*</include>
-                <include>LICENSE.*</include>
-                <include>CHANGELOG.*</include>
+                <include>README.md</include>
+                <include>LICENSE.md</include>
+                <include>CHANGELOG.md</include>
             </includes>
-        </fileSet>
-
-        <!-- Natives -->
-        <fileSet>
-            <directory>${project.build.directory}/natives</directory>
-            <outputDirectory>lib/natives</outputDirectory>
-            <includes>
-                <include>*.dll</include>
-                <include>*.so</include>
-                <include>*.jnilib</include>
-            </includes>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
     </fileSets>
 
     <dependencySets>
+        <!-- Artifact -->
+        <dependencySet>
+            <includes>
+                <include>${artifact}</include>
+            </includes>
+            <outputDirectory>/</outputDirectory>
+        </dependencySet>
+
         <!-- Libraries -->
         <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>lib</outputDirectory>
-            <scope>runtime</scope>
             <excludes>
+                <exclude>${artifact}</exclude>
                 <exclude>*:natives-*</exclude>
             </excludes>
+            <outputDirectory>/lib</outputDirectory>
+        </dependencySet>
+
+        <!-- Natives -->
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <includes>
+                <include>*:natives-*</include>
+            </includes>
+            <outputDirectory>/lib/natives</outputDirectory>
+            <unpack>true</unpack>
+            <unpackOptions>
+                <excludes>
+                    <exclude>META-INF/</exclude>
+                </excludes>
+            </unpackOptions>
         </dependencySet>
     </dependencySets>
 </assembly>
