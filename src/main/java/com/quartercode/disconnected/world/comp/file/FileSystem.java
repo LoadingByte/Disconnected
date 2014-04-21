@@ -148,7 +148,8 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
             @Override
             public File<?> invoke(FunctionInvocation<File<?>> invocation, Object... arguments) {
 
-                String[] parts = ((String) arguments[0]).split(File.SEPARATOR);
+                String path = FileUtils.normalizePath((String) arguments[0]);
+                String[] parts = path.split(File.SEPARATOR);
                 File<?> current = invocation.getHolder().get(ROOT).get();
                 for (String part : parts) {
                     if (!part.isEmpty()) {

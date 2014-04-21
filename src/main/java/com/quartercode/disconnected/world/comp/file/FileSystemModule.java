@@ -297,7 +297,7 @@ public class FileSystemModule extends OSModule {
             @Override
             public File<?> invoke(FunctionInvocation<File<?>> invocation, Object... arguments) {
 
-                String path = (String) arguments[0];
+                String path = FileUtils.normalizePath((String) arguments[0]);
                 String[] pathComponents = FileUtils.getComponents(path);
                 Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path ('%s' is invalid)", path);
 
@@ -320,7 +320,7 @@ public class FileSystemModule extends OSModule {
             public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
 
                 File<?> file = (File<?>) arguments[0];
-                String path = (String) arguments[1];
+                String path = FileUtils.normalizePath((String) arguments[1]);
 
                 String[] pathComponents = FileUtils.getComponents(path);
                 Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path ('%s' is invalid)", path);

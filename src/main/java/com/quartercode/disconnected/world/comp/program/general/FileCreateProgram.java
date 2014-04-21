@@ -20,6 +20,7 @@ package com.quartercode.disconnected.world.comp.program.general;
 
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.extra.def.ReferenceProperty;
@@ -62,6 +63,21 @@ public class FileCreateProgram extends ProgramExecutor {
     static {
 
         PATH = ObjectProperty.createDefinition("path");
+        PATH.addSetterExecutor("normalize", FileAddAction.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.LEVEL_6)
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                String normalizedPath = FileUtils.normalizePath((String) arguments[0]);
+                if (!normalizedPath.isEmpty()) {
+                    normalizedPath = normalizedPath.substring(1);
+                }
+                return invocation.next(normalizedPath);
+            }
+
+        });
+
         FILE_TYPE = ObjectProperty.<Class<? extends File<?>>> createDefinition("fileType", ContentFile.class, true);
 
     }
