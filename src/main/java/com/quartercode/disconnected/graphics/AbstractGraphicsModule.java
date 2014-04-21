@@ -36,12 +36,12 @@ public abstract class AbstractGraphicsModule implements GraphicsModule {
     private final Map<String, Object> values = new HashMap<String, Object>();
 
     /**
-     * Calculates the x value that is described by the given relative percent amount between <code>0</code> and <code>1</code>.
+     * Calculates the x value that is described by the given relative percent amount between {@code 0} and {@code 1}.
      * That means that the current width that is available to the given {@link GraphicsState} is just multiplied with the given percent value.
-     * For example, calling the method on a {@link GraphicsState} that has <code>200</code> available width pixels with <code>0.5</code> percent would return <code>100</code>.
+     * For example, calling the method on a {@link GraphicsState} that has {@code 200} available width pixels with {@code 0.5} percent would return {@code 100}.
      * 
      * @param state The {@link GraphicsState} whose available width should be used for the calculation.
-     * @param percent The relative "amount of pixels" in percent. Must be between <code>0</code> and <code>1</code>.
+     * @param percent The relative "amount of pixels" in percent. Must be between {@code 0} and {@code 1}.
      * @return The absolute amount of pixels calculated with the relative amount.
      */
     public int getRelativeX(GraphicsState state, float percent) {
@@ -55,7 +55,7 @@ public abstract class AbstractGraphicsModule implements GraphicsModule {
      * 
      * @param state The {@link GraphicsState} whose available width should be used for the calculation.
      * @param component The {@link Widget} that can be positioned with the result of the calculation.
-     * @param percent The relative "amount of pixels" in percent. Must be between <code>0</code> and <code>1</code>.
+     * @param percent The relative "amount of pixels" in percent. Must be between {@code 0} and {@code 1}.
      * @return The x location where the given {@link Widget} must be positioned.
      */
     public int getRelativeX(GraphicsState state, Widget component, float percent) {
@@ -64,12 +64,12 @@ public abstract class AbstractGraphicsModule implements GraphicsModule {
     }
 
     /**
-     * Calculates the y value that is described by the given relative percent amount between <code>0</code> and <code>1</code>.
+     * Calculates the y value that is described by the given relative percent amount between {@code 0} and {@code 1}.
      * That means that the current height that is available to the given {@link GraphicsState} is just multiplied with the given percent value.
-     * For example, calling the method on a {@link GraphicsState} that has <code>200</code> available height pixels with <code>0.5</code> percent would return <code>100</code>.
+     * For example, calling the method on a {@link GraphicsState} that has {@code 200} available height pixels with {@code 0.5} percent would return {@code 100}.
      * 
      * @param state The {@link GraphicsState} whose available height should be used for the calculation.
-     * @param percent The relative "amount of pixels" in percent. Must be between <code>0</code> and <code>1</code>.
+     * @param percent The relative "amount of pixels" in percent. Must be between {@code 0} and {@code 1}.
      * @return The absolute amount of pixels calculated with the relative amount.
      */
     public int getRelativeY(GraphicsState state, float percent) {
@@ -83,7 +83,7 @@ public abstract class AbstractGraphicsModule implements GraphicsModule {
      * 
      * @param state The {@link GraphicsState} whose available height should be used for the calculation.
      * @param component The {@link Widget} that can be positioned with the result of the calculation.
-     * @param percent The relative "amount of pixels" in percent. Must be between <code>0</code> and <code>1</code>.
+     * @param percent The relative "amount of pixels" in percent. Must be between {@code 0} and {@code 1}.
      * @return The y location where the given {@link Widget} must be positioned.
      */
     public int getRelativeY(GraphicsState state, Widget component, float percent) {

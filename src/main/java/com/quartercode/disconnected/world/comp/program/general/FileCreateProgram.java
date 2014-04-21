@@ -39,7 +39,7 @@ import com.quartercode.disconnected.world.event.Event;
 
 /**
  * The file create program is used to create a new {@link File} under a given global {@link #PATH}.
- * The program takes that global path (<code>/&lt;mountpoint&gt;/&lt;local path&gt;</code>) and the class object of the {@link #FILE_TYPE}.
+ * The program takes that global path ({@code /&lt;mountpoint&gt;/&lt;local path&gt;}) and the class object of the {@link #FILE_TYPE}.
  * 
  * @see ProgramExecutor
  * @see File
@@ -50,7 +50,7 @@ public class FileCreateProgram extends ProgramExecutor {
 
     /**
      * The global path under which the new {@link File} should be located.
-     * The path must be a global one that uses the format <code>/&lt;mountpoint&gt;/&lt;local path&gt;</code>.
+     * The path must be a global one that uses the format {@code /&lt;mountpoint&gt;/&lt;local path&gt;}.
      */
     public static final PropertyDefinition<String>                   PATH;
 

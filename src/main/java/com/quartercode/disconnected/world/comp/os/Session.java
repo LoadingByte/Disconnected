@@ -176,7 +176,7 @@ public class Session extends ProgramExecutor {
         // ----- Properties -----
 
         /**
-         * The provided password that is not correct (may be <code>null</code>).
+         * The provided password that is not correct (may be {@code null}).
          */
         public static final PropertyDefinition<String> WRONG_PASSWORD;
 

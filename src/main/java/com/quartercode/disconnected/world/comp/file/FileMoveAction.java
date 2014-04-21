@@ -47,7 +47,7 @@ public class FileMoveAction extends DefaultFeatureHolder implements FileAction {
      * The {@link FileSystem} where the set {@link #FILE} should be moved to.
      * The target {@link #PATH} is related to that file system.<br>
      * Note that this property is automatically adjusted to the current file system when setting {@link #FILE}.
-     * However, the current value of the property must be <code>null</code> in order for that to happen.
+     * However, the current value of the property must be {@code null} in order for that to happen.
      */
     public static final PropertyDefinition<FileSystem>          FILE_SYSTEM;
 
@@ -55,7 +55,7 @@ public class FileMoveAction extends DefaultFeatureHolder implements FileAction {
      * The {@link File} that should be moved to the set {@link #PATH}.
      * The name of the file is changed to the last entry of the path on execution.<br>
      * Note that setting this property automatically adjusts the {@link #FILE_SYSTEM} to the current system of the new file.
-     * However, the current value of the file system property must be <code>null</code> in order for that to happen.
+     * However, the current value of the file system property must be {@code null} in order for that to happen.
      */
     public static final PropertyDefinition<File<ParentFile<?>>> FILE;
 

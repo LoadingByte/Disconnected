@@ -51,7 +51,7 @@ public class FunctionCallScheduleTask implements ScheduleTask {
     /**
      * Creates a new function call schedule task with the given {@link FunctionDefinition}.<br>
      * <br>
-     * Furthermore, the {@link Class} that contains the <code>public static</code> definition constant needs to be provided for persistence support.
+     * Furthermore, the {@link Class} that contains the {@code public static} definition constant needs to be provided for persistence support.
      * Please note that the name of the definition constant needs to match the name of the function
      * Examples:
      * 
@@ -87,10 +87,10 @@ public class FunctionCallScheduleTask implements ScheduleTask {
     /**
      * Creates a new function call schedule task with the given {@link FunctionDefinition}.<br>
      * <br>
-     * Furthermore, the {@link Class} that contains the <code>public static</code> definition constant needs to be provided for persistence support,
+     * Furthermore, the {@link Class} that contains the {@code public static} definition constant needs to be provided for persistence support,
      * as well as the name of the actual constant field.<br>
-     * For example, if your feature holder <code>SomeFeatureHolder</code> contained the {@link FunctionDefinition} constant <code>public static final
-     * FunctionDefinition&lt;...&gt; SOME_FUNCTION</code>, you would have to provide both values to this constructor.
+     * For example, if your feature holder {@code SomeFeatureHolder} contained the {@link FunctionDefinition} constant {@code public static final
+     * FunctionDefinition&lt;...&gt; SOME_FUNCTION}, you would have to provide both values to this constructor.
      * 
      * @param functionDefinition The {@link FunctionDefinition} that defines the {@link Function} that should be called by the task.
      * @param functionDefinitionLocation The {@link Class} that contains the supplied {@link FunctionDefinition} constant.

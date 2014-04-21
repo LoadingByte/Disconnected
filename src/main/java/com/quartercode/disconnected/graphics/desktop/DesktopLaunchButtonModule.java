@@ -25,9 +25,9 @@ import de.matthiasmann.twl.Button;
 import de.matthiasmann.twl.Widget;
 
 /**
- * The desktop launch button module adds a launch {@link Button} with the theme <code>launch-button</code>.
+ * The desktop launch button module adds a launch {@link Button} with the theme {@code launch-button}.
  * The launch button can be used to start front-end-programs.
- * The actual button object is available under the key <code>button</code>.
+ * The actual button object is available under the key {@code button}.
  */
 public class DesktopLaunchButtonModule extends AbstractGraphicsModule {
 

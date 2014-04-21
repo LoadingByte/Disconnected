@@ -131,7 +131,7 @@ public class DesktopProgramWindow extends ResizableFrame {
 
     /**
      * Closes the window and removes it from the desktop {@link GraphicsState} that was set during construction.
-     * The method uses the {@link DesktopProgramManager} with the name <code>programManager</code> to remove the window.
+     * The method uses the {@link DesktopProgramManager} with the name {@code programManager} to remove the window.
      */
     public void close() {
 

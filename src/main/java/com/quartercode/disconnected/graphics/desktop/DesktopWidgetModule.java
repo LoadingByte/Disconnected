@@ -23,9 +23,9 @@ import com.quartercode.disconnected.graphics.GraphicsState;
 import de.matthiasmann.twl.Widget;
 
 /**
- * The desktop widget module adds a root {@link Widget} with the theme <code>desktop</code> to the {@link GraphicsState}.
- * That root {@link Widget} is stored under the key <code>widget</code>.
- * An example usage of the module is setting a desktop background through the <code>desktop</code> theme.
+ * The desktop widget module adds a root {@link Widget} with the theme {@code desktop} to the {@link GraphicsState}.
+ * That root {@link Widget} is stored under the key {@code widget}.
+ * An example usage of the module is setting a desktop background through the {@code desktop} theme.
  */
 public class DesktopWidgetModule extends AbstractGraphicsModule {
 

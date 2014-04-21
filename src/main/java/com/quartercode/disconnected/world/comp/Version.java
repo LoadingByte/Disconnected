@@ -84,13 +84,13 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
 
     /**
      * Returns the stored version as a string.
-     * The string is using the format <code>MAJOR.MINOR.REVISION</code> (e.g. <code>1.2.5</code>).
+     * The string is using the format {@code MAJOR.MINOR.REVISION} (e.g. {@code 1.2.5}).
      */
     public static final FunctionDefinition<String>  TO_STRING   = StringRepresentable.TO_STRING;
 
     /**
      * Changes the stored version to the ones stored in the given version string.
-     * The string is using the format <code>MAJOR.MINOR.REVISION</code> (e.g. <code>1.2.5</code>).
+     * The string is using the format {@code MAJOR.MINOR.REVISION} (e.g. {@code 1.2.5}).
      * 
      * <table>
      * <tr>
@@ -114,7 +114,7 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
      * </tr>
      * <tr>
      * <td>{@link IllegalArgumentException}</td>
-     * <td>The provided string does not match the <code>MAJOR.MINOR.REVISION</code> pattern.</td>
+     * <td>The provided string does not match the {@code MAJOR.MINOR.REVISION} pattern.</td>
      * </tr>
      * </table>
      */

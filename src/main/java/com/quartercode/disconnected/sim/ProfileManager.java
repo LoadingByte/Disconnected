@@ -80,7 +80,7 @@ public interface ProfileManager {
      * By setting a profile active, it will deserialize the data of it.
      * By setting a profile inactive, it will unlink the data of it from the memory.<br>
      * <br>
-     * If you want to deactivate the current profile without activating a new one, you can use <code>null</code>.
+     * If you want to deactivate the current profile without activating a new one, you can use {@code null}.
      * The change will take place in the next tick.
      * 
      * @param profile The new active profile which will be simulated.

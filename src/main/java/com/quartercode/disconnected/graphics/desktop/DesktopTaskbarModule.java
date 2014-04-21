@@ -26,8 +26,8 @@ import de.matthiasmann.twl.Widget;
 
 /**
  * The desktop taskbar module adds a {@link BoxLayout} that contains all taskbar buttons.
- * That {@link BoxLayout} is stored under the key <code>desktopWidget</code>.
- * An example usage of the module is setting a desktop background through the <code>desktop</code> theme.
+ * That {@link BoxLayout} is stored under the key {@code desktopWidget}.
+ * An example usage of the module is setting a desktop background through the {@code desktop} theme.
  */
 public class DesktopTaskbarModule extends AbstractGraphicsModule {
 

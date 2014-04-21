@@ -38,7 +38,7 @@ public @interface InjectValue {
 
     /**
      * Whether a non-null value is allowed to be injected into the annotated field.
-     * If this value is set <code>false</code> (default), an exception is thrown by the {@link ValueInjector} if the value is null.
+     * If this value is set {@code false} (default), an exception is thrown by the {@link ValueInjector} if the value is null.
      * That guarantees that the annotated field always has a non-null value.
      */
     boolean allowNull () default false;
