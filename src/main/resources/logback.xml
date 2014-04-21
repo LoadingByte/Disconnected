@@ -1,4 +1,7 @@
 <configuration>
+    <!-- Propagate logback settings to jul -->
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator" />
+
     <!-- This part of the pattern is used by every appender -->
     <property name="commonPattern" value="%-33(%date [%thread]) %-5level %-31logger{32} - %msg%n" />
 

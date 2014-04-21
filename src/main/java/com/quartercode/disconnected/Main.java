@@ -29,6 +29,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import com.quartercode.classmod.util.Classmod;
 import com.quartercode.disconnected.graphics.DefaultGraphicsManager;
 import com.quartercode.disconnected.graphics.DefaultStates;
@@ -98,6 +99,9 @@ public class Main {
 
         // Default exception handler if the vm throws an exception to the entry point of thread (e.g. main() or run())
         Thread.setDefaultUncaughtExceptionHandler(new LogExceptionHandler());
+
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
 
         // Print information about the software
         LOGGER.info("Version {}", ApplicationInfo.VERSION);
