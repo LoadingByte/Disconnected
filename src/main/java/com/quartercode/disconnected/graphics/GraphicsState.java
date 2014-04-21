@@ -22,6 +22,7 @@ import java.util.Map;
 import javax.naming.OperationNotSupportedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.quartercode.disconnected.util.ValueInjector;
 import de.matthiasmann.twl.Container;
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.Widget;
@@ -36,10 +37,11 @@ import de.matthiasmann.twl.Widget;
  */
 public class GraphicsState extends Widget {
 
-    private static final Logger               LOGGER = LoggerFactory.getLogger(GraphicsState.class);
+    private static final Logger               LOGGER        = LoggerFactory.getLogger(GraphicsState.class);
 
     private final String                      name;
     private final Map<String, GraphicsModule> modules;
+    private final ValueInjector               valueInjector = new ValueInjector();
 
     /**
      * Creates a new graphics state that is using the given {@link GraphicsModule}s.
@@ -77,6 +79,17 @@ public class GraphicsState extends Widget {
     public GraphicsModule getModule(String name) {
 
         return modules.get(name);
+    }
+
+    /**
+     * Returns the {@link ValueInjector} that may be used by all users of the state.
+     * It can be filled from outside.
+     * 
+     * @return The value injector instance of the graphics state.
+     */
+    public ValueInjector getValueInjector() {
+
+        return valueInjector;
     }
 
     @Override
