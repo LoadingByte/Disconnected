@@ -34,6 +34,26 @@ import com.quartercode.disconnected.world.comp.os.User;
 public class FileUtils {
 
     /**
+     * Normalizes the given path.
+     * Here are some examples:
+     * 
+     * <pre>
+     * /user/bin/../homes/test/
+     * =&gt; /user/homes/test/
+     * 
+     * /user/./homes/test/
+     * =&gt; /user/homes/test/
+     * </pre>
+     * 
+     * @param path The path that should be normalized.
+     * @return The normalized path.
+     */
+    public static String normalizePath(String path) {
+
+        return resolvePath(File.SEPARATOR, path);
+    }
+
+    /**
      * Creates an absolute path out of the given one.
      * The algorithm starts at the given start path and changes the path according to the "change" path.
      * The "change" path also can be absolute. This will ignore the start path.

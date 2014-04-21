@@ -96,7 +96,7 @@ public class FileMoveAction extends DefaultFeatureHolder implements FileAction {
             @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                String normalizedPath = FileUtils.resolvePath("/", (String) arguments[0]);
+                String normalizedPath = FileUtils.normalizePath((String) arguments[0]);
                 if (!normalizedPath.isEmpty()) {
                     normalizedPath = normalizedPath.substring(1);
                 }
