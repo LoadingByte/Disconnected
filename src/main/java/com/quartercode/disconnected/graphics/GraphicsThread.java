@@ -182,7 +182,7 @@ public class GraphicsThread extends Thread {
         PrintWriter themeFileWriter = null;
         File themeFile = null;
         try {
-            themeFile = File.createTempFile("disconnected-theme", ".xml");
+            themeFile = File.createTempFile(ApplicationInfo.TITLE + "-theme", ".xml");
             themeFileWriter = new PrintWriter(themeFile);
             themeFileWriter.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             themeFileWriter.println("<!DOCTYPE themes PUBLIC \"-//www.matthiasmann.de//TWL-Theme//EN\"");

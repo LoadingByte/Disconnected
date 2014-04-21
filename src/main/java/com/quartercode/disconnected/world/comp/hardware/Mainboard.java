@@ -126,7 +126,7 @@ public class Mainboard extends Hardware {
         static {
 
             TYPE = ObjectProperty.createDefinition("name");
-            CONTENT = ReferenceProperty.createDefinition("contentt");
+            CONTENT = ReferenceProperty.createDefinition("content");
 
         }
 

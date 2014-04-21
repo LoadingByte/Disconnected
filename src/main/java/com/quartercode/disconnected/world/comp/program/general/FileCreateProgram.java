@@ -101,11 +101,11 @@ public class FileCreateProgram extends ProgramExecutor {
                     throw new IllegalArgumentException("Cannot create instance of file type '" + fileType.getName() + "'");
                 }
 
-                User sessionUser = holder.getParent().get(Process.GET_USER).invoke();
+                Process<?> process = holder.getParent();
+                User sessionUser = process.get(Process.GET_USER).invoke();
                 addFile.get(File.OWNER).set(sessionUser);
                 addFile.get(File.GROUP).set(sessionUser.get(User.GET_PRIMARY_GROUP).invoke());
 
-                Process<?> process = holder.getParent();
                 FileSystemModule fsModule = process.get(Process.GET_OPERATING_SYSTEM).invoke().get(OperatingSystem.FS_MODULE).get();
                 String path = holder.get(PATH).get();
                 // Add a file seperator at the beginning of the path if it is not already there

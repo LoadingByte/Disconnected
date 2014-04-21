@@ -272,7 +272,7 @@ public class WorldGenerator {
         Configuration envConfig = new Configuration();
         EnvironmentVariable pathVariable = new EnvironmentVariable();
         pathVariable.get(EnvironmentVariable.NAME).set("PATH");
-        pathVariable.get(EnvironmentVariable.VALUE).set("/system/bin" + EnvironmentVariable.LIST_SEPARATOR + "/user/bin");
+        pathVariable.get(EnvironmentVariable.VALUE).set(CommonFiles.SYS_BIN_DIR + EnvironmentVariable.LIST_SEPARATOR + CommonFiles.USER_BIN_DIR);
         envConfig.get(Configuration.ENTRIES).add(pathVariable);
         addContentFile(fileSystem, FileUtils.getComponents(CommonFiles.ENVIRONMENT_CONFIG)[1], superuser, "rw--r---r---", envConfig);
     }
