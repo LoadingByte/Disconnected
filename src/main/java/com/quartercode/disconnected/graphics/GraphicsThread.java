@@ -41,7 +41,6 @@ import com.quartercode.disconnected.util.ExitUtil;
 import com.quartercode.disconnected.util.GlobalStorage;
 import de.matthiasmann.twl.Container;
 import de.matthiasmann.twl.GUI;
-import de.matthiasmann.twl.renderer.Renderer;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 import de.matthiasmann.twl.theme.ThemeManager;
 import de.matthiasmann.twl.utils.PNGDecoder;
@@ -55,6 +54,7 @@ public class GraphicsThread extends Thread {
 
     private static final Logger   LOGGER   = LoggerFactory.getLogger(GraphicsThread.class);
 
+    private LWJGLRenderer         renderer;
     private GUI                   gui;
     private ThemeManager          theme;
     private Container             root;
@@ -120,8 +120,8 @@ public class GraphicsThread extends Thread {
 
         createDisplay();
         createRoot();
-        Renderer renderer = createRenderer();
-        loadTheme(renderer);
+        createRenderer();
+        loadTheme();
         gui.applyTheme(theme);
     }
 
@@ -132,6 +132,7 @@ public class GraphicsThread extends Thread {
         Display.setTitle("Disconnected " + ApplicationInfo.VERSION);
         Display.setIcon(loadIcons());
         Display.setVSyncEnabled(true);
+        Display.setResizable(true);
         Display.create();
     }
 
@@ -165,19 +166,18 @@ public class GraphicsThread extends Thread {
         root.setTheme("");
     }
 
-    private Renderer createRenderer() throws LWJGLException {
+    private void createRenderer() throws LWJGLException {
 
-        LWJGLRenderer renderer = new LWJGLRenderer();
+        renderer = new LWJGLRenderer();
         renderer.setUseSWMouseCursors(true);
 
         gui = new GUI(root, renderer);
         gui.setSize();
 
         renderer.syncViewportSize();
-        return renderer;
     }
 
-    private void loadTheme(Renderer renderer) throws LWJGLException, IOException {
+    private void loadTheme() throws LWJGLException, IOException {
 
         PrintWriter themeFileWriter = null;
         File themeFile = null;
@@ -223,6 +223,11 @@ public class GraphicsThread extends Thread {
 
             if (!toInvoke.isEmpty()) {
                 toInvoke.poll().run();
+            }
+
+            if (Display.wasResized()) {
+                GL11.glViewport(0, 0, Display.getWidth(), Display.getHeight());
+                renderer.setViewport(0, 0, Display.getWidth(), Display.getHeight());
             }
 
             gui.update();
