@@ -84,23 +84,23 @@ public class FileMoveActionTest extends AbstractFileActionTest {
     public void testExecute() {
 
         FileMoveAction action = createAction(file, newPath);
-        actuallyTestExecute(action, oldPath, newPath);
+        actuallyTestExecute(action);
     }
 
     @Test
     public void testFileExecute() {
 
         FileAction action = file.get(File.CREATE_MOVE).invoke(newPath);
-        actuallyTestExecute(action, oldPath, newPath);
+        actuallyTestExecute(action);
     }
 
-    private void actuallyTestExecute(FileAction action, String oldFilePath, String newFilePath) {
+    private void actuallyTestExecute(FileAction action) {
 
         action.get(FileAction.EXECUTE).invoke();
 
-        Assert.assertEquals("Resolved file for new path", file, fileSystem.get(FileSystem.GET_FILE).invoke(newFilePath));
-        Assert.assertEquals("Resolved file for old path", null, fileSystem.get(FileSystem.GET_FILE).invoke(oldFilePath));
-        Assert.assertEquals("Path of moved file", newFilePath, file.get(File.GET_PATH).invoke());
+        Assert.assertEquals("Resolved file for new path", file, fileSystem.get(FileSystem.GET_FILE).invoke(newPath));
+        Assert.assertEquals("Resolved file for old path", null, fileSystem.get(FileSystem.GET_FILE).invoke(oldPath));
+        Assert.assertEquals("Path of moved file", newPath, file.get(File.GET_PATH).invoke());
     }
 
     @Test
@@ -108,7 +108,7 @@ public class FileMoveActionTest extends AbstractFileActionTest {
 
         if (testRights) {
             FileMoveAction action = createAction(file, newPath);
-            actuallyTestIsExecutableBy(action, newParentPath);
+            actuallyTestIsExecutableBy(action);
         }
     }
 
@@ -117,11 +117,11 @@ public class FileMoveActionTest extends AbstractFileActionTest {
 
         if (testRights) {
             FileAction action = file.get(File.CREATE_MOVE).invoke(newPath);
-            actuallyTestIsExecutableBy(action, newParentPath);
+            actuallyTestIsExecutableBy(action);
         }
     }
 
-    private void actuallyTestIsExecutableBy(FileAction action, String newParentPath) {
+    private void actuallyTestIsExecutableBy(FileAction action) {
 
         // Add the directory that would hold the actual file (we need to modify its rights later on)
         Directory newParentFile = new Directory();

@@ -27,33 +27,29 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
-import com.quartercode.disconnected.world.comp.file.Directory;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAction;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
-import com.quartercode.disconnected.world.comp.file.FileRights;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
 import com.quartercode.disconnected.world.comp.file.ParentFile;
 
 @RunWith (Parameterized.class)
-public class FileAddActionTest extends AbstractFileActionTest {
+public class FileAddActionRootTest extends AbstractFileActionTest {
 
     @Parameters
     public static Collection<Object[]> data() {
 
         List<Object[]> data = new ArrayList<Object[]>();
 
-        data.add(new Object[] { "test1/test2", "test1/test2/test.txt" });
+        data.add(new Object[] { "test.txt" });
 
         return data;
     }
 
-    private final String addFileParentPath;
     private final String addFilePath;
 
-    public FileAddActionTest(String addFileParentPath, String addFilePath) {
+    public FileAddActionRootTest(String addFilePath) {
 
-        this.addFileParentPath = addFileParentPath;
         this.addFilePath = addFilePath;
     }
 
@@ -86,26 +82,6 @@ public class FileAddActionTest extends AbstractFileActionTest {
         Assert.assertEquals("Resolved file", file, fileSystem.get(FileSystem.GET_FILE).invoke(addFilePath));
     }
 
-    @Test (expected = IllegalArgumentException.class)
-    public void testExecuteInvalidPath() {
-
-        FileAddAction action = createAction(file, addFilePath);
-        actuallyTestExecuteInvalidPath(action);
-    }
-
-    @Test (expected = IllegalArgumentException.class)
-    public void testFileSystemExecuteInvalidPath() {
-
-        FileAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
-        actuallyTestExecuteInvalidPath(action);
-    }
-
-    private void actuallyTestExecuteInvalidPath(FileAction action) {
-
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), addFileParentPath).get(FileAction.EXECUTE).invoke();
-        action.get(FileAction.EXECUTE).invoke();
-    }
-
     @Test (expected = IllegalStateException.class)
     public void testExecutePathAlreadyOccupied() {
 
@@ -124,37 +100,6 @@ public class FileAddActionTest extends AbstractFileActionTest {
 
         fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), addFilePath).get(FileAction.EXECUTE).invoke();
         action.get(FileAction.EXECUTE).invoke();
-    }
-
-    @Test
-    public void testIsExecutableBy() {
-
-        FileAddAction action = createAction(file, addFilePath);
-        actuallyTestIsExecutableBy(action);
-    }
-
-    @Test
-    public void testFileSystemIsExecutableBy() {
-
-        FileAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
-        actuallyTestIsExecutableBy(action);
-    }
-
-    private void actuallyTestIsExecutableBy(FileAction action) {
-
-        // Add the directory that would hold the actual file (we need to modify its rights later on)
-        Directory parentFile = new Directory();
-        parentFile.get(File.OWNER).set(user);
-        createAction(parentFile, addFileParentPath).get(FileAction.EXECUTE).invoke();
-
-        boolean[] executable = new boolean[2];
-        parentFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("-w----------");
-        executable[0] = action.get(FileAction.IS_EXECUTABLE_BY).invoke(user);
-        parentFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
-        executable[1] = action.get(FileAction.IS_EXECUTABLE_BY).invoke(user);
-
-        Assert.assertTrue("File add action is not executable although the write right is set on the parent directory", executable[0]);
-        Assert.assertTrue("File add action is executable although the write right is not set on the parent directory", !executable[1]);
     }
 
 }

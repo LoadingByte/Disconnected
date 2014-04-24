@@ -83,37 +83,37 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
     public void testExecute() {
 
         FileRemoveAction action = createAction(file);
-        actuallyTestExecute(action, removeFilePath);
+        actuallyTestExecute(action);
     }
 
     @Test
     public void testFileExecute() {
 
         FileAction action = file.get(File.CREATE_REMOVE).invoke();
-        actuallyTestExecute(action, removeFilePath);
+        actuallyTestExecute(action);
     }
 
-    private void actuallyTestExecute(FileAction action, String oldFilePath) {
+    private void actuallyTestExecute(FileAction action) {
 
         action.get(FileAddAction.EXECUTE).invoke();
-        Assert.assertEquals("Resolved file for deleted file", null, fileSystem.get(FileSystem.GET_FILE).invoke(oldFilePath));
+        Assert.assertEquals("Resolved file for deleted file", null, fileSystem.get(FileSystem.GET_FILE).invoke(removeFilePath));
     }
 
     @Test
     public void testIsExecutableBy() {
 
         FileRemoveAction action = createAction(file);
-        actuallyTestIsExecutableBy(action, removeFilePath);
+        actuallyTestIsExecutableBy(action);
     }
 
     @Test
     public void testFileIsExecutableBy() {
 
         FileAction action = file.get(File.CREATE_REMOVE).invoke();
-        actuallyTestIsExecutableBy(action, removeFilePath);
+        actuallyTestIsExecutableBy(action);
     }
 
-    private void actuallyTestIsExecutableBy(FileAction action, String oldFilePath) {
+    private void actuallyTestIsExecutableBy(FileAction action) {
 
         boolean[] executable = new boolean[4];
 
