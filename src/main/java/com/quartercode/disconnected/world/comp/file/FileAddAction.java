@@ -104,6 +104,10 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
      * <td>The set file path isn't valid (for example, a file along the path is not a parent file).</td>
      * </tr>
      * <tr>
+     * <td>{@link IllegalStateException}</td>
+     * <td>The file path, under which the new file should be added, is already used by annother file.</td>
+     * </tr>
+     * <tr>
      * <td>{@link OutOfSpaceException}</td>
      * <td>There is not enough space for the new file or a required directory.</td>
      * </tr>
@@ -163,6 +167,10 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
                 File<?> parent = holder.get(FILE_SYSTEM).get().get(FileSystem.GET_FILE).invoke(pathToParent);
 
                 String addFileName = path.substring(path.lastIndexOf(File.SEPARATOR) + 1);
+                if (parent.get(ParentFile.GET_CHILD_BY_NAME).invoke(addFileName) != null) {
+                    throw new IllegalStateException("There is already a file located under the path '" + path + "'.");
+                }
+
                 File<ParentFile<?>> addFile = holder.get(FILE).get();
                 addFile.get(File.NAME).set(addFileName);
                 parent.get(ParentFile.CHILDREN).add(addFile);

@@ -131,6 +131,10 @@ public class FileCreateProgram extends ProgramExecutor {
                             InvalidPathEvent invalidPathEvent = new InvalidPathEvent();
                             invalidPathEvent.get(InvalidPathEvent.PATH).set(path);
                             invalidPathEvent.get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());
+                        } catch (IllegalStateException e) {
+                            OccupiedFileNameEvent occupiedFileNameEvent = new OccupiedFileNameEvent();
+                            occupiedFileNameEvent.get(OccupiedFileNameEvent.PATH).set(path);
+                            occupiedFileNameEvent.get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());
                         } catch (OutOfSpaceException e) {
                             OutOfSpaceEvent outOfSpaceEvent = new OutOfSpaceEvent();
                             outOfSpaceEvent.get(OutOfSpaceEvent.FILE_SYSTEM).set(e.getFileSystem());
@@ -272,6 +276,36 @@ public class FileCreateProgram extends ProgramExecutor {
         /**
          * The global file path that is not valid.
          * The reason for its invalidity could be a file along the path is not a parent file.
+         */
+        public static final PropertyDefinition<String> PATH;
+
+        static {
+
+            PATH = ObjectProperty.createDefinition("path");
+
+        }
+
+    }
+
+    /**
+     * The occupied file name event is fired by the {@link FileCreateProgram} when the provided file path is already occupied by another {@link File}.<br>
+     * <br>
+     * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.
+     * For example, an instanceof check should look like this:
+     * 
+     * <pre>
+     * if ( event instanceof <b>FileCreateProgram.</b>OccupiedFileNameEvent )
+     * </pre>
+     * 
+     * @see ErrorEvent
+     * @see FileCreateProgram
+     */
+    public static class OccupiedFileNameEvent extends ErrorEvent {
+
+        // ----- Properties -----
+
+        /**
+         * The global file path that is already occupied by a {@link File}.
          */
         public static final PropertyDefinition<String> PATH;
 
