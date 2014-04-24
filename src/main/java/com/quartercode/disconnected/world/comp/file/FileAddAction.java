@@ -123,7 +123,7 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
                 File<ParentFile<?>> addFile = holder.get(FILE).get();
 
                 String path = holder.get(PATH).get();
-                String pathToParent = path.substring(0, path.lastIndexOf(File.SEPARATOR));
+                String pathToParent = path.contains(File.SEPARATOR) ? path.substring(0, path.lastIndexOf(File.SEPARATOR)) : "";
                 String[] pathParts = pathToParent.split(File.SEPARATOR);
 
                 File<?> current = holder.get(FILE_SYSTEM).get().get(FileSystem.ROOT).get();
@@ -159,7 +159,7 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
                 FeatureHolder holder = invocation.getHolder();
 
                 String path = holder.get(PATH).get();
-                String pathToParent = path.substring(0, path.lastIndexOf(File.SEPARATOR));
+                String pathToParent = path.contains(File.SEPARATOR) ? path.substring(0, path.lastIndexOf(File.SEPARATOR)) : "";
                 File<?> parent = holder.get(FILE_SYSTEM).get().get(FileSystem.GET_FILE).invoke(pathToParent);
 
                 String addFileName = path.substring(path.lastIndexOf(File.SEPARATOR) + 1);
