@@ -12,11 +12,11 @@
         <area name="tooltip.background" xywh="24,2,9,9" splitx="L2,R2" splity="T2,B2" tint="#0195FF"/>
 
         <!-- Button -->
-        <area name="button.background.normal" xywh="2,2,19,21" splitx="L6,R6" splity="T2,B2" nocenter="true"/>
+        <area name="button.background.normal" xywh="2,2,19,19" splitx="L3,R3" splity="T3,B3"/>
         <select name="button.background">
             <alias ref="button.background.normal" if="pressed" tint="#007800"/>
-            <alias ref="button.background.normal" if="hover" tint="#00C800"/>
-            <alias ref="button.background.normal" tint="#0196FF"/>
+            <alias ref="button.background.normal" if="hover" tint="#00B900"/>
+            <alias ref="button.background.normal" tint="#0863FF"/>
         </select>
 
         <!-- Editfield -->
@@ -29,7 +29,7 @@
         <alias name="editfield.selection" ref="color" tint="#E000FEFF"/>
 
         <!-- Scrollbar Background -->
-        <area name="scrollbar.background" tiled="true" xywh="2,26,16,16" tint="#0007FA"/>
+        <area name="scrollbar.background" tiled="true" xywh="2,24,16,16" tint="#0007FA"/>
 
         <!-- Scrollbar Buttons -->
         <alias name="scrollbar.button.background.normal" ref="flatarea"/>
