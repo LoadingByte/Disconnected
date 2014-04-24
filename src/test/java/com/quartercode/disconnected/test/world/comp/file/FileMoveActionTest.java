@@ -18,9 +18,15 @@
 
 package com.quartercode.disconnected.test.world.comp.file;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.disconnected.world.comp.file.Directory;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAction;
@@ -30,17 +36,39 @@ import com.quartercode.disconnected.world.comp.file.FileRights;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
 import com.quartercode.disconnected.world.comp.file.ParentFile;
 
+@RunWith (Parameterized.class)
 public class FileMoveActionTest extends AbstractFileActionTest {
 
-    private static final String PARENT_PATH_1 = "test1/test2";
-    private static final String PATH_1        = PARENT_PATH_1 + "/test.txt";
-    private static final String PARENT_PATH_2 = "test3/test4";
-    private static final String PATH_2        = PARENT_PATH_2 + "/test5.txt";
+    @Parameters
+    public static Collection<Object[]> data() {
+
+        List<Object[]> data = new ArrayList<Object[]>();
+
+        data.add(new Object[] { "test1/test2/test.txt", "test3/test4", "test3/test4/test5.txt", true });
+        data.add(new Object[] { "test1/test2/test.txt", "", "test5.txt", false });
+        data.add(new Object[] { "test.txt", "test3/test4", "test3/test4/test5.txt", true });
+        data.add(new Object[] { "test.txt", "", "test5.txt", false });
+
+        return data;
+    }
+
+    private final String  oldPath;
+    private final String  newParentPath;
+    private final String  newPath;
+    private final boolean testRights;
+
+    public FileMoveActionTest(String oldPath, String newParentPath, String newPath, boolean testRights) {
+
+        this.oldPath = oldPath;
+        this.newParentPath = newParentPath;
+        this.newPath = newPath;
+        this.testRights = testRights;
+    }
 
     @Before
     public void setUp2() {
 
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, PATH_1).get(FileAddAction.EXECUTE).invoke();
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, oldPath).get(FileAddAction.EXECUTE).invoke();
     }
 
     private FileMoveAction createAction(File<ParentFile<?>> file, String newPath) {
@@ -55,15 +83,15 @@ public class FileMoveActionTest extends AbstractFileActionTest {
     @Test
     public void testExecute() {
 
-        FileMoveAction action = createAction(file, PATH_2);
-        actuallyTestExecute(action, PATH_1, PATH_2);
+        FileMoveAction action = createAction(file, newPath);
+        actuallyTestExecute(action, oldPath, newPath);
     }
 
     @Test
     public void testFileExecute() {
 
-        FileAction action = file.get(File.CREATE_MOVE).invoke(PATH_2);
-        actuallyTestExecute(action, PATH_1, PATH_2);
+        FileAction action = file.get(File.CREATE_MOVE).invoke(newPath);
+        actuallyTestExecute(action, oldPath, newPath);
     }
 
     private void actuallyTestExecute(FileAction action, String oldFilePath, String newFilePath) {
@@ -78,15 +106,19 @@ public class FileMoveActionTest extends AbstractFileActionTest {
     @Test
     public void testIsExecutableBy() {
 
-        FileMoveAction action = createAction(file, PATH_2);
-        actuallyTestIsExecutableBy(action, PARENT_PATH_2);
+        if (testRights) {
+            FileMoveAction action = createAction(file, newPath);
+            actuallyTestIsExecutableBy(action, newParentPath);
+        }
     }
 
     @Test
     public void testFileIsExecutableBy() {
 
-        FileAction action = file.get(File.CREATE_MOVE).invoke(PATH_2);
-        actuallyTestIsExecutableBy(action, PARENT_PATH_2);
+        if (testRights) {
+            FileAction action = file.get(File.CREATE_MOVE).invoke(newPath);
+            actuallyTestIsExecutableBy(action, newParentPath);
+        }
     }
 
     private void actuallyTestIsExecutableBy(FileAction action, String newParentPath) {

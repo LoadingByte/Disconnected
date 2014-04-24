@@ -18,8 +18,14 @@
 
 package com.quartercode.disconnected.test.world.comp.file;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.disconnected.world.comp.file.Directory;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAction;
@@ -28,10 +34,30 @@ import com.quartercode.disconnected.world.comp.file.FileRights;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
 import com.quartercode.disconnected.world.comp.file.ParentFile;
 
+@RunWith (Parameterized.class)
 public class FileAddActionTest extends AbstractFileActionTest {
 
-    private static final String PARENT_PATH = "test1/test2";
-    private static final String PATH        = PARENT_PATH + "/test.txt";
+    @Parameters
+    public static Collection<Object[]> data() {
+
+        List<Object[]> data = new ArrayList<Object[]>();
+
+        data.add(new Object[] { "test1/test2", "test1/test2/test.txt", true });
+        data.add(new Object[] { "", "test.txt", false });
+
+        return data;
+    }
+
+    private final String  addFileParentPath;
+    private final String  addFilePath;
+    private final boolean testRights;
+
+    public FileAddActionTest(String addFileParentPath, String addFilePath, boolean testRights) {
+
+        this.addFileParentPath = addFileParentPath;
+        this.addFilePath = addFilePath;
+        this.testRights = testRights;
+    }
 
     private FileAddAction createAction(File<ParentFile<?>> file, String path) {
 
@@ -45,15 +71,15 @@ public class FileAddActionTest extends AbstractFileActionTest {
     @Test
     public void testExecute() {
 
-        FileAddAction action = createAction(file, PATH);
-        actuallyTestExecute(action, PATH);
+        FileAddAction action = createAction(file, addFilePath);
+        actuallyTestExecute(action, addFilePath);
     }
 
     @Test
     public void testFileSystemExecute() {
 
-        FileAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, PATH);
-        actuallyTestExecute(action, PATH);
+        FileAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
+        actuallyTestExecute(action, addFilePath);
     }
 
     private void actuallyTestExecute(FileAction action, String filePath) {
@@ -65,15 +91,19 @@ public class FileAddActionTest extends AbstractFileActionTest {
     @Test
     public void testIsExecutableBy() {
 
-        FileAddAction action = createAction(file, PATH);
-        actuallyTestIsExecutableBy(action, PARENT_PATH);
+        if (testRights) {
+            FileAddAction action = createAction(file, addFilePath);
+            actuallyTestIsExecutableBy(action, addFileParentPath);
+        }
     }
 
     @Test
     public void testFileSystemIsExecutableBy() {
 
-        FileAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, PATH);
-        actuallyTestIsExecutableBy(action, PARENT_PATH);
+        if (testRights) {
+            FileAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
+            actuallyTestIsExecutableBy(action, addFileParentPath);
+        }
     }
 
     private void actuallyTestIsExecutableBy(FileAction action, String parentFilePath) {

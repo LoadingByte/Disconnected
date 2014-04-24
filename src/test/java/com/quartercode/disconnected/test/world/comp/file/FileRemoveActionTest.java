@@ -18,9 +18,15 @@
 
 package com.quartercode.disconnected.test.world.comp.file;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAction;
@@ -28,23 +34,42 @@ import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileRemoveAction;
 import com.quartercode.disconnected.world.comp.file.FileRights;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
+import com.quartercode.disconnected.world.comp.file.FileUtils;
 import com.quartercode.disconnected.world.comp.file.ParentFile;
 
+@RunWith (Parameterized.class)
 public class FileRemoveActionTest extends AbstractFileActionTest {
 
-    private static final String PATH       = "test1/test2";
-    private static final String CHILD_PATH = PATH + "/test.txt";
+    @Parameters
+    public static Collection<Object[]> data() {
+
+        List<Object[]> data = new ArrayList<Object[]>();
+
+        data.add(new Object[] { "test1/test2" });
+        data.add(new Object[] { "test" });
+
+        return data;
+    }
+
+    private final String        removeFilePath;
+    private final String        removeFileChildPath;
 
     private File<ParentFile<?>> childFile;
+
+    public FileRemoveActionTest(String removeFilePath) {
+
+        this.removeFilePath = removeFilePath;
+        removeFileChildPath = FileUtils.normalizePath(removeFilePath) + "/test.txt";
+    }
 
     @Before
     public void setUp2() {
 
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, PATH).get(FileAddAction.EXECUTE).invoke();
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, removeFilePath).get(FileAddAction.EXECUTE).invoke();
 
         childFile = new ContentFile();
         childFile.get(File.OWNER).set(user);
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(childFile, CHILD_PATH).get(FileAddAction.EXECUTE).invoke();
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(childFile, removeFileChildPath).get(FileAddAction.EXECUTE).invoke();
     }
 
     private FileRemoveAction createAction(File<ParentFile<?>> file) {
@@ -58,14 +83,14 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
     public void testExecute() {
 
         FileRemoveAction action = createAction(file);
-        actuallyTestExecute(action, PATH);
+        actuallyTestExecute(action, removeFilePath);
     }
 
     @Test
     public void testFileExecute() {
 
         FileAction action = file.get(File.CREATE_REMOVE).invoke();
-        actuallyTestExecute(action, PATH);
+        actuallyTestExecute(action, removeFilePath);
     }
 
     private void actuallyTestExecute(FileAction action, String oldFilePath) {
@@ -78,14 +103,14 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
     public void testIsExecutableBy() {
 
         FileRemoveAction action = createAction(file);
-        actuallyTestIsExecutableBy(action, PATH);
+        actuallyTestIsExecutableBy(action, removeFilePath);
     }
 
     @Test
     public void testFileIsExecutableBy() {
 
         FileAction action = file.get(File.CREATE_REMOVE).invoke();
-        actuallyTestIsExecutableBy(action, PATH);
+        actuallyTestIsExecutableBy(action, removeFilePath);
     }
 
     private void actuallyTestIsExecutableBy(FileAction action, String oldFilePath) {
