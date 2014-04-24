@@ -9,7 +9,7 @@
         <area name="flatarea" border="3" xywh="36,16,9,9" splitx="L3,R3" splity="T3,B3"/>
 
         <!-- Tooltip -->
-        <area name="tooltip.background" xywh="24,2,9,9"/>
+        <area name="tooltip.background" xywh="24,2,9,9" splitx="L2,R2" splity="T2,B2" tint="#0195FF"/>
 
         <!-- Button -->
         <area name="button.background.normal" xywh="2,2,19,21" splitx="L6,R6" splity="T2,B2" nocenter="true"/>
@@ -128,6 +128,7 @@
         <param name="background"><image>tooltip.background</image></param>
         <param name="border"><border>5</border></param>
         <param name="fadeInTime"><int>0</int></param>
+        <theme name="label" ref="-defaults"/>
     </theme>
 
     <theme name="label" ref="-defaults"/>
