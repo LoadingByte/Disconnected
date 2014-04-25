@@ -10,7 +10,7 @@
         <!-- Launch Button -->
         <area name="launch-button.normal" xywh="22,2,17,16" splitx="L3,R3" splity="T1,B1"/>
         <select name="launch-button.background">
-            <alias ref="launch-button.normal" tint="#0093BD" if="disabled"/>
+            <alias ref="launch-button.normal" if="disabled" tint="#0093BD"/>
             <alias ref="launch-button.normal" if="pressed" tint="#00C800"/>
             <alias ref="launch-button.normal" if="hover" tint="#00FF00"/>
             <alias ref="launch-button.normal" tint="#00C7FF"/>
@@ -19,25 +19,25 @@
         <!-- Taskbar Button -->
         <area name="taskbar-button-active.normal" xywh="22,2,17,16" splitx="L3,R3" splity="T1,B1"/>
         <select name="taskbar-button-active.background">
-            <alias ref="taskbar-button-active.normal" tint="#00B4B4" if="disabled"/>
+            <alias ref="taskbar-button-active.normal" if="disabled" tint="#00B4B4"/>
             <alias ref="taskbar-button-active.normal" if="pressed" tint="#00C800"/>
             <alias ref="taskbar-button-active.normal" if="hover" tint="#00FF00"/>
             <alias ref="taskbar-button-active.normal" tint="#00FFFF"/>
         </select>
         <area name="taskbar-button-inactive.normal" xywh="2,2,17,16" splitx="L3,R3" splity="T1,B1" nocenter="true"/>
         <select name="taskbar-button-inactive.background">
-            <alias ref="taskbar-button-inactive.normal" tint="#00D589" if="disabled"/>
+            <alias ref="taskbar-button-inactive.normal" if="disabled" tint="#00D589"/>
             <alias ref="taskbar-button-inactive.normal" if="pressed" tint="#00C800"/>
             <alias ref="taskbar-button-inactive.normal" if="hover" tint="#00FF00"/>
             <alias ref="taskbar-button-inactive.normal" tint="#63FFC7"/>
         </select>
 
         <!-- Frame Background -->
-        <composed name="frame.background" border="25,5,5,5">
-            <area xywh="42,2,9,9" splitx="L3,R3" splity="T3,B3" border="3" tint="#0000FF"/>
-            <grid weightsX="0,1,0" weightsY="0,1" inset="4" sizeOverwriteV="0">
+        <composed name="frame.background" border="30,5,5,5">
+            <area xywh="2,21,3,3" splitx="L1,R1" splity="T1,B1" tint="#0000D5"/>
+            <grid weightsX="0,1,0" weightsY="0,1" inset="4">
                 <alias ref="none"/>
-                <area xywh="2,21,128,7" splitx="L4,R5" splity="T4,B2" tint="#0063FF" sizeOverwriteV="20"/>
+                <area xywh="8,21,1,1" tint="#0063FF" sizeOverwriteV="20"/>
                 <alias ref="none"/>
                 <alias ref="none"/>
                 <alias ref="none"/>
@@ -46,12 +46,12 @@
         </composed>
 
         <!-- Frame Closebutton -->
-        <area name="frame.closebutton.normal" xywh="55,2,15,15" splitx="L4,R4" splity="T4,B4" sizeOverwriteH="15" sizeOverwriteV="15"/>
+        <area name="frame.closebutton.normal" xywh="42,2,7,7" sizeOverwriteH="10" sizeOverwriteV="10"/>
         <select name="frame.closebutton.background">
-            <alias ref="frame.closebutton.normal" tint="#00B3B3" if="disabled"/>
-            <alias ref="frame.closebutton.normal" if="pressed" tint="#00C800"/>
-            <alias ref="frame.closebutton.normal" if="hover" tint="#00FF00"/>
-            <alias ref="frame.closebutton.normal" tint="#00FFFF"/>
+            <alias ref="frame.closebutton.normal" if="disabled" tint="#00D1D1"/>
+            <alias ref="frame.closebutton.normal" if="pressed" tint="#00EA00"/>
+            <alias ref="frame.closebutton.normal" if="hover" tint="#45FF45"/>
+            <alias ref="frame.closebutton.normal" tint="#6FFFFF"/>
         </select>
     </images>
 
@@ -66,11 +66,11 @@
             <param name="titleAreaRight"><int>-40</int></param>
             <param name="titleAreaBottom"><int>28</int></param>
             <param name="hasCloseButton"><bool>true</bool></param>
-            <param name="closeButtonX"><int>-25</int></param>
-            <param name="closeButtonY"><int>8</int></param>
+            <param name="closeButtonX"><int>-23</int></param>
+            <param name="closeButtonY"><int>9</int></param>
             <param name="hasResizeHandle"><bool>false</bool></param>
-            <param name="resizeHandleX"><int>-18</int></param>
-            <param name="resizeHandleY"><int>-18</int></param>
+            <param name="resizeHandleX"><int>0</int></param>
+            <param name="resizeHandleY"><int>0</int></param>
             <param name="fadeColorInactive"><color>white</color></param>
             <param name="fadeDurationActivate"><int>0</int></param>
             <param name="fadeDurationDeactivate"><int>0</int></param>
@@ -80,26 +80,26 @@
             <theme name="title" ref="label">
                 <param name="textAlignment"><enum type="alignment">center</enum></param>
                 <param name="border"><border>0,0,10,0</border></param>
-                <param name="border2"><border>10</border></param>
             </theme>
             <theme name="closeButton" ref="-defaults">
                 <param name="background"><image>frame.closebutton.background</image></param>
+                <param name="mouseCursor"><cursor>cursor.finger</cursor></param>
             </theme>
         </theme>
 
-        <theme name="launch-button" ref="-defaults">
+        <theme name="launch-button" ref="button">
             <param name="background"><image>launch-button.background</image></param>
             <param name="font"><font>button.black</font></param>
             <param name="border"><border>12,7</border></param>
         </theme>
 
-        <theme name="taskbar-button-active" ref="-defaults">
+        <theme name="taskbar-button-active" ref="button">
             <param name="background"><image>taskbar-button-active.background</image></param>
             <param name="font"><font>button.black</font></param>
             <param name="border"><border>10,5</border></param>
         </theme>
 
-        <theme name="taskbar-button-inactive" ref="-defaults">
+        <theme name="taskbar-button-inactive" ref="button">
             <param name="background"><image>taskbar-button-inactive.background</image></param>
             <param name="font"><font>button.white</font></param>
             <param name="border"><border>10,5</border></param>

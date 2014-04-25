@@ -5,23 +5,28 @@
 
     <images file="images/components.png">
         <!-- General -->
-        <area name="color" xywh="46,12,1,1"/>
-        <area name="flatarea" border="3" xywh="36,16,9,9" splitx="L3,R3" splity="T3,B3"/>
+        <area name="color" xywh="19,24,1,1"/>
+        <area name="flatarea1" border="3" xywh="2,24,3,3" splitx="L1,R1" splity="T1,B1"/>
+        <area name="flatarea2" border="3" xywh="8,24,3,3" splitx="L1,R1" splity="T1,B1"/>
 
         <!-- Tooltip -->
-        <area name="tooltip.background" xywh="24,2,9,9" splitx="L2,R2" splity="T2,B2" tint="#0195FF"/>
+        <alias name="tooltip.background" ref="flatarea2" tint="#008AEE"/>
 
         <!-- Button -->
-        <area name="button.background.normal" xywh="2,2,19,19" splitx="L3,R3" splity="T3,B3"/>
+        <area name="button.background.normal" xywh="2,2,19,19" splitx="L1,R1" splity="T1,B1"/>
         <select name="button.background">
             <alias ref="button.background.normal" if="disabled" tint="#0051DE"/>
             <alias ref="button.background.normal" if="pressed" tint="#007800"/>
             <alias ref="button.background.normal" if="hover" tint="#00B900"/>
-            <alias ref="button.background.normal" tint="#0863FF"/>
+            <alias ref="button.background.normal" tint="#3D69FF"/>
         </select>
 
         <!-- Editfield -->
-        <alias name="editfield.background" ref="flatarea" tint="#0000FF"/>
+        <alias name="editfield.background.normal" ref="flatarea2"/>
+        <select name="editfield.background">
+            <alias ref="editfield.background.normal" tint="#0099FA" if="keyboardFocus"/>
+            <alias ref="editfield.background.normal" tint="#2525FF"/>
+        </select>
         <alias name="-editfield.cursor" ref="color" tint="#CCCCCC"/>
         <animation name="editfield.cursor" timeSource="keyboardFocus">
             <frame ref="-editfield.cursor" duration="500"/>
@@ -30,14 +35,14 @@
         <alias name="editfield.selection" ref="color" tint="#E000FEFF"/>
 
         <!-- Scrollbar Background -->
-        <area name="scrollbar.background" tiled="true" xywh="2,24,16,16" tint="#0007FA"/>
+        <area name="scrollbar.background" tiled="true" xywh="14,24,2,2" tint="#0007FA"/>
 
         <!-- Scrollbar Buttons -->
-        <alias name="scrollbar.button.background.normal" ref="flatarea"/>
-        <area name="scrollbar.button.up" xywh="35,8,9,6" inset="5,3,5,4"/>
-        <area name="scrollbar.button.down" xywh="35,1,9,6" inset="5,3,5,4"/>
-        <area name="scrollbar.button.left" xywh="45,1,6,9" inset="3,4,4,6"/>
-        <area name="scrollbar.button.right" xywh="52,1,6,9" inset="3,4,4,6"/>
+        <alias name="scrollbar.button.background.normal" ref="flatarea2"/>
+        <area name="scrollbar.button.up" xywh="32,9,7,4" inset="5,3,5,4" center="true"/>
+        <area name="scrollbar.button.down" xywh="32,2,7,4" inset="5,3,5,4" center="true"/>
+        <area name="scrollbar.button.left" xywh="42,2,4,7" inset="3,4,4,6" center="true"/>
+        <area name="scrollbar.button.right" xywh="49,2,4,7" inset="3,4,4,6" center="true"/>
         <select name="scrollbar.button.background">
             <alias ref="scrollbar.button.background.normal" if="disabled" tint="#0076C9"/>
             <alias ref="scrollbar.button.background.normal" if="pressed" tint="#008B00"/>
@@ -62,7 +67,7 @@
         </composed>
 
         <!-- Scrollbar Thumb -->
-        <alias name="scrollbar.thumb.background.normal" ref="flatarea"/>
+        <alias name="scrollbar.thumb.background.normal" ref="flatarea2"/>
         <select name="scrollbar.thumb.background">
             <alias ref="scrollbar.thumb.background.normal" if="disabled" tint="#0076C9"/>
             <alias ref="scrollbar.thumb.background.normal" if="pressed" tint="#008B00"/>
@@ -70,16 +75,18 @@
             <alias ref="scrollbar.thumb.background.normal" tint="#0196FF"/>
         </select>
 
-        <select name="treetable.treebutton.background" inset="2,1,0,4" tint="#00B4FF">
-            <area unless="selected" xywh="48,16,9,9"/>
-            <area xywh="60,16,9,9"/>
-        </select>
-        <alias name="columnHeader.background" ref="flatarea" inset="-3,0" tint="#005EFF"/>
-
-        <area name="selection" xywh="24,14,9,9" nocenter="true" splitx="L2,R2" splity="T2,B2"/>
+        <!-- Table -->
+        <alias name="table.columnHeader.background" ref="flatarea2" inset="-3,0" tint="#005EFF"/>
+        <area name="table.row.selection" xywh="24,2,5,5" nocenter="true" splitx="L2,R2" splity="T2,B2"/>
         <alias name="table.row.background" ref="none"/>
-        <alias name="table.row.overlay" ref="selection" inset="1" if="keyboardFocus + !hasFocusedChild + leadRow"/>
+        <alias name="table.row.overlay" ref="table.row.selection" inset="1" if="keyboardFocus + !hasFocusedChild + leadRow"/>
         <alias name="table.row.dropmarker" ref="none"/>
+
+        <!-- Tree Table Buttons -->
+        <select name="treetable.treebutton.background" inset="2,1,0,4" tint="#00B4FF">
+            <area xywh="24,18,5,5" if="selected"/>
+            <area xywh="24,10,5,5"/>
+        </select>
     </images>
 
     <fontDef name="white" filename="font/default.fnt" default="true" color="#FFFFFF">
@@ -140,16 +147,19 @@
         <param name="background"><image>button.background</image></param>
         <param name="font"><font>button.white</font></param>
         <param name="border"><border>10,5</border></param>
+        <param name="mouseCursor"><cursor>cursor.finger</cursor></param>
     </theme>
 
     <theme name="editfield" ref="-defaults">
         <param name="background"><image>editfield.background</image></param>
+        <param name="border"><border>3</border></param>
         <param name="cursor"><image>editfield.cursor</image></param>
         <param name="selection"><image>editfield.selection</image></param>
-        <param name="passwordChar"><int>0x25CF</int></param> 
+        <param name="passwordChar"><int>0x25CF</int></param>
         <param name="columns"><int>5</int></param>
         <theme name="renderer" ref="-defaults"/>
         <param name="autocompletion-height"><int>150</int></param>
+        <param name="mouseCursor"><cursor>cursor.text</cursor></param>
     </theme>
 
     <theme name="hscrollbar" ref="-defaults">
@@ -222,7 +232,7 @@
             <param name=""><image>treetable.treebutton.*</image></param>
         </theme>
         <theme name="columnHeader" ref="label">
-            <param name=""><image>columnHeader.*</image></param>
+            <param name=""><image>table.columnHeader.*</image></param>
         </theme>
         <param name="columnHeaderWidth"><int>256</int></param>
         <param name="columnHeaderHeight"><int>20</int></param>
