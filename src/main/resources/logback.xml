@@ -13,11 +13,16 @@
     </appender>
 
     <!-- Log file appender -->
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>${logName}.log</file>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/${logName}.log</file>
         <encoder>
             <pattern>${commonPattern}</pattern>
         </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/${logName}-%d.log.gz</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
     </appender>
 
     <!-- Every part of the application (launcher and main application) uses the same settings -->
