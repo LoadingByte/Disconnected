@@ -41,10 +41,10 @@ public class DesktopProgramWindow extends DesktopWindow {
      * The constructor was called by the given {@link DesktopProgramDescriptor}.
      * The new window is <b>not</b> added to the desktop automatically.
      * 
-     * @param descriptor The program descriptor that created the object.
      * @param state The desktop state the new program will be running in.
+     * @param descriptor The program descriptor that created the object.
      */
-    public DesktopProgramWindow(DesktopProgramDescriptor descriptor, GraphicsState state) {
+    public DesktopProgramWindow(GraphicsState state, DesktopProgramDescriptor descriptor) {
 
         super(state);
 
