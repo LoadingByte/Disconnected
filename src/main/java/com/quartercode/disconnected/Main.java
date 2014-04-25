@@ -36,7 +36,6 @@ import com.quartercode.disconnected.graphics.DefaultStates;
 import com.quartercode.disconnected.graphics.GraphicsManager;
 import com.quartercode.disconnected.graphics.GraphicsModule;
 import com.quartercode.disconnected.graphics.GraphicsState;
-import com.quartercode.disconnected.graphics.desktop.DefaultDesktopProgramManager;
 import com.quartercode.disconnected.graphics.desktop.DesktopLaunchButtonModule;
 import com.quartercode.disconnected.graphics.desktop.DesktopProgramDescriptor;
 import com.quartercode.disconnected.graphics.desktop.DesktopPrograms;
@@ -247,7 +246,6 @@ public class Main {
         DefaultStates.DESKTOP.addModule(DesktopWindowAreaModule.class, "windowArea", 80);
         DefaultStates.DESKTOP.addModule(DesktopLaunchButtonModule.class, "launchButton", 80);
         DefaultStates.DESKTOP.addModule(DesktopTaskbarModule.class, "taskbar", 80);
-        DefaultStates.DESKTOP.addModule(DefaultDesktopProgramManager.class, "programManager", 0);
 
         fillDefaultDesktopPrograms();
     }
