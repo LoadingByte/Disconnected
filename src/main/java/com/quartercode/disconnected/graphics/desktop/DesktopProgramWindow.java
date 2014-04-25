@@ -48,7 +48,7 @@ public class DesktopProgramWindow extends DesktopWindow {
      */
     public DesktopProgramWindow(GraphicsState state, Dimension defaultSize, DesktopProgramDescriptor descriptor) {
 
-        super(state, defaultSize);
+        super(state, null, defaultSize);
 
         this.descriptor = descriptor;
 

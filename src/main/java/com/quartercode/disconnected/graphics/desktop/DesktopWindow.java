@@ -32,21 +32,27 @@ import de.matthiasmann.twl.Widget;
 public class DesktopWindow extends ResizableFrame {
 
     private final GraphicsState  state;
+    private final DesktopWindow  logicalParent;
     private final Dimension      defaultSize;
 
-    private final List<Runnable> closeListeners = new ArrayList<Runnable>();
+    private final List<Runnable> closeListeners   = new ArrayList<Runnable>();
+
+    private boolean              layoutCalledOnce = false;
 
     /**
      * Creates a new desktop window in the given desktop {@link GraphicsState}.
      * The new window is <b>not</b> added to the desktop automatically.
      * 
      * @param state The desktop state the new program will be running in.
+     * @param logicalParent The logical parent window of the new window is the window that created it.
+     *        It is used to center the new window relative to the logical parent window.
      * @param defaultSize The size the window will have when it is added to the desktop.
      */
-    public DesktopWindow(GraphicsState state, Dimension defaultSize) {
+    public DesktopWindow(GraphicsState state, DesktopWindow logicalParent, Dimension defaultSize) {
 
         this.state = state;
         this.defaultSize = defaultSize;
+        this.logicalParent = logicalParent;
 
         setTheme("frame");
 
@@ -69,6 +75,17 @@ public class DesktopWindow extends ResizableFrame {
     protected GraphicsState getState() {
 
         return state;
+    }
+
+    /**
+     * Returns the logical parent window of the new window is the window that created it.
+     * It is used to center the new window relative to the logical parent window.
+     * 
+     * @return The logical parent window of the window.
+     */
+    public DesktopWindow getLogicalParent() {
+
+        return logicalParent;
     }
 
     /**
@@ -135,6 +152,25 @@ public class DesktopWindow extends ResizableFrame {
     public void addCloseListener(Runnable listener) {
 
         closeListeners.add(listener);
+    }
+
+    @Override
+    protected void layout() {
+
+        super.layout();
+
+        if (!layoutCalledOnce) {
+            layoutCalledOnce = true;
+
+            // Center the window
+            if (logicalParent == null) {
+                setPosition( (getParent().getWidth() - getWidth()) / 2, (getParent().getHeight() - getHeight()) / 2);
+            } else {
+                int x = logicalParent.getX() + (logicalParent.getWidth() - getWidth()) / 2;
+                int y = logicalParent.getY() + (logicalParent.getHeight() - getHeight()) / 2;
+                setPosition(x, y);
+            }
+        }
     }
 
 }
