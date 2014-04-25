@@ -18,6 +18,8 @@
 
 package com.quartercode.disconnected.graphics.desktop;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.quartercode.disconnected.graphics.GraphicsState;
 import de.matthiasmann.twl.ResizableFrame;
 import de.matthiasmann.twl.Widget;
@@ -28,7 +30,9 @@ import de.matthiasmann.twl.Widget;
  */
 public class DesktopWindow extends ResizableFrame {
 
-    private final GraphicsState state;
+    private final GraphicsState  state;
+
+    private final List<Runnable> closeListeners = new ArrayList<Runnable>();
 
     /**
      * Creates a new desktop window in the given desktop {@link GraphicsState}.
@@ -99,7 +103,22 @@ public class DesktopWindow extends ResizableFrame {
      */
     public void close() {
 
+        for (Runnable closeListener : closeListeners) {
+            closeListener.run();
+        }
+
         getParent().removeChild(this);
+    }
+
+    /**
+     * Registers a new close listener that is called before the window is removed from the parent desktop.
+     * Close listeners can be added twice.
+     * 
+     * @param listener The close listener to register to the window.
+     */
+    public void addCloseListener(Runnable listener) {
+
+        closeListeners.add(listener);
     }
 
 }
