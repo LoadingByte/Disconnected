@@ -21,6 +21,7 @@ package com.quartercode.disconnected.graphics.desktop;
 import java.util.ArrayList;
 import java.util.List;
 import com.quartercode.disconnected.graphics.GraphicsState;
+import de.matthiasmann.twl.Dimension;
 import de.matthiasmann.twl.ResizableFrame;
 import de.matthiasmann.twl.Widget;
 
@@ -31,6 +32,7 @@ import de.matthiasmann.twl.Widget;
 public class DesktopWindow extends ResizableFrame {
 
     private final GraphicsState  state;
+    private final Dimension      defaultSize;
 
     private final List<Runnable> closeListeners = new ArrayList<Runnable>();
 
@@ -39,10 +41,12 @@ public class DesktopWindow extends ResizableFrame {
      * The new window is <b>not</b> added to the desktop automatically.
      * 
      * @param state The desktop state the new program will be running in.
+     * @param defaultSize The size the window will have when it is added to the desktop.
      */
-    public DesktopWindow(GraphicsState state) {
+    public DesktopWindow(GraphicsState state, Dimension defaultSize) {
 
         this.state = state;
+        this.defaultSize = defaultSize;
 
         setTheme("frame");
 
@@ -65,6 +69,16 @@ public class DesktopWindow extends ResizableFrame {
     protected GraphicsState getState() {
 
         return state;
+    }
+
+    /**
+     * Returns the size the window will have when it is added to the desktop.
+     * 
+     * @return Thed default size of the window.
+     */
+    public Dimension getDefaultSize() {
+
+        return defaultSize;
     }
 
     /**
@@ -96,6 +110,8 @@ public class DesktopWindow extends ResizableFrame {
     protected void open() {
 
         ((Widget) state.getModule("windowArea").getValue("area")).add(this);
+
+        setSize(defaultSize.getX(), defaultSize.getY());
     }
 
     /**

@@ -21,6 +21,7 @@ package com.quartercode.disconnected.graphics.desktop;
 import com.quartercode.disconnected.graphics.GraphicsState;
 import com.quartercode.disconnected.graphics.component.MultiactionButton;
 import com.quartercode.disconnected.util.ResourceBundleGroup;
+import de.matthiasmann.twl.Dimension;
 import de.matthiasmann.twl.Event;
 import de.matthiasmann.twl.Widget;
 
@@ -42,11 +43,12 @@ public class DesktopProgramWindow extends DesktopWindow {
      * The new window is <b>not</b> added to the desktop automatically.
      * 
      * @param state The desktop state the new program will be running in.
+     * @param defaultSize The size the window will have when it is added to the desktop.
      * @param descriptor The program descriptor that created the object.
      */
-    public DesktopProgramWindow(GraphicsState state, DesktopProgramDescriptor descriptor) {
+    public DesktopProgramWindow(GraphicsState state, Dimension defaultSize, DesktopProgramDescriptor descriptor) {
 
-        super(state);
+        super(state, defaultSize);
 
         this.descriptor = descriptor;
 
