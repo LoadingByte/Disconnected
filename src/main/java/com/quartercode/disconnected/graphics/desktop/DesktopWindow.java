@@ -21,7 +21,6 @@ package com.quartercode.disconnected.graphics.desktop;
 import java.util.ArrayList;
 import java.util.List;
 import com.quartercode.disconnected.graphics.GraphicsState;
-import de.matthiasmann.twl.Dimension;
 import de.matthiasmann.twl.ResizableFrame;
 import de.matthiasmann.twl.Widget;
 
@@ -32,27 +31,22 @@ import de.matthiasmann.twl.Widget;
 public class DesktopWindow extends ResizableFrame {
 
     private final GraphicsState  state;
-    private final DesktopWindow  logicalParent;
-    private final Dimension      defaultSize;
 
-    private final List<Runnable> closeListeners   = new ArrayList<Runnable>();
+    private final List<Runnable> openListeners        = new ArrayList<Runnable>();
+    private final List<Runnable> closeListeners       = new ArrayList<Runnable>();
+    private final List<Runnable> firstLayoutListeners = new ArrayList<Runnable>();
 
-    private boolean              layoutCalledOnce = false;
+    private boolean              layoutCalledOnce     = false;
 
     /**
      * Creates a new desktop window in the given desktop {@link GraphicsState}.
      * The new window is <b>not</b> added to the desktop automatically.
      * 
      * @param state The desktop state the new program will be running in.
-     * @param logicalParent The logical parent window of the new window is the window that created it.
-     *        It is used to center the new window relative to the logical parent window.
-     * @param defaultSize The size the window will have when it is added to the desktop.
      */
-    public DesktopWindow(GraphicsState state, DesktopWindow logicalParent, Dimension defaultSize) {
+    public DesktopWindow(GraphicsState state) {
 
         this.state = state;
-        this.defaultSize = defaultSize;
-        this.logicalParent = logicalParent;
 
         setTheme("frame");
 
@@ -75,27 +69,6 @@ public class DesktopWindow extends ResizableFrame {
     protected GraphicsState getState() {
 
         return state;
-    }
-
-    /**
-     * Returns the logical parent window of the new window is the window that created it.
-     * It is used to center the new window relative to the logical parent window.
-     * 
-     * @return The logical parent window of the window.
-     */
-    public DesktopWindow getLogicalParent() {
-
-        return logicalParent;
-    }
-
-    /**
-     * Returns the size the window will have when it is added to the desktop.
-     * 
-     * @return Thed default size of the window.
-     */
-    public Dimension getDefaultSize() {
-
-        return defaultSize;
     }
 
     /**
@@ -128,7 +101,20 @@ public class DesktopWindow extends ResizableFrame {
 
         ((Widget) state.getModule("windowArea").getValue("area")).add(this);
 
-        setSize(defaultSize.getX(), defaultSize.getY());
+        for (Runnable openListener : openListeners) {
+            openListener.run();
+        }
+    }
+
+    /**
+     * Registers a new open listener that is called after the window was added to the parent desktop.
+     * Open listeners can be added twice.
+     * 
+     * @param listener The open listener to register to the window.
+     */
+    public void addOpenListener(Runnable listener) {
+
+        openListeners.add(listener);
     }
 
     /**
@@ -162,15 +148,21 @@ public class DesktopWindow extends ResizableFrame {
         if (!layoutCalledOnce) {
             layoutCalledOnce = true;
 
-            // Center the window
-            if (logicalParent == null) {
-                setPosition( (getParent().getWidth() - getWidth()) / 2, (getParent().getHeight() - getHeight()) / 2);
-            } else {
-                int x = logicalParent.getX() + (logicalParent.getWidth() - getWidth()) / 2;
-                int y = logicalParent.getY() + (logicalParent.getHeight() - getHeight()) / 2;
-                setPosition(x, y);
+            for (Runnable firstLayoutListener : firstLayoutListeners) {
+                firstLayoutListener.run();
             }
         }
+    }
+
+    /**
+     * Registers a new first layout listener that is called after the first time the {@link #layout()} method was invoked.
+     * First layout listeners can be added twice.
+     * 
+     * @param listener The first layout listener to register to the window.
+     */
+    public void addFirstLayoutListener(Runnable listener) {
+
+        firstLayoutListeners.add(listener);
     }
 
 }
