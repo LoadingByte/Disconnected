@@ -134,9 +134,9 @@ public class FileCreateProgram extends ProgramExecutor {
                             invalidPathEvent.get(InvalidPathEvent.PATH).set(path);
                             invalidPathEvent.get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());
                         } catch (OccupiedPathException e) {
-                            OccupiedFileNameEvent occupiedFileNameEvent = new OccupiedFileNameEvent();
-                            occupiedFileNameEvent.get(OccupiedFileNameEvent.PATH).set(path);
-                            occupiedFileNameEvent.get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());
+                            OccupiedPathEvent occupiedPathEvent = new OccupiedPathEvent();
+                            occupiedPathEvent.get(OccupiedPathEvent.PATH).set(path);
+                            occupiedPathEvent.get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());
                         } catch (OutOfSpaceException e) {
                             OutOfSpaceEvent outOfSpaceEvent = new OutOfSpaceEvent();
                             outOfSpaceEvent.get(OutOfSpaceEvent.FILE_SYSTEM).set(e.getFileSystem());
@@ -290,19 +290,19 @@ public class FileCreateProgram extends ProgramExecutor {
     }
 
     /**
-     * The occupied file name event is fired by the {@link FileCreateProgram} when the provided file path is already occupied by another {@link File}.<br>
+     * The occupied path event is fired by the {@link FileCreateProgram} when the provided file path is already occupied by another {@link File}.<br>
      * <br>
      * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.
      * For example, an instanceof check should look like this:
      * 
      * <pre>
-     * if ( event instanceof <b>FileCreateProgram.</b>OccupiedFileNameEvent )
+     * if ( event instanceof <b>FileCreateProgram.</b>OccupiedPathEvent )
      * </pre>
      * 
      * @see ErrorEvent
      * @see FileCreateProgram
      */
-    public static class OccupiedFileNameEvent extends ErrorEvent {
+    public static class OccupiedPathEvent extends ErrorEvent {
 
         // ----- Properties -----
 

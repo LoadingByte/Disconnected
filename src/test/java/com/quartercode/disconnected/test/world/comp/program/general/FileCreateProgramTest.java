@@ -123,7 +123,7 @@ public class FileCreateProgramTest extends AbstractProgramTest {
     }
 
     @Test
-    public void testOccupiedFileName() {
+    public void testOccupiedPath() {
 
         // Add content file that makes the path occupied
         fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), FileUtils.getComponents(PATH)[1]).get(FileAddAction.EXECUTE).invoke();
@@ -132,8 +132,8 @@ public class FileCreateProgramTest extends AbstractProgramTest {
         executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH, eventListener);
 
         Event event = eventListener.get(QueueEventListener.NEXT_EVENT).invoke(TrueEventMatcher.INSTANCE);
-        Assert.assertTrue("File create program did not send OccupiedFileNameEvent", event instanceof FileCreateProgram.OccupiedFileNameEvent);
-        Assert.assertEquals("Occupied path", PATH, event.get(FileCreateProgram.OccupiedFileNameEvent.PATH).get());
+        Assert.assertTrue("File create program did not send OccupiedPathEvent", event instanceof FileCreateProgram.OccupiedPathEvent);
+        Assert.assertEquals("Occupied path", PATH, event.get(FileCreateProgram.OccupiedPathEvent.PATH).get());
     }
 
     @Test
