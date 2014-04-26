@@ -75,33 +75,33 @@ public class RootFile extends ParentFile<FileSystem> {
 
         });
 
-        CREATE_MOVE.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileAction>() {
+        CREATE_MOVE.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileMoveAction>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
-            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
+            public FileMoveAction invoke(FunctionInvocation<FileMoveAction> invocation, Object... arguments) {
 
                 return null;
             }
 
         });
 
-        CREATE_MOVE_TO_OTHER_FS.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileAction>() {
+        CREATE_MOVE_TO_OTHER_FS.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileMoveAction>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
-            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
+            public FileMoveAction invoke(FunctionInvocation<FileMoveAction> invocation, Object... arguments) {
 
                 return null;
             }
 
         });
 
-        CREATE_REMOVE.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileAction>() {
+        CREATE_REMOVE.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileRemoveAction>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
-            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
+            public FileRemoveAction invoke(FunctionInvocation<FileRemoveAction> invocation, Object... arguments) {
 
                 return null;
             }

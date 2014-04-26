@@ -29,7 +29,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
-import com.quartercode.disconnected.world.comp.file.FileAction;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileRemoveAction;
 import com.quartercode.disconnected.world.comp.file.FileRights;
@@ -89,13 +88,13 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
     @Test
     public void testFileExecute() {
 
-        FileAction action = file.get(File.CREATE_REMOVE).invoke();
+        FileRemoveAction action = file.get(File.CREATE_REMOVE).invoke();
         actuallyTestExecute(action);
     }
 
-    private void actuallyTestExecute(FileAction action) {
+    private void actuallyTestExecute(FileRemoveAction action) {
 
-        action.get(FileAddAction.EXECUTE).invoke();
+        action.get(FileRemoveAction.EXECUTE).invoke();
         Assert.assertEquals("Resolved file for deleted file", null, fileSystem.get(FileSystem.GET_FILE).invoke(removeFilePath));
     }
 
@@ -109,29 +108,29 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
     @Test
     public void testFileIsExecutableBy() {
 
-        FileAction action = file.get(File.CREATE_REMOVE).invoke();
+        FileRemoveAction action = file.get(File.CREATE_REMOVE).invoke();
         actuallyTestIsExecutableBy(action);
     }
 
-    private void actuallyTestIsExecutableBy(FileAction action) {
+    private void actuallyTestIsExecutableBy(FileRemoveAction action) {
 
         boolean[] executable = new boolean[4];
 
         file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
         childFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
-        executable[0] = action.get(FileAction.IS_EXECUTABLE_BY).invoke(user);
+        executable[0] = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
 
         file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("--d---------");
         childFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
-        executable[1] = action.get(FileAction.IS_EXECUTABLE_BY).invoke(user);
+        executable[1] = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
 
         file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
         childFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("--d---------");
-        executable[2] = action.get(FileAction.IS_EXECUTABLE_BY).invoke(user);
+        executable[2] = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
 
         file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("--d---------");
         childFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("--d---------");
-        executable[3] = action.get(FileAction.IS_EXECUTABLE_BY).invoke(user);
+        executable[3] = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
 
         Assert.assertTrue("File remove action is executable although no required right is set", !executable[0]);
         Assert.assertTrue("File remove action is executable although the delete right is not set on the child file", !executable[1]);

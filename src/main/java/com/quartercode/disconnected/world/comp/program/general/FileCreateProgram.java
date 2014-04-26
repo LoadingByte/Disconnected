@@ -26,7 +26,6 @@ import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.extra.def.ReferenceProperty;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
-import com.quartercode.disconnected.world.comp.file.FileAction;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
 import com.quartercode.disconnected.world.comp.file.FileSystemModule;
@@ -110,7 +109,7 @@ public class FileCreateProgram extends ProgramExecutor {
                 String path = holder.get(PATH).get();
                 // Add a file seperator at the beginning of the path if it is not already there
                 path = path.startsWith(File.SEPARATOR) ? path : File.SEPARATOR + path;
-                FileAction addAction = null;
+                FileAddAction addAction = null;
                 try {
                     addAction = fsModule.get(FileSystemModule.CREATE_ADD_FILE).invoke(addFile, path);
                 } catch (IllegalStateException e) {
@@ -121,7 +120,7 @@ public class FileCreateProgram extends ProgramExecutor {
 
                 if (addAction != null) {
                     User user = process.get(Process.GET_USER).invoke();
-                    if (addAction.get(FileAction.IS_EXECUTABLE_BY).invoke(user)) {
+                    if (addAction.get(FileAddAction.IS_EXECUTABLE_BY).invoke(user)) {
                         try {
                             addAction.get(FileAddAction.EXECUTE).invoke();
                             SuccessEvent successEvent = new SuccessEvent();

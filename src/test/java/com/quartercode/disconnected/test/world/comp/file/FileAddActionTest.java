@@ -29,7 +29,6 @@ import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.Directory;
 import com.quartercode.disconnected.world.comp.file.File;
-import com.quartercode.disconnected.world.comp.file.FileAction;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileRights;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
@@ -76,13 +75,13 @@ public class FileAddActionTest extends AbstractFileActionTest {
     @Test
     public void testFileSystemExecute() {
 
-        FileAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
+        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
         actuallyTestExecute(action);
     }
 
-    private void actuallyTestExecute(FileAction action) {
+    private void actuallyTestExecute(FileAddAction action) {
 
-        action.get(FileAction.EXECUTE).invoke();
+        action.get(FileAddAction.EXECUTE).invoke();
         Assert.assertEquals("Resolved file", file, fileSystem.get(FileSystem.GET_FILE).invoke(addFilePath));
     }
 
@@ -96,14 +95,14 @@ public class FileAddActionTest extends AbstractFileActionTest {
     @Test (expected = IllegalArgumentException.class)
     public void testFileSystemExecuteInvalidPath() {
 
-        FileAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
+        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
         actuallyTestExecuteInvalidPath(action);
     }
 
-    private void actuallyTestExecuteInvalidPath(FileAction action) {
+    private void actuallyTestExecuteInvalidPath(FileAddAction action) {
 
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), addFileParentPath).get(FileAction.EXECUTE).invoke();
-        action.get(FileAction.EXECUTE).invoke();
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), addFileParentPath).get(FileAddAction.EXECUTE).invoke();
+        action.get(FileAddAction.EXECUTE).invoke();
     }
 
     @Test (expected = IllegalStateException.class)
@@ -116,14 +115,14 @@ public class FileAddActionTest extends AbstractFileActionTest {
     @Test (expected = IllegalStateException.class)
     public void testFileSystemExecutePathAlreadyOccupied() {
 
-        FileAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
+        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
         actuallyTestExecutePathAlreadyOccupied(action);
     }
 
-    private void actuallyTestExecutePathAlreadyOccupied(FileAction action) {
+    private void actuallyTestExecutePathAlreadyOccupied(FileAddAction action) {
 
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), addFilePath).get(FileAction.EXECUTE).invoke();
-        action.get(FileAction.EXECUTE).invoke();
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), addFilePath).get(FileAddAction.EXECUTE).invoke();
+        action.get(FileAddAction.EXECUTE).invoke();
     }
 
     @Test
@@ -136,22 +135,22 @@ public class FileAddActionTest extends AbstractFileActionTest {
     @Test
     public void testFileSystemIsExecutableBy() {
 
-        FileAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
+        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
         actuallyTestIsExecutableBy(action);
     }
 
-    private void actuallyTestIsExecutableBy(FileAction action) {
+    private void actuallyTestIsExecutableBy(FileAddAction action) {
 
         // Add the directory that would hold the actual file (we need to modify its rights later on)
         Directory parentFile = new Directory();
         parentFile.get(File.OWNER).set(user);
-        createAction(parentFile, addFileParentPath).get(FileAction.EXECUTE).invoke();
+        createAction(parentFile, addFileParentPath).get(FileAddAction.EXECUTE).invoke();
 
         boolean[] executable = new boolean[2];
         parentFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("-w----------");
-        executable[0] = action.get(FileAction.IS_EXECUTABLE_BY).invoke(user);
+        executable[0] = action.get(FileAddAction.IS_EXECUTABLE_BY).invoke(user);
         parentFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
-        executable[1] = action.get(FileAction.IS_EXECUTABLE_BY).invoke(user);
+        executable[1] = action.get(FileAddAction.IS_EXECUTABLE_BY).invoke(user);
 
         Assert.assertTrue("File add action is not executable although the write right is set on the parent directory", executable[0]);
         Assert.assertTrue("File add action is executable although the write right is not set on the parent directory", !executable[1]);

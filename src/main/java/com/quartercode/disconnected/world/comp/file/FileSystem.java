@@ -46,12 +46,12 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
     /**
      * The size of the file system, given in bytes.
      */
-    public static final PropertyDefinition<Long>       SIZE;
+    public static final PropertyDefinition<Long>          SIZE;
 
     /**
      * The {@link RootFile} every other {@link File} branches of somehow.
      */
-    public static final PropertyDefinition<RootFile>   ROOT;
+    public static final PropertyDefinition<RootFile>      ROOT;
 
     static {
 
@@ -93,11 +93,11 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<File<?>>    GET_FILE;
+    public static final FunctionDefinition<File<?>>       GET_FILE;
 
     /**
-     * Returns a {@link FileAction} for adding a file with the given parameters.
-     * In order to actually add the file, the {@link FileAction#EXECUTE} method must be invoked.
+     * Returns a {@link FileAddAction} for adding a file with the given parameters.
+     * In order to actually add the file, the {@link FileAddAction#EXECUTE} method must be invoked.
      * Note that that method might throw exceptions if the given file cannot be added.<br>
      * <br>
      * The returned action adds the given {@link File} to the file system under the given path.
@@ -127,19 +127,19 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
      * </tr>
      * </table>
      * 
-     * @see FileAction#EXECUTE
+     * @see FileAddAction#EXECUTE
      */
-    public static final FunctionDefinition<FileAction> CREATE_ADD_FILE;
+    public static final FunctionDefinition<FileAddAction> CREATE_ADD_FILE;
 
     /**
      * Returns the total amount of bytes which are occupied by {@link File}s on the file system.
      */
-    public static final FunctionDefinition<Long>       GET_FILLED;
+    public static final FunctionDefinition<Long>          GET_FILLED;
 
     /**
      * Returns the total amount of bytes which are not occupied by {@link File}s on the file system.
      */
-    public static final FunctionDefinition<Long>       GET_FREE;
+    public static final FunctionDefinition<Long>          GET_FREE;
 
     static {
 
@@ -168,11 +168,11 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
         }, String.class);
 
-        CREATE_ADD_FILE = FunctionDefinitionFactory.create("createAddFile", FileSystem.class, new FunctionExecutor<FileAction>() {
+        CREATE_ADD_FILE = FunctionDefinitionFactory.create("createAddFile", FileSystem.class, new FunctionExecutor<FileAddAction>() {
 
             @Override
             @SuppressWarnings ("unchecked")
-            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
+            public FileAddAction invoke(FunctionInvocation<FileAddAction> invocation, Object... arguments) {
 
                 FileAddAction action = new FileAddAction();
                 action.get(FileAddAction.FILE_SYSTEM).set((FileSystem) invocation.getHolder());

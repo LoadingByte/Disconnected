@@ -186,8 +186,8 @@ public class FileSystemModule extends OSModule {
     public static final FunctionDefinition<File<?>>                                          GET_FILE;
 
     /**
-     * Returns a {@link FileAction} for adding a file with the given parameters.
-     * In order to actually add the file, the {@link FileAction#EXECUTE} method must be invoked.
+     * Returns a {@link FileAddAction} for adding a file with the given parameters.
+     * In order to actually add the file, the {@link FileAddAction#EXECUTE} method must be invoked.
      * Note that that method might throw exceptions if the given file cannot be added.<br>
      * <br>
      * The returned action adds the given {@link File} to a mounted {@link FileSystem} under the given path.
@@ -232,9 +232,9 @@ public class FileSystemModule extends OSModule {
      * </tr>
      * </table>
      * 
-     * @see FileAction#EXECUTE
+     * @see FileAddAction#EXECUTE
      */
-    public static final FunctionDefinition<FileAction>                                       CREATE_ADD_FILE;
+    public static final FunctionDefinition<FileAddAction>                                    CREATE_ADD_FILE;
 
     static {
 
@@ -314,10 +314,10 @@ public class FileSystemModule extends OSModule {
             }
 
         }, String.class);
-        CREATE_ADD_FILE = FunctionDefinitionFactory.create("createAddFile", FileSystemModule.class, new FunctionExecutor<FileAction>() {
+        CREATE_ADD_FILE = FunctionDefinitionFactory.create("createAddFile", FileSystemModule.class, new FunctionExecutor<FileAddAction>() {
 
             @Override
-            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
+            public FileAddAction invoke(FunctionInvocation<FileAddAction> invocation, Object... arguments) {
 
                 File<?> file = (File<?>) arguments[0];
                 String path = FileUtils.normalizePath((String) arguments[1]);
@@ -331,7 +331,7 @@ public class FileSystemModule extends OSModule {
                 }
 
                 FileSystem fileSystem = knownFs.get(KnownFileSystem.FILE_SYSTEM).get();
-                FileAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, pathComponents[1]);
+                FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, pathComponents[1]);
 
                 invocation.next(arguments);
                 return action;

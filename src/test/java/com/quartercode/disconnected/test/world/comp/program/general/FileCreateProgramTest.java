@@ -22,7 +22,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
-import com.quartercode.disconnected.world.comp.file.FileAction;
+import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
 import com.quartercode.disconnected.world.comp.file.FileUtils;
 import com.quartercode.disconnected.world.comp.os.CommonFiles;
@@ -112,7 +112,7 @@ public class FileCreateProgramTest extends AbstractProgramTest {
     public void testInvalidPath() {
 
         // Add content file that makes the path invalid
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), FileUtils.getComponents(PARENT_PATH)[1]).get(FileAction.EXECUTE).invoke();
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), FileUtils.getComponents(PARENT_PATH)[1]).get(FileAddAction.EXECUTE).invoke();
 
         QueueEventListener eventListener = new QueueEventListener();
         executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH, eventListener);
@@ -126,7 +126,7 @@ public class FileCreateProgramTest extends AbstractProgramTest {
     public void testOccupiedFileName() {
 
         // Add content file that makes the path occupied
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), FileUtils.getComponents(PATH)[1]).get(FileAction.EXECUTE).invoke();
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), FileUtils.getComponents(PATH)[1]).get(FileAddAction.EXECUTE).invoke();
 
         QueueEventListener eventListener = new QueueEventListener();
         executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH, eventListener);

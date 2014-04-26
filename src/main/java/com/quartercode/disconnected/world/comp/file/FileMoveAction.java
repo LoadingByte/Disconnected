@@ -171,7 +171,7 @@ public class FileMoveAction extends DefaultFeatureHolder implements FileAction {
 
                 FileRemoveAction action1 = new FileRemoveAction();
                 action1.get(FileRemoveAction.FILE).set(holder.get(FILE).get());
-                if (!action1.get(FileAction.IS_EXECUTABLE_BY).invoke(executor)) {
+                if (!action1.get(IS_EXECUTABLE_BY).invoke(executor)) {
                     result = false;
                 }
 
@@ -179,7 +179,7 @@ public class FileMoveAction extends DefaultFeatureHolder implements FileAction {
                 action2.get(FileAddAction.FILE_SYSTEM).set(holder.get(FILE_SYSTEM).get());
                 action2.get(FileAddAction.FILE).set(holder.get(FILE).get());
                 action2.get(FileAddAction.PATH).set(holder.get(PATH).get());
-                if (!action2.get(FileAction.IS_EXECUTABLE_BY).invoke(executor)) {
+                if (!action2.get(IS_EXECUTABLE_BY).invoke(executor)) {
                     result = false;
                 }
 

@@ -29,7 +29,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.disconnected.world.comp.file.Directory;
 import com.quartercode.disconnected.world.comp.file.File;
-import com.quartercode.disconnected.world.comp.file.FileAction;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileMoveAction;
 import com.quartercode.disconnected.world.comp.file.FileRights;
@@ -90,13 +89,13 @@ public class FileMoveActionTest extends AbstractFileActionTest {
     @Test
     public void testFileExecute() {
 
-        FileAction action = file.get(File.CREATE_MOVE).invoke(newPath);
+        FileMoveAction action = file.get(File.CREATE_MOVE).invoke(newPath);
         actuallyTestExecute(action);
     }
 
-    private void actuallyTestExecute(FileAction action) {
+    private void actuallyTestExecute(FileMoveAction action) {
 
-        action.get(FileAction.EXECUTE).invoke();
+        action.get(FileMoveAction.EXECUTE).invoke();
 
         Assert.assertEquals("Resolved file for new path", file, fileSystem.get(FileSystem.GET_FILE).invoke(newPath));
         Assert.assertEquals("Resolved file for old path", null, fileSystem.get(FileSystem.GET_FILE).invoke(oldPath));
@@ -116,35 +115,35 @@ public class FileMoveActionTest extends AbstractFileActionTest {
     public void testFileIsExecutableBy() {
 
         if (testRights) {
-            FileAction action = file.get(File.CREATE_MOVE).invoke(newPath);
+            FileMoveAction action = file.get(File.CREATE_MOVE).invoke(newPath);
             actuallyTestIsExecutableBy(action);
         }
     }
 
-    private void actuallyTestIsExecutableBy(FileAction action) {
+    private void actuallyTestIsExecutableBy(FileMoveAction action) {
 
         // Add the directory that would hold the actual file (we need to modify its rights later on)
         Directory newParentFile = new Directory();
         newParentFile.get(File.OWNER).set(user);
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(newParentFile, newParentPath).get(FileAddAction.EXECUTE).invoke();
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(newParentFile, newParentPath).get(FileMoveAction.EXECUTE).invoke();
 
         boolean[] executable = new boolean[4];
 
         file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
         newParentFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
-        executable[0] = action.get(FileAction.IS_EXECUTABLE_BY).invoke(user);
+        executable[0] = action.get(FileMoveAction.IS_EXECUTABLE_BY).invoke(user);
 
         file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("--d---------");
         newParentFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
-        executable[1] = action.get(FileAction.IS_EXECUTABLE_BY).invoke(user);
+        executable[1] = action.get(FileMoveAction.IS_EXECUTABLE_BY).invoke(user);
 
         file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
         newParentFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("-w----------");
-        executable[2] = action.get(FileAction.IS_EXECUTABLE_BY).invoke(user);
+        executable[2] = action.get(FileMoveAction.IS_EXECUTABLE_BY).invoke(user);
 
         file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("--d---------");
         newParentFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("-w----------");
-        executable[3] = action.get(FileAction.IS_EXECUTABLE_BY).invoke(user);
+        executable[3] = action.get(FileMoveAction.IS_EXECUTABLE_BY).invoke(user);
 
         Assert.assertTrue("File move action is executable although no required right is set", !executable[0]);
         Assert.assertTrue("File move action is executable although the write right is not set on the new parent file", !executable[1]);

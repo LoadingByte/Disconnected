@@ -49,7 +49,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
     /**
      * The path separator which seperates different files in a path string ({@value #SEPARATOR}).
      */
-    public static final String                         SEPARATOR           = "/";
+    public static final String                               SEPARATOR           = "/";
 
     /**
      * The default {@link FileRights} string for every new file.
@@ -57,32 +57,32 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
      * @deprecated TODO: Make the default {@link FileRights} dynamic.
      */
     @Deprecated
-    public static final String                         DEFAULT_FILE_RIGHTS = "rwd-r---r---";
+    public static final String                               DEFAULT_FILE_RIGHTS = "rwd-r---r---";
 
     // ----- Properties -----
 
     /**
      * The name of the file.
      */
-    public static final PropertyDefinition<String>     NAME;
+    public static final PropertyDefinition<String>           NAME;
 
     /**
      * The {@link FileRights} object which stores the UNIX-like file right attributes.
      * For more documentation on how it works, see the {@link FileRights} class.
      */
-    public static final PropertyDefinition<FileRights> RIGHTS;
+    public static final PropertyDefinition<FileRights>       RIGHTS;
 
     /**
      * The {@link User} who owns the file.
      * This is important for the {@link FileRights} system.
      */
-    public static final PropertyDefinition<User>       OWNER;
+    public static final PropertyDefinition<User>             OWNER;
 
     /**
      * The {@link Group} which partly owns the file.
      * This is important for the {@link FileRights} system.
      */
-    public static final PropertyDefinition<Group>      GROUP;
+    public static final PropertyDefinition<Group>            GROUP;
 
     static {
 
@@ -109,14 +109,14 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
     /**
      * Returns the local the path of the file.
+     * The local path can be used to look up the file a on its {@link FileSystem}.<br>
      * A path is a collection of files seperated by a separator.
-     * The local path can be used to look up the file a on its {@link FileSystem}.
      */
-    public static final FunctionDefinition<String>     GET_PATH;
+    public static final FunctionDefinition<String>           GET_PATH;
 
     /**
-     * Returns a {@link FileAction} that moves the file to a new path on the same {@link FileSystem}.
-     * In order to actually move the file, the {@link FileAction#EXECUTE} method must be invoked.
+     * Returns a {@link FileMoveAction} that moves the file to a new path on the same {@link FileSystem}.
+     * In order to actually move the file, the {@link FileMoveAction#EXECUTE} method must be invoked.
      * Note that that method might throw exceptions if the file cannot be moved.<br>
      * <br>
      * If the new path does not exist, this method creates directories to match it.
@@ -138,13 +138,13 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
      * </tr>
      * </table>
      * 
-     * @see FileAction#EXECUTE
+     * @see FileMoveAction#EXECUTE
      */
-    public static final FunctionDefinition<FileAction> CREATE_MOVE;
+    public static final FunctionDefinition<FileMoveAction>   CREATE_MOVE;
 
     /**
-     * Returns a {@link FileAction} that moves the file to a new path on the given {@link FileSystem}.
-     * In order to actually move the file, the {@link FileAction#EXECUTE} method must be invoked.
+     * Returns a {@link FileMoveAction} that moves the file to a new path on the given {@link FileSystem}.
+     * In order to actually move the file, the {@link FileMoveAction#EXECUTE} method must be invoked.
      * Note that that method might throw exceptions if the file cannot be moved.<br>
      * <br>
      * If the new path does not exist, this method creates directories to match it.
@@ -172,24 +172,24 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
      * </tr>
      * </table>
      * 
-     * @see FileAction#EXECUTE
+     * @see FileMoveAction#EXECUTE
      */
-    public static final FunctionDefinition<FileAction> CREATE_MOVE_TO_OTHER_FS;
+    public static final FunctionDefinition<FileMoveAction>   CREATE_MOVE_TO_OTHER_FS;
 
     /**
-     * Returns an {@link FileAction} for removing the file.
+     * Returns an {@link FileRemoveAction} for removing the file.
      * If the file is a {@link ParentFile}, all child files are also going to be removed.
-     * In order to actually remove the file from its current file system, the {@link FileAction#EXECUTE} method must be invoked.
+     * In order to actually remove the file from its current file system, the {@link FileRemoveAction#EXECUTE} method must be invoked.
      * Note that that method might throw exceptions if the given file cannot be added.
      * 
-     * @see FileAction#EXECUTE
+     * @see FileRemoveAction#EXECUTE
      */
-    public static final FunctionDefinition<FileAction> CREATE_REMOVE;
+    public static final FunctionDefinition<FileRemoveAction> CREATE_REMOVE;
 
     /**
      * Returns the {@link FileSystem} which is hosting the file.
      */
-    public static final FunctionDefinition<FileSystem> GET_FILE_SYSTEM;
+    public static final FunctionDefinition<FileSystem>       GET_FILE_SYSTEM;
 
     static {
 
@@ -212,16 +212,16 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
         });
 
-        CREATE_MOVE = FunctionDefinitionFactory.create("createMove", File.class, new FunctionExecutor<FileAction>() {
+        CREATE_MOVE = FunctionDefinitionFactory.create("createMove", File.class, new FunctionExecutor<FileMoveAction>() {
 
             @Override
-            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
+            public FileMoveAction invoke(FunctionInvocation<FileMoveAction> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
 
                 String path = (String) arguments[0];
                 FileSystem fileSystem = holder.get(GET_FILE_SYSTEM).invoke();
-                FileAction action = holder.get(CREATE_MOVE_TO_OTHER_FS).invoke(path, fileSystem);
+                FileMoveAction action = holder.get(CREATE_MOVE_TO_OTHER_FS).invoke(path, fileSystem);
 
                 invocation.next(arguments);
                 return action;
@@ -229,11 +229,11 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
         }, String.class);
 
-        CREATE_MOVE_TO_OTHER_FS = FunctionDefinitionFactory.create("createMoveToOtherFs", File.class, new FunctionExecutor<FileAction>() {
+        CREATE_MOVE_TO_OTHER_FS = FunctionDefinitionFactory.create("createMoveToOtherFs", File.class, new FunctionExecutor<FileMoveAction>() {
 
             @SuppressWarnings ("unchecked")
             @Override
-            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
+            public FileMoveAction invoke(FunctionInvocation<FileMoveAction> invocation, Object... arguments) {
 
                 FileMoveAction action = new FileMoveAction();
                 action.get(FileMoveAction.FILE_SYSTEM).set((FileSystem) arguments[1]);
@@ -246,11 +246,11 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
         }, String.class, FileSystem.class);
 
-        CREATE_REMOVE = FunctionDefinitionFactory.create("createRemove", File.class, new FunctionExecutor<FileAction>() {
+        CREATE_REMOVE = FunctionDefinitionFactory.create("createRemove", File.class, new FunctionExecutor<FileRemoveAction>() {
 
             @Override
             @SuppressWarnings ("unchecked")
-            public FileAction invoke(FunctionInvocation<FileAction> invocation, Object... arguments) {
+            public FileRemoveAction invoke(FunctionInvocation<FileRemoveAction> invocation, Object... arguments) {
 
                 FileRemoveAction action = new FileRemoveAction();
                 action.get(FileAddAction.FILE).set((File<ParentFile<?>>) invocation.getHolder());

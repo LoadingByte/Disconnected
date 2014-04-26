@@ -22,7 +22,7 @@ import org.junit.Before;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.Version;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
-import com.quartercode.disconnected.world.comp.file.FileAction;
+import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
 import com.quartercode.disconnected.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.world.comp.file.FileSystemModule.KnownFileSystem;
@@ -82,7 +82,7 @@ public abstract class AbstractProgramTest {
 
         ContentFile file = new ContentFile();
         file.get(ContentFile.CONTENT).set(program);
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, path).get(FileAction.EXECUTE).invoke();
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, path).get(FileAddAction.EXECUTE).invoke();
         return file;
     }
 
