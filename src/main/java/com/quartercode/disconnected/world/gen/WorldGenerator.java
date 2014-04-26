@@ -51,6 +51,8 @@ import com.quartercode.disconnected.world.comp.os.User;
 import com.quartercode.disconnected.world.comp.program.Program;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.comp.program.general.FileCreateProgram;
+import com.quartercode.disconnected.world.comp.program.general.FileListProgram;
+import com.quartercode.disconnected.world.comp.program.general.FileRemoveProgram;
 import com.quartercode.disconnected.world.general.Location;
 
 /**
@@ -249,7 +251,9 @@ public class WorldGenerator {
         addContentFile(fileSystem, binDir + "session.exe", superuser, "r--xr--xr--x", createProgram(Session.class, createVersion(1, 0, 0)));
 
         // Add system programs
+        addContentFile(fileSystem, binDir + "filelist.exe", superuser, "r--xr--xr--x", createProgram(FileListProgram.class, createVersion(1, 0, 0)));
         addContentFile(fileSystem, binDir + "filecreate.exe", superuser, "r--xr--xr--x", createProgram(FileCreateProgram.class, createVersion(1, 0, 0)));
+        addContentFile(fileSystem, binDir + "fileremove.exe", superuser, "r--xr--xr--x", createProgram(FileRemoveProgram.class, createVersion(1, 0, 0)));
     }
 
     private static Program createProgram(Class<? extends ProgramExecutor> executorClass, Version version) {
