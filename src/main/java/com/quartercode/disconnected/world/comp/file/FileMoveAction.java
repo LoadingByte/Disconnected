@@ -119,7 +119,7 @@ public class FileMoveAction extends DefaultFeatureHolder implements FileAction {
      * <th>When?</th>
      * </tr>
      * <tr>
-     * <td>{@link IllegalArgumentException}</td>
+     * <td>{@link InvalidPathException}</td>
      * <td>The set file path isn't valid (for example, a file along the path is not a parent file).</td>
      * </tr>
      * <tr>

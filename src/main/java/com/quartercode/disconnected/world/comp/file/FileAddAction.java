@@ -100,11 +100,11 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
      * <th>When?</th>
      * </tr>
      * <tr>
-     * <td>{@link IllegalArgumentException}</td>
+     * <td>{@link InvalidPathException}</td>
      * <td>The set file path isn't valid (for example, a file along the path is not a parent file).</td>
      * </tr>
      * <tr>
-     * <td>{@link IllegalStateException}</td>
+     * <td>{@link OccupiedPathException}</td>
      * <td>The file path, under which the new file should be added, is already used by annother file.</td>
      * </tr>
      * <tr>
@@ -144,7 +144,7 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
                             current.get(ParentFile.CHILDREN).add(directory);
                             nextCurrent = directory;
                         } else if (! (nextCurrent instanceof ParentFile)) {
-                            throw new IllegalArgumentException("File path '" + path + "' isn't valid: A file along the path is not a parent file");
+                            throw new InvalidPathException(holder.get(FILE_SYSTEM).get(), path);
                         }
 
                         current = nextCurrent;
@@ -168,7 +168,7 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
 
                 String addFileName = path.substring(path.lastIndexOf(File.SEPARATOR) + 1);
                 if (parent.get(ParentFile.GET_CHILD_BY_NAME).invoke(addFileName) != null) {
-                    throw new IllegalStateException("There is already a file located under the path '" + path + "'.");
+                    throw new OccupiedPathException(holder.get(FILE_SYSTEM).get(), path);
                 }
 
                 File<ParentFile<?>> addFile = holder.get(FILE).get();

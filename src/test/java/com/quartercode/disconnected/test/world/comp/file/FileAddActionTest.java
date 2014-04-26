@@ -32,6 +32,8 @@ import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileRights;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
+import com.quartercode.disconnected.world.comp.file.InvalidPathException;
+import com.quartercode.disconnected.world.comp.file.OccupiedPathException;
 import com.quartercode.disconnected.world.comp.file.ParentFile;
 
 @RunWith (Parameterized.class)
@@ -85,14 +87,14 @@ public class FileAddActionTest extends AbstractFileActionTest {
         Assert.assertEquals("Resolved file", file, fileSystem.get(FileSystem.GET_FILE).invoke(addFilePath));
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test (expected = InvalidPathException.class)
     public void testExecuteInvalidPath() {
 
         FileAddAction action = createAction(file, addFilePath);
         actuallyTestExecuteInvalidPath(action);
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test (expected = InvalidPathException.class)
     public void testFileSystemExecuteInvalidPath() {
 
         FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
@@ -105,14 +107,14 @@ public class FileAddActionTest extends AbstractFileActionTest {
         action.get(FileAddAction.EXECUTE).invoke();
     }
 
-    @Test (expected = IllegalStateException.class)
+    @Test (expected = OccupiedPathException.class)
     public void testExecutePathAlreadyOccupied() {
 
         FileAddAction action = createAction(file, addFilePath);
         actuallyTestExecutePathAlreadyOccupied(action);
     }
 
-    @Test (expected = IllegalStateException.class)
+    @Test (expected = OccupiedPathException.class)
     public void testFileSystemExecutePathAlreadyOccupied() {
 
         FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);

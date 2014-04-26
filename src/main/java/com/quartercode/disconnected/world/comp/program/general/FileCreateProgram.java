@@ -30,7 +30,10 @@ import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
 import com.quartercode.disconnected.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.world.comp.file.FileUtils;
+import com.quartercode.disconnected.world.comp.file.InvalidPathException;
+import com.quartercode.disconnected.world.comp.file.OccupiedPathException;
 import com.quartercode.disconnected.world.comp.file.OutOfSpaceException;
+import com.quartercode.disconnected.world.comp.file.UnknownMountpointException;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.os.User;
 import com.quartercode.disconnected.world.comp.program.Process;
@@ -112,9 +115,9 @@ public class FileCreateProgram extends ProgramExecutor {
                 FileAddAction addAction = null;
                 try {
                     addAction = fsModule.get(FileSystemModule.CREATE_ADD_FILE).invoke(addFile, path);
-                } catch (IllegalStateException e) {
+                } catch (UnknownMountpointException e) {
                     UnknownMountpointEvent unknownMountpointEvent = new UnknownMountpointEvent();
-                    unknownMountpointEvent.get(UnknownMountpointEvent.MOUNTPOINT).set(FileUtils.getComponents(path)[0]);
+                    unknownMountpointEvent.get(UnknownMountpointEvent.MOUNTPOINT).set(e.getMountpoint());
                     unknownMountpointEvent.get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());
                 }
 
@@ -126,11 +129,11 @@ public class FileCreateProgram extends ProgramExecutor {
                             SuccessEvent successEvent = new SuccessEvent();
                             successEvent.get(SuccessEvent.FILE).set(addFile);
                             successEvent.get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());
-                        } catch (IllegalArgumentException e) {
+                        } catch (InvalidPathException e) {
                             InvalidPathEvent invalidPathEvent = new InvalidPathEvent();
                             invalidPathEvent.get(InvalidPathEvent.PATH).set(path);
                             invalidPathEvent.get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());
-                        } catch (IllegalStateException e) {
+                        } catch (OccupiedPathException e) {
                             OccupiedFileNameEvent occupiedFileNameEvent = new OccupiedFileNameEvent();
                             occupiedFileNameEvent.get(OccupiedFileNameEvent.PATH).set(path);
                             occupiedFileNameEvent.get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());

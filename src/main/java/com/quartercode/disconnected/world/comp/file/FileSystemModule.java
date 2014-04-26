@@ -178,7 +178,7 @@ public class FileSystemModule extends OSModule {
      * <td>The provided path is not absolute (it does not start with {@link File#SEPARATOR}).</td>
      * </tr>
      * <tr>
-     * <td>{@link IllegalStateException}</td>
+     * <td>{@link UnknownMountpointException}</td>
      * <td>The file system for the path cannot be found or is not mounted.</td>
      * </tr>
      * </table>
@@ -227,7 +227,7 @@ public class FileSystemModule extends OSModule {
      * <td>The provided path for new new file is not absolute (it does not start with {@link File#SEPARATOR}).</td>
      * </tr>
      * <tr>
-     * <td>{@link IllegalStateException}</td>
+     * <td>{@link UnknownMountpointException}</td>
      * <td>The file system for the path cannot be found or is not mounted.</td>
      * </tr>
      * </table>
@@ -303,7 +303,7 @@ public class FileSystemModule extends OSModule {
 
                 KnownFileSystem knownFs = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]);
                 if (knownFs == null) {
-                    throw new IllegalStateException("No mounted file system with mountpoint '" + pathComponents[0] + "'");
+                    throw new UnknownMountpointException((FileSystemModule) invocation.getHolder(), pathComponents[0]);
                 }
 
                 FileSystem fileSystem = knownFs.get(KnownFileSystem.FILE_SYSTEM).get();
@@ -327,7 +327,7 @@ public class FileSystemModule extends OSModule {
 
                 KnownFileSystem knownFs = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]);
                 if (knownFs == null) {
-                    throw new IllegalStateException("No mounted file system with mountpoint '" + pathComponents[0] + "'");
+                    throw new UnknownMountpointException((FileSystemModule) invocation.getHolder(), pathComponents[0]);
                 }
 
                 FileSystem fileSystem = knownFs.get(KnownFileSystem.FILE_SYSTEM).get();
@@ -397,7 +397,7 @@ public class FileSystemModule extends OSModule {
          * <th>When?</th>
          * </tr>
          * <tr>
-         * <td>{@link IllegalArgumentException}</td>
+         * <td>{@link IllegalStateException}</td>
          * <td>The known file system is mounted while the mountpoint should be changed.</td>
          * </tr>
          * </table>
@@ -434,7 +434,9 @@ public class FileSystemModule extends OSModule {
                 public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                     FeatureHolder holder = invocation.getHolder();
-                    Validate.isTrue(!holder.get(MOUNTED).get(), "Can't change mountpoint of known file system '%s' while mounted", holder.get(MOUNTPOINT).get());
+                    if (holder.get(MOUNTED).get()) {
+                        throw new IllegalStateException("Can't change mountpoint of known file system '" + holder.get(MOUNTPOINT).get() + "' while mounted");
+                    }
                     return invocation.next(arguments);
                 }
 
