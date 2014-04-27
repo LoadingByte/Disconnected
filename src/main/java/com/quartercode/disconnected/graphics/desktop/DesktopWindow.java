@@ -66,7 +66,7 @@ public class DesktopWindow extends ResizableFrame {
      * 
      * @return The graphics state that uses the program.
      */
-    protected GraphicsState getState() {
+    public GraphicsState getState() {
 
         return state;
     }
