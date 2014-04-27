@@ -33,8 +33,9 @@ import de.matthiasmann.twl.Widget;
  */
 public class DesktopProgramWindow extends DesktopWindow {
 
-    private final DesktopProgramDescriptor descriptor;
-    private final MultiactionButton        taskbarButton;
+    private final DesktopProgramDescriptor   descriptor;
+    private final DesktopProgramWorldContext worldContext;
+    private final MultiactionButton          taskbarButton;
 
     /**
      * Creates a new desktop program window in the given desktop {@link GraphicsState}.
@@ -43,12 +44,14 @@ public class DesktopProgramWindow extends DesktopWindow {
      * 
      * @param state The desktop state the new program will be running in.
      * @param descriptor The program descriptor that created the object.
+     * @param worldContext The {@link DesktopProgramWorldContext} that contains information about the environment of the program.
      */
-    public DesktopProgramWindow(GraphicsState state, DesktopProgramDescriptor descriptor) {
+    public DesktopProgramWindow(GraphicsState state, DesktopProgramDescriptor descriptor, DesktopProgramWorldContext worldContext) {
 
         super(state);
 
         this.descriptor = descriptor;
+        this.worldContext = worldContext;
 
         new DesktopWindowCenteringMediator(this);
         setTitle(descriptor.getName());
@@ -87,6 +90,16 @@ public class DesktopProgramWindow extends DesktopWindow {
     public DesktopProgramDescriptor getDescriptor() {
 
         return descriptor;
+    }
+
+    /**
+     * Returns a {@link DesktopProgramWorldContext} which contains information about the environment of the program.
+     * 
+     * @return The {@link DesktopProgramWorldContext} which is assigned to the program.
+     */
+    public DesktopProgramWorldContext getWorldContext() {
+
+        return worldContext;
     }
 
     @Override
