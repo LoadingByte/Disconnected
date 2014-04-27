@@ -18,6 +18,8 @@
 
 package com.quartercode.disconnected.test.world.comp.program.general;
 
+import static com.quartercode.disconnected.world.comp.file.FileUtils.getComponents;
+import static com.quartercode.disconnected.world.comp.program.ExecutorUtils.getCommonLocation;
 import org.junit.Assert;
 import org.junit.Test;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
@@ -51,7 +53,7 @@ public class FileCreateProgramTest extends AbstractProgramTest {
     private void executeProgram(Process<?> parentProcess, String path, EventListener eventListener) {
 
         ChildProcess process = parentProcess.get(Process.CREATE_CHILD).invoke();
-        process.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke("bin/filecreate.exe"));
+        process.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(getComponents(getCommonLocation(FileCreateProgram.class))[1]));
         process.get(Process.INITIALIZE).invoke();
 
         ProgramExecutor program = process.get(Process.EXECUTOR).get();
@@ -95,7 +97,7 @@ public class FileCreateProgramTest extends AbstractProgramTest {
         testUser.get(User.NAME).set("testUser");
 
         ChildProcess sessionProcess = processModule.get(ProcessModule.ROOT_PROCESS).get().get(Process.CREATE_CHILD).invoke();
-        sessionProcess.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke("bin/session.exe"));
+        sessionProcess.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(getComponents(getCommonLocation(Session.class))[1]));
         sessionProcess.get(Process.INITIALIZE).invoke();
         ProgramExecutor session = sessionProcess.get(Process.EXECUTOR).get();
         session.get(Session.USER).set(testUser);

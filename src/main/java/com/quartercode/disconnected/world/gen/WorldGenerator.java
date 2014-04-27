@@ -48,6 +48,7 @@ import com.quartercode.disconnected.world.comp.os.EnvironmentVariable;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.os.Session;
 import com.quartercode.disconnected.world.comp.os.User;
+import com.quartercode.disconnected.world.comp.program.ExecutorUtils;
 import com.quartercode.disconnected.world.comp.program.Program;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.comp.program.general.FileCreateProgram;
@@ -244,24 +245,22 @@ public class WorldGenerator {
     // Temporary method for generating the kernel and some system programs
     private static void addSystemFiles(FileSystem fileSystem, User superuser) {
 
-        // Make a shortcut for the bin directory
-        String binDir = FileUtils.getComponents(CommonFiles.SYS_BIN_DIR)[1] + File.SEPARATOR;
-
         // Add session program
-        addContentFile(fileSystem, binDir + "session.exe", superuser, "r--xr--xr--x", createProgram(Session.class, createVersion(1, 0, 0)));
+        addProgramFile(fileSystem, superuser, Session.class, createVersion(1, 0, 0));
 
         // Add system programs
-        addContentFile(fileSystem, binDir + "filelist.exe", superuser, "r--xr--xr--x", createProgram(FileListProgram.class, createVersion(1, 0, 0)));
-        addContentFile(fileSystem, binDir + "filecreate.exe", superuser, "r--xr--xr--x", createProgram(FileCreateProgram.class, createVersion(1, 0, 0)));
-        addContentFile(fileSystem, binDir + "fileremove.exe", superuser, "r--xr--xr--x", createProgram(FileRemoveProgram.class, createVersion(1, 0, 0)));
+        addProgramFile(fileSystem, superuser, FileListProgram.class, createVersion(1, 0, 0));
+        addProgramFile(fileSystem, superuser, FileCreateProgram.class, createVersion(1, 0, 0));
+        addProgramFile(fileSystem, superuser, FileRemoveProgram.class, createVersion(1, 0, 0));
     }
 
-    private static Program createProgram(Class<? extends ProgramExecutor> executorClass, Version version) {
+    private static void addProgramFile(FileSystem fileSystem, User superuser, Class<? extends ProgramExecutor> executor, Version version) {
 
         Program program = new Program();
         program.get(Program.VERSION).set(version);
-        program.get(Program.EXECUTOR_CLASS).set(executorClass);
-        return program;
+        program.get(Program.EXECUTOR_CLASS).set(executor);
+
+        addContentFile(fileSystem, FileUtils.getComponents(ExecutorUtils.getCommonLocation(executor))[1], superuser, "r--xr--xr--x", program);
     }
 
     // Temporary method for generating some unnecessary programs and personal files

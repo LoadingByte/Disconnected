@@ -25,7 +25,9 @@ import com.quartercode.classmod.extra.def.ReferenceProperty;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileRemoveAction;
+import com.quartercode.disconnected.world.comp.os.CommonFiles;
 import com.quartercode.disconnected.world.comp.os.User;
+import com.quartercode.disconnected.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.event.Event;
@@ -36,6 +38,7 @@ import com.quartercode.disconnected.world.event.Event;
  * @see ProgramExecutor
  * @see File
  */
+@CommonLocation (dir = CommonFiles.SYS_BIN_DIR, file = "filedelete.exe")
 public class FileRemoveProgram extends ProgramExecutor {
 
     // ----- Properties -----

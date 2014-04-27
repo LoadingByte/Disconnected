@@ -34,8 +34,10 @@ import com.quartercode.disconnected.world.comp.file.InvalidPathException;
 import com.quartercode.disconnected.world.comp.file.OccupiedPathException;
 import com.quartercode.disconnected.world.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.world.comp.file.UnknownMountpointException;
+import com.quartercode.disconnected.world.comp.os.CommonFiles;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.os.User;
+import com.quartercode.disconnected.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.event.Event;
@@ -47,6 +49,7 @@ import com.quartercode.disconnected.world.event.Event;
  * @see ProgramExecutor
  * @see File
  */
+@CommonLocation (dir = CommonFiles.SYS_BIN_DIR, file = "filecreate.exe")
 public class FileCreateProgram extends ProgramExecutor {
 
     // ----- Properties -----

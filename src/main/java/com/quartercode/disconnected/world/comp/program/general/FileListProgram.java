@@ -30,7 +30,9 @@ import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.world.comp.file.FileUtils;
 import com.quartercode.disconnected.world.comp.file.ParentFile;
+import com.quartercode.disconnected.world.comp.os.CommonFiles;
 import com.quartercode.disconnected.world.comp.os.User;
+import com.quartercode.disconnected.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.event.Event;
@@ -42,6 +44,7 @@ import com.quartercode.disconnected.world.event.Event;
  * @see ParentFile
  * @see File
  */
+@CommonLocation (dir = CommonFiles.SYS_BIN_DIR, file = "filelist.exe")
 public class FileListProgram extends ProgramExecutor {
 
     // ----- Properties -----

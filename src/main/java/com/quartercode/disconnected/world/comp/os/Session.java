@@ -28,6 +28,7 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.extra.def.ReferenceProperty;
 import com.quartercode.disconnected.world.comp.program.ChildProcess;
+import com.quartercode.disconnected.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.event.Event;
@@ -41,6 +42,7 @@ import com.quartercode.disconnected.world.event.Event;
  * <li>password: The password of the given {@link User}. Can be null if the parent session is null or a root session.</li>
  * </ul>
  */
+@CommonLocation (dir = CommonFiles.SYS_BIN_DIR, file = "session.exe")
 public class Session extends ProgramExecutor {
 
     // ----- Properties -----
