@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.test.world.comp.program.general;
 
 import static com.quartercode.disconnected.world.comp.file.FileUtils.getComponents;
-import static com.quartercode.disconnected.world.comp.program.ExecutorUtils.getCommonLocation;
+import static com.quartercode.disconnected.world.comp.program.ProgramUtils.getCommonLocation;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;

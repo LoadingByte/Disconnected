@@ -21,9 +21,12 @@ package com.quartercode.disconnected.world.comp.program;
 import com.quartercode.disconnected.world.comp.file.FileUtils;
 
 /**
- * The executor utils class provides some utility methods for {@link ProgramExecutor}s.
+ * The program utils class provides some utility methods for programs and program executors.
+ * 
+ * @see Program
+ * @see ProgramExecutor
  */
-public class ExecutorUtils {
+public class ProgramUtils {
 
     /**
      * Returns the complete file path the given {@link ProgramExecutor} can be commonly found under.
@@ -43,7 +46,7 @@ public class ExecutorUtils {
         }
     }
 
-    private ExecutorUtils() {
+    private ProgramUtils() {
 
     }
 

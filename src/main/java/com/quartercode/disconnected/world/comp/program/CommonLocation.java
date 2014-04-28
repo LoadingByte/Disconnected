@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  * The common location annotation sets the file path the annotated {@link ProgramExecutor} can be commonly found under.
  * The annotation should be used on every program executor, so users of the programs do not need to search for it.
  * 
- * @see ExecutorUtils#getCommonLocation(Class)
+ * @see ProgramUtils#getCommonLocation(Class)
  */
 @Target (ElementType.TYPE)
 @Retention (RetentionPolicy.RUNTIME)
