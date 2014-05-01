@@ -125,7 +125,7 @@ public class FileListProgram extends ProgramExecutor {
 
         static {
 
-            FILES = ReferenceCollectionProperty.createDefinition("file", new ArrayList<File<ParentFile<?>>>(), true);
+            FILES = ReferenceCollectionProperty.createDefinition("file", new ArrayList<File<ParentFile<?>>>());
 
         }
 

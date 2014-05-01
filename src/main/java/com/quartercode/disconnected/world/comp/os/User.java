@@ -123,7 +123,7 @@ public class User extends ConfigurationEntry {
 
         PASSWORD = ObjectProperty.createDefinition("password");
 
-        GROUPS = ReferenceCollectionProperty.createDefinition("groups", new ArrayList<Group>(), true);
+        GROUPS = ReferenceCollectionProperty.createDefinition("groups", new ArrayList<Group>());
         GROUPS.addAdderExecutor("checkNotSuperuser", User.class, new FunctionExecutor<Void>() {
 
             @Override

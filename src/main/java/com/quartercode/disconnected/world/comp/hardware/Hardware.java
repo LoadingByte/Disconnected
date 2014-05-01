@@ -51,7 +51,7 @@ public class Hardware extends WorldChildFeatureHolder<Computer> {
     static {
 
         NAME = ObjectProperty.createDefinition("name");
-        VULNERABILITIES = ObjectCollectionProperty.createDefinition("vulnerabilities", new HashSet<Vulnerability>(), true);
+        VULNERABILITIES = ObjectCollectionProperty.createDefinition("vulnerabilities", new HashSet<Vulnerability>());
 
     }
 

@@ -63,7 +63,7 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
 
     static {
 
-        ENTRIES = ObjectCollectionProperty.createDefinition("entires", new ArrayList<ConfigurationEntry>(), true);
+        ENTRIES = ObjectCollectionProperty.createDefinition("entries", new ArrayList<ConfigurationEntry>());
 
     }
 

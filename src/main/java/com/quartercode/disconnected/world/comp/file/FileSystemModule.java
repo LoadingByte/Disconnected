@@ -76,7 +76,7 @@ public class FileSystemModule extends OSModule {
 
     static {
 
-        KNOWN_FS = ObjectCollectionProperty.createDefinition("knownFs", new ArrayList<KnownFileSystem>(), true);
+        KNOWN_FS = ObjectCollectionProperty.createDefinition("knownFs", new ArrayList<KnownFileSystem>());
         KNOWN_FS.addAdderExecutor("checkNotMounted", FileSystemModule.class, new FunctionExecutor<Void>() {
 
             @Override

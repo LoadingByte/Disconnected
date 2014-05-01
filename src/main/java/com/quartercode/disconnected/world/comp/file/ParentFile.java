@@ -64,7 +64,7 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
 
     static {
 
-        CHILDREN = ObjectCollectionProperty.createDefinition("children", new ArrayList<File<ParentFile<?>>>(), true);
+        CHILDREN = ObjectCollectionProperty.createDefinition("children", new ArrayList<File<ParentFile<?>>>());
         CHILDREN.addAdderExecutor("checkSize", ParentFile.class, new FunctionExecutor<Void>() {
 
             @Override

@@ -58,7 +58,7 @@ public class Computer extends WorldChildFeatureHolder<World> {
     static {
 
         LOCATION = ObjectProperty.createDefinition("location");
-        HARDWARE = ObjectCollectionProperty.createDefinition("hardware", new ArrayList<Hardware>(), true);
+        HARDWARE = ObjectCollectionProperty.createDefinition("hardware", new ArrayList<Hardware>());
         OS = ObjectProperty.createDefinition("operatingSystem");
 
     }

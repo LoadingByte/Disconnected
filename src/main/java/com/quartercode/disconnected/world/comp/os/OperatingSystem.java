@@ -87,7 +87,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
         NAME = ObjectProperty.createDefinition("name");
         VERSION = ObjectProperty.createDefinition("version");
-        VULNERABILITIES = ObjectCollectionProperty.createDefinition("vulnerabilities", new HashSet<Vulnerability>(), true);
+        VULNERABILITIES = ObjectCollectionProperty.createDefinition("vulnerabilities", new HashSet<Vulnerability>());
 
         FS_MODULE = ObjectProperty.createDefinition("fileSystemModule", new FileSystemModule(), true);
         FS_MODULE.addSetterExecutor("cancel", OperatingSystem.class, new FunctionExecutor<Void>() {

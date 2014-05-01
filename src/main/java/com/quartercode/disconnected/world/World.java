@@ -43,7 +43,7 @@ public class World extends DefaultFeatureHolder {
 
     static {
 
-        COMPUTERS = ObjectCollectionProperty.createDefinition("computers", new ArrayList<Computer>(), true);
+        COMPUTERS = ObjectCollectionProperty.createDefinition("computers", new ArrayList<Computer>());
 
     }
 
