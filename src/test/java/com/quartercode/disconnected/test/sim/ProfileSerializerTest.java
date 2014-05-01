@@ -21,6 +21,8 @@ package com.quartercode.disconnected.test.sim;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import javax.xml.bind.JAXBException;
@@ -32,7 +34,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import com.quartercode.classmod.base.Feature;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
-import com.quartercode.classmod.extra.Property;
+import com.quartercode.classmod.extra.CollectionProperty;
+import com.quartercode.classmod.extra.ValueSupplier;
+import com.quartercode.classmod.extra.def.AbstractCollectionProperty;
+import com.quartercode.classmod.extra.def.AbstractProperty;
 import com.quartercode.disconnected.Main;
 import com.quartercode.disconnected.sim.Profile;
 import com.quartercode.disconnected.sim.ProfileSerializer;
@@ -66,7 +71,7 @@ public class ProfileSerializerTest {
         outputStream.flush();
 
         World copy = ProfileSerializer.deserializeWorld(new ReaderInputStream(new StringReader(serialized.toString())));
-        Assert.assertTrue("Serialized-deserialized copy of world equals original", equalsPersistent(world, copy));
+        Assert.assertTrue("Serialized-deserialized copy of world does not equal original", equalsPersistent(world, copy));
     }
 
     /*
@@ -100,31 +105,68 @@ public class ProfileSerializerTest {
 
     private boolean equalsPersistent(Feature feature1, Feature feature2) {
 
-        // Only check for persistent properties
-        if (! (feature1 instanceof Property) || ! (feature2 instanceof Property)) {
+        // Only check for value suppliers
+        if (! (feature1 instanceof ValueSupplier) || ! (feature2 instanceof ValueSupplier)) {
+            return true;
+        }
+        // Don't check features that are excluded from equality checks
+        else if (isIgnoreEquals(feature1) || isIgnoreEquals(feature2)) {
             return true;
         }
 
-        return equalsPersistent( ((Property<?>) feature1).get(), ((Property<?>) feature2).get());
+        Object value1 = getInternalValue((ValueSupplier<?>) feature1);
+        Object value2 = getInternalValue((ValueSupplier<?>) feature2);
+
+        // Return true if the feature is a collection property and the collection is empty
+        if (feature1 instanceof CollectionProperty && feature2 instanceof CollectionProperty && value2 == null) {
+            return true;
+        }
+
+        return equalsPersistent(value1, value2);
+    }
+
+    private boolean isIgnoreEquals(Feature feature) {
+
+        try {
+            Field ignoreEquals;
+            if (feature instanceof AbstractProperty) {
+                ignoreEquals = AbstractProperty.class.getDeclaredField("ignoreEquals");
+            } else if (feature instanceof AbstractCollectionProperty) {
+                ignoreEquals = AbstractCollectionProperty.class.getDeclaredField("ignoreEquals");
+            } else {
+                return false;
+            }
+
+            ignoreEquals.setAccessible(true);
+            boolean value = (boolean) ignoreEquals.get(feature);
+            ignoreEquals.setAccessible(false);
+            return value;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Object getInternalValue(ValueSupplier<?> valueSupplier) {
+
+        try {
+            Method getInternal = valueSupplier.getClass().getDeclaredMethod("getInternal");
+            getInternal.setAccessible(true);
+            Object value = getInternal.invoke(valueSupplier);
+            getInternal.setAccessible(false);
+            return value;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private boolean equalsPersistent(Object o1, Object o2) {
 
-        if (o1 instanceof Collection<?> && o2 instanceof Collection<?>) {
+        if (o1 instanceof Object[] && o2 instanceof Object[]) {
+            return equalsPersistent((Object[]) o1, (Object[]) o2);
+        } else if (o1 instanceof Collection<?> && o2 instanceof Collection<?>) {
             Object[] collection1 = ((Collection<?>) o1).toArray(new Object[ ((Collection<?>) o1).size()]);
             Object[] collection2 = ((Collection<?>) o2).toArray(new Object[ ((Collection<?>) o2).size()]);
-
-            if (collection1.length != collection2.length) {
-                return false;
-            } else {
-                for (int index = 0; index < collection1.length; index++) {
-                    if (!equalsPersistent(collection1[index], collection2[index])) {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
+            return equalsPersistent(collection1, collection2);
         } else if (o1 instanceof DefaultFeatureHolder && o2 instanceof DefaultFeatureHolder) {
             return equalsPersistent((DefaultFeatureHolder) o1, (DefaultFeatureHolder) o2);
         } else if (o1 == null && o2 == null) {
@@ -132,6 +174,21 @@ public class ProfileSerializerTest {
         } else {
             return o1 != null && o1.equals(o2);
         }
+    }
+
+    private boolean equalsPersistent(Object[] array1, Object[] array2) {
+
+        if (array1.length != array2.length) {
+            return false;
+        } else {
+            for (int index = 0; index < array1.length; index++) {
+                if (!equalsPersistent(array1[index], array2[index])) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
 }
