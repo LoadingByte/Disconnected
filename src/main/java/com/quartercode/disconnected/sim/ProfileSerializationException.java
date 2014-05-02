@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.sim;
 
 /**
- * The profile serialization exception occurrs if a {@link Profile} cannot be serialized or deserialized.
+ * The profile serialization exception occures if a {@link Profile} cannot be serialized or deserialized.
  * It is generally thrown by the {@link ProfileSerializer}.
  * 
  * @see ProfileSerializer

@@ -23,7 +23,7 @@ import com.quartercode.disconnected.util.ResourceBundleGroup;
 
 /**
  * A desktop program descriptor declares some generic data of a desktop program and allows to create new instances.
- * The class should be inherited for each desktop program in order to make the {@link #create(DesktopProgramContext)} method type-safe.<br>
+ * The class should be inherited for each desktop program in order to make the {@link #create(GraphicsState, DesktopProgramWorldContext)} method type-safe.<br>
  * <br>
  * Desktop programs are programs that only have a gui and don't run as a process. They only support the ui.
  * However, such programs create normal processes in order to execute operations.
@@ -36,10 +36,11 @@ public abstract class DesktopProgramDescriptor {
     private final String              nameKey;
 
     /**
-     * Creates a new desktop program descriptor. The name is retrieved from the given {@link ResourceBundleGroup} with the given key.
+     * Creates a new desktop program descriptor.
+     * The name is retrieved from the given {@link ResourceBundleGroup} with the given key.
      * 
-     * @param resourceBundle The {@link ResourceBundleGroup} that provides resources for the program descriptor.
-     * @param nameKey The key the name of the described program is provided under in the given {@link ResourceBundleGroup}.
+     * @param resourceBundle The resource bundle group that provides resources for the program descriptor.
+     * @param nameKey The key the name of the described program is provided under in the given resource bundle group.
      */
     public DesktopProgramDescriptor(ResourceBundleGroup resourceBundle, String nameKey) {
 

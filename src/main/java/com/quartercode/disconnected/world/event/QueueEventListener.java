@@ -75,7 +75,7 @@ public class QueueEventListener extends DefaultFeatureHolder implements EventLis
      * <td>0</td>
      * <td>{@link Event}</td>
      * <td>event</td>
-     * <td>The new incoming {@link Event} the queue should receive.</td>
+     * <td>The incoming event that should be added to the queue.</td>
      * </tr>
      * </table>
      */

@@ -24,7 +24,7 @@ import com.quartercode.classmod.util.FunctionDefinitionFactory;
 
 /**
  * An event listener can receive and handle {@link Event}s. There are different implementations and concepts on how this can work.
- * The central point is the {@link #HANDLE_EVENT} method that processes incoming {@link Event}s.
+ * The central point is the {@link #HANDLE_EVENT} method that processes incoming events.
  * The simplest event listener could just take an incoming event and process it directly in the {@link #HANDLE_EVENT} method.
  * More advanced listeners could distribute events to other methods or even own classes, or they could store the events for later processing.
  * 
@@ -34,7 +34,7 @@ public interface EventListener extends FeatureHolder {
 
     /**
      * Lets the event listener receive and handle an {@link Event}.
-     * The method could just execute some processing code, or it could distribute or store the received {@link Event}.
+     * The method could just execute some processing code, or it could distribute or store the received event.
      * 
      * <table>
      * <tr>
@@ -47,7 +47,7 @@ public interface EventListener extends FeatureHolder {
      * <td>0</td>
      * <td>{@link Event}</td>
      * <td>event</td>
-     * <td>The new incoming {@link Event} the listener should handle.</td>
+     * <td>The incoming event that should be handled by the listener.</td>
      * </tr>
      * </table>
      */

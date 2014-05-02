@@ -56,7 +56,8 @@ public class FileUtils {
     /**
      * Creates an absolute path out of the given one.
      * The algorithm starts at the given start path and changes the path according to the "change" path.
-     * The "change" path also can be absolute. This will ignore the start path.
+     * The "change" path also can be absolute. This will ignore the start path.<br>
+     * <br>
      * 
      * Here's an example:
      * 
