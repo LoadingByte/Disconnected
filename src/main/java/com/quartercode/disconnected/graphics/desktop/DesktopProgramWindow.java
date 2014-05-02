@@ -18,6 +18,8 @@
 
 package com.quartercode.disconnected.graphics.desktop;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.quartercode.disconnected.graphics.GraphicsState;
 import com.quartercode.disconnected.graphics.component.MultiactionButton;
 import com.quartercode.disconnected.util.ResourceBundleGroup;
@@ -36,6 +38,8 @@ public class DesktopProgramWindow extends DesktopWindow {
     private final DesktopProgramDescriptor   descriptor;
     private final DesktopProgramWorldContext worldContext;
     private final MultiactionButton          taskbarButton;
+
+    private final List<DesktopWindow>        openPopups = new ArrayList<DesktopWindow>();
 
     /**
      * Creates a new desktop program window in the given desktop {@link GraphicsState}.
@@ -109,6 +113,11 @@ public class DesktopProgramWindow extends DesktopWindow {
 
         taskbarButton.setTheme(visible ? "taskbar-button-active" : "taskbar-button-inactive");
         taskbarButton.reapplyTheme();
+
+        // Toggle visibility for all popups
+        for (DesktopWindow popup : openPopups) {
+            popup.setVisible(visible);
+        }
     }
 
     @Override
@@ -145,6 +154,50 @@ public class DesktopProgramWindow extends DesktopWindow {
     protected String getString(String key) {
 
         return descriptor.getResourceBundle().getString(key);
+    }
+
+    protected void openPopup(final DesktopWindow popup, boolean modal) {
+
+        // Can't open new popup while a modal popup is present
+        if (!isEnabled()) {
+            throw new IllegalStateException("Cannot open new popups while program window is disabled");
+        }
+
+        // Add new popup to list
+        openPopups.add(popup);
+
+        // Add close listener that removes the popup from the list when it is closed
+        popup.addCloseListener(new Runnable() {
+
+            @Override
+            public void run() {
+
+                openPopups.remove(popup);
+            }
+
+        });
+
+        // Center the popup relative to the parent window
+        new DesktopWindowCenteringMediator(popup, this);
+
+        if (modal) {
+            // Disable the main program window if the popup is modal
+            setEnabled(false);
+
+            // Add close listener that enables the main program window when the popup is closed
+            popup.addCloseListener(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    setEnabled(true);
+                }
+
+            });
+        }
+
+        // Show the popup
+        popup.setVisible(true);
     }
 
 }
