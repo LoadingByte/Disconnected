@@ -142,7 +142,7 @@ public class DesktopProgramWindow extends DesktopWindow {
      * @param key The key the returned value is associated with.
      * @return The i18n string which is associated with the given key.
      */
-    public String getString(String key) {
+    protected String getString(String key) {
 
         return descriptor.getResourceBundle().getString(key);
     }

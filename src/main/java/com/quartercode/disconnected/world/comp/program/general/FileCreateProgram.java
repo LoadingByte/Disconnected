@@ -103,7 +103,7 @@ public class FileCreateProgram extends ProgramExecutor {
                 try {
                     addFile = fileType.newInstance();
                 } catch (Exception e) {
-                    throw new IllegalArgumentException("Cannot create instance of file type '" + fileType.getName() + "'");
+                    throw new IllegalArgumentException("Cannot create instance of file type '" + fileType.getName() + "'", e);
                 }
 
                 Process<?> process = holder.getParent();

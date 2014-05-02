@@ -131,7 +131,7 @@ public class WorldGenerator {
         Computer computer = new Computer();
 
         Mainboard mainboard = new Mainboard();
-        mainboard.get(Hardware.NAME).set("MB XYZ 2000 Pro");
+        mainboard.get(Mainboard.NAME).set("MB XYZ 2000 Pro");
         mainboard.get(Mainboard.SLOTS).add(generateMainboardSlot(CPU.class));
         mainboard.get(Mainboard.SLOTS).add(generateMainboardSlot(RAM.class));
         mainboard.get(Mainboard.SLOTS).add(generateMainboardSlot(HardDrive.class));
@@ -140,13 +140,13 @@ public class WorldGenerator {
         computer.get(Computer.HARDWARE).add(mainboard);
 
         CPU cpu = new CPU();
-        cpu.get(Hardware.NAME).set("Intel Core i7-4950HQ");
+        cpu.get(CPU.NAME).set("Intel Core i7-4950HQ");
         cpu.get(CPU.THREADS).set(8);
         cpu.get(CPU.FREQUENCY).set(2400000000L);
         computer.get(Computer.HARDWARE).add(cpu);
 
         RAM ram = new RAM();
-        ram.get(Hardware.NAME).set("EpicRAM 4194304");
+        ram.get(RAM.NAME).set("EpicRAM 4194304");
         ram.get(RAM.SIZE).set(ByteUnit.BYTE.convert(4, ByteUnit.MEGABYTE));
         ram.get(RAM.FREQUENCY).set(1600000000L);
         computer.get(Computer.HARDWARE).add(ram);
@@ -156,13 +156,13 @@ public class WorldGenerator {
         computer.get(Computer.HARDWARE).add(networkInterface);
 
         HardDrive systemMedium = new HardDrive();
-        systemMedium.get(Hardware.NAME).set("TheHardDrive 1TB");
+        systemMedium.get(HardDrive.NAME).set("TheHardDrive 1TB");
         FileSystem systemFs = systemMedium.get(HardDrive.FILE_SYSTEM).get();
         systemFs.get(FileSystem.SIZE).set(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
         computer.get(Computer.HARDWARE).add(systemMedium);
 
         HardDrive userMedium = new HardDrive();
-        userMedium.get(Hardware.NAME).set("TheHardDrive 1TB");
+        userMedium.get(HardDrive.NAME).set("TheHardDrive 1TB");
         FileSystem userFs = userMedium.get(HardDrive.FILE_SYSTEM).get();
         userFs.get(FileSystem.SIZE).set(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
         computer.get(Computer.HARDWARE).add(userMedium);
@@ -260,7 +260,7 @@ public class WorldGenerator {
         program.get(Program.VERSION).set(version);
         program.get(Program.EXECUTOR_CLASS).set(executor);
 
-        addContentFile(fileSystem, FileUtils.getComponents(ExecutorUtils.getCommonLocation(executor))[1], superuser, "r--xr--xr--x", program);
+        addContentFile(fileSystem, FileUtils.getComponents(ProgramUtils.getCommonLocation(executor))[1], superuser, "r--xr--xr--x", program);
     }
 
     // Temporary method for generating some unnecessary programs and personal files

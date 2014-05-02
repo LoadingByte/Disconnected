@@ -126,7 +126,8 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                     root.get(Process.ENVIRONMENT).set(environment);
 
                     // Get session program
-                    ContentFile sessionProgramFile = (ContentFile) fsModule.get(FileSystemModule.GET_FILE).invoke(CommonFiles.SYS_BIN_DIR + File.SEPARATOR + "session.exe");
+                    String sessionProgramFilePath = ProgramUtils.getCommonLocation(Session.class);
+                    ContentFile sessionProgramFile = (ContentFile) fsModule.get(FileSystemModule.GET_FILE).invoke(sessionProgramFilePath);
                     if (sessionProgramFile == null) {
                         throw new IllegalStateException("Cannot start process module: Session program not found");
                     }

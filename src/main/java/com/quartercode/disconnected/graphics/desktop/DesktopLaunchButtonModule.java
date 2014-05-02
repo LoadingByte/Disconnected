@@ -38,7 +38,7 @@ public class DesktopLaunchButtonModule extends AbstractGraphicsModule {
 
         button = new Button();
         button.setTheme("launch-button");
-        button.setText(ResourceBundles.DESKTOP.getString("launch.button"));
+        button.setText(ResourceBundles.DESKTOP.getString("launchButton.text"));
         button.addCallback(new Runnable() {
 
             @Override
@@ -46,6 +46,7 @@ public class DesktopLaunchButtonModule extends AbstractGraphicsModule {
 
                 // TODO: Display launch menu
             }
+
         });
         ((Widget) state.getModule("desktopWidget").getValue("widget")).add(button);
         setValue("button", button);

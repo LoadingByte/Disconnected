@@ -95,6 +95,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
                 FileRights rights = new FileRights();
                 rights.get(FileRights.FROM_STRING).invoke(DEFAULT_FILE_RIGHTS);
+
                 return new ObjectProperty<FileRights>(getName(), holder, rights);
             }
 
