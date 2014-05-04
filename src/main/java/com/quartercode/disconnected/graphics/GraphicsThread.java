@@ -211,7 +211,7 @@ public class GraphicsThread extends Thread {
                 }
             }
 
-            if (!toInvoke.isEmpty()) {
+            while (!toInvoke.isEmpty()) {
                 toInvoke.poll().run();
             }
 
