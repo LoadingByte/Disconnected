@@ -161,7 +161,8 @@ public class Main {
 
         // Initialize profile manager and load stored profiles
         LOGGER.info("Initializing profile manager");
-        ServiceRegistry.register(ProfileManager.class, new DefaultProfileManager(new File("profiles")));
+        ProfileManager profileManager = new DefaultProfileManager(new File("profiles"));
+        ServiceRegistry.register(ProfileManager.class, profileManager);
 
         // Initialize ticker
         LOGGER.info("Initializing ticker");
@@ -172,8 +173,9 @@ public class Main {
 
         // Initialize graphics manager and start it
         LOGGER.info("Initializing graphics manager");
-        ServiceRegistry.register(GraphicsManager.class, new DefaultGraphicsManager());
-        ServiceRegistry.lookup(GraphicsManager.class).setRunning(true);
+        GraphicsManager graphicsManager = new DefaultGraphicsManager();
+        ServiceRegistry.register(GraphicsManager.class, graphicsManager);
+        graphicsManager.setRunning(true);
 
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG-ACTION: Generating new simulation");
@@ -186,17 +188,17 @@ public class Main {
         Profile profile = new Profile("test");
         profile.setWorld(world);
         profile.setRandom(random);
-        ServiceRegistry.lookup(ProfileManager.class).addProfile(profile);
+        profileManager.addProfile(profile);
         try {
-            ServiceRegistry.lookup(ProfileManager.class).setActive(profile);
+            profileManager.setActive(profile);
         } catch (ProfileSerializationException e) {
             // Won't ever happen (we just created a new profile)
         }
 
         // DEBUG: Start "game" with current simulation
         LOGGER.info("DEBUG-ACTION: Starting test-game with current simulation");
-        ServiceRegistry.lookup(Ticker.class).setRunning(true);
-        ServiceRegistry.lookup(GraphicsManager.class).setState(DefaultStates.DESKTOP.create());
+        ticker.setRunning(true);
+        graphicsManager.setState(DefaultStates.DESKTOP.create());
     }
 
     @SuppressWarnings ("static-access")
