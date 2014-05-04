@@ -33,7 +33,7 @@ import javax.imageio.ImageIO;
  */
 public class ResourceStore {
 
-    private static final Map<String, Object> loadedResources = new HashMap<String, Object>();
+    private static final Map<String, Object> loadedResources = new HashMap<>();
 
     /**
      * Returns all resource objects which are currently loaded into the resource store.

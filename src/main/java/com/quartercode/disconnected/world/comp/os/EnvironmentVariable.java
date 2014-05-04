@@ -119,7 +119,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
             public List<String> invoke(FunctionInvocation<List<String>> invocation, Object... arguments) {
 
                 String value = invocation.getHolder().get(VALUE).get();
-                List<String> valueList = new ArrayList<String>();
+                List<String> valueList = new ArrayList<>();
 
                 if (value != null && !value.isEmpty()) {
                     // Split at separator and return

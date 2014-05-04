@@ -63,7 +63,7 @@ public class TickThread extends Thread {
         long next = System.currentTimeMillis();
 
         while (!isInterrupted()) {
-            for (TickAction action : new ArrayList<TickAction>(ticker.getActions())) {
+            for (TickAction action : new ArrayList<>(ticker.getActions())) {
                 try {
                     action.update();
                 } catch (RuntimeException e) {

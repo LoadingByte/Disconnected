@@ -34,7 +34,7 @@ public class SpeedUnitTest {
     @Parameters
     public static Collection<Object[]> data() {
 
-        List<Object[]> data = new ArrayList<Object[]>();
+        List<Object[]> data = new ArrayList<>();
 
         data.add(new Object[] { 10, SpeedUnit.BYTE, 10, SpeedUnit.BYTE });
         data.add(new Object[] { 10, SpeedUnit.KILOBYTE, 10000, SpeedUnit.BYTE });

@@ -84,7 +84,7 @@ public class Scheduler extends AbstractFeature {
 
         super(name, holder);
 
-        runningTasks = new ArrayList<ScheduleTaskContext>();
+        runningTasks = new ArrayList<>();
     }
 
     /**

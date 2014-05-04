@@ -38,7 +38,7 @@ public class StreamGobblerTest {
     @Parameters
     public static Collection<Object[]> getData() {
 
-        List<Object[]> data = new ArrayList<Object[]>();
+        List<Object[]> data = new ArrayList<>();
         data.add(new Object[] { "SomeInput", null });
         data.add(new Object[] { "-:_.,+#'2", null });
         data.add(new Object[] { "Input with prefix", "> " });

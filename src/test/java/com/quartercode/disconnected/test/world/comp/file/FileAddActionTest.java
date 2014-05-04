@@ -42,7 +42,7 @@ public class FileAddActionTest extends AbstractFileActionTest {
     @Parameters
     public static Collection<Object[]> data() {
 
-        List<Object[]> data = new ArrayList<Object[]>();
+        List<Object[]> data = new ArrayList<>();
 
         data.add(new Object[] { "test1/test2", "test1/test2/test.txt" });
 

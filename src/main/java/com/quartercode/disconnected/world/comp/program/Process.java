@@ -508,7 +508,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
             private List<Process<?>> getAllChildren(Process<?> parent) {
 
-                List<Process<?>> allChildren = new ArrayList<Process<?>>();
+                List<Process<?>> allChildren = new ArrayList<>();
                 for (Process<?> directChild : parent.get(CHILDREN).get()) {
                     allChildren.addAll(directChild.get(GET_ALL_CHILDREN).invoke());
                 }
@@ -527,7 +527,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
                 ChildProcess process = new ChildProcess();
                 process.setParent((Process<?>) holder);
-                process.get(ENVIRONMENT).set(new HashMap<String, String>(holder.get(ENVIRONMENT).get()));
+                process.get(ENVIRONMENT).set(new HashMap<>(holder.get(ENVIRONMENT).get()));
                 holder.get(CHILDREN).add(process);
 
                 invocation.next(arguments);
@@ -636,7 +636,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 FeatureHolder holder = invocation.getHolder();
 
                 // Calculate new pid
-                Set<Integer> existingPids = new HashSet<Integer>();
+                Set<Integer> existingPids = new HashSet<>();
                 Process<?> root = holder.get(GET_ROOT).invoke();
                 existingPids.add(root.get(PID).get());
                 for (Process<?> process : root.get(GET_ALL_CHILDREN).invoke()) {

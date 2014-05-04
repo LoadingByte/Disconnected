@@ -77,7 +77,7 @@ public class FileUtils {
         if (!start.startsWith(File.SEPARATOR)) {
             throw new IllegalArgumentException("Start path must be absolute (it has to start with " + File.SEPARATOR + "): " + start);
         } else {
-            List<String> current = new ArrayList<String>();
+            List<String> current = new ArrayList<>();
             if (!path.startsWith(File.SEPARATOR)) {
                 current.addAll(Arrays.asList(start.split(File.SEPARATOR)));
                 if (current.size() > 0) {

@@ -103,9 +103,9 @@ public class WorldGenerator {
      */
     public static List<Computer> generateComputers(RandomPool random, int amount, List<Computer> ignore) {
 
-        List<Computer> computers = new ArrayList<Computer>();
+        List<Computer> computers = new ArrayList<>();
 
-        List<Location> ignoreLocations = new ArrayList<Location>();
+        List<Location> ignoreLocations = new ArrayList<>();
         if (ignore != null) {
             for (Computer computer : ignore) {
                 ignoreLocations.add(computer.get(Computer.LOCATION).get());
@@ -206,7 +206,7 @@ public class WorldGenerator {
 
     private static List<Hardware> getHardwareByType(List<Hardware> availableHardware, Class<? extends Hardware> type) {
 
-        List<Hardware> hardwareByType = new ArrayList<Hardware>();
+        List<Hardware> hardwareByType = new ArrayList<>();
         for (Hardware hardwarePart : availableHardware) {
             if (TypeUtils.isInstance(hardwarePart, type)) {
                 hardwareByType.add(hardwarePart);

@@ -32,9 +32,9 @@ public class DesktopWindow extends ResizableFrame {
 
     private final GraphicsState  state;
 
-    private final List<Runnable> openListeners        = new ArrayList<Runnable>();
-    private final List<Runnable> closeListeners       = new ArrayList<Runnable>();
-    private final List<Runnable> firstLayoutListeners = new ArrayList<Runnable>();
+    private final List<Runnable> openListeners        = new ArrayList<>();
+    private final List<Runnable> closeListeners       = new ArrayList<>();
+    private final List<Runnable> firstLayoutListeners = new ArrayList<>();
 
     private boolean              layoutCalledOnce     = false;
 

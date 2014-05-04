@@ -40,7 +40,7 @@ public class SizeUtilTest {
     @Parameters
     public static Collection<Object[]> data() {
 
-        List<Object[]> data = new ArrayList<Object[]>();
+        List<Object[]> data = new ArrayList<>();
 
         // Boolean
         data.add(new Object[] { true, 1 });

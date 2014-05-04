@@ -34,7 +34,7 @@ public class ByteUnitTest {
     @Parameters
     public static Collection<Object[]> data() {
 
-        List<Object[]> data = new ArrayList<Object[]>();
+        List<Object[]> data = new ArrayList<>();
 
         data.add(new Object[] { 10, ByteUnit.BYTE, 10, ByteUnit.BYTE });
         data.add(new Object[] { 10, ByteUnit.KILOBYTE, 10240, ByteUnit.BYTE });

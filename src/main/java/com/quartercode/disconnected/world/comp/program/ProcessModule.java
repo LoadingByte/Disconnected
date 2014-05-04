@@ -89,7 +89,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
             @Override
             public List<Process<?>> invoke(FunctionInvocation<List<Process<?>>> invocation, Object... arguments) {
 
-                List<Process<?>> processes = new ArrayList<Process<?>>();
+                List<Process<?>> processes = new ArrayList<>();
                 RootProcess root = invocation.getHolder().get(ROOT_PROCESS).get();
                 processes.add(root);
                 processes.addAll(root.get(Process.GET_ALL_CHILDREN).invoke());
@@ -115,7 +115,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                     FileSystemModule fsModule = ((ProcessModule) holder).getParent().get(OperatingSystem.FS_MODULE).get();
 
                     // Get environment
-                    Map<String, String> environment = new HashMap<String, String>();
+                    Map<String, String> environment = new HashMap<>();
                     File<?> environmentFile = fsModule.get(FileSystemModule.GET_FILE).invoke(CommonFiles.ENVIRONMENT_CONFIG);
                     if (environmentFile != null) {
                         Configuration environmentConfig = (Configuration) environmentFile.get(ContentFile.CONTENT).get();

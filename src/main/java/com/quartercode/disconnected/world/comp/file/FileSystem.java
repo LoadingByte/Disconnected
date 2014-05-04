@@ -64,7 +64,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
                 RootFile root = new RootFile();
                 root.setParent((FileSystem) holder);
-                return new ObjectProperty<RootFile>(getName(), holder, root);
+                return new ObjectProperty<>(getName(), holder, root);
             }
 
         };

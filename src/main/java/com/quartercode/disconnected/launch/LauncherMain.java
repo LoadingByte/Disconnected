@@ -44,7 +44,7 @@ public class LauncherMain {
 
         if (args.length > 0 && new File(args[0]).exists()) {
             directory = new File(args[0]);
-            args = new ArrayList<String>(Arrays.asList(args)).subList(1, args.length).toArray(new String[args.length - 1]);
+            args = new ArrayList<>(Arrays.asList(args)).subList(1, args.length).toArray(new String[args.length - 1]);
         }
 
         Launcher launcher = new Launcher(mainClass, vmArguments, args, directory);

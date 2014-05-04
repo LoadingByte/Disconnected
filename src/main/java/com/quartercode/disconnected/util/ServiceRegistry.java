@@ -27,7 +27,7 @@ import org.apache.commons.lang3.Validate;
  */
 public class ServiceRegistry {
 
-    private static Map<Class<?>, Object> services = new HashMap<Class<?>, Object>();
+    private static Map<Class<?>, Object> services = new HashMap<>();
 
     /**
      * Looks up the registered service implementation for the given service specification.

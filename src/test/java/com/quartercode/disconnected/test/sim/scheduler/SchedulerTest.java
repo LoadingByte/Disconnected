@@ -44,7 +44,7 @@ public class SchedulerTest {
     @Parameters
     public static Collection<Object[]> data() {
 
-        List<Object[]> data = new ArrayList<Object[]>();
+        List<Object[]> data = new ArrayList<>();
 
         data.add(new Object[] { 1 });
         data.add(new Object[] { 5 });

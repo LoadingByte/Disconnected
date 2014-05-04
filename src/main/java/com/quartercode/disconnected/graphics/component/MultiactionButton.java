@@ -32,7 +32,7 @@ import de.matthiasmann.twl.model.ButtonModel;
  */
 public class MultiactionButton extends Button {
 
-    private final Map<Integer, Runnable> callbacks = new HashMap<Integer, Runnable>();
+    private final Map<Integer, Runnable> callbacks = new HashMap<>();
 
     public MultiactionButton() {
 

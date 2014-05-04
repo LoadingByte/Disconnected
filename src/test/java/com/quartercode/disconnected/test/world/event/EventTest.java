@@ -38,7 +38,7 @@ public class EventTest {
         TestEvent event = new TestEvent();
         event.get(TestEvent.TEST_DATA).set("test");
 
-        final AtomicReference<Event> receivedEvent = new AtomicReference<Event>();
+        final AtomicReference<Event> receivedEvent = new AtomicReference<>();
         EventListener.HANDLE_EVENT.addExecutor("default", SendListener.class, new FunctionExecutor<Void>() {
 
             @Override

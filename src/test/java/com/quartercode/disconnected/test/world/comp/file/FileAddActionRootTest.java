@@ -39,7 +39,7 @@ public class FileAddActionRootTest extends AbstractFileActionTest {
     @Parameters
     public static Collection<Object[]> data() {
 
-        List<Object[]> data = new ArrayList<Object[]>();
+        List<Object[]> data = new ArrayList<>();
 
         data.add(new Object[] { "test.txt" });
 

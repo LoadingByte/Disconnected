@@ -35,7 +35,7 @@ public class TypeEventMatcherTest {
     @Parameters
     public static Collection<Object[]> data() {
 
-        List<Object[]> data = new ArrayList<Object[]>();
+        List<Object[]> data = new ArrayList<>();
 
         data.add(new Object[] { new TestEvent1(), TestEvent1.class, true });
         data.add(new Object[] { new TestEvent1(), TestEvent2.class, false });

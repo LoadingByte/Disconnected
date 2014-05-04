@@ -37,7 +37,7 @@ public class RandomPool implements Serializable {
 
     private static final long  serialVersionUID = 1187445181932361744L;
 
-    private final List<Random> randoms          = new ArrayList<Random>();
+    private final List<Random> randoms          = new ArrayList<>();
     private int                currentIndex;
 
     /**

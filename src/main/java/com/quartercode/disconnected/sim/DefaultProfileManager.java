@@ -20,7 +20,6 @@ package com.quartercode.disconnected.sim;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ public class DefaultProfileManager implements ProfileManager {
 
     private final File          directory;
 
-    private final List<Profile> profiles = new ArrayList<Profile>();
+    private final List<Profile> profiles = new ArrayList<>();
     private Profile             active;
 
     /**
@@ -81,7 +80,7 @@ public class DefaultProfileManager implements ProfileManager {
     @Override
     public void removeProfile(Profile profile) {
 
-        for (Profile existingProfile : new ArrayList<Profile>(profiles)) {
+        for (Profile existingProfile : new ArrayList<>(profiles)) {
             if (existingProfile.getName().equalsIgnoreCase(profile.getName())) {
                 profiles.remove(profile);
                 new File(directory, profile.getName() + ".zip").delete();
@@ -97,20 +96,10 @@ public class DefaultProfileManager implements ProfileManager {
             profileFile.delete();
         }
 
-        FileOutputStream outputStream = null;
-        try {
-            outputStream = new FileOutputStream(profileFile);
+        try (FileOutputStream outputStream = new FileOutputStream(profileFile)) {
             ProfileSerializer.serializeProfile(outputStream, profile);
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new ProfileSerializationException(e, profile);
-        } finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    // Ignore
-                }
-            }
         }
     }
 
@@ -133,20 +122,10 @@ public class DefaultProfileManager implements ProfileManager {
         if (active != null && (active.getWorld() == null || active.getRandom() == null)) {
             File profileFile = new File(directory, active.getName() + ".zip");
             if (profileFile.exists()) {
-                FileInputStream inputStream = null;
-                try {
-                    inputStream = new FileInputStream(profileFile);
+                try (FileInputStream inputStream = new FileInputStream(profileFile)) {
                     ProfileSerializer.deserializeProfile(inputStream, active);
-                } catch (FileNotFoundException e) {
+                } catch (IOException e) {
                     throw new ProfileSerializationException(e, profile);
-                } finally {
-                    if (inputStream != null) {
-                        try {
-                            inputStream.close();
-                        } catch (IOException e) {
-                            // Ignore
-                        }
-                    }
                 }
             }
         }

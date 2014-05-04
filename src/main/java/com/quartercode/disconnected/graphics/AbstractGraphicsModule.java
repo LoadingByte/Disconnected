@@ -33,7 +33,7 @@ import de.matthiasmann.twl.Widget;
  */
 public abstract class AbstractGraphicsModule implements GraphicsModule {
 
-    private final Map<String, Object> values = new HashMap<String, Object>();
+    private final Map<String, Object> values = new HashMap<>();
 
     /**
      * Calculates the x value that is described by the given relative percent amount between {@code 0} and {@code 1}.

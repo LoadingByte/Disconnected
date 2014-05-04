@@ -51,9 +51,7 @@ public class ProfileSerializer {
      */
     public static void serializeProfile(OutputStream outputStream, Profile profile) throws ProfileSerializationException {
 
-        ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
-
-        try {
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
             zipOutputStream.putNextEntry(new ZipEntry("world.xml"));
             serializeWorld(zipOutputStream, profile.getWorld());
             zipOutputStream.closeEntry();
@@ -63,12 +61,6 @@ public class ProfileSerializer {
             zipOutputStream.closeEntry();
         } catch (Exception e) {
             throw new ProfileSerializationException(e, profile);
-        } finally {
-            try {
-                zipOutputStream.close();
-            } catch (IOException e) {
-                // Ignore
-            }
         }
     }
 
@@ -85,8 +77,7 @@ public class ProfileSerializer {
         World world = null;
         RandomPool random = null;
 
-        ZipInputStream zipInputStream = new ZipInputStream(inputStream);
-        try {
+        try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
             ZipEntry zipEntry = null;
             while ( (zipEntry = zipInputStream.getNextEntry()) != null) {
                 if (zipEntry.getName().equals("world.xml")) {
@@ -97,12 +88,6 @@ public class ProfileSerializer {
             }
         } catch (Exception e) {
             throw new ProfileSerializationException(e, target);
-        } finally {
-            try {
-                zipInputStream.close();
-            } catch (IOException e) {
-                // Ignore
-            }
         }
 
         if (world == null || random == null) {

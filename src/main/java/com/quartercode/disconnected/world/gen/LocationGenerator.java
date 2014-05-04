@@ -61,13 +61,13 @@ public class LocationGenerator {
         BufferedImage map = (BufferedImage) ResourceStore.get("map.png");
 
         if (ignore == null) {
-            ignore = new ArrayList<Location>();
+            ignore = new ArrayList<>();
         }
 
         int width = map.getWidth();
         int height = map.getHeight();
 
-        List<Location> result = new ArrayList<Location>();
+        List<Location> result = new ArrayList<>();
         int blackRGB = Color.BLACK.getRGB();
         while (result.size() < amount) {
             int x = random.nextInt(width);

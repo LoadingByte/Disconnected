@@ -34,7 +34,7 @@ public class ValueInjector {
 
     private static final Logger       LOGGER = LoggerFactory.getLogger(ValueInjector.class);
 
-    private final Map<String, Object> values = new HashMap<String, Object>();
+    private final Map<String, Object> values = new HashMap<>();
 
     /**
      * Creates a new empty value injector.

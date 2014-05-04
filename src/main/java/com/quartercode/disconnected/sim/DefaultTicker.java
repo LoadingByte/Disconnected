@@ -36,7 +36,7 @@ public class DefaultTicker implements Ticker {
     private static final Logger    LOGGER              = LoggerFactory.getLogger(DefaultTicker.class);
 
     private TickThread             thread;
-    private final List<TickAction> actions             = new ArrayList<TickAction>();
+    private final List<TickAction> actions             = new ArrayList<>();
     private int                    delay               = DEFAULT_DELAY;
 
     // Performance: Object cache

@@ -40,7 +40,7 @@ public class GraphicsStateDescriptor {
     private static final Logger                                                   LOGGER  = LoggerFactory.getLogger(GraphicsStateDescriptor.class);
 
     private final String                                                          name;
-    private final Map<Class<? extends GraphicsModule>, GraphicsModuleInformation> modules = new HashMap<Class<? extends GraphicsModule>, GraphicsModuleInformation>();
+    private final Map<Class<? extends GraphicsModule>, GraphicsModuleInformation> modules = new HashMap<>();
 
     /**
      * Creates a new graphics state descriptor that produces {@link GraphicsState} with the given name.
@@ -110,7 +110,7 @@ public class GraphicsStateDescriptor {
 
         LOGGER.info("Creating instance of graphics state '{}'", name);
 
-        List<GraphicsModule> moduleObjects = new ArrayList<GraphicsModule>();
+        List<GraphicsModule> moduleObjects = new ArrayList<>();
         // Create module objects
         for (Class<? extends GraphicsModule> moduleClass : modules.keySet()) {
             try {
@@ -135,7 +135,7 @@ public class GraphicsStateDescriptor {
         });
 
         // Associate names with modules and create map
-        Map<String, GraphicsModule> moduleMap = new LinkedHashMap<String, GraphicsModule>();
+        Map<String, GraphicsModule> moduleMap = new LinkedHashMap<>();
         for (GraphicsModule module : moduleObjects) {
             moduleMap.put(modules.get(module.getClass()).getName(), module);
         }

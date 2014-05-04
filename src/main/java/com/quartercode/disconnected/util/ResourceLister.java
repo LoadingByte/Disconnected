@@ -45,7 +45,7 @@ public class ResourceLister {
     public static List<String> getResources(String path, boolean directories) throws IOException {
 
         if (path.startsWith("/")) {
-            List<String> resources = new ArrayList<String>();
+            List<String> resources = new ArrayList<>();
 
             for (String entry : System.getProperty("java.class.path", ".").split(System.getProperty("path.separator"))) {
                 File file = new File(entry);
@@ -68,7 +68,7 @@ public class ResourceLister {
 
     private static List<String> getResourcesFromDirectory(File classpathEntry, File directory, String path, boolean directories) {
 
-        List<String> resources = new ArrayList<String>();
+        List<String> resources = new ArrayList<>();
 
         for (File file : directory.listFiles()) {
             if (!file.isDirectory() || directories) {
@@ -88,11 +88,9 @@ public class ResourceLister {
 
     private static List<String> getResourcesFromJar(File file, String path, boolean directories) throws IOException {
 
-        List<String> resources = new ArrayList<String>();
+        List<String> resources = new ArrayList<>();
 
-        ZipFile zipFile = null;
-        try {
-            zipFile = new ZipFile(file);
+        try (ZipFile zipFile = new ZipFile(file)) {
             Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
             while (enumeration.hasMoreElements()) {
                 ZipEntry entry = enumeration.nextElement();
@@ -103,10 +101,6 @@ public class ResourceLister {
                         resources.add(fileName);
                     }
                 }
-            }
-        } finally {
-            if (zipFile != null) {
-                zipFile.close();
             }
         }
 

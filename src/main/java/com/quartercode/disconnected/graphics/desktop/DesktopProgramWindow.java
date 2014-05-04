@@ -39,7 +39,7 @@ public class DesktopProgramWindow extends DesktopWindow {
     private final DesktopProgramWorldContext worldContext;
     private final MultiactionButton          taskbarButton;
 
-    private final List<DesktopWindow>        openPopups = new ArrayList<DesktopWindow>();
+    private final List<DesktopWindow>        openPopups = new ArrayList<>();
 
     /**
      * Creates a new desktop program window in the given desktop {@link GraphicsState}.

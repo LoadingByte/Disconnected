@@ -128,7 +128,7 @@ public class QueueEventListener extends DefaultFeatureHolder implements EventLis
                 FeatureHolder holder = invocation.getHolder();
                 EventMatcher matcher = (EventMatcher) arguments[0];
 
-                Queue<Event> clone = new LinkedList<Event>(holder.get(EVENTS).get());
+                Queue<Event> clone = new LinkedList<>(holder.get(EVENTS).get());
                 Event nextEvent = null;
                 while (!clone.isEmpty()) {
                     Event current = clone.poll();

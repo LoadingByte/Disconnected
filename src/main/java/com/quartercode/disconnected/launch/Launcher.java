@@ -171,7 +171,7 @@ public class Launcher {
         try {
             File file = new File(Launcher.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 
-            List<String> command = new ArrayList<String>();
+            List<String> command = new ArrayList<>();
             command.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
             LOGGER.info("Java Binary: '{}'", command.get(0));
             if (vmArguments != null && vmArguments.length > 0) {

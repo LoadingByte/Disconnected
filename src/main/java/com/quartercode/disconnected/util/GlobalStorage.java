@@ -45,7 +45,7 @@ import org.apache.commons.lang3.reflect.TypeUtils;
  */
 public class GlobalStorage {
 
-    private static Map<String, List<Object>> storage = new HashMap<String, List<Object>>();
+    private static Map<String, List<Object>> storage = new HashMap<>();
 
     /**
      * Returns all objects that are stored in the given category that are instances of the given type.
@@ -56,7 +56,7 @@ public class GlobalStorage {
      */
     public static <T> List<T> get(String category, Class<T> type) {
 
-        List<T> requestedObjects = new ArrayList<T>();
+        List<T> requestedObjects = new ArrayList<>();
 
         if (storage.containsKey(category)) {
             for (Object storedObject : storage.get(category)) {
@@ -83,7 +83,7 @@ public class GlobalStorage {
         Validate.notNull(storage, "Cannot put null objects into storage");
 
         if (!storage.containsKey(category)) {
-            storage.put(category, new ArrayList<Object>());
+            storage.put(category, new ArrayList<>());
         }
 
         storage.get(category).add(object);

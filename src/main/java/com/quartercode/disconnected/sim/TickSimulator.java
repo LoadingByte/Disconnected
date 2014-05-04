@@ -55,7 +55,7 @@ public class TickSimulator implements TickAction {
      */
     public void setWorld(World world) {
 
-        this.world = world == null ? null : new WeakReference<World>(world);
+        this.world = world == null ? null : new WeakReference<>(world);
     }
 
     /**

@@ -30,7 +30,7 @@ import java.util.Set;
  */
 public class DesktopPrograms {
 
-    private static Set<DesktopProgramDescriptor> descriptors = new HashSet<DesktopProgramDescriptor>();
+    private static Set<DesktopProgramDescriptor> descriptors = new HashSet<>();
 
     /**
      * Retunrs all the {@link DesktopProgramDescriptor}s that are registered so far.
