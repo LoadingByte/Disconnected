@@ -18,11 +18,13 @@
 
 package com.quartercode.disconnected.graphics;
 
+import com.quartercode.disconnected.util.RunnableInvocationProvider;
+
 /**
  * This service is the main manager of the graphics system.
  * The manager can create or destroy the lwjgl context and keeps track of all important twl internals.
  */
-public interface GraphicsManager {
+public interface GraphicsManager extends RunnableInvocationProvider {
 
     /**
      * Returns whether the graphics manager is currently running.
@@ -60,6 +62,7 @@ public interface GraphicsManager {
      * 
      * @param runnable The runnable to invoke in the graphics update thread.
      */
+    @Override
     public void invoke(Runnable runnable);
 
 }
