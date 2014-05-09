@@ -35,11 +35,11 @@ import de.matthiasmann.twl.Widget;
  */
 public class DesktopProgramWindow extends DesktopWindow {
 
-    private final DesktopProgramDescriptor   descriptor;
-    private final DesktopProgramWorldContext worldContext;
-    private final MultiactionButton          taskbarButton;
+    private final DesktopProgramDescriptor descriptor;
+    private final DesktopProgramContext    context;
+    private final MultiactionButton        taskbarButton;
 
-    private final List<DesktopWindow>        openPopups = new ArrayList<>();
+    private final List<DesktopWindow>      openPopups = new ArrayList<>();
 
     /**
      * Creates a new desktop program window in the given desktop {@link GraphicsState}.
@@ -48,14 +48,14 @@ public class DesktopProgramWindow extends DesktopWindow {
      * 
      * @param state The desktop state the new program will be running in.
      * @param descriptor The program descriptor that created the object.
-     * @param worldContext The {@link DesktopProgramWorldContext} that contains information about the environment of the program.
+     * @param context The {@link DesktopProgramContext} that contains information about the environment of the program.
      */
-    public DesktopProgramWindow(GraphicsState state, DesktopProgramDescriptor descriptor, DesktopProgramWorldContext worldContext) {
+    public DesktopProgramWindow(GraphicsState state, DesktopProgramDescriptor descriptor, DesktopProgramContext context) {
 
         super(state);
 
         this.descriptor = descriptor;
-        this.worldContext = worldContext;
+        this.context = context;
 
         new DesktopWindowCenteringMediator(this);
         setTitle(descriptor.getName());
@@ -97,13 +97,13 @@ public class DesktopProgramWindow extends DesktopWindow {
     }
 
     /**
-     * Returns a {@link DesktopProgramWorldContext} which contains information about the environment of the program.
+     * Returns a {@link DesktopProgramContext} which contains information about the environment of the program.
      * 
-     * @return The {@link DesktopProgramWorldContext} which is assigned to the program.
+     * @return The {@link DesktopProgramContext} which is assigned to the program.
      */
-    public DesktopProgramWorldContext getWorldContext() {
+    public DesktopProgramContext getContext() {
 
-        return worldContext;
+        return context;
     }
 
     @Override

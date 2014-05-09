@@ -23,7 +23,7 @@ import com.quartercode.disconnected.util.ResourceBundleGroup;
 
 /**
  * A desktop program descriptor declares some generic data of a desktop program and allows to create new instances.
- * The class should be inherited for each desktop program in order to make the {@link #create(GraphicsState, DesktopProgramWorldContext)} method type-safe.<br>
+ * The class should be inherited for each desktop program in order to make the {@link #create(GraphicsState, DesktopProgramContext)} method type-safe.<br>
  * <br>
  * Desktop programs are programs that only have a gui and don't run as a process. They only support the ui.
  * However, such programs create normal processes in order to execute operations.
@@ -76,9 +76,9 @@ public abstract class DesktopProgramDescriptor {
      * It should be implemented by every desktop program for keeping type-safety.
      * 
      * @param state The {@link GraphicsState} the created {@link DesktopProgramWindow} is running in.
-     * @param worldContext The {@link DesktopProgramWorldContext} that contains information about the environment of the program.
+     * @param context The {@link DesktopProgramContext} that contains information about the environment of the program.
      * @return The new instance of the described program as a {@link DesktopProgramWindow}.
      */
-    public abstract DesktopProgramWindow create(GraphicsState state, DesktopProgramWorldContext worldContext);
+    public abstract DesktopProgramWindow create(GraphicsState state, DesktopProgramContext context);
 
 }
