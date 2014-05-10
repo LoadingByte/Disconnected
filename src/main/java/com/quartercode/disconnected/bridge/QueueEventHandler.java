@@ -145,24 +145,13 @@ public class QueueEventHandler<T extends Event> extends AbstractEventHandler<T> 
 
         while (!clone.isEmpty()) {
             T currentEvent = clone.poll();
-            if (tryTest(matcher, currentEvent)) {
+            if (EventUtils.tryTest(matcher, currentEvent)) {
                 events.remove(currentEvent);
                 return currentEvent;
             }
         }
 
         return null;
-    }
-
-    private <E extends Event> boolean tryTest(EventPredicate<E> predicate, Event event) {
-
-        try {
-            @SuppressWarnings ("unchecked")
-            E castedEvent = (E) event;
-            return predicate.test(castedEvent);
-        } catch (ClassCastException e) {
-            return false;
-        }
     }
 
 }
