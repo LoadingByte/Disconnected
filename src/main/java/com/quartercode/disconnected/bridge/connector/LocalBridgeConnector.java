@@ -23,40 +23,29 @@ import com.quartercode.disconnected.bridge.Bridge;
 import com.quartercode.disconnected.bridge.BridgeConnector;
 import com.quartercode.disconnected.bridge.BridgeConnectorException;
 import com.quartercode.disconnected.bridge.Event;
-import com.quartercode.disconnected.util.RunnableInvocationProvider;
 
 /**
  * The local bridge connector is a simple {@link BridgeConnector} that connects two {@link Bridge}s that run on the same vm.
- * It also allows the event handlers of a bridge to be called by certain {@link RunnableInvocationProvider}s.
  * 
  * @see BridgeConnector
  */
 public class LocalBridgeConnector extends AbstractBridgeConnector {
 
-    private Bridge                     remote;
-    private RunnableInvocationProvider localInvocProvider;
-    private RunnableInvocationProvider remoteInvocProvider;
-
-    private LocalBridgeConnector       remoteConnector;
+    private Bridge               remote;
+    private LocalBridgeConnector remoteConnector;
 
     /**
      * Creates a new local bridge connector that connects to the given remote {@link Bridge}.
-     * Also sets the {@link RunnableInvocationProvider} the event handlers of the bridges are called by.
      * 
      * @param remote The second {@link Bridge} the local bridge connector connects to.
-     * @param localInvocProvider The runnable invocation provider that executes the event handler calls of all received events.
-     * @param remoteInvocProvider The runnable invocation provider that executes the event handler calls of all sent events.
      */
-    public LocalBridgeConnector(Bridge remote, RunnableInvocationProvider localInvocProvider, RunnableInvocationProvider remoteInvocProvider) {
+    public LocalBridgeConnector(Bridge remote) {
 
         this.remote = remote;
-        this.localInvocProvider = localInvocProvider;
-        this.remoteInvocProvider = remoteInvocProvider;
     }
 
-    private LocalBridgeConnector(RunnableInvocationProvider localInvocProvider, LocalBridgeConnector remoteConnector) {
+    private LocalBridgeConnector(LocalBridgeConnector remoteConnector) {
 
-        this.localInvocProvider = localInvocProvider;
         this.remoteConnector = remoteConnector;
     }
 
@@ -66,8 +55,8 @@ public class LocalBridgeConnector extends AbstractBridgeConnector {
         super.start(localBridge);
 
         // Connect the remote bridge with the local bridge (add reverse connection)
-        if (remote != null && remoteInvocProvider != null) {
-            remoteConnector = new LocalBridgeConnector(remoteInvocProvider, this);
+        if (remote != null) {
+            remoteConnector = new LocalBridgeConnector(this);
             remote.connect(remoteConnector);
         }
     }
@@ -78,13 +67,11 @@ public class LocalBridgeConnector extends AbstractBridgeConnector {
         super.stop();
 
         // Disconnect the remote bridge from the local bridge (remove reverse connection)
-        if (remote != null && remoteInvocProvider != null) {
+        if (remote != null) {
             remote.disconnect(remoteConnector);
         }
 
         remote = null;
-        localInvocProvider = null;
-        remoteInvocProvider = null;
         remoteConnector = null;
     }
 
@@ -94,17 +81,9 @@ public class LocalBridgeConnector extends AbstractBridgeConnector {
         remoteConnector.handle(event);
     }
 
-    private void handle(final Event event) {
+    private void handle(Event event) {
 
-        localInvocProvider.invoke(new Runnable() {
-
-            @Override
-            public void run() {
-
-                getLocalBridge().handle(LocalBridgeConnector.this, event);
-            }
-
-        });
+        getLocalBridge().handle(this, event);
     }
 
 }

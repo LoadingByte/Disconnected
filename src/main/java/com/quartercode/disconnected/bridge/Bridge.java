@@ -23,8 +23,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.quartercode.disconnected.util.RunnableInvocationProvider;
 
 /**
  * Bridges allow to connect two parts of an application without specifying the way of transport between multiple bridges.
@@ -50,6 +52,7 @@ public class Bridge {
     private static final Logger                                 LOGGER                    = LoggerFactory.getLogger(Bridge.class);
 
     private final List<EventHandler<?>>                         handlers                  = new ArrayList<>();
+    private RunnableInvocationProvider                          handlerInvoker;
     private final List<BridgeConnector>                         connections               = new ArrayList<>();
 
     private final Map<BridgeConnector, List<EventPredicate<?>>> remoteAcceptionPredicates = new HashMap<>();
@@ -59,6 +62,8 @@ public class Bridge {
      */
     public Bridge() {
 
+        // Set the default handler invoker
+        setHandlerInvoker(null);
     }
 
     // ----- Handlers -----
@@ -101,6 +106,42 @@ public class Bridge {
 
         // Remove handler's acception predicate from remote bridge
         send(new AddRemovePredicateEvent(handler.getPredicate(), false));
+    }
+
+    /**
+     * Returns the current {@link RunnableInvocationProvider} which invokes all event handler calls.
+     * For example, the mechanism could be used to invoke all handlers in a specific thread.
+     * 
+     * @return The current handler invoker.
+     */
+    public RunnableInvocationProvider getHandlerInvoker() {
+
+        return handlerInvoker;
+    }
+
+    /**
+     * Changes the {@link RunnableInvocationProvider} which invokes all event handler calls.
+     * If a {@code null} value is provided, a default invoker, which directly executes all handlers, is used.
+     * For example, the mechanism could be used to invoke all handlers in a specific thread.
+     * 
+     * @param handlerInvoker The new handler invoker.
+     */
+    public void setHandlerInvoker(RunnableInvocationProvider handlerInvoker) {
+
+        if (handlerInvoker == null) {
+            // If the provided value is null, set the handler invoker to one that just invokes the handler calls
+            this.handlerInvoker = new RunnableInvocationProvider() {
+
+                @Override
+                public void invoke(Runnable runnable) {
+
+                    runnable.run();
+                }
+
+            };
+        } else {
+            this.handlerInvoker = handlerInvoker;
+        }
     }
 
     // ----- Connections -----
@@ -232,8 +273,22 @@ public class Bridge {
         try {
             @SuppressWarnings ("unchecked")
             T castedEvent = (T) event;
-            handler.handle(castedEvent);
+            handlerInvoker.invoke(new HandlerInvocationRunnable<>(handler, castedEvent));
         } catch (ClassCastException e) {}
+    }
+
+    @RequiredArgsConstructor
+    private static class HandlerInvocationRunnable<T extends Event> implements Runnable {
+
+        private final EventHandler<T> handler;
+        private final T               event;
+
+        @Override
+        public void run() {
+
+            handler.handle(event);
+        }
+
     }
 
 }

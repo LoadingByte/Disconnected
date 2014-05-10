@@ -30,7 +30,6 @@ import com.quartercode.disconnected.bridge.BridgeConnectorException;
 import com.quartercode.disconnected.bridge.Event;
 import com.quartercode.disconnected.bridge.connector.LocalBridgeConnector;
 import com.quartercode.disconnected.bridge.predicate.TruePredicate;
-import com.quartercode.disconnected.util.RunnableInvocationProvider;
 
 public class LocalBridgeConnectorTest {
 
@@ -70,16 +69,7 @@ public class LocalBridgeConnectorTest {
     @Test
     public void test() throws BridgeConnectorException {
 
-        RunnableInvocationProvider invocProvider = new RunnableInvocationProvider() {
-
-            @Override
-            public void invoke(Runnable runnable) {
-
-                runnable.run();
-            }
-
-        };
-        LocalBridgeConnector connector = new LocalBridgeConnector(remote, invocProvider, invocProvider);
+        LocalBridgeConnector connector = new LocalBridgeConnector(remote);
         local.connect(connector);
 
         List<TestEvent> localToRemoteEvents = new ArrayList<>(Arrays.asList(new TestEvent(), new TestEvent(), new TestEvent()));
