@@ -30,9 +30,9 @@ import com.quartercode.disconnected.bridge.EventPredicate;
 @Data
 public class TypePredicate<T extends Event> implements EventPredicate<T> {
 
-    private static final long serialVersionUID = 8225740116869401804L;
+    private static final long        serialVersionUID = 8225740116869401804L;
 
-    private final Class<T>    type;
+    private final Class<? extends T> type;
 
     @Override
     public boolean test(T event) {

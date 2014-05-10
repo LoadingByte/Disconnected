@@ -66,8 +66,7 @@ public class TypePredicateTest {
     @Test
     public void testMatches() {
 
-        @SuppressWarnings ("unchecked")
-        TypePredicate<Event> predicate = (TypePredicate<Event>) new TypePredicate<>(type);
+        TypePredicate<Event> predicate = new TypePredicate<>(type);
         Assert.assertEquals("Result for event of type " + event.getClass().getName() + " and matching type " + type.getName(), result, predicate.test(event));
     }
 
