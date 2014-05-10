@@ -45,7 +45,47 @@ public class BridgeTest {
     }
 
     @Test
-    public void testSend() throws BridgeConnectorException {
+    public void testSendToLocalHandler() {
+
+        final List<Event1> handler1Calls = new ArrayList<>();
+        bridge.addHandler(new AbstractEventHandler<Event1>(new TruePredicate<Event1>()) {
+
+            @Override
+            public void handle(Event1 event) {
+
+                handler1Calls.add(event);
+            }
+
+        });
+
+        final List<Event2> handler2Calls = new ArrayList<>();
+        bridge.addHandler(new AbstractEventHandler<Event2>(new TruePredicate<Event2>()) {
+
+            @Override
+            public void handle(Event2 event) {
+
+                handler2Calls.add(event);
+            }
+
+        });
+
+        Event event1 = new Event1();
+        Event event2 = new Event2();
+        Event event3 = new Event2();
+        Event event4 = new Event1();
+        Event event5 = new Event2();
+        bridge.send(event1);
+        bridge.send(event2);
+        bridge.send(event3);
+        bridge.send(event4);
+        bridge.send(event5);
+
+        Assert.assertEquals("Events that were handled by handler 1", new ArrayList<>(Arrays.asList(event1, event4)), handler1Calls);
+        Assert.assertEquals("Events that were handled by handler 2", new ArrayList<>(Arrays.asList(event2, event3, event5)), handler2Calls);
+    }
+
+    @Test
+    public void testSendToConnector() throws BridgeConnectorException {
 
         final List<Event> connectorCalls = new ArrayList<>();
         BridgeConnector connector = new AbstractBridgeConnector() {
@@ -72,7 +112,7 @@ public class BridgeTest {
 
     @SuppressWarnings ("serial")
     @Test
-    public void testSendWithPredicate() throws BridgeConnectorException {
+    public void testSendToConnectorWithPredicate() throws BridgeConnectorException {
 
         final List<Event> connectorCalls = new ArrayList<>();
         BridgeConnector connector = new AbstractBridgeConnector() {

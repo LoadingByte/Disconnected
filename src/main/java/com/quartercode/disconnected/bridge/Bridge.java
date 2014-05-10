@@ -31,7 +31,8 @@ import com.quartercode.disconnected.util.RunnableInvocationProvider;
 /**
  * Bridges allow to connect two parts of an application without specifying the way of transport between multiple bridges.
  * Generally, bridges communicate with {@link Event}s that are sent between the bridges.
- * Events are sent by the first bridge, received by the second bridge and finally processed by some {@link EventHandler}s.<br>
+ * Events are sent by the first bridge, received by the second bridge and finally processed by some {@link EventHandler}s.
+ * However, events can also be sent to one bridge which then hands them over to its local handlers.<br>
  * <br>
  * Bridges use the concept of {@link EventPredicate}s:
  * Since every event handler supplies such a predicate, they can be used to determine whether an event should be sent between some bridges.
@@ -198,13 +199,18 @@ public class Bridge {
     // ----- Events -----
 
     /**
-     * Sends the given {@link Event} to all connected bridges which have an {@link EventHandler} whose predicate allows the event.
-     * If no connected bridge is interested, this method does nothing.
+     * Sends the given {@link Event} to all interested local handlers, as well as to all connected bridges which have an {@link EventHandler} whose
+     * predicate allows the event.
+     * If no local handler or connected bridge is interested, this method does nothing.
      * 
      * @param event The event that should be tried to send to any interested connected bridge.
      */
     public void send(Event event) {
 
+        // Local handlers
+        handle(event);
+
+        // Connected bridges
         for (BridgeConnector connection : connections) {
             // Check whether the connected bridge is interested in the event
             if (isInteresting(connection, event)) {
@@ -214,28 +220,6 @@ public class Bridge {
                     LOGGER.error("Can't send event '" + event + "' through bridge connector", e);
                 }
             }
-        }
-    }
-
-    private boolean isInteresting(BridgeConnector connection, Event event) {
-
-        for (EventPredicate<? extends Event> predicate : remoteAcceptionPredicates.get(connection)) {
-            if (tryTest(predicate, event)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private <T extends Event> boolean tryTest(EventPredicate<T> predicate, Event event) {
-
-        try {
-            @SuppressWarnings ("unchecked")
-            T castedEvent = (T) event;
-            return predicate.test(castedEvent);
-        } catch (ClassCastException e) {
-            return false;
         }
     }
 
@@ -250,6 +234,7 @@ public class Bridge {
      */
     public void handle(BridgeConnector connection, Event event) {
 
+        // Internal AddRemovePredicateEvent
         if (event instanceof AddRemovePredicateEvent) {
             AddRemovePredicateEvent predicateEvent = (AddRemovePredicateEvent) event;
             EventPredicate<?> predicate = predicateEvent.getPredicate();
@@ -261,32 +246,41 @@ public class Bridge {
             return;
         }
 
+        // Local handlers
+        handle(event);
+    }
+
+    private boolean isInteresting(BridgeConnector connection, Event event) {
+
+        for (EventPredicate<? extends Event> predicate : remoteAcceptionPredicates.get(connection)) {
+            if (EventUtils.tryTest(predicate, event)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void handle(Event event) {
+
         for (EventHandler<?> handler : handlers) {
-            if (tryTest(handler.getPredicate(), event)) {
-                tryHandle(handler, event);
+            // Do the test here in order to avoid thousands of useless handler invoker calls
+            if (EventUtils.tryTest(handler.getPredicate(), event)) {
+                handlerInvoker.invoke(new HandlerInvocationRunnable(handler, event));
             }
         }
     }
 
-    private <T extends Event> void tryHandle(EventHandler<T> handler, Event event) {
-
-        try {
-            @SuppressWarnings ("unchecked")
-            T castedEvent = (T) event;
-            handlerInvoker.invoke(new HandlerInvocationRunnable<>(handler, castedEvent));
-        } catch (ClassCastException e) {}
-    }
-
     @RequiredArgsConstructor
-    private static class HandlerInvocationRunnable<T extends Event> implements Runnable {
+    private static class HandlerInvocationRunnable implements Runnable {
 
-        private final EventHandler<T> handler;
-        private final T               event;
+        private final EventHandler<?> handler;
+        private final Event           event;
 
         @Override
         public void run() {
 
-            handler.handle(event);
+            EventUtils.tryHandle(handler, event, false);
         }
 
     }
