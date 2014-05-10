@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.graphics;
 
+import com.quartercode.disconnected.bridge.Bridge;
 import com.quartercode.disconnected.util.RunnableInvocationProvider;
 
 /**
@@ -56,6 +57,14 @@ public interface GraphicsManager extends RunnableInvocationProvider {
      * @param state The new active graphics state.
      */
     public void setState(GraphicsState state);
+
+    /**
+     * Returns the {@link Bridge} that is used by the graphics manager.
+     * It should also be used for sending events by anything related to graphics.
+     * 
+     * @return The client graphics bridge.
+     */
+    public Bridge getBridge();
 
     /**
      * Invokes the given {@link Runnable} in the graphics update thread.

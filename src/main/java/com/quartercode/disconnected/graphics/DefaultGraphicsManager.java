@@ -20,6 +20,7 @@ package com.quartercode.disconnected.graphics;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.quartercode.disconnected.bridge.Bridge;
 
 /**
  * This is the default implementation of the {@link GraphicsManager} service.
@@ -32,12 +33,14 @@ public class DefaultGraphicsManager implements GraphicsManager {
 
     private GraphicsThread      thread;
     private GraphicsState       state;
+    private final Bridge        bridge = new Bridge();
 
     /**
      * Creates a new default graphics manager.
      */
     public DefaultGraphicsManager() {
 
+        bridge.setHandlerInvoker(this);
     }
 
     @Override
@@ -75,6 +78,12 @@ public class DefaultGraphicsManager implements GraphicsManager {
         if (thread != null) {
             thread.changeState(state);
         }
+    }
+
+    @Override
+    public Bridge getBridge() {
+
+        return bridge;
     }
 
     @Override

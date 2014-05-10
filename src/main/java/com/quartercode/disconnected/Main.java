@@ -47,7 +47,7 @@ import com.quartercode.disconnected.sim.DefaultTicker;
 import com.quartercode.disconnected.sim.Profile;
 import com.quartercode.disconnected.sim.ProfileManager;
 import com.quartercode.disconnected.sim.ProfileSerializationException;
-import com.quartercode.disconnected.sim.TickRunnableInvoker;
+import com.quartercode.disconnected.sim.TickBridgeProvider;
 import com.quartercode.disconnected.sim.TickSimulator;
 import com.quartercode.disconnected.sim.Ticker;
 import com.quartercode.disconnected.util.ApplicationInfo;
@@ -168,7 +168,7 @@ public class Main {
         LOGGER.info("Initializing ticker");
         Ticker ticker = new DefaultTicker();
         ServiceRegistry.register(Ticker.class, ticker);
-        ticker.addAction(new TickRunnableInvoker());
+        ticker.addAction(new TickBridgeProvider());
         ticker.addAction(new TickSimulator());
 
         // Initialize graphics manager and start it
