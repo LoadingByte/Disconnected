@@ -18,6 +18,8 @@
 
 package com.quartercode.disconnected.bridge;
 
+import com.quartercode.disconnected.bridge.predicate.TypePredicate;
+
 /**
  * The abstract event handler class hides some boilerplate code every {@link EventHandler} must implement.
  * It basically provides an implementation for the {@link #getPredicate()} method by requesting the predicate on construction.
@@ -28,6 +30,17 @@ package com.quartercode.disconnected.bridge;
 public abstract class AbstractEventHandler<T extends Event> implements EventHandler<T> {
 
     private final EventPredicate<T> predicate;
+
+    /**
+     * Creates a new abstract event handler and uses a {@link TypePredicate} with the given event type.
+     * The event type must equal the generic type parameter of the new event handler.
+     * 
+     * @param eventType The type of events the new handler can handle.
+     */
+    public AbstractEventHandler(Class<T> eventType) {
+
+        this(new TypePredicate<>(eventType));
+    }
 
     /**
      * Creates a new abstract event handler and sets the {@link EventPredicate} that the {@link #getPredicate()} method always returns.
