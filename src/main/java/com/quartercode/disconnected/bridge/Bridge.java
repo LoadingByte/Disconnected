@@ -52,6 +52,9 @@ public class Bridge {
 
     private static final Logger                                 LOGGER                    = LoggerFactory.getLogger(Bridge.class);
 
+    private final long                                          bridgeId;
+    private long                                                nextLocalId;
+
     private final List<EventHandler<?>>                         handlers                  = new ArrayList<>();
     private RunnableInvocationProvider                          handlerInvoker;
     private final List<BridgeConnector>                         connections               = new ArrayList<>();
@@ -63,8 +66,26 @@ public class Bridge {
      */
     public Bridge() {
 
+        // TODO: Generate certainly unique bridge id
+        bridgeId = System.currentTimeMillis();
+
         // Set the default handler invoker
         setHandlerInvoker(null);
+    }
+
+    // ----- ID System -----
+
+    /**
+     * Requests a new identifier string that is unique over this and all connected bridges.
+     * That means that a call of this message on any connected bridge won't return the same result again.
+     * 
+     * @return A new unique identifier.
+     */
+    public String nextId() {
+
+        String id = new StringBuilder().append(bridgeId).append('/').append(nextLocalId).toString();
+        nextLocalId++;
+        return id;
     }
 
     // ----- Handlers -----
