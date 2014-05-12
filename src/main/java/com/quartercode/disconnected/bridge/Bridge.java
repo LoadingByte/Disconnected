@@ -229,7 +229,9 @@ public class Bridge {
     public void send(Event event) {
 
         // Local handlers
-        handle(event);
+        if (! (event instanceof AddRemovePredicateEvent)) {
+            handle(event);
+        }
 
         // Connected bridges
         for (BridgeConnector connection : connections) {
