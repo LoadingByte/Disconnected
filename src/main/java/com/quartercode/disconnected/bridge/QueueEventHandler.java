@@ -20,6 +20,7 @@ package com.quartercode.disconnected.bridge;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import com.quartercode.disconnected.bridge.predicate.TypePredicate;
 
 /**
  * A queue event handler stores received {@link Event}s in a queue in order to make them accessible at a later time.
@@ -33,6 +34,17 @@ import java.util.Queue;
 public class QueueEventHandler<T extends Event> extends AbstractEventHandler<T> {
 
     private final Queue<T> events = new LinkedList<>();
+
+    /**
+     * Creates a new queue event handler and uses a {@link TypePredicate} with the given event type.
+     * The event type must equal the generic type parameter of the new queue event handler.
+     * 
+     * @param eventType The type of events the new queue event handler can handle.
+     */
+    public QueueEventHandler(Class<T> eventType) {
+
+        super(eventType);
+    }
 
     /**
      * Creates a new queue event handler and sets the {@link EventPredicate} that the {@link #getPredicate()} method always returns.
