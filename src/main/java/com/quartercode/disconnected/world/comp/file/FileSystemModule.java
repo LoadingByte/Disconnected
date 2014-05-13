@@ -29,13 +29,13 @@ import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.DefaultChildFeatureHolder;
 import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.classmod.extra.def.ReferenceProperty;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.world.comp.os.OSModule;
@@ -376,7 +376,7 @@ public class FileSystemModule extends OSModule {
      * 
      * @see FileSystem
      */
-    public static class KnownFileSystem extends DefaultChildFeatureHolder<FileSystemModule> {
+    public static class KnownFileSystem extends WorldChildFeatureHolder<FileSystemModule> {
 
         // ----- Properties -----
 

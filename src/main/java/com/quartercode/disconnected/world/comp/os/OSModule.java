@@ -19,8 +19,8 @@
 package com.quartercode.disconnected.world.comp.os;
 
 import com.quartercode.classmod.extra.FunctionDefinition;
-import com.quartercode.classmod.extra.def.DefaultChildFeatureHolder;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 
 /**
  * The base class for all {@link OperatingSystem} modules.
@@ -30,7 +30,7 @@ import com.quartercode.classmod.util.FunctionDefinitionFactory;
  * @see OSModule#SET_RUNNING
  * @see OperatingSystem
  */
-public abstract class OSModule extends DefaultChildFeatureHolder<OperatingSystem> {
+public abstract class OSModule extends WorldChildFeatureHolder<OperatingSystem> {
 
     // ----- Functions -----
 
