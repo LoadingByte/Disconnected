@@ -29,15 +29,14 @@ import com.quartercode.disconnected.bridge.Bridge;
 import com.quartercode.disconnected.bridge.BridgeConnectorException;
 import com.quartercode.disconnected.bridge.Event;
 import com.quartercode.disconnected.bridge.connector.LocalBridgeConnector;
-import com.quartercode.disconnected.bridge.predicate.TruePredicate;
 
 public class LocalBridgeConnectorTest {
 
-    private Bridge                local;
-    private Bridge                remote;
+    private Bridge                 local;
+    private Bridge                 remote;
 
-    private final List<TestEvent> localHandlerCalls  = new ArrayList<>();
-    private final List<TestEvent> remoteHandlerCalls = new ArrayList<>();
+    private final List<TestEvent2> localHandlerCalls  = new ArrayList<>();
+    private final List<TestEvent1> remoteHandlerCalls = new ArrayList<>();
 
     @Before
     public void setUp() {
@@ -45,20 +44,20 @@ public class LocalBridgeConnectorTest {
         local = new Bridge();
         remote = new Bridge();
 
-        local.addHandler(new AbstractEventHandler<TestEvent>(new TruePredicate<TestEvent>()) {
+        local.addHandler(new AbstractEventHandler<TestEvent2>(TestEvent2.class) {
 
             @Override
-            public void handle(TestEvent event) {
+            public void handle(TestEvent2 event) {
 
                 localHandlerCalls.add(event);
             }
 
         });
 
-        remote.addHandler(new AbstractEventHandler<TestEvent>(new TruePredicate<TestEvent>()) {
+        remote.addHandler(new AbstractEventHandler<TestEvent1>(TestEvent1.class) {
 
             @Override
-            public void handle(TestEvent event) {
+            public void handle(TestEvent1 event) {
 
                 remoteHandlerCalls.add(event);
             }
@@ -72,13 +71,13 @@ public class LocalBridgeConnectorTest {
         LocalBridgeConnector connector = new LocalBridgeConnector(remote);
         local.connect(connector);
 
-        List<TestEvent> localToRemoteEvents = new ArrayList<>(Arrays.asList(new TestEvent(), new TestEvent(), new TestEvent()));
-        List<TestEvent> remoteToLocalEvents = new ArrayList<>(Arrays.asList(new TestEvent(), new TestEvent(), new TestEvent()));
+        List<TestEvent1> localToRemoteEvents = new ArrayList<>(Arrays.asList(new TestEvent1(), new TestEvent1(), new TestEvent1()));
+        List<TestEvent2> remoteToLocalEvents = new ArrayList<>(Arrays.asList(new TestEvent2(), new TestEvent2(), new TestEvent2()));
 
-        for (TestEvent event : localToRemoteEvents) {
+        for (TestEvent1 event : localToRemoteEvents) {
             local.send(event);
         }
-        for (TestEvent event : remoteToLocalEvents) {
+        for (TestEvent2 event : remoteToLocalEvents) {
             remote.send(event);
         }
 
@@ -92,7 +91,12 @@ public class LocalBridgeConnectorTest {
     }
 
     @SuppressWarnings ("serial")
-    private static class TestEvent implements Event {
+    private static class TestEvent1 implements Event {
+
+    }
+
+    @SuppressWarnings ("serial")
+    private static class TestEvent2 implements Event {
 
     }
 
