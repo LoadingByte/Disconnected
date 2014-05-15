@@ -276,6 +276,10 @@ public class Bridge {
 
     private boolean isInteresting(BridgeConnector connection, Event event) {
 
+        if (event instanceof AddRemovePredicateEvent) {
+            return true;
+        }
+
         for (EventPredicate<? extends Event> predicate : remoteAcceptionPredicates.get(connection)) {
             if (EventUtils.tryTest(predicate, event)) {
                 return true;
