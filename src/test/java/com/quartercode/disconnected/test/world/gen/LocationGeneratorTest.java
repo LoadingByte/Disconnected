@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.test.sim.gen;
+package com.quartercode.disconnected.test.world.gen;
 
 import java.io.IOException;
 import java.util.List;
