@@ -50,6 +50,18 @@ public class FileSystemTest {
     }
 
     @Test
+    public void testGetFileNotExisting() {
+
+        Assert.assertNull("GET_FILE didn't return null for a not existing path", fileSystem.get(FileSystem.GET_FILE).invoke("test1/test2/test2.txt"));
+    }
+
+    @Test
+    public void testGetFileWithInvalidPath() {
+
+        Assert.assertNull("GET_FILE didn't return null for an invalid path (one dir is a content file)", fileSystem.get(FileSystem.GET_FILE).invoke("test1/test2/test.txt/test2.txt"));
+    }
+
+    @Test
     public void testCalcSpace() {
 
         long contentSize = 30;

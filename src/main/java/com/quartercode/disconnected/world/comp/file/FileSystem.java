@@ -149,13 +149,23 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
             public File<?> invoke(FunctionInvocation<File<?>> invocation, Object... arguments) {
 
                 String path = FileUtils.normalizePath((String) arguments[0]);
+
                 String[] parts = path.split(File.SEPARATOR);
                 File<?> current = invocation.getHolder().get(ROOT).get();
-                for (String part : parts) {
+                for (int index = 0; index < parts.length; index++) {
+                    String part = parts[index];
+
                     if (!part.isEmpty()) {
                         if (current instanceof ParentFile) {
                             current = current.get(ParentFile.GET_CHILD_BY_NAME).invoke(part);
-                            if (current == null) {
+
+                            // Return null if the next file is not a parent file and not the last file (invalid path)
+                            if (! (current instanceof ParentFile) && index != parts.length - 1) {
+                                current = null;
+                                break;
+                            }
+                            // Return null if the next file doesn't exist
+                            else if (current == null) {
                                 break;
                             }
                         }
