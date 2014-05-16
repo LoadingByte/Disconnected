@@ -19,8 +19,11 @@
 package com.quartercode.disconnected.graphics.desktop;
 
 import com.quartercode.disconnected.graphics.AbstractGraphicsModule;
+import com.quartercode.disconnected.graphics.GraphicsManager;
 import com.quartercode.disconnected.graphics.GraphicsState;
 import com.quartercode.disconnected.util.ResourceBundles;
+import com.quartercode.disconnected.util.ServiceRegistry;
+import com.quartercode.disconnected.util.ValueInjector;
 import de.matthiasmann.twl.Button;
 import de.matthiasmann.twl.Widget;
 
@@ -31,10 +34,13 @@ import de.matthiasmann.twl.Widget;
  */
 public class DesktopLaunchButtonModule extends AbstractGraphicsModule {
 
-    private Button button;
+    private Button                button;
+    private DesktopProgramContext programContext;
 
     @Override
     public void add(final GraphicsState state) {
+
+        programContext = createProgramContext();
 
         button = new Button();
         button.setTheme("launch-button");
@@ -50,6 +56,14 @@ public class DesktopLaunchButtonModule extends AbstractGraphicsModule {
         });
         ((Widget) state.getModule("desktopWidget").getValue("widget")).add(button);
         setValue("button", button);
+    }
+
+    private DesktopProgramContext createProgramContext() {
+
+        ValueInjector valueInjector = new ValueInjector();
+        valueInjector.put("bridge", ServiceRegistry.lookup(GraphicsManager.class).getBridge());
+
+        return new DesktopProgramContext(valueInjector);
     }
 
     @Override
