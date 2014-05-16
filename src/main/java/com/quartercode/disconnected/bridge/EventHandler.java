@@ -43,7 +43,7 @@ public interface EventHandler<T extends Event> {
 
     /**
      * Processes the given {@link Event} and does something depending on the event.
-     * Since events are immutable, this methodmay not modify the event.
+     * Since events are immutable, this method may not modify the event.
      * The generic parameter {@code <T>} defines the type of event the handler can process.<br>
      * <br>
      * Please note that this method only processes events that are accepted by the {@link EventPredicate} which is supplied by {@link #getPredicate()}.

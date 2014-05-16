@@ -48,7 +48,7 @@ public class BridgeTest {
     public void testSendToLocalHandler() {
 
         final List<Event1> handler1Calls = new ArrayList<>();
-        bridge.addHandler(new AbstractEventHandler<Event1>(new TruePredicate<Event1>()) {
+        bridge.addHandler(new AbstractEventHandler<Event1>(Event1.class) {
 
             @Override
             public void handle(Event1 event) {
@@ -59,7 +59,7 @@ public class BridgeTest {
         });
 
         final List<Event2> handler2Calls = new ArrayList<>();
-        bridge.addHandler(new AbstractEventHandler<Event2>(new TruePredicate<Event2>()) {
+        bridge.addHandler(new AbstractEventHandler<Event2>(Event2.class) {
 
             @Override
             public void handle(Event2 event) {
@@ -149,7 +149,7 @@ public class BridgeTest {
     public void testHandle() {
 
         final List<Event1> handler1Calls = new ArrayList<>();
-        bridge.addHandler(new AbstractEventHandler<Event1>(new TruePredicate<Event1>()) {
+        bridge.addHandler(new AbstractEventHandler<Event1>(Event1.class) {
 
             @Override
             public void handle(Event1 event) {
@@ -160,7 +160,7 @@ public class BridgeTest {
         });
 
         final List<Event2> handler2Calls = new ArrayList<>();
-        bridge.addHandler(new AbstractEventHandler<Event2>(new TruePredicate<Event2>()) {
+        bridge.addHandler(new AbstractEventHandler<Event2>(Event2.class) {
 
             @Override
             public void handle(Event2 event) {

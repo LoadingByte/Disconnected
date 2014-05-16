@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.reflect.TypeUtils;
 
 /**
  * The global storage class just stores all kinds of global values and makes them available through a filtering method.<br>
@@ -60,7 +59,7 @@ public class GlobalStorage {
 
         if (storage.containsKey(category)) {
             for (Object storedObject : storage.get(category)) {
-                if (TypeUtils.isInstance(storedObject, type)) {
+                if (type.isInstance(storedObject)) {
                     requestedObjects.add(type.cast(storedObject));
                 }
             }

@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.bridge;
 
+import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.bridge.predicate.TypePredicate;
 
 /**
@@ -48,6 +49,8 @@ public abstract class AbstractEventHandler<T extends Event> implements EventHand
      * @param predicate The immutable event predicate that can be used to determine which events the handler can handle.
      */
     public AbstractEventHandler(EventPredicate<T> predicate) {
+
+        Validate.notNull(predicate, "Event predicate of event handler cannot be null");
 
         this.predicate = predicate;
     }

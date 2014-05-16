@@ -26,6 +26,7 @@ import com.quartercode.disconnected.bridge.EventPredicate;
  * The type predicate checks whether an event is and instance of a known type.
  * 
  * @param <T> The type of event that can be tested by the predicate.
+ * @see EventPredicate
  */
 @Data
 public class TypePredicate<T extends Event> implements EventPredicate<T> {

@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.reflect.TypeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +58,7 @@ public class DefaultTicker implements Ticker {
     public <T> T getAction(Class<T> type) {
 
         for (TickAction action : actions) {
-            if (TypeUtils.isInstance(action, type)) {
+            if (type.isInstance(action)) {
                 return type.cast(action);
             }
         }
