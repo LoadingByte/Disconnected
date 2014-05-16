@@ -63,9 +63,18 @@ public class ProcessModule extends OSModule implements SchedulerUser {
      */
     public static final PropertyDefinition<RootProcess>      ROOT_PROCESS;
 
+    /**
+     * The next pid value is used as a counter for {@link Process#PID}s (process ids).
+     * Every time a new process is created, its pid should be set to a new value returned by {@link #NEXT_PID}.
+     * That function uses this property as a counter.<br>
+     * The next pid value is reset to {@code 0} every time when the process module starts up or shuts down.
+     */
+    public static final PropertyDefinition<Integer>          NEXT_PID_VALUE;
+
     static {
 
         ROOT_PROCESS = ObjectProperty.createDefinition("rootProcess");
+        NEXT_PID_VALUE = ObjectProperty.createDefinition("nextPidValue", 0, false);
 
     }
 
@@ -75,6 +84,12 @@ public class ProcessModule extends OSModule implements SchedulerUser {
      * Returns a {@link List} containing all currently running {@link Process}es.
      */
     public static final FunctionDefinition<List<Process<?>>> GET_ALL;
+
+    /**
+     * Every time a new process is created, its pid should be set to the next pid returned by this function.
+     * It uses the {@link #NEXT_PID_VALUE} as an internal counter.
+     */
+    public static final FunctionDefinition<Integer>          NEXT_PID;
 
     /**
      * Kills the whole {@link Process} tree immediately.
@@ -98,6 +113,32 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                 return processes;
             }
 
+        });
+
+        NEXT_PID = FunctionDefinitionFactory.create("nextPid", ProcessModule.class, new FunctionExecutor<Integer>() {
+
+            @Override
+            public Integer invoke(FunctionInvocation<Integer> invocation, Object... arguments) {
+
+                FeatureHolder holder = invocation.getHolder();
+                int value = holder.get(NEXT_PID_VALUE).get();
+                holder.get(NEXT_PID_VALUE).set(value + 1);
+
+                invocation.next(arguments);
+                return value;
+            }
+
+        });
+
+        SET_RUNNING.addExecutor("resetNextPidValue", ProcessModule.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.LEVEL_7)
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                invocation.getHolder().get(NEXT_PID_VALUE).set(0);
+                return invocation.next(arguments);
+            }
         });
 
         SET_RUNNING.addExecutor("startRootProcess", ProcessModule.class, new FunctionExecutor<Void>() {
@@ -145,7 +186,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
 
                     // Start root process
                     holder.get(ROOT_PROCESS).set(root);
-                    root.get(Process.INITIALIZE).invoke();
+                    root.get(Process.INITIALIZE).invoke(holder.get(NEXT_PID).invoke());
                     ProgramExecutor rootProgram = root.get(Process.EXECUTOR).get();
                     rootProgram.get(Session.USER).set(superuser);
                     rootProgram.get(ProgramExecutor.RUN).invoke();

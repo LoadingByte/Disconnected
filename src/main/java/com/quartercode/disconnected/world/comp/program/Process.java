@@ -376,8 +376,27 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
      * 
      * <table>
      * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Integer}</td>
+     * <td>pid</td>
+     * <td>The {@link #PID} of the new process (can be generated using {@link ProcessModule#NEXT_PID}). Its uniqueness is validated by the function.</td>
+     * </tr>
+     * </table>
+     * 
+     * <table>
+     * <tr>
      * <th>Exception</th>
      * <th>When?</th>
+     * </tr>
+     * <tr>
+     * <td>{@link IllegalArgumentException}</td>
+     * <td>The given pid is already used by another process.</td>
      * </tr>
      * <tr>
      * <td>{@link IllegalStateException}</td>
@@ -626,7 +645,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        INITIALIZE = FunctionDefinitionFactory.create("initialize");
+        INITIALIZE = FunctionDefinitionFactory.create("initialize", Integer.class);
         INITIALIZE.addExecutor("setPid", Process.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -635,17 +654,16 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
                 FeatureHolder holder = invocation.getHolder();
 
-                // Calculate new pid
+                int pid = (int) arguments[0];
+
+                // Check given pid
                 Set<Integer> existingPids = new HashSet<>();
                 Process<?> root = holder.get(GET_ROOT).invoke();
                 existingPids.add(root.get(PID).get());
                 for (Process<?> process : root.get(GET_ALL_CHILDREN).invoke()) {
                     existingPids.add(process.get(PID).get());
                 }
-                int pid = 0;
-                while (existingPids.contains(pid)) {
-                    pid++;
-                }
+                Validate.isTrue(!existingPids.contains(pid), "Pid {} is already used by another process", pid);
 
                 holder.get(PID).set(pid);
                 return invocation.next(arguments);
