@@ -33,6 +33,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import com.quartercode.classmod.util.Classmod;
+import com.quartercode.disconnected.bridge.Bridge;
+import com.quartercode.disconnected.bridge.BridgeConnectorException;
+import com.quartercode.disconnected.bridge.connector.LocalBridgeConnector;
 import com.quartercode.disconnected.graphics.DefaultGraphicsManager;
 import com.quartercode.disconnected.graphics.DefaultStates;
 import com.quartercode.disconnected.graphics.GraphicsManager;
@@ -180,6 +183,17 @@ public class Main {
         GraphicsManager graphicsManager = new DefaultGraphicsManager();
         ServiceRegistry.register(GraphicsManager.class, graphicsManager);
         graphicsManager.setRunning(true);
+
+        // DEBUG: Connect the client and server bridges
+        LOGGER.info("DEBUG-ACTION: Connect the client and server bridges");
+        final Bridge clientBridge = graphicsManager.getBridge();
+        final Bridge serverBridge = ticker.getAction(TickBridgeProvider.class).getBridge();
+        try {
+            clientBridge.connect(new LocalBridgeConnector(serverBridge));
+        } catch (BridgeConnectorException e) {
+            LOGGER.error("Can't connect the client and server bridges");
+            return;
+        }
 
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG-ACTION: Generating new simulation");
