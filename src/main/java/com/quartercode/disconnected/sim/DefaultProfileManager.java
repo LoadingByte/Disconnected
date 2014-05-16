@@ -113,6 +113,7 @@ public class DefaultProfileManager implements ProfileManager {
     public void setActive(Profile profile) throws ProfileSerializationException {
 
         if (active != null) {
+            active.getWorld().injectBridge(null);
             active.setWorld(null);
             active.setRandom(null);
         }
@@ -132,6 +133,8 @@ public class DefaultProfileManager implements ProfileManager {
 
         Ticker ticker = ServiceRegistry.lookup(Ticker.class);
         if (ticker != null) {
+            active.getWorld().injectBridge(ticker.getAction(TickBridgeProvider.class).getBridge());
+
             TickSimulator simulator = ticker.getAction(TickSimulator.class);
             if (simulator != null) {
                 simulator.setWorld(active == null ? null : active.getWorld());

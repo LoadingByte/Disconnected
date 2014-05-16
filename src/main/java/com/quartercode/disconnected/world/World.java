@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
+import com.quartercode.disconnected.bridge.Bridge;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.comp.Computer;
 
@@ -47,6 +48,7 @@ public class World extends DefaultFeatureHolder {
 
     }
 
+    private Bridge                                                             bridge;
     private RandomPool                                                         random;
 
     /**
@@ -58,6 +60,17 @@ public class World extends DefaultFeatureHolder {
     }
 
     /**
+     * Returns the {@link Bridge} that should be used for sending events by any object in the world tree.
+     * It is must be injected using {@link #injectBridge(Bridge)}.
+     * 
+     * @return The world's bridge.
+     */
+    public Bridge getBridge() {
+
+        return bridge;
+    }
+
+    /**
      * Returns the {@link RandomPool} that can be used by the world.
      * It is must be injected using {@link #injectRandom(RandomPool)}.
      * 
@@ -66,6 +79,17 @@ public class World extends DefaultFeatureHolder {
     public RandomPool getRandom() {
 
         return random;
+    }
+
+    /**
+     * Injects a {@link Bridge} that can be used by the world.
+     * It can be retrieved with {@link #getBridge()}.
+     * 
+     * @param bridge The bridge the world can use.
+     */
+    public void injectBridge(Bridge bridge) {
+
+        this.bridge = bridge;
     }
 
     /**
