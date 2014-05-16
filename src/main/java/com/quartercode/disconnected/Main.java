@@ -35,6 +35,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import com.quartercode.classmod.util.Classmod;
 import com.quartercode.disconnected.bridge.Bridge;
 import com.quartercode.disconnected.bridge.BridgeConnectorException;
+import com.quartercode.disconnected.bridge.EventHandler;
 import com.quartercode.disconnected.bridge.connector.LocalBridgeConnector;
 import com.quartercode.disconnected.graphics.DefaultGraphicsManager;
 import com.quartercode.disconnected.graphics.DefaultStates;
@@ -66,6 +67,8 @@ import com.quartercode.disconnected.util.ServiceRegistry;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.world.event.ProgramLaunchCommandEventHandler;
+import com.quartercode.disconnected.world.event.ProgramLaunchInfoRequestEventHandler;
 import com.quartercode.disconnected.world.gen.WorldGenerator;
 
 /**
@@ -178,6 +181,9 @@ public class Main {
         ticker.addAction(new TickBridgeProvider());
         ticker.addAction(new TickSimulator());
 
+        LOGGER.info("Filling default server handlers");
+        fillDefaultServerHandlers(ticker.getAction(TickBridgeProvider.class).getBridge());
+
         // Initialize graphics manager and start it
         LOGGER.info("Initializing graphics manager");
         GraphicsManager graphicsManager = new DefaultGraphicsManager();
@@ -199,9 +205,6 @@ public class Main {
         LOGGER.info("DEBUG-ACTION: Generating new simulation");
         RandomPool random = new RandomPool(Profile.DEFAULT_RANDOM_POOL_SIZE);
         World world = WorldGenerator.generateWorld(random, 10);
-        for (Computer computer : world.get(World.COMPUTERS).get()) {
-            computer.get(Computer.OS).get().get(OperatingSystem.SET_RUNNING).invoke(true);
-        }
 
         Profile profile = new Profile("test");
         profile.setWorld(world);
@@ -211,6 +214,10 @@ public class Main {
             profileManager.setActive(profile);
         } catch (ProfileSerializationException e) {
             // Won't ever happen (we just created a new profile)
+        }
+
+        for (Computer computer : world.get(World.COMPUTERS).get()) {
+            computer.get(Computer.OS).get().get(OperatingSystem.SET_RUNNING).invoke(true);
         }
 
         // DEBUG: Start "game" with current simulation
@@ -278,6 +285,17 @@ public class Main {
      */
     public static void fillDefaultDesktopPrograms() {
 
+    }
+
+    /**
+     * Adds the default tick server {@link EventHandler}s to the given {@link Bridge}.
+     * 
+     * @param bridge The bridge to add the default tick server handlers to.
+     */
+    public static void fillDefaultServerHandlers(Bridge bridge) {
+
+        bridge.addHandler(new ProgramLaunchInfoRequestEventHandler(bridge));
+        bridge.addHandler(new ProgramLaunchCommandEventHandler());
     }
 
     private Main() {

@@ -23,11 +23,16 @@ import static com.quartercode.disconnected.world.comp.program.ProgramUtils.getCo
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import com.quartercode.disconnected.bridge.Event;
+import com.quartercode.disconnected.bridge.QueueEventHandler;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
+import com.quartercode.disconnected.world.comp.file.FileRemoveAction;
 import com.quartercode.disconnected.world.comp.file.FileRights;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
+import com.quartercode.disconnected.world.comp.file.FileUtils;
+import com.quartercode.disconnected.world.comp.file.ParentFile;
 import com.quartercode.disconnected.world.comp.os.CommonFiles;
 import com.quartercode.disconnected.world.comp.os.Session;
 import com.quartercode.disconnected.world.comp.os.User;
@@ -36,10 +41,6 @@ import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.comp.program.general.FileRemoveProgram;
-import com.quartercode.disconnected.world.event.Event;
-import com.quartercode.disconnected.world.event.EventListener;
-import com.quartercode.disconnected.world.event.QueueEventListener;
-import com.quartercode.disconnected.world.event.TrueEventMatcher;
 
 public class FileRemoveProgramTest extends AbstractProgramTest {
 
@@ -57,33 +58,63 @@ public class FileRemoveProgramTest extends AbstractProgramTest {
     public void setUp2() {
 
         removeFile = new ContentFile();
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(removeFile, PATH).get(FileAddAction.EXECUTE).invoke();
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(removeFile, LOCAL_PATH).get(FileAddAction.EXECUTE).invoke();
     }
 
-    private void executeProgram(Process<?> parentProcess, String path, EventListener eventListener) {
+    private void executeProgram(Process<?> parentProcess, String path) {
 
         ChildProcess process = parentProcess.get(Process.CREATE_CHILD).invoke();
         process.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(getComponents(getCommonLocation(FileRemoveProgram.class))[1]));
         process.get(Process.INITIALIZE).invoke();
 
         ProgramExecutor program = process.get(Process.EXECUTOR).get();
-        program.get(FileRemoveProgram.FILE).set(removeFile);
-        program.get(ProgramExecutor.OUT_EVENT_LISTENERS).add(eventListener);
+        program.get(FileRemoveProgram.PATH).set(path);
         program.get(ProgramExecutor.RUN).invoke();
     }
 
     @Test
     public void testSuccess() {
 
-        Assert.assertNotNull("Not removed file does not exist", fileSystem.get(FileSystem.GET_FILE).invoke(PATH));
+        Assert.assertNotNull("Not removed file does not exist", fileSystem.get(FileSystem.GET_FILE).invoke(LOCAL_PATH));
 
-        QueueEventListener eventListener = new QueueEventListener();
-        executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH, eventListener);
+        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
+        bridge.setHandler(handler);
+        executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH);
 
-        Event event = eventListener.get(QueueEventListener.NEXT_EVENT).invoke(TrueEventMatcher.INSTANCE);
+        Event event = handler.next();
         Assert.assertTrue("File remove program did not send SuccessEvent", event instanceof FileRemoveProgram.SuccessEvent);
 
-        Assert.assertNull("Removed file still exists", fileSystem.get(FileSystem.GET_FILE).invoke(PATH));
+        Assert.assertNull("Removed file does still exist", fileSystem.get(FileSystem.GET_FILE).invoke(LOCAL_PATH));
+    }
+
+    @Test
+    public void testUnknownMountpoint() {
+
+        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
+        bridge.setHandler(handler);
+        executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), "/testunknown/" + FileUtils.getComponents(PATH)[1]);
+
+        Event event = handler.next();
+        Assert.assertTrue("File remove program did not send UnknownMountpointEvent", event instanceof FileRemoveProgram.UnknownMountpointEvent);
+        Assert.assertEquals("Unknown mountpoint", "testunknown", ((FileRemoveProgram.UnknownMountpointEvent) event).getMountpoint());
+    }
+
+    @Test
+    public void testInvalidPath() {
+
+        // Replace file's parent with content file -> make the path invalid
+        File<?> parentFile = (File<?>) removeFile.getParent();
+        String parentPath = parentFile.get(File.GET_PATH).invoke();
+        parentFile.get(ParentFile.CREATE_REMOVE).invoke().get(FileRemoveAction.EXECUTE).invoke();
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), parentPath).get(FileAddAction.EXECUTE).invoke();
+
+        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
+        bridge.setHandler(handler);
+        executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH);
+
+        Event event = handler.next();
+        Assert.assertTrue("File remove program did not send InvalidPathEvent", event instanceof FileRemoveProgram.InvalidPathEvent);
+        Assert.assertEquals("Invalid path", PATH, ((FileRemoveProgram.InvalidPathEvent) event).getPath());
     }
 
     @Test
@@ -101,10 +132,11 @@ public class FileRemoveProgramTest extends AbstractProgramTest {
         session.get(Session.USER).set(testUser);
         session.get(ProgramExecutor.RUN).invoke();
 
-        QueueEventListener eventListener = new QueueEventListener();
-        executeProgram(sessionProcess, PATH, eventListener);
+        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
+        bridge.setHandler(handler);
+        executeProgram(sessionProcess, PATH);
 
-        Event event = eventListener.get(QueueEventListener.NEXT_EVENT).invoke(TrueEventMatcher.INSTANCE);
+        Event event = handler.next();
         Assert.assertTrue("File remove program did not send MissingRightsEvent", event instanceof FileRemoveProgram.MissingRightsEvent);
     }
 

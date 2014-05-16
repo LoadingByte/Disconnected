@@ -18,12 +18,15 @@
 
 package com.quartercode.disconnected.world.comp.program.general;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.extra.def.ReferenceProperty;
+import com.quartercode.disconnected.bridge.Bridge;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
@@ -40,7 +43,7 @@ import com.quartercode.disconnected.world.comp.os.User;
 import com.quartercode.disconnected.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
-import com.quartercode.disconnected.world.event.Event;
+import com.quartercode.disconnected.world.event.ProgramEvent;
 
 /**
  * The file create program is used to create a new {@link File} under a given global {@link #PATH}.
@@ -97,8 +100,17 @@ public class FileCreateProgram extends ProgramExecutor {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FileCreateProgram holder = (FileCreateProgram) invocation.getHolder();
-                Class<? extends File<?>> fileType = holder.get(FILE_TYPE).get();
 
+                Validate.notNull(holder.get(PATH).get(), "PATH cannot be null");
+                Validate.notNull(holder.get(FILE_TYPE).get(), "FILE_TYPE cannot be null");
+
+                Process<?> process = holder.getParent();
+                Bridge bridge = holder.getWorld().getBridge();
+                OperatingSystem os = process.get(Process.GET_OPERATING_SYSTEM).invoke();
+                String computerId = os.getParent().getId();
+                int pid = process.get(Process.PID).get();
+
+                Class<? extends File<?>> fileType = holder.get(FILE_TYPE).get();
                 File<?> addFile = null;
                 try {
                     addFile = fileType.newInstance();
@@ -106,48 +118,35 @@ public class FileCreateProgram extends ProgramExecutor {
                     throw new IllegalArgumentException("Cannot create instance of file type '" + fileType.getName() + "'", e);
                 }
 
-                Process<?> process = holder.getParent();
                 User sessionUser = process.get(Process.GET_USER).invoke();
                 addFile.get(File.OWNER).set(sessionUser);
                 addFile.get(File.GROUP).set(sessionUser.get(User.GET_PRIMARY_GROUP).invoke());
 
-                FileSystemModule fsModule = process.get(Process.GET_OPERATING_SYSTEM).invoke().get(OperatingSystem.FS_MODULE).get();
+                FileSystemModule fsModule = os.get(OperatingSystem.FS_MODULE).get();
                 String path = holder.get(PATH).get();
-                // Add a file seperator at the beginning of the path if it is not already there
+                // Make sure that there is a file seperator at the beginning of the path
                 path = path.startsWith(File.SEPARATOR) ? path : File.SEPARATOR + path;
                 FileAddAction addAction = null;
                 try {
                     addAction = fsModule.get(FileSystemModule.CREATE_ADD_FILE).invoke(addFile, path);
                 } catch (UnknownMountpointException e) {
-                    UnknownMountpointEvent unknownMountpointEvent = new UnknownMountpointEvent();
-                    unknownMountpointEvent.get(UnknownMountpointEvent.MOUNTPOINT).set(e.getMountpoint());
-                    unknownMountpointEvent.get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());
+                    bridge.send(new UnknownMountpointEvent(computerId, pid, e.getMountpoint()));
                 }
 
                 if (addAction != null) {
-                    User user = process.get(Process.GET_USER).invoke();
-                    if (addAction.get(FileAddAction.IS_EXECUTABLE_BY).invoke(user)) {
+                    if (addAction.get(FileAddAction.IS_EXECUTABLE_BY).invoke(sessionUser)) {
                         try {
                             addAction.get(FileAddAction.EXECUTE).invoke();
-                            SuccessEvent successEvent = new SuccessEvent();
-                            successEvent.get(SuccessEvent.FILE).set(addFile);
-                            successEvent.get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());
+                            bridge.send(new SuccessEvent(computerId, pid));
                         } catch (InvalidPathException e) {
-                            InvalidPathEvent invalidPathEvent = new InvalidPathEvent();
-                            invalidPathEvent.get(InvalidPathEvent.PATH).set(path);
-                            invalidPathEvent.get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());
+                            bridge.send(new InvalidPathEvent(computerId, pid, path));
                         } catch (OccupiedPathException e) {
-                            OccupiedPathEvent occupiedPathEvent = new OccupiedPathEvent();
-                            occupiedPathEvent.get(OccupiedPathEvent.PATH).set(path);
-                            occupiedPathEvent.get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());
+                            bridge.send(new OccupiedPathEvent(computerId, pid, path));
                         } catch (OutOfSpaceException e) {
-                            OutOfSpaceEvent outOfSpaceEvent = new OutOfSpaceEvent();
-                            outOfSpaceEvent.get(OutOfSpaceEvent.FILE_SYSTEM).set(e.getFileSystem());
-                            outOfSpaceEvent.get(OutOfSpaceEvent.REQUIRED_SPACE).set(e.getSize());
-                            outOfSpaceEvent.get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());
+                            bridge.send(new OutOfSpaceEvent(computerId, pid, FileUtils.getComponents(path)[0], e.getSize()));
                         }
                     } else {
-                        new MissingRightsEvent().get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());
+                        bridge.send(new MissingRightsEvent(computerId, pid));
                     }
                 }
 
@@ -166,8 +165,30 @@ public class FileCreateProgram extends ProgramExecutor {
     }
 
     /**
-     * The success event is fired by the {@link FileCreateProgram} when the file creation process was successful.
-     * It also carries the {@link #FILE} that was created by the file create program.<br>
+     * File create program events are events that are fired by the {@link FileCreateProgram}.<br>
+     * <br>
+     * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.
+     * For example, an instanceof check should look like this:
+     * 
+     * <pre>
+     * if ( event instanceof <b>FileCreateProgram.</b>FileCreateProgramEvent )
+     * </pre>
+     * 
+     * @see FileCreateProgram
+     */
+    public static class FileCreateProgramEvent extends ProgramEvent {
+
+        private static final long serialVersionUID = -4305409712951906877L;
+
+        public FileCreateProgramEvent(String computerId, int pid) {
+
+            super(computerId, pid);
+        }
+
+    }
+
+    /**
+     * The success event is fired by the {@link FileCreateProgram} when the file creation process was successful.<br>
      * <br>
      * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.
      * For example, an instanceof check should look like this:
@@ -178,19 +199,13 @@ public class FileCreateProgram extends ProgramExecutor {
      * 
      * @see FileCreateProgram
      */
-    public static class SuccessEvent extends Event {
+    public static class SuccessEvent extends FileCreateProgramEvent {
 
-        // ----- Properties -----
+        private static final long serialVersionUID = 4401971263121394946L;
 
-        /**
-         * The {@link File} object that was created by the {@link FileCreateProgram} which fired the event.
-         */
-        public static final PropertyDefinition<File<?>> FILE;
+        public SuccessEvent(String computerId, int pid) {
 
-        static {
-
-            FILE = ReferenceProperty.createDefinition("file");
-
+            super(computerId, pid);
         }
 
     }
@@ -208,7 +223,14 @@ public class FileCreateProgram extends ProgramExecutor {
      * 
      * @see FileCreateProgram
      */
-    public static class ErrorEvent extends Event {
+    public static class ErrorEvent extends FileCreateProgramEvent {
+
+        private static final long serialVersionUID = -4838627736142625093L;
+
+        public ErrorEvent(String computerId, int pid) {
+
+            super(computerId, pid);
+        }
 
     }
 
@@ -225,44 +247,29 @@ public class FileCreateProgram extends ProgramExecutor {
      * @see ErrorEvent
      * @see FileCreateProgram
      */
+    @Data
+    @EqualsAndHashCode (callSuper = true)
     public static class UnknownMountpointEvent extends ErrorEvent {
 
-        // ----- Properties -----
+        private static final long serialVersionUID = -7988421543408698031L;
 
         /**
          * The mountpoint that describes a file system which is not known or not mounted.
          * This mountpoint was derived from the provided {@link FileCreateProgram#PATH} string.
          */
-        public static final PropertyDefinition<String> MOUNTPOINT;
+        private final String      mountpoint;
 
-        static {
+        public UnknownMountpointEvent(String computerId, int pid, String mountpoint) {
 
-            MOUNTPOINT = ObjectProperty.createDefinition("mountpoint");
-
+            super(computerId, pid);
+            this.mountpoint = mountpoint;
         }
 
     }
 
     /**
-     * The missing rights event is fired by the {@link FileCreateProgram} when the session that runs the program has not enough rights for the file creation.<br>
-     * <br>
-     * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.
-     * For example, an instanceof check should look like this:
-     * 
-     * <pre>
-     * if ( event instanceof <b>FileCreateProgram.</b>MissingRightsEvent )
-     * </pre>
-     * 
-     * @see ErrorEvent
-     * @see FileCreateProgram
-     */
-    public static class MissingRightsEvent extends ErrorEvent {
-
-    }
-
-    /**
      * The invalid path event is fired by the {@link FileCreateProgram} when the provided file path is not valid for adding a file under it.
-     * The reason for its invalidity could be a file along the path is not a parent file.<br>
+     * The reason for its invalidity could be a file along the path which is not a parent file.<br>
      * <br>
      * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.
      * For example, an instanceof check should look like this:
@@ -274,20 +281,22 @@ public class FileCreateProgram extends ProgramExecutor {
      * @see ErrorEvent
      * @see FileCreateProgram
      */
+    @Data
+    @EqualsAndHashCode (callSuper = true)
     public static class InvalidPathEvent extends ErrorEvent {
 
-        // ----- Properties -----
+        private static final long serialVersionUID = -835974144089304053L;
 
         /**
          * The global file path that is not valid.
-         * The reason for its invalidity could be a file along the path is not a parent file.
+         * The reason for its invalidity could be a file along the path is not a directory.
          */
-        public static final PropertyDefinition<String> PATH;
+        private final String      path;
 
-        static {
+        public InvalidPathEvent(String computerId, int pid, String path) {
 
-            PATH = ObjectProperty.createDefinition("path");
-
+            super(computerId, pid);
+            this.path = path;
         }
 
     }
@@ -305,19 +314,21 @@ public class FileCreateProgram extends ProgramExecutor {
      * @see ErrorEvent
      * @see FileCreateProgram
      */
+    @Data
+    @EqualsAndHashCode (callSuper = true)
     public static class OccupiedPathEvent extends ErrorEvent {
 
-        // ----- Properties -----
+        private static final long serialVersionUID = -7938069303768892159L;
 
         /**
-         * The global file path that is already occupied by a {@link File}.
+         * The global file path that is already occupied by a file.
          */
-        public static final PropertyDefinition<String> PATH;
+        private final String      path;
 
-        static {
+        public OccupiedPathEvent(String computerId, int pid, String path) {
 
-            PATH = ObjectProperty.createDefinition("path");
-
+            super(computerId, pid);
+            this.path = path;
         }
 
     }
@@ -337,25 +348,51 @@ public class FileCreateProgram extends ProgramExecutor {
      * @see ErrorEvent
      * @see FileCreateProgram
      */
+    @Data
+    @EqualsAndHashCode (callSuper = true)
     public static class OutOfSpaceEvent extends ErrorEvent {
 
-        // ----- Properties -----
+        private static final long serialVersionUID = -8920069055350818363L;
 
         /**
-         * The {@link FileSystem} where the file should have been added to.
+         * The mountpoint of the {@link FileSystem} where the file should have been added to.
          */
-        public static final PropertyDefinition<FileSystem> FILE_SYSTEM;
+        private final String      fileSystemMountpoint;
 
         /**
-         * The amount of bytes that should have been added to the {@link #FILE_SYSTEM}.
+         * The amount of bytes that should have been added to the file system.
          */
-        public static final PropertyDefinition<Long>       REQUIRED_SPACE;
+        private final long        requiredSpace;
 
-        static {
+        public OutOfSpaceEvent(String computerId, int pid, String fileSystemMountpoint, long requiredSpace) {
 
-            FILE_SYSTEM = ReferenceProperty.createDefinition("fileSystem");
-            REQUIRED_SPACE = ObjectProperty.createDefinition("requiredSpace");
+            super(computerId, pid);
+            this.fileSystemMountpoint = fileSystemMountpoint;
+            this.requiredSpace = requiredSpace;
+        }
 
+    }
+
+    /**
+     * The missing rights event is fired by the {@link FileCreateProgram} when the session that runs the program has not enough rights for the file creation.<br>
+     * <br>
+     * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.
+     * For example, an instanceof check should look like this:
+     * 
+     * <pre>
+     * if ( event instanceof <b>FileCreateProgram.</b>MissingRightsEvent )
+     * </pre>
+     * 
+     * @see ErrorEvent
+     * @see FileCreateProgram
+     */
+    public static class MissingRightsEvent extends ErrorEvent {
+
+        private static final long serialVersionUID = 1363673374686927819L;
+
+        public MissingRightsEvent(String computerId, int pid) {
+
+            super(computerId, pid);
         }
 
     }

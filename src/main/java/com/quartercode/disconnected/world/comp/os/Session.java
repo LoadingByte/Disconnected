@@ -18,9 +18,10 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.Validate;
-import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
@@ -31,7 +32,7 @@ import com.quartercode.disconnected.world.comp.program.ChildProcess;
 import com.quartercode.disconnected.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
-import com.quartercode.disconnected.world.event.Event;
+import com.quartercode.disconnected.world.event.ProgramEvent;
 
 /**
  * This class represents a program which opens a session.
@@ -90,10 +91,10 @@ public class Session extends ProgramExecutor {
             @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_5)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                Session holder = (Session) invocation.getHolder();
 
                 // Determine whether a check is required (parent session != null or parent session user != root)
-                Session parentSession = ((Session) holder).getParent().get(Process.GET_SESSION).invoke();
+                Session parentSession = holder.getParent().get(Process.GET_SESSION).invoke();
                 boolean checkRequired = parentSession != null && !parentSession.get(USER).get().get(User.IS_SUPERUSER).invoke();
 
                 if (checkRequired && holder.get(USER).get().get(User.PASSWORD).get() != null) {
@@ -114,11 +115,11 @@ public class Session extends ProgramExecutor {
                 return invocation.next(arguments);
             }
 
-            private void fireWrongPasswordEvent(FeatureHolder holder, String wrongPassword) {
+            private void fireWrongPasswordEvent(Session holder, String wrongPassword) {
 
-                WrongPasswordEvent wrongPasswordEvent = new WrongPasswordEvent();
-                wrongPasswordEvent.get(WrongPasswordEvent.WRONG_PASSWORD).set(wrongPassword);
-                wrongPasswordEvent.get(Event.SEND).invoke(holder.get(OUT_EVENT_LISTENERS).get());
+                String computerId = holder.getParent().get(Process.GET_OPERATING_SYSTEM).invoke().getParent().getId();
+                int pid = holder.getParent().get(Process.PID).get();
+                holder.getWorld().getBridge().send(new WrongPasswordEvent(computerId, pid, wrongPassword));
             }
 
         });
@@ -129,7 +130,10 @@ public class Session extends ProgramExecutor {
             @Prioritized (Prioritized.LEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                new FinishStartEvent().get(Event.SEND).invoke(invocation.getHolder().get(OUT_EVENT_LISTENERS).get());
+                Session holder = (Session) invocation.getHolder();
+                String computerId = holder.getParent().get(Process.GET_OPERATING_SYSTEM).invoke().getParent().getId();
+                int pid = holder.getParent().get(Process.PID).get();
+                holder.getWorld().getBridge().send(new FinishStartEvent(computerId, pid));
 
                 return invocation.next(arguments);
             }
@@ -146,6 +150,29 @@ public class Session extends ProgramExecutor {
     }
 
     /**
+     * Session events are events that are fired by the {@link Session} program.<br>
+     * <br>
+     * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.
+     * For example, an instanceof check should look like this:
+     * 
+     * <pre>
+     * if ( event instanceof <b>Session.</b>SessionEvent )
+     * </pre>
+     * 
+     * @see Session
+     */
+    public static class SessionEvent extends ProgramEvent {
+
+        private static final long serialVersionUID = -2264878017550342789L;
+
+        public SessionEvent(String computerId, int pid) {
+
+            super(computerId, pid);
+        }
+
+    }
+
+    /**
      * The success event is fired by the {@link Session} when the startup process is finished.<br>
      * <br>
      * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.
@@ -157,7 +184,14 @@ public class Session extends ProgramExecutor {
      * 
      * @see Session
      */
-    public static class FinishStartEvent extends Event {
+    public static class FinishStartEvent extends SessionEvent {
+
+        private static final long serialVersionUID = 3149954173860266466L;
+
+        public FinishStartEvent(String computerId, int pid) {
+
+            super(computerId, pid);
+        }
 
     }
 
@@ -173,19 +207,21 @@ public class Session extends ProgramExecutor {
      * 
      * @see Session
      */
-    public static class WrongPasswordEvent extends Event {
+    @Data
+    @EqualsAndHashCode (callSuper = true)
+    public static class WrongPasswordEvent extends SessionEvent {
 
-        // ----- Properties -----
+        private static final long serialVersionUID = 7354728090960359912L;
 
         /**
          * The provided password that is not correct (may be {@code null}).
          */
-        public static final PropertyDefinition<String> WRONG_PASSWORD;
+        private final String      wrongPassword;
 
-        static {
+        public WrongPasswordEvent(String computerId, int pid, String wrongPassword) {
 
-            WRONG_PASSWORD = ObjectProperty.createDefinition("wrongPassword");
-
+            super(computerId, pid);
+            this.wrongPassword = wrongPassword;
         }
 
     }

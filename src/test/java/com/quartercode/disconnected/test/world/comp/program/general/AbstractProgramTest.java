@@ -19,6 +19,8 @@
 package com.quartercode.disconnected.test.world.comp.program.general;
 
 import org.junit.Before;
+import com.quartercode.disconnected.test.bridge.BridgeMock;
+import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.Version;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
@@ -36,6 +38,8 @@ public abstract class AbstractProgramTest {
 
     private final String      fileSystemMountpoint;
 
+    protected BridgeMock      bridge;
+    protected World           world;
     protected Computer        computer;
     protected OperatingSystem os;
     protected ProcessModule   processModule;
@@ -49,7 +53,13 @@ public abstract class AbstractProgramTest {
     @Before
     public void setUp() {
 
-        computer = WorldGenerator.generateComputer();
+        bridge = new BridgeMock();
+
+        world = new World();
+        world.injectBridge(bridge);
+
+        computer = WorldGenerator.generateComputer(false);
+        world.get(World.COMPUTERS).add(computer);
 
         os = computer.get(Computer.OS).get();
         os.get(OperatingSystem.SET_RUNNING).invoke(true);

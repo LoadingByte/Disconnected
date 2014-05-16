@@ -20,18 +20,26 @@ package com.quartercode.disconnected.test.world.comp.program.general;
 
 import static com.quartercode.disconnected.world.comp.file.FileUtils.getComponents;
 import static com.quartercode.disconnected.world.comp.program.ProgramUtils.getCommonLocation;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import com.quartercode.disconnected.bridge.Event;
+import com.quartercode.disconnected.bridge.QueueEventHandler;
+import com.quartercode.disconnected.world.comp.ByteUnit;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.Directory;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
+import com.quartercode.disconnected.world.comp.file.FileRemoveAction;
 import com.quartercode.disconnected.world.comp.file.FileRights;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
+import com.quartercode.disconnected.world.comp.file.FileUtils;
 import com.quartercode.disconnected.world.comp.file.ParentFile;
+import com.quartercode.disconnected.world.comp.file.RootFile;
 import com.quartercode.disconnected.world.comp.os.CommonFiles;
+import com.quartercode.disconnected.world.comp.os.Group;
 import com.quartercode.disconnected.world.comp.os.Session;
 import com.quartercode.disconnected.world.comp.os.User;
 import com.quartercode.disconnected.world.comp.program.ChildProcess;
@@ -39,10 +47,7 @@ import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.comp.program.general.FileListProgram;
-import com.quartercode.disconnected.world.event.Event;
-import com.quartercode.disconnected.world.event.EventListener;
-import com.quartercode.disconnected.world.event.QueueEventListener;
-import com.quartercode.disconnected.world.event.TrueEventMatcher;
+import com.quartercode.disconnected.world.comp.program.general.FileListProgram.SuccessEvent.FilePlaceholder;
 
 public class FileListProgramTest extends AbstractProgramTest {
 
@@ -62,35 +67,95 @@ public class FileListProgramTest extends AbstractProgramTest {
 
         for (int index = 0; index < testFiles.length; index++) {
             File<?> file = testFiles[index];
-            fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, PATH + "/file" + index + ".txt").get(FileAddAction.EXECUTE).invoke();
+            fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, LOCAL_PATH + "/file" + index + ".txt").get(FileAddAction.EXECUTE).invoke();
         }
 
-        dir = (ParentFile<?>) fileSystem.get(FileSystem.GET_FILE).invoke(PATH);
+        dir = (ParentFile<?>) fileSystem.get(FileSystem.GET_FILE).invoke(LOCAL_PATH);
     }
 
-    private void executeProgram(Process<?> parentProcess, String path, EventListener eventListener) {
+    private void executeProgram(Process<?> parentProcess, String path) {
 
         ChildProcess process = parentProcess.get(Process.CREATE_CHILD).invoke();
         process.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(getComponents(getCommonLocation(FileListProgram.class))[1]));
         process.get(Process.INITIALIZE).invoke();
 
         ProgramExecutor program = process.get(Process.EXECUTOR).get();
-        program.get(FileListProgram.DIR).set(dir);
-        program.get(ProgramExecutor.OUT_EVENT_LISTENERS).add(eventListener);
+        program.get(FileListProgram.PATH).set(path);
         program.get(ProgramExecutor.RUN).invoke();
     }
 
     @Test
     public void testSuccess() {
 
-        QueueEventListener eventListener = new QueueEventListener();
-        executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH, eventListener);
+        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
+        bridge.setHandler(handler);
+        executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH);
 
-        Event event = eventListener.get(QueueEventListener.NEXT_EVENT).invoke(TrueEventMatcher.INSTANCE);
+        Event event = handler.next();
         Assert.assertTrue("File list program did not send SuccessEvent", event instanceof FileListProgram.SuccessEvent);
-        List<File<ParentFile<?>>> files = event.get(FileListProgram.SuccessEvent.FILES).get();
-        File<?>[] filesArray = files.toArray(new File<?>[files.size()]);
-        Assert.assertArrayEquals("Listed files", testFiles, filesArray);
+
+        List<FilePlaceholder> files = new ArrayList<>( ((FileListProgram.SuccessEvent) event).getFiles());
+        List<FilePlaceholder> actualFiles = new ArrayList<>();
+        for (File<?> file : testFiles) {
+            String name = file.get(File.NAME).get();
+            @SuppressWarnings ("unchecked")
+            Class<? extends File<?>> type = (Class<? extends File<?>>) file.getClass();
+            long size = file.get(File.GET_SIZE).invoke();
+            String rights = file.get(File.RIGHTS).get().get(FileRights.TO_STRING).invoke();
+            User ownerObject = file.get(File.OWNER).get();
+            String owner = ownerObject == null ? null : ownerObject.get(User.NAME).get();
+            Group groupObject = file.get(File.GROUP).get();
+            String group = groupObject == null ? null : groupObject.get(Group.NAME).get();
+            actualFiles.add(new FilePlaceholder(name, type, size, rights, owner, group));
+        }
+        Assert.assertEquals("Listed files", actualFiles, files);
+    }
+
+    @Test
+    public void testSuccessWithRootFiles() {
+
+        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
+        bridge.setHandler(handler);
+        executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), "/");
+
+        Event event = handler.next();
+        Assert.assertTrue("File list program did not send SuccessEvent", event instanceof FileListProgram.SuccessEvent);
+
+        List<FilePlaceholder> files = new ArrayList<>( ((FileListProgram.SuccessEvent) event).getFiles());
+        List<FilePlaceholder> actualFiles = new ArrayList<>();
+        long terabyte = ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE);
+        String rights = "rwd-r---r---";
+        actualFiles.add(new FilePlaceholder(CommonFiles.SYSTEM_MOUNTPOINT, RootFile.class, terabyte, rights, null, null));
+        actualFiles.add(new FilePlaceholder(CommonFiles.USER_MOUNTPOINT, RootFile.class, terabyte, rights, null, null));
+        Assert.assertEquals("Listed files", actualFiles, files);
+    }
+
+    @Test
+    public void testUnknownMountpoint() {
+
+        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
+        bridge.setHandler(handler);
+        executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), "/testunknown/" + FileUtils.getComponents(PATH)[1]);
+
+        Event event = handler.next();
+        Assert.assertTrue("File list program did not send UnknownMountpointEvent", event instanceof FileListProgram.UnknownMountpointEvent);
+        Assert.assertEquals("Unknown mountpoint", "testunknown", ((FileListProgram.UnknownMountpointEvent) event).getMountpoint());
+    }
+
+    @Test
+    public void testInvalidPath() {
+
+        // Replace dir with content file -> make the path invalid
+        dir.get(ParentFile.CREATE_REMOVE).invoke().get(FileRemoveAction.EXECUTE).invoke();
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), FileUtils.getComponents(LOCAL_PATH)[1]).get(FileAddAction.EXECUTE).invoke();
+
+        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
+        bridge.setHandler(handler);
+        executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH);
+
+        Event event = handler.next();
+        Assert.assertTrue("File list program did not send InvalidPathEvent", event instanceof FileListProgram.InvalidPathEvent);
+        Assert.assertEquals("Invalid path", PATH, ((FileListProgram.InvalidPathEvent) event).getPath());
     }
 
     @Test
@@ -108,10 +173,11 @@ public class FileListProgramTest extends AbstractProgramTest {
         session.get(Session.USER).set(testUser);
         session.get(ProgramExecutor.RUN).invoke();
 
-        QueueEventListener eventListener = new QueueEventListener();
-        executeProgram(sessionProcess, PATH, eventListener);
+        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
+        bridge.setHandler(handler);
+        executeProgram(sessionProcess, PATH);
 
-        Event event = eventListener.get(QueueEventListener.NEXT_EVENT).invoke(TrueEventMatcher.INSTANCE);
+        Event event = handler.next();
         Assert.assertTrue("File list program did not send MissingRightsEvent", event instanceof FileListProgram.MissingRightsEvent);
     }
 
