@@ -154,6 +154,14 @@ public class ReturnEventUtil {
          */
         public Returnable withNextReturnId(String nextReturnId);
 
+        /**
+         * Returns the next return id of the returnable event.
+         * It is used as {@code returnId} in {@link Return} events.
+         * 
+         * @return The next return id.
+         */
+        public String getNextReturnId();
+
     }
 
     /**
