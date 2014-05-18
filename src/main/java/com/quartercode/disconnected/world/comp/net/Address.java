@@ -32,18 +32,18 @@ import com.quartercode.disconnected.world.general.StringRepresentable;
 
 /**
  * This class represents an address which locates a specific service which is available through a specific network interface.
- * The network interface is defined by an ip, the service by a port on which it's listening.
+ * The network interface is defined by an {@link NetID}, the service by a port on which it's listening.
  * 
- * @see IP
+ * @see NetID
  */
 public class Address extends DefaultFeatureHolder implements StringRepresentable {
 
     // ----- Properties -----
 
     /**
-     * The target {@link IP} which represents the network interface which holds the service.
+     * The target {@link NetID} that represents the network interface which holds the service.
      */
-    public static final PropertyDefinition<IP>      IP;
+    public static final PropertyDefinition<NetID>   NET_ID;
 
     /**
      * The target port which specifies the service.<br>
@@ -57,7 +57,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
      * </tr>
      * <tr>
      * <td>{@link IllegalArgumentException}</td>
-     * <td>The provided port lesser than 0 or greater than 65535.</td>
+     * <td>The provided port is lesser than 0 or greater than 65535.</td>
      * </tr>
      * </table>
      */
@@ -65,7 +65,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
 
     static {
 
-        IP = ObjectProperty.createDefinition("ip");
+        NET_ID = ObjectProperty.createDefinition("netID");
 
         PORT = ObjectProperty.createDefinition("port");
         PORT.addSetterExecutor("checkRange", Address.class, new FunctionExecutor<Void>() {
@@ -87,7 +87,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
     // ----- Functions -----
 
     /**
-     * Changes the stored ip and port to the ones stored by the given address object.
+     * Changes the stored {@link NetID} and port to the ones stored in the given address object.
      * 
      * <table>
      * <tr>
@@ -108,13 +108,13 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
 
     /**
      * Returns the stored address as a string.
-     * The string is using the format {@code IP:PORT} (e.g. {@code 127.0.0.1:8080}).
+     * The returned string is using the format {@code NET_ID:PORT} (e.g. {@code 4353.8:80}).
      */
     public static final FunctionDefinition<String>  TO_STRING   = StringRepresentable.TO_STRING;
 
     /**
      * Changes the stored address to the one set by the given string.
-     * The string is using the format {@code IP:PORT} (e.g. {@code 127.0.0.1:8080}).
+     * The string must be using the format {@code NET_ID:PORT} (e.g. {@code 4353.8:80}).
      * 
      * <table>
      * <tr>
@@ -127,7 +127,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
      * <td>0</td>
      * <td>{@link String}</td>
      * <td>address</td>
-     * <td>The new address given in the {@code IP:PORT} notation.</td>
+     * <td>The new address given in the {@code NET_ID:PORT} notation.</td>
      * </tr>
      * </table>
      * 
@@ -138,7 +138,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
      * </tr>
      * <tr>
      * <td>{@link IllegalArgumentException}</td>
-     * <td>The provided string does not match the {@code IP:PORT} notation.</td>
+     * <td>The provided string does not match the {@code NET_ID:PORT} notation.</td>
      * </tr>
      * </table>
      */
@@ -152,12 +152,13 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
+                Address object = (Address) arguments[0];
 
-                String ipString = ((Address) arguments[0]).get(IP).get().get(com.quartercode.disconnected.world.comp.net.IP.TO_STRING).invoke();
-                IP ip = new IP();
-                ip.get(com.quartercode.disconnected.world.comp.net.IP.FROM_STRING).invoke(ipString);
-                holder.get(IP).set(ip);
-                holder.get(PORT).set( ((Address) arguments[0]).get(PORT).get());
+                NetID netID = new NetID();
+                netID.get(NetID.FROM_OBJECT).invoke(object.get(NET_ID).get());
+                holder.get(NET_ID).set(netID);
+
+                holder.get(PORT).set(object.get(PORT).get());
 
                 return invocation.next(arguments);
             }
@@ -170,9 +171,12 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
             public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
                 FeatureHolder holder = invocation.getHolder();
-                String result = holder.get(IP).get().get(com.quartercode.disconnected.world.comp.net.IP.TO_STRING).invoke() + ":" + holder.get(PORT).get();
+
+                String netID = holder.get(NET_ID).get().get(NetID.TO_STRING).invoke();
+                int port = holder.get(PORT).get();;
+
                 invocation.next(arguments);
-                return result;
+                return new StringBuilder(netID).append(":").append(port).toString();
             }
 
         });
@@ -181,12 +185,16 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                String[] parts = ((String) arguments[0]).split(":");
-                Validate.isTrue(parts.length == 2, "Address (%s) must have the format IP:PORT", arguments[0]);
-                IP ip = new IP();
-                ip.get(com.quartercode.disconnected.world.comp.net.IP.FROM_STRING).invoke(parts[0]);
-                invocation.getHolder().get(IP).set(ip);
-                invocation.getHolder().get(PORT).set(Integer.parseInt(parts[1]));
+                FeatureHolder holder = invocation.getHolder();
+
+                String[] stringParts = ((String) arguments[0]).split(":");
+                Validate.isTrue(stringParts.length == 2, "Address (%s) must be provided in the format NET_ID:PORT", arguments[0]);
+
+                NetID netID = new NetID();
+                netID.get(NetID.FROM_STRING).invoke(stringParts[0]);
+                holder.get(NET_ID).set(netID);
+
+                holder.get(PORT).set(Integer.parseInt(stringParts[1]));
 
                 return invocation.next(arguments);
             }
@@ -197,7 +205,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
 
     /**
      * Creates a new empty address.
-     * You should fill the {@link #IP} and {@link #PORT} properties after creation.
+     * You should fill the {@link #NET_ID} and {@link #PORT} properties after creation.
      */
     public Address() {
 

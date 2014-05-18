@@ -2,5 +2,6 @@ CPU
 HardDrive
 Hardware
 Mainboard
-NetworkInterface
+NodeNetInterface
 RAM
+RouterNetInterface

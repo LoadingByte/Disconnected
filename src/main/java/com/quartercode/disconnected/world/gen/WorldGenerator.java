@@ -20,6 +20,7 @@ package com.quartercode.disconnected.world.gen;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.quartercode.disconnected.util.ProbabilityUtil;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.ByteUnit;
@@ -39,8 +40,11 @@ import com.quartercode.disconnected.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.world.comp.hardware.Mainboard;
 import com.quartercode.disconnected.world.comp.hardware.Mainboard.MainboardSlot;
 import com.quartercode.disconnected.world.comp.hardware.Mainboard.NeedsMainboardSlot;
-import com.quartercode.disconnected.world.comp.hardware.NetworkInterface;
+import com.quartercode.disconnected.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.world.comp.hardware.RAM;
+import com.quartercode.disconnected.world.comp.hardware.RouterNetInterface;
+import com.quartercode.disconnected.world.comp.net.Backbone;
+import com.quartercode.disconnected.world.comp.net.NetID;
 import com.quartercode.disconnected.world.comp.os.CommonFiles;
 import com.quartercode.disconnected.world.comp.os.Configuration;
 import com.quartercode.disconnected.world.comp.os.EnvironmentVariable;
@@ -73,7 +77,8 @@ public class WorldGenerator {
 
         World world = new World();
 
-        for (Computer computer : generateComputers(random, computers)) {
+        Backbone backbone = world.get(World.BACKBONE).get();
+        for (Computer computer : generateComputers(random, computers, backbone)) {
             world.get(World.COMPUTERS).add(computer);
         }
 
@@ -87,9 +92,9 @@ public class WorldGenerator {
      * @param amount The amount of computers the generator should generate.
      * @return The generated list of computers.
      */
-    public static List<Computer> generateComputers(RandomPool random, int amount) {
+    public static List<Computer> generateComputers(RandomPool random, int amount, Backbone backbone) {
 
-        return generateComputers(random, amount, null);
+        return generateComputers(random, amount, backbone, null);
     }
 
     /**
@@ -97,10 +102,11 @@ public class WorldGenerator {
      * 
      * @param random The {@link RandomPool} which is used for generating the computers.
      * @param amount The amount of computers the generator should generate.
+     * @param backbone The {@link Backbone} that should be used for connecting some routers to the internet.
      * @param ignore There won't be any computers with one of those locations.
      * @return The generated list of computers.
      */
-    public static List<Computer> generateComputers(RandomPool random, int amount, List<Computer> ignore) {
+    public static List<Computer> generateComputers(RandomPool random, int amount, Backbone backbone, List<Computer> ignore) {
 
         List<Computer> computers = new ArrayList<>();
 
@@ -111,9 +117,54 @@ public class WorldGenerator {
             }
         }
 
-        for (Location location : LocationGenerator.generateLocations(amount, ignoreLocations, random)) {
-            Computer computer = generateComputer();
-            computer.get(Computer.LOCATION).set(location);
+        List<Location> locations = LocationGenerator.generateLocations(amount, ignoreLocations, random);
+        int lastRouterIndex = -1;
+        RouterNetInterface lastRouter = null;
+        int lastSubnet = -1;
+        int lastNetID = -1;
+        for (int index = 0; index < locations.size(); index++) {
+            boolean router = false;
+            // First computer must be a router
+            if (lastRouterIndex < 0) {
+                router = true;
+                lastRouterIndex = index;
+            }
+            // Randomly generate routers
+            else if (locations.size() - index > 3 && index - lastRouterIndex > 3 && ProbabilityUtil.gen(0.5F, random)) {
+                router = true;
+            }
+
+            if (router) {
+                lastRouterIndex = index;
+                lastSubnet++;
+                lastNetID = -1;
+            } else {
+                lastNetID++;
+            }
+
+            Computer computer = generateComputer(router);
+
+            // Configure the network interfaces
+            if (router) {
+                List<Hardware> netInterfaces = getHardwareByType(computer.get(Computer.HARDWARE).get(), RouterNetInterface.class);
+                lastRouter = (RouterNetInterface) netInterfaces.get(0);
+                // Connect the router to the backbone
+                backbone.get(Backbone.CHILDREN).add(lastRouter);
+                // Set the router's subnet
+                lastRouter.get(RouterNetInterface.SUBNET).set(lastSubnet);
+            } else {
+                List<Hardware> netInterfaces = getHardwareByType(computer.get(Computer.HARDWARE).get(), NodeNetInterface.class);
+                NodeNetInterface netInterface = (NodeNetInterface) netInterfaces.get(0);
+                // Connect the computer to its router
+                netInterface.get(NodeNetInterface.CONNECTION).set(lastRouter);
+                // Set the interface's net id
+                NetID netID = new NetID();
+                netID.get(NetID.SUBNET).set(lastSubnet);
+                netID.get(NetID.ID).set(lastNetID);
+                netInterface.get(NodeNetInterface.NET_ID).set(netID);
+            }
+
+            computer.get(Computer.LOCATION).set(locations.get(index));
             computers.add(computer);
         }
 
@@ -121,11 +172,12 @@ public class WorldGenerator {
     }
 
     /**
-     * Generates a typical {@link Computer} with common hardware and the default file systems.
+     * Generates a typical {@link Computer} or router with common hardware and the default file systems.
      * 
+     * @param router Whether the generated computer is a router.
      * @return A newly generated computer.
      */
-    public static Computer generateComputer() {
+    public static Computer generateComputer(boolean router) {
 
         Computer computer = new Computer();
 
@@ -135,7 +187,7 @@ public class WorldGenerator {
         mainboard.get(Mainboard.SLOTS).add(generateMainboardSlot(RAM.class));
         mainboard.get(Mainboard.SLOTS).add(generateMainboardSlot(HardDrive.class));
         mainboard.get(Mainboard.SLOTS).add(generateMainboardSlot(HardDrive.class));
-        mainboard.get(Mainboard.SLOTS).add(generateMainboardSlot(NetworkInterface.class));
+        mainboard.get(Mainboard.SLOTS).add(generateMainboardSlot(NodeNetInterface.class));
         computer.get(Computer.HARDWARE).add(mainboard);
 
         CPU cpu = new CPU();
@@ -150,9 +202,15 @@ public class WorldGenerator {
         ram.get(RAM.FREQUENCY).set(1600000000L);
         computer.get(Computer.HARDWARE).add(ram);
 
-        NetworkInterface networkInterface = new NetworkInterface();
-        networkInterface.get(Hardware.NAME).set("NI FiberScore Ultimate");
-        computer.get(Computer.HARDWARE).add(networkInterface);
+        Hardware netInterface = null;
+        if (router) {
+            netInterface = new RouterNetInterface();
+            netInterface.get(RouterNetInterface.NAME).set("RNI FiberScore Ultimate");
+        } else {
+            netInterface = new NodeNetInterface();
+            netInterface.get(NodeNetInterface.NAME).set("NNI FiberScore Ultimate");
+        }
+        computer.get(Computer.HARDWARE).add(netInterface);
 
         HardDrive systemMedium = new HardDrive();
         systemMedium.get(HardDrive.NAME).set("TheHardDrive 1TB");

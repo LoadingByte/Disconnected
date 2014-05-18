@@ -23,10 +23,13 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
+import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
+import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.disconnected.bridge.Bridge;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.comp.Computer;
+import com.quartercode.disconnected.world.comp.net.Backbone;
 
 /**
  * A world is a space which contains one "game ecosystem".
@@ -38,12 +41,19 @@ public class World extends DefaultFeatureHolder {
     // ----- Properties -----
 
     /**
+     * The {@link Backbone} (<i>"magical router connector"</i>) that is used by the world.
+     * See its javadoc for more details.
+     */
+    public static final PropertyDefinition<Backbone>                           BACKBONE;
+
+    /**
      * The {@link Computer}s which are present in the world.
      */
     public static final CollectionPropertyDefinition<Computer, List<Computer>> COMPUTERS;
 
     static {
 
+        BACKBONE = ObjectProperty.createDefinition("backbone", new Backbone(), true);
         COMPUTERS = ObjectCollectionProperty.createDefinition("computers", new ArrayList<Computer>());
 
     }
