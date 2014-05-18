@@ -18,8 +18,6 @@
 
 package com.quartercode.disconnected.world.comp.program.general;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -38,8 +36,8 @@ import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.os.User;
 import com.quartercode.disconnected.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.world.comp.program.Process;
+import com.quartercode.disconnected.world.comp.program.ProgramEvent;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
-import com.quartercode.disconnected.world.event.ProgramEvent;
 
 /**
  * The file remove program is used to remove a file from its file system.
@@ -155,8 +153,14 @@ public class FileRemoveProgram extends ProgramExecutor {
      */
     public static class FileRemoveProgramEvent extends ProgramEvent {
 
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -5873609560189311803L;
 
+        /**
+         * Creates a new file remove program event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         */
         public FileRemoveProgramEvent(String computerId, int pid) {
 
             super(computerId, pid);
@@ -178,8 +182,14 @@ public class FileRemoveProgram extends ProgramExecutor {
      */
     public static class SuccessEvent extends FileRemoveProgramEvent {
 
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 7058952593759431423L;
 
+        /**
+         * Creates a new file remove program success event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         */
         public SuccessEvent(String computerId, int pid) {
 
             super(computerId, pid);
@@ -202,8 +212,14 @@ public class FileRemoveProgram extends ProgramExecutor {
      */
     public static class ErrorEvent extends FileRemoveProgramEvent {
 
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2759597877097862693L;
 
+        /**
+         * Creates a new file remove program error event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         */
         public ErrorEvent(String computerId, int pid) {
 
             super(computerId, pid);
@@ -224,22 +240,35 @@ public class FileRemoveProgram extends ProgramExecutor {
      * @see ErrorEvent
      * @see FileRemoveProgram
      */
-    @Data
-    @EqualsAndHashCode (callSuper = true)
     public static class UnknownMountpointEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 8879490600025066486L;
 
-        /**
-         * The mountpoint that describes a file system which is not known or not mounted.
-         * This mountpoint was derived from the provided {@link FileRemoveProgram#PATH} string.
-         */
         private final String      mountpoint;
 
+        /**
+         * Creates a new file remove program unknown mountpoint event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         * @param mountpoint The mountpoint which describes a file system that is not known or not mounted.
+         */
         public UnknownMountpointEvent(String computerId, int pid, String mountpoint) {
 
             super(computerId, pid);
+
             this.mountpoint = mountpoint;
+        }
+
+        /**
+         * Returns the mountpoint which describes a file system that is not known or not mounted.
+         * This mountpoint was derived from the provided {@link FileRemoveProgram#PATH} string.
+         * 
+         * @return The unknown mountpoint.
+         */
+        public String getMountpoint() {
+
+            return mountpoint;
         }
 
     }
@@ -258,22 +287,35 @@ public class FileRemoveProgram extends ProgramExecutor {
      * @see ErrorEvent
      * @see FileRemoveProgram
      */
-    @Data
-    @EqualsAndHashCode (callSuper = true)
     public static class InvalidPathEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -5965708459827546032L;
 
-        /**
-         * The global file path that is not valid.
-         * The reason for its invalidity could be a file along the path is not a directory.
-         */
         private final String      path;
 
+        /**
+         * Creates a new file remove program invalid path event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         * @param path The global file path which is not valid.
+         */
         public InvalidPathEvent(String computerId, int pid, String path) {
 
             super(computerId, pid);
+
             this.path = path;
+        }
+
+        /**
+         * Returns the global file path which is not valid.
+         * The reason for its invalidity could be a file along the path which is not a directory.
+         * 
+         * @return The invalid path.
+         */
+        public String getPath() {
+
+            return path;
         }
 
     }
@@ -293,8 +335,14 @@ public class FileRemoveProgram extends ProgramExecutor {
      */
     public static class MissingRightsEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -445913561240040324L;
 
+        /**
+         * Creates a new file remove program missing rights event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         */
         public MissingRightsEvent(String computerId, int pid) {
 
             super(computerId, pid);

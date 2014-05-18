@@ -18,32 +18,64 @@
 
 package com.quartercode.disconnected.world.event;
 
-import lombok.Data;
 import com.quartercode.disconnected.bridge.Event;
+import com.quartercode.disconnected.util.DataObjectBase;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 
 /**
  * The program launch event is sent by a program executor when it's started.
  * It contains general information about the type and identity of launched program.
  */
-@Data
-public class ProgramLaunchEvent implements Event {
+public class ProgramLaunchEvent extends DataObjectBase implements Event {
 
-    private static final long                      serialVersionUID = -3412734406679227132L;
+    private static final long                      serialVersionUID = -534015204805331837L;
 
-    /**
-     * The id of the computer that runs the newly launched program.
-     */
     private final String                           computerId;
-
-    /**
-     * The process id of the process that runs the newly launched program.
-     */
     private final int                              pid;
+    private final Class<? extends ProgramExecutor> type;
 
     /**
-     * The program executor type (class object) that represents which kind of program was launched.
+     * Creates a new program launch event.
+     * 
+     * @param computerId The id of the computer which runs the newly launched program.
+     * @param pid The process id of the process which runs the newly launched program.
+     * @param type The program executor type (class object) that represents which kind of program was launched.
      */
-    private final Class<? extends ProgramExecutor> type;
+    public ProgramLaunchEvent(String computerId, int pid, Class<? extends ProgramExecutor> type) {
+
+        this.computerId = computerId;
+        this.pid = pid;
+        this.type = type;
+    }
+
+    /**
+     * Returns the id of the computer which runs the newly launched program.
+     * 
+     * @return The computer id.
+     */
+    public String getComputerId() {
+
+        return computerId;
+    }
+
+    /**
+     * Returns the process id of the process which runs the newly launched program.
+     * 
+     * @return The pid (process id).
+     */
+    public int getPid() {
+
+        return pid;
+    }
+
+    /**
+     * Returns The program executor type (class object) that represents which kind of program was launched.
+     * 
+     * @return The type of the program executor.
+     */
+    public Class<? extends ProgramExecutor> getType() {
+
+        return type;
+    }
 
 }

@@ -18,8 +18,6 @@
 
 package com.quartercode.disconnected.world.comp.program.general;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -42,8 +40,8 @@ import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.os.User;
 import com.quartercode.disconnected.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.world.comp.program.Process;
+import com.quartercode.disconnected.world.comp.program.ProgramEvent;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
-import com.quartercode.disconnected.world.event.ProgramEvent;
 
 /**
  * The file create program is used to create a new {@link File} under a given global {@link #PATH}.
@@ -180,6 +178,12 @@ public class FileCreateProgram extends ProgramExecutor {
 
         private static final long serialVersionUID = -4305409712951906877L;
 
+        /**
+         * Creates a new file create program event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         */
         public FileCreateProgramEvent(String computerId, int pid) {
 
             super(computerId, pid);
@@ -203,6 +207,12 @@ public class FileCreateProgram extends ProgramExecutor {
 
         private static final long serialVersionUID = 4401971263121394946L;
 
+        /**
+         * Creates a new file create program success event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         */
         public SuccessEvent(String computerId, int pid) {
 
             super(computerId, pid);
@@ -227,6 +237,12 @@ public class FileCreateProgram extends ProgramExecutor {
 
         private static final long serialVersionUID = -4838627736142625093L;
 
+        /**
+         * Creates a new file create program error event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         */
         public ErrorEvent(String computerId, int pid) {
 
             super(computerId, pid);
@@ -247,22 +263,35 @@ public class FileCreateProgram extends ProgramExecutor {
      * @see ErrorEvent
      * @see FileCreateProgram
      */
-    @Data
-    @EqualsAndHashCode (callSuper = true)
     public static class UnknownMountpointEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = -7988421543408698031L;
+        private static final long serialVersionUID = -2452808547476443012L;
 
-        /**
-         * The mountpoint that describes a file system which is not known or not mounted.
-         * This mountpoint was derived from the provided {@link FileCreateProgram#PATH} string.
-         */
         private final String      mountpoint;
 
+        /**
+         * Creates a new file create program unknown mountpoint event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         * @param mountpoint The mountpoint which describes a file system that is not known or not mounted.
+         */
         public UnknownMountpointEvent(String computerId, int pid, String mountpoint) {
 
             super(computerId, pid);
+
             this.mountpoint = mountpoint;
+        }
+
+        /**
+         * Returns the mountpoint which describes a file system that is not known or not mounted.
+         * This mountpoint was derived from the provided {@link FileCreateProgram#PATH} string.
+         * 
+         * @return The unknown mountpoint.
+         */
+        public String getMountpoint() {
+
+            return mountpoint;
         }
 
     }
@@ -281,22 +310,35 @@ public class FileCreateProgram extends ProgramExecutor {
      * @see ErrorEvent
      * @see FileCreateProgram
      */
-    @Data
-    @EqualsAndHashCode (callSuper = true)
     public static class InvalidPathEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = -835974144089304053L;
+        private static final long serialVersionUID = 32541238748937669L;
 
-        /**
-         * The global file path that is not valid.
-         * The reason for its invalidity could be a file along the path is not a directory.
-         */
         private final String      path;
 
+        /**
+         * Creates a new file create program invalid path event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         * @param path The global file path which is not valid.
+         */
         public InvalidPathEvent(String computerId, int pid, String path) {
 
             super(computerId, pid);
+
             this.path = path;
+        }
+
+        /**
+         * Returns the global file path which is not valid.
+         * The reason for its invalidity could be a file along the path which is not a directory.
+         * 
+         * @return The invalid path.
+         */
+        public String getPath() {
+
+            return path;
         }
 
     }
@@ -314,21 +356,34 @@ public class FileCreateProgram extends ProgramExecutor {
      * @see ErrorEvent
      * @see FileCreateProgram
      */
-    @Data
-    @EqualsAndHashCode (callSuper = true)
     public static class OccupiedPathEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = -7938069303768892159L;
+        private static final long serialVersionUID = -712482791353066258L;
 
-        /**
-         * The global file path that is already occupied by a file.
-         */
         private final String      path;
 
+        /**
+         * Creates a new file create program occupied path event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         * @param path The global file path which is already occupied by another file.
+         */
         public OccupiedPathEvent(String computerId, int pid, String path) {
 
             super(computerId, pid);
+
             this.path = path;
+        }
+
+        /**
+         * Returns the global file path which is already occupied by another file.
+         * 
+         * @return The occupied path.
+         */
+        public String getPath() {
+
+            return path;
         }
 
     }
@@ -348,27 +403,47 @@ public class FileCreateProgram extends ProgramExecutor {
      * @see ErrorEvent
      * @see FileCreateProgram
      */
-    @Data
-    @EqualsAndHashCode (callSuper = true)
     public static class OutOfSpaceEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = -8920069055350818363L;
+        private static final long serialVersionUID = 1605576993550104512L;
 
-        /**
-         * The mountpoint of the {@link FileSystem} where the file should have been added to.
-         */
         private final String      fileSystemMountpoint;
-
-        /**
-         * The amount of bytes that should have been added to the file system.
-         */
         private final long        requiredSpace;
 
+        /**
+         * Creates a new file create program out of space event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         * @param fileSystemMountpoint The mountpoint of the {@link FileSystem} where the new file should have been added to.
+         * @param requiredSpace The amount of bytes which should have been added to the file system.
+         */
         public OutOfSpaceEvent(String computerId, int pid, String fileSystemMountpoint, long requiredSpace) {
 
             super(computerId, pid);
+
             this.fileSystemMountpoint = fileSystemMountpoint;
             this.requiredSpace = requiredSpace;
+        }
+
+        /**
+         * Returns the mountpoint of the {@link FileSystem} where the new file should have been added to.
+         * 
+         * @return The mountpoint of the target file system.
+         */
+        public String getFileSystemMountpoint() {
+
+            return fileSystemMountpoint;
+        }
+
+        /**
+         * Returns the amount of bytes which should have been added to the file system.
+         * 
+         * @return The amount of new bytes.
+         */
+        public long getRequiredSpace() {
+
+            return requiredSpace;
         }
 
     }
@@ -390,6 +465,12 @@ public class FileCreateProgram extends ProgramExecutor {
 
         private static final long serialVersionUID = 1363673374686927819L;
 
+        /**
+         * Creates a new file create program missing rights event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         */
         public MissingRightsEvent(String computerId, int pid) {
 
             super(computerId, pid);

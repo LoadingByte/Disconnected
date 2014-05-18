@@ -21,8 +21,6 @@ package com.quartercode.disconnected.world.comp.program.general;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -30,6 +28,7 @@ import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
 import com.quartercode.disconnected.bridge.Bridge;
+import com.quartercode.disconnected.util.DataObjectBase;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileRights;
@@ -47,9 +46,9 @@ import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.os.User;
 import com.quartercode.disconnected.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.world.comp.program.Process;
+import com.quartercode.disconnected.world.comp.program.ProgramEvent;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.comp.program.general.FileListProgram.SuccessEvent.FilePlaceholder;
-import com.quartercode.disconnected.world.event.ProgramEvent;
 
 /**
  * The file list program is used to list all files which are children of a given directory ({@link #PATH}).
@@ -209,6 +208,12 @@ public class FileListProgram extends ProgramExecutor {
 
         private static final long serialVersionUID = -9112210048232206110L;
 
+        /**
+         * Creates a new file list program event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         */
         public FileListProgramEvent(String computerId, int pid) {
 
             super(computerId, pid);
@@ -218,7 +223,7 @@ public class FileListProgram extends ProgramExecutor {
 
     /**
      * The success event is fired by the {@link FileListProgram} when the file list process was successful.
-     * It also carries the {@link #FILES} property which contains the names of all listed files.<br>
+     * It also carries some {@link FilePlaceholder}s which represent the listed files.<br>
      * <br>
      * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.
      * For example, an instanceof check should look like this:
@@ -229,17 +234,19 @@ public class FileListProgram extends ProgramExecutor {
      * 
      * @see FileListProgram
      */
-    @Data
-    @EqualsAndHashCode (callSuper = true)
     public static class SuccessEvent extends FileListProgramEvent {
 
-        private static final long           serialVersionUID = 5150968724724858614L;
+        private static final long           serialVersionUID = -7847306412641023157L;
 
-        /**
-         * Placeholder objects that represent requested files which are children of the input directory.
-         */
         private final List<FilePlaceholder> files;
 
+        /**
+         * Creates a new list create program success event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         * @param files The placeholder objects that represent the requested files which are children of the input directory.
+         */
         public SuccessEvent(String computerId, int pid, List<FilePlaceholder> files) {
 
             super(computerId, pid);
@@ -247,46 +254,112 @@ public class FileListProgram extends ProgramExecutor {
         }
 
         /**
+         * Returns the placeholder objects that represent the requested files which are children of the input directory.
+         * 
+         * @return Placeholder objects for the requested files.
+         */
+        public List<FilePlaceholder> getFiles() {
+
+            return files;
+        }
+
+        /**
          * A file placeholder represents a {@link File} object by storing commonly used data about it.
          * File systems are represented by their {@link RootFile}s.
          */
-        @Data
-        public static class FilePlaceholder implements Serializable {
+        public static class FilePlaceholder extends DataObjectBase implements Serializable {
 
-            private static final long              serialVersionUID = 2757049420246691150L;
+            private static final long              serialVersionUID = -2426223562927131377L;
 
-            /**
-             * The name of the represented file.
-             */
             private final String                   name;
-
-            /**
-             * The type (class object) of the represented file.
-             */
             private final Class<? extends File<?>> type;
-
-            /**
-             * The total size of the represented file.
-             * If the placeholder represents a file system, the size of the file system is used.
-             */
             private final long                     size;
+            private final String                   rights;
+            private final String                   owner;
+            private final String                   group;
 
             /**
-             * The {@link FileRights}s string that stores the file rights of the represented file.
+             * Creates a new file placeholder.
              * 
+             * @param name The name of the represented file.
+             * @param type The type (class object) of the represented file.
+             * @param size The total size of the represented file.
+             *        If the placeholder represents a file system, the size of that file system should be used.
+             * @param rights A {@link FileRights}s string which stores the file rights of the represented file.
+             * @param owner The name of the user that owns the represented file.
+             * @param group The name of the group that is assigned to the represented file.
+             */
+            public FilePlaceholder(String name, Class<? extends File<?>> type, long size, String rights, String owner, String group) {
+
+                this.name = name;
+                this.type = type;
+                this.size = size;
+                this.rights = rights;
+                this.owner = owner;
+                this.group = group;
+            }
+
+            /**
+             * Returns the name of the represented file.
+             * 
+             * @return The file name.
+             */
+            public String getName() {
+
+                return name;
+            }
+
+            /**
+             * Returns the type (class object) of the represented file.
+             * 
+             * @return The file type.
+             */
+            public Class<? extends File<?>> getType() {
+
+                return type;
+            }
+
+            /**
+             * Returns the total size of the represented file.
+             * If the placeholder represents a file system, the size of that file system is used.
+             * 
+             * @return The file/file system size.
+             */
+            public long getSize() {
+
+                return size;
+            }
+
+            /**
+             * Returns a {@link FileRights}s string which stores the file rights of the represented file.
+             * 
+             * @return The file rights as a string.
              * @see FileRights#TO_STRING
              */
-            private final String                   rights;
+            public String getRights() {
+
+                return rights;
+            }
 
             /**
-             * The name of the user that owns the represented file.
+             * Returns the name of the user which owns the represented file.
+             * 
+             * @return The name of the file owner.
              */
-            private final String                   owner;
+            public String getOwner() {
+
+                return owner;
+            }
 
             /**
-             * The name of the group that is assigned to the represented file.
+             * Returns The name of the group which is assigned to the represented file.
+             * 
+             * @return The name of the file group.
              */
-            private final String                   group;
+            public String getGroup() {
+
+                return group;
+            }
 
         }
 
@@ -309,6 +382,12 @@ public class FileListProgram extends ProgramExecutor {
 
         private static final long serialVersionUID = 347053041373954853L;
 
+        /**
+         * Creates a new file list program error event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         */
         public ErrorEvent(String computerId, int pid) {
 
             super(computerId, pid);
@@ -329,22 +408,35 @@ public class FileListProgram extends ProgramExecutor {
      * @see ErrorEvent
      * @see FileListProgram
      */
-    @Data
-    @EqualsAndHashCode (callSuper = true)
     public static class UnknownMountpointEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = -1037703413535146645L;
+        private static final long serialVersionUID = -8883689816152325034L;
 
-        /**
-         * The mountpoint that describes a file system which is not known or not mounted.
-         * This mountpoint was derived from the provided {@link FileListProgram#PATH} string.
-         */
         private final String      mountpoint;
 
+        /**
+         * Creates a new file list program unknown mountpoint event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         * @param mountpoint The mountpoint which describes a file system that is not known or not mounted.
+         */
         public UnknownMountpointEvent(String computerId, int pid, String mountpoint) {
 
             super(computerId, pid);
+
             this.mountpoint = mountpoint;
+        }
+
+        /**
+         * Returns the mountpoint which describes a file system that is not known or not mounted.
+         * This mountpoint was derived from the provided {@link FileListProgram#PATH} string.
+         * 
+         * @return The unknown mountpoint.
+         */
+        public String getMountpoint() {
+
+            return mountpoint;
         }
 
     }
@@ -363,22 +455,35 @@ public class FileListProgram extends ProgramExecutor {
      * @see ErrorEvent
      * @see FileListProgram
      */
-    @Data
-    @EqualsAndHashCode (callSuper = true)
     public static class InvalidPathEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = -3573024132427884551L;
+        private static final long serialVersionUID = -8503020862248673551L;
 
-        /**
-         * The global file path that is not valid.
-         * The reason for its invalidity could be a file along the path is not a directory.
-         */
         private final String      path;
 
+        /**
+         * Creates a new file list program invalid path event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         * @param path The global file path which is not valid.
+         */
         public InvalidPathEvent(String computerId, int pid, String path) {
 
             super(computerId, pid);
+
             this.path = path;
+        }
+
+        /**
+         * Returns the global file path which is not valid.
+         * The reason for its invalidity could be a file along the path which is not a directory.
+         * 
+         * @return The invalid path.
+         */
+        public String getPath() {
+
+            return path;
         }
 
     }
@@ -400,6 +505,12 @@ public class FileListProgram extends ProgramExecutor {
 
         private static final long serialVersionUID = 8170183641838774836L;
 
+        /**
+         * Creates a new file list program missing rights event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         */
         public MissingRightsEvent(String computerId, int pid) {
 
             super(computerId, pid);

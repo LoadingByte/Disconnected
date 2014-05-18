@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.bridge.predicate;
 
-import lombok.Data;
 import com.quartercode.disconnected.bridge.Event;
 import com.quartercode.disconnected.bridge.EventPredicate;
+import com.quartercode.disconnected.util.DataObjectBase;
 
 /**
  * Multi predicates combine different predicates by linking them together with logical operations (like {@code OR} or {@code AND}).
@@ -65,12 +65,16 @@ public class MultiPredicates {
         return new AndPredicate<>(predicates);
     }
 
-    @Data
-    private static class OrPredicate<T extends Event> implements EventPredicate<T> {
+    private static class OrPredicate<T extends Event> extends DataObjectBase implements EventPredicate<T> {
 
-        private static final long                 serialVersionUID = 4566924849000854937L;
+        private static final long                 serialVersionUID = 5468534553109606081L;
 
         private final EventPredicate<? super T>[] predicates;
+
+        private OrPredicate(EventPredicate<? super T>[] predicates) {
+
+            this.predicates = predicates;
+        }
 
         @Override
         public boolean test(T event) {
@@ -86,12 +90,16 @@ public class MultiPredicates {
 
     }
 
-    @Data
-    private static class AndPredicate<T extends Event> implements EventPredicate<T> {
+    private static class AndPredicate<T extends Event> extends DataObjectBase implements EventPredicate<T> {
 
-        private static final long                 serialVersionUID = -532845016351849577L;
+        private static final long                 serialVersionUID = 2779756637065151027L;
 
         private final EventPredicate<? super T>[] predicates;
+
+        private AndPredicate(EventPredicate<? super T>[] predicates) {
+
+            this.predicates = predicates;
+        }
 
         @Override
         public boolean test(T event) {

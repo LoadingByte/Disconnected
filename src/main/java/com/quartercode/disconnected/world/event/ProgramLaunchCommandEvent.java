@@ -19,8 +19,8 @@
 package com.quartercode.disconnected.world.event;
 
 import java.util.Map;
-import lombok.Data;
 import com.quartercode.disconnected.bridge.Event;
+import com.quartercode.disconnected.util.DataObjectBase;
 
 /**
  * A program launch command event starts a program on the computer of the client that sends it.
@@ -48,27 +48,55 @@ import com.quartercode.disconnected.bridge.Event;
  * 
  * @see ProgramLaunchCommandEventHandler
  */
-@Data
-public class ProgramLaunchCommandEvent implements Event {
+public class ProgramLaunchCommandEvent extends DataObjectBase implements Event {
 
-    private static final long         serialVersionUID = 6037198507618228282L;
+    private static final long         serialVersionUID = -1124332803786649358L;
 
     // TODO: Proper user identification
 
-    /**
-     * The pid the newly launched program will have.
-     * It is checked for uniqueness before it's actually used.
-     */
     private final int                 pid;
-
-    /**
-     * The path under which the program file, which will be used for the new program instance, can be found.
-     * If the path doesn't point to a valid program file, the launch process is stopped.
-     */
     private final String              filePath;
+    private final Map<String, Object> executorProperties;
 
     /**
-     * The properties which should be set on the program executor which'll run the new program instance.
+     * Creates a new program launch command event
+     * 
+     * @param pid The pid the newly launched program will have.
+     * @param filePath The path under which the program file, which will be used for the new program instance, can be found.
+     * @param executorProperties The properties which should be set on the program executor which'll run the new program instance.
+     *        For more details, see {@link #getExecutorProperties()}.
+     */
+    public ProgramLaunchCommandEvent(int pid, String filePath, Map<String, Object> executorProperties) {
+
+        this.pid = pid;
+        this.filePath = filePath;
+        this.executorProperties = executorProperties;
+    }
+
+    /**
+     * Returns the pid the newly launched program will have.
+     * It is checked for uniqueness before it's actually used.
+     * 
+     * @return The pid for the new program.
+     */
+    public int getPid() {
+
+        return pid;
+    }
+
+    /**
+     * Returns the path under which the program file, which will be used for the new program instance, can be found.
+     * If the path doesn't point to a valid program file, the launch process is stopped.
+     * 
+     * @return The source file path for the new program.
+     */
+    public String getFilePath() {
+
+        return filePath;
+    }
+
+    /**
+     * Returns the properties which should be set on the program executor which'll run the new program instance.
      * The key of an entry is the name of the definition constant in the executor class, the value is the value for the property.
      * Example:
      * 
@@ -85,7 +113,12 @@ public class ProgramLaunchCommandEvent implements Event {
      *   { "VALUE_2", "test" }
      * ]
      * </pre>
+     * 
+     * @return The properties map for the new program executor.
      */
-    private final Map<String, Object> executorProperties;
+    public Map<String, Object> getExecutorProperties() {
+
+        return executorProperties;
+    }
 
 }

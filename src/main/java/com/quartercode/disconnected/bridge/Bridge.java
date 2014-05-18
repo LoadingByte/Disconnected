@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.util.RunnableInvocationProvider;
@@ -299,11 +298,16 @@ public class Bridge {
         }
     }
 
-    @RequiredArgsConstructor
     private static class HandlerInvocationRunnable implements Runnable {
 
         private final EventHandler<?> handler;
         private final Event           event;
+
+        public HandlerInvocationRunnable(EventHandler<?> handler, Event event) {
+
+            this.handler = handler;
+            this.event = event;
+        }
 
         @Override
         public void run() {

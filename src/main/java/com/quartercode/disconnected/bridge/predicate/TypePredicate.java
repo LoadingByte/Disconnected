@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.bridge.predicate;
 
-import lombok.Data;
 import com.quartercode.disconnected.bridge.Event;
 import com.quartercode.disconnected.bridge.EventPredicate;
+import com.quartercode.disconnected.util.DataObjectBase;
 
 /**
  * The type predicate checks whether an event is and instance of a known type.
@@ -28,12 +28,21 @@ import com.quartercode.disconnected.bridge.EventPredicate;
  * @param <T> The type of event that can be tested by the predicate.
  * @see EventPredicate
  */
-@Data
-public class TypePredicate<T extends Event> implements EventPredicate<T> {
+public class TypePredicate<T extends Event> extends DataObjectBase implements EventPredicate<T> {
 
-    private static final long        serialVersionUID = 8225740116869401804L;
+    private static final long        serialVersionUID = 328857758958950420L;
 
     private final Class<? extends T> type;
+
+    /**
+     * Creates a new type predicate which uses the given type for testing incoming events.
+     * 
+     * @param type The type (class object) to use for the test.
+     */
+    public TypePredicate(Class<? extends T> type) {
+
+        this.type = type;
+    }
 
     @Override
     public boolean test(T event) {

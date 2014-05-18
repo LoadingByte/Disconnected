@@ -18,22 +18,39 @@
 
 package com.quartercode.disconnected.bridge;
 
-import lombok.Data;
+import com.quartercode.disconnected.util.DataObjectBase;
 
 /**
  * The add/remove predicate event is internally sent between two {@link Bridge}s for limiting the events that are sent
  * to the ones the other side is really interested in.
- * See the bridge javadoc for more details on the event limit system.
+ * See the bridge javadoc for more details on the event limit system.<br>
+ * <br>
+ * <i>This class is internal and not intended to be used outside the bridge package.</i>
  * 
  * @see Bridge
  * @see EventPredicate
  */
-@Data
-public class AddRemovePredicateEvent implements Event {
+public class AddRemovePredicateEvent extends DataObjectBase implements Event {
 
-    private static final long       serialVersionUID = 2145361986393264897L;
+    private static final long       serialVersionUID = -5336795442194231716L;
 
     private final EventPredicate<?> predicate;
     private final boolean           add;
+
+    public AddRemovePredicateEvent(EventPredicate<?> predicate, boolean add) {
+
+        this.predicate = predicate;
+        this.add = add;
+    }
+
+    public EventPredicate<?> getPredicate() {
+
+        return predicate;
+    }
+
+    public boolean isAdd() {
+
+        return add;
+    }
 
 }

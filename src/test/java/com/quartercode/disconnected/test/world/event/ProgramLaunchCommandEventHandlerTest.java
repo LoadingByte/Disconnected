@@ -20,12 +20,12 @@ package com.quartercode.disconnected.test.world.event;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Data;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.disconnected.util.DataObjectBase;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.program.Process;
@@ -128,11 +128,18 @@ public class ProgramLaunchCommandEventHandlerTest {
 
     }
 
-    @Data
-    private static class SomeObject {
+    private static class SomeObject extends DataObjectBase {
 
+        @SuppressWarnings ("unused")
         private final double value1;
+        @SuppressWarnings ("unused")
         private final String value2;
+
+        private SomeObject(double value1, String value2) {
+
+            this.value1 = value1;
+            this.value2 = value2;
+        }
 
     }
 

@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.bridge;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import lombok.Data;
+import com.quartercode.disconnected.util.DataObjectBase;
 
 /**
  * The return event utility allows to send returnable {@link Event}s that are answered with return events.
@@ -123,12 +123,16 @@ public class ReturnEventUtil {
 
     }
 
-    @Data
-    private static class ReturnIdPredicate<T extends Return> implements EventPredicate<T> {
+    private static class ReturnIdPredicate<T extends Return> extends DataObjectBase implements EventPredicate<T> {
 
-        private static final long serialVersionUID = -2306749354040625943L;
+        private static final long serialVersionUID = 2959205586146211520L;
 
         private final String      returnId;
+
+        private ReturnIdPredicate(String returnId) {
+
+            this.returnId = returnId;
+        }
 
         @Override
         public boolean test(T event) {
@@ -221,10 +225,19 @@ public class ReturnEventUtil {
      * @see CloseChecker
      * @see ReturnEventUtil#send(Bridge, Returnable, EventHandler, CloseChecker)
      */
-    @Data
     public static class BooleanCloseChecker implements CloseChecker {
 
         private final AtomicBoolean flag;
+
+        /**
+         * Creates a new boolean close checker which uses the given flag.
+         * 
+         * @param flag The flag which should be used by the close checker.
+         */
+        public BooleanCloseChecker(AtomicBoolean flag) {
+
+            this.flag = flag;
+        }
 
         @Override
         public boolean check() {

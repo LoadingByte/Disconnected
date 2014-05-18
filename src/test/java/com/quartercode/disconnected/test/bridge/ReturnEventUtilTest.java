@@ -22,12 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Wither;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,7 +57,7 @@ public class ReturnEventUtilTest {
 
         });
 
-        Event1 event = new Event1();
+        Event1 event = new Event1("teststring");
         ReturnEventUtil.send(bridge, event, new AbstractEventHandler<Event2>(Event2.class) {
 
             @Override
@@ -110,7 +104,7 @@ public class ReturnEventUtilTest {
 
         });
 
-        ReturnEventUtil.send(bridge, new Event1(), handler);
+        ReturnEventUtil.send(bridge, new Event1("teststring"), handler);
 
         Event2 response = lastHandlerCall.get();
         Assert.assertNotNull("No event was handled by the return-awaiting handler", response);
@@ -155,7 +149,7 @@ public class ReturnEventUtilTest {
 
         });
 
-        ReturnEventUtil.send(bridge, new Event1(), handler, new BooleanCloseChecker(closeFlag));
+        ReturnEventUtil.send(bridge, new Event1("teststring"), handler, new BooleanCloseChecker(closeFlag));
 
         Assert.assertTrue("The return-awaiting handler didn't receive any return events", handlerCalls.size() == 3);
         Assert.assertEquals("The events that were handled by the return-awaiting handler", sentResponses, handlerCalls);
@@ -163,22 +157,63 @@ public class ReturnEventUtilTest {
     }
 
     @SuppressWarnings ("serial")
-    @Data
-    @RequiredArgsConstructor
-    @AllArgsConstructor (access = AccessLevel.PRIVATE)
     private static class Event1 implements Returnable {
 
-        @Wither
-        @Setter (AccessLevel.NONE)
-        private String nextReturnId;
+        private final String testData;
+        private final String nextReturnId;
+
+        public Event1(String testData) {
+
+            this.testData = testData;
+            nextReturnId = null;
+        }
+
+        private Event1(String testData, String nextReturnId) {
+
+            this.testData = testData;
+            this.nextReturnId = nextReturnId;
+        }
+
+        public String getTestData() {
+
+            return testData;
+        }
+
+        @Override
+        public String getNextReturnId() {
+
+            return nextReturnId;
+        }
+
+        @Override
+        public Event1 withNextReturnId(String nextReturnId) {
+
+            return new Event1(testData, nextReturnId);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+
+            return obj instanceof Event1 && testData.equals( ((Event1) obj).getTestData());
+        }
 
     }
 
     @SuppressWarnings ("serial")
-    @Data
     private static class Event2 implements Return {
 
         private final String returnId;
+
+        public Event2(String returnId) {
+
+            this.returnId = returnId;
+        }
+
+        @Override
+        public String getReturnId() {
+
+            return returnId;
+        }
 
     }
 

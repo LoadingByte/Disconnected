@@ -18,7 +18,6 @@
 
 package com.quartercode.disconnected.util;
 
-import lombok.Synchronized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,8 +47,7 @@ public class ExitUtil {
      * Exits the application using the injected {@link ExitProcessor}.
      * Please note that this method can only be executed once.
      */
-    @Synchronized
-    public static void exit() {
+    public static synchronized void exit() {
 
         if (!exitUnderway) {
             if (processor == null) {

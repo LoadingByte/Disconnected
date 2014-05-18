@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.bridge.predicate;
 
-import lombok.Data;
 import com.quartercode.disconnected.bridge.Event;
 import com.quartercode.disconnected.bridge.EventPredicate;
+import com.quartercode.disconnected.util.DataObjectBase;
 
 /**
  * The true predicate just returns true when the {@link #test(Event)} method is called.
@@ -29,10 +29,16 @@ import com.quartercode.disconnected.bridge.EventPredicate;
  * @param <T> The type of event that can be tested by the predicate.
  * @see EventPredicate
  */
-@Data
-public class TruePredicate<T extends Event> implements EventPredicate<T> {
+public class TruePredicate<T extends Event> extends DataObjectBase implements EventPredicate<T> {
 
-    private static final long serialVersionUID = -6312889895325471315L;
+    private static final long serialVersionUID = 2396355064846764377L;
+
+    /**
+     * Creates a new true predicate.
+     */
+    public TruePredicate() {
+
+    }
 
     @Override
     public boolean test(T event) {

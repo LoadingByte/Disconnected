@@ -18,14 +18,9 @@
 
 package com.quartercode.disconnected.world.event;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Wither;
 import com.quartercode.disconnected.bridge.ReturnEventUtil.Return;
 import com.quartercode.disconnected.bridge.ReturnEventUtil.Returnable;
+import com.quartercode.disconnected.util.DataObjectBase;
 
 /**
  * The program launch info request event can be used to retrieve needed information before sending a {@link ProgramLaunchCommandEvent}.
@@ -35,18 +30,38 @@ import com.quartercode.disconnected.bridge.ReturnEventUtil.Returnable;
  * @see ProgramLaunchInfoResponseEvent
  * @see ProgramLaunchInfoRequestEventHandler
  */
-@Data
-@RequiredArgsConstructor
-@AllArgsConstructor (access = AccessLevel.PRIVATE)
-public class ProgramLaunchInfoRequestEvent implements Returnable {
+public class ProgramLaunchInfoRequestEvent extends DataObjectBase implements Returnable {
 
-    private static final long serialVersionUID = 8657866299342353712L;
+    private static final long serialVersionUID = 4257982834926575833L;
 
     // TODO: Proper user identification
 
-    @Wither
-    @Setter (AccessLevel.NONE)
-    private String            nextReturnId;
+    private final String      nextReturnId;
+
+    /**
+     * Creates a new program launch info request event.
+     */
+    public ProgramLaunchInfoRequestEvent() {
+
+        nextReturnId = null;
+    }
+
+    private ProgramLaunchInfoRequestEvent(String nextReturnId) {
+
+        this.nextReturnId = nextReturnId;
+    }
+
+    @Override
+    public ProgramLaunchInfoRequestEvent withNextReturnId(String nextReturnId) {
+
+        return new ProgramLaunchInfoRequestEvent(nextReturnId);
+    }
+
+    @Override
+    public String getNextReturnId() {
+
+        return nextReturnId;
+    }
 
     /**
      * The program launch info response event response to the return event for the {@link ProgramLaunchInfoRequestEvent}.
@@ -55,22 +70,53 @@ public class ProgramLaunchInfoRequestEvent implements Returnable {
      * @see ProgramLaunchInfoRequestEvent
      * @see ProgramLaunchInfoRequestEventHandler
      */
-    @Data
     public static class ProgramLaunchInfoResponseEvent implements Return {
 
-        private static final long serialVersionUID = -2662532919300573317L;
+        private static final long serialVersionUID = 2985616167848182219L;
 
-        /**
-         * The id of the computer which represents the client that sent the request event.
-         */
         private final String      computerId;
+        private final int         pid;
+        private final String      returnId;
 
         /**
-         * A newly generated process id that might be used to launch a new program.
+         * Creates a new program launch info response event.
+         * 
+         * @param computerId The id of the computer which represents the client that sent the request event.
+         * @param pid A newly generated process id that might be used to launch a new program.
+         * @param returnId The return id.
          */
-        private final int         pid;
+        public ProgramLaunchInfoResponseEvent(String computerId, int pid, String returnId) {
 
-        private final String      returnId;
+            this.computerId = computerId;
+            this.pid = pid;
+            this.returnId = returnId;
+        }
+
+        /**
+         * Returns the id of the computer which represents the client that sent the request event.
+         * 
+         * @return The computer id.
+         */
+        public String getComputerId() {
+
+            return computerId;
+        }
+
+        /**
+         * Returns a newly generated process id that might be used to launch a new program.
+         * 
+         * @return A new pid.
+         */
+        public int getPid() {
+
+            return pid;
+        }
+
+        @Override
+        public String getReturnId() {
+
+            return returnId;
+        }
 
     }
 

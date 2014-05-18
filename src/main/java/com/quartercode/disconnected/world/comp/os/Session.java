@@ -18,8 +18,6 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -31,8 +29,8 @@ import com.quartercode.classmod.extra.def.ReferenceProperty;
 import com.quartercode.disconnected.world.comp.program.ChildProcess;
 import com.quartercode.disconnected.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.world.comp.program.Process;
+import com.quartercode.disconnected.world.comp.program.ProgramEvent;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
-import com.quartercode.disconnected.world.event.ProgramEvent;
 
 /**
  * This class represents a program which opens a session.
@@ -165,6 +163,12 @@ public class Session extends ProgramExecutor {
 
         private static final long serialVersionUID = -2264878017550342789L;
 
+        /**
+         * Creates a new session event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         */
         public SessionEvent(String computerId, int pid) {
 
             super(computerId, pid);
@@ -188,6 +192,12 @@ public class Session extends ProgramExecutor {
 
         private static final long serialVersionUID = 3149954173860266466L;
 
+        /**
+         * Creates a new session finish start event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         */
         public FinishStartEvent(String computerId, int pid) {
 
             super(computerId, pid);
@@ -207,21 +217,33 @@ public class Session extends ProgramExecutor {
      * 
      * @see Session
      */
-    @Data
-    @EqualsAndHashCode (callSuper = true)
     public static class WrongPasswordEvent extends SessionEvent {
 
-        private static final long serialVersionUID = 7354728090960359912L;
+        private static final long serialVersionUID = -1232371466644442727L;
 
-        /**
-         * The provided password that is not correct (may be {@code null}).
-         */
         private final String      wrongPassword;
 
+        /**
+         * Creates a new session wrong password event.
+         * 
+         * @param computerId The id of the computer which runs the program the event is fired by.
+         * @param pid The process id of the process which runs the program the event is fired by.
+         * @param wrongPassword The provided password which is not correct (may be {@code null}).
+         */
         public WrongPasswordEvent(String computerId, int pid, String wrongPassword) {
 
             super(computerId, pid);
             this.wrongPassword = wrongPassword;
+        }
+
+        /**
+         * Returns the provided password which is not correct (may be {@code null}).
+         * 
+         * @return The wrong password.
+         */
+        public String getWrongPassword() {
+
+            return wrongPassword;
         }
 
     }
