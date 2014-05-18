@@ -65,7 +65,7 @@ public class FileRemoveProgramTest extends AbstractProgramTest {
 
         ChildProcess process = parentProcess.get(Process.CREATE_CHILD).invoke();
         process.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(getComponents(getCommonLocation(FileRemoveProgram.class))[1]));
-        process.get(Process.INITIALIZE).invoke();
+        process.get(Process.INITIALIZE).invoke(10);
 
         ProgramExecutor program = process.get(Process.EXECUTOR).get();
         program.get(FileRemoveProgram.PATH).set(path);
@@ -127,7 +127,7 @@ public class FileRemoveProgramTest extends AbstractProgramTest {
 
         ChildProcess sessionProcess = processModule.get(ProcessModule.ROOT_PROCESS).get().get(Process.CREATE_CHILD).invoke();
         sessionProcess.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(getComponents(getCommonLocation(Session.class))[1]));
-        sessionProcess.get(Process.INITIALIZE).invoke();
+        sessionProcess.get(Process.INITIALIZE).invoke(1);
         ProgramExecutor session = sessionProcess.get(Process.EXECUTOR).get();
         session.get(Session.USER).set(testUser);
         session.get(ProgramExecutor.RUN).invoke();

@@ -76,7 +76,9 @@ public class MultiPredicatesTest<T extends Event> {
     }
 
     @SuppressWarnings ("serial")
-    private static class Event1 implements Event {}
+    private static class Event1 implements Event {
+
+    }
 
     @SuppressWarnings ("serial")
     private static class Event2 implements Event {
