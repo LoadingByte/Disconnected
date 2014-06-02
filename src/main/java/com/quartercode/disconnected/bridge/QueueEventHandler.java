@@ -58,41 +58,6 @@ public class QueueEventHandler<T extends Event> implements EventHandler<T> {
     }
 
     /**
-     * Returns the next received {@link Event} from the {@link Queue} which matches the criteria of the given {@link EventPredicate}.
-     * Every returned event is removed from the internal storage queue.
-     * Example:
-     * 
-     * <pre>
-     * Format: EventType[Identifier]
-     * Queue:  A[1], A[2], B[3], A[4], B[5], B[6]
-     * 
-     * NEXT_EVENT (predicate for A) returns A[1]
-     * =&gt; A[2], B[3], A[4], B[5], B[6]
-     * 
-     * NEXT_EVENT (predicate for B) returns B[3]
-     * =&gt; A[2], A[4], B[5], B[6]
-     * 
-     * NEXT_EVENT (predicate for A) returns A[2]
-     * =&gt; A[4], B[5], B[6]
-     * </pre>
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link EventPredicate}</td>
-     * <td>predicate</td>
-     * <td>The event predicate that checks for the event which should be returned.</td>
-     * </tr>
-     * </table>
-     */
-
-    /**
      * Returns the next received {@link Event} from the event queue.
      * Every returned event is removed from the internal storage queue.
      * Example:

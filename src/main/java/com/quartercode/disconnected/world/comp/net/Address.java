@@ -173,7 +173,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
                 FeatureHolder holder = invocation.getHolder();
 
                 String netID = holder.get(NET_ID).get().get(NetID.TO_STRING).invoke();
-                int port = holder.get(PORT).get();;
+                int port = holder.get(PORT).get();
 
                 invocation.next(arguments);
                 return new StringBuilder(netID).append(":").append(port).toString();

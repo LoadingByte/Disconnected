@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * A random pool stores a list of randoms for generating more independent randoms out of one object.
@@ -247,39 +250,19 @@ public class RandomPool implements Serializable {
     @Override
     public int hashCode() {
 
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (randoms == null ? 0 : randoms.hashCode());
-        return result;
+        return HashCodeBuilder.reflectionHashCode(this);
     }
 
     @Override
     public boolean equals(Object obj) {
 
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        RandomPool other = (RandomPool) obj;
-        if (randoms == null) {
-            if (other.randoms != null) {
-                return false;
-            }
-        } else if (!randoms.equals(other.randoms)) {
-            return false;
-        }
-        return true;
+        return EqualsBuilder.reflectionEquals(this, obj);
     }
 
     @Override
     public String toString() {
 
-        return getClass().getName() + " [" + randoms.size() + " randoms]";
+        return new ToStringBuilder(this).append("randoms", randoms.size()).append("currentIndex", currentIndex).build();
     }
 
 }
