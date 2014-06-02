@@ -41,16 +41,34 @@ public class FileRightsTest {
     public void testSet() {
 
         FileRights rights = new FileRights();
-        rights.get(FileRights.FROM_STRING).invoke("------------");
 
-        rights.get(FileRights.SET).invoke(FileAccessor.OWNER, FileRight.EXECUTE, true);
-        Assert.assertTrue("Owner execute right can't get set", rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.EXECUTE));
+        for (FileAccessor accessor : FileAccessor.values()) {
+            for (FileRight right : FileRight.values()) {
+                rights.get(FileRights.SET).invoke(accessor, right, true);
+                Assert.assertTrue(accessor + " " + right + " right is false after setting it to true", rights.get(FileRights.GET).invoke(accessor, right));
 
-        rights.get(FileRights.SET).invoke(FileAccessor.GROUP, FileRight.WRITE, true);
-        Assert.assertTrue("Group write right can't get set", rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.WRITE));
+                rights.get(FileRights.SET).invoke(accessor, right, false);
+                Assert.assertFalse(accessor + " " + right + " right is true after setting it to false", rights.get(FileRights.GET).invoke(accessor, right));
+            }
+        }
+    }
 
-        rights.get(FileRights.SET).invoke(FileAccessor.OTHERS, FileRight.READ, false);
-        Assert.assertFalse("Others write can't get set", rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.READ));
+    @Test
+    public void testSetAll() {
+
+        FileRights rights = new FileRights();
+
+        for (FileRight right : FileRight.values()) {
+            rights.get(FileRights.SET).invoke(null, right, true);
+            for (FileAccessor accessor : FileAccessor.values()) {
+                Assert.assertTrue(accessor + " " + right + " right is false after setting it to true", rights.get(FileRights.GET).invoke(accessor, right));
+            }
+
+            rights.get(FileRights.SET).invoke(null, right, false);
+            for (FileAccessor accessor : FileAccessor.values()) {
+                Assert.assertFalse(accessor + " " + right + " right is true after setting it to false", rights.get(FileRights.GET).invoke(accessor, right));
+            }
+        }
     }
 
     @Test
