@@ -46,6 +46,7 @@ import com.quartercode.disconnected.graphics.desktop.DesktopPrograms;
 import com.quartercode.disconnected.graphics.desktop.DesktopTaskbarModule;
 import com.quartercode.disconnected.graphics.desktop.DesktopWidgetModule;
 import com.quartercode.disconnected.graphics.desktop.DesktopWindowAreaModule;
+import com.quartercode.disconnected.graphics.desktop.program.FileManagerProgram;
 import com.quartercode.disconnected.sim.DefaultProfileManager;
 import com.quartercode.disconnected.sim.DefaultTicker;
 import com.quartercode.disconnected.sim.Profile;
@@ -96,6 +97,25 @@ public class Main {
         String jarName = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
         JAR_NAME = jarName.endsWith(".jar") ? jarName : null;
 
+    }
+
+    /**
+     * The main method which initializes the whole game.
+     * 
+     * @param args The command line arguments.
+     */
+    public static void main(String[] args) {
+
+        // Set default exception handler
+        Thread.setDefaultUncaughtExceptionHandler(new LogExceptionHandler());
+
+        // Set default ToStringBuilder style
+        ToStringBuilder.setDefaultStyle(ToStringStyle.SHORT_PREFIX_STYLE);
+
+        // Install JUL to SLF4J bridge
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+
         // Inject exit processor
         ExitUtil.injectProcessor(new ExitProcessor() {
 
@@ -107,74 +127,24 @@ public class Main {
             }
         });
 
-    }
-
-    /**
-     * The main method which initializes the whole game.
-     * 
-     * @param args The command line arguments.
-     */
-    public static void main(String[] args) {
-
-        // Default exception handler if the vm throws an exception to the entry point of thread (e.g. main() or run())
-        Thread.setDefaultUncaughtExceptionHandler(new LogExceptionHandler());
-
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
-
-        ToStringBuilder.setDefaultStyle(ToStringStyle.SHORT_PREFIX_STYLE);
-
         // Add custom mappings to EventBridgeFactory
         fillEventBridgeFactory();
 
         // Print information about the software
         LOGGER.info("Version {}", ApplicationInfo.VERSION);
 
-        // Parse command line arguments
-        Options options = createCommandLineOptions();
-        CommandLine line = null;
-        try {
-            line = new PosixParser().parse(options, args, true);
-        } catch (ParseException e) {
-            LOGGER.warn(e.getMessage());
-            new HelpFormatter().printHelp("java -jar " + JAR_NAME, options, true);
-            return;
-        }
-
-        // Print help if necessary
-        if (line.hasOption("help")) {
-            LOGGER.info("Printing help and returning");
-            new HelpFormatter().printHelp("java -jar " + JAR_NAME, options, true);
-            return;
-        }
-
-        // Set locale if necessary
-        if (line.hasOption("locale")) {
-            String[] localeParts = line.getOptionValue("locale").split("_");
-            String language = "";
-            String country = "";
-            String variant = "";
-            if (localeParts.length >= 1) {
-                language = localeParts[0];
-            }
-            if (localeParts.length >= 2) {
-                country = localeParts[1];
-            }
-            if (localeParts.length >= 3) {
-                variant = localeParts[2];
-            }
-            Locale.setDefault(new Locale(language, country, variant));
-        }
+        // Process the command line arguments
+        processCommandLineArguments(args);
 
         // Fill global storage
         LOGGER.info("Filling global storage with common data");
         fillGlobalStorage();
 
         // Fill resource store
+        LOGGER.info("Filling resource store");
         try {
-            LOGGER.info("Filling resource store");
             fillResourceStore();
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             LOGGER.error("Can't fill resource store", e);
             return;
         }
@@ -250,6 +220,45 @@ public class Main {
         factoryManager.setFactory(HandleInvocationProviderExtension.class, new DefaultHandleInvocationProviderExtensionFactory());
     }
 
+    private static void processCommandLineArguments(String[] arguments) {
+
+        // Parse command line arguments
+        Options options = createCommandLineOptions();
+        CommandLine line = null;
+        try {
+            line = new PosixParser().parse(options, arguments, true);
+        } catch (ParseException e) {
+            LOGGER.warn(e.getMessage());
+            new HelpFormatter().printHelp("java -jar " + JAR_NAME, options, true);
+            return;
+        }
+
+        // Print help if necessary
+        if (line.hasOption("help")) {
+            LOGGER.info("Printing help and returning");
+            new HelpFormatter().printHelp("java -jar " + JAR_NAME, options, true);
+            return;
+        }
+
+        // Set locale if necessary
+        if (line.hasOption("locale")) {
+            String[] localeParts = line.getOptionValue("locale").split("_");
+            String language = "";
+            String country = "";
+            String variant = "";
+            if (localeParts.length >= 1) {
+                language = localeParts[0];
+            }
+            if (localeParts.length >= 2) {
+                country = localeParts[1];
+            }
+            if (localeParts.length >= 3) {
+                variant = localeParts[2];
+            }
+            Locale.setDefault(new Locale(language, country, variant));
+        }
+    }
+
     @SuppressWarnings ("static-access")
     private static Options createCommandLineOptions() {
 
@@ -309,6 +318,7 @@ public class Main {
      */
     public static void fillDefaultDesktopPrograms() {
 
+        DesktopPrograms.addDescriptor(new FileManagerProgram());
     }
 
     /**
