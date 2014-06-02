@@ -161,7 +161,7 @@ public class Session extends ProgramExecutor {
      */
     public static class SessionEvent extends ProgramEvent {
 
-        private static final long serialVersionUID = -2264878017550342789L;
+        private static final long serialVersionUID = 4729545187490062176L;
 
         /**
          * Creates a new session event.
@@ -190,7 +190,7 @@ public class Session extends ProgramExecutor {
      */
     public static class FinishStartEvent extends SessionEvent {
 
-        private static final long serialVersionUID = 3149954173860266466L;
+        private static final long serialVersionUID = 4471128673972448941L;
 
         /**
          * Creates a new session finish start event.
@@ -219,7 +219,7 @@ public class Session extends ProgramExecutor {
      */
     public static class WrongPasswordEvent extends SessionEvent {
 
-        private static final long serialVersionUID = -1232371466644442727L;
+        private static final long serialVersionUID = -1976215576776172371L;
 
         private final String      wrongPassword;
 

@@ -18,24 +18,28 @@
 
 package com.quartercode.disconnected.test.world.event;
 
+import static com.quartercode.disconnected.test.ExtraActions.storeArgument;
 import java.util.ArrayList;
 import java.util.List;
+import org.jmock.Expectations;
+import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import com.quartercode.disconnected.bridge.AbstractEventHandler;
-import com.quartercode.disconnected.bridge.Bridge;
-import com.quartercode.disconnected.bridge.Event;
-import com.quartercode.disconnected.test.bridge.BridgeMock;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.world.event.ProgramLaunchInfoRequestEvent;
 import com.quartercode.disconnected.world.event.ProgramLaunchInfoRequestEvent.ProgramLaunchInfoResponseEvent;
 import com.quartercode.disconnected.world.event.ProgramLaunchInfoRequestEventHandler;
+import com.quartercode.eventbridge.bridge.Event;
+import com.quartercode.eventbridge.extra.extension.ReturnEventSender;
 
 public class ProgramLaunchInfoRequestEventHandlerTest {
 
-    private BridgeMock                               bridge;
+    @Rule
+    public JUnitRuleMockery                          context = new JUnitRuleMockery();
+
     private ProgramLaunchInfoRequestEventHandlerMock handler;
 
     private Computer                                 playerComputer;
@@ -47,8 +51,7 @@ public class ProgramLaunchInfoRequestEventHandlerTest {
         playerComputer = new Computer();
         procModule = new ProcessModule();
 
-        bridge = new BridgeMock();
-        handler = new ProgramLaunchInfoRequestEventHandlerMock(bridge, playerComputer, procModule);
+        handler = new ProgramLaunchInfoRequestEventHandlerMock(playerComputer, procModule);
     }
 
     @Test
@@ -70,28 +73,26 @@ public class ProgramLaunchInfoRequestEventHandlerTest {
 
     private void sendAndAssert(int expectedPid) {
 
+        final ReturnEventSender returnEventSender = context.mock(ReturnEventSender.class, "returnEventSender" + expectedPid);
         final List<Event> returnEvents = new ArrayList<>();
-        bridge.setHandler(new AbstractEventHandler<Event>(Event.class) {
 
-            @Override
-            public void handle(Event event) {
+        // @formatter:off
+        context.checking(new Expectations() {{
 
-                returnEvents.add(event);
-            }
+            oneOf(returnEventSender).send(with(any(Event.class)));
+                will(storeArgument(0).in(returnEvents));
 
-        });
+        }});
+        // @formatter:on
 
-        handler.handle(new ProgramLaunchInfoRequestEvent().withNextReturnId("testid"));
+        handler.handle(new ProgramLaunchInfoRequestEvent(), returnEventSender);
 
         Assert.assertEquals("Amount of events that were sent back by the handler", 1, returnEvents.size());
         Event rawReturnEvent = returnEvents.get(0);
         Assert.assertTrue("Event that was sent back by the handler is a '" + rawReturnEvent.getClass().getName() + "' (ProgramLaunchInfoResponseEvent required)", rawReturnEvent instanceof ProgramLaunchInfoResponseEvent);
         ProgramLaunchInfoResponseEvent returnEvent = (ProgramLaunchInfoResponseEvent) rawReturnEvent;
-        Assert.assertEquals("Return id of the return event", "testid", returnEvent.getReturnId());
         Assert.assertEquals("Computer id that is stored in the return event", playerComputer.getId(), returnEvent.getComputerId());
         Assert.assertEquals("Pid that is stored in the return event", expectedPid, returnEvent.getPid());
-
-        bridge.setHandler(null);
     }
 
     private static class ProgramLaunchInfoRequestEventHandlerMock extends ProgramLaunchInfoRequestEventHandler {
@@ -99,9 +100,7 @@ public class ProgramLaunchInfoRequestEventHandlerTest {
         private final Computer      playerComputer;
         private final ProcessModule procModule;
 
-        public ProgramLaunchInfoRequestEventHandlerMock(Bridge bridge, Computer playerComputer, ProcessModule procModule) {
-
-            super(bridge);
+        public ProgramLaunchInfoRequestEventHandlerMock(Computer playerComputer, ProcessModule procModule) {
 
             this.playerComputer = playerComputer;
             this.procModule = procModule;

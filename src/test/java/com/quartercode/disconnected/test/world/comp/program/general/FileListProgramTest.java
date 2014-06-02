@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.test.world.comp.program.general;
 
+import static com.quartercode.disconnected.test.ExtraAssert.assertCollectionSize;
 import static com.quartercode.disconnected.world.comp.file.FileUtils.getComponents;
 import static com.quartercode.disconnected.world.comp.program.ProgramUtils.getCommonLocation;
 import java.util.ArrayList;
@@ -25,8 +26,6 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.bridge.Event;
-import com.quartercode.disconnected.bridge.QueueEventHandler;
 import com.quartercode.disconnected.world.comp.ByteUnit;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.Directory;
@@ -48,6 +47,7 @@ import com.quartercode.disconnected.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.comp.program.general.FileListProgram;
 import com.quartercode.disconnected.world.comp.program.general.FileListProgram.SuccessEvent.FilePlaceholder;
+import com.quartercode.eventbridge.bridge.Event;
 
 public class FileListProgramTest extends AbstractProgramTest {
 
@@ -87,11 +87,11 @@ public class FileListProgramTest extends AbstractProgramTest {
     @Test
     public void testSuccess() {
 
-        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
-        bridge.setHandler(handler);
+        restartEventRecording();
         executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH);
 
-        Event event = handler.next();
+        assertCollectionSize("File list program did not send correct number of events", events, 1);
+        Event event = events.get(0);
         Assert.assertTrue("File list program did not send SuccessEvent", event instanceof FileListProgram.SuccessEvent);
 
         List<FilePlaceholder> files = new ArrayList<>( ((FileListProgram.SuccessEvent) event).getFiles());
@@ -114,11 +114,11 @@ public class FileListProgramTest extends AbstractProgramTest {
     @Test
     public void testSuccessWithRootFiles() {
 
-        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
-        bridge.setHandler(handler);
+        restartEventRecording();
         executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), "/");
 
-        Event event = handler.next();
+        assertCollectionSize("File list program did not send correct number of events", events, 1);
+        Event event = events.get(0);
         Assert.assertTrue("File list program did not send SuccessEvent", event instanceof FileListProgram.SuccessEvent);
 
         List<FilePlaceholder> files = new ArrayList<>( ((FileListProgram.SuccessEvent) event).getFiles());
@@ -133,11 +133,11 @@ public class FileListProgramTest extends AbstractProgramTest {
     @Test
     public void testUnknownMountpoint() {
 
-        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
-        bridge.setHandler(handler);
+        restartEventRecording();
         executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), "/testunknown/" + FileUtils.getComponents(PATH)[1]);
 
-        Event event = handler.next();
+        assertCollectionSize("File list program did not send correct number of events", events, 1);
+        Event event = events.get(0);
         Assert.assertTrue("File list program did not send UnknownMountpointEvent", event instanceof FileListProgram.UnknownMountpointEvent);
         Assert.assertEquals("Unknown mountpoint", "testunknown", ((FileListProgram.UnknownMountpointEvent) event).getMountpoint());
     }
@@ -149,11 +149,11 @@ public class FileListProgramTest extends AbstractProgramTest {
         dir.get(ParentFile.CREATE_REMOVE).invoke().get(FileRemoveAction.EXECUTE).invoke();
         fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), FileUtils.getComponents(LOCAL_PATH)[1]).get(FileAddAction.EXECUTE).invoke();
 
-        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
-        bridge.setHandler(handler);
+        restartEventRecording();
         executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH);
 
-        Event event = handler.next();
+        assertCollectionSize("File list program did not send correct number of events", events, 1);
+        Event event = events.get(0);
         Assert.assertTrue("File list program did not send InvalidPathEvent", event instanceof FileListProgram.InvalidPathEvent);
         Assert.assertEquals("Invalid path", PATH, ((FileListProgram.InvalidPathEvent) event).getPath());
     }
@@ -173,11 +173,11 @@ public class FileListProgramTest extends AbstractProgramTest {
         session.get(Session.USER).set(testUser);
         session.get(ProgramExecutor.RUN).invoke();
 
-        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
-        bridge.setHandler(handler);
+        restartEventRecording();
         executeProgram(sessionProcess, PATH);
 
-        Event event = handler.next();
+        assertCollectionSize("File list program did not send correct number of events", events, 1);
+        Event event = events.get(0);
         Assert.assertTrue("File list program did not send MissingRightsEvent", event instanceof FileListProgram.MissingRightsEvent);
     }
 

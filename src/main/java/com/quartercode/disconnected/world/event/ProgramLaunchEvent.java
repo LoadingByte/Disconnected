@@ -18,17 +18,16 @@
 
 package com.quartercode.disconnected.world.event;
 
-import com.quartercode.disconnected.bridge.Event;
-import com.quartercode.disconnected.util.DataObjectBase;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
+import com.quartercode.eventbridge.basic.EventBase;
 
 /**
  * The program launch event is sent by a program executor when it's started.
  * It contains general information about the type and identity of launched program.
  */
-public class ProgramLaunchEvent extends DataObjectBase implements Event {
+public class ProgramLaunchEvent extends EventBase {
 
-    private static final long                      serialVersionUID = -534015204805331837L;
+    private static final long                      serialVersionUID = 315320067304169133L;
 
     private final String                           computerId;
     private final int                              pid;

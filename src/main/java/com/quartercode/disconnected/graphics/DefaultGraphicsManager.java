@@ -20,7 +20,12 @@ package com.quartercode.disconnected.graphics;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.quartercode.disconnected.bridge.Bridge;
+import com.quartercode.disconnected.bridge.HandleInvocationProviderExtension;
+import com.quartercode.eventbridge.EventBridgeFactory;
+import com.quartercode.eventbridge.bridge.Bridge;
+import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionRequester;
+import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
+import com.quartercode.eventbridge.extra.extension.SendPredicateCheckExtension;
 
 /**
  * This is the default implementation of the {@link GraphicsManager} service.
@@ -33,14 +38,19 @@ public class DefaultGraphicsManager implements GraphicsManager {
 
     private GraphicsThread      thread;
     private GraphicsState       state;
-    private final Bridge        bridge = new Bridge();
+    private final Bridge        bridge = EventBridgeFactory.create(Bridge.class);
 
     /**
      * Creates a new default graphics manager.
      */
     public DefaultGraphicsManager() {
 
-        bridge.setHandlerInvoker(this);
+        bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionRequester.class));
+        bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionReturner.class));
+        bridge.addModule(EventBridgeFactory.create(SendPredicateCheckExtension.class));
+        bridge.addModule(EventBridgeFactory.create(HandleInvocationProviderExtension.class));
+
+        bridge.getModule(HandleInvocationProviderExtension.class).setInvocationProvider(this);
     }
 
     @Override

@@ -18,8 +18,6 @@
 
 package com.quartercode.disconnected.world.event;
 
-import com.quartercode.disconnected.bridge.AbstractEventHandler;
-import com.quartercode.disconnected.bridge.Bridge;
 import com.quartercode.disconnected.sim.ProfileManager;
 import com.quartercode.disconnected.util.ServiceRegistry;
 import com.quartercode.disconnected.world.World;
@@ -27,6 +25,8 @@ import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.world.event.ProgramLaunchInfoRequestEvent.ProgramLaunchInfoResponseEvent;
+import com.quartercode.eventbridge.extra.extension.RequestEventHandler;
+import com.quartercode.eventbridge.extra.extension.ReturnEventSender;
 
 /**
  * The program launch info request event handler responses {@link ProgramLaunchInfoRequestEvent}.
@@ -34,35 +34,24 @@ import com.quartercode.disconnected.world.event.ProgramLaunchInfoRequestEvent.Pr
  * 
  * @see ProgramLaunchInfoRequestEvent
  */
-public class ProgramLaunchInfoRequestEventHandler extends AbstractEventHandler<ProgramLaunchInfoRequestEvent> {
-
-    private final Bridge bridge;
+public class ProgramLaunchInfoRequestEventHandler implements RequestEventHandler<ProgramLaunchInfoRequestEvent> {
 
     /**
      * Creates a new program launch info request event handler.
-     * 
-     * @param bridge The bridge the handler will use to send back responses.
      */
-    public ProgramLaunchInfoRequestEventHandler(Bridge bridge) {
+    public ProgramLaunchInfoRequestEventHandler() {
 
-        super(ProgramLaunchInfoRequestEvent.class);
-
-        this.bridge = bridge;
     }
 
     @Override
-    public void handle(ProgramLaunchInfoRequestEvent event) {
-
-        if (event.getNextReturnId() == null) {
-            return;
-        }
+    public void handle(ProgramLaunchInfoRequestEvent request, ReturnEventSender sender) {
 
         Computer playerComputer = getPlayerComputer();
 
         ProcessModule procModule = getProcessModule(playerComputer);
         int pid = procModule.get(ProcessModule.NEXT_PID).invoke();
 
-        bridge.send(new ProgramLaunchInfoResponseEvent(playerComputer.getId(), pid, event.getNextReturnId()));
+        sender.send(new ProgramLaunchInfoResponseEvent(playerComputer.getId(), pid));
     }
 
     protected Computer getPlayerComputer() {

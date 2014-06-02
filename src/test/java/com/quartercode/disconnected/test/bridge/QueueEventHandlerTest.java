@@ -21,11 +21,12 @@ package com.quartercode.disconnected.test.bridge;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.bridge.Event;
-import com.quartercode.disconnected.bridge.EventPredicate;
 import com.quartercode.disconnected.bridge.QueueEventHandler;
-import com.quartercode.disconnected.bridge.predicate.TruePredicate;
-import com.quartercode.disconnected.bridge.predicate.TypePredicate;
+import com.quartercode.disconnected.test.bridge.DummyEvents.Event1;
+import com.quartercode.disconnected.test.bridge.DummyEvents.Event2;
+import com.quartercode.eventbridge.bridge.Event;
+import com.quartercode.eventbridge.bridge.EventPredicate;
+import com.quartercode.eventbridge.extra.predicate.TypePredicate;
 
 public class QueueEventHandlerTest {
 
@@ -34,7 +35,7 @@ public class QueueEventHandlerTest {
     @Before
     public void setUp() {
 
-        handler = new QueueEventHandler<>(new TruePredicate<>());
+        handler = new QueueEventHandler<>();
     }
 
     @Test
@@ -76,16 +77,6 @@ public class QueueEventHandlerTest {
         Assert.assertNull("Next event after all events of type 2 were polled", handler.next(currentPredicate));
 
         Assert.assertNull("Next event after all events of all types were polled", handler.next());
-    }
-
-    @SuppressWarnings ("serial")
-    private static class Event1 implements Event {
-
-    }
-
-    @SuppressWarnings ("serial")
-    private static class Event2 implements Event {
-
     }
 
 }

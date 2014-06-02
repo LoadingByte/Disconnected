@@ -19,8 +19,7 @@
 package com.quartercode.disconnected.world.event;
 
 import java.util.Map;
-import com.quartercode.disconnected.bridge.Event;
-import com.quartercode.disconnected.util.DataObjectBase;
+import com.quartercode.eventbridge.basic.EventBase;
 
 /**
  * A program launch command event starts a program on the computer of the client that sends it.
@@ -48,9 +47,9 @@ import com.quartercode.disconnected.util.DataObjectBase;
  * 
  * @see ProgramLaunchCommandEventHandler
  */
-public class ProgramLaunchCommandEvent extends DataObjectBase implements Event {
+public class ProgramLaunchCommandEvent extends EventBase {
 
-    private static final long         serialVersionUID = -1124332803786649358L;
+    private static final long         serialVersionUID = 6395719275942293140L;
 
     // TODO: Proper user identification
 

@@ -33,10 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import com.quartercode.classmod.util.Classmod;
-import com.quartercode.disconnected.bridge.Bridge;
-import com.quartercode.disconnected.bridge.BridgeConnectorException;
-import com.quartercode.disconnected.bridge.EventHandler;
-import com.quartercode.disconnected.bridge.connector.LocalBridgeConnector;
+import com.quartercode.disconnected.bridge.HandleInvocationProviderExtension;
+import com.quartercode.disconnected.bridge.def.DefaultHandleInvocationProviderExtension.DefaultHandleInvocationProviderExtensionFactory;
 import com.quartercode.disconnected.graphics.DefaultGraphicsManager;
 import com.quartercode.disconnected.graphics.DefaultStates;
 import com.quartercode.disconnected.graphics.GraphicsManager;
@@ -67,9 +65,22 @@ import com.quartercode.disconnected.util.ServiceRegistry;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.world.event.ProgramLaunchCommandEvent;
 import com.quartercode.disconnected.world.event.ProgramLaunchCommandEventHandler;
+import com.quartercode.disconnected.world.event.ProgramLaunchInfoRequestEvent;
 import com.quartercode.disconnected.world.event.ProgramLaunchInfoRequestEventHandler;
 import com.quartercode.disconnected.world.gen.WorldGenerator;
+import com.quartercode.eventbridge.EventBridgeFactory;
+import com.quartercode.eventbridge.bridge.Bridge;
+import com.quartercode.eventbridge.bridge.BridgeConnectorException;
+import com.quartercode.eventbridge.bridge.EventPredicate;
+import com.quartercode.eventbridge.bridge.module.EventHandler;
+import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
+import com.quartercode.eventbridge.extra.connector.LocalBridgeConnector;
+import com.quartercode.eventbridge.extra.extension.RequestEventHandler;
+import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
+import com.quartercode.eventbridge.extra.predicate.TypePredicate;
+import com.quartercode.eventbridge.factory.FactoryManager;
 
 /**
  * The main class which initializes the whole game.
@@ -112,6 +123,9 @@ public class Main {
         SLF4JBridgeHandler.install();
 
         ToStringBuilder.setDefaultStyle(ToStringStyle.SHORT_PREFIX_STYLE);
+
+        // Add custom mappings to EventBridgeFactory
+        fillEventBridgeFactory();
 
         // Print information about the software
         LOGGER.info("Version {}", ApplicationInfo.VERSION);
@@ -195,7 +209,7 @@ public class Main {
         final Bridge clientBridge = graphicsManager.getBridge();
         final Bridge serverBridge = ticker.getAction(TickBridgeProvider.class).getBridge();
         try {
-            clientBridge.connect(new LocalBridgeConnector(serverBridge));
+            clientBridge.addConnector(new LocalBridgeConnector(serverBridge));
         } catch (BridgeConnectorException e) {
             LOGGER.error("Can't connect the client and server bridges");
             return;
@@ -224,6 +238,16 @@ public class Main {
         LOGGER.info("DEBUG-ACTION: Starting test-game with current simulation");
         ticker.setRunning(true);
         graphicsManager.setState(DefaultStates.DESKTOP.create());
+    }
+
+    /**
+     * Adds the default custom mappings to the {@link EventBridgeFactory}.
+     */
+    public static void fillEventBridgeFactory() {
+
+        FactoryManager factoryManager = EventBridgeFactory.getFactoryManager();
+
+        factoryManager.setFactory(HandleInvocationProviderExtension.class, new DefaultHandleInvocationProviderExtensionFactory());
     }
 
     @SuppressWarnings ("static-access")
@@ -294,8 +318,18 @@ public class Main {
      */
     public static void fillDefaultServerHandlers(Bridge bridge) {
 
-        bridge.addHandler(new ProgramLaunchInfoRequestEventHandler(bridge));
-        bridge.addHandler(new ProgramLaunchCommandEventHandler());
+        addRequestHandler(bridge, new ProgramLaunchInfoRequestEventHandler(), new TypePredicate<>(ProgramLaunchInfoRequestEvent.class));
+        addEventHandler(bridge, new ProgramLaunchCommandEventHandler(), new TypePredicate<>(ProgramLaunchCommandEvent.class));
+    }
+
+    private static void addEventHandler(Bridge bridge, EventHandler<?> handler, EventPredicate<?> predicate) {
+
+        bridge.getModule(StandardHandlerModule.class).addHandler(handler, predicate);
+    }
+
+    private static void addRequestHandler(Bridge bridge, RequestEventHandler<?> requestEventHandler, EventPredicate<?> predicate) {
+
+        bridge.getModule(ReturnEventExtensionReturner.class).addRequestHandler(requestEventHandler, predicate);
     }
 
     private Main() {

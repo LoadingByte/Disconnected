@@ -20,7 +20,10 @@ package com.quartercode.disconnected.bridge;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import com.quartercode.disconnected.bridge.predicate.TypePredicate;
+import com.quartercode.eventbridge.basic.EventUtils;
+import com.quartercode.eventbridge.bridge.Event;
+import com.quartercode.eventbridge.bridge.EventPredicate;
+import com.quartercode.eventbridge.bridge.module.EventHandler;
 
 /**
  * A queue event handler stores received {@link Event}s in a queue in order to make them accessible at a later time.
@@ -28,32 +31,19 @@ import com.quartercode.disconnected.bridge.predicate.TypePredicate;
  * They can hold them back and process them when they want to.
  * Furthermore, users of this implementation can also use an {@link EventPredicate} to only get events that match their criteria.
  * 
+ * @param <T> The type of event that can be handled by the handler.
  * @see EventHandler
  * @see EventPredicate
  */
-public class QueueEventHandler<T extends Event> extends AbstractEventHandler<T> {
+public class QueueEventHandler<T extends Event> implements EventHandler<T> {
 
     private final Queue<T> events = new LinkedList<>();
 
     /**
-     * Creates a new queue event handler and uses a {@link TypePredicate} with the given event type.
-     * The event type must equal the generic type parameter of the new queue event handler.
-     * 
-     * @param eventType The type of events the new queue event handler can handle.
+     * Creates a new queue event handler.
      */
-    public QueueEventHandler(Class<T> eventType) {
+    public QueueEventHandler() {
 
-        super(eventType);
-    }
-
-    /**
-     * Creates a new queue event handler and sets the {@link EventPredicate} that the {@link #getPredicate()} method always returns.
-     * 
-     * @param predicate The immutable event predicate that can be used to determine which events the queue handler can handle.
-     */
-    public QueueEventHandler(EventPredicate<T> predicate) {
-
-        super(predicate);
     }
 
     /**

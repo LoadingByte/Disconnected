@@ -20,12 +20,14 @@ package com.quartercode.disconnected.test.world.event;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.disconnected.util.DataObjectBase;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.program.Process;
@@ -128,7 +130,7 @@ public class ProgramLaunchCommandEventHandlerTest {
 
     }
 
-    private static class SomeObject extends DataObjectBase {
+    private static class SomeObject {
 
         @SuppressWarnings ("unused")
         private final double value1;
@@ -139,6 +141,24 @@ public class ProgramLaunchCommandEventHandlerTest {
 
             this.value1 = value1;
             this.value2 = value2;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return HashCodeBuilder.reflectionHashCode(this);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+
+            return EqualsBuilder.reflectionEquals(this, obj);
+        }
+
+        @Override
+        public String toString() {
+
+            return ToStringBuilder.reflectionToString(this);
         }
 
     }

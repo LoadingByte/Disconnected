@@ -24,7 +24,6 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.disconnected.bridge.Bridge;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileRemoveAction;
@@ -38,6 +37,7 @@ import com.quartercode.disconnected.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProgramEvent;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
+import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
  * The file remove program is used to remove a file from its file system.
@@ -153,7 +153,7 @@ public class FileRemoveProgram extends ProgramExecutor {
      */
     public static class FileRemoveProgramEvent extends ProgramEvent {
 
-        private static final long serialVersionUID = -5873609560189311803L;
+        private static final long serialVersionUID = 4117274991893251301L;
 
         /**
          * Creates a new file remove program event.
@@ -182,7 +182,7 @@ public class FileRemoveProgram extends ProgramExecutor {
      */
     public static class SuccessEvent extends FileRemoveProgramEvent {
 
-        private static final long serialVersionUID = 7058952593759431423L;
+        private static final long serialVersionUID = 5899197829471023231L;
 
         /**
          * Creates a new file remove program success event.
@@ -212,7 +212,7 @@ public class FileRemoveProgram extends ProgramExecutor {
      */
     public static class ErrorEvent extends FileRemoveProgramEvent {
 
-        private static final long serialVersionUID = 2759597877097862693L;
+        private static final long serialVersionUID = 1508598335152399248L;
 
         /**
          * Creates a new file remove program error event.
@@ -242,7 +242,7 @@ public class FileRemoveProgram extends ProgramExecutor {
      */
     public static class UnknownMountpointEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = 8879490600025066486L;
+        private static final long serialVersionUID = -5271654433309884884L;
 
         private final String      mountpoint;
 
@@ -289,7 +289,7 @@ public class FileRemoveProgram extends ProgramExecutor {
      */
     public static class InvalidPathEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = -5965708459827546032L;
+        private static final long serialVersionUID = 345535509295725575L;
 
         private final String      path;
 
@@ -335,7 +335,7 @@ public class FileRemoveProgram extends ProgramExecutor {
      */
     public static class MissingRightsEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = -445913561240040324L;
+        private static final long serialVersionUID = -2568133126052294005L;
 
         /**
          * Creates a new file remove program missing rights event.

@@ -26,10 +26,10 @@ import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
 import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.disconnected.bridge.Bridge;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.net.Backbone;
+import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
  * A world is a space which contains one "game ecosystem".

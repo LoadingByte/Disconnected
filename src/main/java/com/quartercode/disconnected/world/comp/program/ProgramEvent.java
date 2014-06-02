@@ -18,17 +18,16 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
-import com.quartercode.disconnected.bridge.Event;
-import com.quartercode.disconnected.bridge.EventPredicate;
-import com.quartercode.disconnected.util.DataObjectBase;
+import com.quartercode.eventbridge.basic.EventBase;
+import com.quartercode.eventbridge.basic.EventPredicateBase;
 
 /**
  * Program events are fired by program executors and transport state or other program-related information.
  * For requesting these program events, {@link ProgramEventPredicate}s can be used.
  */
-public class ProgramEvent extends DataObjectBase implements Event {
+public class ProgramEvent extends EventBase {
 
-    private static final long serialVersionUID = -799460291560821563L;
+    private static final long serialVersionUID = 5188377394737998492L;
 
     private final String      computerId;
     private final int         pid;
@@ -72,9 +71,9 @@ public class ProgramEvent extends DataObjectBase implements Event {
      * @param <T> The further specified type of program event that can be tested by the predicate.
      *        Might be just {@code ProgramEvent}.
      */
-    public static class ProgramEventPredicate<T extends ProgramEvent> extends DataObjectBase implements EventPredicate<T> {
+    public static class ProgramEventPredicate<T extends ProgramEvent> extends EventPredicateBase<T> {
 
-        private static final long serialVersionUID = -8481054597885149089L;
+        private static final long serialVersionUID = -3932315616627849567L;
 
         private final String      computerId;
         private final int         pid;

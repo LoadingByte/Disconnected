@@ -28,7 +28,6 @@ import com.quartercode.classmod.extra.CollectionProperty;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.Property;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.disconnected.bridge.AbstractEventHandler;
 import com.quartercode.disconnected.sim.ProfileManager;
 import com.quartercode.disconnected.util.ServiceRegistry;
 import com.quartercode.disconnected.world.World;
@@ -39,6 +38,7 @@ import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
+import com.quartercode.eventbridge.bridge.module.EventHandler;
 
 /**
  * The program launch command event handler executes {@link ProgramLaunchCommandEvent}s.
@@ -46,7 +46,7 @@ import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
  * 
  * @see ProgramLaunchCommandEvent
  */
-public class ProgramLaunchCommandEventHandler extends AbstractEventHandler<ProgramLaunchCommandEvent> {
+public class ProgramLaunchCommandEventHandler implements EventHandler<ProgramLaunchCommandEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgramLaunchCommandEventHandler.class);
 
@@ -55,7 +55,6 @@ public class ProgramLaunchCommandEventHandler extends AbstractEventHandler<Progr
      */
     public ProgramLaunchCommandEventHandler() {
 
-        super(ProgramLaunchCommandEvent.class);
     }
 
     @Override

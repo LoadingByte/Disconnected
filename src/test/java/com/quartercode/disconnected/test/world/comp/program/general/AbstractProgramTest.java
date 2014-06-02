@@ -18,8 +18,13 @@
 
 package com.quartercode.disconnected.test.world.comp.program.general;
 
+import static com.quartercode.disconnected.test.ExtraActions.storeArgument;
+import java.util.ArrayList;
+import java.util.List;
+import org.jmock.Expectations;
+import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
-import com.quartercode.disconnected.test.bridge.BridgeMock;
+import org.junit.Rule;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.Version;
@@ -33,27 +38,46 @@ import com.quartercode.disconnected.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.world.comp.program.Program;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.gen.WorldGenerator;
+import com.quartercode.eventbridge.bridge.Bridge;
+import com.quartercode.eventbridge.bridge.Event;
 
 public abstract class AbstractProgramTest {
 
+    @Rule
+    public JUnitRuleMockery   context = new JUnitRuleMockery();
+
     private final String      fileSystemMountpoint;
 
-    protected BridgeMock      bridge;
+    protected Bridge          bridge  = context.mock(Bridge.class);
     protected World           world;
     protected Computer        computer;
     protected OperatingSystem os;
     protected ProcessModule   processModule;
     protected FileSystem      fileSystem;
 
-    public AbstractProgramTest(String fileSystemMountpoint) {
+    protected List<Event>     events  = new ArrayList<>();
+
+    protected AbstractProgramTest(String fileSystemMountpoint) {
 
         this.fileSystemMountpoint = fileSystemMountpoint;
+
+        // @formatter:off
+        context.checking(new Expectations() {{
+
+            allowing(bridge).send(with(any(Event.class)));
+                will(storeArgument(0).in(events));
+
+        }});
+        // @formatter:on
+    }
+
+    protected void restartEventRecording() {
+
+        events.clear();
     }
 
     @Before
     public void setUp() {
-
-        bridge = new BridgeMock();
 
         world = new World();
         world.injectBridge(bridge);

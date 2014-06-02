@@ -18,7 +18,12 @@
 
 package com.quartercode.disconnected.sim;
 
-import com.quartercode.disconnected.bridge.Bridge;
+import com.quartercode.disconnected.bridge.HandleInvocationProviderExtension;
+import com.quartercode.eventbridge.EventBridgeFactory;
+import com.quartercode.eventbridge.bridge.Bridge;
+import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionRequester;
+import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
+import com.quartercode.eventbridge.extra.extension.SendPredicateCheckExtension;
 
 /**
  * The tick bridge provider extends the {@link TickRunnableInvoker} by providing a {@link Bridge} for the parent ticker.
@@ -28,14 +33,19 @@ import com.quartercode.disconnected.bridge.Bridge;
  */
 public class TickBridgeProvider extends TickRunnableInvoker {
 
-    private final Bridge bridge = new Bridge();
+    private final Bridge bridge = EventBridgeFactory.create(Bridge.class);
 
     /**
      * Creates a new tick bridge provider.
      */
     public TickBridgeProvider() {
 
-        bridge.setHandlerInvoker(this);
+        bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionRequester.class));
+        bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionReturner.class));
+        bridge.addModule(EventBridgeFactory.create(SendPredicateCheckExtension.class));
+        bridge.addModule(EventBridgeFactory.create(HandleInvocationProviderExtension.class));
+
+        bridge.getModule(HandleInvocationProviderExtension.class).setInvocationProvider(this);
     }
 
     /**

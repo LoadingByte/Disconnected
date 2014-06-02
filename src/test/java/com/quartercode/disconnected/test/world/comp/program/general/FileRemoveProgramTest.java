@@ -18,13 +18,12 @@
 
 package com.quartercode.disconnected.test.world.comp.program.general;
 
+import static com.quartercode.disconnected.test.ExtraAssert.assertCollectionSize;
 import static com.quartercode.disconnected.world.comp.file.FileUtils.getComponents;
 import static com.quartercode.disconnected.world.comp.program.ProgramUtils.getCommonLocation;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.bridge.Event;
-import com.quartercode.disconnected.bridge.QueueEventHandler;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
@@ -41,6 +40,7 @@ import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.comp.program.general.FileRemoveProgram;
+import com.quartercode.eventbridge.bridge.Event;
 
 public class FileRemoveProgramTest extends AbstractProgramTest {
 
@@ -77,11 +77,11 @@ public class FileRemoveProgramTest extends AbstractProgramTest {
 
         Assert.assertNotNull("Not removed file does not exist", fileSystem.get(FileSystem.GET_FILE).invoke(LOCAL_PATH));
 
-        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
-        bridge.setHandler(handler);
+        restartEventRecording();
         executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH);
 
-        Event event = handler.next();
+        assertCollectionSize("File delete program did not send correct number of events", events, 1);
+        Event event = events.get(0);
         Assert.assertTrue("File remove program did not send SuccessEvent", event instanceof FileRemoveProgram.SuccessEvent);
 
         Assert.assertNull("Removed file does still exist", fileSystem.get(FileSystem.GET_FILE).invoke(LOCAL_PATH));
@@ -90,11 +90,11 @@ public class FileRemoveProgramTest extends AbstractProgramTest {
     @Test
     public void testUnknownMountpoint() {
 
-        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
-        bridge.setHandler(handler);
+        restartEventRecording();
         executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), "/testunknown/" + FileUtils.getComponents(PATH)[1]);
 
-        Event event = handler.next();
+        assertCollectionSize("File delete program did not send correct number of events", events, 1);
+        Event event = events.get(0);
         Assert.assertTrue("File remove program did not send UnknownMountpointEvent", event instanceof FileRemoveProgram.UnknownMountpointEvent);
         Assert.assertEquals("Unknown mountpoint", "testunknown", ((FileRemoveProgram.UnknownMountpointEvent) event).getMountpoint());
     }
@@ -108,11 +108,11 @@ public class FileRemoveProgramTest extends AbstractProgramTest {
         parentFile.get(ParentFile.CREATE_REMOVE).invoke().get(FileRemoveAction.EXECUTE).invoke();
         fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), parentPath).get(FileAddAction.EXECUTE).invoke();
 
-        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
-        bridge.setHandler(handler);
+        restartEventRecording();
         executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH);
 
-        Event event = handler.next();
+        assertCollectionSize("File delete program did not send correct number of events", events, 1);
+        Event event = events.get(0);
         Assert.assertTrue("File remove program did not send InvalidPathEvent", event instanceof FileRemoveProgram.InvalidPathEvent);
         Assert.assertEquals("Invalid path", PATH, ((FileRemoveProgram.InvalidPathEvent) event).getPath());
     }
@@ -132,11 +132,11 @@ public class FileRemoveProgramTest extends AbstractProgramTest {
         session.get(Session.USER).set(testUser);
         session.get(ProgramExecutor.RUN).invoke();
 
-        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
-        bridge.setHandler(handler);
+        restartEventRecording();
         executeProgram(sessionProcess, PATH);
 
-        Event event = handler.next();
+        assertCollectionSize("File delete program did not send correct number of events", events, 1);
+        Event event = events.get(0);
         Assert.assertTrue("File remove program did not send MissingRightsEvent", event instanceof FileRemoveProgram.MissingRightsEvent);
     }
 

@@ -18,17 +18,16 @@
 
 package com.quartercode.disconnected.world.comp.net;
 
-import com.quartercode.disconnected.bridge.Event;
-import com.quartercode.disconnected.util.DataObjectBase;
+import com.quartercode.eventbridge.basic.EventBase;
 
 /**
  * This event represents the income of a network {@link Packet} on a computer.
  * 
  * @see Packet
  */
-public class ReceivePacketEvent extends DataObjectBase implements Event {
+public class ReceivePacketEvent extends EventBase {
 
-    private static final long serialVersionUID = -3740110437713258546L;
+    private static final long serialVersionUID = 4232201098390515542L;
 
     private final Packet      packet;
 

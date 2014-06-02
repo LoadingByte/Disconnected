@@ -23,11 +23,11 @@ import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.util.FunctionDefinitionFactory;
-import com.quartercode.disconnected.bridge.Bridge;
 import com.quartercode.disconnected.sim.SchedulerUser;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.event.ProgramLaunchEvent;
+import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
  * This abstract class defines a program executor which takes care of acutally running a program.

@@ -18,9 +18,7 @@
 
 package com.quartercode.disconnected.world.event;
 
-import com.quartercode.disconnected.bridge.ReturnEventUtil.Return;
-import com.quartercode.disconnected.bridge.ReturnEventUtil.Returnable;
-import com.quartercode.disconnected.util.DataObjectBase;
+import com.quartercode.eventbridge.basic.EventBase;
 
 /**
  * The program launch info request event can be used to retrieve needed information before sending a {@link ProgramLaunchCommandEvent}.
@@ -30,37 +28,17 @@ import com.quartercode.disconnected.util.DataObjectBase;
  * @see ProgramLaunchInfoResponseEvent
  * @see ProgramLaunchInfoRequestEventHandler
  */
-public class ProgramLaunchInfoRequestEvent extends DataObjectBase implements Returnable {
+public class ProgramLaunchInfoRequestEvent extends EventBase {
 
-    private static final long serialVersionUID = 4257982834926575833L;
+    private static final long serialVersionUID = 8049474812855579764L;
 
     // TODO: Proper user identification
-
-    private final String      nextReturnId;
 
     /**
      * Creates a new program launch info request event.
      */
     public ProgramLaunchInfoRequestEvent() {
 
-        nextReturnId = null;
-    }
-
-    private ProgramLaunchInfoRequestEvent(String nextReturnId) {
-
-        this.nextReturnId = nextReturnId;
-    }
-
-    @Override
-    public ProgramLaunchInfoRequestEvent withNextReturnId(String nextReturnId) {
-
-        return new ProgramLaunchInfoRequestEvent(nextReturnId);
-    }
-
-    @Override
-    public String getNextReturnId() {
-
-        return nextReturnId;
     }
 
     /**
@@ -70,26 +48,23 @@ public class ProgramLaunchInfoRequestEvent extends DataObjectBase implements Ret
      * @see ProgramLaunchInfoRequestEvent
      * @see ProgramLaunchInfoRequestEventHandler
      */
-    public static class ProgramLaunchInfoResponseEvent implements Return {
+    public static class ProgramLaunchInfoResponseEvent extends EventBase {
 
-        private static final long serialVersionUID = 2985616167848182219L;
+        private static final long serialVersionUID = -5422095285753485545L;
 
         private final String      computerId;
         private final int         pid;
-        private final String      returnId;
 
         /**
          * Creates a new program launch info response event.
          * 
          * @param computerId The id of the computer which represents the client that sent the request event.
          * @param pid A newly generated process id that might be used to launch a new program.
-         * @param returnId The return id.
          */
-        public ProgramLaunchInfoResponseEvent(String computerId, int pid, String returnId) {
+        public ProgramLaunchInfoResponseEvent(String computerId, int pid) {
 
             this.computerId = computerId;
             this.pid = pid;
-            this.returnId = returnId;
         }
 
         /**
@@ -110,12 +85,6 @@ public class ProgramLaunchInfoRequestEvent extends DataObjectBase implements Ret
         public int getPid() {
 
             return pid;
-        }
-
-        @Override
-        public String getReturnId() {
-
-            return returnId;
         }
 
     }

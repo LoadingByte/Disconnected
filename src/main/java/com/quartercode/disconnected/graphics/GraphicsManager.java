@@ -18,8 +18,8 @@
 
 package com.quartercode.disconnected.graphics;
 
-import com.quartercode.disconnected.bridge.Bridge;
 import com.quartercode.disconnected.util.RunnableInvocationProvider;
+import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
  * This service is the main manager of the graphics system.

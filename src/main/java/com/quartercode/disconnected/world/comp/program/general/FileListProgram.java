@@ -22,13 +22,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.disconnected.bridge.Bridge;
-import com.quartercode.disconnected.util.DataObjectBase;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileRights;
@@ -49,6 +50,7 @@ import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProgramEvent;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.comp.program.general.FileListProgram.SuccessEvent.FilePlaceholder;
+import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
  * The file list program is used to list all files which are children of a given directory ({@link #PATH}).
@@ -206,7 +208,7 @@ public class FileListProgram extends ProgramExecutor {
      */
     public static class FileListProgramEvent extends ProgramEvent {
 
-        private static final long serialVersionUID = -9112210048232206110L;
+        private static final long serialVersionUID = 2098360282411098945L;
 
         /**
          * Creates a new file list program event.
@@ -236,7 +238,7 @@ public class FileListProgram extends ProgramExecutor {
      */
     public static class SuccessEvent extends FileListProgramEvent {
 
-        private static final long           serialVersionUID = -7847306412641023157L;
+        private static final long           serialVersionUID = -4145116285039354316L;
 
         private final List<FilePlaceholder> files;
 
@@ -267,9 +269,9 @@ public class FileListProgram extends ProgramExecutor {
          * A file placeholder represents a {@link File} object by storing commonly used data about it.
          * File systems are represented by their {@link RootFile}s.
          */
-        public static class FilePlaceholder extends DataObjectBase implements Serializable {
+        public static class FilePlaceholder implements Serializable {
 
-            private static final long              serialVersionUID = -2426223562927131377L;
+            private static final long              serialVersionUID = 2316854110693641190L;
 
             private final String                   name;
             private final Class<? extends File<?>> type;
@@ -361,6 +363,24 @@ public class FileListProgram extends ProgramExecutor {
                 return group;
             }
 
+            @Override
+            public int hashCode() {
+
+                return HashCodeBuilder.reflectionHashCode(this);
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+
+                return EqualsBuilder.reflectionEquals(this, obj);
+            }
+
+            @Override
+            public String toString() {
+
+                return ToStringBuilder.reflectionToString(this);
+            }
+
         }
 
     }
@@ -380,7 +400,7 @@ public class FileListProgram extends ProgramExecutor {
      */
     public static class ErrorEvent extends FileListProgramEvent {
 
-        private static final long serialVersionUID = 347053041373954853L;
+        private static final long serialVersionUID = 153189680811572592L;
 
         /**
          * Creates a new file list program error event.
@@ -410,7 +430,7 @@ public class FileListProgram extends ProgramExecutor {
      */
     public static class UnknownMountpointEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = -8883689816152325034L;
+        private static final long serialVersionUID = -4668086945570925486L;
 
         private final String      mountpoint;
 
@@ -457,7 +477,7 @@ public class FileListProgram extends ProgramExecutor {
      */
     public static class InvalidPathEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = -8503020862248673551L;
+        private static final long serialVersionUID = 8973847394902989176L;
 
         private final String      path;
 
@@ -503,7 +523,7 @@ public class FileListProgram extends ProgramExecutor {
      */
     public static class MissingRightsEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = 8170183641838774836L;
+        private static final long serialVersionUID = -5289989493420422302L;
 
         /**
          * Creates a new file list program missing rights event.

@@ -24,7 +24,6 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.disconnected.bridge.Bridge;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
@@ -42,6 +41,7 @@ import com.quartercode.disconnected.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProgramEvent;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
+import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
  * The file create program is used to create a new {@link File} under a given global {@link #PATH}.
@@ -176,7 +176,7 @@ public class FileCreateProgram extends ProgramExecutor {
      */
     public static class FileCreateProgramEvent extends ProgramEvent {
 
-        private static final long serialVersionUID = -4305409712951906877L;
+        private static final long serialVersionUID = -2640623294328041021L;
 
         /**
          * Creates a new file create program event.
@@ -205,7 +205,7 @@ public class FileCreateProgram extends ProgramExecutor {
      */
     public static class SuccessEvent extends FileCreateProgramEvent {
 
-        private static final long serialVersionUID = 4401971263121394946L;
+        private static final long serialVersionUID = 2276947021146657523L;
 
         /**
          * Creates a new file create program success event.
@@ -235,7 +235,7 @@ public class FileCreateProgram extends ProgramExecutor {
      */
     public static class ErrorEvent extends FileCreateProgramEvent {
 
-        private static final long serialVersionUID = -4838627736142625093L;
+        private static final long serialVersionUID = -5715015104171607677L;
 
         /**
          * Creates a new file create program error event.
@@ -265,7 +265,7 @@ public class FileCreateProgram extends ProgramExecutor {
      */
     public static class UnknownMountpointEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = -2452808547476443012L;
+        private static final long serialVersionUID = -1663068599050779385L;
 
         private final String      mountpoint;
 
@@ -312,7 +312,7 @@ public class FileCreateProgram extends ProgramExecutor {
      */
     public static class InvalidPathEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = 32541238748937669L;
+        private static final long serialVersionUID = 6347414737051975493L;
 
         private final String      path;
 
@@ -358,7 +358,7 @@ public class FileCreateProgram extends ProgramExecutor {
      */
     public static class OccupiedPathEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = -712482791353066258L;
+        private static final long serialVersionUID = 2560542890478154606L;
 
         private final String      path;
 
@@ -405,7 +405,7 @@ public class FileCreateProgram extends ProgramExecutor {
      */
     public static class OutOfSpaceEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = 1605576993550104512L;
+        private static final long serialVersionUID = -678289769911469929L;
 
         private final String      fileSystemMountpoint;
         private final long        requiredSpace;
@@ -463,7 +463,7 @@ public class FileCreateProgram extends ProgramExecutor {
      */
     public static class MissingRightsEvent extends ErrorEvent {
 
-        private static final long serialVersionUID = 1363673374686927819L;
+        private static final long serialVersionUID = -1722850688027611488L;
 
         /**
          * Creates a new file create program missing rights event.

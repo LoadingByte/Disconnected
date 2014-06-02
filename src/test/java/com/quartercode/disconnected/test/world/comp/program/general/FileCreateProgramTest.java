@@ -18,12 +18,11 @@
 
 package com.quartercode.disconnected.test.world.comp.program.general;
 
+import static com.quartercode.disconnected.test.ExtraAssert.assertCollectionSize;
 import static com.quartercode.disconnected.world.comp.file.FileUtils.getComponents;
 import static com.quartercode.disconnected.world.comp.program.ProgramUtils.getCommonLocation;
 import org.junit.Assert;
 import org.junit.Test;
-import com.quartercode.disconnected.bridge.Event;
-import com.quartercode.disconnected.bridge.QueueEventHandler;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
@@ -36,6 +35,7 @@ import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.comp.program.general.FileCreateProgram;
+import com.quartercode.eventbridge.bridge.Event;
 
 public class FileCreateProgramTest extends AbstractProgramTest {
 
@@ -62,22 +62,22 @@ public class FileCreateProgramTest extends AbstractProgramTest {
     @Test
     public void testSuccess() {
 
-        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
-        bridge.setHandler(handler);
+        restartEventRecording();
         executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH);
 
-        Event event = handler.next();
+        assertCollectionSize("File create program did not send correct number of events", events, 1);
+        Event event = events.get(0);
         Assert.assertTrue("File create program did not send SuccessEvent", event instanceof FileCreateProgram.SuccessEvent);
     }
 
     @Test
     public void testUnknownMountpoint() {
 
-        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
-        bridge.setHandler(handler);
+        restartEventRecording();
         executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), "/testunknown/" + FileUtils.getComponents(PATH)[1]);
 
-        Event event = handler.next();
+        assertCollectionSize("File create program did not send correct number of events", events, 1);
+        Event event = events.get(0);
         Assert.assertTrue("File create program did not send UnknownMountpointEvent", event instanceof FileCreateProgram.UnknownMountpointEvent);
         Assert.assertEquals("Unknown mountpoint", "testunknown", ((FileCreateProgram.UnknownMountpointEvent) event).getMountpoint());
     }
@@ -88,11 +88,11 @@ public class FileCreateProgramTest extends AbstractProgramTest {
         // Add content file that makes the path invalid
         fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), FileUtils.getComponents(PARENT_PATH)[1]).get(FileAddAction.EXECUTE).invoke();
 
-        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
-        bridge.setHandler(handler);
+        restartEventRecording();
         executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH);
 
-        Event event = handler.next();
+        assertCollectionSize("File create program did not send correct number of events", events, 1);
+        Event event = events.get(0);
         Assert.assertTrue("File create program did not send InvalidPathEvent", event instanceof FileCreateProgram.InvalidPathEvent);
         Assert.assertEquals("Invalid path", PATH, ((FileCreateProgram.InvalidPathEvent) event).getPath());
     }
@@ -103,11 +103,11 @@ public class FileCreateProgramTest extends AbstractProgramTest {
         // Add content file that makes the path occupied
         fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), FileUtils.getComponents(PATH)[1]).get(FileAddAction.EXECUTE).invoke();
 
-        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
-        bridge.setHandler(handler);
+        restartEventRecording();
         executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH);
 
-        Event event = handler.next();
+        assertCollectionSize("File create program did not send correct number of events", events, 1);
+        Event event = events.get(0);
         Assert.assertTrue("File create program did not send OccupiedPathEvent", event instanceof FileCreateProgram.OccupiedPathEvent);
         Assert.assertEquals("Occupied path", PATH, ((FileCreateProgram.OccupiedPathEvent) event).getPath());
     }
@@ -118,11 +118,11 @@ public class FileCreateProgramTest extends AbstractProgramTest {
         // Set size of the file system to something very small
         fileSystem.get(FileSystem.SIZE).set(40L);
 
-        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
-        bridge.setHandler(handler);
+        restartEventRecording();
         executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH);
 
-        Event event = handler.next();
+        assertCollectionSize("File create program did not send correct number of events", events, 1);
+        Event event = events.get(0);
         Assert.assertTrue("File create program did not send OutOfSpaceEvent", event instanceof FileCreateProgram.OutOfSpaceEvent);
         FileCreateProgram.OutOfSpaceEvent castedEvent = (FileCreateProgram.OutOfSpaceEvent) event;
         Assert.assertEquals("File system which is out of space", CommonFiles.SYSTEM_MOUNTPOINT, castedEvent.getFileSystemMountpoint());
@@ -142,11 +142,11 @@ public class FileCreateProgramTest extends AbstractProgramTest {
         session.get(Session.USER).set(testUser);
         session.get(ProgramExecutor.RUN).invoke();
 
-        QueueEventHandler<Event> handler = new QueueEventHandler<>(Event.class);
-        bridge.setHandler(handler);
+        restartEventRecording();
         executeProgram(sessionProcess, PATH);
 
-        Event event = handler.next();
+        assertCollectionSize("File create program did not send correct number of events", events, 1);
+        Event event = events.get(0);
         Assert.assertTrue("File create program did not send MissingRightsEvent", event instanceof FileCreateProgram.MissingRightsEvent);
     }
 
