@@ -178,7 +178,7 @@ public class DefaultHandleInvocationProviderExtensionTest {
         }
 
         @Override
-        public Object invoke(Invocation invocation) throws Throwable {
+        public Object invoke(Invocation invocation) {
 
             Runnable runnable = (Runnable) invocation.getParameter(0);
             runnable.run();
