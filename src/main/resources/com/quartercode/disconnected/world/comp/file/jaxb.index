@@ -4,5 +4,6 @@ File
 FileRights
 FileSystem
 FileSystemModule
+FileSystemModule$KnownFileSystem
 ParentFile
 RootFile

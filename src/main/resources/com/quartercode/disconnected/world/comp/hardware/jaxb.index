@@ -2,6 +2,7 @@ CPU
 HardDrive
 Hardware
 Mainboard
+Mainboard$MainboardSlot
 NodeNetInterface
 RAM
 RouterNetInterface
