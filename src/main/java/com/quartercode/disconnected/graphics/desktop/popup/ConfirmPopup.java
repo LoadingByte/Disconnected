@@ -146,7 +146,7 @@ public class ConfirmPopup extends DesktopWindow {
      * The confirm popup callback is used by the {@link ConfirmPopup} class.
      * It is called when certain events happen.
      * 
-     * @see #onClose(Option)
+     * @see #onClose(ConfirmPopup.Option)
      */
     public static interface Callback {
 
