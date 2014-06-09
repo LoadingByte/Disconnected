@@ -18,8 +18,11 @@
 
 package com.quartercode.disconnected.world.comp.hardware;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.ValueFactory;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileSystem;
@@ -46,7 +49,15 @@ public class HardDrive extends Hardware {
 
     static {
 
-        FILE_SYSTEM = ObjectProperty.createDefinition("fileSystem", new FileSystem(), true);
+        FILE_SYSTEM = create(new TypeLiteral<PropertyDefinition<FileSystem>>() {}, "name", "fileSystem", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<FileSystem>() {
+
+            @Override
+            public FileSystem get() {
+
+                return new FileSystem();
+            }
+
+        });
 
     }
 

@@ -18,14 +18,17 @@
 
 package com.quartercode.disconnected.world;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
-import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.ValueFactory;
+import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.net.Backbone;
@@ -53,8 +56,16 @@ public class World extends DefaultFeatureHolder {
 
     static {
 
-        BACKBONE = ObjectProperty.createDefinition("backbone", new Backbone(), true);
-        COMPUTERS = ObjectCollectionProperty.createDefinition("computers", new ArrayList<Computer>());
+        BACKBONE = create(new TypeLiteral<PropertyDefinition<Backbone>>() {}, "name", "backbone", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<Backbone>() {
+
+            @Override
+            public Backbone get() {
+
+                return new Backbone();
+            }
+
+        });
+        COMPUTERS = create(new TypeLiteral<CollectionPropertyDefinition<Computer, List<Computer>>>() {}, "name", "computers", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
 
     }
 

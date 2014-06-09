@@ -18,6 +18,8 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -25,8 +27,8 @@ import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.extra.def.ReferenceProperty;
+import com.quartercode.classmod.extra.storage.ReferenceStorage;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.world.comp.os.User;
 
@@ -64,10 +66,10 @@ public class FileAddAction extends DefaultFeatureHolder implements FileAction {
 
     static {
 
-        FILE_SYSTEM = ReferenceProperty.createDefinition("fileSystem");
-        FILE = ObjectProperty.createDefinition("file");
+        FILE_SYSTEM = create(new TypeLiteral<PropertyDefinition<FileSystem>>() {}, "name", "fileSystem", "storage", new ReferenceStorage<>());
+        FILE = create(new TypeLiteral<PropertyDefinition<File<ParentFile<?>>>>() {}, "name", "file", "storage", new StandardStorage<>());
 
-        PATH = ObjectProperty.createDefinition("path");
+        PATH = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "path", "storage", new StandardStorage<>());
         PATH.addSetterExecutor("normalize", FileAddAction.class, new FunctionExecutor<Void>() {
 
             @Override

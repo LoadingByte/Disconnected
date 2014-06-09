@@ -18,9 +18,10 @@
 
 package com.quartercode.disconnected.world.comp.net;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
 
 /**
  * This class represents a "thing" that can take {@link Packet}s and do something with them.
@@ -49,6 +50,6 @@ public interface PacketProcessor extends FeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void> PROCESS = FunctionDefinitionFactory.create("process", Packet.class);
+    public static final FunctionDefinition<Void> PROCESS = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "process", "parameters", new Class<?>[] { Packet.class });
 
 }

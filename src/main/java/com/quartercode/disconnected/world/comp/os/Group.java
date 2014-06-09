@@ -18,12 +18,14 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.Map;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.ValueSupplierDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.comp.os.Configuration.ConfigurationEntry;
 
@@ -45,7 +47,7 @@ public class Group extends ConfigurationEntry {
 
     static {
 
-        NAME = ObjectProperty.createDefinition("name");
+        NAME = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "name", "storage", new StandardStorage<>());
 
     }
 

@@ -18,14 +18,16 @@
 
 package com.quartercode.disconnected.world.comp.hardware;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.extra.def.ReferenceProperty;
+import com.quartercode.classmod.extra.storage.ReferenceStorage;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.world.comp.hardware.Mainboard.NeedsMainboardSlot;
 import com.quartercode.disconnected.world.comp.net.Address;
 import com.quartercode.disconnected.world.comp.net.NetID;
@@ -74,7 +76,7 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
 
     static {
 
-        NET_ID = ObjectProperty.createDefinition("netID");
+        NET_ID = create(new TypeLiteral<PropertyDefinition<NetID>>() {}, "name", "netID", "storage", new StandardStorage<>());
         NET_ID.addSetterExecutor("checkSubnetAgainstConnection", NodeNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -96,7 +98,7 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
 
         });
 
-        CONNECTION = ReferenceProperty.createDefinition("connection", true);
+        CONNECTION = create(new TypeLiteral<PropertyDefinition<RouterNetInterface>>() {}, "name", "connection", "storage", new ReferenceStorage<>(), "ignoreEquals", true);
         CONNECTION.addSetterExecutor("invalidateNetID", NodeNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override

@@ -18,17 +18,18 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.HashSet;
 import java.util.Set;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 import com.quartercode.disconnected.world.comp.Version;
@@ -65,9 +66,9 @@ public class Program extends DefaultFeatureHolder implements DerivableSize {
 
     static {
 
-        VERSION = ObjectProperty.createDefinition("version");
-        VULNERABILITIES = ObjectCollectionProperty.createDefinition("vulnerabilities", new HashSet<Vulnerability>());
-        EXECUTOR_CLASS = ObjectProperty.createDefinition("executorClass");
+        VERSION = create(new TypeLiteral<PropertyDefinition<Version>>() {}, "name", "version", "storage", new StandardStorage<>());
+        VULNERABILITIES = create(new TypeLiteral<CollectionPropertyDefinition<Vulnerability, Set<Vulnerability>>>() {}, "name", "vulnerabilities", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new HashSet<>()));
+        EXECUTOR_CLASS = create(new TypeLiteral<PropertyDefinition<Class<? extends ProgramExecutor>>>() {}, "name", "executorClass", "storage", new StandardStorage<>());
 
     }
 
@@ -92,7 +93,8 @@ public class Program extends DefaultFeatureHolder implements DerivableSize {
 
     static {
 
-        CREATE_EXECUTOR = FunctionDefinitionFactory.create("createExecutor", Program.class, new FunctionExecutor<ProgramExecutor>() {
+        CREATE_EXECUTOR = create(new TypeLiteral<FunctionDefinition<ProgramExecutor>>() {}, "name", "createExecutor", "parameters", new Class<?>[0]);
+        CREATE_EXECUTOR.addExecutor("default", Program.class, new FunctionExecutor<ProgramExecutor>() {
 
             @Override
             public ProgramExecutor invoke(FunctionInvocation<ProgramExecutor> invocation, Object... arguments) {

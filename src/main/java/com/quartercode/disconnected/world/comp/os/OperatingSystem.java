@@ -18,18 +18,19 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.HashSet;
 import java.util.Set;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.extra.ValueFactory;
+import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.Version;
@@ -85,42 +86,36 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
     static {
 
-        NAME = ObjectProperty.createDefinition("name");
-        VERSION = ObjectProperty.createDefinition("version");
-        VULNERABILITIES = ObjectCollectionProperty.createDefinition("vulnerabilities", new HashSet<Vulnerability>());
+        NAME = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "name", "storage", new StandardStorage<>());
+        VERSION = create(new TypeLiteral<PropertyDefinition<Version>>() {}, "name", "version", "storage", new StandardStorage<>());
+        VULNERABILITIES = create(new TypeLiteral<CollectionPropertyDefinition<Vulnerability, Set<Vulnerability>>>() {}, "name", "vulnerabilities", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new HashSet<>()));
 
-        FS_MODULE = ObjectProperty.createDefinition("fileSystemModule", new FileSystemModule(), true);
-        FS_MODULE.addSetterExecutor("cancel", OperatingSystem.class, new FunctionExecutor<Void>() {
+        FS_MODULE = create(new TypeLiteral<PropertyDefinition<FileSystemModule>>() {}, "name", "fileSystemModule", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<FileSystemModule>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+            public FileSystemModule get() {
 
-                return null;
+                return new FileSystemModule();
             }
 
         });
 
-        PROC_MODULE = ObjectProperty.createDefinition("processModule", new ProcessModule(), true);
-        PROC_MODULE.addSetterExecutor("cancel", OperatingSystem.class, new FunctionExecutor<Void>() {
+        PROC_MODULE = create(new TypeLiteral<PropertyDefinition<ProcessModule>>() {}, "name", "processModule", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<ProcessModule>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+            public ProcessModule get() {
 
-                return null;
+                return new ProcessModule();
             }
 
         });
 
-        NET_MODULE = ObjectProperty.createDefinition("networkModule", new NetworkModule(), true);
-        NET_MODULE.addSetterExecutor("cancel", OperatingSystem.class, new FunctionExecutor<Void>() {
+        NET_MODULE = create(new TypeLiteral<PropertyDefinition<NetworkModule>>() {}, "name", "networkModule", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<NetworkModule>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+            public NetworkModule get() {
 
-                return null;
+                return new NetworkModule();
             }
 
         });
@@ -160,7 +155,8 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
     static {
 
-        IS_RUNNING = FunctionDefinitionFactory.create("isRunning", OperatingSystem.class, new FunctionExecutor<Boolean>() {
+        IS_RUNNING = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "isRunning", "parameters", new Class<?>[0]);
+        IS_RUNNING.addExecutor("default", OperatingSystem.class, new FunctionExecutor<Boolean>() {
 
             @Override
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
@@ -173,7 +169,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
             }
 
         });
-        SET_RUNNING = FunctionDefinitionFactory.create("setRunning", Boolean.class);
+        SET_RUNNING = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setRunning", "parameters", new Class<?>[] { Boolean.class });
 
     }
 

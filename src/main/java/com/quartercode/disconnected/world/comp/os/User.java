@@ -18,10 +18,12 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -30,9 +32,9 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.ValueSupplierDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.extra.def.ReferenceCollectionProperty;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.extra.storage.ReferenceCollectionStorage;
+import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.comp.os.Configuration.ConfigurationEntry;
 
@@ -104,7 +106,7 @@ public class User extends ConfigurationEntry {
 
     static {
 
-        NAME = ObjectProperty.createDefinition("name");
+        NAME = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "name", "storage", new StandardStorage<>());
         NAME.addSetterExecutor("checkNotSuperuser", User.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -121,9 +123,9 @@ public class User extends ConfigurationEntry {
 
         });
 
-        PASSWORD = ObjectProperty.createDefinition("password");
+        PASSWORD = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "password", "storage", new StandardStorage<>());
 
-        GROUPS = ReferenceCollectionProperty.createDefinition("groups", new ArrayList<Group>());
+        GROUPS = create(new TypeLiteral<CollectionPropertyDefinition<Group, List<Group>>>() {}, "name", "groups", "storage", new ReferenceCollectionStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
         GROUPS.addAdderExecutor("checkNotSuperuser", User.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -201,7 +203,8 @@ public class User extends ConfigurationEntry {
 
     static {
 
-        GET_PRIMARY_GROUP = FunctionDefinitionFactory.create("getPrimaryGroup", User.class, new FunctionExecutor<Group>() {
+        GET_PRIMARY_GROUP = create(new TypeLiteral<FunctionDefinition<Group>>() {}, "name", "getPrimaryGroup", "parameters", new Class<?>[0]);
+        GET_PRIMARY_GROUP.addExecutor("default", User.class, new FunctionExecutor<Group>() {
 
             @Override
             public Group invoke(FunctionInvocation<Group> invocation, Object... arguments) {
@@ -217,7 +220,8 @@ public class User extends ConfigurationEntry {
             }
 
         });
-        SET_PRIMARY_GROUP = FunctionDefinitionFactory.create("setPrimaryGroup", User.class, new FunctionExecutor<Void>() {
+        SET_PRIMARY_GROUP = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setPrimaryGroup", "parameters", new Class<?>[] { Group.class });
+        SET_PRIMARY_GROUP.addExecutor("default", User.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
@@ -241,9 +245,10 @@ public class User extends ConfigurationEntry {
                 return invocation.next(arguments);
             }
 
-        }, Group.class);
+        });
 
-        IS_SUPERUSER = FunctionDefinitionFactory.create("isSuperuser", User.class, new FunctionExecutor<Boolean>() {
+        IS_SUPERUSER = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "isSuperuser", "parameters", new Class<?>[0]);
+        IS_SUPERUSER.addExecutor("default", User.class, new FunctionExecutor<Boolean>() {
 
             @Override
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {

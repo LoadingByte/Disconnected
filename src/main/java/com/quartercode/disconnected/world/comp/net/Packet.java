@@ -18,9 +18,11 @@
 
 package com.quartercode.disconnected.world.comp.net;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 
@@ -50,9 +52,9 @@ public class Packet extends DefaultFeatureHolder implements DerivableSize {
 
     static {
 
-        SENDER = ObjectProperty.createDefinition("sender");
-        RECEIVER = ObjectProperty.createDefinition("receiver");
-        DATA = ObjectProperty.createDefinition("data");
+        SENDER = create(new TypeLiteral<PropertyDefinition<Address>>() {}, "name", "sender", "storage", new StandardStorage<>());
+        RECEIVER = create(new TypeLiteral<PropertyDefinition<Address>>() {}, "name", "receiver", "storage", new StandardStorage<>());
+        DATA = create(new TypeLiteral<PropertyDefinition<Object>>() {}, "name", "data", "storage", new StandardStorage<>());
 
     }
 

@@ -18,13 +18,15 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ReferenceProperty;
+import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.world.comp.os.User;
 
@@ -48,7 +50,7 @@ public class FileRemoveAction extends DefaultFeatureHolder implements FileAction
 
     static {
 
-        FILE = ReferenceProperty.createDefinition("file");
+        FILE = create(new TypeLiteral<PropertyDefinition<File<ParentFile<?>>>>() {}, "name", "file", "storage", new ReferenceStorage<>());
 
     }
 

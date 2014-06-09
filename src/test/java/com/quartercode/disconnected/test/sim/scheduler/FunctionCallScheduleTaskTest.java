@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.test.sim.scheduler;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +40,6 @@ import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.sim.scheduler.FunctionCallScheduleTask;
 import com.quartercode.disconnected.sim.scheduler.Scheduler;
 
@@ -118,7 +119,8 @@ public class FunctionCallScheduleTaskTest {
 
         static {
 
-            TEST_FUNCTION_WITH_COMPLEX_NAME = FunctionDefinitionFactory.create("testFunctionWithComplexName", TestFeatureHolder.class, new FunctionExecutor<String>() {
+            TEST_FUNCTION_WITH_COMPLEX_NAME = create(new TypeLiteral<FunctionDefinition<String>>() {}, "name", "testFunctionWithComplexName", "parameters", new Class<?>[0]);
+            TEST_FUNCTION_WITH_COMPLEX_NAME.addExecutor("default", TestFeatureHolder.class, new FunctionExecutor<String>() {
 
                 @Override
                 public String invoke(FunctionInvocation<String> invocation, Object... arguments) {

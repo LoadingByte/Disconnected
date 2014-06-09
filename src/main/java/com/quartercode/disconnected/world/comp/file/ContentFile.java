@@ -18,11 +18,13 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 
 /**
@@ -56,7 +58,7 @@ public class ContentFile extends File<ParentFile<?>> {
 
     static {
 
-        CONTENT = ObjectProperty.createDefinition("content");
+        CONTENT = create(new TypeLiteral<PropertyDefinition<Object>>() {}, "name", "content", "storage", new StandardStorage<>());
         CONTENT.addSetterExecutor("checkSize", ContentFile.class, new FunctionExecutor<Void>() {
 
             @Override

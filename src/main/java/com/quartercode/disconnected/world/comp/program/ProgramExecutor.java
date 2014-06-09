@@ -18,11 +18,12 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.sim.SchedulerUser;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
@@ -64,7 +65,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
 
         });
 
-        RUN = FunctionDefinitionFactory.create("run");
+        RUN = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "run", "parameters", new Class<?>[0]);
         RUN.addExecutor("sendLaunchEvent", ProgramExecutor.class, new FunctionExecutor<Void>() {
 
             @Override

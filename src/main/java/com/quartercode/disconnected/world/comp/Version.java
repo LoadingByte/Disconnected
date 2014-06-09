@@ -18,15 +18,16 @@
 
 package com.quartercode.disconnected.world.comp;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.world.general.StringRepresentable;
 
 /**
@@ -54,9 +55,9 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
 
     static {
 
-        MAJOR = ObjectProperty.createDefinition("major");
-        MINOR = ObjectProperty.createDefinition("minor");
-        REVISION = ObjectProperty.createDefinition("revision");
+        MAJOR = create(new TypeLiteral<PropertyDefinition<Integer>>() {}, "name", "major", "storage", new StandardStorage<>());
+        MINOR = create(new TypeLiteral<PropertyDefinition<Integer>>() {}, "name", "minor", "storage", new StandardStorage<>());
+        REVISION = create(new TypeLiteral<PropertyDefinition<Integer>>() {}, "name", "revision", "storage", new StandardStorage<>());
 
     }
 
@@ -122,7 +123,8 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
 
     static {
 
-        FROM_OBJECT = FunctionDefinitionFactory.create("fromObject", Version.class, new FunctionExecutor<Void>() {
+        FROM_OBJECT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "fromObject", "parameters", new Class<?>[] { Version.class });
+        FROM_OBJECT.addExecutor("default", Version.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
@@ -135,7 +137,7 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
                 return invocation.next(arguments);
             }
 
-        }, Version.class);
+        });
 
         TO_STRING.addExecutor("default", Version.class, new FunctionExecutor<String>() {
 

@@ -18,8 +18,10 @@
 
 package com.quartercode.disconnected.world.comp.hardware;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.world.comp.hardware.Mainboard.NeedsMainboardSlot;
 
 /**
@@ -45,8 +47,8 @@ public class RAM extends Hardware {
 
     static {
 
-        SIZE = ObjectProperty.createDefinition("size");
-        FREQUENCY = ObjectProperty.createDefinition("frequency");
+        SIZE = create(new TypeLiteral<PropertyDefinition<Long>>() {}, "name", "size", "storage", new StandardStorage<>());
+        FREQUENCY = create(new TypeLiteral<PropertyDefinition<Long>>() {}, "name", "frequency", "storage", new StandardStorage<>());
 
     }
 

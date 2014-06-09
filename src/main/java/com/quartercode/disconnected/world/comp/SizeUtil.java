@@ -18,9 +18,11 @@
 
 package com.quartercode.disconnected.world.comp;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionProperty;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
@@ -29,7 +31,6 @@ import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Property;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.util.NullPreventer;
 
 /**
@@ -139,7 +140,7 @@ public class SizeUtil {
         /**
          * Derives the size of the implementing {@link FeatureHolder} in bytes.
          */
-        public static final FunctionDefinition<Long> GET_SIZE = FunctionDefinitionFactory.create("getSize");
+        public static final FunctionDefinition<Long> GET_SIZE = create(new TypeLiteral<FunctionDefinition<Long>>() {}, "name", "getSize", "parameters", new Class<?>[0]);
 
     }
 

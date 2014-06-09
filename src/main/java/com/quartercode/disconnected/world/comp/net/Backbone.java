@@ -18,14 +18,17 @@
 
 package com.quartercode.disconnected.world.comp.net;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
-import com.quartercode.classmod.extra.def.ReferenceCollectionProperty;
+import com.quartercode.classmod.extra.storage.ReferenceCollectionStorage;
+import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.hardware.NodeNetInterface;
@@ -48,7 +51,7 @@ public class Backbone extends WorldChildFeatureHolder<World> implements PacketPr
 
     static {
 
-        CHILDREN = ReferenceCollectionProperty.createDefinition("children", new ArrayList<RouterNetInterface>());
+        CHILDREN = create(new TypeLiteral<CollectionPropertyDefinition<RouterNetInterface, List<RouterNetInterface>>>() {}, "name", "children", "storage", new ReferenceCollectionStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
         CHILDREN.addAdderExecutor("addReverseConnection", Backbone.class, new FunctionExecutor<Void>() {
 
             @Override

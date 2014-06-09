@@ -18,12 +18,14 @@
 
 package com.quartercode.disconnected.world.comp.program.general;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileRemoveAction;
@@ -57,7 +59,7 @@ public class FileRemoveProgram extends ProgramExecutor {
 
     static {
 
-        PATH = ObjectProperty.createDefinition("path");
+        PATH = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "path", "storage", new StandardStorage<>());
         PATH.addSetterExecutor("normalize", FileAddAction.class, new FunctionExecutor<Void>() {
 
             @Override

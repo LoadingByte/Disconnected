@@ -32,7 +32,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import com.quartercode.classmod.util.Classmod;
+import com.quartercode.classmod.Classmod;
 import com.quartercode.disconnected.bridge.HandleInvocationProviderExtension;
 import com.quartercode.disconnected.bridge.def.DefaultHandleInvocationProviderExtension.DefaultHandleInvocationProviderExtensionFactory;
 import com.quartercode.disconnected.graphics.DefaultGraphicsManager;

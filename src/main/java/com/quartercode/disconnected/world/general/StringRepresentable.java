@@ -18,9 +18,10 @@
 
 package com.quartercode.disconnected.world.general;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
 
 /**
  * <p>
@@ -45,7 +46,7 @@ public interface StringRepresentable extends FeatureHolder {
      * Returns a string which is representating the original object in its current state.
      * The returned string must be convertable back into an object using {@link #FROM_STRING} which must be equal to the original object.
      */
-    public static final FunctionDefinition<String> TO_STRING   = FunctionDefinitionFactory.create("toString");
+    public static final FunctionDefinition<String> TO_STRING   = create(new TypeLiteral<FunctionDefinition<String>>() {}, "name", "toString", "parameters", new Class<?>[0]);
 
     /**
      * Changes the state of the object so its equal to the state described by the input string.
@@ -66,6 +67,6 @@ public interface StringRepresentable extends FeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>   FROM_STRING = FunctionDefinitionFactory.create("fromString", String.class);
+    public static final FunctionDefinition<Void>   FROM_STRING = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "fromString", "parameters", new Class<?>[] { String.class });
 
 }

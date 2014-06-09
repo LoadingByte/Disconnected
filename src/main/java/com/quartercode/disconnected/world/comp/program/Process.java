@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.world.comp.program;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -32,10 +34,10 @@ import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.extra.def.ReferenceProperty;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.extra.storage.ReferenceStorage;
+import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
+import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
@@ -162,9 +164,9 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
     static {
 
-        PID = ObjectProperty.createDefinition("pid");
+        PID = create(new TypeLiteral<PropertyDefinition<Integer>>() {}, "name", "pid", "storage", new StandardStorage<>());
 
-        SOURCE = ReferenceProperty.createDefinition("source");
+        SOURCE = create(new TypeLiteral<PropertyDefinition<ContentFile>>() {}, "name", "source", "storage", new ReferenceStorage<>());
         SOURCE.addSetterExecutor("checkFileContent", Process.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -177,10 +179,10 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        ENVIRONMENT = ObjectProperty.<Map<String, String>> createDefinition("environment", new HashMap<String, String>(), true);
-        STATE = ObjectProperty.createDefinition("state", ProcessState.RUNNING, false);
-        EXECUTOR = ObjectProperty.createDefinition("executor");
-        CHILDREN = ObjectCollectionProperty.createDefinition("children", new ArrayList<Process<?>>());
+        ENVIRONMENT = create(new TypeLiteral<PropertyDefinition<Map<String, String>>>() {}, "name", "environment", "storage", new StandardStorage<>(), "initialValue", new CloneValueFactory<>(new HashMap<>()));
+        STATE = create(new TypeLiteral<PropertyDefinition<ProcessState>>() {}, "name", "state", "storage", new StandardStorage<>(), "initialValue", new ConstantValueFactory<>(ProcessState.RUNNING));
+        EXECUTOR = create(new TypeLiteral<PropertyDefinition<ProgramExecutor>>() {}, "name", "executor", "storage", new StandardStorage<>());
+        CHILDREN = create(new TypeLiteral<CollectionPropertyDefinition<Process<?>, List<Process<?>>>>() {}, "name", "children", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
 
     }
 
@@ -408,7 +410,8 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
     static {
 
-        IS_STATE_APPLIED = FunctionDefinitionFactory.create("isStateApplied", Process.class, new FunctionExecutor<Boolean>() {
+        IS_STATE_APPLIED = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "isStateApplied", "parameters", new Class<?>[] { ProcessState.class });
+        IS_STATE_APPLIED.addExecutor("default", Process.class, new FunctionExecutor<Boolean>() {
 
             @Override
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
@@ -431,8 +434,9 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 return stateApplied;
             }
 
-        }, ProcessState.class);
-        APPLY_STATE = FunctionDefinitionFactory.create("setState", Process.class, new FunctionExecutor<Void>() {
+        });
+        APPLY_STATE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setState", "parameters", new Class<?>[] { ProcessState.class, Boolean.class });
+        APPLY_STATE.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
@@ -449,8 +453,9 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 return invocation.next(arguments);
             }
 
-        }, ProcessState.class, Boolean.class);
-        SUSPEND = FunctionDefinitionFactory.create("suspend", Process.class, new FunctionExecutor<Void>() {
+        });
+        SUSPEND = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "suspend", "parameters", new Class<?>[] { Boolean.class });
+        SUSPEND.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
@@ -464,8 +469,9 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 return invocation.next(arguments);
             }
 
-        }, Boolean.class);
-        RESUME = FunctionDefinitionFactory.create("resume", Process.class, new FunctionExecutor<Void>() {
+        });
+        RESUME = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "resume", "parameters", new Class<?>[] { Boolean.class });
+        RESUME.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
@@ -479,8 +485,9 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 return invocation.next(arguments);
             }
 
-        }, Boolean.class);
-        INTERRUPT = FunctionDefinitionFactory.create("interrupt", Process.class, new FunctionExecutor<Void>() {
+        });
+        INTERRUPT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "interrupt", "parameters", new Class<?>[] { Boolean.class });
+        INTERRUPT.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
@@ -494,8 +501,9 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 return invocation.next(arguments);
             }
 
-        }, Boolean.class);
-        STOP = FunctionDefinitionFactory.create("stop", Process.class, new FunctionExecutor<Void>() {
+        });
+        STOP = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "stop", "parameters", new Class<?>[] { Boolean.class });
+        STOP.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
@@ -513,9 +521,10 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 return invocation.next(arguments);
             }
 
-        }, Boolean.class);
+        });
 
-        GET_ALL_CHILDREN = FunctionDefinitionFactory.create("getAllChildren", Process.class, new FunctionExecutor<List<Process<?>>>() {
+        GET_ALL_CHILDREN = create(new TypeLiteral<FunctionDefinition<List<Process<?>>>>() {}, "name", "getAllChildren", "parameters", new Class<?>[0]);
+        GET_ALL_CHILDREN.addExecutor("default", Process.class, new FunctionExecutor<List<Process<?>>>() {
 
             @Override
             public List<Process<?>> invoke(FunctionInvocation<List<Process<?>>> invocation, Object... arguments) {
@@ -537,7 +546,8 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        CREATE_CHILD = FunctionDefinitionFactory.create("createChild", Process.class, new FunctionExecutor<ChildProcess>() {
+        CREATE_CHILD = create(new TypeLiteral<FunctionDefinition<ChildProcess>>() {}, "name", "createChild", "parameters", new Class<?>[0]);
+        CREATE_CHILD.addExecutor("default", Process.class, new FunctionExecutor<ChildProcess>() {
 
             @Override
             public ChildProcess invoke(FunctionInvocation<ChildProcess> invocation, Object... arguments) {
@@ -555,7 +565,8 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        GET_ROOT = FunctionDefinitionFactory.create("getRoot", Process.class, new FunctionExecutor<RootProcess>() {
+        GET_ROOT = create(new TypeLiteral<FunctionDefinition<RootProcess>>() {}, "name", "getRoot", "parameters", new Class<?>[0]);
+        GET_ROOT.addExecutor("default", Process.class, new FunctionExecutor<RootProcess>() {
 
             @Override
             public RootProcess invoke(FunctionInvocation<RootProcess> invocation, Object... arguments) {
@@ -575,7 +586,8 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        GET_OPERATING_SYSTEM = FunctionDefinitionFactory.create("getOperatingSystem", Process.class, new FunctionExecutor<OperatingSystem>() {
+        GET_OPERATING_SYSTEM = create(new TypeLiteral<FunctionDefinition<OperatingSystem>>() {}, "name", "getOperatingSystem", "parameters", new Class<?>[0]);
+        GET_OPERATING_SYSTEM.addExecutor("default", Process.class, new FunctionExecutor<OperatingSystem>() {
 
             @Override
             public OperatingSystem invoke(FunctionInvocation<OperatingSystem> invocation, Object... arguments) {
@@ -587,7 +599,8 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        GET_SESSION_PROCESS = FunctionDefinitionFactory.create("getSessionProcess", Process.class, new FunctionExecutor<Process<?>>() {
+        GET_SESSION_PROCESS = create(new TypeLiteral<FunctionDefinition<Process<?>>>() {}, "name", "getSessionProcess", "parameters", new Class<?>[0]);
+        GET_SESSION_PROCESS.addExecutor("default", Process.class, new FunctionExecutor<Process<?>>() {
 
             @Override
             public Process<?> invoke(FunctionInvocation<Process<?>> invocation, Object... arguments) {
@@ -611,7 +624,8 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        GET_SESSION = FunctionDefinitionFactory.create("getSession", Process.class, new FunctionExecutor<Session>() {
+        GET_SESSION = create(new TypeLiteral<FunctionDefinition<Session>>() {}, "name", "getSession", "parameters", new Class<?>[0]);
+        GET_SESSION.addExecutor("default", Process.class, new FunctionExecutor<Session>() {
 
             @Override
             public Session invoke(FunctionInvocation<Session> invocation, Object... arguments) {
@@ -628,7 +642,8 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        GET_USER = FunctionDefinitionFactory.create("getUser", Process.class, new FunctionExecutor<User>() {
+        GET_USER = create(new TypeLiteral<FunctionDefinition<User>>() {}, "name", "getUser", "parameters", new Class<?>[0]);
+        GET_USER.addExecutor("default", Process.class, new FunctionExecutor<User>() {
 
             @Override
             public User invoke(FunctionInvocation<User> invocation, Object... arguments) {
@@ -645,7 +660,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        INITIALIZE = FunctionDefinitionFactory.create("initialize", Integer.class);
+        INITIALIZE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "initialize", "parameters", new Class<?>[] { Integer.class });
         INITIALIZE.addExecutor("setPid", Process.class, new FunctionExecutor<Void>() {
 
             @Override

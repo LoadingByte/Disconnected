@@ -18,16 +18,16 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Property;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.AbstractPropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.extra.def.ReferenceProperty;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.extra.ValueFactory;
+import com.quartercode.classmod.extra.storage.ReferenceStorage;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
@@ -86,23 +86,22 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
     static {
 
-        NAME = ObjectProperty.createDefinition("name");
+        NAME = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "name", "storage", new StandardStorage<>());
 
-        RIGHTS = new AbstractPropertyDefinition<FileRights>("rights") {
+        RIGHTS = create(new TypeLiteral<PropertyDefinition<FileRights>>() {}, "name", "rights", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<FileRights>() {
 
             @Override
-            public Property<FileRights> create(FeatureHolder holder) {
+            public FileRights get() {
 
                 FileRights rights = new FileRights();
                 rights.get(FileRights.FROM_STRING).invoke(DEFAULT_FILE_RIGHTS);
-
-                return new ObjectProperty<>(getName(), holder, rights);
+                return rights;
             }
 
-        };
+        });
 
-        OWNER = ReferenceProperty.createDefinition("owner");
-        GROUP = ReferenceProperty.createDefinition("group");
+        OWNER = create(new TypeLiteral<PropertyDefinition<User>>() {}, "name", "owner", "storage", new ReferenceStorage<>());
+        GROUP = create(new TypeLiteral<PropertyDefinition<Group>>() {}, "name", "group", "storage", new ReferenceStorage<>());
 
     }
 
@@ -194,7 +193,8 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
     static {
 
-        GET_PATH = FunctionDefinitionFactory.create("getPath", File.class, new FunctionExecutor<String>() {
+        GET_PATH = create(new TypeLiteral<FunctionDefinition<String>>() {}, "name", "getPath", "parameters", new Class<?>[0]);
+        GET_PATH.addExecutor("default", File.class, new FunctionExecutor<String>() {
 
             @Override
             public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
@@ -213,7 +213,8 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
         });
 
-        CREATE_MOVE = FunctionDefinitionFactory.create("createMove", File.class, new FunctionExecutor<FileMoveAction>() {
+        CREATE_MOVE = create(new TypeLiteral<FunctionDefinition<FileMoveAction>>() {}, "name", "createMove", "parameters", new Class<?>[] { String.class });
+        CREATE_MOVE.addExecutor("default", File.class, new FunctionExecutor<FileMoveAction>() {
 
             @Override
             public FileMoveAction invoke(FunctionInvocation<FileMoveAction> invocation, Object... arguments) {
@@ -228,9 +229,10 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
                 return action;
             }
 
-        }, String.class);
+        });
 
-        CREATE_MOVE_TO_OTHER_FS = FunctionDefinitionFactory.create("createMoveToOtherFs", File.class, new FunctionExecutor<FileMoveAction>() {
+        CREATE_MOVE_TO_OTHER_FS = create(new TypeLiteral<FunctionDefinition<FileMoveAction>>() {}, "name", "createMoveToOtherFs", "parameters", new Class<?>[] { String.class, FileSystem.class });
+        CREATE_MOVE_TO_OTHER_FS.addExecutor("default", File.class, new FunctionExecutor<FileMoveAction>() {
 
             @SuppressWarnings ("unchecked")
             @Override
@@ -245,9 +247,10 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
                 return action;
             }
 
-        }, String.class, FileSystem.class);
+        });
 
-        CREATE_REMOVE = FunctionDefinitionFactory.create("createRemove", File.class, new FunctionExecutor<FileRemoveAction>() {
+        CREATE_REMOVE = create(new TypeLiteral<FunctionDefinition<FileRemoveAction>>() {}, "name", "createRemove", "parameters", new Class<?>[0]);
+        CREATE_REMOVE.addExecutor("default", File.class, new FunctionExecutor<FileRemoveAction>() {
 
             @Override
             @SuppressWarnings ("unchecked")
@@ -262,7 +265,8 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
         });
 
-        GET_FILE_SYSTEM = FunctionDefinitionFactory.create("getFileSystem", File.class, new FunctionExecutor<FileSystem>() {
+        GET_FILE_SYSTEM = create(new TypeLiteral<FunctionDefinition<FileSystem>>() {}, "name", "getFileSystem", "parameters", new Class<?>[0]);
+        GET_FILE_SYSTEM.addExecutor("default", File.class, new FunctionExecutor<FileSystem>() {
 
             @Override
             public FileSystem invoke(FunctionInvocation<FileSystem> invocation, Object... arguments) {

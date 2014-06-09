@@ -18,16 +18,15 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
-import com.quartercode.classmod.base.FeatureHolder;
+import static com.quartercode.classmod.ClassmodFactory.create;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Property;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.AbstractPropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.extra.ValueFactory;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
@@ -55,19 +54,17 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
     static {
 
-        SIZE = ObjectProperty.createDefinition("size");
+        SIZE = create(new TypeLiteral<PropertyDefinition<Long>>() {}, "name", "size", "storage", new StandardStorage<>());
 
-        ROOT = new AbstractPropertyDefinition<RootFile>("root") {
+        ROOT = create(new TypeLiteral<PropertyDefinition<RootFile>>() {}, "name", "root", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<RootFile>() {
 
             @Override
-            public Property<RootFile> create(FeatureHolder holder) {
+            public RootFile get() {
 
-                RootFile root = new RootFile();
-                root.setParent((FileSystem) holder);
-                return new ObjectProperty<>(getName(), holder, root);
+                return new RootFile();
             }
 
-        };
+        });
 
     }
 
@@ -143,7 +140,8 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
     static {
 
-        GET_FILE = FunctionDefinitionFactory.create("getFile", FileSystem.class, new FunctionExecutor<File<?>>() {
+        GET_FILE = create(new TypeLiteral<FunctionDefinition<File<?>>>() {}, "name", "getFile", "parameters", new Class<?>[] { String.class });
+        GET_FILE.addExecutor("default", FileSystem.class, new FunctionExecutor<File<?>>() {
 
             @Override
             public File<?> invoke(FunctionInvocation<File<?>> invocation, Object... arguments) {
@@ -176,9 +174,10 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
                 return current;
             }
 
-        }, String.class);
+        });
 
-        CREATE_ADD_FILE = FunctionDefinitionFactory.create("createAddFile", FileSystem.class, new FunctionExecutor<FileAddAction>() {
+        CREATE_ADD_FILE = create(new TypeLiteral<FunctionDefinition<FileAddAction>>() {}, "name", "createAddFile", "parameters", new Class<?>[] { File.class, String.class });
+        CREATE_ADD_FILE.addExecutor("default", FileSystem.class, new FunctionExecutor<FileAddAction>() {
 
             @Override
             @SuppressWarnings ("unchecked")
@@ -193,9 +192,10 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
                 return action;
             }
 
-        }, File.class, String.class);
+        });
 
-        GET_FILLED = FunctionDefinitionFactory.create("getFilled", FileSystem.class, new FunctionExecutor<Long>() {
+        GET_FILLED = create(new TypeLiteral<FunctionDefinition<Long>>() {}, "name", "getFilled", "parameters", new Class<?>[0]);
+        GET_FILLED.addExecutor("default", FileSystem.class, new FunctionExecutor<Long>() {
 
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
@@ -207,7 +207,8 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
         });
 
-        GET_FREE = FunctionDefinitionFactory.create("getFree", FileSystem.class, new FunctionExecutor<Long>() {
+        GET_FREE = create(new TypeLiteral<FunctionDefinition<Long>>() {}, "name", "getFree", "parameters", new Class<?>[0]);
+        GET_FREE.addExecutor("default", FileSystem.class, new FunctionExecutor<Long>() {
 
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {

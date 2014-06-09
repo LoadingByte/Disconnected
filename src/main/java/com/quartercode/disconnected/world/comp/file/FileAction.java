@@ -18,9 +18,10 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.world.comp.os.User;
 
 /**
@@ -45,7 +46,7 @@ public interface FileAction extends FeatureHolder {
      * Actually executes the defined action without doing anything else.
      * For example, a file movement action would simply do the file movement here.
      */
-    public static final FunctionDefinition<Void>    EXECUTE          = FunctionDefinitionFactory.create("execute");
+    public static final FunctionDefinition<Void>    EXECUTE          = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "execute", "parameters", new Class<?>[0]);
 
     /**
      * Takes a {@link User} and checks whether the user is allowed to execute the action under the current circumstances.<br>
@@ -67,6 +68,6 @@ public interface FileAction extends FeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Boolean> IS_EXECUTABLE_BY = FunctionDefinitionFactory.create("isExecutableBy", User.class);
+    public static final FunctionDefinition<Boolean> IS_EXECUTABLE_BY = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "isExecutableBy", "parameters", new Class<?>[] { User.class });
 
 }

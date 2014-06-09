@@ -18,8 +18,9 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionDefinition;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 
 /**
@@ -52,7 +53,7 @@ public abstract class OSModule extends WorldChildFeatureHolder<OperatingSystem> 
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void> SET_RUNNING = FunctionDefinitionFactory.create("setRunning", Boolean.class);
+    public static final FunctionDefinition<Void> SET_RUNNING = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setRunning", "parameters", new Class<?>[] { Boolean.class });
 
     /**
      * Creates a new generic {@link OperatingSystem} module.

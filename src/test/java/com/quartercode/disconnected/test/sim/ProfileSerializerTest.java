@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import javax.xml.bind.JAXBException;
@@ -35,9 +34,10 @@ import org.junit.Test;
 import com.quartercode.classmod.base.Feature;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionProperty;
+import com.quartercode.classmod.extra.Storage;
 import com.quartercode.classmod.extra.ValueSupplier;
-import com.quartercode.classmod.extra.def.AbstractCollectionProperty;
-import com.quartercode.classmod.extra.def.AbstractProperty;
+import com.quartercode.classmod.extra.def.DefaultCollectionProperty;
+import com.quartercode.classmod.extra.def.DefaultProperty;
 import com.quartercode.disconnected.Main;
 import com.quartercode.disconnected.sim.Profile;
 import com.quartercode.disconnected.sim.ProfileSerializer;
@@ -114,8 +114,8 @@ public class ProfileSerializerTest {
             return true;
         }
 
-        Object value1 = getInternalValue((ValueSupplier<?>) feature1);
-        Object value2 = getInternalValue((ValueSupplier<?>) feature2);
+        Object value1 = getStorage((ValueSupplier<?>) feature1).get();
+        Object value2 = getStorage((ValueSupplier<?>) feature2).get();
 
         // Return true if the feature is a collection property and the collection is empty
         if (feature1 instanceof CollectionProperty && feature2 instanceof CollectionProperty && value2 == null) {
@@ -129,10 +129,10 @@ public class ProfileSerializerTest {
 
         try {
             Field ignoreEquals;
-            if (feature instanceof AbstractProperty) {
-                ignoreEquals = AbstractProperty.class.getDeclaredField("ignoreEquals");
-            } else if (feature instanceof AbstractCollectionProperty) {
-                ignoreEquals = AbstractCollectionProperty.class.getDeclaredField("ignoreEquals");
+            if (feature instanceof DefaultProperty) {
+                ignoreEquals = DefaultProperty.class.getDeclaredField("ignoreEquals");
+            } else if (feature instanceof DefaultCollectionProperty) {
+                ignoreEquals = DefaultCollectionProperty.class.getDeclaredField("ignoreEquals");
             } else {
                 return false;
             }
@@ -146,14 +146,14 @@ public class ProfileSerializerTest {
         }
     }
 
-    private Object getInternalValue(ValueSupplier<?> valueSupplier) {
+    private Storage<?> getStorage(ValueSupplier<?> valueSupplier) {
 
         try {
-            Method getInternal = valueSupplier.getClass().getDeclaredMethod("getInternal");
-            getInternal.setAccessible(true);
-            Object value = getInternal.invoke(valueSupplier);
-            getInternal.setAccessible(false);
-            return value;
+            Field storageField = valueSupplier.getClass().getDeclaredField("storage");
+            storageField.setAccessible(true);
+            Storage<?> storage = (Storage<?>) storageField.get(valueSupplier);
+            storageField.setAccessible(false);
+            return storage;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

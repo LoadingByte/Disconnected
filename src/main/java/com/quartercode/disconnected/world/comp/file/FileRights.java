@@ -18,14 +18,16 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.Arrays;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.general.StringRepresentable;
@@ -161,7 +163,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
 
     static {
 
-        RIGHTS = ObjectProperty.createDefinition("rights", new Boolean[3 * 4], true);
+        RIGHTS = create(new TypeLiteral<PropertyDefinition<Boolean[]>>() {}, "name", "rights", "storage", new StandardStorage<>(), "initialValue", new CloneValueFactory<>(new Boolean[3 * 4]), "ignoreEquals", true);
 
     }
 
@@ -315,7 +317,8 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
 
     static {
 
-        GET = FunctionDefinitionFactory.create("get", FileRights.class, new FunctionExecutor<Boolean>() {
+        GET = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "get", "parameters", new Class<?>[] { FileAccessor.class, FileRight.class });
+        GET.addExecutor("default", FileRights.class, new FunctionExecutor<Boolean>() {
 
             @Override
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
@@ -331,9 +334,10 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
                 return result;
             }
 
-        }, FileAccessor.class, FileRight.class);
+        });
 
-        SET = FunctionDefinitionFactory.create("set", FileRights.class, new FunctionExecutor<Void>() {
+        SET = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "set", "parameters", new Class<?>[] { FileAccessor.class, FileRight.class, Boolean.class });
+        SET.addExecutor("default", FileRights.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
@@ -350,9 +354,10 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
                 return invocation.next(arguments);
             }
 
-        }, FileAccessor.class, FileRight.class, Boolean.class);
+        });
 
-        FROM_OBJECT = FunctionDefinitionFactory.create("fromObject", FileRights.class, new FunctionExecutor<Void>() {
+        FROM_OBJECT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "fromObject", "parameters", new Class<?>[] { FileRights.class });
+        FROM_OBJECT.addExecutor("default", FileRights.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
@@ -362,7 +367,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
                 return invocation.next(arguments);
             }
 
-        }, FileRights.class);
+        });
 
         TO_STRING.addExecutor("default", FileRights.class, new FunctionExecutor<String>() {
 

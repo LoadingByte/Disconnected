@@ -18,21 +18,22 @@
 
 package com.quartercode.disconnected.world.comp.hardware;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.extra.def.ReferenceProperty;
+import com.quartercode.classmod.extra.storage.ReferenceStorage;
+import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 
 /**
@@ -53,7 +54,7 @@ public class Mainboard extends Hardware {
 
     static {
 
-        SLOTS = ObjectCollectionProperty.createDefinition("slots", new ArrayList<MainboardSlot>());
+        SLOTS = create(new TypeLiteral<CollectionPropertyDefinition<MainboardSlot, List<MainboardSlot>>>() {}, "name", "slots", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
 
     }
 
@@ -81,7 +82,8 @@ public class Mainboard extends Hardware {
 
     static {
 
-        GET_SLOTS_BY_CONTENT_TYPE = FunctionDefinitionFactory.create("getSlotsByContentType", Mainboard.class, CollectionPropertyAccessorFactory.createGet(SLOTS, new CriteriumMatcher<MainboardSlot>() {
+        GET_SLOTS_BY_CONTENT_TYPE = create(new TypeLiteral<FunctionDefinition<List<MainboardSlot>>>() {}, "name", "getSlotsByContentType", "parameters", new Class<?>[] { Class.class });
+        GET_SLOTS_BY_CONTENT_TYPE.addExecutor("default", Mainboard.class, CollectionPropertyAccessorFactory.createGet(SLOTS, new CriteriumMatcher<MainboardSlot>() {
 
             @Override
             public boolean matches(MainboardSlot element, Object... arguments) {
@@ -89,7 +91,7 @@ public class Mainboard extends Hardware {
                 return ((Class<?>) arguments[0]).isAssignableFrom(element.get(MainboardSlot.TYPE).get());
             }
 
-        }), Class.class);
+        }));
 
     }
 
@@ -124,8 +126,8 @@ public class Mainboard extends Hardware {
 
         static {
 
-            TYPE = ObjectProperty.createDefinition("name");
-            CONTENT = ReferenceProperty.createDefinition("content");
+            TYPE = create(new TypeLiteral<PropertyDefinition<Class<? extends Hardware>>>() {}, "name", "name", "storage", new StandardStorage<>());
+            CONTENT = create(new TypeLiteral<PropertyDefinition<Hardware>>() {}, "name", "content", "storage", new ReferenceStorage<>());
 
         }
 

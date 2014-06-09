@@ -18,7 +18,9 @@
 
 package com.quartercode.disconnected.world.comp.net;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -26,8 +28,7 @@ import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.world.general.StringRepresentable;
 
 /**
@@ -65,9 +66,9 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
 
     static {
 
-        NET_ID = ObjectProperty.createDefinition("netID");
+        NET_ID = create(new TypeLiteral<PropertyDefinition<NetID>>() {}, "name", "netID", "storage", new StandardStorage<>());
 
-        PORT = ObjectProperty.createDefinition("port");
+        PORT = create(new TypeLiteral<PropertyDefinition<Integer>>() {}, "name", "port", "storage", new StandardStorage<>());
         PORT.addSetterExecutor("checkRange", Address.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -146,7 +147,8 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
 
     static {
 
-        FROM_OBJECT = FunctionDefinitionFactory.create("fromObject", Address.class, new FunctionExecutor<Void>() {
+        FROM_OBJECT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "fromObject", "parameters", new Class<?>[] { Address.class });
+        FROM_OBJECT.addExecutor("default", Address.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
@@ -163,7 +165,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
                 return invocation.next(arguments);
             }
 
-        }, Address.class);
+        });
 
         TO_STRING.addExecutor("default", Address.class, new FunctionExecutor<String>() {
 

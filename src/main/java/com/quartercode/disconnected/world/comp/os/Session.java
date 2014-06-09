@@ -18,14 +18,16 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.extra.def.ReferenceProperty;
+import com.quartercode.classmod.extra.storage.ReferenceStorage;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.world.comp.program.ChildProcess;
 import com.quartercode.disconnected.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.world.comp.program.Process;
@@ -61,8 +63,8 @@ public class Session extends ProgramExecutor {
 
     static {
 
-        USER = ReferenceProperty.createDefinition("user");
-        PASSWORD = ObjectProperty.createDefinition("password");
+        USER = create(new TypeLiteral<PropertyDefinition<User>>() {}, "name", "user", "storage", new ReferenceStorage<>());
+        PASSWORD = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "password", "storage", new StandardStorage<>());
 
     }
 

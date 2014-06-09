@@ -18,8 +18,10 @@
 
 package com.quartercode.disconnected.world.comp.hardware;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.hardware.Mainboard.NeedsMainboardSlot;
 
@@ -46,8 +48,8 @@ public class CPU extends Hardware {
 
     static {
 
-        THREADS = ObjectProperty.createDefinition("threads");
-        FREQUENCY = ObjectProperty.createDefinition("frequency");
+        THREADS = create(new TypeLiteral<PropertyDefinition<Integer>>() {}, "name", "threads", "storage", new StandardStorage<>());
+        FREQUENCY = create(new TypeLiteral<PropertyDefinition<Long>>() {}, "name", "frequency", "storage", new StandardStorage<>());
 
     }
 

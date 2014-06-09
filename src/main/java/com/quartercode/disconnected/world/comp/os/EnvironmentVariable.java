@@ -18,17 +18,18 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.ValueSupplierDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.comp.os.Configuration.ConfigurationEntry;
 
@@ -60,8 +61,8 @@ public class EnvironmentVariable extends ConfigurationEntry {
 
     static {
 
-        NAME = ObjectProperty.createDefinition("name");
-        VALUE = ObjectProperty.createDefinition("value");
+        NAME = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "name", "storage", new StandardStorage<>());
+        VALUE = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "value", "storage", new StandardStorage<>());
 
     }
 
@@ -113,7 +114,8 @@ public class EnvironmentVariable extends ConfigurationEntry {
 
     static {
 
-        GET_VALUE_LIST = FunctionDefinitionFactory.create("getValueList", EnvironmentVariable.class, new FunctionExecutor<List<String>>() {
+        GET_VALUE_LIST = create(new TypeLiteral<FunctionDefinition<List<String>>>() {}, "name", "getValueList", "parameters", new Class<?>[0]);
+        GET_VALUE_LIST.addExecutor("default", EnvironmentVariable.class, new FunctionExecutor<List<String>>() {
 
             @Override
             public List<String> invoke(FunctionInvocation<List<String>> invocation, Object... arguments) {
@@ -132,7 +134,8 @@ public class EnvironmentVariable extends ConfigurationEntry {
             }
 
         });
-        SET_VALUE_LIST = FunctionDefinitionFactory.create("setValueList", EnvironmentVariable.class, new FunctionExecutor<Void>() {
+        SET_VALUE_LIST = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setValueList", "parameters", new Class<?>[] { List.class });
+        SET_VALUE_LIST.addExecutor("default", EnvironmentVariable.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
@@ -150,7 +153,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
                 return invocation.next(arguments);
             }
 
-        }, List.class);
+        });
 
         GET_COLUMNS.addExecutor("name", EnvironmentVariable.class, new FunctionExecutor<Map<ValueSupplierDefinition<?, ?>, Class<?>>>() {
 

@@ -18,9 +18,11 @@
 
 package com.quartercode.disconnected.world.comp.os;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
@@ -28,8 +30,8 @@ import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.ValueSupplierDefinition;
-import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
+import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.SizeUtil;
@@ -63,7 +65,7 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
 
     static {
 
-        ENTRIES = ObjectCollectionProperty.createDefinition("entries", new ArrayList<ConfigurationEntry>());
+        ENTRIES = create(new TypeLiteral<CollectionPropertyDefinition<ConfigurationEntry, List<ConfigurationEntry>>>() {}, "name", "entries", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
 
     }
 
@@ -105,7 +107,7 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
 
         static {
 
-            GET_COLUMNS = FunctionDefinitionFactory.create("getColumns");
+            GET_COLUMNS = create(new TypeLiteral<FunctionDefinition<Map<ValueSupplierDefinition<?, ?>, Class<?>>>>() {}, "name", "getColumns", "parameters", new Class<?>[0]);
 
             GET_SIZE.addExecutor("columns", ConfigurationEntry.class, new FunctionExecutor<Long>() {
 

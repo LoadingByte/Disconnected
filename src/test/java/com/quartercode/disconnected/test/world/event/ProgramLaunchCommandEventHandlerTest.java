@@ -18,16 +18,19 @@
 
 package com.quartercode.disconnected.test.world.event;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.program.Process;
@@ -119,10 +122,10 @@ public class ProgramLaunchCommandEventHandlerTest {
     // Must be protected in order to make newInstance() work
     protected static class TestProgram extends ProgramExecutor {
 
-        public static final PropertyDefinition<Integer>    VALUE_1 = ObjectProperty.createDefinition("value1");
-        public static final PropertyDefinition<String>     VALUE_2 = ObjectProperty.createDefinition("value2");
-        public static final PropertyDefinition<SomeObject> VALUE_3 = ObjectProperty.createDefinition("value3");
-        public static final PropertyDefinition<String>     VALUE_4 = ObjectProperty.createDefinition("value4", "someotherstring", false);
+        public static final PropertyDefinition<Integer>    VALUE_1 = create(new TypeLiteral<PropertyDefinition<Integer>>() {}, "name", "value1", "storage", new StandardStorage<>());
+        public static final PropertyDefinition<String>     VALUE_2 = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "value2", "storage", new StandardStorage<>());
+        public static final PropertyDefinition<SomeObject> VALUE_3 = create(new TypeLiteral<PropertyDefinition<SomeObject>>() {}, "name", "value3", "storage", new StandardStorage<>());
+        public static final PropertyDefinition<String>     VALUE_4 = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "value4", "storage", new StandardStorage<>(), "initialValue", new ConstantValueFactory<>("someOtherString"));
 
         public TestProgram() {
 

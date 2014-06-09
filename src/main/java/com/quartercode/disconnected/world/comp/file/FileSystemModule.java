@@ -18,9 +18,11 @@
 
 package com.quartercode.disconnected.world.comp.file;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.Feature;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
@@ -29,12 +31,12 @@ import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
-import com.quartercode.classmod.extra.def.ObjectProperty;
-import com.quartercode.classmod.extra.def.ReferenceProperty;
+import com.quartercode.classmod.extra.storage.ReferenceStorage;
+import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
+import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
-import com.quartercode.classmod.util.FunctionDefinitionFactory;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.hardware.Hardware;
@@ -76,7 +78,7 @@ public class FileSystemModule extends OSModule {
 
     static {
 
-        KNOWN_FS = ObjectCollectionProperty.createDefinition("knownFs", new ArrayList<KnownFileSystem>());
+        KNOWN_FS = create(new TypeLiteral<CollectionPropertyDefinition<KnownFileSystem, List<KnownFileSystem>>>() {}, "name", "knownFs", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
         KNOWN_FS.addAdderExecutor("checkNotMounted", FileSystemModule.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -238,7 +240,8 @@ public class FileSystemModule extends OSModule {
 
     static {
 
-        GET_AVAILABLE = FunctionDefinitionFactory.create("getAvailable", FileSystemModule.class, new FunctionExecutor<List<FileSystem>>() {
+        GET_AVAILABLE = create(new TypeLiteral<FunctionDefinition<List<FileSystem>>>() {}, "name", "getAvailable", "parameters", new Class<?>[0]);
+        GET_AVAILABLE.addExecutor("default", FileSystemModule.class, new FunctionExecutor<List<FileSystem>>() {
 
             @Override
             public List<FileSystem> invoke(FunctionInvocation<List<FileSystem>> invocation, Object... arguments) {
@@ -263,7 +266,8 @@ public class FileSystemModule extends OSModule {
 
         });
 
-        GET_KNOWN_BY_FILESYSTEM = FunctionDefinitionFactory.create("getKnownByFilesystem", FileSystemModule.class, CollectionPropertyAccessorFactory.createGetSingle(KNOWN_FS, new CriteriumMatcher<KnownFileSystem>() {
+        GET_KNOWN_BY_FILESYSTEM = create(new TypeLiteral<FunctionDefinition<KnownFileSystem>>() {}, "name", "getKnownByFilesystem", "parameters", new Class<?>[] { FileSystem.class });
+        GET_KNOWN_BY_FILESYSTEM.addExecutor("default", FileSystemModule.class, CollectionPropertyAccessorFactory.createGetSingle(KNOWN_FS, new CriteriumMatcher<KnownFileSystem>() {
 
             @Override
             public boolean matches(KnownFileSystem element, Object... arguments) {
@@ -271,9 +275,10 @@ public class FileSystemModule extends OSModule {
                 return element.get(KnownFileSystem.FILE_SYSTEM).get().equals(arguments[0]);
             }
 
-        }), FileSystem.class);
+        }));
 
-        GET_MOUNTED = FunctionDefinitionFactory.create("getMounted", FileSystemModule.class, CollectionPropertyAccessorFactory.createGet(KNOWN_FS, new CriteriumMatcher<KnownFileSystem>() {
+        GET_MOUNTED = create(new TypeLiteral<FunctionDefinition<List<KnownFileSystem>>>() {}, "name", "getMounted", "parameters", new Class<?>[0]);
+        GET_MOUNTED.addExecutor("default", FileSystemModule.class, CollectionPropertyAccessorFactory.createGet(KNOWN_FS, new CriteriumMatcher<KnownFileSystem>() {
 
             @Override
             public boolean matches(KnownFileSystem element, Object... arguments) {
@@ -282,7 +287,8 @@ public class FileSystemModule extends OSModule {
             }
 
         }));
-        GET_MOUNTED_BY_MOUNTPOINT = FunctionDefinitionFactory.create("getMountedByMountpoint", FileSystemModule.class, CollectionPropertyAccessorFactory.createGetSingle(KNOWN_FS, new CriteriumMatcher<KnownFileSystem>() {
+        GET_MOUNTED_BY_MOUNTPOINT = create(new TypeLiteral<FunctionDefinition<KnownFileSystem>>() {}, "name", "getMountedByMountpoint", "parameters", new Class<?>[] { String.class });
+        GET_MOUNTED_BY_MOUNTPOINT.addExecutor("default", FileSystemModule.class, CollectionPropertyAccessorFactory.createGetSingle(KNOWN_FS, new CriteriumMatcher<KnownFileSystem>() {
 
             @Override
             public boolean matches(KnownFileSystem element, Object... arguments) {
@@ -290,9 +296,10 @@ public class FileSystemModule extends OSModule {
                 return element.get(KnownFileSystem.MOUNTED).get() && element.get(KnownFileSystem.MOUNTPOINT).get().equals(arguments[0]);
             }
 
-        }), String.class);
+        }));
 
-        GET_FILE = FunctionDefinitionFactory.create("getFile", FileSystemModule.class, new FunctionExecutor<File<?>>() {
+        GET_FILE = create(new TypeLiteral<FunctionDefinition<File<?>>>() {}, "name", "getFile", "parameters", new Class<?>[] { String.class });
+        GET_FILE.addExecutor("default", FileSystemModule.class, new FunctionExecutor<File<?>>() {
 
             @Override
             public File<?> invoke(FunctionInvocation<File<?>> invocation, Object... arguments) {
@@ -313,8 +320,9 @@ public class FileSystemModule extends OSModule {
                 return result;
             }
 
-        }, String.class);
-        CREATE_ADD_FILE = FunctionDefinitionFactory.create("createAddFile", FileSystemModule.class, new FunctionExecutor<FileAddAction>() {
+        });
+        CREATE_ADD_FILE = create(new TypeLiteral<FunctionDefinition<FileAddAction>>() {}, "name", "createAddFile", "parameters", new Class<?>[] { File.class, String.class });
+        CREATE_ADD_FILE.addExecutor("default", FileSystemModule.class, new FunctionExecutor<FileAddAction>() {
 
             @Override
             public FileAddAction invoke(FunctionInvocation<FileAddAction> invocation, Object... arguments) {
@@ -337,7 +345,7 @@ public class FileSystemModule extends OSModule {
                 return action;
             }
 
-        }, File.class, String.class);
+        });
 
         SET_RUNNING.addExecutor("mountSystemFs", FileSystemModule.class, new FunctionExecutor<Void>() {
 
@@ -424,9 +432,9 @@ public class FileSystemModule extends OSModule {
 
         static {
 
-            FILE_SYSTEM = ReferenceProperty.createDefinition("fileSystem");
+            FILE_SYSTEM = create(new TypeLiteral<PropertyDefinition<FileSystem>>() {}, "name", "fileSystem", "storage", new ReferenceStorage<>());
 
-            MOUNTPOINT = ObjectProperty.createDefinition("mountpoint");
+            MOUNTPOINT = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "mountpoint", "storage", new StandardStorage<>());
             MOUNTPOINT.addSetterExecutor("checkNotMounted", KnownFileSystem.class, new FunctionExecutor<Void>() {
 
                 @Override
@@ -442,7 +450,7 @@ public class FileSystemModule extends OSModule {
 
             });
 
-            MOUNTED = ObjectProperty.createDefinition("mounted", false, false);
+            MOUNTED = create(new TypeLiteral<PropertyDefinition<Boolean>>() {}, "name", "mounted", "storage", new StandardStorage<>(), "initialValue", new ConstantValueFactory<>(false));
             MOUNTED.addSetterExecutor("checkMountpointNotTaken", KnownFileSystem.class, new FunctionExecutor<Void>() {
 
                 @Override

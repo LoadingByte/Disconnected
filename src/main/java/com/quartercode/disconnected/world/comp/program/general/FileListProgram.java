@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.world.comp.program.general;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +26,12 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.world.comp.file.FileRights;
@@ -69,7 +71,7 @@ public class FileListProgram extends ProgramExecutor {
 
     static {
 
-        PATH = ObjectProperty.createDefinition("path");
+        PATH = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "path", "storage", new StandardStorage<>());
         PATH.addSetterExecutor("normalize", FileAddAction.class, new FunctionExecutor<Void>() {
 
             @Override

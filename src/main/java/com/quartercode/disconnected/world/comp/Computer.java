@@ -18,12 +18,14 @@
 
 package com.quartercode.disconnected.world.comp;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.def.ObjectCollectionProperty;
-import com.quartercode.classmod.extra.def.ObjectProperty;
+import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.hardware.Hardware;
@@ -57,9 +59,9 @@ public class Computer extends WorldChildFeatureHolder<World> {
 
     static {
 
-        LOCATION = ObjectProperty.createDefinition("location");
-        HARDWARE = ObjectCollectionProperty.createDefinition("hardware", new ArrayList<Hardware>());
-        OS = ObjectProperty.createDefinition("operatingSystem");
+        LOCATION = create(new TypeLiteral<PropertyDefinition<Location>>() {}, "name", "location", "storage", new StandardStorage<>());
+        HARDWARE = create(new TypeLiteral<CollectionPropertyDefinition<Hardware, List<Hardware>>>() {}, "name", "hardware", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
+        OS = create(new TypeLiteral<PropertyDefinition<OperatingSystem>>() {}, "name", "operatingSystem", "storage", new StandardStorage<>());
 
     }
 
