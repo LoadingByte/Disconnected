@@ -283,6 +283,7 @@ public class Main {
         GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp.net");
         GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp.os");
         GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp.program");
+        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.general");
 
         GlobalStorage.put("themes", Main.class.getResource("/ui/default/default.xml"));
         GlobalStorage.put("themes", Main.class.getResource("/ui/desktop/desktop.xml"));
