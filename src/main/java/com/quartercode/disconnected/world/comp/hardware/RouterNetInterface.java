@@ -332,13 +332,29 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
 
     private static void routePacket(FeatureHolder router, Packet packet) {
 
-        int destinationSubnet = packet.get(Packet.DESTINATION).get().get(Address.NET_ID).get().get(NetID.SUBNET).get();
-        List<Integer> path = calculatePathToDestinationRouter(router, destinationSubnet, new HashSet<Integer>());
+        final int destinationSubnet = packet.get(Packet.DESTINATION).get().get(Address.NET_ID).get().get(NetID.SUBNET).get();
+        List<Integer> path = calculatePathToDestination(new DestinationMatcher() {
+
+            @Override
+            public boolean matches(FeatureHolder router) {
+
+                return router.get(SUBNET).get() == destinationSubnet;
+            }
+
+        }, new ArrayList<Integer>(), router, new HashSet<Integer>());
 
         // When no path is found, the destination router is not connected with the router that called this method.
         // That means that the only way to reach the destination is to send the packet over the backbone.
         if (path == null) {
-            path = calculatePathToBackbone(router, new HashSet<Integer>());
+            path = calculatePathToDestination(new DestinationMatcher() {
+
+                @Override
+                public boolean matches(FeatureHolder router) {
+
+                    return router.get(BACKBONE_CONNECTION).get() != null;
+                }
+
+            }, new ArrayList<>(Arrays.asList(-1)), router, new HashSet<Integer>());
         }
 
         // When no path to the backbone is found, the routing must be aborted since there is no way to reach the destination.
@@ -355,49 +371,26 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
         router.get(PROCESS_ROUTED).invoke(routedPacket);
     }
 
-    private static List<Integer> calculatePathToDestinationRouter(FeatureHolder start, int destinationSubnet, Set<Integer> visitedSubnets) {
+    /*
+     * This method just calculates "a" valid path from a starting router ("currentRouter") to a destination router.
+     * The destination matcher is called once for every visited router and returns whether the provided router is the destination.
+     * If that is the case, the given "pathEnd" list is used to start the path list from the back.
+     */
+    private static List<Integer> calculatePathToDestination(DestinationMatcher destinationMatcher, List<Integer> pathEnd, FeatureHolder currentRouter, Set<Integer> visitedSubnets) {
 
-        int startSubnet = start.get(SUBNET).get();
-        visitedSubnets.add(startSubnet);
-
-        if (startSubnet == destinationSubnet) {
-            return new ArrayList<>();
+        if (destinationMatcher.matches(currentRouter)) {
+            return pathEnd;
         }
 
+        int startSubnet = currentRouter.get(SUBNET).get();
+        visitedSubnets.add(startSubnet);
+
         List<Integer> shortestPath = null;
-        for (RouterNetInterface neighbour : start.get(NEIGHBOURS).get()) {
+        for (RouterNetInterface neighbour : currentRouter.get(NEIGHBOURS).get()) {
             int neighbourSubnet = neighbour.get(SUBNET).get();
 
             if (!visitedSubnets.contains(neighbourSubnet)) {
-                List<Integer> path = calculatePathToDestinationRouter(neighbour, destinationSubnet, visitedSubnets);
-                if (path != null) {
-                    path = new ArrayList<>(path);
-                    path.add(0, neighbourSubnet);
-                    if (shortestPath == null || path.size() < shortestPath.size()) {
-                        shortestPath = path;
-                    }
-                }
-            }
-        }
-
-        return shortestPath;
-    }
-
-    private static List<Integer> calculatePathToBackbone(FeatureHolder start, Set<Integer> visitedSubnets) {
-
-        int startSubnet = start.get(SUBNET).get();
-        visitedSubnets.add(startSubnet);
-
-        if (start.get(BACKBONE_CONNECTION).get() != null) {
-            return new ArrayList<>(Arrays.asList(-1));
-        }
-
-        List<Integer> shortestPath = null;
-        for (RouterNetInterface neighbour : start.get(NEIGHBOURS).get()) {
-            int neighbourSubnet = neighbour.get(SUBNET).get();
-
-            if (!visitedSubnets.contains(neighbourSubnet)) {
-                List<Integer> path = calculatePathToBackbone(neighbour, visitedSubnets);
+                List<Integer> path = calculatePathToDestination(destinationMatcher, pathEnd, neighbour, visitedSubnets);
                 if (path != null) {
                     path = new ArrayList<>(path);
                     path.add(0, neighbourSubnet);
@@ -415,6 +408,12 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
      * Creates a new router network interface.
      */
     public RouterNetInterface() {
+
+    }
+
+    private static interface DestinationMatcher {
+
+        public boolean matches(FeatureHolder router);
 
     }
 
