@@ -112,7 +112,7 @@ public class Backbone extends WorldChildFeatureHolder<World> implements PacketPr
              */
             private boolean routeToChild(FeatureHolder backbone, Packet packet) {
 
-                NetID packetDest = packet.get(Packet.RECEIVER).get().get(Address.NET_ID).get();
+                NetID packetDest = packet.get(Packet.DESTINATION).get().get(Address.NET_ID).get();
                 int packetDestSubnet = packetDest.get(NetID.SUBNET).get();
 
                 Set<Integer> visitedSubnets = new HashSet<>();

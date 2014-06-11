@@ -182,7 +182,7 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
              */
             private boolean tryRouteToOs(FeatureHolder netInterface, Packet packet) {
 
-                NetID destination = packet.get(Packet.RECEIVER).get().get(Address.NET_ID).get();
+                NetID destination = packet.get(Packet.DESTINATION).get().get(Address.NET_ID).get();
 
                 if (!destination.equals(netInterface.get(NET_ID).get())) {
                     // Packet destination is not this network interface

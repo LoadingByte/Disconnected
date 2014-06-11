@@ -744,9 +744,9 @@ public class RoutingTest {
         for (NodeNetInterface node1 : nodes) {
             for (NodeNetInterface node2 : nodes) {
                 NetID senderID = node1.get(NodeNetInterface.NET_ID).get();
-                NetID receiverID = node2.get(NodeNetInterface.NET_ID).get();
+                NetID destinationID = node2.get(NodeNetInterface.NET_ID).get();
                 // Run a test between the two nodes (might be the same node)
-                new TestExecutor(node1, senderID, receiverID).run();
+                new TestExecutor(node1, senderID, destinationID).run();
             }
         }
     }
@@ -770,24 +770,24 @@ public class RoutingTest {
 
         private final PacketProcessor sender;
         private final NetID           senderId;
-        private final NetID           receiverId;
+        private final NetID           destinationId;
 
         private boolean               receivedPacket;
 
-        public TestExecutor(PacketProcessor sender, NetID senderId, NetID receiverId) {
+        public TestExecutor(PacketProcessor sender, NetID senderId, NetID destinationId) {
 
             this.sender = sender;
             this.senderId = senderId;
-            this.receiverId = receiverId;
+            this.destinationId = destinationId;
 
             processPacketCallback = new ProcessPacketCallback() {
 
                 @Override
                 public void onProcessPacket(NetID processorId, Packet packet) {
 
-                    NetID receiver = packet.get(Packet.RECEIVER).get().get(Address.NET_ID).get();
+                    NetID destination = packet.get(Packet.DESTINATION).get().get(Address.NET_ID).get();
 
-                    if (receiver.equals(processorId) && receiver.equals(TestExecutor.this.receiverId)) {
+                    if (destination.equals(processorId) && destination.equals(TestExecutor.this.destinationId)) {
                         receivedPacket = true;
                     }
                 }
@@ -799,14 +799,14 @@ public class RoutingTest {
 
             Packet packet = new Packet();
             packet.get(Packet.SENDER).set(generateAddress(senderId, 0));
-            packet.get(Packet.RECEIVER).set(generateAddress(receiverId, 0));
+            packet.get(Packet.DESTINATION).set(generateAddress(destinationId, 0));
             packet.get(Packet.DATA).set("testdata");
 
             sender.get(PacketProcessor.PROCESS).invoke(packet);
 
             String senderString = senderId.get(NetID.TO_STRING).invoke();
-            String receiverString = receiverId.get(NetID.TO_STRING).invoke();
-            Assert.assertTrue("Packet wasn't received by planned receiver (" + senderString + " -> " + receiverString + ")", receivedPacket);
+            String destinationString = destinationId.get(NetID.TO_STRING).invoke();
+            Assert.assertTrue("Packet wasn't received by planned destination (" + senderString + " -> " + destinationString + ")", receivedPacket);
         }
 
     }

@@ -270,22 +270,22 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
             }
 
             /*
-             * Try to send the packet to the receiver child node of the given packet.
+             * Try to send the packet to its destination child node.
              */
             private boolean tryHandOverToChild(FeatureHolder router, Packet packet) {
 
-                NetID receiver = packet.get(Packet.RECEIVER).get().get(Address.NET_ID).get();
-                int receiverSubnet = receiver.get(NetID.SUBNET).get();
-                int receiverId = receiver.get(NetID.ID).get();
+                NetID destination = packet.get(Packet.DESTINATION).get().get(Address.NET_ID).get();
+                int destinationSubnet = destination.get(NetID.SUBNET).get();
+                int destinationId = destination.get(NetID.ID).get();
 
-                if (receiverSubnet != router.get(SUBNET).get()) {
-                    // Packet receiver subnet does not equal the router's subnet
+                if (destinationSubnet != router.get(SUBNET).get()) {
+                    // Packet destination subnet does not equal the router's subnet
                     return false;
                 }
 
                 for (NodeNetInterface child : router.get(CHILDREN).get()) {
                     int childId = child.get(NodeNetInterface.NET_ID).get().get(NetID.ID).get();
-                    if (childId == receiverId) {
+                    if (childId == destinationId) {
                         child.get(NodeNetInterface.PROCESS).invoke(packet);
                         return true;
                     }
@@ -332,16 +332,16 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
 
     private static void routePacket(FeatureHolder router, Packet packet) {
 
-        int receiverSubnet = packet.get(Packet.RECEIVER).get().get(Address.NET_ID).get().get(NetID.SUBNET).get();
-        List<Integer> path = calculatePathToReceiverRouter(router, receiverSubnet, new HashSet<Integer>());
+        int destinationSubnet = packet.get(Packet.DESTINATION).get().get(Address.NET_ID).get().get(NetID.SUBNET).get();
+        List<Integer> path = calculatePathToDestinationRouter(router, destinationSubnet, new HashSet<Integer>());
 
-        // When no path is found, the receiver router is not connected with the router that called this method.
-        // That means that the only way to reach the receiver is to send the packet over the backbone.
+        // When no path is found, the destination router is not connected with the router that called this method.
+        // That means that the only way to reach the destination is to send the packet over the backbone.
         if (path == null) {
             path = calculatePathToBackbone(router, new HashSet<Integer>());
         }
 
-        // When no path to the backbone is found, the routing must be aborted since there is no way to reach the receiver.
+        // When no path to the backbone is found, the routing must be aborted since there is no way to reach the destination.
         if (path == null) {
             return;
         }
@@ -355,12 +355,12 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
         router.get(PROCESS_ROUTED).invoke(routedPacket);
     }
 
-    private static List<Integer> calculatePathToReceiverRouter(FeatureHolder start, int receiverSubnet, Set<Integer> visitedSubnets) {
+    private static List<Integer> calculatePathToDestinationRouter(FeatureHolder start, int destinationSubnet, Set<Integer> visitedSubnets) {
 
         int startSubnet = start.get(SUBNET).get();
         visitedSubnets.add(startSubnet);
 
-        if (startSubnet == receiverSubnet) {
+        if (startSubnet == destinationSubnet) {
             return new ArrayList<>();
         }
 
@@ -369,7 +369,7 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
             int neighbourSubnet = neighbour.get(SUBNET).get();
 
             if (!visitedSubnets.contains(neighbourSubnet)) {
-                List<Integer> path = calculatePathToReceiverRouter(neighbour, receiverSubnet, visitedSubnets);
+                List<Integer> path = calculatePathToDestinationRouter(neighbour, destinationSubnet, visitedSubnets);
                 if (path != null) {
                     path = new ArrayList<>(path);
                     path.add(0, neighbourSubnet);

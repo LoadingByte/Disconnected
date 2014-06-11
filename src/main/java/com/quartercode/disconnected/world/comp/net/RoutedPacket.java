@@ -59,7 +59,7 @@ public class RoutedPacket extends DefaultFeatureHolder implements DerivableSize 
      * <td colspan="4">No</td>
      * </tr>
      * <tr>
-     * <td colspan="2">Is the packet receiver a node in my subnet?</td>
+     * <td colspan="2">Is the packet destination a node in my subnet?</td>
      * <td colspan="4">Poll the next entry from the queue.</td>
      * </tr>
      * <tr>
@@ -68,8 +68,8 @@ public class RoutedPacket extends DefaultFeatureHolder implements DerivableSize 
      * <td colspan="4">Is the next entry a negative integer?</td>
      * </tr>
      * <tr>
-     * <td>Extract the packet and hand it over to the receiver node.</td>
-     * <td>Calculate a new route to the receiver of the packet.</td>
+     * <td>Extract the packet and hand it over to the destination node.</td>
+     * <td>Calculate a new route to the destination of the packet.</td>
      * <td colspan="2">Yes</td>
      * <td colspan="2">No</td>
      * </tr>
@@ -88,9 +88,9 @@ public class RoutedPacket extends DefaultFeatureHolder implements DerivableSize 
      * <tr>
      * <td colspan="2"></td>
      * <td>Extract the packet and hand it over to the backbone.</td>
-     * <td>Calculate a new route to the receiver of the packet.</td>
+     * <td>Calculate a new route to the destination of the packet.</td>
      * <td>Hand the routed packet over to the determined neighbour router.</td>
-     * <td>Calculate a new route to the receiver of the packet.</td>
+     * <td>Calculate a new route to the destination of the packet.</td>
      * </tr>
      * </table>
      * 
