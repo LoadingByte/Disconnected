@@ -93,7 +93,7 @@ public class Program extends DefaultFeatureHolder implements DerivableSize {
 
     static {
 
-        CREATE_EXECUTOR = create(new TypeLiteral<FunctionDefinition<ProgramExecutor>>() {}, "name", "createExecutor", "parameters", new Class<?>[0]);
+        CREATE_EXECUTOR = create(new TypeLiteral<FunctionDefinition<ProgramExecutor>>() {}, "name", "createExecutor", "parameters", new Class[0]);
         CREATE_EXECUTOR.addExecutor("default", Program.class, new FunctionExecutor<ProgramExecutor>() {
 
             @Override

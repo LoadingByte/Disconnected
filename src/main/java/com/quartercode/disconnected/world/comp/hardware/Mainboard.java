@@ -82,7 +82,7 @@ public class Mainboard extends Hardware {
 
     static {
 
-        GET_SLOTS_BY_CONTENT_TYPE = create(new TypeLiteral<FunctionDefinition<List<MainboardSlot>>>() {}, "name", "getSlotsByContentType", "parameters", new Class<?>[] { Class.class });
+        GET_SLOTS_BY_CONTENT_TYPE = create(new TypeLiteral<FunctionDefinition<List<MainboardSlot>>>() {}, "name", "getSlotsByContentType", "parameters", new Class[] { Class.class });
         GET_SLOTS_BY_CONTENT_TYPE.addExecutor("default", Mainboard.class, CollectionPropertyAccessorFactory.createGet(SLOTS, new CriteriumMatcher<MainboardSlot>() {
 
             @Override

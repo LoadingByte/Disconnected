@@ -240,7 +240,7 @@ public class FileSystemModule extends OSModule {
 
     static {
 
-        GET_AVAILABLE = create(new TypeLiteral<FunctionDefinition<List<FileSystem>>>() {}, "name", "getAvailable", "parameters", new Class<?>[0]);
+        GET_AVAILABLE = create(new TypeLiteral<FunctionDefinition<List<FileSystem>>>() {}, "name", "getAvailable", "parameters", new Class[0]);
         GET_AVAILABLE.addExecutor("default", FileSystemModule.class, new FunctionExecutor<List<FileSystem>>() {
 
             @Override
@@ -266,7 +266,7 @@ public class FileSystemModule extends OSModule {
 
         });
 
-        GET_KNOWN_BY_FILESYSTEM = create(new TypeLiteral<FunctionDefinition<KnownFileSystem>>() {}, "name", "getKnownByFilesystem", "parameters", new Class<?>[] { FileSystem.class });
+        GET_KNOWN_BY_FILESYSTEM = create(new TypeLiteral<FunctionDefinition<KnownFileSystem>>() {}, "name", "getKnownByFilesystem", "parameters", new Class[] { FileSystem.class });
         GET_KNOWN_BY_FILESYSTEM.addExecutor("default", FileSystemModule.class, CollectionPropertyAccessorFactory.createGetSingle(KNOWN_FS, new CriteriumMatcher<KnownFileSystem>() {
 
             @Override
@@ -277,7 +277,7 @@ public class FileSystemModule extends OSModule {
 
         }));
 
-        GET_MOUNTED = create(new TypeLiteral<FunctionDefinition<List<KnownFileSystem>>>() {}, "name", "getMounted", "parameters", new Class<?>[0]);
+        GET_MOUNTED = create(new TypeLiteral<FunctionDefinition<List<KnownFileSystem>>>() {}, "name", "getMounted", "parameters", new Class[0]);
         GET_MOUNTED.addExecutor("default", FileSystemModule.class, CollectionPropertyAccessorFactory.createGet(KNOWN_FS, new CriteriumMatcher<KnownFileSystem>() {
 
             @Override
@@ -287,7 +287,7 @@ public class FileSystemModule extends OSModule {
             }
 
         }));
-        GET_MOUNTED_BY_MOUNTPOINT = create(new TypeLiteral<FunctionDefinition<KnownFileSystem>>() {}, "name", "getMountedByMountpoint", "parameters", new Class<?>[] { String.class });
+        GET_MOUNTED_BY_MOUNTPOINT = create(new TypeLiteral<FunctionDefinition<KnownFileSystem>>() {}, "name", "getMountedByMountpoint", "parameters", new Class[] { String.class });
         GET_MOUNTED_BY_MOUNTPOINT.addExecutor("default", FileSystemModule.class, CollectionPropertyAccessorFactory.createGetSingle(KNOWN_FS, new CriteriumMatcher<KnownFileSystem>() {
 
             @Override
@@ -298,7 +298,7 @@ public class FileSystemModule extends OSModule {
 
         }));
 
-        GET_FILE = create(new TypeLiteral<FunctionDefinition<File<?>>>() {}, "name", "getFile", "parameters", new Class<?>[] { String.class });
+        GET_FILE = create(new TypeLiteral<FunctionDefinition<File<?>>>() {}, "name", "getFile", "parameters", new Class[] { String.class });
         GET_FILE.addExecutor("default", FileSystemModule.class, new FunctionExecutor<File<?>>() {
 
             @Override
@@ -321,7 +321,7 @@ public class FileSystemModule extends OSModule {
             }
 
         });
-        CREATE_ADD_FILE = create(new TypeLiteral<FunctionDefinition<FileAddAction>>() {}, "name", "createAddFile", "parameters", new Class<?>[] { File.class, String.class });
+        CREATE_ADD_FILE = create(new TypeLiteral<FunctionDefinition<FileAddAction>>() {}, "name", "createAddFile", "parameters", new Class[] { File.class, String.class });
         CREATE_ADD_FILE.addExecutor("default", FileSystemModule.class, new FunctionExecutor<FileAddAction>() {
 
             @Override

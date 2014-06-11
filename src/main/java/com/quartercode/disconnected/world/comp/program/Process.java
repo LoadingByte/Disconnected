@@ -410,7 +410,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
     static {
 
-        IS_STATE_APPLIED = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "isStateApplied", "parameters", new Class<?>[] { ProcessState.class });
+        IS_STATE_APPLIED = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "isStateApplied", "parameters", new Class[] { ProcessState.class });
         IS_STATE_APPLIED.addExecutor("default", Process.class, new FunctionExecutor<Boolean>() {
 
             @Override
@@ -435,7 +435,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             }
 
         });
-        APPLY_STATE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setState", "parameters", new Class<?>[] { ProcessState.class, Boolean.class });
+        APPLY_STATE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setState", "parameters", new Class[] { ProcessState.class, Boolean.class });
         APPLY_STATE.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -454,7 +454,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             }
 
         });
-        SUSPEND = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "suspend", "parameters", new Class<?>[] { Boolean.class });
+        SUSPEND = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "suspend", "parameters", new Class[] { Boolean.class });
         SUSPEND.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -470,7 +470,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             }
 
         });
-        RESUME = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "resume", "parameters", new Class<?>[] { Boolean.class });
+        RESUME = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "resume", "parameters", new Class[] { Boolean.class });
         RESUME.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -486,7 +486,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             }
 
         });
-        INTERRUPT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "interrupt", "parameters", new Class<?>[] { Boolean.class });
+        INTERRUPT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "interrupt", "parameters", new Class[] { Boolean.class });
         INTERRUPT.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -502,7 +502,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             }
 
         });
-        STOP = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "stop", "parameters", new Class<?>[] { Boolean.class });
+        STOP = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "stop", "parameters", new Class[] { Boolean.class });
         STOP.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -523,7 +523,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        GET_ALL_CHILDREN = create(new TypeLiteral<FunctionDefinition<List<Process<?>>>>() {}, "name", "getAllChildren", "parameters", new Class<?>[0]);
+        GET_ALL_CHILDREN = create(new TypeLiteral<FunctionDefinition<List<Process<?>>>>() {}, "name", "getAllChildren", "parameters", new Class[0]);
         GET_ALL_CHILDREN.addExecutor("default", Process.class, new FunctionExecutor<List<Process<?>>>() {
 
             @Override
@@ -546,7 +546,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        CREATE_CHILD = create(new TypeLiteral<FunctionDefinition<ChildProcess>>() {}, "name", "createChild", "parameters", new Class<?>[0]);
+        CREATE_CHILD = create(new TypeLiteral<FunctionDefinition<ChildProcess>>() {}, "name", "createChild", "parameters", new Class[0]);
         CREATE_CHILD.addExecutor("default", Process.class, new FunctionExecutor<ChildProcess>() {
 
             @Override
@@ -565,7 +565,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        GET_ROOT = create(new TypeLiteral<FunctionDefinition<RootProcess>>() {}, "name", "getRoot", "parameters", new Class<?>[0]);
+        GET_ROOT = create(new TypeLiteral<FunctionDefinition<RootProcess>>() {}, "name", "getRoot", "parameters", new Class[0]);
         GET_ROOT.addExecutor("default", Process.class, new FunctionExecutor<RootProcess>() {
 
             @Override
@@ -586,7 +586,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        GET_OPERATING_SYSTEM = create(new TypeLiteral<FunctionDefinition<OperatingSystem>>() {}, "name", "getOperatingSystem", "parameters", new Class<?>[0]);
+        GET_OPERATING_SYSTEM = create(new TypeLiteral<FunctionDefinition<OperatingSystem>>() {}, "name", "getOperatingSystem", "parameters", new Class[0]);
         GET_OPERATING_SYSTEM.addExecutor("default", Process.class, new FunctionExecutor<OperatingSystem>() {
 
             @Override
@@ -599,7 +599,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        GET_SESSION_PROCESS = create(new TypeLiteral<FunctionDefinition<Process<?>>>() {}, "name", "getSessionProcess", "parameters", new Class<?>[0]);
+        GET_SESSION_PROCESS = create(new TypeLiteral<FunctionDefinition<Process<?>>>() {}, "name", "getSessionProcess", "parameters", new Class[0]);
         GET_SESSION_PROCESS.addExecutor("default", Process.class, new FunctionExecutor<Process<?>>() {
 
             @Override
@@ -624,7 +624,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        GET_SESSION = create(new TypeLiteral<FunctionDefinition<Session>>() {}, "name", "getSession", "parameters", new Class<?>[0]);
+        GET_SESSION = create(new TypeLiteral<FunctionDefinition<Session>>() {}, "name", "getSession", "parameters", new Class[0]);
         GET_SESSION.addExecutor("default", Process.class, new FunctionExecutor<Session>() {
 
             @Override
@@ -642,7 +642,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        GET_USER = create(new TypeLiteral<FunctionDefinition<User>>() {}, "name", "getUser", "parameters", new Class<?>[0]);
+        GET_USER = create(new TypeLiteral<FunctionDefinition<User>>() {}, "name", "getUser", "parameters", new Class[0]);
         GET_USER.addExecutor("default", Process.class, new FunctionExecutor<User>() {
 
             @Override
@@ -660,7 +660,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
         });
 
-        INITIALIZE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "initialize", "parameters", new Class<?>[] { Integer.class });
+        INITIALIZE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "initialize", "parameters", new Class[] { Integer.class });
         INITIALIZE.addExecutor("setPid", Process.class, new FunctionExecutor<Void>() {
 
             @Override

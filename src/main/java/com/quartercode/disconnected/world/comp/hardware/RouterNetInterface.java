@@ -238,7 +238,7 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
 
         });
 
-        PROCESS_ROUTED = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "processRouted", "parameters", new Class<?>[] { RoutedPacket.class });
+        PROCESS_ROUTED = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "processRouted", "parameters", new Class[] { RoutedPacket.class });
         PROCESS_ROUTED.addExecutor("default", RouterNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override

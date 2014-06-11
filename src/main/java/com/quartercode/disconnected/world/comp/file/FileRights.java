@@ -317,7 +317,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
 
     static {
 
-        GET = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "get", "parameters", new Class<?>[] { FileAccessor.class, FileRight.class });
+        GET = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "get", "parameters", new Class[] { FileAccessor.class, FileRight.class });
         GET.addExecutor("default", FileRights.class, new FunctionExecutor<Boolean>() {
 
             @Override
@@ -336,7 +336,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
 
         });
 
-        SET = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "set", "parameters", new Class<?>[] { FileAccessor.class, FileRight.class, Boolean.class });
+        SET = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "set", "parameters", new Class[] { FileAccessor.class, FileRight.class, Boolean.class });
         SET.addExecutor("default", FileRights.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -356,7 +356,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
 
         });
 
-        FROM_OBJECT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "fromObject", "parameters", new Class<?>[] { FileRights.class });
+        FROM_OBJECT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "fromObject", "parameters", new Class[] { FileRights.class });
         FROM_OBJECT.addExecutor("default", FileRights.class, new FunctionExecutor<Void>() {
 
             @Override

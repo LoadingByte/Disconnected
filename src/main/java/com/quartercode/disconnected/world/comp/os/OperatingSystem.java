@@ -155,7 +155,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
     static {
 
-        IS_RUNNING = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "isRunning", "parameters", new Class<?>[0]);
+        IS_RUNNING = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "isRunning", "parameters", new Class[0]);
         IS_RUNNING.addExecutor("default", OperatingSystem.class, new FunctionExecutor<Boolean>() {
 
             @Override
@@ -169,7 +169,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
             }
 
         });
-        SET_RUNNING = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setRunning", "parameters", new Class<?>[] { Boolean.class });
+        SET_RUNNING = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setRunning", "parameters", new Class[] { Boolean.class });
 
     }
 

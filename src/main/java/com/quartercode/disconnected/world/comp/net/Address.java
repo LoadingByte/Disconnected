@@ -147,7 +147,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
 
     static {
 
-        FROM_OBJECT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "fromObject", "parameters", new Class<?>[] { Address.class });
+        FROM_OBJECT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "fromObject", "parameters", new Class[] { Address.class });
         FROM_OBJECT.addExecutor("default", Address.class, new FunctionExecutor<Void>() {
 
             @Override

@@ -114,7 +114,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
 
     static {
 
-        GET_VALUE_LIST = create(new TypeLiteral<FunctionDefinition<List<String>>>() {}, "name", "getValueList", "parameters", new Class<?>[0]);
+        GET_VALUE_LIST = create(new TypeLiteral<FunctionDefinition<List<String>>>() {}, "name", "getValueList", "parameters", new Class[0]);
         GET_VALUE_LIST.addExecutor("default", EnvironmentVariable.class, new FunctionExecutor<List<String>>() {
 
             @Override
@@ -134,7 +134,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
             }
 
         });
-        SET_VALUE_LIST = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setValueList", "parameters", new Class<?>[] { List.class });
+        SET_VALUE_LIST = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setValueList", "parameters", new Class[] { List.class });
         SET_VALUE_LIST.addExecutor("default", EnvironmentVariable.class, new FunctionExecutor<Void>() {
 
             @Override

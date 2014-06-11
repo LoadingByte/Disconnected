@@ -107,7 +107,7 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
 
         static {
 
-            GET_COLUMNS = create(new TypeLiteral<FunctionDefinition<Map<ValueSupplierDefinition<?, ?>, Class<?>>>>() {}, "name", "getColumns", "parameters", new Class<?>[0]);
+            GET_COLUMNS = create(new TypeLiteral<FunctionDefinition<Map<ValueSupplierDefinition<?, ?>, Class<?>>>>() {}, "name", "getColumns", "parameters", new Class[0]);
 
             GET_SIZE.addExecutor("columns", ConfigurationEntry.class, new FunctionExecutor<Long>() {
 

@@ -112,7 +112,7 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
 
     static {
 
-        GET_CHILD_BY_NAME = create(new TypeLiteral<FunctionDefinition<File<ParentFile<?>>>>() {}, "name", "getChildByName", "parameters", new Class<?>[] { String.class });
+        GET_CHILD_BY_NAME = create(new TypeLiteral<FunctionDefinition<File<ParentFile<?>>>>() {}, "name", "getChildByName", "parameters", new Class[] { String.class });
         GET_CHILD_BY_NAME.addExecutor("default", ParentFile.class, CollectionPropertyAccessorFactory.createGetSingle(CHILDREN, new CriteriumMatcher<File<ParentFile<?>>>() {
 
             @Override

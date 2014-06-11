@@ -140,7 +140,7 @@ public class SizeUtil {
         /**
          * Derives the size of the implementing {@link FeatureHolder} in bytes.
          */
-        public static final FunctionDefinition<Long> GET_SIZE = create(new TypeLiteral<FunctionDefinition<Long>>() {}, "name", "getSize", "parameters", new Class<?>[0]);
+        public static final FunctionDefinition<Long> GET_SIZE = create(new TypeLiteral<FunctionDefinition<Long>>() {}, "name", "getSize", "parameters", new Class[0]);
 
     }
 

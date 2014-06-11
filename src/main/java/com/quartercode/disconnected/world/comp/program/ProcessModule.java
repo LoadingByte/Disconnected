@@ -101,7 +101,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
 
     static {
 
-        GET_ALL = create(new TypeLiteral<FunctionDefinition<List<Process<?>>>>() {}, "name", "getAll", "parameters", new Class<?>[0]);
+        GET_ALL = create(new TypeLiteral<FunctionDefinition<List<Process<?>>>>() {}, "name", "getAll", "parameters", new Class[0]);
         GET_ALL.addExecutor("default", ProcessModule.class, new FunctionExecutor<List<Process<?>>>() {
 
             @Override
@@ -118,7 +118,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
 
         });
 
-        NEXT_PID = create(new TypeLiteral<FunctionDefinition<Integer>>() {}, "name", "nextPid", "parameters", new Class<?>[0]);
+        NEXT_PID = create(new TypeLiteral<FunctionDefinition<Integer>>() {}, "name", "nextPid", "parameters", new Class[0]);
         NEXT_PID.addExecutor("default", ProcessModule.class, new FunctionExecutor<Integer>() {
 
             @Override
@@ -220,7 +220,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
 
         });
 
-        KILL = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "kill", "parameters", new Class<?>[0]);
+        KILL = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "kill", "parameters", new Class[0]);
         KILL.addExecutor("default", ProcessModule.class, new FunctionExecutor<Void>() {
 
             @Override

@@ -34,6 +34,6 @@ public interface TickUpdatable extends FeatureHolder {
      * The tick update {@link Function} is automatically invoked by the tick simulator on every tick.
      * It should execute some activities related to the simulation of the world tree.
      */
-    public static final FunctionDefinition<Void> TICK_UPDATE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "tickUpdate", "parameters", new Class<?>[0]);
+    public static final FunctionDefinition<Void> TICK_UPDATE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "tickUpdate", "parameters", new Class[0]);
 
 }

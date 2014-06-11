@@ -123,7 +123,7 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
 
     static {
 
-        FROM_OBJECT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "fromObject", "parameters", new Class<?>[] { Version.class });
+        FROM_OBJECT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "fromObject", "parameters", new Class[] { Version.class });
         FROM_OBJECT.addExecutor("default", Version.class, new FunctionExecutor<Void>() {
 
             @Override

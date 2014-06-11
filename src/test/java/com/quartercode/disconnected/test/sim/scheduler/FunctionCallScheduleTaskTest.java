@@ -119,7 +119,7 @@ public class FunctionCallScheduleTaskTest {
 
         static {
 
-            TEST_FUNCTION_WITH_COMPLEX_NAME = create(new TypeLiteral<FunctionDefinition<String>>() {}, "name", "testFunctionWithComplexName", "parameters", new Class<?>[0]);
+            TEST_FUNCTION_WITH_COMPLEX_NAME = create(new TypeLiteral<FunctionDefinition<String>>() {}, "name", "testFunctionWithComplexName", "parameters", new Class[0]);
             TEST_FUNCTION_WITH_COMPLEX_NAME.addExecutor("default", TestFeatureHolder.class, new FunctionExecutor<String>() {
 
                 @Override

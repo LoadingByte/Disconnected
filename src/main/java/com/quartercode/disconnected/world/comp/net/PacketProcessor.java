@@ -50,6 +50,6 @@ public interface PacketProcessor extends FeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void> PROCESS = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "process", "parameters", new Class<?>[] { Packet.class });
+    public static final FunctionDefinition<Void> PROCESS = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "process", "parameters", new Class[] { Packet.class });
 
 }

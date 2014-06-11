@@ -203,7 +203,7 @@ public class User extends ConfigurationEntry {
 
     static {
 
-        GET_PRIMARY_GROUP = create(new TypeLiteral<FunctionDefinition<Group>>() {}, "name", "getPrimaryGroup", "parameters", new Class<?>[0]);
+        GET_PRIMARY_GROUP = create(new TypeLiteral<FunctionDefinition<Group>>() {}, "name", "getPrimaryGroup", "parameters", new Class[0]);
         GET_PRIMARY_GROUP.addExecutor("default", User.class, new FunctionExecutor<Group>() {
 
             @Override
@@ -220,7 +220,7 @@ public class User extends ConfigurationEntry {
             }
 
         });
-        SET_PRIMARY_GROUP = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setPrimaryGroup", "parameters", new Class<?>[] { Group.class });
+        SET_PRIMARY_GROUP = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setPrimaryGroup", "parameters", new Class[] { Group.class });
         SET_PRIMARY_GROUP.addExecutor("default", User.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -247,7 +247,7 @@ public class User extends ConfigurationEntry {
 
         });
 
-        IS_SUPERUSER = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "isSuperuser", "parameters", new Class<?>[0]);
+        IS_SUPERUSER = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "isSuperuser", "parameters", new Class[0]);
         IS_SUPERUSER.addExecutor("default", User.class, new FunctionExecutor<Boolean>() {
 
             @Override

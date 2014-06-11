@@ -140,7 +140,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
     static {
 
-        GET_FILE = create(new TypeLiteral<FunctionDefinition<File<?>>>() {}, "name", "getFile", "parameters", new Class<?>[] { String.class });
+        GET_FILE = create(new TypeLiteral<FunctionDefinition<File<?>>>() {}, "name", "getFile", "parameters", new Class[] { String.class });
         GET_FILE.addExecutor("default", FileSystem.class, new FunctionExecutor<File<?>>() {
 
             @Override
@@ -176,7 +176,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
         });
 
-        CREATE_ADD_FILE = create(new TypeLiteral<FunctionDefinition<FileAddAction>>() {}, "name", "createAddFile", "parameters", new Class<?>[] { File.class, String.class });
+        CREATE_ADD_FILE = create(new TypeLiteral<FunctionDefinition<FileAddAction>>() {}, "name", "createAddFile", "parameters", new Class[] { File.class, String.class });
         CREATE_ADD_FILE.addExecutor("default", FileSystem.class, new FunctionExecutor<FileAddAction>() {
 
             @Override
@@ -194,7 +194,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
         });
 
-        GET_FILLED = create(new TypeLiteral<FunctionDefinition<Long>>() {}, "name", "getFilled", "parameters", new Class<?>[0]);
+        GET_FILLED = create(new TypeLiteral<FunctionDefinition<Long>>() {}, "name", "getFilled", "parameters", new Class[0]);
         GET_FILLED.addExecutor("default", FileSystem.class, new FunctionExecutor<Long>() {
 
             @Override
@@ -207,7 +207,7 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
         });
 
-        GET_FREE = create(new TypeLiteral<FunctionDefinition<Long>>() {}, "name", "getFree", "parameters", new Class<?>[0]);
+        GET_FREE = create(new TypeLiteral<FunctionDefinition<Long>>() {}, "name", "getFree", "parameters", new Class[0]);
         GET_FREE.addExecutor("default", FileSystem.class, new FunctionExecutor<Long>() {
 
             @Override

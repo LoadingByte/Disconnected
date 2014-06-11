@@ -193,7 +193,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
     static {
 
-        GET_PATH = create(new TypeLiteral<FunctionDefinition<String>>() {}, "name", "getPath", "parameters", new Class<?>[0]);
+        GET_PATH = create(new TypeLiteral<FunctionDefinition<String>>() {}, "name", "getPath", "parameters", new Class[0]);
         GET_PATH.addExecutor("default", File.class, new FunctionExecutor<String>() {
 
             @Override
@@ -213,7 +213,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
         });
 
-        CREATE_MOVE = create(new TypeLiteral<FunctionDefinition<FileMoveAction>>() {}, "name", "createMove", "parameters", new Class<?>[] { String.class });
+        CREATE_MOVE = create(new TypeLiteral<FunctionDefinition<FileMoveAction>>() {}, "name", "createMove", "parameters", new Class[] { String.class });
         CREATE_MOVE.addExecutor("default", File.class, new FunctionExecutor<FileMoveAction>() {
 
             @Override
@@ -231,7 +231,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
         });
 
-        CREATE_MOVE_TO_OTHER_FS = create(new TypeLiteral<FunctionDefinition<FileMoveAction>>() {}, "name", "createMoveToOtherFs", "parameters", new Class<?>[] { String.class, FileSystem.class });
+        CREATE_MOVE_TO_OTHER_FS = create(new TypeLiteral<FunctionDefinition<FileMoveAction>>() {}, "name", "createMoveToOtherFs", "parameters", new Class[] { String.class, FileSystem.class });
         CREATE_MOVE_TO_OTHER_FS.addExecutor("default", File.class, new FunctionExecutor<FileMoveAction>() {
 
             @SuppressWarnings ("unchecked")
@@ -249,7 +249,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
         });
 
-        CREATE_REMOVE = create(new TypeLiteral<FunctionDefinition<FileRemoveAction>>() {}, "name", "createRemove", "parameters", new Class<?>[0]);
+        CREATE_REMOVE = create(new TypeLiteral<FunctionDefinition<FileRemoveAction>>() {}, "name", "createRemove", "parameters", new Class[0]);
         CREATE_REMOVE.addExecutor("default", File.class, new FunctionExecutor<FileRemoveAction>() {
 
             @Override
@@ -265,7 +265,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
         });
 
-        GET_FILE_SYSTEM = create(new TypeLiteral<FunctionDefinition<FileSystem>>() {}, "name", "getFileSystem", "parameters", new Class<?>[0]);
+        GET_FILE_SYSTEM = create(new TypeLiteral<FunctionDefinition<FileSystem>>() {}, "name", "getFileSystem", "parameters", new Class[0]);
         GET_FILE_SYSTEM.addExecutor("default", File.class, new FunctionExecutor<FileSystem>() {
 
             @Override

@@ -184,7 +184,7 @@ public class NetID extends DefaultFeatureHolder implements StringRepresentable {
 
     static {
 
-        FROM_OBJECT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "fromObject", "parameters", new Class<?>[] { NetID.class });
+        FROM_OBJECT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "fromObject", "parameters", new Class[] { NetID.class });
         FROM_OBJECT.addExecutor("default", NetID.class, new FunctionExecutor<Void>() {
 
             @Override

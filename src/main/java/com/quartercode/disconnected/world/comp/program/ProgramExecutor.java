@@ -65,7 +65,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
 
         });
 
-        RUN = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "run", "parameters", new Class<?>[0]);
+        RUN = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "run", "parameters", new Class[0]);
         RUN.addExecutor("sendLaunchEvent", ProgramExecutor.class, new FunctionExecutor<Void>() {
 
             @Override
