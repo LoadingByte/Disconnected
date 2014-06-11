@@ -415,7 +415,7 @@ public class RoutingTest {
                 addNodes(cycle1_6, 1);
 
                 // Right cycle
-                RouterNetInterface cycle2_1 = generateRouter(6, null, cycle1_2);
+                RouterNetInterface cycle2_1 = generateRouter(6, null, cycle1_3);
                 addNodes(cycle2_1, 1);
 
                 RouterNetInterface cycle2_2 = generateRouter(7, null, cycle2_1);
@@ -472,7 +472,7 @@ public class RoutingTest {
                 addNodes(cycle1_6, 1);
 
                 // Right cycle
-                RouterNetInterface cycle2_1 = generateRouter(6, null, cycle1_2);
+                RouterNetInterface cycle2_1 = generateRouter(6, null, cycle1_3);
                 addNodes(cycle2_1, 1);
 
                 RouterNetInterface cycle2_2 = generateRouter(7, null, cycle2_1);
