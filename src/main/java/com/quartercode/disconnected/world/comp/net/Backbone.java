@@ -20,7 +20,9 @@ package com.quartercode.disconnected.world.comp.net;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
@@ -113,32 +115,33 @@ public class Backbone extends WorldChildFeatureHolder<World> implements PacketPr
                 NetID packetDest = packet.get(Packet.RECEIVER).get().get(Address.NET_ID).get();
                 int packetDestSubnet = packetDest.get(NetID.SUBNET).get();
 
-                List<RouterNetInterface> visited = new ArrayList<>();
+                Set<Integer> visitedSubnets = new HashSet<>();
                 for (RouterNetInterface child : backbone.get(Backbone.CHILDREN).get()) {
-                    if (!visited.contains(child)) {
-                        List<NodeNetInterface> nodes = new ArrayList<>();
-                        recordAllNodes(child, nodes, visited);
-                        for (NodeNetInterface node : nodes) {
-                            if (node.get(NodeNetInterface.NET_ID).get().get(NetID.SUBNET).get() == packetDestSubnet) {
-                                child.get(NodeNetInterface.PROCESS).invoke(packet);
-                                return true;
-                            }
+                    List<NodeNetInterface> nodes = new ArrayList<>();
+                    recordAllNodes(child, nodes, visitedSubnets);
+                    for (NodeNetInterface node : nodes) {
+                        if (node.get(NodeNetInterface.NET_ID).get().get(NetID.SUBNET).get() == packetDestSubnet) {
+                            child.get(NodeNetInterface.PROCESS).invoke(packet);
+                            return true;
                         }
                     }
                 }
 
-                // No feasible child node found: Abort routing
+                // No feasible child node found
                 return false;
             }
 
-            private void recordAllNodes(RouterNetInterface router, List<NodeNetInterface> list, List<RouterNetInterface> visited) {
+            private void recordAllNodes(RouterNetInterface router, List<NodeNetInterface> list, Set<Integer> visitedSubnets) {
 
-                visited.add(router);
-                list.addAll(router.get(RouterNetInterface.CHILDREN).get());
+                int routerSubnet = router.get(RouterNetInterface.SUBNET).get();
 
-                for (RouterNetInterface neighbour : router.get(RouterNetInterface.NEIGHBOURS).get()) {
-                    if (!visited.contains(neighbour)) {
-                        recordAllNodes(neighbour, list, visited);
+                if (!visitedSubnets.contains(routerSubnet)) {
+                    visitedSubnets.add(routerSubnet);
+                    visitedSubnets.add(router.get(RouterNetInterface.SUBNET).get());
+                    list.addAll(router.get(RouterNetInterface.CHILDREN).get());
+
+                    for (RouterNetInterface neighbour : router.get(RouterNetInterface.NEIGHBOURS).get()) {
+                        recordAllNodes(neighbour, list, visitedSubnets);
                     }
                 }
             }

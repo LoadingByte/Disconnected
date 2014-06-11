@@ -185,7 +185,7 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
                 NetID destination = packet.get(Packet.RECEIVER).get().get(Address.NET_ID).get();
 
                 if (!destination.equals(netInterface.get(NET_ID).get())) {
-                    // Packet destination is not this network interface: Abort routing
+                    // Packet destination is not this network interface
                     return false;
                 }
 
@@ -200,7 +200,7 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
             private boolean tryRouteToRouter(FeatureHolder netInterface, Packet packet) {
 
                 if (netInterface.get(CONNECTION).get() == null) {
-                    // Network interface is not connected to a router: Abort routing
+                    // Network interface is not connected to a router
                     return false;
                 }
 

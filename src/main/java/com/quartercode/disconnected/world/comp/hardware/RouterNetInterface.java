@@ -20,12 +20,14 @@ package com.quartercode.disconnected.world.comp.hardware;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
+import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
@@ -40,6 +42,7 @@ import com.quartercode.disconnected.world.comp.net.Backbone;
 import com.quartercode.disconnected.world.comp.net.NetID;
 import com.quartercode.disconnected.world.comp.net.Packet;
 import com.quartercode.disconnected.world.comp.net.PacketProcessor;
+import com.quartercode.disconnected.world.comp.net.RoutedPacket;
 
 /**
  * This class represents a router network interface that may be used by a router computer.
@@ -200,6 +203,27 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
 
     // ----- Functions -----
 
+    /**
+     * Processes the given {@link RoutedPacket} by implementing the rules that are described in {@link RoutedPacket#PATH}.
+     * This method is not intended for public usage and takes care of sending routed packets between routers.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link RoutedPacket}</td>
+     * <td>routedPacket</td>
+     * <td>The routed packet that should be handled by the router net interface.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                                   PROCESS_ROUTED;
+
     static {
 
         PROCESS.addExecutor("default", RouterNetInterface.class, new FunctionExecutor<Void>() {
@@ -207,13 +231,38 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
-                Packet packet = (Packet) arguments[0];
+                routePacket(invocation.getHolder(), (Packet) arguments[0]);
 
-                // Routing cascade
-                if (!tryRouteToChild(holder, packet)) {
-                    if (!tryRouteToNeighbour(holder, packet)) {
-                        tryRouteToBackbone(holder, packet);
+                return invocation.next(arguments);
+            }
+
+        });
+
+        PROCESS_ROUTED = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "processRouted", "parameters", new Class<?>[] { RoutedPacket.class });
+        PROCESS_ROUTED.addExecutor("default", RouterNetInterface.class, new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                FeatureHolder holder = invocation.getHolder();
+                RoutedPacket routedPacket = (RoutedPacket) arguments[0];
+                Packet packet = routedPacket.get(RoutedPacket.PACKET).get();
+
+                if (routedPacket.get(RoutedPacket.PATH).get().isEmpty()) {
+                    if (!tryHandOverToChild(holder, packet)) {
+                        routePacket(holder, packet);
+                    }
+                } else {
+                    // Poll the next subnet from the path pseudo-queue
+                    int nextSubnet = routedPacket.get(RoutedPacket.PATH).get().get(0);
+                    routedPacket.get(RoutedPacket.PATH).remove(nextSubnet);
+
+                    if (nextSubnet < 0) {
+                        if (!tryHandOverToBackbone(holder, packet)) {
+                            routePacket(holder, packet);
+                        }
+                    } else if (!tryHandOverToNeighbour(holder, routedPacket, packet, nextSubnet)) {
+                        routePacket(holder, packet);
                     }
                 }
 
@@ -221,157 +270,145 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
             }
 
             /*
-             * Try to send the packet to a feasible child node.
+             * Try to send the packet to the receiver child node of the given packet.
              */
-            private boolean tryRouteToChild(FeatureHolder router, Packet packet) {
+            private boolean tryHandOverToChild(FeatureHolder router, Packet packet) {
 
-                NetID destination = packet.get(Packet.RECEIVER).get().get(Address.NET_ID).get();
-                int destinationID = destination.get(NetID.ID).get();
+                NetID receiver = packet.get(Packet.RECEIVER).get().get(Address.NET_ID).get();
+                int receiverSubnet = receiver.get(NetID.SUBNET).get();
+                int receiverId = receiver.get(NetID.ID).get();
 
-                if (destination.get(NetID.SUBNET).get() != router.get(SUBNET).get()) {
-                    // Packet destination subnet does not equal the router's subnet: Abort routing
+                if (receiverSubnet != router.get(SUBNET).get()) {
+                    // Packet receiver subnet does not equal the router's subnet
                     return false;
                 }
 
                 for (NodeNetInterface child : router.get(CHILDREN).get()) {
-                    NetID childID = child.get(NodeNetInterface.NET_ID).get();
-                    if (childID.get(NetID.ID).get() == destinationID) {
+                    int childId = child.get(NodeNetInterface.NET_ID).get().get(NetID.ID).get();
+                    if (childId == receiverId) {
                         child.get(NodeNetInterface.PROCESS).invoke(packet);
                         return true;
                     }
                 }
 
-                // No feasible child found: Abort routing
+                // No feasible child node found
                 return false;
             }
 
             /*
-             * Try to send the packet to the next router on the shortest path to the packet's destination.
+             * Try to send the packet to the backbone if connected.
              */
-            private boolean tryRouteToNeighbour(FeatureHolder router, Packet packet) {
-
-                int destinationSubnet = packet.get(Packet.RECEIVER).get().get(Address.NET_ID).get().get(NetID.SUBNET).get();
-                RouterNetInterface nextRouter = getNextShortestPathRouter(router, destinationSubnet);
-
-                if (nextRouter == null) {
-                    // No next router found: Abort routing
-                    return false;
-                }
-
-                nextRouter.get(PROCESS).invoke(packet);
-                return true;
-            }
-
-            private RouterNetInterface getNextShortestPathRouter(FeatureHolder router, int destinationSubnet) {
-
-                List<RouterNetInterface> neighbours = router.get(NEIGHBOURS).get();
-
-                if (neighbours.isEmpty()) {
-                    // No connected routers
-                    return null;
-                }
-
-                // Calculate the next router of the shortest path to the given destination
-                // Note that the algorithm which is used might not caclulate the shortest path in some cases
-                int shortestDistance = Integer.MAX_VALUE;
-                RouterNetInterface shortestDistanceNeighbour = null;
-                for (RouterNetInterface neighbour : neighbours) {
-                    int distance = getShortestPathDistance(neighbour, destinationSubnet, new HashSet<Integer>());
-                    if (distance >= 0 && distance < shortestDistance) {
-                        shortestDistance = distance;
-                        shortestDistanceNeighbour = neighbour;
-                    }
-                }
-
-                if (shortestDistance == Integer.MAX_VALUE) {
-                    // No route found
-                    return null;
-                }
-
-                return shortestDistanceNeighbour;
-            }
-
-            private int getShortestPathDistance(RouterNetInterface start, int destinationSubnet, Set<Integer> visitedSubnets) {
-
-                int startSubnet = start.get(SUBNET).get();
-
-                if (startSubnet == destinationSubnet) {
-                    // Distance between two references of the same router is 0
-                    return 0;
-                } else {
-                    // Add the start router to the "visited" list in order to prevent endless cycle errors
-                    visitedSubnets.add(startSubnet);
-
-                    // Retrieve the distances of all unvisited neighbours to the destination and record the shortest one
-                    int shortestDistance = Integer.MAX_VALUE;
-                    for (RouterNetInterface neighbour : start.get(NEIGHBOURS).get()) {
-                        int neighbourSubnet = neighbour.get(SUBNET).get();
-                        if (!visitedSubnets.contains(neighbourSubnet)) {
-                            int distance = getShortestPathDistance(neighbour, destinationSubnet, visitedSubnets);
-                            if (distance >= 0 && distance < shortestDistance) {
-                                shortestDistance = distance;
-                            }
-                        }
-                    }
-                    if (shortestDistance == Integer.MAX_VALUE) {
-                        shortestDistance = -1;
-                    }
-
-                    // If a path was found, increase the distance by one in order to add the node -> neighbour jump
-                    if (shortestDistance >= 0) {
-                        shortestDistance++;
-                    }
-
-                    return shortestDistance;
-                }
-            }
-
-            /*
-             * Try to send the packet to a connected backbone.
-             */
-            private boolean tryRouteToBackbone(FeatureHolder router, Packet packet) {
+            private boolean tryHandOverToBackbone(FeatureHolder router, Packet packet) {
 
                 if (router.get(BACKBONE_CONNECTION).get() != null) {
                     router.get(BACKBONE_CONNECTION).get().get(Backbone.PROCESS).invoke(packet);
                     return true;
-                } else {
-                    RouterNetInterface uplink = null;
-                    {
-                        List<RouterNetInterface> allNeighbours = new ArrayList<>();
-                        recordAllNeighbours((RouterNetInterface) router, allNeighbours);
-                        for (RouterNetInterface neighbour : allNeighbours) {
-                            Backbone backboneConnection = neighbour.get(BACKBONE_CONNECTION).get();
-                            if (backboneConnection != null) {
-                                uplink = neighbour;
-                                break;
-                            }
-                        }
-                    }
-
-                    RouterNetInterface nextRouter = getNextShortestPathRouter(router, uplink.get(SUBNET).get());
-                    if (nextRouter == null) {
-                        // No next router found: Abort routing
-                        return false;
-                    }
-
-                    nextRouter.get(PROCESS).invoke(packet);
-                    return true;
                 }
+
+                // Not connected to the backbone
+                return false;
             }
 
-            private void recordAllNeighbours(RouterNetInterface router, List<RouterNetInterface> list) {
+            /*
+             * Try to send the packet to the neighbour router with the given subnet.
+             */
+            private boolean tryHandOverToNeighbour(FeatureHolder router, RoutedPacket routedPacket, Packet packet, int nextSubnet) {
 
-                list.add(router);
-
-                for (RouterNetInterface neighbour : router.get(RouterNetInterface.NEIGHBOURS).get()) {
-                    if (!list.contains(neighbour)) {
-                        recordAllNeighbours(neighbour, list);
+                for (RouterNetInterface neighbour : router.get(NEIGHBOURS).get()) {
+                    int neighbourSubnet = neighbour.get(SUBNET).get();
+                    if (neighbourSubnet == nextSubnet) {
+                        neighbour.get(PROCESS_ROUTED).invoke(routedPacket);
+                        return true;
                     }
                 }
+
+                // No feasible neighbour router found
+                return false;
             }
 
         });
 
+    }
+
+    private static void routePacket(FeatureHolder router, Packet packet) {
+
+        int receiverSubnet = packet.get(Packet.RECEIVER).get().get(Address.NET_ID).get().get(NetID.SUBNET).get();
+        List<Integer> path = calculatePathToReceiverRouter(router, receiverSubnet, new HashSet<Integer>());
+
+        // When no path is found, the receiver router is not connected with the router that called this method.
+        // That means that the only way to reach the receiver is to send the packet over the backbone.
+        if (path == null) {
+            path = calculatePathToBackbone(router, new HashSet<Integer>());
+        }
+
+        // When no path to the backbone is found, the routing must be aborted since there is no way to reach the receiver.
+        if (path == null) {
+            return;
+        }
+
+        RoutedPacket routedPacket = new RoutedPacket();
+        routedPacket.get(RoutedPacket.PACKET).set(packet);
+        for (int pathEntry : path) {
+            routedPacket.get(RoutedPacket.PATH).add(pathEntry);
+        }
+
+        router.get(PROCESS_ROUTED).invoke(routedPacket);
+    }
+
+    private static List<Integer> calculatePathToReceiverRouter(FeatureHolder start, int receiverSubnet, Set<Integer> visitedSubnets) {
+
+        int startSubnet = start.get(SUBNET).get();
+        visitedSubnets.add(startSubnet);
+
+        if (startSubnet == receiverSubnet) {
+            return new ArrayList<>();
+        }
+
+        List<Integer> shortestPath = null;
+        for (RouterNetInterface neighbour : start.get(NEIGHBOURS).get()) {
+            int neighbourSubnet = neighbour.get(SUBNET).get();
+
+            if (!visitedSubnets.contains(neighbourSubnet)) {
+                List<Integer> path = calculatePathToReceiverRouter(neighbour, receiverSubnet, visitedSubnets);
+                if (path != null) {
+                    path = new ArrayList<>(path);
+                    path.add(0, neighbourSubnet);
+                    if (shortestPath == null || path.size() < shortestPath.size()) {
+                        shortestPath = path;
+                    }
+                }
+            }
+        }
+
+        return shortestPath;
+    }
+
+    private static List<Integer> calculatePathToBackbone(FeatureHolder start, Set<Integer> visitedSubnets) {
+
+        int startSubnet = start.get(SUBNET).get();
+        visitedSubnets.add(startSubnet);
+
+        if (start.get(BACKBONE_CONNECTION).get() != null) {
+            return new ArrayList<>(Arrays.asList(-1));
+        }
+
+        List<Integer> shortestPath = null;
+        for (RouterNetInterface neighbour : start.get(NEIGHBOURS).get()) {
+            int neighbourSubnet = neighbour.get(SUBNET).get();
+
+            if (!visitedSubnets.contains(neighbourSubnet)) {
+                List<Integer> path = calculatePathToBackbone(neighbour, visitedSubnets);
+                if (path != null) {
+                    path = new ArrayList<>(path);
+                    path.add(0, neighbourSubnet);
+                    if (shortestPath == null || path.size() < shortestPath.size()) {
+                        shortestPath = path;
+                    }
+                }
+            }
+        }
+
+        return shortestPath;
     }
 
     /**
