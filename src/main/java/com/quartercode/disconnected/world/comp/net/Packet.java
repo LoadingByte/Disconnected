@@ -28,7 +28,7 @@ import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 
 /**
  * This class represents a packet which can be sent between network interfaces.
- * A packet contains a sender, a destination (both represented by addresses) and a data payload {@link Object} which should be sent.
+ * A packet contains a source, a destination (both represented by addresses) and a data payload {@link Object} which should be sent.
  */
 public class Packet extends DefaultFeatureHolder implements DerivableSize {
 
@@ -37,7 +37,7 @@ public class Packet extends DefaultFeatureHolder implements DerivableSize {
     /**
      * The network {@link Address} which sends the packet.
      */
-    public static final PropertyDefinition<Address> SENDER;
+    public static final PropertyDefinition<Address> SOURCE;
 
     /**
      * The network {@link Address} the packet should be sent to.
@@ -52,7 +52,7 @@ public class Packet extends DefaultFeatureHolder implements DerivableSize {
 
     static {
 
-        SENDER = create(new TypeLiteral<PropertyDefinition<Address>>() {}, "name", "sender", "storage", new StandardStorage<>());
+        SOURCE = create(new TypeLiteral<PropertyDefinition<Address>>() {}, "name", "source", "storage", new StandardStorage<>());
         DESTINATION = create(new TypeLiteral<PropertyDefinition<Address>>() {}, "name", "destination", "storage", new StandardStorage<>());
         DATA = create(new TypeLiteral<PropertyDefinition<Object>>() {}, "name", "data", "storage", new StandardStorage<>());
 
