@@ -8,7 +8,7 @@
     <packaging>jar</packaging>
 
     <name>Disconnected</name>
-    <url>http://maven.apache.org</url>
+    <url>http://www.quartercode.com</url>
     <description>Disconnected is a large sandbox-type hacking game which simulates the entire world for giving realistic reactions of the society.</description>
     <inceptionYear>2013</inceptionYear>
 
