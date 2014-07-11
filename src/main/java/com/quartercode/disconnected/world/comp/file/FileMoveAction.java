@@ -193,11 +193,4 @@ public class FileMoveAction extends DefaultFeatureHolder implements FileAction {
 
     }
 
-    /**
-     * Creates a new file move action.
-     */
-    public FileMoveAction() {
-
-    }
-
 }

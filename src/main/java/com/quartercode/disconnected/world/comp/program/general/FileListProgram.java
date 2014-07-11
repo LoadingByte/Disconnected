@@ -190,13 +190,6 @@ public class FileListProgram extends ProgramExecutor {
     }
 
     /**
-     * Creates a new file list program executor.
-     */
-    public FileListProgram() {
-
-    }
-
-    /**
      * File list program events are events that are fired by the {@link FileListProgram}.<br>
      * <br>
      * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.

@@ -371,13 +371,6 @@ public class FileSystemModule extends OSModule {
     }
 
     /**
-     * Creates a new file system module.
-     */
-    public FileSystemModule() {
-
-    }
-
-    /**
      * The known file system represents a {@link FileSystem} which can mounted into an operating system because it's mountpoint is known.
      * This is used in a datastructure of the {@link FileSystemModule} to store the mountpoints of {@link FileSystem}s.
      * A mountpoint is a string like "system". To get the root {@link File} of a mounted {@link FileSystem} with that mountpoint, you can use "/system".

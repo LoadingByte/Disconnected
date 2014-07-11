@@ -123,11 +123,4 @@ public class Program extends DefaultFeatureHolder implements DerivableSize {
 
     }
 
-    /**
-     * Creates a new program.
-     */
-    public Program() {
-
-    }
-
 }

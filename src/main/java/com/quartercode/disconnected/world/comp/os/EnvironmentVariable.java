@@ -180,11 +180,4 @@ public class EnvironmentVariable extends ConfigurationEntry {
 
     }
 
-    /**
-     * Creates a new environment variable.
-     */
-    public EnvironmentVariable() {
-
-    }
-
 }

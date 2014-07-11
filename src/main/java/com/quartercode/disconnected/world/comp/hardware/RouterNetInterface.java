@@ -404,13 +404,6 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
         return shortestPath;
     }
 
-    /**
-     * Creates a new router network interface.
-     */
-    public RouterNetInterface() {
-
-    }
-
     private static interface DestinationMatcher {
 
         public boolean matches(FeatureHolder router);

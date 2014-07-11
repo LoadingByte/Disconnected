@@ -159,13 +159,6 @@ public class FileCreateProgram extends ProgramExecutor {
     }
 
     /**
-     * Creates a new file create program executor.
-     */
-    public FileCreateProgram() {
-
-    }
-
-    /**
      * File create program events are events that are fired by the {@link FileCreateProgram}.<br>
      * <br>
      * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.

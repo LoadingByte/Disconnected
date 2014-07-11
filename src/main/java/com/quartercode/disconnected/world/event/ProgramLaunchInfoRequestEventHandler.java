@@ -36,13 +36,6 @@ import com.quartercode.eventbridge.extra.extension.ReturnEventSender;
  */
 public class ProgramLaunchInfoRequestEventHandler implements RequestEventHandler<ProgramLaunchInfoRequestEvent> {
 
-    /**
-     * Creates a new program launch info request event handler.
-     */
-    public ProgramLaunchInfoRequestEventHandler() {
-
-    }
-
     @Override
     public void handle(ProgramLaunchInfoRequestEvent request, ReturnEventSender sender) {
 

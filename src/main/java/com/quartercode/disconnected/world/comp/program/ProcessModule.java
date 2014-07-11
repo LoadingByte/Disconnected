@@ -237,11 +237,4 @@ public class ProcessModule extends OSModule implements SchedulerUser {
 
     }
 
-    /**
-     * Creates a new process module.
-     */
-    public ProcessModule() {
-
-    }
-
 }

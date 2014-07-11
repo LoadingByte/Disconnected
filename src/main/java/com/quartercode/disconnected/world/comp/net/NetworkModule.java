@@ -34,11 +34,4 @@ public class NetworkModule extends OSModule {
 
     // TODO: Fill this with life when the new network system is done
 
-    /**
-     * Creates a new network module.
-     */
-    public NetworkModule() {
-
-    }
-
 }

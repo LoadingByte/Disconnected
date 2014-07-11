@@ -40,14 +40,6 @@ public class DefaultHandleInvocationProviderExtension extends AbstractBridgeModu
 
     private RunnableInvocationProvider  invocationProvider;
 
-    /**
-     * Creates a new handle invocation provider extension.
-     * See the {@link HandleInvocationProviderExtension} javadoc for more details on how to use the extension.
-     */
-    public DefaultHandleInvocationProviderExtension() {
-
-    }
-
     @Override
     public void add(Bridge bridge) {
 

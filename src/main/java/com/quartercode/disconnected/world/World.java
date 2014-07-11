@@ -73,14 +73,6 @@ public class World extends DefaultFeatureHolder {
     private RandomPool                                                         random;
 
     /**
-     * Creates a new empty world.
-     * Please note that a {@link RandomPool} must be injected after creation using {@link #injectRandom(RandomPool)}.
-     */
-    public World() {
-
-    }
-
-    /**
      * Returns the {@link Bridge} that should be used for sending events by any object in the world tree.
      * It is must be injected using {@link #injectBridge(Bridge)}.
      * 

@@ -150,11 +150,4 @@ public class Backbone extends WorldChildFeatureHolder<World> implements PacketPr
 
     }
 
-    /**
-     * Creates a new backbone.
-     */
-    public Backbone() {
-
-    }
-
 }

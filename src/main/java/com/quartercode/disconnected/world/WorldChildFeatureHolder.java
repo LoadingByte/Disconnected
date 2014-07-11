@@ -32,13 +32,6 @@ import com.quartercode.classmod.extra.def.DefaultChildFeatureHolder;
 public class WorldChildFeatureHolder<P extends FeatureHolder> extends DefaultChildFeatureHolder<P> {
 
     /**
-     * Creates a new world child feature holder.
-     */
-    public WorldChildFeatureHolder() {
-
-    }
-
-    /**
      * Resolves the {@link World} this world child feature holder is in.
      * 
      * @return The {@link World} which uses this feature holder.

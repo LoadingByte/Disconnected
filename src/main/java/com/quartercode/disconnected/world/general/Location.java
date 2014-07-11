@@ -48,11 +48,4 @@ public class Location extends DefaultFeatureHolder {
 
     }
 
-    /**
-     * Creates a new relative location.
-     */
-    public Location() {
-
-    }
-
 }

@@ -205,12 +205,4 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
 
     }
 
-    /**
-     * Creates a new empty address.
-     * You should fill the {@link #NET_ID} and {@link #PORT} properties after creation.
-     */
-    public Address() {
-
-    }
-
 }

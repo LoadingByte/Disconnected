@@ -52,11 +52,4 @@ public class RAM extends Hardware {
 
     }
 
-    /**
-     * Creates a new ram module.
-     */
-    public RAM() {
-
-    }
-
 }

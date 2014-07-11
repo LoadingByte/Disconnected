@@ -41,13 +41,6 @@ public class DefaultTicker implements Ticker {
     // Performance: Object cache
     private List<TickAction>       unmodifiableActions = Collections.unmodifiableList(actions);
 
-    /**
-     * Creates a new default ticker.
-     */
-    public DefaultTicker() {
-
-    }
-
     @Override
     public List<TickAction> getActions() {
 

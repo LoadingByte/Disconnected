@@ -127,11 +127,4 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
 
     }
 
-    /**
-     * Creates a new parent file.
-     */
-    public ParentFile() {
-
-    }
-
 }

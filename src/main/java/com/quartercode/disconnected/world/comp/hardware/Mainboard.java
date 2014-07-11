@@ -96,13 +96,6 @@ public class Mainboard extends Hardware {
     }
 
     /**
-     * Creates a new mainboard.
-     */
-    public Mainboard() {
-
-    }
-
-    /**
      * This class represents a mainboard slot which can have a {@link Hardware} part as content.
      * The {@link Hardware} type a slot can accept is defined using the type class.
      * A mainboard slot is only used by the mainboard class.

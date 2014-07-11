@@ -113,11 +113,4 @@ public class RoutedPacket extends DefaultFeatureHolder implements DerivableSize 
 
     }
 
-    /**
-     * Creates a new routed packet.
-     */
-    public RoutedPacket() {
-
-    }
-
 }

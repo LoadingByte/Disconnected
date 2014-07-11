@@ -224,11 +224,4 @@ public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
 
     }
 
-    /**
-     * Creates a new file system.
-     */
-    public FileSystem() {
-
-    }
-
 }

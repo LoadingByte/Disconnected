@@ -61,11 +61,4 @@ public class HardDrive extends Hardware {
 
     }
 
-    /**
-     * Creates a new hard drive.
-     */
-    public HardDrive() {
-
-    }
-
 }

@@ -50,13 +50,6 @@ public class ProgramLaunchCommandEventHandler implements EventHandler<ProgramLau
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgramLaunchCommandEventHandler.class);
 
-    /**
-     * Creates a new program launch command event handler.
-     */
-    public ProgramLaunchCommandEventHandler() {
-
-    }
-
     @Override
     public void handle(ProgramLaunchCommandEvent event) {
 

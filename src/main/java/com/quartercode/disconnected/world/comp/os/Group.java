@@ -69,11 +69,4 @@ public class Group extends ConfigurationEntry {
 
     }
 
-    /**
-     * Creates a new group object.
-     */
-    public Group() {
-
-    }
-
 }

@@ -30,13 +30,6 @@ public class TickRunnableInvoker implements TickAction, RunnableInvocationProvid
     private final Queue<Runnable> toInvoke = new LinkedList<>();
 
     /**
-     * Creates a new tick runnable invoker.
-     */
-    public TickRunnableInvoker() {
-
-    }
-
-    /**
      * Invokes the given {@link Runnable} in the tick update thread.
      * 
      * @param runnable The runnable to invoke in the tick update thread.

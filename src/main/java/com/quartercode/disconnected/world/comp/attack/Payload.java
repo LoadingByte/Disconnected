@@ -31,11 +31,4 @@ import com.quartercode.disconnected.world.comp.os.OperatingSystem;
  */
 public class Payload extends DefaultFeatureHolder {
 
-    /**
-     * Creates a new payload object.
-     */
-    public Payload() {
-
-    }
-
 }

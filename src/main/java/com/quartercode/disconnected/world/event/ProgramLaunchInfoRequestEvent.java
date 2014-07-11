@@ -35,13 +35,6 @@ public class ProgramLaunchInfoRequestEvent extends EventBase {
     // TODO: Proper user identification
 
     /**
-     * Creates a new program launch info request event.
-     */
-    public ProgramLaunchInfoRequestEvent() {
-
-    }
-
-    /**
      * The program launch info response event response to the return event for the {@link ProgramLaunchInfoRequestEvent}.
      * It contains a newly generated pid which can be input into a {@link ProgramLaunchCommandEvent}.
      * 

@@ -66,11 +66,4 @@ public class Packet extends DefaultFeatureHolder implements DerivableSize {
 
     }
 
-    /**
-     * Creates a new packet.
-     */
-    public Packet() {
-
-    }
-
 }

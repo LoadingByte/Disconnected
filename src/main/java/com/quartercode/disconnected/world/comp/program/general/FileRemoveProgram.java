@@ -135,13 +135,6 @@ public class FileRemoveProgram extends ProgramExecutor {
     }
 
     /**
-     * Creates a new file remove program executor.
-     */
-    public FileRemoveProgram() {
-
-    }
-
-    /**
      * File remove program events are events that are fired by the {@link FileRemoveProgram}.<br>
      * <br>
      * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.

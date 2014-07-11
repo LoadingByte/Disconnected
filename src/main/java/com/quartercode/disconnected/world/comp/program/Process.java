@@ -714,12 +714,4 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
 
     }
 
-    /**
-     * Creates a new empty process.
-     * You can start the new process using {@link Process#INITIALIZE} and then {@link ProgramExecutor#RUN} on {@link Process#EXECUTOR}.
-     */
-    public Process() {
-
-    }
-
 }

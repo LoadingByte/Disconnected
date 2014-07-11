@@ -296,11 +296,4 @@ public class User extends ConfigurationEntry {
 
     }
 
-    /**
-     * Creates a new user.
-     */
-    public User() {
-
-    }
-
 }

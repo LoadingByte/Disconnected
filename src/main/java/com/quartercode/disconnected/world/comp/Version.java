@@ -172,11 +172,4 @@ public class Version extends DefaultFeatureHolder implements StringRepresentable
 
     }
 
-    /**
-     * Creates a new version object.
-     */
-    public Version() {
-
-    }
-
 }

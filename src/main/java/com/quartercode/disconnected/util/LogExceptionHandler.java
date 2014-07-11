@@ -39,13 +39,6 @@ public class LogExceptionHandler implements UncaughtExceptionHandler {
         return LOGGER;
     }
 
-    /**
-     * Creates a new default uncaught exception handler.
-     */
-    public LogExceptionHandler() {
-
-    }
-
     @Override
     public void uncaughtException(Thread thread, Throwable t) {
 

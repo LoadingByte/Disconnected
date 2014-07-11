@@ -212,11 +212,4 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
 
     }
 
-    /**
-     * Creates a new node network interface.
-     */
-    public NodeNetInterface() {
-
-    }
-
 }

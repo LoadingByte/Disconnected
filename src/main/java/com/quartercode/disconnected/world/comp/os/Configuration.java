@@ -78,13 +78,6 @@ public class Configuration extends DefaultFeatureHolder implements DerivableSize
     }
 
     /**
-     * Creates a new configuration object.
-     */
-    public Configuration() {
-
-    }
-
-    /**
      * A {@link Configuration} object uses configuration entries which represent the lines in a configuration string.
      * These entries have different columns. Every column contains a value or a list.
      * 

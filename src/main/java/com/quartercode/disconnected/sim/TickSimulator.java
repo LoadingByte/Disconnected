@@ -31,13 +31,6 @@ public class TickSimulator implements TickAction {
     private volatile WeakReference<World> world;
 
     /**
-     * Creates a new empty tick simulator.
-     */
-    public TickSimulator() {
-
-    }
-
-    /**
      * Returns the {@link World} that is currently simulated by the tick simulator.
      * 
      * @return The currently simulated world.

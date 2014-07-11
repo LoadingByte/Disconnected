@@ -40,13 +40,6 @@ public class QueueEventHandler<T extends Event> implements EventHandler<T> {
     private final Queue<T> events = new LinkedList<>();
 
     /**
-     * Creates a new queue event handler.
-     */
-    public QueueEventHandler() {
-
-    }
-
-    /**
      * Adds the given incoming {@link Event} to the internal queue.
      * 
      * @param event The event that should be added to the queue.

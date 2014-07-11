@@ -236,12 +236,4 @@ public class NetID extends DefaultFeatureHolder implements StringRepresentable {
 
     }
 
-    /**
-     * Creates a new empty net id.
-     * You should fill in the {@link #SUBNET} and {@link #ID} properties after creation.
-     */
-    public NetID() {
-
-    }
-
 }

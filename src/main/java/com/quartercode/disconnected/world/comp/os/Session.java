@@ -143,13 +143,6 @@ public class Session extends ProgramExecutor {
     }
 
     /**
-     * Creates a new session program.
-     */
-    public Session() {
-
-    }
-
-    /**
      * Session events are events that are fired by the {@link Session} program.<br>
      * <br>
      * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.

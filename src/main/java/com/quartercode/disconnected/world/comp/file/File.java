@@ -290,11 +290,4 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
     }
 
-    /**
-     * Creates a new file.
-     */
-    public File() {
-
-    }
-
 }
