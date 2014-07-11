@@ -1,0 +1,13 @@
+<configuration>
+    <!-- Console appender -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%-33(%date [%thread]) %-5level %-31logger{32} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Direct all log messages from all components to the console -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
