@@ -76,18 +76,18 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
 
     static {
 
-        NET_ID = create(new TypeLiteral<PropertyDefinition<NetID>>() {}, "name", "netID", "storage", new StandardStorage<>());
+        NET_ID = create(new TypeLiteral<PropertyDefinition<NetID>>() {}, "name", "netId", "storage", new StandardStorage<>());
         NET_ID.addSetterExecutor("checkSubnetAgainstConnection", NodeNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
             @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                NetID netID = (NetID) arguments[0];
+                NetID netId = (NetID) arguments[0];
                 RouterNetInterface connection = invocation.getHolder().get(CONNECTION).get();
 
-                if (netID != null && connection != null) {
-                    int newSubnet = netID.get(NetID.SUBNET).get();
+                if (netId != null && connection != null) {
+                    int newSubnet = netId.get(NetID.SUBNET).get();
                     int conSubnet = connection.get(RouterNetInterface.SUBNET).get();
 
                     Validate.isTrue(newSubnet == conSubnet, "The subnet of the new net id (%d) must be equal to the one connected to (%d)", newSubnet, conSubnet);

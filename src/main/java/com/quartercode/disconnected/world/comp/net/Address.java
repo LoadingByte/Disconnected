@@ -66,7 +66,7 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
 
     static {
 
-        NET_ID = create(new TypeLiteral<PropertyDefinition<NetID>>() {}, "name", "netID", "storage", new StandardStorage<>());
+        NET_ID = create(new TypeLiteral<PropertyDefinition<NetID>>() {}, "name", "netId", "storage", new StandardStorage<>());
 
         PORT = create(new TypeLiteral<PropertyDefinition<Integer>>() {}, "name", "port", "storage", new StandardStorage<>());
         PORT.addSetterExecutor("checkRange", Address.class, new FunctionExecutor<Void>() {
@@ -156,9 +156,9 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
                 FeatureHolder holder = invocation.getHolder();
                 Address object = (Address) arguments[0];
 
-                NetID netID = new NetID();
-                netID.get(NetID.FROM_OBJECT).invoke(object.get(NET_ID).get());
-                holder.get(NET_ID).set(netID);
+                NetID netId = new NetID();
+                netId.get(NetID.FROM_OBJECT).invoke(object.get(NET_ID).get());
+                holder.get(NET_ID).set(netId);
 
                 holder.get(PORT).set(object.get(PORT).get());
 
@@ -174,11 +174,11 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
 
                 FeatureHolder holder = invocation.getHolder();
 
-                String netID = holder.get(NET_ID).get().get(NetID.TO_STRING).invoke();
+                String netId = holder.get(NET_ID).get().get(NetID.TO_STRING).invoke();
                 int port = holder.get(PORT).get();
 
                 invocation.next(arguments);
-                return new StringBuilder(netID).append(":").append(port).toString();
+                return new StringBuilder(netId).append(":").append(port).toString();
             }
 
         });
@@ -192,9 +192,9 @@ public class Address extends DefaultFeatureHolder implements StringRepresentable
                 String[] stringParts = ((String) arguments[0]).split(":");
                 Validate.isTrue(stringParts.length == 2, "Address (%s) must be provided in the format NET_ID:PORT", arguments[0]);
 
-                NetID netID = new NetID();
-                netID.get(NetID.FROM_STRING).invoke(stringParts[0]);
-                holder.get(NET_ID).set(netID);
+                NetID netId = new NetID();
+                netId.get(NetID.FROM_STRING).invoke(stringParts[0]);
+                holder.get(NET_ID).set(netId);
 
                 holder.get(PORT).set(Integer.parseInt(stringParts[1]));
 

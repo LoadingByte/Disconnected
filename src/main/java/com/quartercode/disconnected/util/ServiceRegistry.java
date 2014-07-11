@@ -53,4 +53,8 @@ public class ServiceRegistry {
         services.put(service, implementation);
     }
 
+    private ServiceRegistry() {
+
+    }
+
 }

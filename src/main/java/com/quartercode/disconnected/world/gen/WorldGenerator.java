@@ -158,10 +158,10 @@ public class WorldGenerator {
                 // Connect the computer to its router
                 netInterface.get(NodeNetInterface.CONNECTION).set(lastRouter);
                 // Set the interface's net id
-                NetID netID = new NetID();
-                netID.get(NetID.SUBNET).set(lastSubnet);
-                netID.get(NetID.ID).set(lastNetID);
-                netInterface.get(NodeNetInterface.NET_ID).set(netID);
+                NetID netId = new NetID();
+                netId.get(NetID.SUBNET).set(lastSubnet);
+                netId.get(NetID.ID).set(lastNetID);
+                netInterface.get(NodeNetInterface.NET_ID).set(netId);
             }
 
             computer.get(Computer.LOCATION).set(locations.get(index));

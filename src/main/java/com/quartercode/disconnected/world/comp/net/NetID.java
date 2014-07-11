@@ -137,7 +137,7 @@ public class NetID extends DefaultFeatureHolder implements StringRepresentable {
      * <tr>
      * <td>0</td>
      * <td>{@link NetID}</td>
-     * <td>netID</td>
+     * <td>netId</td>
      * <td>The net id object whose stored net id should be copied into this net id object.</td>
      * </tr>
      * </table>
@@ -164,7 +164,7 @@ public class NetID extends DefaultFeatureHolder implements StringRepresentable {
      * <tr>
      * <td>0</td>
      * <td>{@link String}</td>
-     * <td>netID</td>
+     * <td>netId</td>
      * <td>The new net id provided in the default notation.</td>
      * </tr>
      * </table>

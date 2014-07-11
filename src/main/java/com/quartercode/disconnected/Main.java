@@ -27,6 +27,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
@@ -242,20 +243,7 @@ public class Main {
 
         // Set locale if necessary
         if (line.hasOption("locale")) {
-            String[] localeParts = line.getOptionValue("locale").split("_");
-            String language = "";
-            String country = "";
-            String variant = "";
-            if (localeParts.length >= 1) {
-                language = localeParts[0];
-            }
-            if (localeParts.length >= 2) {
-                country = localeParts[1];
-            }
-            if (localeParts.length >= 3) {
-                variant = localeParts[2];
-            }
-            Locale.setDefault(new Locale(language, country, variant));
+            Locale.setDefault(LocaleUtils.toLocale(line.getOptionValue("locale")));
         }
     }
 

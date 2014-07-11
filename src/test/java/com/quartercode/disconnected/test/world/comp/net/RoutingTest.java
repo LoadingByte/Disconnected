@@ -608,16 +608,16 @@ public class RoutingTest {
 
     private static NetID generateNetID(int subnet, int id) {
 
-        NetID netID = new NetID();
-        netID.get(NetID.SUBNET).set(subnet);
-        netID.get(NetID.ID).set(id);
-        return netID;
+        NetID netId = new NetID();
+        netId.get(NetID.SUBNET).set(subnet);
+        netId.get(NetID.ID).set(id);
+        return netId;
     }
 
-    private static Address generateAddress(NetID netID, int port) {
+    private static Address generateAddress(NetID netId, int port) {
 
         Address address = new Address();
-        address.get(Address.NET_ID).set(netID);
+        address.get(Address.NET_ID).set(netId);
         address.get(Address.PORT).set(port);
         return address;
     }

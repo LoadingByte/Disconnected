@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.test.world.comp.net;
+package com.quartercode.disconnected.test.world.comp.hardware;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -71,9 +71,9 @@ public class NodeNetInterfaceTest {
 
         nodeInterface.get(NodeNetInterface.CONNECTION).set(connection);
 
-        NetID netID = new NetID();
-        netID.get(NetID.SUBNET).set(10);
-        nodeInterface.get(NodeNetInterface.NET_ID).set(netID);
+        NetID netId = new NetID();
+        netId.get(NetID.SUBNET).set(10);
+        nodeInterface.get(NodeNetInterface.NET_ID).set(netId);
     }
 
     @Test (expected = IllegalArgumentException.class)
@@ -81,9 +81,9 @@ public class NodeNetInterfaceTest {
 
         nodeInterface.get(NodeNetInterface.CONNECTION).set(connection);
 
-        NetID netID = new NetID();
-        netID.get(NetID.SUBNET).set(11);
-        nodeInterface.get(NodeNetInterface.NET_ID).set(netID);
+        NetID netId = new NetID();
+        netId.get(NetID.SUBNET).set(11);
+        nodeInterface.get(NodeNetInterface.NET_ID).set(netId);
     }
 
 }

@@ -24,12 +24,9 @@ import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 
 /**
- * <p>
- * The string representable interface defines methods for classes which can be converted to and created from strings. Such classes are called "representable by a string" and only they can be used as
- * program parameters.
- * </p>
- * 
- * <p>
+ * The string representable interface defines methods for classes which can be converted to and created from strings.
+ * Such classes are called "representable by a string" and only they can be used as program parameters. <br>
+ * <br>
  * The {@link #FROM_STRING} and {@link #TO_STRING} methods are required to function as follows:
  * 
  * <pre>
@@ -38,7 +35,6 @@ import com.quartercode.classmod.extra.FunctionDefinition;
  * </pre>
  * 
  * An object converted into a string and then converted back into an object must be equal to the original object.
- * </p>
  */
 public interface StringRepresentable extends FeatureHolder {
 

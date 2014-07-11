@@ -84,7 +84,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
          */
         STOPPED (true);
 
-        private boolean tickState;
+        private final boolean tickState;
 
         /**
          * Creates a new process state enumeration entry.

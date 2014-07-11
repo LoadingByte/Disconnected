@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.test.world.comp.net;
+package com.quartercode.disconnected.test.world.comp.hardware;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -58,10 +58,10 @@ public class RouterNetInterfaceTest {
 
     private NetID generateNetID(int subnet, int id) {
 
-        NetID netID = new NetID();
-        netID.get(NetID.SUBNET).set(subnet);
-        netID.get(NetID.ID).set(id);
-        return netID;
+        NetID netId = new NetID();
+        netId.get(NetID.SUBNET).set(subnet);
+        netId.get(NetID.ID).set(id);
+        return netId;
     }
 
     @Test
