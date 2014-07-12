@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim;
+package com.quartercode.disconnected.sim.profile;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -30,8 +30,8 @@ import java.util.zip.ZipOutputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import com.quartercode.disconnected.util.GlobalStorage;
 import com.quartercode.disconnected.util.RandomPool;
+import com.quartercode.disconnected.util.storage.GlobalStorage;
 import com.quartercode.disconnected.world.World;
 
 /**

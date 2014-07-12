@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.util;
+package com.quartercode.disconnected.util.storage;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
+import com.quartercode.disconnected.util.ResourceLister;
 
 /**
  * The resource store loads all kinds of resources before the game starts.

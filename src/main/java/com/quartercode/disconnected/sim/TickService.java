@@ -26,10 +26,10 @@ import java.util.List;
  * 
  * @see TickAction
  */
-public interface Ticker {
+public interface TickService {
 
     /**
-     * The amount of milliseconds the ticker will wait from one tick to another by default.
+     * The amount of milliseconds the tick service will wait from one tick to another by default.
      */
     public static final int DEFAULT_DELAY            = 50;
 
@@ -63,14 +63,14 @@ public interface Ticker {
     public void addAction(TickAction action);
 
     /**
-     * Removes a {@link TickAction} from the ticker.
+     * Removes a {@link TickAction} from the tick service.
      * 
      * @param action The tick action to remove.
      */
     public void removeAction(TickAction action);
 
     /**
-     * Returns the delay the ticker should wait between two ticks.
+     * Returns the delay the tick service should wait between two ticks.
      * 
      * @return The tick delay.
      */
@@ -84,17 +84,17 @@ public interface Ticker {
     public void setDelay(int delay);
 
     /**
-     * Returns whether the ticker is currently running.
+     * Returns whether the tick service is currently running.
      * 
-     * @return The current running state of the ticker.
+     * @return The current running state of the tick service.
      */
     public boolean isRunning();
 
     /**
-     * Changes the running state of the ticker.
+     * Changes the running state of the tick service.
      * This method starts and stops the tick update.
      * 
-     * @param running Whether the ticker should run.
+     * @param running Whether the tick service should run.
      */
     public void setRunning(boolean running);
 

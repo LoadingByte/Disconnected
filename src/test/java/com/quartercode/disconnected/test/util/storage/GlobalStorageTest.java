@@ -16,13 +16,13 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.test.util;
+package com.quartercode.disconnected.test.util.storage;
 
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.util.GlobalStorage;
+import com.quartercode.disconnected.util.storage.GlobalStorage;
 
 public class GlobalStorageTest {
 

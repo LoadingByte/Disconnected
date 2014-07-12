@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.util.RandomPool;
-import com.quartercode.disconnected.util.ResourceStore;
+import com.quartercode.disconnected.util.storage.ResourceStore;
 import com.quartercode.disconnected.world.general.Location;
 
 /**

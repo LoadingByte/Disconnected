@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim;
+package com.quartercode.disconnected.sim.profile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,14 +25,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import com.quartercode.disconnected.util.ServiceRegistry;
+import com.quartercode.disconnected.sim.TickBridgeProvider;
+import com.quartercode.disconnected.sim.TickService;
+import com.quartercode.disconnected.sim.TickSimulator;
+import com.quartercode.disconnected.util.storage.ServiceRegistry;
 
 /**
- * This is the default implementation of the {@link ProfileManager} service.
+ * This is the default implementation of the {@link ProfileService}.
  * 
- * @see ProfileManager
+ * @see ProfileService
  */
-public class DefaultProfileManager implements ProfileManager {
+public class DefaultProfileService implements ProfileService {
 
     private final File          directory;
 
@@ -40,12 +43,12 @@ public class DefaultProfileManager implements ProfileManager {
     private Profile             active;
 
     /**
-     * Creates a new default profile manager which stores its profiles in the given directory.
+     * Creates a new default profile service which stores its profiles in the given directory.
      * The constructor also loads all profile as trunks which are present in the given directory.
      * 
-     * @param directory The directory the new manager will store its profiles in.
+     * @param directory The directory the new service will store its profiles in.
      */
-    public DefaultProfileManager(File directory) {
+    public DefaultProfileService(File directory) {
 
         this.directory = directory;
 
@@ -131,11 +134,11 @@ public class DefaultProfileManager implements ProfileManager {
             }
         }
 
-        Ticker ticker = ServiceRegistry.lookup(Ticker.class);
-        if (ticker != null) {
-            active.getWorld().injectBridge(ticker.getAction(TickBridgeProvider.class).getBridge());
+        TickService tickService = ServiceRegistry.lookup(TickService.class);
+        if (tickService != null) {
+            active.getWorld().injectBridge(tickService.getAction(TickBridgeProvider.class).getBridge());
 
-            TickSimulator simulator = ticker.getAction(TickSimulator.class);
+            TickSimulator simulator = tickService.getAction(TickSimulator.class);
             if (simulator != null) {
                 simulator.setWorld(active == null ? null : active.getWorld());
             }

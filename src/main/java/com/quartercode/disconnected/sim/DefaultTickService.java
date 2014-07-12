@@ -26,13 +26,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This is the default implementation of the {@link Ticker} service.
+ * This is the default implementation of the {@link TickService}.
  * 
- * @see Ticker
+ * @see TickService
  */
-public class DefaultTicker implements Ticker {
+public class DefaultTickService implements TickService {
 
-    private static final Logger    LOGGER              = LoggerFactory.getLogger(DefaultTicker.class);
+    private static final Logger    LOGGER              = LoggerFactory.getLogger(DefaultTickService.class);
 
     private TickThread             thread;
     private final List<TickAction> actions             = new ArrayList<>();

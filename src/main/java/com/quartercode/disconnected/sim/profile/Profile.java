@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim;
+package com.quartercode.disconnected.sim.profile;
 
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.World;
@@ -25,7 +25,7 @@ import com.quartercode.disconnected.world.World;
  * A profile has a name and an associated {@link World}.
  * It also holds a {@link RandomPool}.
  * 
- * @see ProfileManager
+ * @see ProfileService
  */
 public class Profile {
 
@@ -41,7 +41,7 @@ public class Profile {
 
     /**
      * Creates a new profile with the given name.
-     * Please note that the {@link World} and the {@link RandomPool} the profile manages must be injected later on.
+     * Please note that the {@link World} and the {@link RandomPool} the profile stores must be set later on.
      * 
      * @param name The name for the new profile.
      */

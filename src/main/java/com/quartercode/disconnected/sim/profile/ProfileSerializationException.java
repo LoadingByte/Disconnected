@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim;
+package com.quartercode.disconnected.sim.profile;
 
 /**
  * The profile serialization exception occures if a {@link Profile} cannot be serialized or deserialized.

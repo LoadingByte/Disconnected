@@ -38,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.util.ApplicationInfo;
 import com.quartercode.disconnected.util.ExitUtil;
-import com.quartercode.disconnected.util.GlobalStorage;
+import com.quartercode.disconnected.util.storage.GlobalStorage;
 import de.matthiasmann.twl.Container;
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
@@ -48,7 +48,7 @@ import de.matthiasmann.twl.utils.PNGDecoder;
 /**
  * This thread executes the OpenGL update which keeps the lwjgl display alive.
  * 
- * @see GraphicsManager
+ * @see GraphicsService
  */
 public class GraphicsThread extends Thread {
 
@@ -139,10 +139,10 @@ public class GraphicsThread extends Thread {
     private ByteBuffer[] loadIcons() throws IOException {
 
         ByteBuffer[] icons = new ByteBuffer[4];
-        icons[0] = loadImage(getClass().getResource("/images/icons/icon16.png"));
-        icons[1] = loadImage(getClass().getResource("/images/icons/icon32.png"));
-        icons[2] = loadImage(getClass().getResource("/images/icons/icon64.png"));
-        icons[3] = loadImage(getClass().getResource("/images/icons/icon128.png"));
+        icons[0] = loadImage(getClass().getResource("/icons/icon16.png"));
+        icons[1] = loadImage(getClass().getResource("/icons/icon32.png"));
+        icons[2] = loadImage(getClass().getResource("/icons/icon64.png"));
+        icons[3] = loadImage(getClass().getResource("/icons/icon128.png"));
         return icons;
     }
 

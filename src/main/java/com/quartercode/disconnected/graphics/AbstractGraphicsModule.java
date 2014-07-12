@@ -44,7 +44,7 @@ public abstract class AbstractGraphicsModule implements GraphicsModule {
      * @param percent The relative "amount of pixels" in percent. Must be between {@code 0} and {@code 1}.
      * @return The absolute amount of pixels calculated with the relative amount.
      */
-    public int getRelativeX(GraphicsState state, float percent) {
+    protected int getRelativeX(GraphicsState state, float percent) {
 
         return (int) (state.getWidth() * percent);
     }
@@ -58,7 +58,7 @@ public abstract class AbstractGraphicsModule implements GraphicsModule {
      * @param percent The relative "amount of pixels" in percent. Must be between {@code 0} and {@code 1}.
      * @return The x location where the given {@link Widget} must be positioned.
      */
-    public int getRelativeX(GraphicsState state, Widget component, float percent) {
+    protected int getRelativeX(GraphicsState state, Widget component, float percent) {
 
         return (int) (getRelativeX(state, percent) - component.getWidth() * percent);
     }
@@ -72,7 +72,7 @@ public abstract class AbstractGraphicsModule implements GraphicsModule {
      * @param percent The relative "amount of pixels" in percent. Must be between {@code 0} and {@code 1}.
      * @return The absolute amount of pixels calculated with the relative amount.
      */
-    public int getRelativeY(GraphicsState state, float percent) {
+    protected int getRelativeY(GraphicsState state, float percent) {
 
         return (int) (state.getHeight() * percent);
     }
@@ -86,7 +86,7 @@ public abstract class AbstractGraphicsModule implements GraphicsModule {
      * @param percent The relative "amount of pixels" in percent. Must be between {@code 0} and {@code 1}.
      * @return The y location where the given {@link Widget} must be positioned.
      */
-    public int getRelativeY(GraphicsState state, Widget component, float percent) {
+    protected int getRelativeY(GraphicsState state, Widget component, float percent) {
 
         return (int) (getRelativeY(state, percent) - component.getHeight() * percent);
     }

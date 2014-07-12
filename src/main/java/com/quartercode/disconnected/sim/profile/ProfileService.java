@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim;
+package com.quartercode.disconnected.sim.profile;
 
 import java.io.File;
 import java.util.List;
@@ -28,12 +28,12 @@ import java.util.List;
  * @see Profile
  * @see ProfileSerializer
  */
-public interface ProfileManager {
+public interface ProfileService {
 
     /**
-     * Returns The directory the profile manager stores its {@link Profile}s in.
+     * Returns The directory the profile service stores its {@link Profile}s in.
      * 
-     * @return The directory the manager uses as storage.
+     * @return The directory the service uses as storage.
      */
     public File getDirectory();
 

@@ -26,7 +26,7 @@ import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
 import com.quartercode.eventbridge.extra.extension.SendPredicateCheckExtension;
 
 /**
- * The tick bridge provider extends the {@link TickRunnableInvoker} by providing a {@link Bridge} for the parent ticker.
+ * The tick bridge provider extends the {@link TickRunnableInvoker} by providing a {@link Bridge} for the parent {@link TickService}.
  * If bridge functionality is needed, this class should be used over the plain runnable invoker.
  * 
  * @see Bridge
@@ -51,7 +51,7 @@ public class TickBridgeProvider extends TickRunnableInvoker {
     /**
      * Returns the {@link Bridge} that should be used for sending events by anything related to the simulation.
      * 
-     * @return The server ticker bridge.
+     * @return The server tick service bridge.
      */
     public Bridge getBridge() {
 

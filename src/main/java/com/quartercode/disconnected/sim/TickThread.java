@@ -26,44 +26,44 @@ import org.slf4j.LoggerFactory;
  * This thread calls the tick update on several {@link TickAction}s.
  * It's an independent utility.
  * 
- * @see Ticker
+ * @see TickService
  */
 public class TickThread extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TickThread.class);
 
-    private final Ticker        ticker;
+    private final TickService   service;
 
     /**
-     * Creates a new tick thread that will use the given {@link Ticker}.
+     * Creates a new tick thread that will use the given {@link TickService}.
      * 
-     * @param ticker The ticker to retrieve the tick data from.
+     * @param service The tick service to retrieve the tick data from.
      */
-    public TickThread(Ticker ticker) {
+    public TickThread(TickService service) {
 
         super("tick");
 
-        this.ticker = ticker;
+        this.service = service;
     }
 
     /**
-     * Returns the {@link Ticker} that is used to retrieve tick data from.
+     * Returns the {@link TickService} that is used to retrieve tick data from.
      * 
-     * @return The assigned ticker.
+     * @return The assigned tick service.
      */
-    public Ticker getTicker() {
+    public TickService getService() {
 
-        return ticker;
+        return service;
     }
 
     @Override
     public void run() {
 
-        long delay = ticker.getDelay();
+        long delay = service.getDelay();
         long next = System.currentTimeMillis();
 
         while (!isInterrupted()) {
-            for (TickAction action : new ArrayList<>(ticker.getActions())) {
+            for (TickAction action : new ArrayList<>(service.getActions())) {
                 try {
                     action.update();
                 } catch (RuntimeException e) {

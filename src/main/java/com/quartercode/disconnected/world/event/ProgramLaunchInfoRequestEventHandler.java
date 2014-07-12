@@ -18,8 +18,8 @@
 
 package com.quartercode.disconnected.world.event;
 
-import com.quartercode.disconnected.sim.ProfileManager;
-import com.quartercode.disconnected.util.ServiceRegistry;
+import com.quartercode.disconnected.sim.profile.ProfileService;
+import com.quartercode.disconnected.util.storage.ServiceRegistry;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
@@ -49,7 +49,7 @@ public class ProgramLaunchInfoRequestEventHandler implements RequestEventHandler
 
     protected Computer getPlayerComputer() {
 
-        World world = ServiceRegistry.lookup(ProfileManager.class).getActive().getWorld();
+        World world = ServiceRegistry.lookup(ProfileService.class).getActive().getWorld();
         // Just use first available computer as the player's one
         return world.get(World.COMPUTERS).get().get(0);
     }

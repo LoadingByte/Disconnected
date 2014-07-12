@@ -19,6 +19,10 @@
 package com.quartercode.disconnected.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -99,6 +103,28 @@ public class ValueInjector {
         } else {
             LOGGER.warn(message);
         }
+    }
+
+    /**
+     * The inject value annotation is put on fields that can receive a value from a {@link ValueInjector}.
+     */
+    @Target (ElementType.FIELD)
+    @Retention (RetentionPolicy.RUNTIME)
+    public static @interface InjectValue {
+
+        /**
+         * The name of the value that should be injected into annotated the field.
+         * It is equivalent to the first argument of the {@link ValueInjector#put(String, Object)} method.
+         */
+        String value ();
+
+        /**
+         * Whether a non-null value is allowed to be injected into the annotated field.
+         * If this value is set {@code false} (default), an exception is thrown by the {@link ValueInjector} if the value is null.
+         * That guarantees that the annotated field always has a non-null value.
+         */
+        boolean allowNull () default false;
+
     }
 
 }

@@ -32,9 +32,9 @@ import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
-import com.quartercode.disconnected.sim.SchedulerUser;
-import com.quartercode.disconnected.sim.Ticker;
+import com.quartercode.disconnected.sim.TickService;
 import com.quartercode.disconnected.sim.scheduler.FunctionCallScheduleTask;
+import com.quartercode.disconnected.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileSystemModule;
@@ -212,7 +212,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                 if (! ((Boolean) arguments[0])) {
                     holder.get(ROOT_PROCESS).get().get(Process.INTERRUPT).invoke();
                     // Kill the process tree after 5 seconds
-                    holder.get(SCHEDULER).schedule(new FunctionCallScheduleTask(KILL, ProcessModule.class), Ticker.DEFAULT_TICKS_PER_SECOND * 5);
+                    holder.get(SCHEDULER).schedule(new FunctionCallScheduleTask(KILL, ProcessModule.class), TickService.DEFAULT_TICKS_PER_SECOND * 5);
                 }
 
                 return invocation.next(arguments);

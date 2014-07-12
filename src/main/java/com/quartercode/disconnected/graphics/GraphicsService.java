@@ -23,22 +23,22 @@ import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
  * This service is the main manager of the graphics system.
- * The manager can create or destroy the lwjgl context and keeps track of all important twl internals.
+ * The service can create or destroy the lwjgl context and keeps track of all important twl internals.
  */
-public interface GraphicsManager extends RunnableInvocationProvider {
+public interface GraphicsService extends RunnableInvocationProvider {
 
     /**
-     * Returns whether the graphics manager is currently running.
+     * Returns whether the graphics service is currently running.
      * 
-     * @return The running state of the graphics manager.
+     * @return The running state of the graphics service.
      */
     public boolean isRunning();
 
     /**
-     * Changes the status of the graphics manager.
-     * This method starts and stops the graphics manager.
+     * Changes the status of the graphics service.
+     * This method starts and stops the graphics service.
      * 
-     * @param running Whether the graphics manager should run.
+     * @param running Whether the graphics service should run.
      */
     public void setRunning(boolean running);
 
@@ -59,7 +59,7 @@ public interface GraphicsManager extends RunnableInvocationProvider {
     public void setState(GraphicsState state);
 
     /**
-     * Returns the {@link Bridge} that is used by the graphics manager.
+     * Returns the {@link Bridge} that is used by the graphics service.
      * It should also be used for sending events by anything related to graphics.
      * 
      * @return The client graphics bridge.

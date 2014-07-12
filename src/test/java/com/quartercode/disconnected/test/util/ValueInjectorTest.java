@@ -21,8 +21,8 @@ package com.quartercode.disconnected.test.util;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.util.InjectValue;
 import com.quartercode.disconnected.util.ValueInjector;
+import com.quartercode.disconnected.util.ValueInjector.InjectValue;
 
 public class ValueInjectorTest {
 

@@ -28,22 +28,22 @@ import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
 import com.quartercode.eventbridge.extra.extension.SendPredicateCheckExtension;
 
 /**
- * This is the default implementation of the {@link GraphicsManager} service.
+ * This is the default implementation of the {@link GraphicsService}.
  * 
- * @see GraphicsManager
+ * @see GraphicsService
  */
-public class DefaultGraphicsManager implements GraphicsManager {
+public class DefaultGraphicsService implements GraphicsService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultGraphicsManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultGraphicsService.class);
 
     private GraphicsThread      thread;
     private GraphicsState       state;
     private final Bridge        bridge = EventBridgeFactory.create(Bridge.class);
 
     /**
-     * Creates a new default graphics manager.
+     * Creates a new default graphics service.
      */
-    public DefaultGraphicsManager() {
+    public DefaultGraphicsService() {
 
         bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionRequester.class));
         bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionReturner.class));

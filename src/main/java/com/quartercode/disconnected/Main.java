@@ -36,10 +36,10 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import com.quartercode.classmod.Classmod;
 import com.quartercode.disconnected.bridge.HandleInvocationProviderExtension;
 import com.quartercode.disconnected.bridge.def.DefaultHandleInvocationProviderExtension.DefaultHandleInvocationProviderExtensionFactory;
-import com.quartercode.disconnected.graphics.DefaultGraphicsManager;
+import com.quartercode.disconnected.graphics.DefaultGraphicsService;
 import com.quartercode.disconnected.graphics.DefaultStates;
-import com.quartercode.disconnected.graphics.GraphicsManager;
 import com.quartercode.disconnected.graphics.GraphicsModule;
+import com.quartercode.disconnected.graphics.GraphicsService;
 import com.quartercode.disconnected.graphics.GraphicsState;
 import com.quartercode.disconnected.graphics.desktop.DesktopLaunchButtonModule;
 import com.quartercode.disconnected.graphics.desktop.DesktopProgramDescriptor;
@@ -48,22 +48,21 @@ import com.quartercode.disconnected.graphics.desktop.DesktopTaskbarModule;
 import com.quartercode.disconnected.graphics.desktop.DesktopWidgetModule;
 import com.quartercode.disconnected.graphics.desktop.DesktopWindowAreaModule;
 import com.quartercode.disconnected.graphics.desktop.program.FileManagerProgram;
-import com.quartercode.disconnected.sim.DefaultProfileManager;
-import com.quartercode.disconnected.sim.DefaultTicker;
-import com.quartercode.disconnected.sim.Profile;
-import com.quartercode.disconnected.sim.ProfileManager;
-import com.quartercode.disconnected.sim.ProfileSerializationException;
+import com.quartercode.disconnected.sim.DefaultTickService;
 import com.quartercode.disconnected.sim.TickBridgeProvider;
+import com.quartercode.disconnected.sim.TickService;
 import com.quartercode.disconnected.sim.TickSimulator;
-import com.quartercode.disconnected.sim.Ticker;
+import com.quartercode.disconnected.sim.profile.DefaultProfileService;
+import com.quartercode.disconnected.sim.profile.Profile;
+import com.quartercode.disconnected.sim.profile.ProfileSerializationException;
+import com.quartercode.disconnected.sim.profile.ProfileService;
 import com.quartercode.disconnected.util.ApplicationInfo;
 import com.quartercode.disconnected.util.ExitUtil;
 import com.quartercode.disconnected.util.ExitUtil.ExitProcessor;
-import com.quartercode.disconnected.util.GlobalStorage;
-import com.quartercode.disconnected.util.LogExceptionHandler;
 import com.quartercode.disconnected.util.RandomPool;
-import com.quartercode.disconnected.util.ResourceStore;
-import com.quartercode.disconnected.util.ServiceRegistry;
+import com.quartercode.disconnected.util.storage.GlobalStorage;
+import com.quartercode.disconnected.util.storage.ResourceStore;
+import com.quartercode.disconnected.util.storage.ServiceRegistry;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
@@ -123,8 +122,8 @@ public class Main {
             @Override
             public void exit() {
 
-                ServiceRegistry.lookup(GraphicsManager.class).setRunning(false);
-                ServiceRegistry.lookup(Ticker.class).setRunning(false);
+                ServiceRegistry.lookup(GraphicsService.class).setRunning(false);
+                ServiceRegistry.lookup(TickService.class).setRunning(false);
             }
         });
 
@@ -154,31 +153,31 @@ public class Main {
         LOGGER.info("Filling default graphics states");
         fillDefaultGraphicsStates();
 
-        // Initialize profile manager and load stored profiles
-        LOGGER.info("Initializing profile manager");
-        ProfileManager profileManager = new DefaultProfileManager(new File("profiles"));
-        ServiceRegistry.register(ProfileManager.class, profileManager);
+        // Initialize profile service and load stored profiles
+        LOGGER.info("Initializing profile service");
+        ProfileService profileService = new DefaultProfileService(new File("profiles"));
+        ServiceRegistry.register(ProfileService.class, profileService);
 
-        // Initialize ticker
-        LOGGER.info("Initializing ticker");
-        Ticker ticker = new DefaultTicker();
-        ServiceRegistry.register(Ticker.class, ticker);
-        ticker.addAction(new TickBridgeProvider());
-        ticker.addAction(new TickSimulator());
+        // Initialize tick service
+        LOGGER.info("Initializing tick service");
+        TickService tickService = new DefaultTickService();
+        ServiceRegistry.register(TickService.class, tickService);
+        tickService.addAction(new TickBridgeProvider());
+        tickService.addAction(new TickSimulator());
 
         LOGGER.info("Filling default server handlers");
-        fillDefaultServerHandlers(ticker.getAction(TickBridgeProvider.class).getBridge());
+        fillDefaultServerHandlers(tickService.getAction(TickBridgeProvider.class).getBridge());
 
-        // Initialize graphics manager and start it
-        LOGGER.info("Initializing graphics manager");
-        GraphicsManager graphicsManager = new DefaultGraphicsManager();
-        ServiceRegistry.register(GraphicsManager.class, graphicsManager);
-        graphicsManager.setRunning(true);
+        // Initialize graphics service and start it
+        LOGGER.info("Initializing graphics service");
+        GraphicsService graphicsService = new DefaultGraphicsService();
+        ServiceRegistry.register(GraphicsService.class, graphicsService);
+        graphicsService.setRunning(true);
 
         // DEBUG: Connect the client and server bridges
         LOGGER.info("DEBUG-ACTION: Connect the client and server bridges");
-        final Bridge clientBridge = graphicsManager.getBridge();
-        final Bridge serverBridge = ticker.getAction(TickBridgeProvider.class).getBridge();
+        final Bridge clientBridge = graphicsService.getBridge();
+        final Bridge serverBridge = tickService.getAction(TickBridgeProvider.class).getBridge();
         try {
             clientBridge.addConnector(new LocalBridgeConnector(serverBridge));
         } catch (BridgeConnectorException e) {
@@ -194,9 +193,9 @@ public class Main {
         Profile profile = new Profile("test");
         profile.setWorld(world);
         profile.setRandom(random);
-        profileManager.addProfile(profile);
+        profileService.addProfile(profile);
         try {
-            profileManager.setActive(profile);
+            profileService.setActive(profile);
         } catch (ProfileSerializationException e) {
             // Won't ever happen (we just created a new profile)
         }
@@ -207,8 +206,8 @@ public class Main {
 
         // DEBUG: Start "game" with current simulation
         LOGGER.info("DEBUG-ACTION: Starting test-game with current simulation");
-        ticker.setRunning(true);
-        graphicsManager.setState(DefaultStates.DESKTOP.create());
+        tickService.setRunning(true);
+        graphicsService.setState(DefaultStates.DESKTOP.create());
     }
 
     /**

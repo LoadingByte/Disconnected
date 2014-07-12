@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.sim;
+package com.quartercode.disconnected.sim.scheduler;
 
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
@@ -24,7 +24,7 @@ import com.quartercode.classmod.extra.Function;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.disconnected.sim.scheduler.Scheduler;
+import com.quartercode.disconnected.sim.TickUpdatable;
 
 /**
  * {@link FeatureHolder}s which implement this interface inherit a {@link Scheduler} that is automatically invoked by the tick simulator.
