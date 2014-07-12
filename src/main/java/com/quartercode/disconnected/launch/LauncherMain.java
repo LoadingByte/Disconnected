@@ -21,7 +21,6 @@ package com.quartercode.disconnected.launch;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import org.apache.commons.io.FileUtils;
 import com.quartercode.disconnected.Main;
 
 /**
@@ -41,7 +40,7 @@ public class LauncherMain {
 
         String mainClass = Main.class.getName();
         String[] vmArguments = { "-DlogName=disconnected", "-Djava.library.path=" + new File("lib/natives").getAbsolutePath() };
-        File directory = new File(FileUtils.getUserDirectory(), ".disconnected");
+        File directory = new File(System.getProperty("user.home"), ".disconnected");
 
         // If the first parameter is an existing file, use that one as running dir
         if (args.length > 0 && new File(args[0]).exists()) {

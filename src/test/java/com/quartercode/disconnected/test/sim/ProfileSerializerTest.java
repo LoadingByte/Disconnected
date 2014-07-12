@@ -18,15 +18,13 @@
 
 package com.quartercode.disconnected.test.sim;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import javax.xml.bind.JAXBException;
-import org.apache.commons.io.input.ReaderInputStream;
-import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -65,12 +63,12 @@ public class ProfileSerializerTest {
     @Test
     public void testSerializeWorld() throws IOException, JAXBException {
 
-        StringWriter serialized = new StringWriter();
-        WriterOutputStream outputStream = new WriterOutputStream(serialized);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ProfileSerializer.serializeWorld(outputStream, world);
         outputStream.flush();
+        String serialized = new String(outputStream.toByteArray(), "UTF-8");
 
-        World copy = ProfileSerializer.deserializeWorld(new ReaderInputStream(new StringReader(serialized.toString())));
+        World copy = ProfileSerializer.deserializeWorld(new ByteArrayInputStream(serialized.getBytes("UTF-8")));
         Assert.assertTrue("Serialized-deserialized copy of world does not equal original", equalsPersistent(world, copy));
     }
 

@@ -19,7 +19,6 @@
 package com.quartercode.disconnected.world.comp.os;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -28,6 +27,7 @@ import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.disconnected.util.HashUtil;
 import com.quartercode.disconnected.world.comp.program.ChildProcess;
 import com.quartercode.disconnected.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.world.comp.program.Process;
@@ -103,7 +103,7 @@ public class Session extends ProgramExecutor {
                         fireWrongPasswordEvent(holder, password);
                         return null;
                     }
-                    String hashedPassword = DigestUtils.sha256Hex(password);
+                    String hashedPassword = HashUtil.sha256(password);
 
                     String correctPassword = holder.get(USER).get().get(User.PASSWORD).get();
                     if (!correctPassword.equals(hashedPassword)) {
