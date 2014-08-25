@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import com.quartercode.classmod.Classmod;
+import com.quartercode.classmod.util.TreeInitializer;
 import com.quartercode.disconnected.bridge.HandleInvocationProviderExtension;
 import com.quartercode.disconnected.bridge.def.DefaultHandleInvocationProviderExtension.DefaultHandleInvocationProviderExtensionFactory;
 import com.quartercode.disconnected.graphics.DefaultGraphicsService;
@@ -65,6 +66,8 @@ import com.quartercode.disconnected.util.storage.ResourceStore;
 import com.quartercode.disconnected.util.storage.ServiceRegistry;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
+import com.quartercode.disconnected.world.comp.hardware.NodeNetInterface;
+import com.quartercode.disconnected.world.comp.hardware.RouterNetInterface;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.event.ProgramLaunchCommandEvent;
 import com.quartercode.disconnected.world.event.ProgramLaunchCommandEventHandler;
@@ -274,6 +277,12 @@ public class Main {
 
         GlobalStorage.put("themes", Main.class.getResource("/ui/default/default.xml"));
         GlobalStorage.put("themes", Main.class.getResource("/ui/desktop/desktop.xml"));
+
+        TreeInitializer worldInitializer = new TreeInitializer();
+        worldInitializer.addInitializationDefinition(NodeNetInterface.class, NodeNetInterface.CONNECTION);
+        worldInitializer.addInitializationDefinition(RouterNetInterface.class, RouterNetInterface.BACKBONE_CONNECTION);
+        worldInitializer.addInitializationDefinition(RouterNetInterface.class, RouterNetInterface.NEIGHBOURS);
+        GlobalStorage.put("worldInitializer", worldInitializer);
     }
 
     /**

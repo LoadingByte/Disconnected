@@ -85,7 +85,7 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
 
         SUBNET = create(new TypeLiteral<PropertyDefinition<Integer>>() {}, "name", "subnet", "storage", new StandardStorage<>());
 
-        BACKBONE_CONNECTION = create(new TypeLiteral<PropertyDefinition<Backbone>>() {}, "name", "backboneConnection", "storage", new ReferenceStorage<>(), "ignoreEquals", true);
+        BACKBONE_CONNECTION = create(new TypeLiteral<PropertyDefinition<Backbone>>() {}, "name", "backboneConnection", "storage", new ReferenceStorage<>(), "hidden", true);
         BACKBONE_CONNECTION.addSetterExecutor("addReverseConnection", RouterNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -125,7 +125,7 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
 
         });
 
-        NEIGHBOURS = create(new TypeLiteral<CollectionPropertyDefinition<RouterNetInterface, List<RouterNetInterface>>>() {}, "name", "neighbours", "storage", new ReferenceCollectionStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()), "ignoreEquals", true);
+        NEIGHBOURS = create(new TypeLiteral<CollectionPropertyDefinition<RouterNetInterface, List<RouterNetInterface>>>() {}, "name", "neighbours", "storage", new ReferenceCollectionStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()), "hidden", true);
         NEIGHBOURS.addAdderExecutor("addReverseConnection", RouterNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override

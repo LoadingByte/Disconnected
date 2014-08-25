@@ -24,12 +24,14 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import com.quartercode.classmod.util.TreeInitializer;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.util.storage.GlobalStorage;
 import com.quartercode.disconnected.world.World;
@@ -132,6 +134,7 @@ public class ProfileSerializer {
 
     /**
      * Reads a {@link World} which is saved as xml from an {@link InputStream}.
+     * Also tries to initialize the read world if a {@link TreeInitializer} is available through the global storage (key is {@code worldInitializer}).
      * 
      * @param inputStream The input stream to read the xml from.
      * @return The deserialized world object.
@@ -139,7 +142,15 @@ public class ProfileSerializer {
      */
     public static World deserializeWorld(InputStream inputStream) throws JAXBException {
 
-        return (World) createWorldContext().createUnmarshaller().unmarshal(new JAXBNoCloseInputStream(inputStream));
+        World world = (World) createWorldContext().createUnmarshaller().unmarshal(new JAXBNoCloseInputStream(inputStream));
+
+        List<TreeInitializer> initializers = GlobalStorage.get("worldInitializer", TreeInitializer.class);
+        if (!initializers.isEmpty()) {
+            TreeInitializer initializer = initializers.get(0);
+            initializer.apply(world);
+        }
+
+        return world;
     }
 
     /**

@@ -98,7 +98,7 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
 
         });
 
-        CONNECTION = create(new TypeLiteral<PropertyDefinition<RouterNetInterface>>() {}, "name", "connection", "storage", new ReferenceStorage<>(), "ignoreEquals", true);
+        CONNECTION = create(new TypeLiteral<PropertyDefinition<RouterNetInterface>>() {}, "name", "connection", "storage", new ReferenceStorage<>(), "hidden", true);
         CONNECTION.addSetterExecutor("invalidateNetID", NodeNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override

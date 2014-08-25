@@ -163,7 +163,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
 
     static {
 
-        RIGHTS = create(new TypeLiteral<PropertyDefinition<Boolean[]>>() {}, "name", "rights", "storage", new StandardStorage<>(), "initialValue", new CloneValueFactory<>(new Boolean[3 * 4]), "ignoreEquals", true);
+        RIGHTS = create(new TypeLiteral<PropertyDefinition<Boolean[]>>() {}, "name", "rights", "storage", new StandardStorage<>(), "initialValue", new CloneValueFactory<>(new Boolean[3 * 4]));
 
     }
 
