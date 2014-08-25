@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.test;
 
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicReference;
+import org.apache.commons.lang3.mutable.Mutable;
 import org.jmock.api.Action;
 import org.jmock.api.Invocation;
 import org.jmock.lib.action.CustomAction;
@@ -44,9 +44,9 @@ public class ExtraActions {
             this.parameter = parameter;
         }
 
-        public Action in(AtomicReference<?> reference) {
+        public Action in(Mutable<?> reference) {
 
-            return in(new AtomicReferenceStorage<>(reference));
+            return in(new MutableStorage<>(reference));
         }
 
         public Action in(Collection<?> collection) {
@@ -96,11 +96,11 @@ public class ExtraActions {
 
     }
 
-    private static class AtomicReferenceStorage<T> implements Storage<T> {
+    private static class MutableStorage<T> implements Storage<T> {
 
-        private final AtomicReference<T> reference;
+        private final Mutable<T> reference;
 
-        private AtomicReferenceStorage(AtomicReference<T> reference) {
+        private MutableStorage(Mutable<T> reference) {
 
             this.reference = reference;
         }
@@ -108,7 +108,7 @@ public class ExtraActions {
         @Override
         public void store(T object) {
 
-            reference.set(object);
+            reference.setValue(object);
         }
 
     }

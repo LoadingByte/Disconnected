@@ -20,7 +20,8 @@ package com.quartercode.disconnected.test.bridge.def;
 
 import static com.quartercode.disconnected.test.ExtraActions.storeArgument;
 import static org.junit.Assert.assertEquals;
-import java.util.concurrent.atomic.AtomicReference;
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.jmock.Expectations;
 import org.jmock.Sequence;
 import org.jmock.api.Action;
@@ -61,7 +62,7 @@ public class DefaultHandleInvocationProviderExtensionTest {
     private Channel<HandleInterceptor>               handlerModuleChannel;
 
     private DefaultHandleInvocationProviderExtension extension;
-    private final AtomicReference<HandleInterceptor> hookInterceptor = new AtomicReference<>();
+    private final Mutable<HandleInterceptor>         hookInterceptor = new MutableObject<>();
 
     @Before
     public void setUp() {
@@ -114,7 +115,7 @@ public class DefaultHandleInvocationProviderExtensionTest {
 
         // Create a dummy channel for the hook interceptor
         Channel<HandleInterceptor> dummyChannel = new DefaultChannel<>(HandleInterceptor.class);
-        dummyChannel.addInterceptor(hookInterceptor.get(), Integer.MAX_VALUE);
+        dummyChannel.addInterceptor(hookInterceptor.getValue(), Integer.MAX_VALUE);
 
         // Add the custom interceptor
         dummyChannel.addInterceptor(lastInterceptor, 0);
