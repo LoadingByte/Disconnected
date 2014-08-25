@@ -22,11 +22,11 @@ import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
+import com.quartercode.disconnected.world.WorldFeatureHolder;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 
@@ -36,7 +36,7 @@ import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
  * 
  * @see #PATH
  */
-public class RoutedPacket extends DefaultFeatureHolder implements DerivableSize {
+public class RoutedPacket extends WorldFeatureHolder implements DerivableSize {
 
     // ----- Properties -----
 

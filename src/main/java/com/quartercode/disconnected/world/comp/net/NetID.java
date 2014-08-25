@@ -22,13 +22,13 @@ import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.disconnected.world.WorldFeatureHolder;
 import com.quartercode.disconnected.world.general.StringRepresentable;
 
 /**
@@ -46,7 +46,7 @@ import com.quartercode.disconnected.world.general.StringRepresentable;
  * 
  * @see Address
  */
-public class NetID extends DefaultFeatureHolder implements StringRepresentable {
+public class NetID extends WorldFeatureHolder implements StringRepresentable {
 
     // ----- Properties -----
 

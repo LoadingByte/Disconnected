@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.world.comp.attack;
 
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.disconnected.world.WorldFeatureHolder;
 import com.quartercode.disconnected.world.comp.Vulnerability;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 
@@ -29,6 +29,6 @@ import com.quartercode.disconnected.world.comp.os.OperatingSystem;
  * @see Exploit
  * @see Vulnerability
  */
-public class Payload extends DefaultFeatureHolder {
+public class Payload extends WorldFeatureHolder {
 
 }

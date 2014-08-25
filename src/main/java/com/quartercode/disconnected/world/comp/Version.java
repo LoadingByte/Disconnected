@@ -22,19 +22,19 @@ import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.disconnected.world.WorldFeatureHolder;
 import com.quartercode.disconnected.world.general.StringRepresentable;
 
 /**
  * This class represents a simple version.
  * A version contains a major version, minor version and a revision.
  */
-public class Version extends DefaultFeatureHolder implements StringRepresentable {
+public class Version extends WorldFeatureHolder implements StringRepresentable {
 
     // ----- Properties -----
 

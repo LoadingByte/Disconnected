@@ -20,9 +20,9 @@ package com.quartercode.disconnected.world.comp.net;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.disconnected.world.WorldFeatureHolder;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 
@@ -30,7 +30,7 @@ import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
  * This class represents a packet which can be sent between network interfaces.
  * A packet contains a source, a destination (both represented by addresses) and a data payload {@link Object} which should be sent.
  */
-public class Packet extends DefaultFeatureHolder implements DerivableSize {
+public class Packet extends WorldFeatureHolder implements DerivableSize {
 
     // ----- Properties -----
 

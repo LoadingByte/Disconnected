@@ -20,14 +20,14 @@ package com.quartercode.disconnected.world.general;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.disconnected.world.WorldFeatureHolder;
 
 /**
  * This class stores a location using x and y relative coordinates.
  */
-public class Location extends DefaultFeatureHolder {
+public class Location extends WorldFeatureHolder {
 
     // ----- Properties -----
 

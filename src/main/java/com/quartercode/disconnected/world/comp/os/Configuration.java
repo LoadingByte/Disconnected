@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -34,6 +33,7 @@ import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.util.NullPreventer;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
+import com.quartercode.disconnected.world.WorldFeatureHolder;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 
@@ -53,7 +53,7 @@ import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
  * 
  * @see ConfigurationEntry
  */
-public class Configuration extends DefaultFeatureHolder implements DerivableSize {
+public class Configuration extends WorldFeatureHolder implements DerivableSize {
 
     // ----- Properties -----
 

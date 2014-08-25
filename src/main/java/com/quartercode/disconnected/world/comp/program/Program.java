@@ -22,7 +22,6 @@ import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -31,6 +30,7 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.util.NullPreventer;
+import com.quartercode.disconnected.world.WorldFeatureHolder;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 import com.quartercode.disconnected.world.comp.Version;
 import com.quartercode.disconnected.world.comp.Vulnerability;
@@ -44,7 +44,7 @@ import com.quartercode.disconnected.world.comp.Vulnerability;
  * @see ProgramExecutor
  * @see Process
  */
-public class Program extends DefaultFeatureHolder implements DerivableSize {
+public class Program extends WorldFeatureHolder implements DerivableSize {
 
     // ----- Properties -----
 

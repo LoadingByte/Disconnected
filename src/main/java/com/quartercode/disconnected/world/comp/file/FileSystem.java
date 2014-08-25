@@ -20,7 +20,6 @@ package com.quartercode.disconnected.world.comp.file;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -28,6 +27,7 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.ValueFactory;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.util.PropertyAccessorFactory;
+import com.quartercode.disconnected.world.WorldFeatureHolder;
 import com.quartercode.disconnected.world.comp.SizeUtil;
 import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
 
@@ -38,7 +38,7 @@ import com.quartercode.disconnected.world.comp.SizeUtil.DerivableSize;
  * 
  * @see File
  */
-public class FileSystem extends DefaultFeatureHolder implements DerivableSize {
+public class FileSystem extends WorldFeatureHolder implements DerivableSize {
 
     // ----- Properties -----
 

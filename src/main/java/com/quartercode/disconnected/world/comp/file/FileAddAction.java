@@ -21,7 +21,6 @@ package com.quartercode.disconnected.world.comp.file;
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -29,6 +28,7 @@ import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.disconnected.world.WorldFeatureHolder;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.world.comp.os.User;
 
@@ -42,7 +42,7 @@ import com.quartercode.disconnected.world.comp.os.User;
  * @see File
  * @see FileSystem
  */
-public class FileAddAction extends DefaultFeatureHolder implements FileAction {
+public class FileAddAction extends WorldFeatureHolder implements FileAction {
 
     // ----- Properties -----
 
