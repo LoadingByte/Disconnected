@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.junit.Assert;
@@ -40,6 +39,7 @@ import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.util.FeatureDefinitionReference;
 import com.quartercode.disconnected.sim.scheduler.FunctionCallScheduleTask;
 import com.quartercode.disconnected.sim.scheduler.Scheduler;
 
@@ -82,7 +82,7 @@ public class FunctionCallScheduleTaskTest {
     @Test
     public void testSchedule() {
 
-        scheduler.schedule(new FunctionCallScheduleTask(TestFeatureHolder.TEST_FUNCTION_WITH_COMPLEX_NAME, TestFeatureHolder.class), delay);
+        scheduler.schedule(new FunctionCallScheduleTask(new FeatureDefinitionReference<FunctionDefinition<?>>(TestFeatureHolder.class, "TEST_FUNCTION")), delay);
 
         for (int update = 0; update < delay; update++) {
             scheduler.update();
@@ -94,15 +94,13 @@ public class FunctionCallScheduleTaskTest {
     @Test
     public void testScheduleWithPersistence() throws JAXBException {
 
-        scheduler.schedule(new FunctionCallScheduleTask(TestFeatureHolder.TEST_FUNCTION_WITH_COMPLEX_NAME, TestFeatureHolder.class), delay);
+        scheduler.schedule(new FunctionCallScheduleTask(new FeatureDefinitionReference<FunctionDefinition<?>>(TestFeatureHolder.class, "TEST_FUNCTION")), delay);
 
-        JAXBContext context = JAXBContext.newInstance(Scheduler.class, FunctionCallScheduleTask.class, TestFeatureHolder.class, RootElement.class);
+        JAXBContext context = JAXBContext.newInstance(Scheduler.class, FunctionCallScheduleTask.class, TestFeatureHolder.class);
         StringWriter serialized = new StringWriter();
-        RootElement root = new RootElement();
-        root.testFeatureHolder = schedulerHolder;
-        context.createMarshaller().marshal(root, serialized);
-        RootElement rootCopy = (RootElement) context.createUnmarshaller().unmarshal(new StringReader(serialized.toString()));
-        Scheduler copy = rootCopy.testFeatureHolder.get(TestFeatureHolder.SCHEDULER);
+        context.createMarshaller().marshal(schedulerHolder, serialized);
+        TestFeatureHolder schedulerHolderCopy = (TestFeatureHolder) context.createUnmarshaller().unmarshal(new StringReader(serialized.toString()));
+        Scheduler copy = schedulerHolderCopy.get(TestFeatureHolder.SCHEDULER);
 
         for (int update = 0; update < delay; update++) {
             copy.update();
@@ -111,16 +109,17 @@ public class FunctionCallScheduleTaskTest {
         Assert.assertTrue("Function call schedule task with delay of " + delay + " called function after " + (delay + 1) + " updates", executedTestFunction);
     }
 
+    @XmlRootElement
     private static class TestFeatureHolder extends DefaultFeatureHolder {
 
         public static final FeatureDefinition<Scheduler> SCHEDULER = Scheduler.createDefinition("scheduler");
 
-        public static final FunctionDefinition<String>   TEST_FUNCTION_WITH_COMPLEX_NAME;
+        public static final FunctionDefinition<String>   TEST_FUNCTION;
 
         static {
 
-            TEST_FUNCTION_WITH_COMPLEX_NAME = create(new TypeLiteral<FunctionDefinition<String>>() {}, "name", "testFunctionWithComplexName", "parameters", new Class[0]);
-            TEST_FUNCTION_WITH_COMPLEX_NAME.addExecutor("default", TestFeatureHolder.class, new FunctionExecutor<String>() {
+            TEST_FUNCTION = create(new TypeLiteral<FunctionDefinition<String>>() {}, "name", "testFunction", "parameters", new Class[0]);
+            TEST_FUNCTION.addExecutor("default", TestFeatureHolder.class, new FunctionExecutor<String>() {
 
                 @Override
                 public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
@@ -132,14 +131,6 @@ public class FunctionCallScheduleTaskTest {
             });
 
         }
-
-    }
-
-    @XmlRootElement
-    private static class RootElement {
-
-        @XmlElement
-        public TestFeatureHolder testFeatureHolder;
 
     }
 
