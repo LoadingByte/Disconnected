@@ -18,7 +18,9 @@
 
 package com.quartercode.disconnected.world.event;
 
+import java.util.Collection;
 import java.util.Map;
+import com.quartercode.classmod.util.FeatureDefinitionReference;
 import com.quartercode.eventbridge.basic.EventBase;
 
 /**
@@ -49,13 +51,13 @@ import com.quartercode.eventbridge.basic.EventBase;
  */
 public class ProgramLaunchCommandEvent extends EventBase {
 
-    private static final long         serialVersionUID = 6395719275942293140L;
+    private static final long                                serialVersionUID = 6395719275942293140L;
 
     // TODO: Proper user identification
 
-    private final int                 pid;
-    private final String              filePath;
-    private final Map<String, Object> executorProperties;
+    private final int                                        pid;
+    private final String                                     filePath;
+    private final Map<FeatureDefinitionReference<?>, Object> executorProperties;
 
     /**
      * Creates a new program launch command event
@@ -65,7 +67,7 @@ public class ProgramLaunchCommandEvent extends EventBase {
      * @param executorProperties The properties which should be set on the program executor which'll run the new program instance.
      *        For more details, see {@link #getExecutorProperties()}.
      */
-    public ProgramLaunchCommandEvent(int pid, String filePath, Map<String, Object> executorProperties) {
+    public ProgramLaunchCommandEvent(int pid, String filePath, Map<FeatureDefinitionReference<?>, Object> executorProperties) {
 
         this.pid = pid;
         this.filePath = filePath;
@@ -97,6 +99,7 @@ public class ProgramLaunchCommandEvent extends EventBase {
     /**
      * Returns the properties which should be set on the program executor which'll run the new program instance.
      * The key of an entry is the name of the definition constant in the executor class, the value is the value for the property.
+     * If a collection property should be set, the value must be a {@link Collection}.
      * Example:
      * 
      * <pre>
@@ -108,14 +111,14 @@ public class ProgramLaunchCommandEvent extends EventBase {
      * <i>Executor properties map that sets both values:</i>
      * 
      * [
-     *   { "VALUE_1", 10 },
-     *   { "VALUE_2", "test" }
+     *   { FeatureDefinitionReference(..., "VALUE_1"), 10 },
+     *   { FeatureDefinitionReference(..., "VALUE_2"), "test" }
      * ]
      * </pre>
      * 
      * @return The properties map for the new program executor.
      */
-    public Map<String, Object> getExecutorProperties() {
+    public Map<FeatureDefinitionReference<?>, Object> getExecutorProperties() {
 
         return executorProperties;
     }

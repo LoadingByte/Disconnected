@@ -18,16 +18,17 @@
 
 package com.quartercode.disconnected.world.event;
 
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.extra.CollectionProperty;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.Property;
 import com.quartercode.classmod.extra.PropertyDefinition;
+import com.quartercode.classmod.util.FeatureDefinitionReference;
 import com.quartercode.disconnected.sim.profile.ProfileService;
 import com.quartercode.disconnected.util.storage.ServiceRegistry;
 import com.quartercode.disconnected.world.World;
@@ -80,24 +81,30 @@ public class ProgramLaunchCommandEventHandler implements EventHandler<ProgramLau
 
         // Set the provided properties
         ProgramExecutor executor = process.get(Process.EXECUTOR).get();
-        Class<?> executorClass = executor.getClass();
-        Map<String, Object> executorProperties = event.getExecutorProperties();
-        for (Entry<String, Object> property : executorProperties.entrySet()) {
+        Map<FeatureDefinitionReference<?>, Object> executorProperties = event.getExecutorProperties();
+        for (Entry<FeatureDefinitionReference<?>, Object> property : executorProperties.entrySet()) {
             try {
-                Field field = executorClass.getField(property.getKey());
-                if (field != null) {
-                    Object fieldValue = field.get(null);
-                    // Warning: This construction might fill properties with entries of the wrong type
-                    if (fieldValue instanceof PropertyDefinition) {
-                        castProperty(executor.get((PropertyDefinition<?>) fieldValue)).set(property.getValue());
-                    } else if (fieldValue instanceof CollectionPropertyDefinition && property.getValue() instanceof Collection) {
-                        CollectionProperty<?, ?> feature = executor.get((CollectionPropertyDefinition<?, ?>) fieldValue);
-                        for (Object entry : (Collection<?>) property.getValue()) {
+                FeatureDefinition<?> definition = property.getKey().getDefinition();
+                Object value = property.getValue();
+                if (definition instanceof PropertyDefinition) {
+                    castProperty(executor.get((PropertyDefinition<?>) definition)).set(value);
+                } else if (definition instanceof CollectionPropertyDefinition) {
+                    if (value instanceof Collection) {
+                        CollectionProperty<?, ?> feature = executor.get((CollectionPropertyDefinition<?, ?>) definition);
+                        for (Object entry : (Collection<?>) value) {
                             castCollectionProperty(feature).add(entry);
                         }
+                    } else {
+                        LOGGER.warn("Can't set collection property '{}' to non-collection value '{}'", definition, value);
+                        abort(sessionProcess, process);
+                        return;
                     }
+                } else {
+                    LOGGER.warn("Can't set value of non-property feature definition '{}'", definition);
+                    abort(sessionProcess, process);
+                    return;
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 LOGGER.warn("Error while setting property '{}' of program executor '{}' to '{}'; client failure?", property.getKey(), executor, property.getValue(), e);
                 abort(sessionProcess, process);
                 return;

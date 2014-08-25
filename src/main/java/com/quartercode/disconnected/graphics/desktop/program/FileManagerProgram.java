@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
+import com.quartercode.classmod.util.FeatureDefinitionReference;
 import com.quartercode.disconnected.graphics.GraphicsState;
 import com.quartercode.disconnected.graphics.desktop.DesktopProgramContext;
 import com.quartercode.disconnected.graphics.desktop.DesktopProgramDescriptor;
@@ -428,8 +429,8 @@ public class FileManagerProgram extends DesktopProgramDescriptor {
 
                     // Launch FileListProgram
                     String fileListProgramPath = ProgramUtils.getCommonLocation(FileListProgram.class);
-                    Map<String, Object> executorProperties = new HashMap<>();
-                    executorProperties.put("PATH", path);
+                    Map<FeatureDefinitionReference<?>, Object> executorProperties = new HashMap<>();
+                    executorProperties.put(new FeatureDefinitionReference<>(FileListProgram.class, FileListProgram.PATH), path);
                     bridge.send(new ProgramLaunchCommandEvent(event.getPid(), fileListProgramPath, executorProperties));
                 }
 
@@ -487,9 +488,9 @@ public class FileManagerProgram extends DesktopProgramDescriptor {
 
                     // Launch FileCreateProgram
                     String fileCreateProgramPath = ProgramUtils.getCommonLocation(FileCreateProgram.class);
-                    Map<String, Object> executorProperties = new HashMap<>();
-                    executorProperties.put("PATH", FileUtils.resolvePath(getPath(), name));
-                    executorProperties.put("FILE_TYPE", type);
+                    Map<FeatureDefinitionReference<?>, Object> executorProperties = new HashMap<>();
+                    executorProperties.put(new FeatureDefinitionReference<>(FileCreateProgram.class, FileCreateProgram.PATH), FileUtils.resolvePath(getPath(), name));
+                    executorProperties.put(new FeatureDefinitionReference<>(FileCreateProgram.class, FileCreateProgram.FILE_TYPE), type);
                     bridge.send(new ProgramLaunchCommandEvent(event.getPid(), fileCreateProgramPath, executorProperties));
                 }
 
@@ -524,8 +525,8 @@ public class FileManagerProgram extends DesktopProgramDescriptor {
 
                     // Launch FileRemoveProgram
                     String fileCreateProgramPath = ProgramUtils.getCommonLocation(FileRemoveProgram.class);
-                    Map<String, Object> executorProperties = new HashMap<>();
-                    executorProperties.put("PATH", FileUtils.resolvePath(getPath(), name));
+                    Map<FeatureDefinitionReference<?>, Object> executorProperties = new HashMap<>();
+                    executorProperties.put(new FeatureDefinitionReference<>(FileRemoveProgram.class, FileRemoveProgram.PATH), FileUtils.resolvePath(getPath(), name));
                     bridge.send(new ProgramLaunchCommandEvent(event.getPid(), fileCreateProgramPath, executorProperties));
                 }
 

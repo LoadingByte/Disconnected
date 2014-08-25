@@ -31,6 +31,7 @@ import org.junit.Test;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
+import com.quartercode.classmod.util.FeatureDefinitionReference;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.program.Process;
@@ -65,11 +66,11 @@ public class ProgramLaunchCommandEventHandlerTest {
     @Test
     public void test() {
 
-        Map<String, Object> executorProperties = new HashMap<>();
-        executorProperties.put("VALUE_1", 123);
-        executorProperties.put("VALUE_2", "somestring1");
-        executorProperties.put("VALUE_3", new SomeObject(0.123456789, "somestring2"));
-        executorProperties.put("VALUE_4", null);
+        Map<FeatureDefinitionReference<?>, Object> executorProperties = new HashMap<>();
+        executorProperties.put(new FeatureDefinitionReference<>(TestProgram.class, "VALUE_1"), 123);
+        executorProperties.put(new FeatureDefinitionReference<>(TestProgram.class, "VALUE_2"), "somestring1");
+        executorProperties.put(new FeatureDefinitionReference<>(TestProgram.class, "VALUE_3"), new SomeObject(0.123456789, "somestring2"));
+        executorProperties.put(new FeatureDefinitionReference<>(TestProgram.class, "VALUE_4"), null);
         ProgramLaunchCommandEvent event = new ProgramLaunchCommandEvent(10, null, executorProperties);
         handler.handle(event);
 
