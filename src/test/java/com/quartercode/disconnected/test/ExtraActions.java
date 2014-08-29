@@ -28,7 +28,7 @@ public class ExtraActions {
 
     public static StoreArgumentActionBuilder storeArgument(int parameter) {
 
-        return new StoreArgumentActionBuilder(parameter);
+        return new StoreArgumentActionBuilder(parameter, null);
     }
 
     private ExtraActions() {
@@ -37,11 +37,18 @@ public class ExtraActions {
 
     public static class StoreArgumentActionBuilder {
 
-        private final int parameter;
+        private final int                parameter;
+        private final StorageListener<?> listener;
 
-        private StoreArgumentActionBuilder(int parameter) {
+        private StoreArgumentActionBuilder(int parameter, StorageListener<?> listener) {
 
             this.parameter = parameter;
+            this.listener = listener;
+        }
+
+        public StoreArgumentActionBuilder withListener(StorageListener<?> listener) {
+
+            return new StoreArgumentActionBuilder(parameter, listener);
         }
 
         public Action in(Mutable<?> reference) {
@@ -56,21 +63,23 @@ public class ExtraActions {
 
         public Action in(Storage<?> storage) {
 
-            return new StoreArgumentAction<>(parameter, storage);
+            return new StoreArgumentAction<>(parameter, listener, storage);
         }
 
     }
 
-    private static class StoreArgumentAction<T> extends CustomAction {
+    private static class StoreArgumentAction<L, T> extends CustomAction {
 
-        private final int        parameter;
-        private final Storage<T> storage;
+        private final int                parameter;
+        private final StorageListener<L> listener;
+        private final Storage<T>         storage;
 
-        private StoreArgumentAction(int parameter, Storage<T> storage) {
+        private StoreArgumentAction(int parameter, StorageListener<L> listener, Storage<T> storage) {
 
             super("stores objects in storage");
 
             this.parameter = parameter;
+            this.listener = listener;
             this.storage = storage;
         }
 
@@ -79,8 +88,11 @@ public class ExtraActions {
         public Object invoke(Invocation invocation) {
 
             Object argument = invocation.getParameter(parameter);
+
             try {
-                storage.store((T) argument);
+                if (listener == null || listener.accept((L) argument)) {
+                    storage.store((T) argument);
+                }
             } catch (ClassCastException e) {
                 throw new RuntimeException("Method argument '" + argument + "' cannot be stored");
             }
@@ -127,6 +139,12 @@ public class ExtraActions {
 
             collection.add(object);
         }
+
+    }
+
+    public static interface StorageListener<T> {
+
+        public boolean accept(T object);
 
     }
 
