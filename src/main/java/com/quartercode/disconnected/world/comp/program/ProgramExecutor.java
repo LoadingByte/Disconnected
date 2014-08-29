@@ -23,8 +23,6 @@ import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
-import com.quartercode.disconnected.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.event.ProgramLaunchEvent;
@@ -37,33 +35,17 @@ import com.quartercode.eventbridge.bridge.Bridge;
  * @see Program
  * @see Process
  */
-public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>> implements SchedulerUser {
+public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>> {
 
     // ----- Functions -----
 
     /**
      * This callback is executed once when the program executor should start running.
-     * For example, this method could schedule tasks using the scheduler.
+     * For example, this method could scheduler tasks using the scheduler.
      */
     public static final FunctionDefinition<Void> RUN;
 
     static {
-
-        // Prevent the scheduler from updating if the current process state isn't an active one
-        TICK_UPDATE.addExecutor("checkAllowTick", ProgramExecutor.class, new FunctionExecutor<Void>() {
-
-            @Override
-            @Prioritized (Prioritized.LEVEL_9)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                if ( ((ProgramExecutor) invocation.getHolder()).getParent().get(Process.STATE).get().isTickState()) {
-                    invocation.next(arguments);
-                }
-
-                return null;
-            }
-
-        });
 
         RUN = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "run", "parameters", new Class[0]);
         RUN.addExecutor("sendLaunchEvent", ProgramExecutor.class, new FunctionExecutor<Void>() {

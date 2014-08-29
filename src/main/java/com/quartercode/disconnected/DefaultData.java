@@ -34,6 +34,7 @@ import com.quartercode.disconnected.graphics.desktop.DesktopTaskbarModule;
 import com.quartercode.disconnected.graphics.desktop.DesktopWidgetModule;
 import com.quartercode.disconnected.graphics.desktop.DesktopWindowAreaModule;
 import com.quartercode.disconnected.graphics.desktop.program.FileManagerProgram;
+import com.quartercode.disconnected.sim.TickSchedulerUpdater;
 import com.quartercode.disconnected.sim.profile.ProfileSerializer;
 import com.quartercode.disconnected.util.storage.ResourceStore;
 import com.quartercode.disconnected.world.comp.hardware.NodeNetInterface;
@@ -123,6 +124,16 @@ public class DefaultData {
     }
 
     // ----- Simulation -----
+
+    /**
+     * Adds the scheduler groups with their priorities to the given {@link TickSchedulerUpdater}.
+     * 
+     * @param schedulerUpdater The tick scheduler update the groups should be added to.
+     */
+    public static void addDefaultSchedulerGroups(TickSchedulerUpdater schedulerUpdater) {
+
+        schedulerUpdater.addGroup("computerProgramUpdate", 500);
+    }
 
     /**
      * Adds the default tick server {@link EventHandler}s to the given {@link Bridge}.

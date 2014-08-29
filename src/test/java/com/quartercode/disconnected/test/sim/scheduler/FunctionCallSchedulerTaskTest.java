@@ -21,9 +21,6 @@ package com.quartercode.disconnected.test.sim.scheduler;
 import static com.quartercode.classmod.ClassmodFactory.create;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -31,44 +28,22 @@ import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.util.FeatureDefinitionReference;
-import com.quartercode.disconnected.sim.scheduler.FunctionCallScheduleTask;
+import com.quartercode.disconnected.sim.scheduler.FunctionCallSchedulerTask;
 import com.quartercode.disconnected.sim.scheduler.Scheduler;
+import com.quartercode.disconnected.sim.scheduler.SchedulerDefinition;
 
-@RunWith (Parameterized.class)
-public class FunctionCallScheduleTaskTest {
+public class FunctionCallSchedulerTaskTest {
 
-    private static boolean executedTestFunction;
-
-    @Parameters
-    public static Collection<Object[]> data() {
-
-        List<Object[]> data = new ArrayList<>();
-
-        data.add(new Object[] { 1 });
-        data.add(new Object[] { 5 });
-        data.add(new Object[] { 100 });
-
-        return data;
-    }
-
-    private final int         delay;
+    private static boolean    executedTestFunction;
 
     private TestFeatureHolder schedulerHolder;
     private Scheduler         scheduler;
-
-    public FunctionCallScheduleTaskTest(int delay) {
-
-        this.delay = delay;
-    }
 
     @Before
     public void setUp() {
@@ -77,42 +52,34 @@ public class FunctionCallScheduleTaskTest {
 
         schedulerHolder = new TestFeatureHolder();
         scheduler = schedulerHolder.get(TestFeatureHolder.SCHEDULER);
+
+        scheduler.schedule(new FunctionCallSchedulerTask(1, "testGroup", new FeatureDefinitionReference<FunctionDefinition<?>>(TestFeatureHolder.class, "TEST_FUNCTION")));
     }
 
     @Test
     public void testSchedule() {
 
-        scheduler.schedule(new FunctionCallScheduleTask(new FeatureDefinitionReference<FunctionDefinition<?>>(TestFeatureHolder.class, "TEST_FUNCTION")), delay);
-
-        for (int update = 0; update < delay; update++) {
-            scheduler.update();
-        }
-
-        Assert.assertTrue("Function call schedule task with delay of " + delay + " called function after " + (delay + 1) + " updates", executedTestFunction);
+        scheduler.update("testGroup");
+        Assert.assertTrue("Function call scheduler task didn't call test function", executedTestFunction);
     }
 
     @Test
     public void testScheduleWithPersistence() throws JAXBException {
 
-        scheduler.schedule(new FunctionCallScheduleTask(new FeatureDefinitionReference<FunctionDefinition<?>>(TestFeatureHolder.class, "TEST_FUNCTION")), delay);
-
-        JAXBContext context = JAXBContext.newInstance(Scheduler.class, FunctionCallScheduleTask.class, TestFeatureHolder.class);
+        JAXBContext context = JAXBContext.newInstance(Scheduler.class, FunctionCallSchedulerTask.class, TestFeatureHolder.class);
         StringWriter serialized = new StringWriter();
         context.createMarshaller().marshal(schedulerHolder, serialized);
         TestFeatureHolder schedulerHolderCopy = (TestFeatureHolder) context.createUnmarshaller().unmarshal(new StringReader(serialized.toString()));
         Scheduler copy = schedulerHolderCopy.get(TestFeatureHolder.SCHEDULER);
 
-        for (int update = 0; update < delay; update++) {
-            copy.update();
-        }
-
-        Assert.assertTrue("Function call schedule task with delay of " + delay + " called function after " + (delay + 1) + " updates", executedTestFunction);
+        copy.update("testGroup");
+        Assert.assertTrue("Function call scheduler task didn't call test function", executedTestFunction);
     }
 
     @XmlRootElement
     private static class TestFeatureHolder extends DefaultFeatureHolder {
 
-        public static final FeatureDefinition<Scheduler> SCHEDULER = Scheduler.createDefinition("scheduler");
+        public static final FeatureDefinition<Scheduler> SCHEDULER = new SchedulerDefinition("scheduler");
 
         public static final FunctionDefinition<String>   TEST_FUNCTION;
 

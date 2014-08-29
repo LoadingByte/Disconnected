@@ -18,54 +18,20 @@
 
 package com.quartercode.disconnected.sim.scheduler;
 
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.extra.Function;
-import com.quartercode.classmod.extra.FunctionDefinition;
-import com.quartercode.classmod.extra.FunctionExecutor;
-import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.disconnected.sim.TickUpdatable;
 
 /**
- * {@link FeatureHolder}s which implement this interface inherit a {@link Scheduler} that is automatically invoked by the tick simulator.
- * Actually, this class uses a {@link #TICK_UPDATE} function from {@link TickUpdatable} that delegates the call to the {@link Scheduler}.
+ * {@link FeatureHolder}s which implement this interface inherit the {@link #SCHEDULER} feature which is a {@link Scheduler} that
+ * is automatically updated by the tick simulator.
+ * The simulator visits all {@link FeatureHolder}s of a world and updates all automatic schedulers with all groups in the correct order.
  * 
  * @see Scheduler
- * @see #SCHEDULER
- * @see TickUpdatable
  */
-public interface SchedulerUser extends FeatureHolder, TickUpdatable {
+public interface SchedulerUser extends FeatureHolder {
 
     /**
-     * The {@link Scheduler} that can be used to execute schedule tasks later.
-     * Scheduler users should use the scheduler instead of manually timing things with a {@link TickUpdatable}.
+     * The {@link Scheduler} which is automatically updated by the tick simulator on every tick.
      */
-    public static final FeatureDefinition<Scheduler> SCHEDULER   = Scheduler.createDefinition("scheduler");
-
-    /**
-     * The tick update {@link Function} is automatically invoked by the tick simulator on every tick.
-     * In this case, it just calls the {@link Scheduler#update()} method on the defined {@link #SCHEDULER} feature.
-     * The priority of the delegation executor is the default one.
-     */
-    public static final FunctionDefinition<Void>     TICK_UPDATE = Initializer.tickUpdateAddScheduleCall(TickUpdatable.TICK_UPDATE);
-
-    static class Initializer {
-
-        private static FunctionDefinition<Void> tickUpdateAddScheduleCall(FunctionDefinition<Void> definition) {
-
-            definition.addExecutor("updateScheduler", SchedulerUser.class, new FunctionExecutor<Void>() {
-
-                @Override
-                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                    invocation.getHolder().get(SchedulerUser.SCHEDULER).update();
-                    return invocation.next(arguments);
-                }
-            });
-
-            return definition;
-        }
-
-    }
+    public static final SchedulerDefinition SCHEDULER = new SchedulerDefinition("scheduler");
 
 }

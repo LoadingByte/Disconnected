@@ -26,45 +26,29 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.base.Feature;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.Persistent;
 import com.quartercode.classmod.base.def.AbstractFeature;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
 
 /**
- * The scheduler is a {@link Feature} that allows executing delayed actions.<br>
- * These delayed actions are called {@link ScheduleTask}s.
- * Such tasks are registered and started through the {@link #schedule(ScheduleTask, int)} method.<br>
- * For actually counting down the delay, the {@link #update()} method needs to be called once every time unit (tick).
+ * The scheduler is a {@link Feature} that allows executing actions after a delay or periodically.
+ * These delayed actions are called {@link SchedulerTask}s.
+ * Such tasks are registered and started through the {@link #schedule(SchedulerTask)} method.
+ * For actually counting down any delay and finally executing the tasks, the {@link #update(String)} method needs to be called
+ * once per time unit (tick) for each group.
+ * Note that the update method can be temporarily disabled using the {@link #setActive(boolean)} method.<br>
+ * <br>
+ * See the scheduler task class for more information on the scheduler system.
  * 
- * @see ScheduleTask
+ * @see SchedulerTask
  */
 @Persistent
 @XmlRootElement
 public class Scheduler extends AbstractFeature {
 
-    /**
-     * Creates a new {@link FeatureDefinition} that describes an scheduler with the given name.
-     * 
-     * @param name The name of the scheduler which the returned {@link FeatureDefinition} describes.
-     * @return A {@link FeatureDefinition} which can be used to describe a scheduler.
-     */
-    public static FeatureDefinition<Scheduler> createDefinition(String name) {
-
-        return new AbstractFeatureDefinition<Scheduler>(name) {
-
-            @Override
-            public Scheduler create(FeatureHolder holder) {
-
-                return new Scheduler(getName(), holder);
-            }
-
-        };
-    }
-
-    @XmlElement (name = "runningTask")
-    private List<ScheduleTaskContext> runningTasks;
+    private boolean             active;
+    @XmlElement (name = "scheduledTask")
+    private List<ScheduledTask> scheduledTasks;
 
     /**
      * Creates a new empty scheduler.
@@ -84,88 +68,151 @@ public class Scheduler extends AbstractFeature {
 
         super(name, holder);
 
-        runningTasks = new ArrayList<>();
+        active = true;
+        scheduledTasks = new ArrayList<>();
     }
 
     /**
-     * Returns the amount of {@link ScheduleTask}s that are currently running.
-     * Such tasks must have been scheduled with {@link #schedule(ScheduleTask, int)} before.
+     * Returns whether the scheduler is active and processes {@link #update(String)} invocations.
+     * If this is set to {@code false}, any update calls do nothing.
      * 
-     * @return The amount of currently running tasks.
+     * @return Whether the scheduler is active.
+     */
+    public boolean isActive() {
+
+        return active;
+    }
+
+    /**
+     * Sets whether the scheduler is active and processes {@link #update(String)} invocations.
+     * If this is set to {@code false}, any update calls do nothing.
+     * 
+     * @param active Whether the scheduler should be active.
+     */
+    public void setActive(boolean active) {
+
+        this.active = active;
+    }
+
+    /**
+     * Returns the amount of {@link SchedulerTask}s that are currently scheduled.
+     * Such tasks must have been added using {@link #schedule(SchedulerTask)} before.
+     * 
+     * @return The amount of currently scheduled tasks.
      */
     public int countTasks() {
 
-        return runningTasks.size();
+        return scheduledTasks.size();
     }
 
     /**
-     * Schedules the given {@link ScheduleTask}. It will be executed after the given amount of time units (ticks).
+     * Schedules a stateless copy of the given {@link SchedulerTask} (see {@link SchedulerTask#cloneStateless()}).
+     * See the scheduler task class for more information about when the task will be executed.
+     * Note that the task can be can be cancelled by setting their {@link SchedulerTask#isCancelled()} flag to {@code true}.
      * 
-     * @param task The actual {@link ScheduleTask} that should be scheduled for invocation.
-     * @param delay The amount of time units (ticks) that pass before the task is invoked.
-     *        Zero is not allowed, one would execute the task on the next {@link #update()} call.
+     * @param task The scheduler task that should be scheduled for execution.
      */
-    public void schedule(ScheduleTask task, int delay) {
+    public void schedule(SchedulerTask task) {
 
-        Validate.notNull(task, "Cannot schedule null task");
-        Validate.isTrue(delay > 0, "Delay (%d) must be > 0", delay);
-
-        runningTasks.add(new ScheduleTaskContext(task, delay));
+        scheduledTasks.add(new ScheduledTask(task));
     }
 
     /**
-     * Executes a time unit (tick) pass and invokes {@link ScheduleTask}s that need to be invoked.
-     * This method should be called once every time unit (tick).<br>
+     * Lets <b>one</b> time unit (tick) pass and executes all scheduled {@link SchedulerTask}s which are assigned to the given group
+     * and need to be executed based on their delays.
+     * This method should be called once per time unit for each group.
+     * Note that this method can be temporarily disabled using the {@link #setActive(boolean)} method.<br>
      * <br>
-     * If a {@link ScheduleTask} throws an exception, it is given up the stack to the update caller.
-     * The exception might cause an error there because no one can handle it, so exceptions should be handled in the task classes.
+     * If a scheduler task throws a {@link RuntimeException}, it is thrown up the stack to the update caller.
+     * Since it is not the responsibility of the update caller to handle exceptions, they should be handled by the tasks themselves.
+     * 
+     * @param group The group whose scheduler tasks should be updated.
+     *        Note that this method should be invoked once per tick for <b>each</b> group.
      */
-    public void update() {
+    public void update(String group) {
 
-        Iterator<ScheduleTaskContext> iterator = runningTasks.iterator();
+        if (!active) {
+            return;
+        }
+
+        Iterator<ScheduledTask> iterator = scheduledTasks.iterator();
         while (iterator.hasNext()) {
-            ScheduleTaskContext task = iterator.next();
-            task.update();
-            if (task.isComplete()) {
-                task.getTask().execute(getHolder());
-                iterator.remove();
+            ScheduledTask scheduledTask = iterator.next();
+
+            if (scheduledTask.getTask().getGroup().equals(group)) {
+                if (scheduledTask.getTask().isCancelled()) {
+                    iterator.remove();
+                } else {
+                    scheduledTask.update(getHolder());
+                }
             }
         }
     }
 
-    private static class ScheduleTaskContext {
+    private static class ScheduledTask {
 
-        private ScheduleTask task;
+        private SchedulerTask task;
+
         @XmlAttribute
-        private int          remainingUpdates;
+        private boolean       executedInitially;
+        @XmlAttribute
+        private int           ticksSinceLastExecution;
 
+        // JAXB constructor
         @SuppressWarnings ("unused")
-        protected ScheduleTaskContext() {
+        protected ScheduledTask() {
 
         }
 
-        public ScheduleTaskContext(ScheduleTask task, int delay) {
+        private ScheduledTask(SchedulerTask task) {
 
-            this.task = task;
-            remainingUpdates = delay;
+            Validate.notNull(task, "Cannot schedule null task");
+            Validate.isTrue(task.getInitialDelay() > 0, "Scheduler task initial delay (%d) must be > 0", task.getInitialDelay());
+            Validate.isTrue(task.getPeriodicDelay() == -1 || task.getPeriodicDelay() > 0, "Scheduler task periodic delay (%d) must be -1 or > 0", task.getPeriodicDelay());
+            Validate.notBlank(task.getGroup(), "Scheduler task group cannot be blank");
+
+            this.task = task.cloneStateless();
         }
 
-        public ScheduleTask getTask() {
+        private SchedulerTask getTask() {
 
             return task;
         }
 
-        public void update() {
+        private void update(FeatureHolder schedulerHolder) {
 
-            remainingUpdates--;
+            ticksSinceLastExecution++;
+
+            if (!executedInitially && reachedDelay(task.getInitialDelay())) {
+                if (isPeriodic()) {
+                    executedInitially = true;
+                } else {
+                    task.cancel();
+                }
+
+                execute(schedulerHolder);
+            } else if (executedInitially && reachedDelay(task.getPeriodicDelay())) {
+                execute(schedulerHolder);
+            }
         }
 
-        public boolean isComplete() {
+        private boolean reachedDelay(int delay) {
 
-            return remainingUpdates <= 0;
+            return ticksSinceLastExecution >= delay;
         }
 
-        // Use an object reference to make it possible for JAXB to map the ScheduleTask interface
+        private boolean isPeriodic() {
+
+            return task.getPeriodicDelay() > 0;
+        }
+
+        private void execute(FeatureHolder schedulerHolder) {
+
+            ticksSinceLastExecution = 0;
+            task.execute(schedulerHolder);
+        }
+
+        // Use an object reference because JAXB doesn't support interfaces and SchedulerTask is an interface
 
         @XmlElement (name = "task")
         protected Object getTaskAsObject() {
@@ -176,7 +223,7 @@ public class Scheduler extends AbstractFeature {
         @SuppressWarnings ("unused")
         protected void setTaskAsObject(Object task) {
 
-            this.task = (ScheduleTask) task;
+            this.task = (SchedulerTask) task;
         }
 
     }

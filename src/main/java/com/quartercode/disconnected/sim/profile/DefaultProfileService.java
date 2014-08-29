@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import com.quartercode.disconnected.sim.TickBridgeProvider;
+import com.quartercode.disconnected.sim.TickSchedulerUpdater;
 import com.quartercode.disconnected.sim.TickService;
-import com.quartercode.disconnected.sim.TickSimulator;
 import com.quartercode.disconnected.util.storage.ServiceRegistry;
 
 /**
@@ -138,9 +138,9 @@ public class DefaultProfileService implements ProfileService {
         if (tickService != null) {
             active.getWorld().injectBridge(tickService.getAction(TickBridgeProvider.class).getBridge());
 
-            TickSimulator simulator = tickService.getAction(TickSimulator.class);
-            if (simulator != null) {
-                simulator.setWorld(active == null ? null : active.getWorld());
+            TickSchedulerUpdater schedulerUpdater = tickService.getAction(TickSchedulerUpdater.class);
+            if (schedulerUpdater != null) {
+                schedulerUpdater.setWorld(active == null ? null : active.getWorld());
             }
         }
     }

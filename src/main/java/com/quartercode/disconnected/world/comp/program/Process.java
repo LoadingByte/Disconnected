@@ -38,6 +38,7 @@ import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
+import com.quartercode.disconnected.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
@@ -180,7 +181,26 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
         });
 
         ENVIRONMENT = create(new TypeLiteral<PropertyDefinition<Map<String, String>>>() {}, "name", "environment", "storage", new StandardStorage<>(), "initialValue", new CloneValueFactory<>(new HashMap<>()));
+
         STATE = create(new TypeLiteral<PropertyDefinition<ProcessState>>() {}, "name", "state", "storage", new StandardStorage<>(), "initialValue", new ConstantValueFactory<>(ProcessState.RUNNING));
+        STATE.addSetterExecutor("setExecutorSchedulerActive", Process.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.LEVEL_6)
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                ProgramExecutor executor = invocation.getHolder().get(EXECUTOR).get();
+
+                if (executor instanceof SchedulerUser) {
+                    boolean active = ((ProcessState) arguments[0]).isTickState();
+                    executor.get(SchedulerUser.SCHEDULER).setActive(active);
+                }
+
+                return invocation.next(arguments);
+            }
+
+        });
+
         EXECUTOR = create(new TypeLiteral<PropertyDefinition<ProgramExecutor>>() {}, "name", "executor", "storage", new StandardStorage<>());
         CHILDREN = create(new TypeLiteral<CollectionPropertyDefinition<Process<?>, List<Process<?>>>>() {}, "name", "children", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
 

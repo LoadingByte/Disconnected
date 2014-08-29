@@ -38,8 +38,8 @@ import com.quartercode.disconnected.graphics.DefaultStates;
 import com.quartercode.disconnected.graphics.GraphicsService;
 import com.quartercode.disconnected.sim.DefaultTickService;
 import com.quartercode.disconnected.sim.TickBridgeProvider;
+import com.quartercode.disconnected.sim.TickSchedulerUpdater;
 import com.quartercode.disconnected.sim.TickService;
-import com.quartercode.disconnected.sim.TickSimulator;
 import com.quartercode.disconnected.sim.profile.DefaultProfileService;
 import com.quartercode.disconnected.sim.profile.Profile;
 import com.quartercode.disconnected.sim.profile.ProfileSerializationException;
@@ -245,7 +245,7 @@ public class Main {
         ServiceRegistry.register(TickService.class, tickService);
 
         tickService.addAction(new TickBridgeProvider());
-        tickService.addAction(new TickSimulator());
+        tickService.addAction(new TickSchedulerUpdater());
 
         DefaultData.addDefaultServerHandlers(tickService.getAction(TickBridgeProvider.class).getBridge());
     }
