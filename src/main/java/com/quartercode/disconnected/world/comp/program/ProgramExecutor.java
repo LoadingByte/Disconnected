@@ -23,6 +23,7 @@ import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.world.event.ProgramLaunchEvent;
@@ -51,6 +52,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
         RUN.addExecutor("sendLaunchEvent", ProgramExecutor.class, new FunctionExecutor<Void>() {
 
             @Override
+            @Prioritized (Prioritized.LEVEL_8)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 ProgramExecutor holder = (ProgramExecutor) invocation.getHolder();

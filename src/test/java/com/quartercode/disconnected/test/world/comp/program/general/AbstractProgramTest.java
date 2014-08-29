@@ -25,6 +25,7 @@ import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
 import org.junit.Rule;
+import com.quartercode.disconnected.test.ExtraActions.StorageListener;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.Version;
@@ -37,6 +38,7 @@ import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.world.comp.program.Program;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
+import com.quartercode.disconnected.world.event.ProgramLaunchEvent;
 import com.quartercode.disconnected.world.gen.WorldGenerator;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.Event;
@@ -65,7 +67,10 @@ public abstract class AbstractProgramTest {
         context.checking(new Expectations() {{
 
             allowing(bridge).send(with(any(Event.class)));
-                will(storeArgument(0).in(events));
+                will(storeArgument(0).withListener(new StorageListener<Event>() { @Override
+                public boolean accept(Event object) {
+                    return ! (object instanceof ProgramLaunchEvent);
+                }}).in(events));
 
         }});
         // @formatter:on
