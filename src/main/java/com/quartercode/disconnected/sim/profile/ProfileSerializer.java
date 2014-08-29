@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -33,7 +32,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import com.quartercode.classmod.util.TreeInitializer;
 import com.quartercode.disconnected.util.RandomPool;
-import com.quartercode.disconnected.util.storage.GlobalStorage;
 import com.quartercode.disconnected.world.World;
 
 /**
@@ -42,6 +40,51 @@ import com.quartercode.disconnected.world.World;
  * @see Profile
  */
 public class ProfileSerializer {
+
+    // ----- Data -----
+
+    private static String          worldContextPath = "";
+    private static TreeInitializer worldInitializer = new TreeInitializer();
+
+    /**
+     * Returns the jaxb context path for world serialization which sets the packages that contain jaxb.index files.
+     * It is used for creating new {@link JAXBContext}s inside the {@link #createWorldContext()} method.
+     * 
+     * @return The jaxb context path for worlds.
+     */
+    public static String getWorldContextPath() {
+
+        return worldContextPath;
+    }
+
+    /**
+     * Appends the given context path part, which may be one package or a list of packages separated by {@code :}, to the world context path.
+     * 
+     * @param contextPathEntry The context path part which should be appended.
+     * @see #getWorldContextPath()
+     */
+    public static void appendToWorldContextPath(String contextPathEntry) {
+
+        if (!worldContextPath.isEmpty()) {
+            worldContextPath += ":";
+        }
+
+        worldContextPath += contextPathEntry;
+    }
+
+    /**
+     * Returns the {@link TreeInitializer} which is used to initialize some features in deserialized {@link World}s.
+     * Note that the returned initializer is mutable should be changed in order to add new mappings.
+     * 
+     * @return The world tree initializer.
+     * @see #deserializeWorld(InputStream)
+     */
+    public static TreeInitializer getWorldInitializer() {
+
+        return worldInitializer;
+    }
+
+    // ----- Serialization Methods -----
 
     /**
      * Serializes the given {@link Profile} to the given {@link OutputStream}.
@@ -102,19 +145,14 @@ public class ProfileSerializer {
 
     /**
      * Creates a new {@link JAXBContext} which can be used for {@link World} xml model.
+     * The new context uses the context path which is accessible through {@link #getWorldContextPath()}.
      * 
-     * @return A {@link JAXBContext} for the {@link World} model.
+     * @return A jaxb context for the world model.
      * @throws JAXBException The world jaxb context cannot be created.
      */
     public static JAXBContext createWorldContext() throws JAXBException {
 
-        StringBuilder contextPathStringBuilder = new StringBuilder();
-        for (String contextPathEntry : GlobalStorage.get("contextPath", String.class)) {
-            contextPathStringBuilder.append(":").append(contextPathEntry);
-        }
-        String contextPathString = contextPathStringBuilder.length() > 0 ? contextPathStringBuilder.substring(1) : "";
-
-        return JAXBContext.newInstance(contextPathString);
+        return JAXBContext.newInstance(worldContextPath);
     }
 
     /**
@@ -143,12 +181,7 @@ public class ProfileSerializer {
     public static World deserializeWorld(InputStream inputStream) throws JAXBException {
 
         World world = (World) createWorldContext().createUnmarshaller().unmarshal(new JAXBNoCloseInputStream(inputStream));
-
-        List<TreeInitializer> initializers = GlobalStorage.get("worldInitializer", TreeInitializer.class);
-        if (!initializers.isEmpty()) {
-            TreeInitializer initializer = initializers.get(0);
-            initializer.apply(world);
-        }
+        worldInitializer.apply(world);
 
         return world;
     }

@@ -18,6 +18,8 @@
 
 package com.quartercode.disconnected.graphics;
 
+import java.net.URL;
+import java.util.Set;
 import com.quartercode.disconnected.util.RunnableInvocationProvider;
 import com.quartercode.eventbridge.bridge.Bridge;
 
@@ -26,6 +28,30 @@ import com.quartercode.eventbridge.bridge.Bridge;
  * The service can create or destroy the lwjgl context and keeps track of all important twl internals.
  */
 public interface GraphicsService extends RunnableInvocationProvider {
+
+    /**
+     * Returns a set which contains the {@link URL}s of all themes that should be loaded into the twl theme manager.
+     * Note that only loaded themes can be used by graphical components.
+     * 
+     * @return The twl themes that should be loaded.
+     */
+    public Set<URL> getThemes();
+
+    /**
+     * Adds the {@link URL} of a twl theme that should be loaded into the twl theme manager.
+     * Note that the graphics service must be restarted if it is currently running in order for this change to apply.
+     * 
+     * @param theme The url of the twl theme that should be loaded.
+     */
+    public void addTheme(URL theme);
+
+    /**
+     * Removes the {@link URL} of a twl theme that should not be loaded into the twl theme manager.
+     * Note that the graphics service must be restarted if it is currently running in order for this change to apply.
+     * 
+     * @param theme The url of the twl theme that should not be loaded.
+     */
+    public void removeTheme(URL theme);
 
     /**
      * Returns whether the graphics service is currently running.

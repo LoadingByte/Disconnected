@@ -33,22 +33,9 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import com.quartercode.classmod.Classmod;
-import com.quartercode.classmod.util.TreeInitializer;
-import com.quartercode.disconnected.bridge.HandleInvocationProviderExtension;
-import com.quartercode.disconnected.bridge.def.DefaultHandleInvocationProviderExtension.DefaultHandleInvocationProviderExtensionFactory;
 import com.quartercode.disconnected.graphics.DefaultGraphicsService;
 import com.quartercode.disconnected.graphics.DefaultStates;
-import com.quartercode.disconnected.graphics.GraphicsModule;
 import com.quartercode.disconnected.graphics.GraphicsService;
-import com.quartercode.disconnected.graphics.GraphicsState;
-import com.quartercode.disconnected.graphics.desktop.DesktopLaunchButtonModule;
-import com.quartercode.disconnected.graphics.desktop.DesktopProgramDescriptor;
-import com.quartercode.disconnected.graphics.desktop.DesktopPrograms;
-import com.quartercode.disconnected.graphics.desktop.DesktopTaskbarModule;
-import com.quartercode.disconnected.graphics.desktop.DesktopWidgetModule;
-import com.quartercode.disconnected.graphics.desktop.DesktopWindowAreaModule;
-import com.quartercode.disconnected.graphics.desktop.program.FileManagerProgram;
 import com.quartercode.disconnected.sim.DefaultTickService;
 import com.quartercode.disconnected.sim.TickBridgeProvider;
 import com.quartercode.disconnected.sim.TickService;
@@ -61,30 +48,14 @@ import com.quartercode.disconnected.util.ApplicationInfo;
 import com.quartercode.disconnected.util.ExitUtil;
 import com.quartercode.disconnected.util.ExitUtil.ExitProcessor;
 import com.quartercode.disconnected.util.RandomPool;
-import com.quartercode.disconnected.util.storage.GlobalStorage;
-import com.quartercode.disconnected.util.storage.ResourceStore;
 import com.quartercode.disconnected.util.storage.ServiceRegistry;
 import com.quartercode.disconnected.world.World;
 import com.quartercode.disconnected.world.comp.Computer;
-import com.quartercode.disconnected.world.comp.hardware.NodeNetInterface;
-import com.quartercode.disconnected.world.comp.hardware.RouterNetInterface;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.world.event.ProgramLaunchCommandEvent;
-import com.quartercode.disconnected.world.event.ProgramLaunchCommandEventHandler;
-import com.quartercode.disconnected.world.event.ProgramLaunchInfoRequestEvent;
-import com.quartercode.disconnected.world.event.ProgramLaunchInfoRequestEventHandler;
 import com.quartercode.disconnected.world.gen.WorldGenerator;
-import com.quartercode.eventbridge.EventBridgeFactory;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.BridgeConnectorException;
-import com.quartercode.eventbridge.bridge.EventPredicate;
-import com.quartercode.eventbridge.bridge.module.EventHandler;
-import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 import com.quartercode.eventbridge.extra.connector.LocalBridgeConnector;
-import com.quartercode.eventbridge.extra.extension.RequestEventHandler;
-import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
-import com.quartercode.eventbridge.extra.predicate.TypePredicate;
-import com.quartercode.eventbridge.factory.FactoryManager;
 
 /**
  * The main class which initializes the whole game.
@@ -109,6 +80,64 @@ public class Main {
      */
     public static void main(String[] args) {
 
+        // Set general properties
+        initializeGeneral();
+
+        // Print some information about the software
+        LOGGER.info("Starting {} {} by {}", ApplicationInfo.TITLE, ApplicationInfo.VERSION, ApplicationInfo.VENDOR);
+
+        // Process the command line arguments
+        processCommandLineArguments(args);
+
+        // Fill the resource store
+        fillResourceStore();
+
+        // Initialize the game services
+        initializeServices();
+
+        // DEBUG: Retrieve the game services
+        ProfileService profileService = ServiceRegistry.lookup(ProfileService.class);
+        TickService tickService = ServiceRegistry.lookup(TickService.class);
+        GraphicsService graphicsService = ServiceRegistry.lookup(GraphicsService.class);
+
+        // DEBUG: Connect the client and server bridges
+        LOGGER.info("DEBUG: Connect the client and server bridges");
+        final Bridge clientBridge = graphicsService.getBridge();
+        final Bridge serverBridge = tickService.getAction(TickBridgeProvider.class).getBridge();
+        try {
+            clientBridge.addConnector(new LocalBridgeConnector(serverBridge));
+        } catch (BridgeConnectorException e) {
+            LOGGER.error("Can't connect the client and server bridges");
+            return;
+        }
+
+        // DEBUG: Generate and set new simulation
+        LOGGER.info("DEBUG: Generating new simulation");
+        RandomPool random = new RandomPool(Profile.DEFAULT_RANDOM_POOL_SIZE);
+        World world = WorldGenerator.generateWorld(random, 10);
+
+        Profile profile = new Profile("test");
+        profile.setWorld(world);
+        profile.setRandom(random);
+        profileService.addProfile(profile);
+        try {
+            profileService.setActive(profile);
+        } catch (ProfileSerializationException e) {
+            // Won't ever happen (we just created a new profile)
+        }
+
+        for (Computer computer : world.get(World.COMPUTERS).get()) {
+            computer.get(Computer.OS).get().get(OperatingSystem.SET_RUNNING).invoke(true);
+        }
+
+        // DEBUG: Start "game" with current simulation
+        LOGGER.info("DEBUG: Starting test-game with current simulation");
+        tickService.setRunning(true);
+        graphicsService.setState(DefaultStates.DESKTOP.create());
+    }
+
+    private static void initializeGeneral() {
+
         // Set default exception handler
         Thread.setDefaultUncaughtExceptionHandler(new LogExceptionHandler());
 
@@ -128,99 +157,11 @@ public class Main {
                 ServiceRegistry.lookup(GraphicsService.class).setRunning(false);
                 ServiceRegistry.lookup(TickService.class).setRunning(false);
             }
+
         });
 
         // Add custom mappings to EventBridgeFactory
-        fillEventBridgeFactory();
-
-        // Print information about the software
-        LOGGER.info("Version {}", ApplicationInfo.VERSION);
-
-        // Process the command line arguments
-        processCommandLineArguments(args);
-
-        // Fill global storage
-        LOGGER.info("Filling global storage with common data");
-        fillGlobalStorage();
-
-        // Fill resource store
-        LOGGER.info("Filling resource store");
-        try {
-            fillResourceStore();
-        } catch (IOException | RuntimeException e) {
-            LOGGER.error("Can't fill resource store", e);
-            return;
-        }
-
-        // Fill default graphics states
-        LOGGER.info("Filling default graphics states");
-        fillDefaultGraphicsStates();
-
-        // Initialize profile service and load stored profiles
-        LOGGER.info("Initializing profile service");
-        ProfileService profileService = new DefaultProfileService(new File("profiles"));
-        ServiceRegistry.register(ProfileService.class, profileService);
-
-        // Initialize tick service
-        LOGGER.info("Initializing tick service");
-        TickService tickService = new DefaultTickService();
-        ServiceRegistry.register(TickService.class, tickService);
-        tickService.addAction(new TickBridgeProvider());
-        tickService.addAction(new TickSimulator());
-
-        LOGGER.info("Filling default server handlers");
-        fillDefaultServerHandlers(tickService.getAction(TickBridgeProvider.class).getBridge());
-
-        // Initialize graphics service and start it
-        LOGGER.info("Initializing graphics service");
-        GraphicsService graphicsService = new DefaultGraphicsService();
-        ServiceRegistry.register(GraphicsService.class, graphicsService);
-        graphicsService.setRunning(true);
-
-        // DEBUG: Connect the client and server bridges
-        LOGGER.info("DEBUG-ACTION: Connect the client and server bridges");
-        final Bridge clientBridge = graphicsService.getBridge();
-        final Bridge serverBridge = tickService.getAction(TickBridgeProvider.class).getBridge();
-        try {
-            clientBridge.addConnector(new LocalBridgeConnector(serverBridge));
-        } catch (BridgeConnectorException e) {
-            LOGGER.error("Can't connect the client and server bridges");
-            return;
-        }
-
-        // DEBUG: Generate and set new simulation
-        LOGGER.info("DEBUG-ACTION: Generating new simulation");
-        RandomPool random = new RandomPool(Profile.DEFAULT_RANDOM_POOL_SIZE);
-        World world = WorldGenerator.generateWorld(random, 10);
-
-        Profile profile = new Profile("test");
-        profile.setWorld(world);
-        profile.setRandom(random);
-        profileService.addProfile(profile);
-        try {
-            profileService.setActive(profile);
-        } catch (ProfileSerializationException e) {
-            // Won't ever happen (we just created a new profile)
-        }
-
-        for (Computer computer : world.get(World.COMPUTERS).get()) {
-            computer.get(Computer.OS).get().get(OperatingSystem.SET_RUNNING).invoke(true);
-        }
-
-        // DEBUG: Start "game" with current simulation
-        LOGGER.info("DEBUG-ACTION: Starting test-game with current simulation");
-        tickService.setRunning(true);
-        graphicsService.setState(DefaultStates.DESKTOP.create());
-    }
-
-    /**
-     * Adds the default custom mappings to the {@link EventBridgeFactory}.
-     */
-    public static void fillEventBridgeFactory() {
-
-        FactoryManager factoryManager = EventBridgeFactory.getFactoryManager();
-
-        factoryManager.setFactory(HandleInvocationProviderExtension.class, new DefaultHandleInvocationProviderExtensionFactory());
+        DefaultData.addCustomEventBridgeFactoryMappings();
     }
 
     private static void processCommandLineArguments(String[] arguments) {
@@ -258,85 +199,64 @@ public class Main {
         return options;
     }
 
-    /**
-     * Fills the {@link GlobalStorage} with the default values for the context path and default themes.
-     */
-    public static void fillGlobalStorage() {
+    private static void fillResourceStore() {
 
-        GlobalStorage.put("contextPath", Classmod.CONTEXT_PATH);
-        GlobalStorage.put("contextPath", "com.quartercode.disconnected.sim.scheduler");
-        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world");
-        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp");
-        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp.attack");
-        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp.file");
-        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp.hardware");
-        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp.net");
-        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp.os");
-        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.comp.program");
-        GlobalStorage.put("contextPath", "com.quartercode.disconnected.world.general");
-
-        GlobalStorage.put("themes", Main.class.getResource("/ui/default/default.xml"));
-        GlobalStorage.put("themes", Main.class.getResource("/ui/desktop/desktop.xml"));
-
-        TreeInitializer worldInitializer = new TreeInitializer();
-        worldInitializer.addInitializationDefinition(NodeNetInterface.class, NodeNetInterface.CONNECTION);
-        worldInitializer.addInitializationDefinition(RouterNetInterface.class, RouterNetInterface.BACKBONE_CONNECTION);
-        worldInitializer.addInitializationDefinition(RouterNetInterface.class, RouterNetInterface.NEIGHBOURS);
-        GlobalStorage.put("worldInitializer", worldInitializer);
+        // Load the resource store data
+        LOGGER.info("Loading resource store data");
+        try {
+            DefaultData.fillResourceStore();
+        } catch (IOException | RuntimeException e) {
+            LOGGER.error("Can't fill resource store", e);
+            return;
+        }
     }
 
-    /**
-     * Fills the global {@link ResourceStore} with the default resource objects which are needed for running Disconnected.
-     * 
-     * @throws IOException Something goes wrong while reading from a jar file or resource.
-     */
-    public static void fillResourceStore() throws IOException {
+    private static void initializeServices() {
 
-        ResourceStore.loadFromClasspath("/data");
+        // Initialize profile service and load stored profiles
+        LOGGER.info("Initializing profile service and loading stored profiles");
+        initializeProfileService();
+
+        // Initialize tick service
+        LOGGER.info("Initializing tick service");
+        initializeTickService();
+
+        // Initialize graphics service
+        LOGGER.info("Initializing graphics service");
+        initializeGraphicsService();
+
+        // Start graphics service
+        LOGGER.info("Starting graphics service");
+        ServiceRegistry.lookup(GraphicsService.class).setRunning(true);
     }
 
-    /**
-     * Adds the default {@link GraphicsModule}s to the default {@link GraphicsState}s declared in {@link DefaultStates}.
-     */
-    public static void fillDefaultGraphicsStates() {
+    private static void initializeProfileService() {
 
-        DefaultStates.DESKTOP.addModule(DesktopWidgetModule.class, "desktopWidget", 100);
-        DefaultStates.DESKTOP.addModule(DesktopWindowAreaModule.class, "windowArea", 80);
-        DefaultStates.DESKTOP.addModule(DesktopLaunchButtonModule.class, "launchButton", 80);
-        DefaultStates.DESKTOP.addModule(DesktopTaskbarModule.class, "taskbar", 80);
+        ProfileService profileService = new DefaultProfileService(new File("profiles"));
+        ServiceRegistry.register(ProfileService.class, profileService);
 
-        fillDefaultDesktopPrograms();
+        DefaultData.addDefaultWorldContextPath();
+        DefaultData.addDefaultWorldInitializerMappings();
     }
 
-    /**
-     * Adds the default {@link DesktopProgramDescriptor}s to the {@link DesktopPrograms} list.
-     * 
-     * @see DesktopPrograms
-     */
-    public static void fillDefaultDesktopPrograms() {
+    private static void initializeTickService() {
 
-        DesktopPrograms.addDescriptor(new FileManagerProgram());
+        TickService tickService = new DefaultTickService();
+        ServiceRegistry.register(TickService.class, tickService);
+
+        tickService.addAction(new TickBridgeProvider());
+        tickService.addAction(new TickSimulator());
+
+        DefaultData.addDefaultServerHandlers(tickService.getAction(TickBridgeProvider.class).getBridge());
     }
 
-    /**
-     * Adds the default tick server {@link EventHandler}s to the given {@link Bridge}.
-     * 
-     * @param bridge The bridge to add the default tick server handlers to.
-     */
-    public static void fillDefaultServerHandlers(Bridge bridge) {
+    private static void initializeGraphicsService() {
 
-        addRequestHandler(bridge, new ProgramLaunchInfoRequestEventHandler(), new TypePredicate<>(ProgramLaunchInfoRequestEvent.class));
-        addEventHandler(bridge, new ProgramLaunchCommandEventHandler(), new TypePredicate<>(ProgramLaunchCommandEvent.class));
-    }
+        GraphicsService graphicsService = new DefaultGraphicsService();
+        ServiceRegistry.register(GraphicsService.class, graphicsService);
 
-    private static void addEventHandler(Bridge bridge, EventHandler<?> handler, EventPredicate<?> predicate) {
-
-        bridge.getModule(StandardHandlerModule.class).addHandler(handler, predicate);
-    }
-
-    private static void addRequestHandler(Bridge bridge, RequestEventHandler<?> requestEventHandler, EventPredicate<?> predicate) {
-
-        bridge.getModule(ReturnEventExtensionReturner.class).addRequestHandler(requestEventHandler, predicate);
+        DefaultData.addDefaultGraphicsServiceThemes(graphicsService);
+        DefaultData.initializeDefaultGraphicsStates();
     }
 
     private Main() {

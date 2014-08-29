@@ -18,6 +18,10 @@
 
 package com.quartercode.disconnected.graphics;
 
+import java.net.URL;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.bridge.HandleInvocationProviderExtension;
@@ -35,6 +39,8 @@ import com.quartercode.eventbridge.extra.extension.SendPredicateCheckExtension;
 public class DefaultGraphicsService implements GraphicsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultGraphicsService.class);
+
+    private final Set<URL>      themes = new HashSet<>();
 
     private GraphicsThread      thread;
     private GraphicsState       state;
@@ -54,6 +60,24 @@ public class DefaultGraphicsService implements GraphicsService {
     }
 
     @Override
+    public Set<URL> getThemes() {
+
+        return Collections.unmodifiableSet(themes);
+    }
+
+    @Override
+    public void addTheme(URL theme) {
+
+        themes.add(theme);
+    }
+
+    @Override
+    public void removeTheme(URL theme) {
+
+        themes.remove(theme);
+    }
+
+    @Override
     public boolean isRunning() {
 
         return thread != null && thread.isAlive();
@@ -64,7 +88,7 @@ public class DefaultGraphicsService implements GraphicsService {
 
         if (running && !isRunning()) {
             LOGGER.info("Starting up graphics thread");
-            thread = new GraphicsThread();
+            thread = new GraphicsThread(themes);
             thread.changeState(state);
             thread.start();
         } else if (!running && isRunning()) {

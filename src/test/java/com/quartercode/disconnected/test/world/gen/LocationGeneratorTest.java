@@ -23,7 +23,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import com.quartercode.disconnected.Main;
+import com.quartercode.disconnected.DefaultData;
 import com.quartercode.disconnected.util.RandomPool;
 import com.quartercode.disconnected.world.gen.LocationGenerator;
 import com.quartercode.disconnected.world.general.Location;
@@ -33,8 +33,7 @@ public class LocationGeneratorTest {
     @BeforeClass
     public static void setUpBeforeClass() throws IOException {
 
-        Main.fillGlobalStorage();
-        Main.fillResourceStore();
+        DefaultData.fillResourceStore();
     }
 
     @Test

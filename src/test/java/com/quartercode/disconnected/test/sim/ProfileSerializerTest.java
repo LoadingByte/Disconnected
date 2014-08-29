@@ -36,7 +36,7 @@ import com.quartercode.classmod.extra.Storage;
 import com.quartercode.classmod.extra.ValueSupplier;
 import com.quartercode.classmod.extra.def.DefaultCollectionProperty;
 import com.quartercode.classmod.extra.def.DefaultProperty;
-import com.quartercode.disconnected.Main;
+import com.quartercode.disconnected.DefaultData;
 import com.quartercode.disconnected.sim.profile.Profile;
 import com.quartercode.disconnected.sim.profile.ProfileSerializer;
 import com.quartercode.disconnected.util.RandomPool;
@@ -50,8 +50,9 @@ public class ProfileSerializerTest {
     @BeforeClass
     public static void setUpBeforeClass() throws IOException {
 
-        Main.fillGlobalStorage();
-        Main.fillResourceStore();
+        DefaultData.fillResourceStore();
+        DefaultData.addDefaultWorldContextPath();
+        DefaultData.addDefaultWorldInitializerMappings();
     }
 
     @Before

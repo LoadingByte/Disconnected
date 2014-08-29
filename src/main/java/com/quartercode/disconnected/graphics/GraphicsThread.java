@@ -28,6 +28,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -38,7 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.util.ApplicationInfo;
 import com.quartercode.disconnected.util.ExitUtil;
-import com.quartercode.disconnected.util.storage.GlobalStorage;
 import de.matthiasmann.twl.Container;
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
@@ -54,6 +54,8 @@ public class GraphicsThread extends Thread {
 
     private static final Logger   LOGGER   = LoggerFactory.getLogger(GraphicsThread.class);
 
+    private final Set<URL>        themes;
+
     private LWJGLRenderer         renderer;
     private GUI                   gui;
     private ThemeManager          theme;
@@ -64,11 +66,15 @@ public class GraphicsThread extends Thread {
     private boolean               exit;
 
     /**
-     * Creates a new graphics update thread.
+     * Creates a new graphics update thread which loads the given twl themes.
+     * 
+     * @param themes The {@link URL}s of the themes that should be loaded.
      */
-    public GraphicsThread() {
+    public GraphicsThread(Set<URL> themes) {
 
         super("graphis");
+
+        this.themes = themes;
     }
 
     /**
@@ -183,7 +189,7 @@ public class GraphicsThread extends Thread {
             themeFileWriter.println("<!DOCTYPE themes PUBLIC \"-//www.matthiasmann.de//TWL-Theme//EN\"");
             themeFileWriter.println("\"http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd\">");
             themeFileWriter.println("<themes>");
-            for (URL themeURL : GlobalStorage.get("themes", URL.class)) {
+            for (URL themeURL : themes) {
                 themeFileWriter.println("<include filename=\"" + themeURL + "\"/>");
             }
             themeFileWriter.println("</themes>");
