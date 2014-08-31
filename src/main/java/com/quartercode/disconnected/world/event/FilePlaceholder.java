@@ -153,7 +153,7 @@ public class FilePlaceholder implements Serializable {
      */
     public String getName() {
 
-        return !isFileSystem() ? path[path.length - 1] : null;
+        return path[path.length - 1];
     }
 
     /**
