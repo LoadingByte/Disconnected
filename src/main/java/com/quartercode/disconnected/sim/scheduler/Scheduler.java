@@ -19,8 +19,8 @@
 package com.quartercode.disconnected.sim.scheduler;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -69,7 +69,7 @@ public class Scheduler extends AbstractFeature {
         super(name, holder);
 
         active = true;
-        scheduledTasks = new ArrayList<>();
+        scheduledTasks = new CopyOnWriteArrayList<>();
     }
 
     /**
@@ -141,13 +141,10 @@ public class Scheduler extends AbstractFeature {
             return;
         }
 
-        Iterator<ScheduledTask> iterator = scheduledTasks.iterator();
-        while (iterator.hasNext()) {
-            ScheduledTask scheduledTask = iterator.next();
-
+        for (ScheduledTask scheduledTask : scheduledTasks) {
             if (scheduledTask.getTask().getGroup().equals(group)) {
                 if (scheduledTask.getTask().isCancelled()) {
-                    iterator.remove();
+                    scheduledTasks.remove(scheduledTask);
                 } else {
                     scheduledTask.update(getHolder());
                 }
