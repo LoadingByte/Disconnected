@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.test.bridge.def;
+package com.quartercode.disconnected.test.bridge;
 
 import static com.quartercode.disconnected.test.ExtraActions.storeArgument;
 import static org.junit.Assert.assertEquals;
@@ -32,7 +32,7 @@ import org.jmock.lib.action.CustomAction;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import com.quartercode.disconnected.bridge.def.DefaultHandleInvocationProviderExtension;
+import com.quartercode.disconnected.bridge.DefaultHandleInvocationProviderExtension;
 import com.quartercode.disconnected.test.bridge.DummyEvents.Event1;
 import com.quartercode.disconnected.util.RunnableInvocationProvider;
 import com.quartercode.eventbridge.bridge.Bridge;

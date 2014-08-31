@@ -16,9 +16,8 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.bridge.def;
+package com.quartercode.disconnected.bridge;
 
-import com.quartercode.disconnected.bridge.HandleInvocationProviderExtension;
 import com.quartercode.disconnected.util.RunnableInvocationProvider;
 import com.quartercode.eventbridge.basic.AbstractBridgeModule;
 import com.quartercode.eventbridge.bridge.Bridge;

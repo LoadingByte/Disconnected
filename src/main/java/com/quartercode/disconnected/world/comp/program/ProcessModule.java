@@ -20,6 +20,7 @@ package com.quartercode.disconnected.world.comp.program;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -172,8 +173,8 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                     root.get(Process.ENVIRONMENT).set(environment);
 
                     // Get session program
-                    String sessionProgramFilePath = ProgramUtils.getCommonLocation(Session.class);
-                    ContentFile sessionProgramFile = (ContentFile) fsModule.get(FileSystemModule.GET_FILE).invoke(sessionProgramFilePath);
+                    List<String> path = Arrays.asList(environment.get("PATH").split(":"));
+                    ContentFile sessionProgramFile = ProgramUtils.getProgramFileFromPath(fsModule, path, ProgramUtils.getCommonFileName(Session.class));
                     if (sessionProgramFile == null) {
                         throw new IllegalStateException("Cannot start process module: Session program not found");
                     }
@@ -213,7 +214,8 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                 if (! ((Boolean) arguments[0])) {
                     holder.get(ROOT_PROCESS).get().get(Process.INTERRUPT).invoke();
                     // Kill the process tree after 5 seconds
-                    holder.get(SCHEDULER).schedule(new FunctionCallSchedulerTask(TickService.DEFAULT_TICKS_PER_SECOND * 5, "computerProgramUpdate", new FeatureDefinitionReference<FunctionDefinition<?>>(ProcessModule.class, KILL)));
+                    FeatureDefinitionReference<FunctionDefinition<?>> killFunction = new FeatureDefinitionReference<FunctionDefinition<?>>(ProcessModule.class, KILL);
+                    holder.get(SCHEDULER).schedule(new FunctionCallSchedulerTask(TickService.DEFAULT_TICKS_PER_SECOND * 5, "computerProgramUpdate", killFunction));
                 }
 
                 return invocation.next(arguments);

@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.world.gen;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import com.quartercode.disconnected.util.ProbabilityUtil;
 import com.quartercode.disconnected.util.RandomPool;
@@ -332,7 +333,7 @@ public class WorldGenerator {
         Configuration envConfig = new Configuration();
         EnvironmentVariable pathVariable = new EnvironmentVariable();
         pathVariable.get(EnvironmentVariable.NAME).set("PATH");
-        pathVariable.get(EnvironmentVariable.VALUE).set(CommonFiles.SYS_BIN_DIR + EnvironmentVariable.LIST_SEPARATOR + CommonFiles.USER_BIN_DIR);
+        pathVariable.get(EnvironmentVariable.SET_VALUE_LIST).invoke(Arrays.asList(CommonFiles.SYS_BIN_DIR, CommonFiles.USER_BIN_DIR));
         envConfig.get(Configuration.ENTRIES).add(pathVariable);
         addContentFile(fileSystem, FileUtils.getComponents(CommonFiles.ENVIRONMENT_CONFIG)[1], superuser, "rw--r---r---", envConfig);
     }

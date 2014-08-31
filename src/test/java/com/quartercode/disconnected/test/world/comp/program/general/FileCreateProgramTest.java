@@ -126,7 +126,7 @@ public class FileCreateProgramTest extends AbstractProgramTest {
         Event event = events.get(0);
         assertTrue("File create program did not send OutOfSpaceEvent", event instanceof FileCreateProgram.OutOfSpaceEvent);
         FileCreateProgram.OutOfSpaceEvent castedEvent = (FileCreateProgram.OutOfSpaceEvent) event;
-        assertEquals("File system which is out of space", CommonFiles.SYSTEM_MOUNTPOINT, castedEvent.getFileSystemMountpoint());
+        assertEquals("File system which is out of space", fileSystemMountpoint, castedEvent.getFileSystemMountpoint());
         assertTrue("Required space for a new file is greater than 0", castedEvent.getRequiredSpace() > 0);
     }
 

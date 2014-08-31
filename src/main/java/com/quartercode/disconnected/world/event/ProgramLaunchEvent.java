@@ -68,7 +68,7 @@ public class ProgramLaunchEvent extends EventBase {
     }
 
     /**
-     * Returns The program executor type (class object) that represents which kind of program was launched.
+     * Returns the program executor type (class object) that represents which kind of program was launched.
      * 
      * @return The type of the program executor.
      */

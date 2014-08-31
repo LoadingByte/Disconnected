@@ -423,6 +423,9 @@ public class FileManagerProgram extends DesktopProgramDescriptor {
                             } else if (event instanceof FileListProgram.MissingRightsEvent) {
                                 callback.missingRights();
                             }
+
+                            // The handler can be removed after the handling of one event because only one event is expected
+                            bridge.getModule(StandardHandlerModule.class).removeHandler(this);
                         }
 
                     }, predicate);
@@ -482,6 +485,9 @@ public class FileManagerProgram extends DesktopProgramDescriptor {
                             } else if (event instanceof FileCreateProgram.MissingRightsEvent) {
                                 callback.missingRights();
                             }
+
+                            // The handler can be removed after the handling of one event because only one event is expected
+                            bridge.getModule(StandardHandlerModule.class).removeHandler(this);
                         }
 
                     }, predicate);
@@ -519,15 +525,18 @@ public class FileManagerProgram extends DesktopProgramDescriptor {
                             } else if (event instanceof FileRemoveProgram.MissingRightsEvent) {
                                 callback.missingRights();
                             }
+
+                            // The handler can be removed after the handling of one event because only one event is expected
+                            bridge.getModule(StandardHandlerModule.class).removeHandler(this);
                         }
 
                     }, predicate);
 
                     // Launch FileRemoveProgram
-                    String fileCreateProgramPath = ProgramUtils.getCommonLocation(FileRemoveProgram.class);
+                    String fileRemoveProgramPath = ProgramUtils.getCommonLocation(FileRemoveProgram.class);
                     Map<FeatureDefinitionReference<?>, Object> executorProperties = new HashMap<>();
                     executorProperties.put(new FeatureDefinitionReference<>(FileRemoveProgram.class, FileRemoveProgram.PATH), FileUtils.resolvePath(getPath(), name));
-                    bridge.send(new ProgramLaunchCommandEvent(event.getPid(), fileCreateProgramPath, executorProperties));
+                    bridge.send(new ProgramLaunchCommandEvent(event.getPid(), fileRemoveProgramPath, executorProperties));
                 }
 
             });

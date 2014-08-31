@@ -417,7 +417,7 @@ public class FileRights extends WorldChildFeatureHolder<File<?>> implements Stri
 
     /**
      * Creates a new file rights storage.
-     * You can fill using {@link #GET}.
+     * You can fill it using {@link #SET}.
      */
     public FileRights() {
 

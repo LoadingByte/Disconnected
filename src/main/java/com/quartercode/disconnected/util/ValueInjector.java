@@ -18,7 +18,6 @@
 
 package com.quartercode.disconnected.util;
 
-import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -71,10 +70,10 @@ public class ValueInjector {
         Class<?> type = object.getClass();
 
         for (Field field : type.getDeclaredFields()) {
-            Annotation injectAnnotation = field.getAnnotation(InjectValue.class);
+            InjectValue injectAnnotation = field.getAnnotation(InjectValue.class);
             if (injectAnnotation != null) {
-                String valueName = ((InjectValue) injectAnnotation).value();
-                boolean allowNull = ((InjectValue) injectAnnotation).allowNull();
+                String valueName = injectAnnotation.value();
+                boolean allowNull = injectAnnotation.allowNull();
 
                 Object value = values.get(valueName);
                 if (value != null) {

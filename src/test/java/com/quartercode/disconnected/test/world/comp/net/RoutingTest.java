@@ -798,8 +798,8 @@ public class RoutingTest {
         public void run() {
 
             Packet packet = new Packet();
-            packet.get(Packet.SOURCE).set(generateAddress(sourceId, 0));
-            packet.get(Packet.DESTINATION).set(generateAddress(destinationId, 0));
+            packet.get(Packet.SOURCE).set(generateAddress(sourceId, 1));
+            packet.get(Packet.DESTINATION).set(generateAddress(destinationId, 1));
             packet.get(Packet.DATA).set("testdata");
 
             source.get(PacketProcessor.PROCESS).invoke(packet);

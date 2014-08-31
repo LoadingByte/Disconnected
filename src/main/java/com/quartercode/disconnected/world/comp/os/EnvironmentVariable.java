@@ -144,9 +144,9 @@ public class EnvironmentVariable extends ConfigurationEntry {
                 @SuppressWarnings ("unchecked")
                 List<String> list = (List<String>) arguments[0];
 
-                String value = "";
+                StringBuilder value = new StringBuilder();
                 for (String listValue : list) {
-                    value += ":" + listValue;
+                    value.append(":").append(listValue);
                 }
                 invocation.getHolder().get(VALUE).set(value.substring(1));
 

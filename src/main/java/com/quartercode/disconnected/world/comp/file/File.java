@@ -53,10 +53,8 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
     /**
      * The default {@link FileRights} string for every new file.
-     * 
-     * @deprecated TODO: Make the default {@link FileRights} dynamic.
      */
-    @Deprecated
+    // TODO: Make the default {@link FileRights} dynamic
     public static final String                               DEFAULT_FILE_RIGHTS = "rwd-r---r---";
 
     // ----- Properties -----
