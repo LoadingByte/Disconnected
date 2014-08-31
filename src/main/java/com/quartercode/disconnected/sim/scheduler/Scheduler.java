@@ -95,14 +95,20 @@ public class Scheduler extends AbstractFeature {
     }
 
     /**
-     * Returns the amount of {@link SchedulerTask}s that are currently scheduled.
+     * Returns all {@link SchedulerTask}s that are currently scheduled.
      * Such tasks must have been added using {@link #schedule(SchedulerTask)} before.
      * 
-     * @return The amount of currently scheduled tasks.
+     * @return All currently scheduled tasks.
      */
-    public int countTasks() {
+    public List<SchedulerTask> getTasks() {
 
-        return scheduledTasks.size();
+        List<SchedulerTask> tasks = new ArrayList<>();
+
+        for (ScheduledTask scheduledTask : scheduledTasks) {
+            tasks.add(scheduledTask.getTask());
+        }
+
+        return tasks;
     }
 
     /**

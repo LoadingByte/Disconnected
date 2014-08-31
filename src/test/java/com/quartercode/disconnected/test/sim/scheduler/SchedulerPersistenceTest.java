@@ -37,9 +37,9 @@ public class SchedulerPersistenceTest {
     public void testScheduleWithPersistence() throws JAXBException {
 
         Scheduler scheduler = new Scheduler("scheduler", new DefaultFeatureHolder());
-        scheduler.schedule(new TestScheduleTask(5, 2));
+        scheduler.schedule(new TestSchedulerTask(5, 2));
 
-        JAXBContext context = JAXBContext.newInstance(Scheduler.class, TestScheduleTask.class);
+        JAXBContext context = JAXBContext.newInstance(Scheduler.class, TestSchedulerTask.class);
         StringWriter serialized = new StringWriter();
         context.createMarshaller().marshal(scheduler, serialized);
         Scheduler copy = (Scheduler) context.createUnmarshaller().unmarshal(new StringReader(serialized.toString()));
@@ -51,15 +51,15 @@ public class SchedulerPersistenceTest {
         Assert.assertEquals("Scheduler task executions after 11 updates", 4, schedulerTaskExecutions);
     }
 
-    private static class TestScheduleTask extends SchedulerTaskAdapter {
+    private static class TestSchedulerTask extends SchedulerTaskAdapter {
 
         // JAXB constructor
         @SuppressWarnings ("unused")
-        protected TestScheduleTask() {
+        protected TestSchedulerTask() {
 
         }
 
-        private TestScheduleTask(int initialDelay, int periodicDelay) {
+        private TestSchedulerTask(int initialDelay, int periodicDelay) {
 
             super(initialDelay, periodicDelay, "testGroup");
         }

@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.test.sim.scheduler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.junit.Assert;
@@ -77,9 +78,18 @@ public class SchedulerTest {
     }
 
     @Test
+    public void testGetTasks() {
+
+        TestSchedulerTask task = new TestSchedulerTask(initialDelay, periodicDelay, "testGroup", 0);
+        scheduler.schedule(task);
+
+        Assert.assertEquals("Scheduled tasks", new ArrayList<>(Arrays.asList(task)), new ArrayList<>(scheduler.getTasks()));
+    }
+
+    @Test
     public void testSchedule() {
 
-        scheduler.schedule(new TestScheduleTask(initialDelay, periodicDelay, "testGroup", 0));
+        scheduler.schedule(new TestSchedulerTask(initialDelay, periodicDelay, "testGroup", 0));
 
         int updates = !periodic ? initialDelay * 3 : initialDelay + periodicDelay * 3;
         for (int update = 0; update < updates; update++) {
@@ -94,8 +104,8 @@ public class SchedulerTest {
     @Test
     public void testScheduleMultipleGroups() {
 
-        scheduler.schedule(new TestScheduleTask(initialDelay, periodicDelay, "testGroup1", 0));
-        scheduler.schedule(new TestScheduleTask(initialDelay, periodicDelay, "testGroup2", 1));
+        scheduler.schedule(new TestSchedulerTask(initialDelay, periodicDelay, "testGroup1", 0));
+        scheduler.schedule(new TestSchedulerTask(initialDelay, periodicDelay, "testGroup2", 1));
 
         int updates = initialDelay;
         for (int update = 0; update < updates; update++) {
@@ -106,11 +116,33 @@ public class SchedulerTest {
         Assert.assertTrue("Scheduler group 1 wasn't invoked while group 2 was", schedulerTaskExecutions[0] == 1 && schedulerTaskExecutions[1] == 0);
     }
 
-    private static class TestScheduleTask extends SchedulerTaskAdapter {
+    @Test
+    public void testDeactivate() {
+
+        scheduler.schedule(new TestSchedulerTask(initialDelay, periodicDelay, "testGroup", 0));
+
+        scheduler.setActive(false);
+
+        for (int update = 0; update < initialDelay; update++) {
+            scheduler.update("testGroup");
+        }
+
+        scheduler.setActive(true);
+
+        // Update the scheduler again to test whether the previous updates changed something they shouldn't have changed
+        for (int update = 0; update < initialDelay; update++) {
+            scheduler.update("testGroup");
+        }
+
+        int actualExecutions = schedulerTaskExecutions[0];
+        Assert.assertEquals("Scheduler task was executed although scheduler was deactivated", 1, actualExecutions);
+    }
+
+    private static class TestSchedulerTask extends SchedulerTaskAdapter {
 
         private final int trackingIndex;
 
-        private TestScheduleTask(int initialDelay, int periodicDelay, String group, int trackingIndex) {
+        private TestSchedulerTask(int initialDelay, int periodicDelay, String group, int trackingIndex) {
 
             super(initialDelay, periodicDelay, group);
 

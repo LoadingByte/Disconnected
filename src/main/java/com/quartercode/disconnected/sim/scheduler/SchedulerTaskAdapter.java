@@ -20,6 +20,9 @@ package com.quartercode.disconnected.sim.scheduler;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * An adapter class for {@link SchedulerTask} which implements common behavior.
@@ -123,6 +126,24 @@ public abstract class SchedulerTaskAdapter implements SchedulerTask, Cloneable {
         clone.cancelled = false;
 
         return clone;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        return EqualsBuilder.reflectionEquals(this, obj);
+    }
+
+    @Override
+    public String toString() {
+
+        return ToStringBuilder.reflectionToString(this);
     }
 
 }
