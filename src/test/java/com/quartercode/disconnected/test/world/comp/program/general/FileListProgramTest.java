@@ -47,7 +47,7 @@ import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.world.comp.program.general.FileListProgram;
-import com.quartercode.disconnected.world.comp.program.general.FileListProgram.SuccessEvent.FilePlaceholder;
+import com.quartercode.disconnected.world.event.FilePlaceholder;
 import com.quartercode.eventbridge.bridge.Event;
 
 public class FileListProgramTest extends AbstractProgramTest {
@@ -98,7 +98,7 @@ public class FileListProgramTest extends AbstractProgramTest {
         List<FilePlaceholder> files = new ArrayList<>( ((FileListProgram.SuccessEvent) event).getFiles());
         List<FilePlaceholder> actualFiles = new ArrayList<>();
         for (File<?> file : testFiles) {
-            String name = file.get(File.NAME).get();
+            String[] filePath = FileUtils.resolvePath(File.SEPARATOR + fileSystemMountpoint, file.get(File.GET_PATH).invoke()).substring(1).split(File.SEPARATOR);
             @SuppressWarnings ("unchecked")
             Class<? extends File<?>> type = (Class<? extends File<?>>) file.getClass();
             long size = file.get(File.GET_SIZE).invoke();
@@ -107,7 +107,7 @@ public class FileListProgramTest extends AbstractProgramTest {
             String owner = ownerObject == null ? null : ownerObject.get(User.NAME).get();
             Group groupObject = file.get(File.GROUP).get();
             String group = groupObject == null ? null : groupObject.get(Group.NAME).get();
-            actualFiles.add(new FilePlaceholder(name, type, size, rights, owner, group));
+            actualFiles.add(new FilePlaceholder(filePath, type, size, rights, owner, group));
         }
         assertEquals("Listed files", actualFiles, files);
     }
@@ -126,8 +126,8 @@ public class FileListProgramTest extends AbstractProgramTest {
         List<FilePlaceholder> actualFiles = new ArrayList<>();
         long terabyte = ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE);
         String rights = "rwd-r---r---";
-        actualFiles.add(new FilePlaceholder(CommonFiles.SYSTEM_MOUNTPOINT, RootFile.class, terabyte, rights, null, null));
-        actualFiles.add(new FilePlaceholder(CommonFiles.USER_MOUNTPOINT, RootFile.class, terabyte, rights, null, null));
+        actualFiles.add(new FilePlaceholder(new String[] { CommonFiles.SYSTEM_MOUNTPOINT }, RootFile.class, terabyte, rights, null, null));
+        actualFiles.add(new FilePlaceholder(new String[] { CommonFiles.USER_MOUNTPOINT }, RootFile.class, terabyte, rights, null, null));
         assertEquals("Listed files", actualFiles, files);
     }
 

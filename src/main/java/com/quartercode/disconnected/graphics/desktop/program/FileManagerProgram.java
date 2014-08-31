@@ -45,8 +45,8 @@ import com.quartercode.disconnected.world.comp.program.ProgramEvent.ProgramEvent
 import com.quartercode.disconnected.world.comp.program.ProgramUtils;
 import com.quartercode.disconnected.world.comp.program.general.FileCreateProgram;
 import com.quartercode.disconnected.world.comp.program.general.FileListProgram;
-import com.quartercode.disconnected.world.comp.program.general.FileListProgram.SuccessEvent.FilePlaceholder;
 import com.quartercode.disconnected.world.comp.program.general.FileRemoveProgram;
+import com.quartercode.disconnected.world.event.FilePlaceholder;
 import com.quartercode.disconnected.world.event.ProgramLaunchCommandEvent;
 import com.quartercode.disconnected.world.event.ProgramLaunchInfoRequestEvent;
 import com.quartercode.disconnected.world.event.ProgramLaunchInfoRequestEvent.ProgramLaunchInfoResponseEvent;

@@ -19,13 +19,9 @@
 package com.quartercode.disconnected.world.comp.program.general;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -34,24 +30,20 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.world.comp.file.File;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
-import com.quartercode.disconnected.world.comp.file.FileRights;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileRight;
-import com.quartercode.disconnected.world.comp.file.FileSystem;
 import com.quartercode.disconnected.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.world.comp.file.FileSystemModule.KnownFileSystem;
 import com.quartercode.disconnected.world.comp.file.FileUtils;
 import com.quartercode.disconnected.world.comp.file.ParentFile;
-import com.quartercode.disconnected.world.comp.file.RootFile;
 import com.quartercode.disconnected.world.comp.file.UnknownMountpointException;
 import com.quartercode.disconnected.world.comp.os.CommonFiles;
-import com.quartercode.disconnected.world.comp.os.Group;
 import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.world.comp.os.User;
 import com.quartercode.disconnected.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.world.comp.program.Process;
 import com.quartercode.disconnected.world.comp.program.ProgramEvent;
 import com.quartercode.disconnected.world.comp.program.ProgramExecutor;
-import com.quartercode.disconnected.world.comp.program.general.FileListProgram.SuccessEvent.FilePlaceholder;
+import com.quartercode.disconnected.world.event.FilePlaceholder;
 import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
@@ -113,22 +105,9 @@ public class FileListProgram extends ProgramExecutor {
 
                 if (path.equals(File.SEPARATOR)) {
                     List<FilePlaceholder> files = new ArrayList<>();
+
                     for (KnownFileSystem fileSystem : fsModule.get(FileSystemModule.GET_MOUNTED).invoke()) {
-                        String name = fileSystem.get(KnownFileSystem.MOUNTPOINT).get();
-
-                        FileSystem actualFs = fileSystem.get(KnownFileSystem.FILE_SYSTEM).get();
-                        long size = actualFs.get(File.GET_SIZE).invoke();
-
-                        RootFile root = actualFs.get(FileSystem.ROOT).get();
-                        String rights = root.get(File.RIGHTS).get().get(FileRights.TO_STRING).invoke();
-
-                        User ownerObject = root.get(File.OWNER).get();
-                        String owner = ownerObject == null ? null : ownerObject.get(User.NAME).get();
-
-                        Group groupObject = root.get(File.GROUP).get();
-                        String group = groupObject == null ? null : groupObject.get(Group.NAME).get();
-
-                        files.add(new FilePlaceholder(name, RootFile.class, size, rights, owner, group));
+                        files.add(new FilePlaceholder(fileSystem));
                     }
 
                     bridge.send(new SuccessEvent(computerId, pid, files));
@@ -152,23 +131,10 @@ public class FileListProgram extends ProgramExecutor {
                             bridge.send(new MissingRightsEvent(computerId, pid));
                         } else {
                             List<FilePlaceholder> files = new ArrayList<>();
+
+                            String pathMountpoint = FileUtils.getComponents(path)[0];
                             for (File<?> file : dir.get(ParentFile.CHILDREN).get()) {
-                                String name = file.get(File.NAME).get();
-
-                                // This unchecked cast does always work since Class<? extends File> is just casted to Class<? extends File<?>>
-                                @SuppressWarnings ("unchecked")
-                                Class<? extends File<?>> type = (Class<? extends File<?>>) file.getClass();
-
-                                long size = file.get(File.GET_SIZE).invoke();
-                                String rights = file.get(File.RIGHTS).get().get(FileRights.TO_STRING).invoke();
-
-                                User ownerObject = file.get(File.OWNER).get();
-                                String owner = ownerObject == null ? null : ownerObject.get(User.NAME).get();
-
-                                Group groupObject = file.get(File.GROUP).get();
-                                String group = groupObject == null ? null : groupObject.get(Group.NAME).get();
-
-                                files.add(new FilePlaceholder(name, type, size, rights, owner, group));
+                                files.add(new FilePlaceholder(pathMountpoint, file));
                             }
 
                             bridge.send(new SuccessEvent(computerId, pid, files));
@@ -258,124 +224,6 @@ public class FileListProgram extends ProgramExecutor {
         public List<FilePlaceholder> getFiles() {
 
             return files;
-        }
-
-        /**
-         * A file placeholder represents a {@link File} object by storing commonly used data about it.
-         * File systems are represented by their {@link RootFile}s.
-         */
-        public static class FilePlaceholder implements Serializable {
-
-            private static final long              serialVersionUID = 2316854110693641190L;
-
-            private final String                   name;
-            private final Class<? extends File<?>> type;
-            private final long                     size;
-            private final String                   rights;
-            private final String                   owner;
-            private final String                   group;
-
-            /**
-             * Creates a new file placeholder.
-             * 
-             * @param name The name of the represented file.
-             * @param type The type (class object) of the represented file.
-             * @param size The total size of the represented file.
-             *        If the placeholder represents a file system, the size of that file system should be used.
-             * @param rights A {@link FileRights}s string which stores the file rights of the represented file.
-             * @param owner The name of the user that owns the represented file.
-             * @param group The name of the group that is assigned to the represented file.
-             */
-            public FilePlaceholder(String name, Class<? extends File<?>> type, long size, String rights, String owner, String group) {
-
-                this.name = name;
-                this.type = type;
-                this.size = size;
-                this.rights = rights;
-                this.owner = owner;
-                this.group = group;
-            }
-
-            /**
-             * Returns the name of the represented file.
-             * 
-             * @return The file name.
-             */
-            public String getName() {
-
-                return name;
-            }
-
-            /**
-             * Returns the type (class object) of the represented file.
-             * 
-             * @return The file type.
-             */
-            public Class<? extends File<?>> getType() {
-
-                return type;
-            }
-
-            /**
-             * Returns the total size of the represented file.
-             * If the placeholder represents a file system, the size of that file system is used.
-             * 
-             * @return The file/file system size.
-             */
-            public long getSize() {
-
-                return size;
-            }
-
-            /**
-             * Returns a {@link FileRights}s string which stores the file rights of the represented file.
-             * 
-             * @return The file rights as a string.
-             * @see FileRights#TO_STRING
-             */
-            public String getRights() {
-
-                return rights;
-            }
-
-            /**
-             * Returns the name of the user which owns the represented file.
-             * 
-             * @return The name of the file owner.
-             */
-            public String getOwner() {
-
-                return owner;
-            }
-
-            /**
-             * Returns The name of the group which is assigned to the represented file.
-             * 
-             * @return The name of the file group.
-             */
-            public String getGroup() {
-
-                return group;
-            }
-
-            @Override
-            public int hashCode() {
-
-                return HashCodeBuilder.reflectionHashCode(this);
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-
-                return EqualsBuilder.reflectionEquals(this, obj);
-            }
-
-            @Override
-            public String toString() {
-
-                return ToStringBuilder.reflectionToString(this);
-            }
-
         }
 
     }

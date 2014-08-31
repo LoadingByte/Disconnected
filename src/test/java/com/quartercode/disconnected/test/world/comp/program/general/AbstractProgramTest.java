@@ -48,7 +48,7 @@ public abstract class AbstractProgramTest {
     @Rule
     public JUnitRuleMockery   context = new JUnitRuleMockery();
 
-    private final String      fileSystemMountpoint;
+    protected final String    fileSystemMountpoint;
 
     protected Bridge          bridge  = context.mock(Bridge.class);
     protected World           world;
