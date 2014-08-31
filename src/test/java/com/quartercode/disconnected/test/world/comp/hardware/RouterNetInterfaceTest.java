@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.test.world.comp.hardware;
 
-import org.junit.Assert;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.world.comp.hardware.NodeNetInterface;
@@ -69,8 +69,8 @@ public class RouterNetInterfaceTest {
 
         routerInterface.get(RouterNetInterface.BACKBONE_CONNECTION).set(backbone);
 
-        Assert.assertEquals("Router -> Backbone connection", backbone, routerInterface.get(RouterNetInterface.BACKBONE_CONNECTION).get());
-        Assert.assertTrue("Backbone -> Router connection not added", backbone.get(Backbone.CHILDREN).get().contains(routerInterface));
+        assertEquals("Router -> Backbone connection", backbone, routerInterface.get(RouterNetInterface.BACKBONE_CONNECTION).get());
+        assertTrue("Backbone -> Router connection not added", backbone.get(Backbone.CHILDREN).get().contains(routerInterface));
     }
 
     @Test
@@ -79,8 +79,8 @@ public class RouterNetInterfaceTest {
         routerInterface.get(RouterNetInterface.BACKBONE_CONNECTION).set(backbone);
         routerInterface.get(RouterNetInterface.BACKBONE_CONNECTION).set(null);
 
-        Assert.assertNull("Router -> Backbone connection", routerInterface.get(RouterNetInterface.BACKBONE_CONNECTION).get());
-        Assert.assertFalse("Backbone -> Router connection not removed", backbone.get(Backbone.CHILDREN).get().contains(routerInterface));
+        assertNull("Router -> Backbone connection", routerInterface.get(RouterNetInterface.BACKBONE_CONNECTION).get());
+        assertFalse("Backbone -> Router connection not removed", backbone.get(Backbone.CHILDREN).get().contains(routerInterface));
     }
 
     @Test
@@ -136,8 +136,8 @@ public class RouterNetInterfaceTest {
     private void assertConnected(RouterNetInterface routerInterface, RouterNetInterface neighbour, boolean connected) {
 
         String messageEnd = " connection" + (connected ? " " : " not ") + "available";
-        Assert.assertTrue("Router -> Neighbour" + messageEnd, routerInterface.get(RouterNetInterface.NEIGHBOURS).get().contains(neighbour) == connected);
-        Assert.assertTrue("Neighbour -> Router" + messageEnd, neighbour.get(RouterNetInterface.NEIGHBOURS).get().contains(routerInterface) == connected);
+        assertTrue("Router -> Neighbour" + messageEnd, routerInterface.get(RouterNetInterface.NEIGHBOURS).get().contains(neighbour) == connected);
+        assertTrue("Neighbour -> Router" + messageEnd, neighbour.get(RouterNetInterface.NEIGHBOURS).get().contains(routerInterface) == connected);
     }
 
     @Test
@@ -209,8 +209,8 @@ public class RouterNetInterfaceTest {
 
         String messageEnd = " connection" + (connected ? " " : " not ") + "available";
 
-        Assert.assertTrue("Router -> Child" + messageEnd, routerInterface.get(RouterNetInterface.CHILDREN).get().contains(child) == connected);
-        Assert.assertTrue("Child -> Router" + messageEnd, routerInterface.equals(child.get(NodeNetInterface.CONNECTION).get()) == connected);
+        assertTrue("Router -> Child" + messageEnd, routerInterface.get(RouterNetInterface.CHILDREN).get().contains(child) == connected);
+        assertTrue("Child -> Router" + messageEnd, routerInterface.equals(child.get(NodeNetInterface.CONNECTION).get()) == connected);
     }
 
 }

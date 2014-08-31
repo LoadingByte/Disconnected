@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.test.launch;
 
+import static org.junit.Assert.assertEquals;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -25,7 +26,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -63,7 +63,7 @@ public class StreamGobblerTest {
         StreamGobbler gobbler = new StreamGobbler(prefix, inputStream, new PrintStream(outputStream));
         gobbler.start();
         gobbler.join();
-        Assert.assertEquals("Output", (prefix == null ? "" : prefix) + input + System.getProperty("line.separator"), outputStream.toString());
+        assertEquals("Output", (prefix == null ? "" : prefix) + input + System.getProperty("line.separator"), outputStream.toString());
     }
 
 }

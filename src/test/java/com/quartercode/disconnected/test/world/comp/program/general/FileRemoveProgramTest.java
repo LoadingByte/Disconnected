@@ -21,7 +21,7 @@ package com.quartercode.disconnected.test.world.comp.program.general;
 import static com.quartercode.disconnected.test.ExtraAssert.assertCollectionSize;
 import static com.quartercode.disconnected.world.comp.file.FileUtils.getComponents;
 import static com.quartercode.disconnected.world.comp.program.ProgramUtils.getCommonLocation;
-import org.junit.Assert;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
@@ -75,16 +75,16 @@ public class FileRemoveProgramTest extends AbstractProgramTest {
     @Test
     public void testSuccess() {
 
-        Assert.assertNotNull("Not removed file does not exist", fileSystem.get(FileSystem.GET_FILE).invoke(LOCAL_PATH));
+        assertNotNull("Not removed file does not exist", fileSystem.get(FileSystem.GET_FILE).invoke(LOCAL_PATH));
 
         restartEventRecording();
         executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get(), PATH);
 
         assertCollectionSize("File delete program did not send correct number of events", events, 1);
         Event event = events.get(0);
-        Assert.assertTrue("File remove program did not send SuccessEvent", event instanceof FileRemoveProgram.SuccessEvent);
+        assertTrue("File remove program did not send SuccessEvent", event instanceof FileRemoveProgram.SuccessEvent);
 
-        Assert.assertNull("Removed file does still exist", fileSystem.get(FileSystem.GET_FILE).invoke(LOCAL_PATH));
+        assertNull("Removed file does still exist", fileSystem.get(FileSystem.GET_FILE).invoke(LOCAL_PATH));
     }
 
     @Test
@@ -95,8 +95,8 @@ public class FileRemoveProgramTest extends AbstractProgramTest {
 
         assertCollectionSize("File delete program did not send correct number of events", events, 1);
         Event event = events.get(0);
-        Assert.assertTrue("File remove program did not send UnknownMountpointEvent", event instanceof FileRemoveProgram.UnknownMountpointEvent);
-        Assert.assertEquals("Unknown mountpoint", "testunknown", ((FileRemoveProgram.UnknownMountpointEvent) event).getMountpoint());
+        assertTrue("File remove program did not send UnknownMountpointEvent", event instanceof FileRemoveProgram.UnknownMountpointEvent);
+        assertEquals("Unknown mountpoint", "testunknown", ((FileRemoveProgram.UnknownMountpointEvent) event).getMountpoint());
     }
 
     @Test
@@ -113,8 +113,8 @@ public class FileRemoveProgramTest extends AbstractProgramTest {
 
         assertCollectionSize("File delete program did not send correct number of events", events, 1);
         Event event = events.get(0);
-        Assert.assertTrue("File remove program did not send InvalidPathEvent", event instanceof FileRemoveProgram.InvalidPathEvent);
-        Assert.assertEquals("Invalid path", PATH, ((FileRemoveProgram.InvalidPathEvent) event).getPath());
+        assertTrue("File remove program did not send InvalidPathEvent", event instanceof FileRemoveProgram.InvalidPathEvent);
+        assertEquals("Invalid path", PATH, ((FileRemoveProgram.InvalidPathEvent) event).getPath());
     }
 
     @Test
@@ -137,7 +137,7 @@ public class FileRemoveProgramTest extends AbstractProgramTest {
 
         assertCollectionSize("File delete program did not send correct number of events", events, 1);
         Event event = events.get(0);
-        Assert.assertTrue("File remove program did not send MissingRightsEvent", event instanceof FileRemoveProgram.MissingRightsEvent);
+        assertTrue("File remove program did not send MissingRightsEvent", event instanceof FileRemoveProgram.MissingRightsEvent);
     }
 
 }

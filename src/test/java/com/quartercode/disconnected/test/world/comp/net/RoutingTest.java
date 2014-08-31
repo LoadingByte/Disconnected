@@ -18,11 +18,11 @@
 
 package com.quartercode.disconnected.test.world.comp.net;
 
+import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -806,7 +806,7 @@ public class RoutingTest {
 
             String sourceString = sourceId.get(NetID.TO_STRING).invoke();
             String destinationString = destinationId.get(NetID.TO_STRING).invoke();
-            Assert.assertTrue("Packet wasn't received by planned destination (" + sourceString + " -> " + destinationString + ")", receivedPacket);
+            assertTrue("Packet wasn't received by planned destination (" + sourceString + " -> " + destinationString + ")", receivedPacket);
         }
 
     }

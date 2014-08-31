@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.test.world.gen;
 
+import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.util.List;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import com.quartercode.disconnected.DefaultData;
@@ -43,7 +43,7 @@ public class LocationGeneratorTest {
         for (Location location : locations) {
             for (Location location2 : locations) {
                 if (location != location2 && location.equals(location2)) {
-                    Assert.fail("Location is duplicate");
+                    fail("Location is duplicate");
                 }
             }
         }

@@ -19,11 +19,12 @@
 package com.quartercode.disconnected.test.world.event;
 
 import static com.quartercode.disconnected.test.ExtraActions.storeArgument;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -87,12 +88,12 @@ public class ProgramLaunchInfoRequestEventHandlerTest {
 
         handler.handle(new ProgramLaunchInfoRequestEvent(), returnEventSender);
 
-        Assert.assertEquals("Amount of events that were sent back by the handler", 1, returnEvents.size());
+        assertEquals("Amount of events that were sent back by the handler", 1, returnEvents.size());
         Event rawReturnEvent = returnEvents.get(0);
-        Assert.assertTrue("Event that was sent back by the handler is a '" + rawReturnEvent.getClass().getName() + "' (ProgramLaunchInfoResponseEvent required)", rawReturnEvent instanceof ProgramLaunchInfoResponseEvent);
+        assertTrue("Event that was sent back by the handler is a '" + rawReturnEvent.getClass().getName() + "' (ProgramLaunchInfoResponseEvent required)", rawReturnEvent instanceof ProgramLaunchInfoResponseEvent);
         ProgramLaunchInfoResponseEvent returnEvent = (ProgramLaunchInfoResponseEvent) rawReturnEvent;
-        Assert.assertEquals("Computer id that is stored in the return event", playerComputer.getId(), returnEvent.getComputerId());
-        Assert.assertEquals("Pid that is stored in the return event", expectedPid, returnEvent.getPid());
+        assertEquals("Computer id that is stored in the return event", playerComputer.getId(), returnEvent.getComputerId());
+        assertEquals("Pid that is stored in the return event", expectedPid, returnEvent.getPid());
     }
 
     private static class ProgramLaunchInfoRequestEventHandlerMock extends ProgramLaunchInfoRequestEventHandler {

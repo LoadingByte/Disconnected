@@ -18,10 +18,10 @@
 
 package com.quartercode.disconnected.test.world.comp.file;
 
+import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -79,7 +79,7 @@ public class FileAddActionRootTest extends AbstractFileActionTest {
     private void actuallyTestExecute(FileAddAction action) {
 
         action.get(FileAddAction.EXECUTE).invoke();
-        Assert.assertEquals("Resolved file", file, fileSystem.get(FileSystem.GET_FILE).invoke(addFilePath));
+        assertEquals("Resolved file", file, fileSystem.get(FileSystem.GET_FILE).invoke(addFilePath));
     }
 
     @Test (expected = OccupiedPathException.class)

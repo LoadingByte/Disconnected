@@ -21,7 +21,8 @@ package com.quartercode.disconnected.test.world.comp.program.general;
 import static com.quartercode.disconnected.test.ExtraAssert.assertCollectionSize;
 import static com.quartercode.disconnected.world.comp.file.FileUtils.getComponents;
 import static com.quartercode.disconnected.world.comp.program.ProgramUtils.getCommonLocation;
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.FileAddAction;
@@ -67,7 +68,7 @@ public class FileCreateProgramTest extends AbstractProgramTest {
 
         assertCollectionSize("File create program did not send correct number of events", events, 1);
         Event event = events.get(0);
-        Assert.assertTrue("File create program did not send SuccessEvent", event instanceof FileCreateProgram.SuccessEvent);
+        assertTrue("File create program did not send SuccessEvent", event instanceof FileCreateProgram.SuccessEvent);
     }
 
     @Test
@@ -78,8 +79,8 @@ public class FileCreateProgramTest extends AbstractProgramTest {
 
         assertCollectionSize("File create program did not send correct number of events", events, 1);
         Event event = events.get(0);
-        Assert.assertTrue("File create program did not send UnknownMountpointEvent", event instanceof FileCreateProgram.UnknownMountpointEvent);
-        Assert.assertEquals("Unknown mountpoint", "testunknown", ((FileCreateProgram.UnknownMountpointEvent) event).getMountpoint());
+        assertTrue("File create program did not send UnknownMountpointEvent", event instanceof FileCreateProgram.UnknownMountpointEvent);
+        assertEquals("Unknown mountpoint", "testunknown", ((FileCreateProgram.UnknownMountpointEvent) event).getMountpoint());
     }
 
     @Test
@@ -93,8 +94,8 @@ public class FileCreateProgramTest extends AbstractProgramTest {
 
         assertCollectionSize("File create program did not send correct number of events", events, 1);
         Event event = events.get(0);
-        Assert.assertTrue("File create program did not send InvalidPathEvent", event instanceof FileCreateProgram.InvalidPathEvent);
-        Assert.assertEquals("Invalid path", PATH, ((FileCreateProgram.InvalidPathEvent) event).getPath());
+        assertTrue("File create program did not send InvalidPathEvent", event instanceof FileCreateProgram.InvalidPathEvent);
+        assertEquals("Invalid path", PATH, ((FileCreateProgram.InvalidPathEvent) event).getPath());
     }
 
     @Test
@@ -108,8 +109,8 @@ public class FileCreateProgramTest extends AbstractProgramTest {
 
         assertCollectionSize("File create program did not send correct number of events", events, 1);
         Event event = events.get(0);
-        Assert.assertTrue("File create program did not send OccupiedPathEvent", event instanceof FileCreateProgram.OccupiedPathEvent);
-        Assert.assertEquals("Occupied path", PATH, ((FileCreateProgram.OccupiedPathEvent) event).getPath());
+        assertTrue("File create program did not send OccupiedPathEvent", event instanceof FileCreateProgram.OccupiedPathEvent);
+        assertEquals("Occupied path", PATH, ((FileCreateProgram.OccupiedPathEvent) event).getPath());
     }
 
     @Test
@@ -123,10 +124,10 @@ public class FileCreateProgramTest extends AbstractProgramTest {
 
         assertCollectionSize("File create program did not send correct number of events", events, 1);
         Event event = events.get(0);
-        Assert.assertTrue("File create program did not send OutOfSpaceEvent", event instanceof FileCreateProgram.OutOfSpaceEvent);
+        assertTrue("File create program did not send OutOfSpaceEvent", event instanceof FileCreateProgram.OutOfSpaceEvent);
         FileCreateProgram.OutOfSpaceEvent castedEvent = (FileCreateProgram.OutOfSpaceEvent) event;
-        Assert.assertEquals("File system which is out of space", CommonFiles.SYSTEM_MOUNTPOINT, castedEvent.getFileSystemMountpoint());
-        Assert.assertTrue("Required space for a new file is greater than 0", castedEvent.getRequiredSpace() > 0);
+        assertEquals("File system which is out of space", CommonFiles.SYSTEM_MOUNTPOINT, castedEvent.getFileSystemMountpoint());
+        assertTrue("Required space for a new file is greater than 0", castedEvent.getRequiredSpace() > 0);
     }
 
     @Test
@@ -147,7 +148,7 @@ public class FileCreateProgramTest extends AbstractProgramTest {
 
         assertCollectionSize("File create program did not send correct number of events", events, 1);
         Event event = events.get(0);
-        Assert.assertTrue("File create program did not send MissingRightsEvent", event instanceof FileCreateProgram.MissingRightsEvent);
+        assertTrue("File create program did not send MissingRightsEvent", event instanceof FileCreateProgram.MissingRightsEvent);
     }
 
 }

@@ -19,13 +19,13 @@
 package com.quartercode.disconnected.test.sim.scheduler;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import static org.junit.Assert.assertTrue;
 import java.io.StringReader;
 import java.io.StringWriter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.classmod.base.FeatureDefinition;
@@ -60,7 +60,7 @@ public class FunctionCallSchedulerTaskTest {
     public void testSchedule() {
 
         scheduler.update("testGroup");
-        Assert.assertTrue("Function call scheduler task didn't call test function", executedTestFunction);
+        assertTrue("Function call scheduler task didn't call test function", executedTestFunction);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class FunctionCallSchedulerTaskTest {
         Scheduler copy = schedulerHolderCopy.get(TestFeatureHolder.SCHEDULER);
 
         copy.update("testGroup");
-        Assert.assertTrue("Function call scheduler task didn't call test function", executedTestFunction);
+        assertTrue("Function call scheduler task didn't call test function", executedTestFunction);
     }
 
     @XmlRootElement

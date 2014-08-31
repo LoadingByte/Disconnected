@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.test.world.comp.hardware;
 
-import org.junit.Assert;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.world.comp.hardware.NodeNetInterface;
@@ -51,9 +51,9 @@ public class NodeNetInterfaceTest {
 
         nodeInterface.get(NodeNetInterface.CONNECTION).set(connection);
 
-        Assert.assertNull("Net id that should've been cleared", nodeInterface.get(NodeNetInterface.NET_ID).get());
-        Assert.assertEquals("Child -> Router connection", connection, nodeInterface.get(NodeNetInterface.CONNECTION).get());
-        Assert.assertTrue("Router -> Child connection not added", connection.get(RouterNetInterface.CHILDREN).get().contains(nodeInterface));
+        assertNull("Net id that should've been cleared", nodeInterface.get(NodeNetInterface.NET_ID).get());
+        assertEquals("Child -> Router connection", connection, nodeInterface.get(NodeNetInterface.CONNECTION).get());
+        assertTrue("Router -> Child connection not added", connection.get(RouterNetInterface.CHILDREN).get().contains(nodeInterface));
     }
 
     @Test
@@ -62,8 +62,8 @@ public class NodeNetInterfaceTest {
         nodeInterface.get(NodeNetInterface.CONNECTION).set(connection);
         nodeInterface.get(NodeNetInterface.CONNECTION).set(null);
 
-        Assert.assertNull("Child -> Router connection", nodeInterface.get(NodeNetInterface.CONNECTION).get());
-        Assert.assertFalse("Router -> Child connection not removed", connection.get(RouterNetInterface.CHILDREN).get().contains(nodeInterface));
+        assertNull("Child -> Router connection", nodeInterface.get(NodeNetInterface.CONNECTION).get());
+        assertFalse("Router -> Child connection not removed", connection.get(RouterNetInterface.CHILDREN).get().contains(nodeInterface));
     }
 
     @Test

@@ -18,10 +18,11 @@
 
 package com.quartercode.disconnected.test.world.comp.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -95,7 +96,7 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
     private void actuallyTestExecute(FileRemoveAction action) {
 
         action.get(FileRemoveAction.EXECUTE).invoke();
-        Assert.assertEquals("Resolved file for deleted file", null, fileSystem.get(FileSystem.GET_FILE).invoke(removeFilePath));
+        assertEquals("Resolved file for deleted file", null, fileSystem.get(FileSystem.GET_FILE).invoke(removeFilePath));
     }
 
     @Test
@@ -132,10 +133,10 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
         childFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("--d---------");
         executable[3] = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
 
-        Assert.assertTrue("File remove action is executable although no required right is set", !executable[0]);
-        Assert.assertTrue("File remove action is executable although the delete right is not set on the child file", !executable[1]);
-        Assert.assertTrue("File remove action is executable although the delete right is not set on the file for removal", !executable[2]);
-        Assert.assertTrue("File remove action is not executable although all required rights are set", executable[3]);
+        assertTrue("File remove action is executable although no required right is set", !executable[0]);
+        assertTrue("File remove action is executable although the delete right is not set on the child file", !executable[1]);
+        assertTrue("File remove action is executable although the delete right is not set on the file for removal", !executable[2]);
+        assertTrue("File remove action is not executable although all required rights are set", executable[3]);
     }
 
 }

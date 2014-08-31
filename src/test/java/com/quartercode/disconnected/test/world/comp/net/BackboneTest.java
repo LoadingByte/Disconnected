@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.test.world.comp.net;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.world.comp.hardware.RouterNetInterface;
@@ -96,8 +96,8 @@ public class BackboneTest {
 
         String messageEnd = " connection" + (connected ? " " : " not ") + "available";
 
-        Assert.assertTrue("Router -> Child" + messageEnd, backbone.get(Backbone.CHILDREN).get().contains(child) == connected);
-        Assert.assertTrue("Child -> Router" + messageEnd, backbone.equals(child.get(RouterNetInterface.BACKBONE_CONNECTION).get()) == connected);
+        assertTrue("Router -> Child" + messageEnd, backbone.get(Backbone.CHILDREN).get().contains(child) == connected);
+        assertTrue("Child -> Router" + messageEnd, backbone.equals(child.get(RouterNetInterface.BACKBONE_CONNECTION).get()) == connected);
     }
 
 }

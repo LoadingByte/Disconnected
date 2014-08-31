@@ -18,10 +18,10 @@
 
 package com.quartercode.disconnected.test.world.comp;
 
+import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -62,7 +62,7 @@ public class ByteUnitTest {
     @Test
     public void testConvert() {
 
-        Assert.assertEquals(source + " " + sourceUnit + " to " + targetUnit, target, targetUnit.convert(source, sourceUnit));
+        assertEquals(source + " " + sourceUnit + " to " + targetUnit, target, targetUnit.convert(source, sourceUnit));
     }
 
 }

@@ -21,9 +21,10 @@ package com.quartercode.disconnected.test.world.comp.program.general;
 import static com.quartercode.disconnected.test.ExtraAssert.assertCollectionSize;
 import static com.quartercode.disconnected.world.comp.file.FileUtils.getComponents;
 import static com.quartercode.disconnected.world.comp.program.ProgramUtils.getCommonLocation;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.world.comp.ByteUnit;
@@ -92,7 +93,7 @@ public class FileListProgramTest extends AbstractProgramTest {
 
         assertCollectionSize("File list program did not send correct number of events", events, 1);
         Event event = events.get(0);
-        Assert.assertTrue("File list program did not send SuccessEvent", event instanceof FileListProgram.SuccessEvent);
+        assertTrue("File list program did not send SuccessEvent", event instanceof FileListProgram.SuccessEvent);
 
         List<FilePlaceholder> files = new ArrayList<>( ((FileListProgram.SuccessEvent) event).getFiles());
         List<FilePlaceholder> actualFiles = new ArrayList<>();
@@ -108,7 +109,7 @@ public class FileListProgramTest extends AbstractProgramTest {
             String group = groupObject == null ? null : groupObject.get(Group.NAME).get();
             actualFiles.add(new FilePlaceholder(name, type, size, rights, owner, group));
         }
-        Assert.assertEquals("Listed files", actualFiles, files);
+        assertEquals("Listed files", actualFiles, files);
     }
 
     @Test
@@ -119,7 +120,7 @@ public class FileListProgramTest extends AbstractProgramTest {
 
         assertCollectionSize("File list program did not send correct number of events", events, 1);
         Event event = events.get(0);
-        Assert.assertTrue("File list program did not send SuccessEvent", event instanceof FileListProgram.SuccessEvent);
+        assertTrue("File list program did not send SuccessEvent", event instanceof FileListProgram.SuccessEvent);
 
         List<FilePlaceholder> files = new ArrayList<>( ((FileListProgram.SuccessEvent) event).getFiles());
         List<FilePlaceholder> actualFiles = new ArrayList<>();
@@ -127,7 +128,7 @@ public class FileListProgramTest extends AbstractProgramTest {
         String rights = "rwd-r---r---";
         actualFiles.add(new FilePlaceholder(CommonFiles.SYSTEM_MOUNTPOINT, RootFile.class, terabyte, rights, null, null));
         actualFiles.add(new FilePlaceholder(CommonFiles.USER_MOUNTPOINT, RootFile.class, terabyte, rights, null, null));
-        Assert.assertEquals("Listed files", actualFiles, files);
+        assertEquals("Listed files", actualFiles, files);
     }
 
     @Test
@@ -138,8 +139,8 @@ public class FileListProgramTest extends AbstractProgramTest {
 
         assertCollectionSize("File list program did not send correct number of events", events, 1);
         Event event = events.get(0);
-        Assert.assertTrue("File list program did not send UnknownMountpointEvent", event instanceof FileListProgram.UnknownMountpointEvent);
-        Assert.assertEquals("Unknown mountpoint", "testunknown", ((FileListProgram.UnknownMountpointEvent) event).getMountpoint());
+        assertTrue("File list program did not send UnknownMountpointEvent", event instanceof FileListProgram.UnknownMountpointEvent);
+        assertEquals("Unknown mountpoint", "testunknown", ((FileListProgram.UnknownMountpointEvent) event).getMountpoint());
     }
 
     @Test
@@ -154,8 +155,8 @@ public class FileListProgramTest extends AbstractProgramTest {
 
         assertCollectionSize("File list program did not send correct number of events", events, 1);
         Event event = events.get(0);
-        Assert.assertTrue("File list program did not send InvalidPathEvent", event instanceof FileListProgram.InvalidPathEvent);
-        Assert.assertEquals("Invalid path", PATH, ((FileListProgram.InvalidPathEvent) event).getPath());
+        assertTrue("File list program did not send InvalidPathEvent", event instanceof FileListProgram.InvalidPathEvent);
+        assertEquals("Invalid path", PATH, ((FileListProgram.InvalidPathEvent) event).getPath());
     }
 
     @Test
@@ -178,7 +179,7 @@ public class FileListProgramTest extends AbstractProgramTest {
 
         assertCollectionSize("File list program did not send correct number of events", events, 1);
         Event event = events.get(0);
-        Assert.assertTrue("File list program did not send MissingRightsEvent", event instanceof FileListProgram.MissingRightsEvent);
+        assertTrue("File list program did not send MissingRightsEvent", event instanceof FileListProgram.MissingRightsEvent);
     }
 
 }

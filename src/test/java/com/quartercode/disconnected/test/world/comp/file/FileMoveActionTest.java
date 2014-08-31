@@ -18,10 +18,11 @@
 
 package com.quartercode.disconnected.test.world.comp.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -97,9 +98,9 @@ public class FileMoveActionTest extends AbstractFileActionTest {
 
         action.get(FileMoveAction.EXECUTE).invoke();
 
-        Assert.assertEquals("Resolved file for new path", file, fileSystem.get(FileSystem.GET_FILE).invoke(newPath));
-        Assert.assertEquals("Resolved file for old path", null, fileSystem.get(FileSystem.GET_FILE).invoke(oldPath));
-        Assert.assertEquals("Path of moved file", newPath, file.get(File.GET_PATH).invoke());
+        assertEquals("Resolved file for new path", file, fileSystem.get(FileSystem.GET_FILE).invoke(newPath));
+        assertEquals("Resolved file for old path", null, fileSystem.get(FileSystem.GET_FILE).invoke(oldPath));
+        assertEquals("Path of moved file", newPath, file.get(File.GET_PATH).invoke());
     }
 
     @Test
@@ -145,10 +146,10 @@ public class FileMoveActionTest extends AbstractFileActionTest {
         newParentFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("-w----------");
         executable[3] = action.get(FileMoveAction.IS_EXECUTABLE_BY).invoke(user);
 
-        Assert.assertTrue("File move action is executable although no required right is set", !executable[0]);
-        Assert.assertTrue("File move action is executable although the write right is not set on the new parent file", !executable[1]);
-        Assert.assertTrue("File move action is executable although the delete right is not set on the old file", !executable[2]);
-        Assert.assertTrue("File move action is not executable although all required rights are set", executable[3]);
+        assertTrue("File move action is executable although no required right is set", !executable[0]);
+        assertTrue("File move action is executable although the write right is not set on the new parent file", !executable[1]);
+        assertTrue("File move action is executable although the delete right is not set on the old file", !executable[2]);
+        assertTrue("File move action is not executable although all required rights are set", executable[3]);
     }
 
 }

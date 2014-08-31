@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.test.world.comp.file;
 
-import org.junit.Assert;
+import static org.junit.Assert.*;
 import org.junit.Test;
 import com.quartercode.disconnected.world.comp.file.FileRights;
 import com.quartercode.disconnected.world.comp.file.FileRights.FileAccessor;
@@ -32,9 +32,9 @@ public class FileRightsTest {
         FileRights rights = new FileRights();
         rights.get(FileRights.FROM_STRING).invoke("-w------r---");
 
-        Assert.assertTrue("Owner write right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.WRITE));
-        Assert.assertFalse("Group delete right is set", rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.DELETE));
-        Assert.assertTrue("Others read right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.READ));
+        assertTrue("Owner write right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.WRITE));
+        assertFalse("Group delete right is set", rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.DELETE));
+        assertTrue("Others read right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.READ));
     }
 
     @Test
@@ -45,10 +45,10 @@ public class FileRightsTest {
         for (FileAccessor accessor : FileAccessor.values()) {
             for (FileRight right : FileRight.values()) {
                 rights.get(FileRights.SET).invoke(accessor, right, true);
-                Assert.assertTrue(accessor + " " + right + " right is false after setting it to true", rights.get(FileRights.GET).invoke(accessor, right));
+                assertTrue(accessor + " " + right + " right is false after setting it to true", rights.get(FileRights.GET).invoke(accessor, right));
 
                 rights.get(FileRights.SET).invoke(accessor, right, false);
-                Assert.assertFalse(accessor + " " + right + " right is true after setting it to false", rights.get(FileRights.GET).invoke(accessor, right));
+                assertFalse(accessor + " " + right + " right is true after setting it to false", rights.get(FileRights.GET).invoke(accessor, right));
             }
         }
     }
@@ -61,12 +61,12 @@ public class FileRightsTest {
         for (FileRight right : FileRight.values()) {
             rights.get(FileRights.SET).invoke(null, right, true);
             for (FileAccessor accessor : FileAccessor.values()) {
-                Assert.assertTrue(accessor + " " + right + " right is false after setting it to true", rights.get(FileRights.GET).invoke(accessor, right));
+                assertTrue(accessor + " " + right + " right is false after setting it to true", rights.get(FileRights.GET).invoke(accessor, right));
             }
 
             rights.get(FileRights.SET).invoke(null, right, false);
             for (FileAccessor accessor : FileAccessor.values()) {
-                Assert.assertFalse(accessor + " " + right + " right is true after setting it to false", rights.get(FileRights.GET).invoke(accessor, right));
+                assertFalse(accessor + " " + right + " right is true after setting it to false", rights.get(FileRights.GET).invoke(accessor, right));
             }
         }
     }
@@ -77,20 +77,20 @@ public class FileRightsTest {
         FileRights rights = new FileRights();
         rights.get(FileRights.FROM_STRING).invoke("rw-x--d-r--x");
 
-        Assert.assertTrue("Owner read right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.READ));
-        Assert.assertTrue("Owner write right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.WRITE));
-        Assert.assertTrue("Owner delete right is set", !rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.DELETE));
-        Assert.assertTrue("Owner execute right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.EXECUTE));
+        assertTrue("Owner read right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.READ));
+        assertTrue("Owner write right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.WRITE));
+        assertTrue("Owner delete right is set", !rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.DELETE));
+        assertTrue("Owner execute right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OWNER, FileRight.EXECUTE));
 
-        Assert.assertTrue("Group read right is set", !rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.READ));
-        Assert.assertTrue("Group write right is set", !rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.WRITE));
-        Assert.assertTrue("Group delete right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.DELETE));
-        Assert.assertTrue("Group execute right is set", !rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.EXECUTE));
+        assertTrue("Group read right is set", !rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.READ));
+        assertTrue("Group write right is set", !rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.WRITE));
+        assertTrue("Group delete right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.DELETE));
+        assertTrue("Group execute right is set", !rights.get(FileRights.GET).invoke(FileAccessor.GROUP, FileRight.EXECUTE));
 
-        Assert.assertTrue("Others read right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.READ));
-        Assert.assertTrue("Others write right is set", !rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.WRITE));
-        Assert.assertTrue("Others delete right is set", !rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.DELETE));
-        Assert.assertTrue("Others execute right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.EXECUTE));
+        assertTrue("Others read right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.READ));
+        assertTrue("Others write right is set", !rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.WRITE));
+        assertTrue("Others delete right is set", !rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.DELETE));
+        assertTrue("Others execute right isn't set", rights.get(FileRights.GET).invoke(FileAccessor.OTHERS, FileRight.EXECUTE));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class FileRightsTest {
         rights.get(FileRights.SET).invoke(FileAccessor.OTHERS, FileRight.DELETE, false);
         rights.get(FileRights.SET).invoke(FileAccessor.OTHERS, FileRight.EXECUTE, true);
 
-        Assert.assertEquals("Generated file right string", "rw-x--d-r--x", rights.get(FileRights.TO_STRING).invoke());
+        assertEquals("Generated file right string", "rw-x--d-r--x", rights.get(FileRights.TO_STRING).invoke());
     }
 
 }

@@ -18,11 +18,12 @@
 
 package com.quartercode.disconnected.test.sim.scheduler;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -83,7 +84,7 @@ public class SchedulerTest {
         TestSchedulerTask task = new TestSchedulerTask(initialDelay, periodicDelay, "testGroup", 0);
         scheduler.schedule(task);
 
-        Assert.assertEquals("Scheduled tasks", new ArrayList<>(Arrays.asList(task)), new ArrayList<>(scheduler.getTasks()));
+        assertEquals("Scheduled tasks", new ArrayList<>(Arrays.asList(task)), new ArrayList<>(scheduler.getTasks()));
     }
 
     @Test
@@ -98,7 +99,7 @@ public class SchedulerTest {
 
         int expectedExecutions = !periodic ? 1 : 4;
         int actualExecutions = schedulerTaskExecutions[0];
-        Assert.assertEquals("Scheduler task invocations after " + updates + " updates (initialDelay=" + initialDelay + ", periodicDelay=" + periodicDelay + ")", expectedExecutions, actualExecutions);
+        assertEquals("Scheduler task invocations after " + updates + " updates (initialDelay=" + initialDelay + ", periodicDelay=" + periodicDelay + ")", expectedExecutions, actualExecutions);
     }
 
     @Test
@@ -113,7 +114,7 @@ public class SchedulerTest {
             scheduler.update("testGroup1");
         }
 
-        Assert.assertTrue("Scheduler group 1 wasn't invoked while group 2 was", schedulerTaskExecutions[0] == 1 && schedulerTaskExecutions[1] == 0);
+        assertTrue("Scheduler group 1 wasn't invoked while group 2 was", schedulerTaskExecutions[0] == 1 && schedulerTaskExecutions[1] == 0);
     }
 
     @Test
@@ -135,7 +136,7 @@ public class SchedulerTest {
         }
 
         int actualExecutions = schedulerTaskExecutions[0];
-        Assert.assertEquals("Scheduler task was executed although scheduler was deactivated", 1, actualExecutions);
+        assertEquals("Scheduler task was executed although scheduler was deactivated", 1, actualExecutions);
     }
 
     private static class TestSchedulerTask extends SchedulerTaskAdapter {

@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.test.world.comp.file;
 
-import org.junit.Assert;
+import static org.junit.Assert.*;
 import org.junit.Test;
 import com.quartercode.disconnected.world.comp.file.ContentFile;
 import com.quartercode.disconnected.world.comp.file.File;
@@ -33,25 +33,25 @@ public class FileUtilsTest {
     @Test
     public void testResolvePath() {
 
-        Assert.assertEquals("Resolved path of relative one", "/user/homes/test2/docs", FileUtils.resolvePath("/user/homes/test/", "../test2/docs/"));
-        Assert.assertEquals("Resolved path of relative one", "/system/bin/kernel", FileUtils.resolvePath("/user/homes/test/", "../../../system/bin/kernel"));
-        Assert.assertEquals("Resolved path of relative one", "/", FileUtils.resolvePath("/user/homes/test/", "../../../"));
+        assertEquals("Resolved path of relative one", "/user/homes/test2/docs", FileUtils.resolvePath("/user/homes/test/", "../test2/docs/"));
+        assertEquals("Resolved path of relative one", "/system/bin/kernel", FileUtils.resolvePath("/user/homes/test/", "../../../system/bin/kernel"));
+        assertEquals("Resolved path of relative one", "/", FileUtils.resolvePath("/user/homes/test/", "../../../"));
 
-        Assert.assertEquals("Resolved path of absolute one", "/system/bin/kernel", FileUtils.resolvePath("/user/homes/test/", "/system/bin/kernel"));
-        Assert.assertEquals("Resolved path of absolute one", "/system/bin/kernel", FileUtils.resolvePath("/", "/system/bin/kernel/"));
-        Assert.assertEquals("Resolved path of absolute one", "/system/bin/kernel", FileUtils.resolvePath("/", "/system//bin/kernel"));
-        Assert.assertEquals("Resolved path of absolute one", "/system/bin/kernel", FileUtils.resolvePath("/", "/system//bin/kernel/"));
+        assertEquals("Resolved path of absolute one", "/system/bin/kernel", FileUtils.resolvePath("/user/homes/test/", "/system/bin/kernel"));
+        assertEquals("Resolved path of absolute one", "/system/bin/kernel", FileUtils.resolvePath("/", "/system/bin/kernel/"));
+        assertEquals("Resolved path of absolute one", "/system/bin/kernel", FileUtils.resolvePath("/", "/system//bin/kernel"));
+        assertEquals("Resolved path of absolute one", "/system/bin/kernel", FileUtils.resolvePath("/", "/system//bin/kernel/"));
     }
 
     @Test
     public void testGetComponents() {
 
-        Assert.assertArrayEquals("Resolved components", new String[] { "system", "etc/test" }, FileUtils.getComponents("/system/etc/test"));
-        Assert.assertArrayEquals("Resolved components", new String[] { "system", "etc/test/" }, FileUtils.getComponents("/system/etc/test/"));
-        Assert.assertArrayEquals("Resolved components", new String[] { "system", null }, FileUtils.getComponents("/system"));
-        Assert.assertArrayEquals("Resolved components", new String[] { "system", null }, FileUtils.getComponents("/system/"));
-        Assert.assertArrayEquals("Resolved components", new String[] { null, "etc/test" }, FileUtils.getComponents("etc/test"));
-        Assert.assertArrayEquals("Resolved components", new String[] { null, "etc/test/" }, FileUtils.getComponents("etc/test/"));
+        assertArrayEquals("Resolved components", new String[] { "system", "etc/test" }, FileUtils.getComponents("/system/etc/test"));
+        assertArrayEquals("Resolved components", new String[] { "system", "etc/test/" }, FileUtils.getComponents("/system/etc/test/"));
+        assertArrayEquals("Resolved components", new String[] { "system", null }, FileUtils.getComponents("/system"));
+        assertArrayEquals("Resolved components", new String[] { "system", null }, FileUtils.getComponents("/system/"));
+        assertArrayEquals("Resolved components", new String[] { null, "etc/test" }, FileUtils.getComponents("etc/test"));
+        assertArrayEquals("Resolved components", new String[] { null, "etc/test/" }, FileUtils.getComponents("etc/test/"));
     }
 
     private User createUser(String name) {
@@ -85,19 +85,19 @@ public class FileUtilsTest {
         FileRights rights = file.get(File.RIGHTS).get();
 
         rights.get(FileRights.FROM_STRING).invoke("------------");
-        Assert.assertTrue("Owner has read right although it is not set for owner", !FileUtils.hasRight(owner, file, FileRight.READ));
+        assertTrue("Owner has read right although it is not set for owner", !FileUtils.hasRight(owner, file, FileRight.READ));
 
         rights.get(FileRights.FROM_STRING).invoke("r-----------");
-        Assert.assertTrue("Owner hasn't read right although it is set for owner", FileUtils.hasRight(owner, file, FileRight.READ));
+        assertTrue("Owner hasn't read right although it is set for owner", FileUtils.hasRight(owner, file, FileRight.READ));
 
         rights.get(FileRights.FROM_STRING).invoke("r-----------");
-        Assert.assertTrue("Group user has read right although it is not set for group", !FileUtils.hasRight(groupuser, file, FileRight.READ));
+        assertTrue("Group user has read right although it is not set for group", !FileUtils.hasRight(groupuser, file, FileRight.READ));
 
         rights.get(FileRights.FROM_STRING).invoke("-w--r-------");
-        Assert.assertTrue("Owner hasn't write right although it is set for owner", FileUtils.hasRight(owner, file, FileRight.WRITE));
-        Assert.assertTrue("Owner hasn't read right although it is set for group", FileUtils.hasRight(owner, file, FileRight.READ));
-        Assert.assertTrue("Group user has write right although it is not set for group", !FileUtils.hasRight(groupuser, file, FileRight.WRITE));
-        Assert.assertTrue("Group user hasn't read right although it is set for group", FileUtils.hasRight(groupuser, file, FileRight.READ));
+        assertTrue("Owner hasn't write right although it is set for owner", FileUtils.hasRight(owner, file, FileRight.WRITE));
+        assertTrue("Owner hasn't read right although it is set for group", FileUtils.hasRight(owner, file, FileRight.READ));
+        assertTrue("Group user has write right although it is not set for group", !FileUtils.hasRight(groupuser, file, FileRight.WRITE));
+        assertTrue("Group user hasn't read right although it is set for group", FileUtils.hasRight(groupuser, file, FileRight.READ));
     }
 
     @Test
@@ -108,8 +108,8 @@ public class FileUtilsTest {
         User other = createUser("other");
         file.get(File.OWNER).set(owner);
 
-        Assert.assertTrue("Owner can't change rights", FileUtils.canChangeRights(owner, file));
-        Assert.assertFalse("Other user can change rights", FileUtils.canChangeRights(other, file));
+        assertTrue("Owner can't change rights", FileUtils.canChangeRights(owner, file));
+        assertFalse("Other user can change rights", FileUtils.canChangeRights(other, file));
     }
 
 }

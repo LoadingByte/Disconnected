@@ -18,10 +18,11 @@
 
 package com.quartercode.disconnected.test.world.comp.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -84,7 +85,7 @@ public class FileAddActionTest extends AbstractFileActionTest {
     private void actuallyTestExecute(FileAddAction action) {
 
         action.get(FileAddAction.EXECUTE).invoke();
-        Assert.assertEquals("Resolved file", file, fileSystem.get(FileSystem.GET_FILE).invoke(addFilePath));
+        assertEquals("Resolved file", file, fileSystem.get(FileSystem.GET_FILE).invoke(addFilePath));
     }
 
     @Test (expected = InvalidPathException.class)
@@ -154,8 +155,8 @@ public class FileAddActionTest extends AbstractFileActionTest {
         parentFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
         executable[1] = action.get(FileAddAction.IS_EXECUTABLE_BY).invoke(user);
 
-        Assert.assertTrue("File add action is not executable although the write right is set on the parent directory", executable[0]);
-        Assert.assertTrue("File add action is executable although the write right is not set on the parent directory", !executable[1]);
+        assertTrue("File add action is not executable although the write right is set on the parent directory", executable[0]);
+        assertTrue("File add action is executable although the write right is not set on the parent directory", !executable[1]);
     }
 
 }

@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.test.world.comp.file;
 
+import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.world.comp.ByteUnit;
@@ -73,16 +73,16 @@ public class FileSystemModuleTest {
     public void testGetKnown() {
 
         List<KnownFileSystem> expected = Arrays.asList(knownFileSystems);
-        Assert.assertEquals("Known file systems", expected, fsModule.get(FileSystemModule.KNOWN_FS).get());
+        assertEquals("Known file systems", expected, fsModule.get(FileSystemModule.KNOWN_FS).get());
     }
 
     @Test
     public void testGetMountedByMountpoint() {
 
-        Assert.assertEquals("Mounted file system fs1", fileSystems[0], fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs1").get(KnownFileSystem.FILE_SYSTEM).get());
-        Assert.assertEquals("Mounted file system fs2", fileSystems[1], fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs2").get(KnownFileSystem.FILE_SYSTEM).get());
+        assertEquals("Mounted file system fs1", fileSystems[0], fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs1").get(KnownFileSystem.FILE_SYSTEM).get());
+        assertEquals("Mounted file system fs2", fileSystems[1], fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs2").get(KnownFileSystem.FILE_SYSTEM).get());
         // File system 3 isn't mounted
-        Assert.assertEquals("No mounted file system fs3", null, fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs3"));
+        assertEquals("No mounted file system fs3", null, fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs3"));
     }
 
     @Test (expected = IllegalStateException.class)
@@ -98,8 +98,8 @@ public class FileSystemModuleTest {
         File<?> file = new ContentFile();
         fileSystems[0].get(FileSystem.CREATE_ADD_FILE).invoke(file, "some/path/to/file").get(FileAddAction.EXECUTE).invoke();
 
-        Assert.assertEquals("Added file", file, fsModule.get(FileSystemModule.GET_FILE).invoke("/fs1/some/path/to/file"));
-        Assert.assertEquals("No added file", null, fsModule.get(FileSystemModule.GET_FILE).invoke("/fs2/some/path/to/file"));
+        assertEquals("Added file", file, fsModule.get(FileSystemModule.GET_FILE).invoke("/fs1/some/path/to/file"));
+        assertEquals("No added file", null, fsModule.get(FileSystemModule.GET_FILE).invoke("/fs2/some/path/to/file"));
     }
 
     @Test
@@ -108,8 +108,8 @@ public class FileSystemModuleTest {
         File<?> file = new ContentFile();
         fsModule.get(FileSystemModule.CREATE_ADD_FILE).invoke(file, "/fs1/some/path/to/file").get(FileAddAction.EXECUTE).invoke();
 
-        Assert.assertEquals("Added file", file, fileSystems[0].get(FileSystem.GET_FILE).invoke("some/path/to/file"));
-        Assert.assertEquals("No added file", null, fileSystems[1].get(FileSystem.GET_FILE).invoke("some/path/to/file"));
+        assertEquals("Added file", file, fileSystems[0].get(FileSystem.GET_FILE).invoke("some/path/to/file"));
+        assertEquals("No added file", null, fileSystems[1].get(FileSystem.GET_FILE).invoke("some/path/to/file"));
     }
 
 }

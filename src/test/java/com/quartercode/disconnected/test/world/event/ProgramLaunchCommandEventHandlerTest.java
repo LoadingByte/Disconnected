@@ -19,13 +19,13 @@
 package com.quartercode.disconnected.test.world.event;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import static org.junit.Assert.*;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.classmod.extra.PropertyDefinition;
@@ -75,16 +75,16 @@ public class ProgramLaunchCommandEventHandlerTest {
         handler.handle(event);
 
         Process<?> child = sessionProcess.get(Process.CHILDREN).get().get(0);
-        Assert.assertNotNull("Child process was not created", child);
-        Assert.assertEquals("Pid of child process", 10, (int) child.get(Process.PID).get());
+        assertNotNull("Child process was not created", child);
+        assertEquals("Pid of child process", 10, (int) child.get(Process.PID).get());
         ProgramExecutor executor = child.get(Process.EXECUTOR).get();
-        Assert.assertNotNull("Child process has no program executor", executor);
-        Assert.assertTrue("Child process has an incorrect program executor (wrong type)", executor instanceof TestProgram);
+        assertNotNull("Child process has no program executor", executor);
+        assertTrue("Child process has an incorrect program executor (wrong type)", executor instanceof TestProgram);
 
-        Assert.assertEquals("Property VALUE_1 of TestProgram executor", 123, (int) executor.get(TestProgram.VALUE_1).get());
-        Assert.assertEquals("Property VALUE_2 of TestProgram executor", "somestring1", executor.get(TestProgram.VALUE_2).get());
-        Assert.assertEquals("Property VALUE_3 of TestProgram executor", new SomeObject(0.123456789, "somestring2"), executor.get(TestProgram.VALUE_3).get());
-        Assert.assertEquals("Property VALUE_4 of TestProgram executor", null, executor.get(TestProgram.VALUE_4).get());
+        assertEquals("Property VALUE_1 of TestProgram executor", 123, (int) executor.get(TestProgram.VALUE_1).get());
+        assertEquals("Property VALUE_2 of TestProgram executor", "somestring1", executor.get(TestProgram.VALUE_2).get());
+        assertEquals("Property VALUE_3 of TestProgram executor", new SomeObject(0.123456789, "somestring2"), executor.get(TestProgram.VALUE_3).get());
+        assertEquals("Property VALUE_4 of TestProgram executor", null, executor.get(TestProgram.VALUE_4).get());
     }
 
     private static class ProgramLaunchCommandEventHandlerMock extends ProgramLaunchCommandEventHandler {

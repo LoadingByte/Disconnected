@@ -18,7 +18,8 @@
 
 package com.quartercode.disconnected.test.bridge;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.bridge.QueueEventHandler;
@@ -48,9 +49,9 @@ public class QueueEventHandlerTest {
         }
 
         for (Event event : events) {
-            Assert.assertEquals("Polled event", event, handler.next());
+            assertEquals("Polled event", event, handler.next());
         }
-        Assert.assertNull("Next event after all events were polled", handler.next());
+        assertNull("Next event after all events were polled", handler.next());
     }
 
     @Test
@@ -66,17 +67,17 @@ public class QueueEventHandlerTest {
 
         EventPredicate<?> currentPredicate = new TypePredicate<>(Event1.class);
         for (Event event : pollOrder1) {
-            Assert.assertEquals("Polled event", event, handler.next(currentPredicate));
+            assertEquals("Polled event", event, handler.next(currentPredicate));
         }
-        Assert.assertNull("Next event after all events of type 1 were polled", handler.next(currentPredicate));
+        assertNull("Next event after all events of type 1 were polled", handler.next(currentPredicate));
 
         currentPredicate = new TypePredicate<>(Event2.class);
         for (Event event : pollOrder2) {
-            Assert.assertEquals("Polled event", event, handler.next(currentPredicate));
+            assertEquals("Polled event", event, handler.next(currentPredicate));
         }
-        Assert.assertNull("Next event after all events of type 2 were polled", handler.next(currentPredicate));
+        assertNull("Next event after all events of type 2 were polled", handler.next(currentPredicate));
 
-        Assert.assertNull("Next event after all events of all types were polled", handler.next());
+        assertNull("Next event after all events of all types were polled", handler.next());
     }
 
 }

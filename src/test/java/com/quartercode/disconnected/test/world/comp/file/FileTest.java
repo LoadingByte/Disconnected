@@ -18,7 +18,8 @@
 
 package com.quartercode.disconnected.test.world.comp.file;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.world.comp.ByteUnit;
@@ -45,7 +46,7 @@ public class FileTest {
     @Test
     public void testGetPath() {
 
-        Assert.assertEquals("File path", "test1/test2/test.txt", testFile.get(File.GET_PATH).invoke());
+        assertEquals("File path", "test1/test2/test.txt", testFile.get(File.GET_PATH).invoke());
     }
 
     /*
@@ -57,9 +58,9 @@ public class FileTest {
 
         testFile.get(File.NAME).set("test3.txt");
 
-        Assert.assertTrue("Renamed file doesn't exist", testFile.equals(fileSystem.get(FileSystem.GET_FILE).invoke("test1/test2/test3.txt")));
-        Assert.assertTrue("Removed file does exist", fileSystem.get(FileSystem.GET_FILE).invoke("test1/test2/test.txt") == null);
-        Assert.assertEquals("Path of renamed file", "test1/test2/test3.txt", testFile.get(File.GET_PATH).invoke());
+        assertTrue("Renamed file doesn't exist", testFile.equals(fileSystem.get(FileSystem.GET_FILE).invoke("test1/test2/test3.txt")));
+        assertTrue("Removed file does exist", fileSystem.get(FileSystem.GET_FILE).invoke("test1/test2/test.txt") == null);
+        assertEquals("Path of renamed file", "test1/test2/test3.txt", testFile.get(File.GET_PATH).invoke());
     }
 
 }

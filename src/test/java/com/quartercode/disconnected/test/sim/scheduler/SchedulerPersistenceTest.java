@@ -18,11 +18,11 @@
 
 package com.quartercode.disconnected.test.sim.scheduler;
 
+import static org.junit.Assert.assertEquals;
 import java.io.StringReader;
 import java.io.StringWriter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import org.junit.Assert;
 import org.junit.Test;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
@@ -48,7 +48,7 @@ public class SchedulerPersistenceTest {
             copy.update("testGroup");
         }
 
-        Assert.assertEquals("Scheduler task executions after 11 updates", 4, schedulerTaskExecutions);
+        assertEquals("Scheduler task executions after 11 updates", 4, schedulerTaskExecutions);
     }
 
     private static class TestSchedulerTask extends SchedulerTaskAdapter {

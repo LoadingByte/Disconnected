@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.test.util;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.util.ValueInjector;
@@ -42,8 +42,8 @@ public class ValueInjectorTest {
         TestClass1 object = new TestClass1();
         valueInjector.runOn(object);
 
-        Assert.assertEquals("Injected value for 'test1'", 10, object.test1);
-        Assert.assertEquals("Injected value for 'test2'", "something", object.test2);
+        assertEquals("Injected value for 'test1'", 10, object.test1);
+        assertEquals("Injected value for 'test2'", "something", object.test2);
     }
 
     @Test (expected = IllegalStateException.class)
@@ -59,7 +59,7 @@ public class ValueInjectorTest {
         TestClass3 object = new TestClass3();
         valueInjector.runOn(object);
 
-        Assert.assertEquals("Injected value for 'test1' (unavailable)", 0, object.test);
+        assertEquals("Injected value for 'test1' (unavailable)", 0, object.test);
     }
 
     @Test (expected = IllegalStateException.class)
@@ -75,7 +75,7 @@ public class ValueInjectorTest {
         TestClass5 object = new TestClass5();
         valueInjector.runOn(object);
 
-        Assert.assertEquals("Injected value for 'test1' (wrong type)", null, object.test);
+        assertEquals("Injected value for 'test1' (wrong type)", null, object.test);
     }
 
     private class TestClass1 {

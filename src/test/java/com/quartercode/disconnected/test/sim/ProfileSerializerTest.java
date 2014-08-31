@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.test.sim;
 
+import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,7 +26,6 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import javax.xml.bind.JAXBException;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -69,7 +69,7 @@ public class ProfileSerializerTest {
         String serialized = new String(outputStream.toByteArray(), "UTF-8");
 
         World copy = ProfileSerializer.deserializeWorld(new ByteArrayInputStream(serialized.getBytes("UTF-8")));
-        Assert.assertTrue("Serialized-deserialized copy of world does not equal original", equalsPersistent(world, copy));
+        assertTrue("Serialized-deserialized copy of world does not equal original", equalsPersistent(world, copy));
     }
 
     /*
