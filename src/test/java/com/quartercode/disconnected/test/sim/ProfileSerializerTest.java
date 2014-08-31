@@ -30,12 +30,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import com.quartercode.classmod.base.Feature;
+import com.quartercode.classmod.base.Hideable;
 import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionProperty;
 import com.quartercode.classmod.extra.Storage;
 import com.quartercode.classmod.extra.ValueSupplier;
-import com.quartercode.classmod.extra.def.DefaultCollectionProperty;
-import com.quartercode.classmod.extra.def.DefaultProperty;
 import com.quartercode.disconnected.DefaultData;
 import com.quartercode.disconnected.sim.profile.Profile;
 import com.quartercode.disconnected.sim.profile.ProfileSerializer;
@@ -109,7 +108,7 @@ public class ProfileSerializerTest {
             return true;
         }
         // Don't check features that are excluded from equality checks
-        else if (isIgnoreEquals(feature1) || isIgnoreEquals(feature2)) {
+        else if (isHidden(feature1) || isHidden(feature2)) {
             return true;
         }
 
@@ -124,25 +123,9 @@ public class ProfileSerializerTest {
         return equalsPersistent(value1, value2);
     }
 
-    private boolean isIgnoreEquals(Feature feature) {
+    private boolean isHidden(Feature feature) {
 
-        try {
-            Field ignoreEquals;
-            if (feature instanceof DefaultProperty) {
-                ignoreEquals = DefaultProperty.class.getDeclaredField("ignoreEquals");
-            } else if (feature instanceof DefaultCollectionProperty) {
-                ignoreEquals = DefaultCollectionProperty.class.getDeclaredField("ignoreEquals");
-            } else {
-                return false;
-            }
-
-            ignoreEquals.setAccessible(true);
-            boolean value = (boolean) ignoreEquals.get(feature);
-            ignoreEquals.setAccessible(false);
-            return value;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return feature instanceof Hideable && ((Hideable) feature).isHidden();
     }
 
     private Storage<?> getStorage(ValueSupplier<?> valueSupplier) {
