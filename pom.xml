@@ -16,6 +16,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <main.class>com.quartercode.disconnected.launch.LauncherMain</main.class>
         <slf4j.version>1.7.7</slf4j.version>
+        <jmock.version>2.6.0</jmock.version>
     </properties>
 
     <organization>
@@ -89,6 +90,11 @@
             <artifactId>commons-cli</artifactId>
             <version>1.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+        </dependency>
 
         <!-- Logging -->
         <dependency>
@@ -130,7 +136,13 @@
         <dependency>
             <groupId>org.jmock</groupId>
             <artifactId>jmock-junit4</artifactId>
-            <version>2.6.0</version>
+            <version>${jmock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jmock</groupId>
+            <artifactId>jmock-legacy</artifactId>
+            <version>${jmock.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
