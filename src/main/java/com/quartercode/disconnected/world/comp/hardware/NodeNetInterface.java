@@ -28,11 +28,14 @@ import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.disconnected.world.comp.Computer;
 import com.quartercode.disconnected.world.comp.hardware.Mainboard.NeedsMainboardSlot;
 import com.quartercode.disconnected.world.comp.net.Address;
 import com.quartercode.disconnected.world.comp.net.NetID;
+import com.quartercode.disconnected.world.comp.net.NetworkModule;
 import com.quartercode.disconnected.world.comp.net.Packet;
 import com.quartercode.disconnected.world.comp.net.PacketProcessor;
+import com.quartercode.disconnected.world.comp.os.OperatingSystem;
 
 /**
  * This class represents a node network interface that may be used by a normal computer.
@@ -166,7 +169,7 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                NodeNetInterface holder = (NodeNetInterface) invocation.getHolder();
                 Packet packet = (Packet) arguments[0];
 
                 // Routing cascade
@@ -180,7 +183,7 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
             /*
              * Try to deliver the packet to the operating system.
              */
-            private boolean tryRouteToOs(FeatureHolder netInterface, Packet packet) {
+            private boolean tryRouteToOs(NodeNetInterface netInterface, Packet packet) {
 
                 NetID destination = packet.get(Packet.DESTINATION).get().get(Address.NET_ID).get();
 
@@ -189,7 +192,11 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
                     return false;
                 }
 
-                // TODO: Deliver packet to os
+                // Only deliver the packet if the net interface is connected to a computer
+                if (netInterface.getParent() != null) {
+                    NetworkModule netModule = netInterface.getParent().get(Computer.OS).get().get(OperatingSystem.NET_MODULE).get();
+                    netModule.get(NetworkModule.HANDLE).invoke(packet);
+                }
 
                 return true;
             }

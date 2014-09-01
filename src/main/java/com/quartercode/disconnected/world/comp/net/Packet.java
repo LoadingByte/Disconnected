@@ -35,18 +35,18 @@ public class Packet extends WorldFeatureHolder implements DerivableSize {
     // ----- Properties -----
 
     /**
-     * The network {@link Address} which sends the packet.
+     * The network {@link Address} of the {@link Socket} which sent the packet.
      */
     public static final PropertyDefinition<Address> SOURCE;
 
     /**
-     * The network {@link Address} the packet should be sent to.
+     * The network {@link Address} of the {@link Socket} the packet is sent to.
      */
     public static final PropertyDefinition<Address> DESTINATION;
 
     /**
-     * The data payload {@link Object} which should be sent.
-     * The payload can't be modified after construction.
+     * The data payload {@link Object} which is sent.
+     * The payload shouldn't be modified after construction.
      */
     public static final PropertyDefinition<Object>  DATA;
 

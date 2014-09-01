@@ -132,6 +132,7 @@ public class DefaultData {
      */
     public static void addDefaultSchedulerGroups(TickSchedulerUpdater schedulerUpdater) {
 
+        schedulerUpdater.addGroup("computerNetworkUpdate", 700);
         schedulerUpdater.addGroup("computerProgramUpdate", 500);
     }
 

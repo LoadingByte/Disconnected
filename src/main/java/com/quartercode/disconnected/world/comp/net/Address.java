@@ -32,8 +32,8 @@ import com.quartercode.disconnected.world.WorldFeatureHolder;
 import com.quartercode.disconnected.world.general.StringRepresentable;
 
 /**
- * This class represents an address which locates a specific service which is available through a specific network interface.
- * The network interface is defined by an {@link NetID}, the service by a port on which it's listening.
+ * This class represents an address which locates a specific service or {@link Socket} which is available through a specific network interface.
+ * The network interface is defined by a {@link NetID}, the service/socket by a port on which it's listening and sending.
  * 
  * @see NetID
  */
@@ -42,12 +42,12 @@ public class Address extends WorldFeatureHolder implements StringRepresentable {
     // ----- Properties -----
 
     /**
-     * The target {@link NetID} that represents the network interface which holds the service.
+     * The target {@link NetID} that represents the network interface which holds the service or {@link Socket}.
      */
     public static final PropertyDefinition<NetID>   NET_ID;
 
     /**
-     * The target port which specifies the service.<br>
+     * The target port which specifies the service or {@link Socket}.<br>
      * <br>
      * Exceptions that can occur when setting:
      * 
@@ -58,7 +58,7 @@ public class Address extends WorldFeatureHolder implements StringRepresentable {
      * </tr>
      * <tr>
      * <td>{@link IllegalArgumentException}</td>
-     * <td>The provided port is lesser than 0 or greater than 65535.</td>
+     * <td>The provided port is lesser than 1 or greater than 65535.</td>
      * </tr>
      * </table>
      */
@@ -76,7 +76,7 @@ public class Address extends WorldFeatureHolder implements StringRepresentable {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 int port = (Integer) arguments[0];
-                Validate.isTrue(port >= 0 && port <= 65535, "The port (%d) must be in range 0 <= port <= 65535 (e.g. 8080)", port);
+                Validate.isTrue(port >= 1 && port <= 65535, "The port (%d) must be in range 1 <= port <= 65535 (e.g. 8080)", port);
 
                 return invocation.next(arguments);
             }
