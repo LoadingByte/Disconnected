@@ -55,12 +55,12 @@ Builds
 Run
 ---
 
-If you downloaded a binary package or built your own one, you have several options to run Disconnected:
+If you downloaded a binary package or built your own one, you have several options to run Disconnected (note that <component> must be replaced by either client or server):
 
-* Try to execute `disconnected-<version>.jar` (e.g. with a double-click).
+* Try to execute `disconnected-<component>-dist-<version>.jar` (e.g. with a double-click).
 * If that doesn't work, open a command prompt, navigate to the binaries folder and run:
 
-        java -jar disconnected-<version>.jar
+        java -jar disconnected-<component>-dist-<version>.jar
 
 You need the Java JRE for each of those methods.
 If you haven't downloaded it or the Java JDK yet, get it from [here](http://www.java.com/download).
