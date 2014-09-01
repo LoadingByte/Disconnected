@@ -32,8 +32,6 @@ public class ProgramLaunchInfoRequestEvent extends EventBase {
 
     private static final long serialVersionUID = 8049474812855579764L;
 
-    // TODO: Proper user identification
-
     /**
      * The program launch info response event response to the return event for the {@link ProgramLaunchInfoRequestEvent}.
      * It contains a newly generated pid which can be input into a {@link ProgramLaunchCommandEvent}.

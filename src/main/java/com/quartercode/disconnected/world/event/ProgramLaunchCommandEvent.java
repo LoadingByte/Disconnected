@@ -53,8 +53,6 @@ public class ProgramLaunchCommandEvent extends EventBase {
 
     private static final long                                serialVersionUID = 6395719275942293140L;
 
-    // TODO: Proper user identification
-
     private final int                                        pid;
     private final String                                     filePath;
     private final Map<FeatureDefinitionReference<?>, Object> executorProperties;
