@@ -215,7 +215,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                     holder.get(ROOT_PROCESS).get().get(Process.INTERRUPT).invoke();
                     // Kill the process tree after 5 seconds
                     FeatureDefinitionReference<FunctionDefinition<?>> killFunction = new FeatureDefinitionReference<FunctionDefinition<?>>(ProcessModule.class, KILL);
-                    holder.get(SCHEDULER).schedule(new FunctionCallSchedulerTask(TickService.DEFAULT_TICKS_PER_SECOND * 5, "computerProgramUpdate", killFunction));
+                    holder.get(SCHEDULER).schedule(new FunctionCallSchedulerTask("killRootProcess", "computerProgramUpdate", TickService.DEFAULT_TICKS_PER_SECOND * 5, killFunction));
                 }
 
                 return invocation.next(arguments);

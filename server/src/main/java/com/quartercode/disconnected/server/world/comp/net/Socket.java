@@ -34,6 +34,7 @@ import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
 import com.quartercode.disconnected.server.sim.TickService;
+import com.quartercode.disconnected.server.sim.scheduler.SchedulerTask;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.server.util.ObjArray;
@@ -144,11 +145,6 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
      */
     public static final PropertyDefinition<Integer>                                      CURRENT_SEQ_NUMBER;
 
-    /**
-     * A temporary field which stores whether a response to the last sent keepalive request was received.
-     */
-    public static final PropertyDefinition<Boolean>                                      LAST_KEEPALIVE_SUCCESSFUL;
-
     static {
 
         LOCAL_PORT = create(new TypeLiteral<PropertyDefinition<Integer>>() {}, "name", "localPort", "storage", new StandardStorage<>());
@@ -182,15 +178,14 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                 invocation.next(arguments);
 
                 if (stateChangesToConnected) {
-                    holder.get(SCHEDULER).schedule(new SchedulerTaskAdapter(KEEPALIVE_PERIOD, KEEPALIVE_PERIOD, "computerNetworkUpdate") {
+                    holder.get(SCHEDULER).schedule(new SchedulerTaskAdapter("scheduleKeepalive", "computerNetworkUpdate", KEEPALIVE_PERIOD, KEEPALIVE_PERIOD) {
 
                         @Override
                         public void execute(FeatureHolder holder) {
 
-                            holder.get(LAST_KEEPALIVE_SUCCESSFUL).set(false);
-                            holder.get(SEND).invoke(new ObjArray("$_keepalive", "req"));
-
                             scheduleKeepaliveResponseCheck(holder);
+
+                            holder.get(SEND).invoke(new ObjArray("$_keepalive", "req"));
                         }
 
                     });
@@ -199,16 +194,18 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                 return null;
             }
 
+            /*
+             * This method schedules a task that disconnects the connection after some time.
+             * It is cancelled when a keepalive response packet arrives.
+             */
             private void scheduleKeepaliveResponseCheck(FeatureHolder holder) {
 
-                holder.get(SCHEDULER).schedule(new SchedulerTaskAdapter(KEEPALIVE_REPONSE_TIMEOUT, "computerNetworkUpdate") {
+                holder.get(SCHEDULER).schedule(new SchedulerTaskAdapter("keepaliveTimeout", "computerNetworkUpdate", KEEPALIVE_REPONSE_TIMEOUT) {
 
                     @Override
                     public void execute(FeatureHolder holder) {
 
-                        if (!holder.get(LAST_KEEPALIVE_SUCCESSFUL).get()) {
-                            holder.get(DISCONNECT).invoke();
-                        }
+                        holder.get(DISCONNECT).invoke();
                     }
 
                 });
@@ -235,8 +232,6 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
             }
 
         });
-
-        LAST_KEEPALIVE_SUCCESSFUL = create(new TypeLiteral<PropertyDefinition<Boolean>>() {}, "name", "lastKeepaliveReceived", "storage", new StandardStorage<>());
 
     }
 
@@ -325,7 +320,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
 
                 FeatureHolder holder = invocation.getHolder();
 
-                holder.get(SCHEDULER).schedule(new SchedulerTaskAdapter(CONNECTION_TIMEOUT, "computerNetworkUpdate") {
+                holder.get(SCHEDULER).schedule(new SchedulerTaskAdapter("connectionTimeout", "computerNetworkUpdate", CONNECTION_TIMEOUT) {
 
                     @Override
                     public void execute(FeatureHolder holder) {
@@ -488,8 +483,11 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                             }
                             // If a response packet was received
                             else if (dataArray[1].equals("rsp")) {
-                                // Inform the keepalive scheduler task
-                                holder.get(LAST_KEEPALIVE_SUCCESSFUL).set(true);
+                                // Cancel the current keepalive timeout scheduler task if one exists
+                                SchedulerTask keepaliveTimeoutTask = holder.get(SCHEDULER).getTask("keepaliveTimeout");
+                                if (keepaliveTimeoutTask != null) {
+                                    keepaliveTimeoutTask.cancel();
+                                }
                             }
                             // If an invalid keepalive packet was received
                             else {
