@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.server.world.comp.os;
 
-import static com.quartercode.disconnected.server.world.comp.file.File.SEPARATOR;
+import static com.quartercode.disconnected.shared.util.PathUtils.SEPARATOR;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.program.Program;
 

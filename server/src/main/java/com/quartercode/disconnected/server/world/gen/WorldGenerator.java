@@ -34,7 +34,6 @@ import com.quartercode.disconnected.server.world.comp.file.FileRights;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
-import com.quartercode.disconnected.server.world.comp.file.FileUtils;
 import com.quartercode.disconnected.server.world.comp.hardware.CPU;
 import com.quartercode.disconnected.server.world.comp.hardware.HardDrive;
 import com.quartercode.disconnected.server.world.comp.hardware.Hardware;
@@ -55,10 +54,9 @@ import com.quartercode.disconnected.server.world.comp.os.User;
 import com.quartercode.disconnected.server.world.comp.program.Program;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
-import com.quartercode.disconnected.server.world.comp.program.general.FileCreateProgram;
-import com.quartercode.disconnected.server.world.comp.program.general.FileListProgram;
-import com.quartercode.disconnected.server.world.comp.program.general.FileRemoveProgram;
+import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
 import com.quartercode.disconnected.server.world.general.Location;
+import com.quartercode.disconnected.shared.util.PathUtils;
 
 /**
  * The world generator utility generates {@link World}s and parts of worlds.
@@ -307,9 +305,7 @@ public class WorldGenerator {
         addProgramFile(fileSystem, superuser, Session.class, createVersion(1, 0, 0));
 
         // Add system programs
-        addProgramFile(fileSystem, superuser, FileListProgram.class, createVersion(1, 0, 0));
-        addProgramFile(fileSystem, superuser, FileCreateProgram.class, createVersion(1, 0, 0));
-        addProgramFile(fileSystem, superuser, FileRemoveProgram.class, createVersion(1, 0, 0));
+        addProgramFile(fileSystem, superuser, FileManagerProgram.class, createVersion(1, 0, 0));
     }
 
     private static void addProgramFile(FileSystem fileSystem, User superuser, Class<? extends ProgramExecutor> executor, Version version) {
@@ -318,7 +314,7 @@ public class WorldGenerator {
         program.get(Program.VERSION).set(version);
         program.get(Program.EXECUTOR_CLASS).set(executor);
 
-        addContentFile(fileSystem, FileUtils.getComponents(ProgramUtils.getCommonLocation(executor))[1], superuser, "r--xr--xr--x", program);
+        addContentFile(fileSystem, PathUtils.getComponents(ProgramUtils.getCommonLocation(executor))[1], superuser, "r--xr--xr--x", program);
     }
 
     // Temporary method for generating some unnecessary programs and personal files
@@ -327,7 +323,7 @@ public class WorldGenerator {
         // Generate basic user config
         Configuration userConfig = new Configuration();
         userConfig.get(Configuration.ENTRIES).add(superuser);
-        addContentFile(fileSystem, FileUtils.getComponents(CommonFiles.USER_CONFIG)[1], superuser, "rw----------", userConfig);
+        addContentFile(fileSystem, PathUtils.getComponents(CommonFiles.USER_CONFIG)[1], superuser, "rw----------", userConfig);
 
         // Generate basic environment config
         Configuration envConfig = new Configuration();
@@ -335,7 +331,7 @@ public class WorldGenerator {
         pathVariable.get(EnvironmentVariable.NAME).set("PATH");
         pathVariable.get(EnvironmentVariable.SET_VALUE_LIST).invoke(Arrays.asList(CommonFiles.SYS_BIN_DIR, CommonFiles.USER_BIN_DIR));
         envConfig.get(Configuration.ENTRIES).add(pathVariable);
-        addContentFile(fileSystem, FileUtils.getComponents(CommonFiles.ENVIRONMENT_CONFIG)[1], superuser, "rw--r---r---", envConfig);
+        addContentFile(fileSystem, PathUtils.getComponents(CommonFiles.ENVIRONMENT_CONFIG)[1], superuser, "rw--r---r---", envConfig);
     }
 
     private static ContentFile createContentFile(User owner, String rights, Object content) {

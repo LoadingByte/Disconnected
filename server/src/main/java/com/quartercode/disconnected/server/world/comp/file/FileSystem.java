@@ -30,6 +30,7 @@ import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.server.world.WorldFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.SizeUtil;
 import com.quartercode.disconnected.server.world.comp.SizeUtil.DerivableSize;
+import com.quartercode.disconnected.shared.util.PathUtils;
 
 /**
  * This class represents a file system.
@@ -146,9 +147,9 @@ public class FileSystem extends WorldFeatureHolder implements DerivableSize {
             @Override
             public File<?> invoke(FunctionInvocation<File<?>> invocation, Object... arguments) {
 
-                String path = FileUtils.normalizePath((String) arguments[0]);
+                String path = PathUtils.normalize((String) arguments[0]);
 
-                String[] parts = path.split(File.SEPARATOR);
+                String[] parts = path.split(PathUtils.SEPARATOR);
                 File<?> current = invocation.getHolder().get(ROOT).get();
                 for (int index = 0; index < parts.length; index++) {
                     String part = parts[index];

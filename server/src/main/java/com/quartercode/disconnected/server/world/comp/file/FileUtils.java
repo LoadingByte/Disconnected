@@ -18,12 +18,14 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import org.apache.commons.lang3.tuple.Triple;
 import com.quartercode.disconnected.server.world.comp.file.FileRights.FileAccessor;
 import com.quartercode.disconnected.server.world.comp.file.FileRights.FileRight;
+import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
+import com.quartercode.disconnected.server.world.comp.os.Group;
 import com.quartercode.disconnected.server.world.comp.os.User;
+import com.quartercode.disconnected.shared.event.util.FilePlaceholder;
+import com.quartercode.disconnected.shared.util.PathUtils;
 
 /**
  * This file utility contains methods related to {@link File}s and {@link FileSystem}s.
@@ -32,119 +34,6 @@ import com.quartercode.disconnected.server.world.comp.os.User;
  * @see FileSystem
  */
 public class FileUtils {
-
-    /**
-     * Normalizes the given path.
-     * Here are some examples:
-     * 
-     * <pre>
-     * /user/bin/../homes/test/
-     * =&gt; /user/homes/test/
-     * 
-     * /user/./homes/test/
-     * =&gt; /user/homes/test/
-     * </pre>
-     * 
-     * @param path The path that should be normalized.
-     * @return The normalized path.
-     */
-    public static String normalizePath(String path) {
-
-        return resolvePath(File.SEPARATOR, path);
-    }
-
-    /**
-     * Creates an absolute path out of the given one.
-     * The algorithm starts at the given start path and changes the path according to the "change" path.
-     * The "change" path also can be absolute. This will ignore the start path.<br>
-     * <br>
-     * 
-     * Here's an example:
-     * 
-     * <pre>
-     * Start:  /user/homes/test/
-     * Change: ../test2/docs
-     * Result: /user/home/test2/docs
-     * </pre>
-     * 
-     * @param start The absolute path the algorithm starts at.
-     * @param path The "change" path which defines where the start path should change (see above).
-     * @return The resolved absolute path.
-     * @throws IllegalArgumentException The start path is not absolute (it does not start with {@link File#SEPARATOR}).
-     */
-    public static String resolvePath(String start, String path) {
-
-        if (!start.startsWith(File.SEPARATOR)) {
-            throw new IllegalArgumentException("Start path must be absolute (it has to start with " + File.SEPARATOR + "): " + start);
-        } else {
-            List<String> current = new ArrayList<>();
-            if (!path.startsWith(File.SEPARATOR)) {
-                current.addAll(Arrays.asList(start.split(File.SEPARATOR)));
-                if (current.size() > 0) {
-                    // Remove first entry ([this]/...), it's empty
-                    current.remove(0);
-                }
-            }
-
-            for (String pathChange : path.split(File.SEPARATOR)) {
-                if (!pathChange.equals(".") && !pathChange.isEmpty()) {
-                    if (pathChange.equals("..")) {
-                        current.remove(current.size() - 1);
-                    } else {
-                        current.add(pathChange);
-                    }
-                }
-            }
-
-            if (current.isEmpty()) {
-                return File.SEPARATOR;
-            } else {
-                String resolvedPath = "";
-                for (String part : current) {
-                    resolvedPath += File.SEPARATOR + part;
-                }
-                return resolvedPath;
-            }
-        }
-    }
-
-    /**
-     * Splits the given global path into a mountpoint and a local file system path and returns the result.
-     * The returned array always has two entries. [0] is the mountpoint and [1] is the local fs path.
-     * 
-     * The mountpoint of a path is the first path element. Examples:
-     * 
-     * <pre>
-     * Path: /system/etc/test
-     * =&gt; [system, etc/test]
-     * 
-     * Path: /user
-     * =&gt; [user, null]
-     * 
-     * Path: home/user1/file
-     * =&gt; [null, home/user1/file]
-     * </pre>
-     * 
-     * @param path The path which should be splitted into its compontents.
-     * @return The components of the given path.
-     */
-    public static String[] getComponents(String path) {
-
-        if (path.startsWith(File.SEPARATOR)) {
-            String componentPath = path.substring(1);
-            int splitIndex = componentPath.indexOf(File.SEPARATOR);
-            if (splitIndex < 0) {
-                return new String[] { componentPath, null };
-            } else if (splitIndex == componentPath.length() - 1) {
-                // Filter out slash at the end of the mountpoint
-                return new String[] { componentPath.substring(0, componentPath.length() - 1), null };
-            } else {
-                return new String[] { componentPath.substring(0, splitIndex), componentPath.substring(splitIndex + 1) };
-            }
-        } else {
-            return new String[] { null, path };
-        }
-    }
 
     /**
      * Returns if the given {@link User} has the given {@link FileRight} on the given {@link File}.
@@ -199,6 +88,56 @@ public class FileUtils {
     public static boolean canChangeRights(User user, File<?> file) {
 
         return file.get(File.OWNER).get().equals(user) || user.get(User.IS_SUPERUSER).invoke();
+    }
+
+    /**
+     * Creates a new {@link FilePlaceholder} that represents the given {@link KnownFileSystem}.
+     * 
+     * @param fileSystem The known file system that should be represented by the placeholder.
+     * @return The new file placeholder.
+     */
+    public static FilePlaceholder createFilePlaceholder(KnownFileSystem fileSystem) {
+
+        FileSystem actualFs = fileSystem.get(KnownFileSystem.FILE_SYSTEM).get();
+        RootFile root = actualFs.get(FileSystem.ROOT).get();
+
+        String path = PathUtils.SEPARATOR + fileSystem.get(KnownFileSystem.MOUNTPOINT).get();
+        String type = StringFileTypeMapper.classToString(RootFile.class);
+        long size = actualFs.get(FileSystem.GET_SIZE).invoke();
+        Triple<String, String, String> commonData = getCommonFilePlaceholderData(root);
+
+        return new FilePlaceholder(path, type, size, commonData.getLeft(), commonData.getMiddle(), commonData.getRight());
+    }
+
+    /**
+     * Creates a new {@link FilePlaceholder} that represents the given {@link File} which is stored on a file system that is mounted under the given mountpoint.
+     * 
+     * @param fileSystemMountpoint The mountpoint of the file system the file is stored on.
+     * @param file The file that should be represented by the placeholder.
+     * @return The new file placeholder.
+     */
+    public static FilePlaceholder createFilePlaceholder(String fileSystemMountpoint, File<?> file) {
+
+        String path = PathUtils.resolve(PathUtils.normalize(fileSystemMountpoint), file.get(File.GET_PATH).invoke());
+
+        String type = StringFileTypeMapper.classToString(file.getClass());
+        long size = file.get(File.GET_SIZE).invoke();
+        Triple<String, String, String> commonData = getCommonFilePlaceholderData(file);
+
+        return new FilePlaceholder(path, type, size, commonData.getLeft(), commonData.getMiddle(), commonData.getRight());
+    }
+
+    private static Triple<String, String, String> getCommonFilePlaceholderData(File<?> file) {
+
+        String rights = file.get(File.RIGHTS).get().get(FileRights.TO_STRING).invoke();
+
+        User ownerObject = file.get(File.OWNER).get();
+        String owner = ownerObject == null ? null : ownerObject.get(User.NAME).get();
+
+        Group groupObject = file.get(File.GROUP).get();
+        String group = groupObject == null ? null : groupObject.get(Group.NAME).get();
+
+        return Triple.of(rights, owner, group);
     }
 
     private FileUtils() {

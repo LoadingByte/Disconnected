@@ -12,13 +12,4 @@
 
     <name>Disconnected Shared</name>
     <description>Code and data that is used by the server and the client.</description>
-
-    <dependencies>
-        <!-- Utility -->
-        <dependency>
-            <groupId>com.quartercode</groupId>
-            <artifactId>eventbridge</artifactId>
-            <version>${eventbridge.version}</version>
-        </dependency>
-    </dependencies>
 </project>

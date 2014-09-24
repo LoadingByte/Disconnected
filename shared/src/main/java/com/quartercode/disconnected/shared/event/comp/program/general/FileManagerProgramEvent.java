@@ -16,20 +16,24 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.test;
+package com.quartercode.disconnected.shared.event.comp.program.general;
 
-import static org.junit.Assert.assertTrue;
-import java.util.Collection;
+import com.quartercode.disconnected.shared.event.comp.program.ProgramEvent;
 
-public class ExtraAssert {
+/**
+ * Subclasses of this event are events that are fired by the file manager program.
+ */
+public class FileManagerProgramEvent extends ProgramEvent {
 
-    public static void assertCollectionSize(String message, Collection<?> collection, int size) {
+    /**
+     * Creates a new file manager program event.
+     * 
+     * @param computerId The id of the computer which runs the program the event is fired by.
+     * @param pid The process id of the process which runs the program the event is fired by.
+     */
+    public FileManagerProgramEvent(String computerId, int pid) {
 
-        assertTrue(message, collection.size() == size);
-    }
-
-    private ExtraAssert() {
-
+        super(computerId, pid);
     }
 
 }

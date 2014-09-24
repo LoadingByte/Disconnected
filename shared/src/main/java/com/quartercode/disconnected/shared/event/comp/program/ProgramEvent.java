@@ -16,21 +16,20 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world.comp.program;
+package com.quartercode.disconnected.shared.event.comp.program;
 
 import com.quartercode.eventbridge.basic.EventBase;
-import com.quartercode.eventbridge.basic.EventPredicateBase;
 
 /**
- * Program events are fired by program executors and transport state or other program-related information.
+ * Program events are used to communicate with program executors.
+ * They may be fired by a program executor or sent to a program executor.
+ * Following from that, such events could transport state or other program-related information from or to the program executor.
  * For requesting these program events, {@link ProgramEventPredicate}s can be used.
  */
 public class ProgramEvent extends EventBase {
 
-    private static final long serialVersionUID = 5188377394737998492L;
-
-    private final String      computerId;
-    private final int         pid;
+    private final String computerId;
+    private final int    pid;
 
     /**
      * Creates a new program event.
@@ -62,40 +61,6 @@ public class ProgramEvent extends EventBase {
     public int getPid() {
 
         return pid;
-    }
-
-    /**
-     * The program event predicate tests a {@link ProgramEvent} for a specific {@code computerId} and {@code pid}.
-     * It can be used to request program events that are fired by a specific process.
-     * 
-     * @param <T> The further specified type of program event that can be tested by the predicate.
-     *        Might be just {@code ProgramEvent}.
-     */
-    public static class ProgramEventPredicate<T extends ProgramEvent> extends EventPredicateBase<T> {
-
-        private static final long serialVersionUID = -3932315616627849567L;
-
-        private final String      computerId;
-        private final int         pid;
-
-        /**
-         * Creates a new program event predicate which tests {@link ProgramEvent}s for the given criteria.
-         * 
-         * @param computerId The computer id to check all program events for.
-         * @param pid The process id to check all program events for.
-         */
-        public ProgramEventPredicate(String computerId, int pid) {
-
-            this.computerId = computerId;
-            this.pid = pid;
-        }
-
-        @Override
-        public boolean test(ProgramEvent event) {
-
-            return event.getComputerId().equals(computerId) && event.getPid() == pid;
-        }
-
     }
 
 }

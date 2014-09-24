@@ -16,16 +16,11 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.test.world.comp.program.general;
+package com.quartercode.disconnected.server.test.world.comp.program;
 
-import static com.quartercode.disconnected.server.test.ExtraActions.storeArgument;
-import java.util.ArrayList;
-import java.util.List;
-import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
 import org.junit.Rule;
-import com.quartercode.disconnected.server.test.ExtraActions.StorageListener;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.Version;
@@ -39,9 +34,10 @@ import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.program.Program;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.gen.WorldGenerator;
-import com.quartercode.disconnected.shared.world.event.ProgramLaunchEvent;
+import com.quartercode.eventbridge.EventBridgeFactory;
 import com.quartercode.eventbridge.bridge.Bridge;
-import com.quartercode.eventbridge.bridge.Event;
+import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionRequester;
+import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
 
 public abstract class AbstractProgramTest {
 
@@ -50,39 +46,24 @@ public abstract class AbstractProgramTest {
 
     protected final String    fileSystemMountpoint;
 
-    protected Bridge          bridge  = context.mock(Bridge.class);
+    protected Bridge          bridge;
     protected World           world;
     protected Computer        computer;
     protected OperatingSystem os;
     protected ProcessModule   processModule;
     protected FileSystem      fileSystem;
 
-    protected List<Event>     events  = new ArrayList<>();
-
     protected AbstractProgramTest(String fileSystemMountpoint) {
 
         this.fileSystemMountpoint = fileSystemMountpoint;
-
-        // @formatter:off
-        context.checking(new Expectations() {{
-
-            allowing(bridge).send(with(any(Event.class)));
-                will(storeArgument(0).withListener(new StorageListener<Event>() { @Override
-                public boolean accept(Event object) {
-                    return ! (object instanceof ProgramLaunchEvent);
-                }}).in(events));
-
-        }});
-        // @formatter:on
-    }
-
-    protected void restartEventRecording() {
-
-        events.clear();
     }
 
     @Before
     public void setUp() {
+
+        bridge = EventBridgeFactory.create(Bridge.class);
+        bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionRequester.class));
+        bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionReturner.class));
 
         world = new World();
         world.injectBridge(bridge);
@@ -99,6 +80,7 @@ public abstract class AbstractProgramTest {
         for (KnownFileSystem knownFs : fsModule.get(FileSystemModule.KNOWN_FS).get()) {
             if (knownFs.get(KnownFileSystem.MOUNTPOINT).get().equals(fileSystemMountpoint)) {
                 fileSystem = knownFs.get(KnownFileSystem.FILE_SYSTEM).get();
+                break;
             }
         }
     }

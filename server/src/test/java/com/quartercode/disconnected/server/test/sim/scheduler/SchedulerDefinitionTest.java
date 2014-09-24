@@ -18,8 +18,8 @@
 
 package com.quartercode.disconnected.server.test.sim.scheduler;
 
-import static com.quartercode.disconnected.server.test.ExtraAssert.assertCollectionSize;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -68,7 +68,7 @@ public class SchedulerDefinitionTest {
         schedulerDefinition.remove("testTask", FeatureHolder1.class);
 
         Scheduler scheduler = new FeatureHolder1().get(schedulerDefinition);
-        assertCollectionSize("Scheduler object's tasks are not empty", scheduler.getTasks(), 0);
+        assertTrue("Scheduler object's tasks are not empty", scheduler.getTasks().isEmpty());
     }
 
     @Test

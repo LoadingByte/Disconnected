@@ -33,6 +33,7 @@ import com.quartercode.disconnected.server.world.comp.SizeUtil;
 import com.quartercode.disconnected.server.world.comp.SizeUtil.DerivableSize;
 import com.quartercode.disconnected.server.world.comp.os.Group;
 import com.quartercode.disconnected.server.world.comp.os.User;
+import com.quartercode.disconnected.shared.util.PathUtils;
 
 /**
  * This class represents a file on a {@link FileSystem}.
@@ -45,11 +46,6 @@ import com.quartercode.disconnected.server.world.comp.os.User;
  * @see FileSystem
  */
 public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> implements DerivableSize {
-
-    /**
-     * The path separator which seperates different files in a path string ({@value #SEPARATOR}).
-     */
-    public static final String                               SEPARATOR           = "/";
 
     /**
      * The default {@link FileRights} string for every new file.
@@ -202,7 +198,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
                 // Check for removed files
                 if (holder.getParent() != null) {
                     String parentPath = holder.getParent().get(GET_PATH).invoke();
-                    path = parentPath + (parentPath.isEmpty() ? "" : File.SEPARATOR) + holder.get(NAME).get();
+                    path = parentPath + (parentPath.isEmpty() ? "" : PathUtils.SEPARATOR) + holder.get(NAME).get();
                 }
 
                 invocation.next(arguments);

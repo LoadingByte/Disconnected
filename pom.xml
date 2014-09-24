@@ -29,13 +29,13 @@
         <!-- Global dependencies -->
         <commons-lang3.version>3.3.2</commons-lang3.version>
         <slf4j.version>1.7.7</slf4j.version>
+        <eventbridge.version>0.1.0</eventbridge.version>
         <junit.version>4.11</junit.version>
         <jmock.version>2.6.0</jmock.version>
 
         <!-- Child dependencies -->
         <commons-cli.version>1.2</commons-cli.version>
         <logback.version>1.1.2</logback.version>
-        <eventbridge.version>0.1.0</eventbridge.version>
         <classmod.version>0.3.0-SNAPSHOT</classmod.version>
         <lwjgl.version>2.9.1</lwjgl.version>
         <twl.version>1.0</twl.version>
@@ -95,6 +95,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.quartercode</groupId>
+            <artifactId>eventbridge</artifactId>
+            <version>${eventbridge.version}</version>
         </dependency>
 
         <!-- Logging -->

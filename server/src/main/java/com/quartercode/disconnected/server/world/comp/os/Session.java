@@ -31,8 +31,8 @@ import com.quartercode.disconnected.server.util.HashUtil;
 import com.quartercode.disconnected.server.world.comp.program.ChildProcess;
 import com.quartercode.disconnected.server.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.server.world.comp.program.Process;
-import com.quartercode.disconnected.server.world.comp.program.ProgramEvent;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
+import com.quartercode.disconnected.shared.event.comp.program.ProgramEvent;
 
 /**
  * This class represents a program which opens a session.
@@ -156,8 +156,6 @@ public class Session extends ProgramExecutor {
      */
     public static class SessionEvent extends ProgramEvent {
 
-        private static final long serialVersionUID = 4729545187490062176L;
-
         /**
          * Creates a new session event.
          * 
@@ -184,8 +182,6 @@ public class Session extends ProgramExecutor {
      * @see Session
      */
     public static class FinishStartEvent extends SessionEvent {
-
-        private static final long serialVersionUID = 4471128673972448941L;
 
         /**
          * Creates a new session finish start event.
@@ -214,9 +210,7 @@ public class Session extends ProgramExecutor {
      */
     public static class WrongPasswordEvent extends SessionEvent {
 
-        private static final long serialVersionUID = -1976215576776172371L;
-
-        private final String      wrongPassword;
+        private final String wrongPassword;
 
         /**
          * Creates a new session wrong password event.

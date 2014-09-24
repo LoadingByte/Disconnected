@@ -23,14 +23,14 @@ import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
+import com.quartercode.disconnected.shared.event.comp.program.ProgramLaunchInfoRequestEvent;
+import com.quartercode.disconnected.shared.event.comp.program.ProgramLaunchInfoRequestEvent.ProgramLaunchInfoReturnEvent;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
-import com.quartercode.disconnected.shared.world.event.ProgramLaunchInfoRequestEvent;
-import com.quartercode.disconnected.shared.world.event.ProgramLaunchInfoRequestEvent.ProgramLaunchInfoResponseEvent;
 import com.quartercode.eventbridge.extra.extension.RequestEventHandler;
 import com.quartercode.eventbridge.extra.extension.ReturnEventSender;
 
 /**
- * The program launch info request event handler responses {@link ProgramLaunchInfoRequestEvent}.
+ * The program launch info request event handler responses {@link ProgramLaunchInfoRequestEvent}s.
  * It should run on every tick server.
  * 
  * @see ProgramLaunchInfoRequestEvent
@@ -45,7 +45,7 @@ public class ProgramLaunchInfoRequestEventHandler implements RequestEventHandler
         ProcessModule procModule = getProcessModule(playerComputer);
         int pid = procModule.get(ProcessModule.NEXT_PID).invoke();
 
-        sender.send(new ProgramLaunchInfoResponseEvent(playerComputer.getId(), pid));
+        sender.send(new ProgramLaunchInfoReturnEvent(playerComputer.getId(), pid));
     }
 
     protected Computer getPlayerComputer() {

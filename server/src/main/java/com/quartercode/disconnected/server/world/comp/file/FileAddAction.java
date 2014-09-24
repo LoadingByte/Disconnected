@@ -31,6 +31,7 @@ import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.server.world.WorldFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.server.world.comp.os.User;
+import com.quartercode.disconnected.shared.util.PathUtils;
 
 /**
  * The file add action is a simple file action that defines the process of adding a {@link File} to a {@link FileSystem}.
@@ -76,7 +77,7 @@ public class FileAddAction extends WorldFeatureHolder implements FileAction {
             @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                String normalizedPath = FileUtils.normalizePath((String) arguments[0]);
+                String normalizedPath = PathUtils.normalize((String) arguments[0]);
                 if (!normalizedPath.isEmpty()) {
                     normalizedPath = normalizedPath.substring(1);
                 }
@@ -129,8 +130,8 @@ public class FileAddAction extends WorldFeatureHolder implements FileAction {
                 File<ParentFile<?>> addFile = holder.get(FILE).get();
 
                 String path = holder.get(PATH).get();
-                String pathToParent = path.contains(File.SEPARATOR) ? path.substring(0, path.lastIndexOf(File.SEPARATOR)) : "";
-                String[] pathParts = pathToParent.split(File.SEPARATOR);
+                String pathToParent = path.contains(PathUtils.SEPARATOR) ? path.substring(0, path.lastIndexOf(PathUtils.SEPARATOR)) : "";
+                String[] pathParts = pathToParent.split(PathUtils.SEPARATOR);
 
                 File<?> current = holder.get(FILE_SYSTEM).get().get(FileSystem.ROOT).get();
                 for (String pathPart : pathParts) {
@@ -165,10 +166,10 @@ public class FileAddAction extends WorldFeatureHolder implements FileAction {
                 FeatureHolder holder = invocation.getHolder();
 
                 String path = holder.get(PATH).get();
-                String pathToParent = path.contains(File.SEPARATOR) ? path.substring(0, path.lastIndexOf(File.SEPARATOR)) : "";
+                String pathToParent = path.contains(PathUtils.SEPARATOR) ? path.substring(0, path.lastIndexOf(PathUtils.SEPARATOR)) : "";
                 File<?> parent = holder.get(FILE_SYSTEM).get().get(FileSystem.GET_FILE).invoke(pathToParent);
 
-                String addFileName = path.substring(path.lastIndexOf(File.SEPARATOR) + 1);
+                String addFileName = path.substring(path.lastIndexOf(PathUtils.SEPARATOR) + 1);
                 if (parent.get(ParentFile.GET_CHILD_BY_NAME).invoke(addFileName) != null) {
                     throw new OccupiedPathException(holder.get(FILE_SYSTEM).get(), path);
                 }
@@ -191,7 +192,7 @@ public class FileAddAction extends WorldFeatureHolder implements FileAction {
                 boolean result = true;
 
                 FeatureHolder holder = invocation.getHolder();
-                String[] parts = holder.get(PATH).get().split(File.SEPARATOR);
+                String[] parts = holder.get(PATH).get().split(PathUtils.SEPARATOR);
                 File<?> current = holder.get(FILE_SYSTEM).get().get(FileSystem.ROOT).get();
                 for (String part : parts) {
                     File<?> newCurrent = current.get(ParentFile.GET_CHILD_BY_NAME).invoke(part);

@@ -25,8 +25,6 @@ package com.quartercode.disconnected.server.world.comp.file;
  */
 public class UnknownMountpointException extends RuntimeException {
 
-    private static final long      serialVersionUID = 274942361374457476L;
-
     private final FileSystemModule fsModule;
     private final String           mountpoint;
 

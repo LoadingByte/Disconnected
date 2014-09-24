@@ -43,6 +43,7 @@ import com.quartercode.disconnected.server.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.server.world.comp.os.OSModule;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.program.Process;
+import com.quartercode.disconnected.shared.util.PathUtils;
 
 /**
  * This class represents an {@link OperatingSystem} module which is used to access the available {@link FileSystem}s.
@@ -177,7 +178,7 @@ public class FileSystemModule extends OSModule {
      * </tr>
      * <tr>
      * <td>{@link IllegalArgumentException}</td>
-     * <td>The provided path is not absolute (it does not start with {@link File#SEPARATOR}).</td>
+     * <td>The provided path is not absolute (it does not start with {@link PathUtils#SEPARATOR}).</td>
      * </tr>
      * <tr>
      * <td>{@link UnknownMountpointException}</td>
@@ -226,7 +227,7 @@ public class FileSystemModule extends OSModule {
      * </tr>
      * <tr>
      * <td>{@link IllegalArgumentException}</td>
-     * <td>The provided path for new new file is not absolute (it does not start with {@link File#SEPARATOR}).</td>
+     * <td>The provided path for new new file is not absolute (it does not start with {@link PathUtils#SEPARATOR}).</td>
      * </tr>
      * <tr>
      * <td>{@link UnknownMountpointException}</td>
@@ -304,8 +305,8 @@ public class FileSystemModule extends OSModule {
             @Override
             public File<?> invoke(FunctionInvocation<File<?>> invocation, Object... arguments) {
 
-                String path = FileUtils.normalizePath((String) arguments[0]);
-                String[] pathComponents = FileUtils.getComponents(path);
+                String path = PathUtils.normalize((String) arguments[0]);
+                String[] pathComponents = PathUtils.getComponents(path);
                 Validate.isTrue(pathComponents[0] != null, "Must provide a path containing a mountpoint ('%s' is invalid)", path);
 
                 KnownFileSystem knownFs = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]);
@@ -328,9 +329,9 @@ public class FileSystemModule extends OSModule {
             public FileAddAction invoke(FunctionInvocation<FileAddAction> invocation, Object... arguments) {
 
                 File<?> file = (File<?>) arguments[0];
-                String path = FileUtils.normalizePath((String) arguments[1]);
+                String path = PathUtils.normalize((String) arguments[1]);
 
-                String[] pathComponents = FileUtils.getComponents(path);
+                String[] pathComponents = PathUtils.getComponents(path);
                 Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path ('%s' is invalid)", path);
 
                 KnownFileSystem knownFs = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]);

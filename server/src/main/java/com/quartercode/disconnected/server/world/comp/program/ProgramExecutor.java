@@ -21,16 +21,10 @@ package com.quartercode.disconnected.server.world.comp.program;
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionDefinition;
-import com.quartercode.classmod.extra.FunctionExecutor;
-import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
-import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.WorldChildFeatureHolder;
-import com.quartercode.disconnected.shared.world.event.ProgramLaunchEvent;
-import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
- * This abstract class defines a program executor which takes care of acutally running a program.
+ * This abstract class defines a program executor which takes care of actually running a program.
  * The executor class is set in the {@link Program}.
  * 
  * @see Program
@@ -49,28 +43,6 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
     static {
 
         RUN = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "run", "parameters", new Class[0]);
-        RUN.addExecutor("sendLaunchEvent", ProgramExecutor.class, new FunctionExecutor<Void>() {
-
-            @Override
-            @Prioritized (Prioritized.LEVEL_8)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                ProgramExecutor holder = (ProgramExecutor) invocation.getHolder();
-                World world = holder.getWorld();
-
-                if (world != null) {
-                    Process<?> parent = holder.getParent();
-                    Bridge bridge = world.getBridge();
-
-                    String computerId = parent.get(Process.GET_OPERATING_SYSTEM).invoke().getParent().getId();
-                    int pid = parent.get(Process.PID).get();
-                    bridge.send(new ProgramLaunchEvent(computerId, pid, holder.getClass()));
-                }
-
-                return invocation.next(arguments);
-            }
-
-        });
 
     }
 

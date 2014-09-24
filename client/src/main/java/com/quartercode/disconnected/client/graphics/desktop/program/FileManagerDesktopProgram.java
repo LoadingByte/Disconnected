@@ -36,10 +36,10 @@ import com.quartercode.disconnected.client.graphics.desktop.popup.MessagePopup;
 import com.quartercode.disconnected.client.graphics.desktop.popup.TextInputPopup;
 import com.quartercode.disconnected.client.util.ResourceBundles;
 import com.quartercode.disconnected.client.util.ValueInjector.InjectValue;
-import com.quartercode.disconnected.shared.world.event.FilePlaceholder;
-import com.quartercode.disconnected.shared.world.event.ProgramLaunchCommandEvent;
-import com.quartercode.disconnected.shared.world.event.ProgramLaunchInfoRequestEvent;
-import com.quartercode.disconnected.shared.world.event.ProgramLaunchInfoRequestEvent.ProgramLaunchInfoResponseEvent;
+import com.quartercode.disconnected.shared.event.comp.program.ProgramLaunchCommandEvent;
+import com.quartercode.disconnected.shared.event.comp.program.ProgramLaunchInfoRequestEvent;
+import com.quartercode.disconnected.shared.event.comp.program.ProgramLaunchInfoRequestEvent.ProgramLaunchInfoReturnEvent;
+import com.quartercode.disconnected.shared.event.util.FilePlaceholder;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.EventPredicate;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
@@ -59,12 +59,12 @@ import de.matthiasmann.twl.model.SimpleTableModel;
 /**
  * The file manager desktop program allows the user to view and manipulate the files on all mounted file systems.
  */
-public class FileManagerProgram extends DesktopProgramDescriptor {
+public class FileManagerDesktopProgram extends DesktopProgramDescriptor {
 
     /**
      * Creates a new file manager desktop program descriptor.
      */
-    public FileManagerProgram() {
+    public FileManagerDesktopProgram() {
 
         super(ResourceBundles.forProgram("file-manager"), "name");
     }
@@ -72,10 +72,10 @@ public class FileManagerProgram extends DesktopProgramDescriptor {
     @Override
     public DesktopProgramWindow create(GraphicsState state, DesktopProgramContext context) {
 
-        return new FileManagerProgramWindow(state, this, context);
+        return new FileManagerDesktopProgramWindow(state, this, context);
     }
 
-    private static class FileManagerProgramWindow extends DesktopProgramWindow {
+    private static class FileManagerDesktopProgramWindow extends DesktopProgramWindow {
 
         @InjectValue ("bridge")
         private Bridge                 bridge;
@@ -89,7 +89,7 @@ public class FileManagerProgram extends DesktopProgramDescriptor {
         private final Table            fileListTable;
         private final SimpleTableModel fileListModel;
 
-        private FileManagerProgramWindow(GraphicsState state, DesktopProgramDescriptor descriptor, DesktopProgramContext context) {
+        private FileManagerDesktopProgramWindow(GraphicsState state, DesktopProgramDescriptor descriptor, DesktopProgramContext context) {
 
             super(state, descriptor, context);
 
@@ -386,10 +386,10 @@ public class FileManagerProgram extends DesktopProgramDescriptor {
         private void getChildren(final GetChildrenCallback callback) {
 
             ProgramLaunchInfoRequestEvent infoRequest = new ProgramLaunchInfoRequestEvent();
-            bridge.getModule(ReturnEventExtensionRequester.class).sendRequest(infoRequest, new EventHandler<ProgramLaunchInfoResponseEvent>() {
+            bridge.getModule(ReturnEventExtensionRequester.class).sendRequest(infoRequest, new EventHandler<ProgramLaunchInfoReturnEvent>() {
 
                 @Override
-                public void handle(ProgramLaunchInfoResponseEvent event) {
+                public void handle(ProgramLaunchInfoReturnEvent event) {
 
                     // Add FileListProgram handlers
                     EventPredicate<FileListProgram.FileListProgramEvent> predicate = new ProgramEventPredicate<>(event.getComputerId(), event.getPid());
@@ -452,10 +452,10 @@ public class FileManagerProgram extends DesktopProgramDescriptor {
             Validate.isTrue(canCreateOrRemoveFiles(), "Unnable to create files in dir '%s'", getPath());
 
             ProgramLaunchInfoRequestEvent infoRequest = new ProgramLaunchInfoRequestEvent();
-            bridge.getModule(ReturnEventExtensionRequester.class).sendRequest(infoRequest, new EventHandler<ProgramLaunchInfoResponseEvent>() {
+            bridge.getModule(ReturnEventExtensionRequester.class).sendRequest(infoRequest, new EventHandler<ProgramLaunchInfoReturnEvent>() {
 
                 @Override
-                public void handle(ProgramLaunchInfoResponseEvent event) {
+                public void handle(ProgramLaunchInfoReturnEvent event) {
 
                     // Add FileCreateProgram handlers
                     EventPredicate<FileCreateProgram.FileCreateProgramEvent> predicate = new ProgramEventPredicate<>(event.getComputerId(), event.getPid());
@@ -498,10 +498,10 @@ public class FileManagerProgram extends DesktopProgramDescriptor {
             Validate.isTrue(canCreateOrRemoveFiles(), "Unnable to remove files in dir '%s'", getPath());
 
             ProgramLaunchInfoRequestEvent infoRequest = new ProgramLaunchInfoRequestEvent();
-            bridge.getModule(ReturnEventExtensionRequester.class).sendRequest(infoRequest, new EventHandler<ProgramLaunchInfoResponseEvent>() {
+            bridge.getModule(ReturnEventExtensionRequester.class).sendRequest(infoRequest, new EventHandler<ProgramLaunchInfoReturnEvent>() {
 
                 @Override
-                public void handle(ProgramLaunchInfoResponseEvent event) {
+                public void handle(ProgramLaunchInfoReturnEvent event) {
 
                     // Add FileRemoveProgram handlers
                     EventPredicate<FileRemoveProgram.FileRemoveProgramEvent> predicate = new ProgramEventPredicate<>(event.getComputerId(), event.getPid());

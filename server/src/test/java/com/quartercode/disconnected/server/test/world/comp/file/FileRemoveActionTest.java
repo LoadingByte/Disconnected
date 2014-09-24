@@ -34,8 +34,8 @@ import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileRemoveAction;
 import com.quartercode.disconnected.server.world.comp.file.FileRights;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
-import com.quartercode.disconnected.server.world.comp.file.FileUtils;
 import com.quartercode.disconnected.server.world.comp.file.ParentFile;
+import com.quartercode.disconnected.shared.util.PathUtils;
 
 @RunWith (Parameterized.class)
 public class FileRemoveActionTest extends AbstractFileActionTest {
@@ -59,7 +59,7 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
     public FileRemoveActionTest(String removeFilePath) {
 
         this.removeFilePath = removeFilePath;
-        removeFileChildPath = FileUtils.normalizePath(removeFilePath) + "/test.txt";
+        removeFileChildPath = PathUtils.normalize(removeFilePath) + "/test.txt";
     }
 
     @Before

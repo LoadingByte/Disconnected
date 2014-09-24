@@ -72,7 +72,7 @@ public class SchedulerDefinition extends AbstractFeatureDefinition<Scheduler> {
      * See the scheduler task class for more information about when the task will be executed.
      * 
      * @param name The name the task is assigned to.
-     *        It can be used to remove the task from the definition using {@link #remove(String)}.
+     *        It can be used to remove the task from the definition using {@link #remove(String, Class)}.
      * @param holderClass The {@link FeatureHolder} class to whose schedulers the task will be added to.
      *        It will also be used for every subclass of this class.
      *        For example, a task with holder class TestFH is only added to schedulers that are held by instances of TestFH or any subclass.

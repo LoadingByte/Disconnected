@@ -30,6 +30,7 @@ import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.server.world.WorldFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.os.User;
+import com.quartercode.disconnected.shared.util.PathUtils;
 
 /**
  * The file move action is a simple file action that defines the process of moving a {@link File} to a new location.
@@ -98,7 +99,7 @@ public class FileMoveAction extends WorldFeatureHolder implements FileAction {
             @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                String normalizedPath = FileUtils.normalizePath((String) arguments[0]);
+                String normalizedPath = PathUtils.normalize((String) arguments[0]);
                 if (!normalizedPath.isEmpty()) {
                     normalizedPath = normalizedPath.substring(1);
                 }

@@ -16,43 +16,37 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.world.event;
+package com.quartercode.disconnected.shared.event.comp.program;
 
 import com.quartercode.eventbridge.basic.EventBase;
 
 /**
- * The program launch info request event can be used to retrieve needed information before sending a {@link ProgramLaunchCommandEvent}.
+ * This event can be used to retrieve needed information before sending a {@link ProgramLaunchCommandEvent}.
  * The returned information is related to the computer of the client that sends the request event.
- * Every response event contains a newly generated pid which can be input into a program launch command event.
+ * Every return event contains a newly generated pid which can be input into a program launch command event.
  * 
- * @see ProgramLaunchInfoResponseEvent
- * @see ProgramLaunchInfoRequestEventHandler
+ * @see ProgramLaunchInfoReturnEvent
  */
 public class ProgramLaunchInfoRequestEvent extends EventBase {
 
-    private static final long serialVersionUID = 8049474812855579764L;
-
     /**
-     * The program launch info response event response to the return event for the {@link ProgramLaunchInfoRequestEvent}.
+     * This event is the return event for the {@link ProgramLaunchInfoRequestEvent}.
      * It contains a newly generated pid which can be input into a {@link ProgramLaunchCommandEvent}.
      * 
      * @see ProgramLaunchInfoRequestEvent
-     * @see ProgramLaunchInfoRequestEventHandler
      */
-    public static class ProgramLaunchInfoResponseEvent extends EventBase {
+    public static class ProgramLaunchInfoReturnEvent extends EventBase {
 
-        private static final long serialVersionUID = -5422095285753485545L;
-
-        private final String      computerId;
-        private final int         pid;
+        private final String computerId;
+        private final int    pid;
 
         /**
-         * Creates a new program launch info response event.
+         * Creates a new program launch info return event.
          * 
          * @param computerId The id of the computer which represents the client that sent the request event.
          * @param pid A newly generated process id that might be used to launch a new program.
          */
-        public ProgramLaunchInfoResponseEvent(String computerId, int pid) {
+        public ProgramLaunchInfoReturnEvent(String computerId, int pid) {
 
             this.computerId = computerId;
             this.pid = pid;

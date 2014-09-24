@@ -28,7 +28,7 @@ import com.quartercode.disconnected.client.graphics.desktop.DesktopPrograms;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopTaskbarModule;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopWidgetModule;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowAreaModule;
-import com.quartercode.disconnected.client.graphics.desktop.program.FileManagerProgram;
+import com.quartercode.disconnected.client.graphics.desktop.program.FileManagerDesktopProgram;
 
 /**
  * This class contains methods that configure everything in the game.
@@ -57,7 +57,7 @@ public class DefaultClientData {
      */
     public static void addDefaultDesktopPrograms() {
 
-        DesktopPrograms.addDescriptor(new FileManagerProgram());
+        DesktopPrograms.addDescriptor(new FileManagerDesktopProgram());
     }
 
     /**

@@ -21,13 +21,6 @@
             <version>0.1.0-SNAPSHOT</version>
         </dependency>
 
-        <!-- Utility -->
-        <dependency>
-            <groupId>com.quartercode</groupId>
-            <artifactId>eventbridge</artifactId>
-            <version>${eventbridge.version}</version>
-        </dependency>
-
         <!-- Logging -->
         <dependency>
             <!-- Bridge jul calls of TWL to slf4j -->

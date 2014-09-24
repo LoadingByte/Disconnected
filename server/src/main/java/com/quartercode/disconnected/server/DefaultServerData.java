@@ -30,8 +30,8 @@ import com.quartercode.disconnected.server.world.event.ProgramLaunchCommandEvent
 import com.quartercode.disconnected.server.world.event.ProgramLaunchInfoRequestEventHandler;
 import com.quartercode.disconnected.shared.bridge.DefaultHandleInvocationProviderExtension.DefaultHandleInvocationProviderExtensionFactory;
 import com.quartercode.disconnected.shared.bridge.HandleInvocationProviderExtension;
-import com.quartercode.disconnected.shared.world.event.ProgramLaunchCommandEvent;
-import com.quartercode.disconnected.shared.world.event.ProgramLaunchInfoRequestEvent;
+import com.quartercode.disconnected.shared.event.comp.program.ProgramLaunchCommandEvent;
+import com.quartercode.disconnected.shared.event.comp.program.ProgramLaunchInfoRequestEvent;
 import com.quartercode.eventbridge.EventBridgeFactory;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.EventPredicate;

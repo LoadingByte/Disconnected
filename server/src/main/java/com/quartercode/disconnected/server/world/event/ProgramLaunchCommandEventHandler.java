@@ -18,17 +18,8 @@
 
 package com.quartercode.disconnected.server.world.event;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.extra.CollectionProperty;
-import com.quartercode.classmod.extra.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.Property;
-import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.util.FeatureDefinitionReference;
 import com.quartercode.disconnected.server.sim.profile.ProfileService;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
@@ -38,8 +29,8 @@ import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.program.Process;
 import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
+import com.quartercode.disconnected.shared.event.comp.program.ProgramLaunchCommandEvent;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
-import com.quartercode.disconnected.shared.world.event.ProgramLaunchCommandEvent;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 
 /**
@@ -80,57 +71,14 @@ public class ProgramLaunchCommandEventHandler implements EventHandler<ProgramLau
             return;
         }
 
-        // Set the provided properties
-        ProgramExecutor executor = process.get(Process.EXECUTOR).get();
-        Map<FeatureDefinitionReference<?>, Object> executorProperties = event.getExecutorProperties();
-        for (Entry<FeatureDefinitionReference<?>, Object> property : executorProperties.entrySet()) {
-            try {
-                FeatureDefinition<?> definition = property.getKey().getDefinition();
-                Object value = property.getValue();
-                if (definition instanceof PropertyDefinition) {
-                    castProperty(executor.get((PropertyDefinition<?>) definition)).set(value);
-                } else if (definition instanceof CollectionPropertyDefinition) {
-                    if (value instanceof Collection) {
-                        CollectionProperty<?, ?> feature = executor.get((CollectionPropertyDefinition<?, ?>) definition);
-                        for (Object entry : (Collection<?>) value) {
-                            castCollectionProperty(feature).add(entry);
-                        }
-                    } else {
-                        LOGGER.warn("Can't set collection property '{}' to non-collection value '{}'", definition, value);
-                        abort(sessionProcess, process);
-                        return;
-                    }
-                } else {
-                    LOGGER.warn("Can't set value of non-property feature definition '{}'", definition);
-                    abort(sessionProcess, process);
-                    return;
-                }
-            } catch (RuntimeException e) {
-                LOGGER.warn("Error while setting property '{}' of program executor '{}' to '{}'; client failure?", property.getKey(), executor, property.getValue(), e);
-                abort(sessionProcess, process);
-                return;
-            }
-        }
-
         // Run the program
+        ProgramExecutor executor = process.get(Process.EXECUTOR).get();
         try {
             executor.get(ProgramExecutor.RUN).invoke();
         } catch (Exception e) {
-            LOGGER.warn("Program executor '{}' threw unexpected exception on start; invalid executor property/client failure? (map '{}')", executor, executorProperties, e);
+            LOGGER.warn("Program executor '{}' threw unexpected exception on start", executor, e);
             abort(sessionProcess, process);
         }
-    }
-
-    @SuppressWarnings ("unchecked")
-    private <T> Property<T> castProperty(Property<?> property) {
-
-        return (Property<T>) property;
-    }
-
-    @SuppressWarnings ("unchecked")
-    private <E, C extends Collection<E>> CollectionProperty<E, C> castCollectionProperty(CollectionProperty<?, ?> property) {
-
-        return (CollectionProperty<E, C>) property;
     }
 
     private void abort(Process<?> parent, Process<?> process) {

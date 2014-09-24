@@ -31,8 +31,8 @@ import org.junit.Test;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.server.world.event.ProgramLaunchInfoRequestEventHandler;
-import com.quartercode.disconnected.shared.world.event.ProgramLaunchInfoRequestEvent;
-import com.quartercode.disconnected.shared.world.event.ProgramLaunchInfoRequestEvent.ProgramLaunchInfoResponseEvent;
+import com.quartercode.disconnected.shared.event.comp.program.ProgramLaunchInfoRequestEvent;
+import com.quartercode.disconnected.shared.event.comp.program.ProgramLaunchInfoRequestEvent.ProgramLaunchInfoReturnEvent;
 import com.quartercode.eventbridge.bridge.Event;
 import com.quartercode.eventbridge.extra.extension.ReturnEventSender;
 
@@ -90,8 +90,8 @@ public class ProgramLaunchInfoRequestEventHandlerTest {
 
         assertEquals("Amount of events that were sent back by the handler", 1, returnEvents.size());
         Event rawReturnEvent = returnEvents.get(0);
-        assertTrue("Event that was sent back by the handler is a '" + rawReturnEvent.getClass().getName() + "' (ProgramLaunchInfoResponseEvent required)", rawReturnEvent instanceof ProgramLaunchInfoResponseEvent);
-        ProgramLaunchInfoResponseEvent returnEvent = (ProgramLaunchInfoResponseEvent) rawReturnEvent;
+        assertTrue("Event that was sent back by the handler is a '" + rawReturnEvent.getClass().getName() + "' (ProgramLaunchInfoResponseEvent required)", rawReturnEvent instanceof ProgramLaunchInfoReturnEvent);
+        ProgramLaunchInfoReturnEvent returnEvent = (ProgramLaunchInfoReturnEvent) rawReturnEvent;
         assertEquals("Computer id that is stored in the return event", playerComputer.getId(), returnEvent.getComputerId());
         assertEquals("Pid that is stored in the return event", expectedPid, returnEvent.getPid());
     }
