@@ -61,7 +61,7 @@ public class SchedulerPersistenceTest {
 
         private TestSchedulerTask(int initialDelay, int periodicDelay) {
 
-            super(initialDelay, periodicDelay, "testGroup");
+            super("testName", "testGroup", initialDelay, periodicDelay);
         }
 
         @Override

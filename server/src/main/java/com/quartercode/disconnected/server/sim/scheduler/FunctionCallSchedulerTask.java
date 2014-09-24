@@ -50,17 +50,19 @@ public class FunctionCallSchedulerTask extends SchedulerTaskAdapter {
      * Note that the given reference must point to a {@link FunctionDefinition}.
      * See the provided methods of the {@link SchedulerTask} class for more information on the other parameters.
      * 
-     * @param initialDelay The amount of ticks that must elapse before the task is executed.
+     * @param name The name that can be used to identify the task inside a {@link Scheduler}.
+     *        This field may be {@code null}, in which case the task is anonymous.
      * @param group The group which defines at which point inside a tick the task should be executed.
+     * @param initialDelay The amount of ticks that must elapse before the task is executed.
      * @param functionDefinition A feature definition reference that references the function definition which defines
      *        the {@link Function} that should be called by the task.
      * 
      * @see SchedulerTask#getInitialDelay()
      * @see SchedulerTask#getGroup()
      */
-    public FunctionCallSchedulerTask(int initialDelay, String group, FeatureDefinitionReference<FunctionDefinition<?>> functionDefinition) {
+    public FunctionCallSchedulerTask(String name, String group, int initialDelay, FeatureDefinitionReference<FunctionDefinition<?>> functionDefinition) {
 
-        super(initialDelay, group);
+        super(name, group, initialDelay);
 
         this.functionDefinition = functionDefinition;
     }
@@ -70,9 +72,11 @@ public class FunctionCallSchedulerTask extends SchedulerTaskAdapter {
      * and then continues with gaps of the given periodic delay.
      * See the provided methods of the {@link SchedulerTask} class for more information on the other parameters.
      * 
+     * @param name The name that can be used to identify the task inside a {@link Scheduler}.
+     *        This field may be {@code null}, in which case the task is anonymous.
+     * @param group The group which defines at which point inside a tick the task should be executed.
      * @param initialDelay The amount of ticks that must elapse before the task is executed for the first time.
      * @param periodicDelay The amount of ticks that must elapse before the task is executed for any subsequent time.
-     * @param group The group which defines at which point inside a tick the task should be executed.
      * @param functionDefinition A feature definition reference that references the function definition which defines
      *        the {@link Function} that should be called by the task.
      * 
@@ -80,9 +84,9 @@ public class FunctionCallSchedulerTask extends SchedulerTaskAdapter {
      * @see SchedulerTask#getPeriodicDelay()
      * @see SchedulerTask#getGroup()
      */
-    public FunctionCallSchedulerTask(int initialDelay, int periodicDelay, String group, FeatureDefinitionReference<FunctionDefinition<?>> functionDefinition) {
+    public FunctionCallSchedulerTask(String name, String group, int initialDelay, int periodicDelay, FeatureDefinitionReference<FunctionDefinition<?>> functionDefinition) {
 
-        super(initialDelay, periodicDelay, group);
+        super(name, group, initialDelay, periodicDelay);
 
         this.functionDefinition = functionDefinition;
     }

@@ -112,6 +112,28 @@ public class Scheduler extends AbstractFeature {
     }
 
     /**
+     * Retrieves the scheduled {@link SchedulerTask} that has the given name.
+     * If multiple tasks have the same name, the task that was scheduled first is returned.
+     * 
+     * @param name The name of the task that should be returned.
+     * @return The first task with the given name.
+     */
+    public SchedulerTask getTask(String name) {
+
+        Validate.notNull(name, "Can't search for scheduler task with null name");
+
+        for (ScheduledTask task : scheduledTasks) {
+            String taskName = task.getTask().getName();
+
+            if (taskName != null && taskName.equals(name)) {
+                return task.getTask();
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Schedules a stateless copy of the given {@link SchedulerTask} (see {@link SchedulerTask#cloneStateless()}).
      * See the scheduler task class for more information about when the task will be executed.
      * Note that the task can be can be cancelled by setting their {@link SchedulerTask#isCancelled()} flag to {@code true}.

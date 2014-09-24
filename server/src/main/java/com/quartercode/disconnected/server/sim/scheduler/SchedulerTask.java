@@ -47,6 +47,25 @@ import com.quartercode.classmod.base.FeatureHolder;
 public interface SchedulerTask {
 
     /**
+     * Returns the name of the scheduler task.
+     * It can be used to retrieve it from its {@link Scheduler} using {@link Scheduler#getTask(String)}.
+     * Afterwards, the {@link #cancel()} method can be used to remove it.
+     * Note that this field may be {@code null}, in which case the scheduler task is anonymous.
+     * 
+     * @return The name of the scheduler task.
+     */
+    public String getName();
+
+    /**
+     * Returns the group which defines at which point inside a tick the scheduler task should be executed.
+     * For example, all tasks with a group which has the priority 2 are executed before all tasks of a priority 1 group.
+     * Note that a list of groups with their priorities is stored by the caller of the {@link Scheduler#update(String)} method.
+     * 
+     * @return The group of the scheduler task.
+     */
+    public String getGroup();
+
+    /**
      * Returns the initial delay which defines the amount of ticks that must elapse before the task is executed for the first time.
      * The delay value is inclusive. For example, a task with an initial delay of 5 is executed on the fifth tick after it was scheduled.
      * 
@@ -61,15 +80,6 @@ public interface SchedulerTask {
      * @return The periodic delay of the scheduler task.
      */
     public int getPeriodicDelay();
-
-    /**
-     * Returns the group which defines at which point inside a tick the scheduler task should be executed.
-     * For example, all tasks with a group which has the priority 2 are executed before all tasks of a priority 1 group.
-     * Note that a list of groups with their priorities is stored by the caller of the {@link Scheduler#update(String)} method.
-     * 
-     * @return The group of the scheduler task.
-     */
-    public String getGroup();
 
     /**
      * Returns whether the task has been cancelled and should no longer be executed.

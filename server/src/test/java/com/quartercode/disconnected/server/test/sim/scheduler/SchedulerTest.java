@@ -81,16 +81,30 @@ public class SchedulerTest {
     @Test
     public void testGetTasks() {
 
-        TestSchedulerTask task = new TestSchedulerTask(initialDelay, periodicDelay, "testGroup", 0);
-        scheduler.schedule(task);
+        TestSchedulerTask task1 = new TestSchedulerTask(null, "testGroup", initialDelay, periodicDelay, 0);
+        TestSchedulerTask task2 = new TestSchedulerTask(null, "testGroup", initialDelay, periodicDelay, 0);
 
-        assertEquals("Scheduled tasks", new ArrayList<>(Arrays.asList(task)), new ArrayList<>(scheduler.getTasks()));
+        scheduler.schedule(task1);
+        scheduler.schedule(task2);
+
+        assertEquals("Scheduled tasks", new ArrayList<>(Arrays.asList(task1, task2)), new ArrayList<>(scheduler.getTasks()));
+    }
+
+    @Test
+    public void testGetTask() {
+
+        scheduler.schedule(new TestSchedulerTask("testName1", "testGroup", initialDelay, periodicDelay, 0));
+        TestSchedulerTask testTask = new TestSchedulerTask("testName2", "testGroup", initialDelay, periodicDelay, 0);
+        scheduler.schedule(testTask);
+        scheduler.schedule(new TestSchedulerTask("testName1", "testGroup3", initialDelay, periodicDelay, 0));
+
+        assertEquals("Scheduled task with name 'testName2'", testTask, scheduler.getTask("testName2"));
     }
 
     @Test
     public void testSchedule() {
 
-        scheduler.schedule(new TestSchedulerTask(initialDelay, periodicDelay, "testGroup", 0));
+        scheduler.schedule(new TestSchedulerTask(null, "testGroup", initialDelay, periodicDelay, 0));
 
         int updates = !periodic ? initialDelay * 3 : initialDelay + periodicDelay * 3;
         for (int update = 0; update < updates; update++) {
@@ -105,8 +119,8 @@ public class SchedulerTest {
     @Test
     public void testScheduleMultipleGroups() {
 
-        scheduler.schedule(new TestSchedulerTask(initialDelay, periodicDelay, "testGroup1", 0));
-        scheduler.schedule(new TestSchedulerTask(initialDelay, periodicDelay, "testGroup2", 1));
+        scheduler.schedule(new TestSchedulerTask(null, "testGroup1", initialDelay, periodicDelay, 0));
+        scheduler.schedule(new TestSchedulerTask(null, "testGroup2", initialDelay, periodicDelay, 1));
 
         int updates = initialDelay;
         for (int update = 0; update < updates; update++) {
@@ -120,7 +134,7 @@ public class SchedulerTest {
     @Test
     public void testDeactivate() {
 
-        scheduler.schedule(new TestSchedulerTask(initialDelay, periodicDelay, "testGroup", 0));
+        scheduler.schedule(new TestSchedulerTask(null, "testGroup", initialDelay, periodicDelay, 0));
 
         scheduler.setActive(false);
 
@@ -143,9 +157,9 @@ public class SchedulerTest {
 
         private final int trackingIndex;
 
-        private TestSchedulerTask(int initialDelay, int periodicDelay, String group, int trackingIndex) {
+        private TestSchedulerTask(String name, String group, int initialDelay, int periodicDelay, int trackingIndex) {
 
-            super(initialDelay, periodicDelay, group);
+            super(name, group, initialDelay, periodicDelay);
 
             this.trackingIndex = trackingIndex;
         }

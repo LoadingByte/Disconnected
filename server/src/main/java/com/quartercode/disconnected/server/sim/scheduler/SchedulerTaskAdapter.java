@@ -32,11 +32,13 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 public abstract class SchedulerTaskAdapter implements SchedulerTask, Cloneable {
 
     @XmlAttribute
+    private String  name;
+    @XmlAttribute
+    private String  group;
+    @XmlAttribute
     private int     initialDelay;
     @XmlAttribute
     private int     periodicDelay;
-    @XmlAttribute
-    private String  group;
 
     @XmlAttribute
     private boolean cancelled;
@@ -53,34 +55,51 @@ public abstract class SchedulerTaskAdapter implements SchedulerTask, Cloneable {
      * Creates a new scheduler task adapter which is executed <b>once</b> after the given initial delay.
      * See the provided methods of the {@link SchedulerTask} class for more information on the different parameters.
      * 
-     * @param initialDelay The amount of ticks that must elapse before the task is executed.
+     * @param name The name that can be used to identify the task inside a {@link Scheduler}.
+     *        This field may be {@code null}, in which case the task is anonymous.
      * @param group The group which defines at which point inside a tick the task should be executed.
+     * @param initialDelay The amount of ticks that must elapse before the task is executed.
      * 
      * @see SchedulerTask#getInitialDelay()
      * @see SchedulerTask#getGroup()
      */
-    public SchedulerTaskAdapter(int initialDelay, String group) {
+    public SchedulerTaskAdapter(String name, String group, int initialDelay) {
 
-        this(initialDelay, -1, group);
+        this(name, group, initialDelay, -1);
     }
 
     /**
      * Creates a new scheduler task adapter whose execution starts after the given initial delay and then continues with gaps of the given periodic delay.
      * See the provided methods of the {@link SchedulerTask} class for more information on the different parameters.
      * 
+     * @param name The name that can be used to identify the task inside a {@link Scheduler}.
+     *        This field may be {@code null}, in which case the task is anonymous.
+     * @param group The group which defines at which point inside a tick the task should be executed.
      * @param initialDelay The amount of ticks that must elapse before the task is executed for the first time.
      * @param periodicDelay The amount of ticks that must elapse before the task is executed for any subsequent time.
-     * @param group The group which defines at which point inside a tick the task should be executed.
      * 
      * @see SchedulerTask#getInitialDelay()
      * @see SchedulerTask#getPeriodicDelay()
      * @see SchedulerTask#getGroup()
      */
-    public SchedulerTaskAdapter(int initialDelay, int periodicDelay, String group) {
+    public SchedulerTaskAdapter(String name, String group, int initialDelay, int periodicDelay) {
 
+        this.name = name;
+        this.group = group;
         this.initialDelay = initialDelay;
         this.periodicDelay = periodicDelay;
-        this.group = group;
+    }
+
+    @Override
+    public String getName() {
+
+        return name;
+    }
+
+    @Override
+    public String getGroup() {
+
+        return group;
     }
 
     @Override
@@ -93,12 +112,6 @@ public abstract class SchedulerTaskAdapter implements SchedulerTask, Cloneable {
     public int getPeriodicDelay() {
 
         return periodicDelay;
-    }
-
-    @Override
-    public String getGroup() {
-
-        return group;
     }
 
     @Override

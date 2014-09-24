@@ -53,7 +53,7 @@ public class FunctionCallSchedulerTaskTest {
         schedulerHolder = new TestFeatureHolder();
         scheduler = schedulerHolder.get(TestFeatureHolder.SCHEDULER);
 
-        scheduler.schedule(new FunctionCallSchedulerTask(1, "testGroup", new FeatureDefinitionReference<FunctionDefinition<?>>(TestFeatureHolder.class, "TEST_FUNCTION")));
+        scheduler.schedule(new FunctionCallSchedulerTask(null, "testGroup", 1, new FeatureDefinitionReference<FunctionDefinition<?>>(TestFeatureHolder.class, "TEST_FUNCTION")));
     }
 
     @Test
