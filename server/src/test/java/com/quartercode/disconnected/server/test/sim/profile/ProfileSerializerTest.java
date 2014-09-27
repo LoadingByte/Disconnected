@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.test.sim;
+package com.quartercode.disconnected.server.test.sim.profile;
 
 import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
@@ -46,8 +46,6 @@ import com.quartercode.disconnected.server.world.gen.WorldGenerator;
 
 public class ProfileSerializerTest {
 
-    private World world;
-
     @BeforeClass
     public static void setUpBeforeClass() throws IOException {
 
@@ -63,6 +61,8 @@ public class ProfileSerializerTest {
         ProfileSerializer.clearWorldContextPath();
         ProgramCommonLocationMapper.clearMappings();
     }
+
+    private World world;
 
     @Before
     public void setUp() {
