@@ -60,6 +60,7 @@ public class ProfileSerializerTest {
     @AfterClass
     public static void tearDownAfterClass() {
 
+        ProfileSerializer.clearWorldContextPath();
         ProgramCommonLocationMapper.clearMappings();
     }
 

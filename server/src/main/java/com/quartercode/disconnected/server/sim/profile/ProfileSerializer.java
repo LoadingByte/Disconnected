@@ -73,6 +73,14 @@ public class ProfileSerializer {
     }
 
     /**
+     * Resets the world context path by setting it to an empty string.
+     */
+    public static void clearWorldContextPath() {
+
+        worldContextPath = "";
+    }
+
+    /**
      * Returns the {@link TreeInitializer} which is used to initialize some features in deserialized {@link World}s.
      * Note that the returned initializer is mutable should be changed in order to add new mappings.
      * 
