@@ -42,61 +42,6 @@ import com.quartercode.eventbridge.extra.predicate.TypePredicate;
  */
 public class ProgramUtils {
 
-    private static void checkCommonLocationAnnotation(Class<? extends ProgramExecutor> executor) {
-
-        if (!executor.isAnnotationPresent(CommonLocation.class)) {
-            throw new IllegalStateException("Program executor '" + executor.getName() + "' hasn't a common location annotation");
-        }
-    }
-
-    /**
-     * Returns the directory the program file for the given {@link ProgramExecutor} can be commonly found under.
-     * Throws an {@link IllegalStateException} if the provided class doesn't have a {@link CommonLocation} annotation.<br>
-     * This method is useful for quickly retrieving a program directory inside a oneliner.
-     * 
-     * @param executor The program executor type whose common directory should be resolved.
-     * @return The common directory of the given program executor.
-     * @throws IllegalStateException The given program executor hasn't a common location annotation.
-     *         Note that every executor should have one.
-     */
-    public static String getCommonDirectory(Class<? extends ProgramExecutor> executor) {
-
-        checkCommonLocationAnnotation(executor);
-        return executor.getAnnotation(CommonLocation.class).dir();
-    }
-
-    /**
-     * Returns the file name the program file for the given {@link ProgramExecutor} commonly has.
-     * Throws an {@link IllegalStateException} if the provided class doesn't have a {@link CommonLocation} annotation.<br>
-     * This method is useful for quickly retrieving a program file name inside a oneliner.
-     * Afterwards, the actual location of the program could be resolved using the {@code PATH} environment variable.
-     * 
-     * @param executor The program executor type whose common file name should be resolved.
-     * @return The common file name of the given program executor.
-     * @throws IllegalStateException The given program executor hasn't a common location annotation.
-     *         Note that every executor should have one.
-     */
-    public static String getCommonFileName(Class<? extends ProgramExecutor> executor) {
-
-        checkCommonLocationAnnotation(executor);
-        return executor.getAnnotation(CommonLocation.class).file();
-    }
-
-    /**
-     * Returns the complete file path the given {@link ProgramExecutor} can be commonly found under.
-     * Throws an {@link IllegalStateException} if the provided class doesn't have a {@link CommonLocation} annotation.<br>
-     * This method is useful for quickly retrieving a program file path inside a oneliner.
-     * 
-     * @param executor The program executor type whose common file location should be resolved.
-     * @return The common file path of the given program executor.
-     * @throws IllegalStateException The given program executor hasn't a common location annotation.
-     *         Note that every executor should have one.
-     */
-    public static String getCommonLocation(Class<? extends ProgramExecutor> executor) {
-
-        return PathUtils.resolve(getCommonDirectory(executor), getCommonFileName(executor));
-    }
-
     /**
      * Tries to resolve a {@link Program} file (a {@link ContentFile} which contains a program) with the given name from one of the provided directory paths.
      * That means that the algorithm iterates over all of the directories and uses the first one which contains a program file with the given name.

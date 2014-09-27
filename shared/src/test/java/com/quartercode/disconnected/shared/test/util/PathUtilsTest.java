@@ -50,17 +50,6 @@ public class PathUtilsTest {
     }
 
     @Test
-    public void testGetComponents() {
-
-        assertArrayEquals("Resolved components", new String[] { "system", "etc/test" }, PathUtils.getComponents("/system/etc/test"));
-        assertArrayEquals("Resolved components", new String[] { "system", "etc/test/" }, PathUtils.getComponents("/system/etc/test/"));
-        assertArrayEquals("Resolved components", new String[] { "system", null }, PathUtils.getComponents("/system"));
-        assertArrayEquals("Resolved components", new String[] { "system", null }, PathUtils.getComponents("/system/"));
-        assertArrayEquals("Resolved components", new String[] { null, "etc/test" }, PathUtils.getComponents("etc/test"));
-        assertArrayEquals("Resolved components", new String[] { null, "etc/test/" }, PathUtils.getComponents("etc/test/"));
-    }
-
-    @Test
     public void testSplit() {
 
         assertArrayEquals("Split path array", new String[] { "system", "etc", "test" }, PathUtils.split("system/etc/test"));
@@ -82,6 +71,57 @@ public class PathUtilsTest {
 
         assertEquals("Joined path string", "/system/etc/../test", PathUtils.join(new String[] { "system", "etc", "..", "test" }));
         assertEquals("Joined path string", "system/etc/test", PathUtils.join(new String[] { "system", "etc", "test" }, false));
+    }
+
+    @Test
+    public void testSplitAfterMountpoint() {
+
+        assertArrayEquals("Resolved components", new String[] { "system", "etc/test" }, PathUtils.splitAfterMountpoint("/system/etc/test"));
+        assertArrayEquals("Resolved components", new String[] { "system", "etc/test/" }, PathUtils.splitAfterMountpoint("/system/etc/test/"));
+        assertArrayEquals("Resolved components", new String[] { "system", "etc/test" }, PathUtils.splitAfterMountpoint("//system/etc/test"));
+        assertArrayEquals("Resolved components", new String[] { "system", "etc/test//" }, PathUtils.splitAfterMountpoint("/system/etc/test//"));
+        assertArrayEquals("Resolved components", new String[] { "system", "etc/test/" }, PathUtils.splitAfterMountpoint("//system/etc/test/"));
+        assertArrayEquals("Resolved components", new String[] { "system", "etc/test//" }, PathUtils.splitAfterMountpoint("//system/etc/test//"));
+        assertArrayEquals("Resolved components", new String[] { "system", "etc//test" }, PathUtils.splitAfterMountpoint("/system//etc//test"));
+
+        assertArrayEquals("Resolved components", new String[] { "system", null }, PathUtils.splitAfterMountpoint("/system"));
+        assertArrayEquals("Resolved components", new String[] { "system", null }, PathUtils.splitAfterMountpoint("/system/"));
+        assertArrayEquals("Resolved components", new String[] { "system", null }, PathUtils.splitAfterMountpoint("//system"));
+        assertArrayEquals("Resolved components", new String[] { "system", null }, PathUtils.splitAfterMountpoint("/system//"));
+        assertArrayEquals("Resolved components", new String[] { "system", null }, PathUtils.splitAfterMountpoint("//system/"));
+        assertArrayEquals("Resolved components", new String[] { "system", null }, PathUtils.splitAfterMountpoint("//system//"));
+
+        assertArrayEquals("Resolved components", new String[] { null, "etc/test" }, PathUtils.splitAfterMountpoint("etc/test"));
+        assertArrayEquals("Resolved components", new String[] { null, "etc/test/" }, PathUtils.splitAfterMountpoint("etc/test/"));
+        assertArrayEquals("Resolved components", new String[] { null, "etc/test//" }, PathUtils.splitAfterMountpoint("etc/test//"));
+
+        assertArrayEquals("Resolved components", null, PathUtils.splitAfterMountpoint(""));
+        assertArrayEquals("Resolved components", null, PathUtils.splitAfterMountpoint("/"));
+        assertArrayEquals("Resolved components", null, PathUtils.splitAfterMountpoint("//"));
+    }
+
+    @Test
+    public void testSplitBeforeName() {
+
+        assertArrayEquals("Resolved components", new String[] { "system/etc", "test" }, PathUtils.splitBeforeName("system/etc/test"));
+        assertArrayEquals("Resolved components", new String[] { "/system/etc", "test" }, PathUtils.splitBeforeName("/system/etc/test"));
+        assertArrayEquals("Resolved components", new String[] { "/system/etc", "test" }, PathUtils.splitBeforeName("/system/etc/test/"));
+        assertArrayEquals("Resolved components", new String[] { "//system/etc", "test" }, PathUtils.splitBeforeName("//system/etc/test"));
+        assertArrayEquals("Resolved components", new String[] { "/system/etc", "test" }, PathUtils.splitBeforeName("/system/etc/test//"));
+        assertArrayEquals("Resolved components", new String[] { "//system/etc", "test" }, PathUtils.splitBeforeName("//system/etc/test/"));
+        assertArrayEquals("Resolved components", new String[] { "//system/etc", "test" }, PathUtils.splitBeforeName("//system/etc/test//"));
+
+        assertArrayEquals("Resolved components", new String[] { null, "test" }, PathUtils.splitBeforeName("test"));
+        assertArrayEquals("Resolved components", new String[] { null, "test" }, PathUtils.splitBeforeName("/test"));
+        assertArrayEquals("Resolved components", new String[] { null, "test" }, PathUtils.splitBeforeName("/test/"));
+        assertArrayEquals("Resolved components", new String[] { null, "test" }, PathUtils.splitBeforeName("//test"));
+        assertArrayEquals("Resolved components", new String[] { null, "test" }, PathUtils.splitBeforeName("/test//"));
+        assertArrayEquals("Resolved components", new String[] { null, "test" }, PathUtils.splitBeforeName("//test/"));
+        assertArrayEquals("Resolved components", new String[] { null, "test" }, PathUtils.splitBeforeName("//test//"));
+
+        assertArrayEquals("Resolved components", null, PathUtils.splitBeforeName(""));
+        assertArrayEquals("Resolved components", null, PathUtils.splitBeforeName("/"));
+        assertArrayEquals("Resolved components", null, PathUtils.splitBeforeName("//"));
     }
 
 }

@@ -30,10 +30,15 @@ import com.quartercode.disconnected.server.world.comp.file.RootFile;
 import com.quartercode.disconnected.server.world.comp.file.StringFileTypeMapper;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
+import com.quartercode.disconnected.server.world.comp.os.Session;
+import com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper;
+import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
 import com.quartercode.disconnected.server.world.event.ProgramLaunchCommandEventHandler;
 import com.quartercode.disconnected.server.world.event.ProgramLaunchInfoRequestEventHandler;
 import com.quartercode.disconnected.shared.bridge.DefaultHandleInvocationProviderExtension.DefaultHandleInvocationProviderExtensionFactory;
 import com.quartercode.disconnected.shared.bridge.HandleInvocationProviderExtension;
+import com.quartercode.disconnected.shared.constant.GeneralProgramConstants;
+import com.quartercode.disconnected.shared.constant.SystemProgramConstants;
 import com.quartercode.disconnected.shared.event.comp.program.ProgramLaunchCommandEvent;
 import com.quartercode.disconnected.shared.event.comp.program.ProgramLaunchInfoRequestEvent;
 import com.quartercode.eventbridge.EventBridgeFactory;
@@ -174,6 +179,18 @@ public class DefaultServerData {
         StringFileTypeMapper.addMapping(RootFile.class, "rootFile");
         StringFileTypeMapper.addMapping(ContentFile.class, "contentFile");
         StringFileTypeMapper.addMapping(Directory.class, "directory");
+    }
+
+    /**
+     * Adds the default {@link ProgramCommonLocationMapper} mappings for the stock programs.
+     */
+    public static void addDefaultProgramCommonLocationMappings() {
+
+        // System programs
+        ProgramCommonLocationMapper.addMapping(Session.class, SystemProgramConstants.COMLOC_SESSION);
+
+        // General programs
+        ProgramCommonLocationMapper.addMapping(FileManagerProgram.class, GeneralProgramConstants.COMLOC_FILE_MANAGER);
     }
 
     private DefaultServerData() {

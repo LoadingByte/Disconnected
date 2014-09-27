@@ -271,6 +271,7 @@ public class Main {
         LOGGER.info("Adding other data");
 
         DefaultServerData.addDefaultStringFileTypeMappings();
+        DefaultServerData.addDefaultProgramCommonLocationMappings();
     }
 
     private Main() {

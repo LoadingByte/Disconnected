@@ -36,6 +36,7 @@ import com.quartercode.disconnected.server.world.comp.file.StringFileTypeMapper;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.program.Program;
+import com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.gen.WorldGenerator;
 import com.quartercode.eventbridge.EventBridgeFactory;
@@ -49,12 +50,14 @@ public abstract class AbstractProgramTest {
     public static void setUpBeforeClass() {
 
         DefaultServerData.addDefaultStringFileTypeMappings();
+        DefaultServerData.addDefaultProgramCommonLocationMappings();
     }
 
     @AfterClass
     public static void tearDownAfterClass() {
 
         StringFileTypeMapper.clearMappings();
+        ProgramCommonLocationMapper.clearMappings();
     }
 
     @Rule

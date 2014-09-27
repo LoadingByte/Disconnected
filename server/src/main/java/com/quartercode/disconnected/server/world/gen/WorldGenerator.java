@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.server.world.gen;
 
+import static com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper.getCommonLocation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,7 +46,6 @@ import com.quartercode.disconnected.server.world.comp.hardware.RAM;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
 import com.quartercode.disconnected.server.world.comp.net.Backbone;
 import com.quartercode.disconnected.server.world.comp.net.NetID;
-import com.quartercode.disconnected.server.world.comp.os.CommonFiles;
 import com.quartercode.disconnected.server.world.comp.os.Configuration;
 import com.quartercode.disconnected.server.world.comp.os.EnvironmentVariable;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
@@ -53,9 +53,9 @@ import com.quartercode.disconnected.server.world.comp.os.Session;
 import com.quartercode.disconnected.server.world.comp.os.User;
 import com.quartercode.disconnected.server.world.comp.program.Program;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
-import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
 import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
 import com.quartercode.disconnected.server.world.general.Location;
+import com.quartercode.disconnected.shared.constant.CommonFiles;
 import com.quartercode.disconnected.shared.util.PathUtils;
 
 /**
@@ -301,10 +301,10 @@ public class WorldGenerator {
     // Temporary method for generating the kernel and some system programs
     private static void addSystemFiles(FileSystem fileSystem, User superuser) {
 
-        // Add session program
+        // Add system programs
         addProgramFile(fileSystem, superuser, Session.class, createVersion(1, 0, 0));
 
-        // Add system programs
+        // Add general programs
         addProgramFile(fileSystem, superuser, FileManagerProgram.class, createVersion(1, 0, 0));
     }
 
@@ -314,7 +314,7 @@ public class WorldGenerator {
         program.get(Program.VERSION).set(version);
         program.get(Program.EXECUTOR_CLASS).set(executor);
 
-        addContentFile(fileSystem, PathUtils.getComponents(ProgramUtils.getCommonLocation(executor))[1], superuser, "r--xr--xr--x", program);
+        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(getCommonLocation(executor).toString())[1], superuser, "r--xr--xr--x", program);
     }
 
     // Temporary method for generating some unnecessary programs and personal files
@@ -323,7 +323,7 @@ public class WorldGenerator {
         // Generate basic user config
         Configuration userConfig = new Configuration();
         userConfig.get(Configuration.ENTRIES).add(superuser);
-        addContentFile(fileSystem, PathUtils.getComponents(CommonFiles.USER_CONFIG)[1], superuser, "rw----------", userConfig);
+        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(CommonFiles.USER_CONFIG)[1], superuser, "rw----------", userConfig);
 
         // Generate basic environment config
         Configuration envConfig = new Configuration();
@@ -331,7 +331,7 @@ public class WorldGenerator {
         pathVariable.get(EnvironmentVariable.NAME).set("PATH");
         pathVariable.get(EnvironmentVariable.SET_VALUE_LIST).invoke(Arrays.asList(CommonFiles.SYS_BIN_DIR, CommonFiles.USER_BIN_DIR));
         envConfig.get(Configuration.ENTRIES).add(pathVariable);
-        addContentFile(fileSystem, PathUtils.getComponents(CommonFiles.ENVIRONMENT_CONFIG)[1], superuser, "rw--r---r---", envConfig);
+        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(CommonFiles.ENVIRONMENT_CONFIG)[1], superuser, "rw--r---r---", envConfig);
     }
 
     private static ContentFile createContentFile(User owner, String rights, Object content) {

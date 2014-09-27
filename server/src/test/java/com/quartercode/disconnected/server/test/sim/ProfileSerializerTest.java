@@ -26,6 +26,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import javax.xml.bind.JAXBException;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,6 +41,7 @@ import com.quartercode.disconnected.server.sim.profile.Profile;
 import com.quartercode.disconnected.server.sim.profile.ProfileSerializer;
 import com.quartercode.disconnected.server.util.RandomPool;
 import com.quartercode.disconnected.server.world.World;
+import com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper;
 import com.quartercode.disconnected.server.world.gen.WorldGenerator;
 
 public class ProfileSerializerTest {
@@ -52,6 +54,13 @@ public class ProfileSerializerTest {
         DefaultServerData.fillResourceStore();
         DefaultServerData.addDefaultWorldContextPath();
         DefaultServerData.addDefaultWorldInitializerMappings();
+        DefaultServerData.addDefaultProgramCommonLocationMappings();
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() {
+
+        ProgramCommonLocationMapper.clearMappings();
     }
 
     @Before

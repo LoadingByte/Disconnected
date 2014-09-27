@@ -21,6 +21,8 @@ package com.quartercode.disconnected.shared.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -31,7 +33,10 @@ public class PathUtils {
     /**
      * The path separator which separates different files in a path string ({@value #SEPARATOR}).
      */
-    public static final String SEPARATOR = "/";
+    public static final String   SEPARATOR                    = "/";
+
+    private static final Pattern SPLIT_AFTER_MOUNTPOINT_REGEX = Pattern.compile("(" + SEPARATOR + "+([^" + SEPARATOR + "]+))?(" + SEPARATOR + "*(.*))?");
+    private static final Pattern SPLIT_BEFORE_NAME_REGEX      = Pattern.compile("((.*)" + SEPARATOR + ")?([^" + SEPARATOR + "]+)" + SEPARATOR + "*");
 
     /**
      * Normalizes the given path.
@@ -108,44 +113,6 @@ public class PathUtils {
     }
 
     /**
-     * Splits the given global path into a mountpoint and a local file system path and returns the result.
-     * The returned array always has two entries. [0] is the mountpoint and [1] is the local file system path.
-     * The mountpoint of a path is the first path element.
-     * Examples:
-     * 
-     * <pre>
-     * Path: /system/etc/test
-     * =&gt; [system, etc/test]
-     * 
-     * Path: /user
-     * =&gt; [user, null]
-     * 
-     * Path: home/user1/file
-     * =&gt; [null, home/user1/file]
-     * </pre>
-     * 
-     * @param path The path which should be split into its components.
-     * @return The components of the given path.
-     */
-    public static String[] getComponents(String path) {
-
-        if (path.startsWith(SEPARATOR)) {
-            String componentPath = path.substring(1);
-            int splitIndex = componentPath.indexOf(SEPARATOR);
-            if (splitIndex < 0) {
-                return new String[] { componentPath, null };
-            } else if (splitIndex == componentPath.length() - 1) {
-                // Filter out slash at the end of the mountpoint
-                return new String[] { componentPath.substring(0, componentPath.length() - 1), null };
-            } else {
-                return new String[] { componentPath.substring(0, splitIndex), componentPath.substring(splitIndex + 1) };
-            }
-        } else {
-            return new String[] { null, path };
-        }
-    }
-
-    /**
      * Splits the path into an array that contains the different path segments which were separated by path separators ({@link #SEPARATOR}).
      * Examples:
      * 
@@ -218,6 +185,75 @@ public class PathUtils {
     public static String join(String[] path, boolean leadingSeparator) {
 
         return (leadingSeparator ? SEPARATOR : "") + StringUtils.join(path, SEPARATOR);
+    }
+
+    /**
+     * Splits the given global path into a mountpoint and a local file system path and returns the result.
+     * The returned array always has two entries. [0] is the mountpoint and [1] is the local file system path.
+     * The mountpoint of a path is the first path element.
+     * Examples:
+     * 
+     * <pre>
+     * Path: /system/etc/test
+     * =&gt; [system, etc/test]
+     * 
+     * Path: /user
+     * =&gt; [user, null]
+     * 
+     * Path: home/user1/file
+     * =&gt; [null, home/user1/file]
+     * </pre>
+     * 
+     * @param path The path which should be split into a mountpoint and a local path.
+     * @return The mountpoint and the local path of the given global path.
+     *         May be {@code null} if an empty path (e.g. "" or "/") is provided.
+     */
+    public static String[] splitAfterMountpoint(String path) {
+
+        Matcher matcher = SPLIT_AFTER_MOUNTPOINT_REGEX.matcher(path);
+
+        if (matcher.find()) {
+            String[] result = { StringUtils.defaultIfEmpty(matcher.group(2), null), StringUtils.defaultIfEmpty(matcher.group(4), null) };
+            return result[0] == null && result[1] == null ? null : result;
+        }
+
+        return null;
+    }
+
+    /**
+     * Splits the given path into a directory path and a file name and returns the result.
+     * The returned array always has two entries. [0] is the directory path and [1] is the file name.
+     * The file name of a path is the last path element.
+     * Examples:
+     * 
+     * <pre>
+     * Path: /system/etc/test
+     * =&gt; [/system/etc, test]
+     * 
+     * Path: /user
+     * =&gt; [null, user]
+     * 
+     * Path: home/user1/file
+     * =&gt; [home/user1, file]
+     * </pre>
+     * 
+     * Note that the file name will never contain a separator.
+     * 
+     * @param path The path which should be split into a directory path and a file name.
+     * @return The directory path and the file name of the given path.
+     *         May be {@code null} if an empty path (e.g. "" or "/") is provided.
+     */
+    public static String[] splitBeforeName(String path) {
+
+        Matcher matcher = SPLIT_BEFORE_NAME_REGEX.matcher(path);
+
+        if (matcher.find()) {
+            String dirPath = matcher.group(2);
+            dirPath = StringUtils.isEmpty(dirPath) || StringUtils.containsOnly(dirPath, SEPARATOR) ? null : dirPath;
+            return new String[] { dirPath, matcher.group(3) };
+        }
+
+        return null;
     }
 
     private PathUtils() {

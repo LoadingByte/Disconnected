@@ -18,8 +18,8 @@
 
 package com.quartercode.disconnected.server.test.world.comp.program.general;
 
-import static com.quartercode.disconnected.server.world.comp.program.ProgramUtils.getCommonLocation;
-import static com.quartercode.disconnected.shared.util.PathUtils.getComponents;
+import static com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper.getCommonLocation;
+import static com.quartercode.disconnected.shared.util.PathUtils.splitAfterMountpoint;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
@@ -28,7 +28,6 @@ import com.quartercode.disconnected.server.test.world.comp.program.AbstractProgr
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
-import com.quartercode.disconnected.server.world.comp.os.CommonFiles;
 import com.quartercode.disconnected.server.world.comp.program.ChildProcess;
 import com.quartercode.disconnected.server.world.comp.program.Process;
 import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
@@ -36,6 +35,7 @@ import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils.ImportantData;
 import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
+import com.quartercode.disconnected.shared.constant.CommonFiles;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramGetCurrentPathRequestEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramGetCurrentPathRequestEvent.FileManagerProgramGetCurrentPathReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramInvalidPathEvent;
@@ -68,7 +68,7 @@ public class FileManagerProgramGetAndSetCurrentPathTest extends AbstractProgramT
     private ImportantData executeProgram(Process<?> parentProcess) {
 
         ChildProcess process = parentProcess.get(Process.CREATE_CHILD).invoke();
-        process.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(getComponents(getCommonLocation(FileManagerProgram.class))[1]));
+        process.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(splitAfterMountpoint(getCommonLocation(FileManagerProgram.class).toString())[1]));
         process.get(Process.INITIALIZE).invoke(10);
 
         ProgramExecutor program = process.get(Process.EXECUTOR).get();

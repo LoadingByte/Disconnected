@@ -16,17 +16,13 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world.comp.os;
+package com.quartercode.disconnected.shared.constant;
 
 import static com.quartercode.disconnected.shared.util.PathUtils.SEPARATOR;
-import com.quartercode.disconnected.server.world.comp.file.File;
-import com.quartercode.disconnected.server.world.comp.program.Program;
 
 /**
- * This class offers some constants which represent commonly used {@link File}s.
- * Such {@link File}s need to always be in the same place.
- * 
- * @see File
+ * This class offers some constants which represent commonly used files.
+ * Such files always need to be in the same place.
  */
 public class CommonFiles {
 
@@ -48,8 +44,6 @@ public class CommonFiles {
 
     /**
      * The path of the binary directory which stores all programs that come with a system.
-     * 
-     * @see Program
      */
     public static final String SYS_BIN_DIR        = SEPARATOR + SYSTEM_MOUNTPOINT + SEPARATOR + "bin";
 
@@ -57,8 +51,6 @@ public class CommonFiles {
 
     /**
      * The path of the binary directory which stores all custom programs that are added by the users.
-     * 
-     * @see Program
      */
     public static final String USER_BIN_DIR       = SEPARATOR + USER_MOUNTPOINT + SEPARATOR + "bin";
 
@@ -69,22 +61,16 @@ public class CommonFiles {
 
     /**
      * The path of the config file which stores the users of a system.
-     * 
-     * @see User
      */
     public static final String USER_CONFIG        = CONFIG_DIR + SEPARATOR + "users.cfg";
 
     /**
      * The path of the config file which stores the groups of a system.
-     * 
-     * @see Group
      */
     public static final String GROUP_CONFIG       = CONFIG_DIR + SEPARATOR + "groups.cfg";
 
     /**
      * The config file which stores the default environment variables that are assigned to every new process.
-     * 
-     * @see EnvironmentVariable
      */
     public static final String ENVIRONMENT_CONFIG = CONFIG_DIR + SEPARATOR + "environment.cfg";
 

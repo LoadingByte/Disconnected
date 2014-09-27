@@ -18,8 +18,8 @@
 
 package com.quartercode.disconnected.server.test.world.comp.program.general;
 
-import static com.quartercode.disconnected.server.world.comp.program.ProgramUtils.getCommonLocation;
-import static com.quartercode.disconnected.shared.util.PathUtils.getComponents;
+import static com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper.getCommonLocation;
+import static com.quartercode.disconnected.shared.util.PathUtils.splitAfterMountpoint;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import com.quartercode.disconnected.server.test.world.comp.program.AbstractProgramTest;
@@ -29,7 +29,6 @@ import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
-import com.quartercode.disconnected.server.world.comp.os.CommonFiles;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.os.Session;
 import com.quartercode.disconnected.server.world.comp.os.User;
@@ -40,6 +39,7 @@ import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils.ImportantData;
 import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
+import com.quartercode.disconnected.shared.constant.CommonFiles;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramCreateRequestEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramCreateRequestEvent.FileManagerProgramCreateMissingRightsReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramCreateRequestEvent.FileManagerProgramCreateOccupiedPathReturnEvent;
@@ -66,7 +66,7 @@ public class FileManagerProgramCreateTest extends AbstractProgramTest {
     private ImportantData executeProgramAndSetCurrentPath(Process<?> parentProcess, String path) {
 
         ChildProcess process = parentProcess.get(Process.CREATE_CHILD).invoke();
-        process.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(getComponents(getCommonLocation(FileManagerProgram.class))[1]));
+        process.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(splitAfterMountpoint(getCommonLocation(FileManagerProgram.class).toString())[1]));
         process.get(Process.INITIALIZE).invoke(10);
 
         ProgramExecutor program = process.get(Process.EXECUTOR).get();
@@ -189,7 +189,7 @@ public class FileManagerProgramCreateTest extends AbstractProgramTest {
         testUser.get(User.NAME).set("testUser");
 
         ChildProcess sessionProcess = processModule.get(ProcessModule.ROOT_PROCESS).get().get(Process.CREATE_CHILD).invoke();
-        sessionProcess.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(getComponents(getCommonLocation(Session.class))[1]));
+        sessionProcess.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(splitAfterMountpoint(getCommonLocation(Session.class).toString())[1]));
         sessionProcess.get(Process.INITIALIZE).invoke(1);
         ProgramExecutor session = sessionProcess.get(Process.EXECUTOR).get();
         session.get(Session.USER).set(testUser);

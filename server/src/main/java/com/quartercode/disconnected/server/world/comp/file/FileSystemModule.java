@@ -306,7 +306,7 @@ public class FileSystemModule extends OSModule {
             public File<?> invoke(FunctionInvocation<File<?>> invocation, Object... arguments) {
 
                 String path = PathUtils.normalize((String) arguments[0]);
-                String[] pathComponents = PathUtils.getComponents(path);
+                String[] pathComponents = PathUtils.splitAfterMountpoint(path);
                 Validate.isTrue(pathComponents[0] != null, "Must provide a path containing a mountpoint ('%s' is invalid)", path);
 
                 KnownFileSystem knownFs = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]);
@@ -331,7 +331,7 @@ public class FileSystemModule extends OSModule {
                 File<?> file = (File<?>) arguments[0];
                 String path = PathUtils.normalize((String) arguments[1]);
 
-                String[] pathComponents = PathUtils.getComponents(path);
+                String[] pathComponents = PathUtils.splitAfterMountpoint(path);
                 Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path ('%s' is invalid)", path);
 
                 KnownFileSystem knownFs = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]);

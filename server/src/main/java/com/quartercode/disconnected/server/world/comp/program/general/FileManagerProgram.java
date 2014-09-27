@@ -40,10 +40,8 @@ import com.quartercode.disconnected.server.world.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.server.world.comp.file.ParentFile;
 import com.quartercode.disconnected.server.world.comp.file.StringFileTypeMapper;
 import com.quartercode.disconnected.server.world.comp.file.UnknownMountpointException;
-import com.quartercode.disconnected.server.world.comp.os.CommonFiles;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.os.User;
-import com.quartercode.disconnected.server.world.comp.program.CommonLocation;
 import com.quartercode.disconnected.server.world.comp.program.Process;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
@@ -71,7 +69,6 @@ import com.quartercode.eventbridge.extra.extension.ReturnEventSender;
  * 
  * @see ProgramExecutor
  */
-@CommonLocation (dir = CommonFiles.SYS_BIN_DIR, file = "filemanager.exe")
 public class FileManagerProgram extends ProgramExecutor {
 
     // ----- Properties -----
@@ -254,7 +251,7 @@ public class FileManagerProgram extends ProgramExecutor {
                     } else {
                         List<FilePlaceholder> files = new ArrayList<>();
 
-                        String pathMountpoint = PathUtils.getComponents(path)[0];
+                        String pathMountpoint = PathUtils.splitAfterMountpoint(path)[0];
                         for (File<?> file : dir.get(ParentFile.CHILDREN).get()) {
                             files.add(FileUtils.createFilePlaceholder(pathMountpoint, file));
                         }
@@ -313,7 +310,7 @@ public class FileManagerProgram extends ProgramExecutor {
                     } catch (OccupiedPathException e) {
                         sender.send(new FileManagerProgramCreateOccupiedPathReturnEvent(data.getComputerId(), data.getPid(), path));
                     } catch (OutOfSpaceException e) {
-                        sender.send(new FileManagerProgramCreateOutOfSpaceReturnEvent(data.getComputerId(), data.getPid(), PathUtils.getComponents(path)[0], e.getSize()));
+                        sender.send(new FileManagerProgramCreateOutOfSpaceReturnEvent(data.getComputerId(), data.getPid(), PathUtils.splitAfterMountpoint(path)[0], e.getSize()));
                     }
                 } else {
                     sender.send(new FileManagerProgramCreateMissingRightsReturnEvent(data.getComputerId(), data.getPid(), path));
