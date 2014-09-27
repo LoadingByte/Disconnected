@@ -19,8 +19,11 @@
 package com.quartercode.disconnected.server.test.world.comp.program;
 
 import org.jmock.integration.junit4.JUnitRuleMockery;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
+import com.quartercode.disconnected.server.DefaultServerData;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.Version;
@@ -29,6 +32,7 @@ import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
+import com.quartercode.disconnected.server.world.comp.file.StringFileTypeMapper;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.program.Program;
@@ -40,6 +44,18 @@ import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionRequester
 import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
 
 public abstract class AbstractProgramTest {
+
+    @BeforeClass
+    public static void setUpBeforeClass() {
+
+        DefaultServerData.addDefaultStringFileTypeMappings();
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() {
+
+        StringFileTypeMapper.clearMappings();
+    }
 
     @Rule
     public JUnitRuleMockery   context = new JUnitRuleMockery();

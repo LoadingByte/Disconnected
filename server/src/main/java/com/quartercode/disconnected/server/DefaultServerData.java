@@ -24,6 +24,10 @@ import com.quartercode.classmod.util.TreeInitializer;
 import com.quartercode.disconnected.server.sim.TickSchedulerUpdater;
 import com.quartercode.disconnected.server.sim.profile.ProfileSerializer;
 import com.quartercode.disconnected.server.util.ResourceStore;
+import com.quartercode.disconnected.server.world.comp.file.ContentFile;
+import com.quartercode.disconnected.server.world.comp.file.Directory;
+import com.quartercode.disconnected.server.world.comp.file.RootFile;
+import com.quartercode.disconnected.server.world.comp.file.StringFileTypeMapper;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
 import com.quartercode.disconnected.server.world.event.ProgramLaunchCommandEventHandler;
@@ -144,6 +148,32 @@ public class DefaultServerData {
     private static void addRequestHandler(Bridge bridge, RequestEventHandler<?> requestEventHandler, EventPredicate<?> predicate) {
 
         bridge.getModule(ReturnEventExtensionReturner.class).addRequestHandler(requestEventHandler, predicate);
+    }
+
+    /**
+     * Adds the default {@link StringFileTypeMapper} mappings for the default file types.
+     * The following mappings are added:
+     * 
+     * <table>
+     * <tr>
+     * <th>Class Type</th>
+     * <td>{@link RootFile}</td>
+     * <td>{@link Directory}</td>
+     * <td>{@link ContentFile}</td>
+     * </tr>
+     * <tr>
+     * <th>String Type</th>
+     * <td>rootFile</td>
+     * <td>directory</td>
+     * <td>contentFile</td>
+     * </tr>
+     * </table>
+     */
+    public static void addDefaultStringFileTypeMappings() {
+
+        StringFileTypeMapper.addMapping(RootFile.class, "rootFile");
+        StringFileTypeMapper.addMapping(ContentFile.class, "contentFile");
+        StringFileTypeMapper.addMapping(Directory.class, "directory");
     }
 
     private DefaultServerData() {

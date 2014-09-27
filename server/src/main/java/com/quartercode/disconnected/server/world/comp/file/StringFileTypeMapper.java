@@ -27,7 +27,7 @@ import java.util.Map;
  * These mappings can then be retrieved in both directions.
  * Moreover, mappings can be added and removed dynamically.<br>
  * <br>
- * By default, the following mappings are available:
+ * By default, the following mappings are available (they must be added using the default server data class):
  * 
  * <table>
  * <tr>
@@ -51,14 +51,6 @@ public class StringFileTypeMapper {
 
     private static final Map<Class<? extends File<?>>, String> CLASSES_TO_STRINGS = new HashMap<>();
     private static final Map<String, Class<? extends File<?>>> STRINGS_TO_CLASSES = new HashMap<>();
-
-    static {
-
-        addMapping(RootFile.class, "rootFile");
-        addMapping(ContentFile.class, "contentFile");
-        addMapping(Directory.class, "directory");
-
-    }
 
     /**
      * Returns the string representation of the given {@link File} class.
@@ -120,6 +112,16 @@ public class StringFileTypeMapper {
 
         CLASSES_TO_STRINGS.remove(stringToClass(stringType));
         STRINGS_TO_CLASSES.remove(stringType);
+    }
+
+    /**
+     * Removes all added mappings.
+     * Note that this method also removes the default mappings.
+     */
+    public static void clearMappings() {
+
+        CLASSES_TO_STRINGS.clear();
+        STRINGS_TO_CLASSES.clear();
     }
 
     private StringFileTypeMapper() {

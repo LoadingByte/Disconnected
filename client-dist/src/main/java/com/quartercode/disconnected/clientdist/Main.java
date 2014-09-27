@@ -95,6 +95,9 @@ public class Main {
         // Fill the resource store
         fillResourceStore();
 
+        // Add other data (e.g. mappings)
+        addOtherData();
+
         // Initialize the game services
         initializeServices();
 
@@ -261,6 +264,13 @@ public class Main {
 
         DefaultClientData.addDefaultGraphicsServiceThemes(graphicsService);
         DefaultClientData.initializeDefaultGraphicsStates();
+    }
+
+    private static void addOtherData() {
+
+        LOGGER.info("Adding other data");
+
+        DefaultServerData.addDefaultStringFileTypeMappings();
     }
 
     private Main() {
