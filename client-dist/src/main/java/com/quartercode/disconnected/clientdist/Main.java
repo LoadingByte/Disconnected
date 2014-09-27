@@ -250,6 +250,7 @@ public class Main {
         tickService.addAction(new TickBridgeProvider());
         tickService.addAction(new TickSchedulerUpdater());
 
+        DefaultServerData.addDefaultSchedulerGroups(tickService.getAction(TickSchedulerUpdater.class));
         DefaultServerData.addDefaultServerHandlers(tickService.getAction(TickBridgeProvider.class).getBridge());
     }
 
