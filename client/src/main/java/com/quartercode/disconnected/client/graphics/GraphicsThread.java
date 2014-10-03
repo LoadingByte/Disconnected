@@ -27,8 +27,8 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
-import java.util.Set;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -54,7 +54,7 @@ public class GraphicsThread extends Thread {
 
     private static final Logger   LOGGER   = LoggerFactory.getLogger(GraphicsThread.class);
 
-    private final Set<URL>        themes;
+    private final List<URL>       themes;
 
     private LWJGLRenderer         renderer;
     private GUI                   gui;
@@ -70,7 +70,7 @@ public class GraphicsThread extends Thread {
      * 
      * @param themes The {@link URL}s of the themes that should be loaded.
      */
-    public GraphicsThread(Set<URL> themes) {
+    public GraphicsThread(List<URL> themes) {
 
         super("graphis");
 

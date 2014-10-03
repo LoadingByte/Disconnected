@@ -19,9 +19,9 @@
 package com.quartercode.disconnected.client.graphics;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.shared.bridge.HandleInvocationProviderExtension;
@@ -40,7 +40,7 @@ public class DefaultGraphicsService implements GraphicsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultGraphicsService.class);
 
-    private final Set<URL>      themes = new HashSet<>();
+    private final List<URL>     themes = new ArrayList<>();
 
     private GraphicsThread      thread;
     private GraphicsState       state;
@@ -60,9 +60,9 @@ public class DefaultGraphicsService implements GraphicsService {
     }
 
     @Override
-    public Set<URL> getThemes() {
+    public List<URL> getThemes() {
 
-        return Collections.unmodifiableSet(themes);
+        return Collections.unmodifiableList(themes);
     }
 
     @Override

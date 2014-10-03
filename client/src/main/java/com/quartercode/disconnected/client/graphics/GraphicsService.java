@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.client.graphics;
 
 import java.net.URL;
-import java.util.Set;
+import java.util.List;
 import com.quartercode.disconnected.shared.util.RunnableInvocationProvider;
 import com.quartercode.eventbridge.bridge.Bridge;
 
@@ -30,12 +30,12 @@ import com.quartercode.eventbridge.bridge.Bridge;
 public interface GraphicsService extends RunnableInvocationProvider {
 
     /**
-     * Returns a set which contains the {@link URL}s of all themes that should be loaded into the twl theme manager.
+     * Returns a list which contains the {@link URL}s of all themes that should be loaded into the twl theme manager.
      * Note that only loaded themes can be used by graphical components.
      * 
      * @return The twl themes that should be loaded.
      */
-    public Set<URL> getThemes();
+    public List<URL> getThemes();
 
     /**
      * Adds the {@link URL} of a twl theme that should be loaded into the twl theme manager.
