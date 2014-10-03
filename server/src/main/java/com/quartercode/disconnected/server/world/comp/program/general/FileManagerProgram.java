@@ -30,6 +30,7 @@ import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
+import com.quartercode.disconnected.server.world.comp.file.FileRemoveAction;
 import com.quartercode.disconnected.server.world.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
@@ -57,6 +58,9 @@ import com.quartercode.disconnected.shared.event.comp.program.general.FileManage
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramListRequestEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramListRequestEvent.FileManagerProgramListMissingRightsReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramListRequestEvent.FileManagerProgramListSuccessReturnEvent;
+import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramRemoveRequestEvent;
+import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramRemoveRequestEvent.FileManagerProgramRemoveMissingRightsReturnEvent;
+import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramRemoveRequestEvent.FileManagerProgramRemoveSuccessReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramSetCurrentPathRequestEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramUnknownMountpointEvent;
 import com.quartercode.disconnected.shared.event.util.FilePlaceholder;
@@ -145,20 +149,20 @@ public class FileManagerProgram extends ProgramExecutor {
             }
 
         });
-        // RUN.addExecutor("registerRemoveHandler", FileManagerProgram.class, new FunctionExecutor<Void>() {
-        //
-        // @Override
-        // public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-        //
-        // FileManagerProgram holder = (FileManagerProgram) invocation.getHolder();
-        // RemoveRequestEventHandler handler = new RemoveRequestEventHandler();
-        // handler.holder = holder;
-        // ProgramUtils.registerRequestEventHandler(holder, FileManagerProgramRemoveRequestEvent.class, handler);
-        //
-        // return invocation.next(arguments);
-        // }
-        //
-        // });
+        RUN.addExecutor("registerRemoveHandler", FileManagerProgram.class, new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                FileManagerProgram holder = (FileManagerProgram) invocation.getHolder();
+                RemoveRequestEventHandler handler = new RemoveRequestEventHandler();
+                handler.holder = holder;
+                ProgramUtils.registerRequestEventHandler(holder, FileManagerProgramRemoveRequestEvent.class, handler);
+
+                return invocation.next(arguments);
+            }
+
+        });
 
     }
 
@@ -292,9 +296,9 @@ public class FileManagerProgram extends ProgramExecutor {
             addFile.get(File.OWNER).set(sessionUser);
             addFile.get(File.GROUP).set(sessionUser.get(User.GET_PRIMARY_GROUP).invoke());
 
-            FileSystemModule fsModule = os.get(OperatingSystem.FS_MODULE).get();
             FileAddAction addAction = null;
             try {
+                FileSystemModule fsModule = os.get(OperatingSystem.FS_MODULE).get();
                 addAction = fsModule.get(FileSystemModule.CREATE_ADD_FILE).invoke(addFile, path);
             } catch (UnknownMountpointException e) {
                 sender.send(new FileManagerProgramUnknownMountpointEvent(data.getComputerId(), data.getPid(), e.getMountpoint()));
@@ -320,44 +324,44 @@ public class FileManagerProgram extends ProgramExecutor {
 
     }
 
-    // private static class RemoveRequestEventHandler implements RequestEventHandler<FileManagerProgramRemoveRequestEvent> {
-    //
-    // private FileManagerProgram holder;
-    //
-    // @Override
-    // public void handle(FileManagerProgramRemoveRequestEvent request, ReturnEventSender sender) {
-    //
-    // String path = PathUtils.normalize(request.getPath());
-    // Validate.notNull(path, "File deletion path cannot be null");
-    //
-    // ImportantData data = ProgramUtils.getImportantData(holder);
-    // Process<?> process = holder.getParent();
-    // OperatingSystem os = process.get(Process.GET_OPERATING_SYSTEM).invoke();
-    // FileSystemModule fsModule = os.get(OperatingSystem.FS_MODULE).get();
-    //
-    // File<?> removeFile = null;
-    // try {
-    // removeFile = fsModule.get(FileSystemModule.GET_FILE).invoke(path);
-    // } catch (UnknownMountpointException e) {
-    // sender.send(new FileManagerProgramRemoveUnknownMountpointReturnEvent(data.getComputerId(), data.getPid(), e.getMountpoint()));
-    // return;
-    // }
-    //
-    // if (removeFile == null) {
-    // sender.send(new FileManagerProgramRemoveInvalidPathReturnEvent(data.getComputerId(), data.getPid(), path));
-    // } else {
-    // FileRemoveAction removeAction = removeFile.get(File.CREATE_REMOVE).invoke();
-    //
-    // User sessionUser = process.get(Process.GET_USER).invoke();
-    // if (removeAction.get(FileAddAction.IS_EXECUTABLE_BY).invoke(sessionUser)) {
-    // removeAction.get(FileRemoveAction.EXECUTE).invoke();
-    // sender.send(new FileManagerProgramRemoveSuccessReturnEvent(data.getComputerId(), data.getPid()));
-    // } else {
-    // sender.send(new FileManagerProgramRemoveMissingRightsReturnEvent(data.getComputerId(), data.getPid()));
-    // }
-    // }
-    // }
-    //
-    // }
+    private static class RemoveRequestEventHandler implements RequestEventHandler<FileManagerProgramRemoveRequestEvent> {
+
+        private FileManagerProgram holder;
+
+        @Override
+        public void handle(FileManagerProgramRemoveRequestEvent request, ReturnEventSender sender) {
+
+            Validate.notNull(request.getSubpath(), "File creation subpath cannot be null");
+            String path = PathUtils.resolve(holder.get(CURRENT_PATH).get(), request.getSubpath());
+
+            ImportantData data = ProgramUtils.getImportantData(holder);
+            Process<?> process = holder.getParent();
+            OperatingSystem os = process.get(Process.GET_OPERATING_SYSTEM).invoke();
+            FileSystemModule fsModule = os.get(OperatingSystem.FS_MODULE).get();
+
+            File<?> removeFile = null;
+            try {
+                removeFile = fsModule.get(FileSystemModule.GET_FILE).invoke(path);
+            } catch (UnknownMountpointException e) {
+                sender.send(new FileManagerProgramUnknownMountpointEvent(data.getComputerId(), data.getPid(), e.getMountpoint()));
+                return;
+            }
+
+            if (removeFile == null) {
+                sender.send(new FileManagerProgramInvalidPathEvent(data.getComputerId(), data.getPid(), path));
+            } else {
+                FileRemoveAction removeAction = removeFile.get(File.CREATE_REMOVE).invoke();
+
+                User sessionUser = process.get(Process.GET_USER).invoke();
+                if (removeAction.get(FileAddAction.IS_EXECUTABLE_BY).invoke(sessionUser)) {
+                    removeAction.get(FileRemoveAction.EXECUTE).invoke();
+                    sender.send(new FileManagerProgramRemoveSuccessReturnEvent(data.getComputerId(), data.getPid()));
+                } else {
+                    sender.send(new FileManagerProgramRemoveMissingRightsReturnEvent(data.getComputerId(), data.getPid(), path));
+                }
+            }
+        }
+
+    }
 
 }

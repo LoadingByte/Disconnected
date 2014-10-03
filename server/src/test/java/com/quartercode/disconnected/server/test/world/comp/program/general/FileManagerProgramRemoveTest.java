@@ -146,7 +146,7 @@ public class FileManagerProgramRemoveTest extends AbstractProgramTest {
         parentFile.get(ParentFile.CREATE_REMOVE).invoke().get(FileRemoveAction.EXECUTE).invoke();
         fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), parentPath).get(FileAddAction.EXECUTE).invoke();
 
-        sendRemoveRequest(executeProgramAndSetCurrentPath(processModule.get(ProcessModule.ROOT_PROCESS).get(), PARENT_PATH), FILE_NAME, new EventHandler<Event>() {
+        sendRemoveRequest(executeProgramAndSetCurrentPath(processModule.get(ProcessModule.ROOT_PROCESS).get(), CommonFiles.SYSTEM_MOUNTPOINT), LOCAL_PATH, new EventHandler<Event>() {
 
             @Override
             public void handle(Event event) {
