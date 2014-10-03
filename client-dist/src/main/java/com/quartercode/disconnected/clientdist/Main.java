@@ -83,11 +83,11 @@ public class Main {
      */
     public static void main(String[] args) {
 
-        // Set general properties
-        initializeGeneral();
-
         // Print some information about the software
         LOGGER.info("Starting {} {} by {}", ApplicationInfo.TITLE, ApplicationInfo.VERSION, ApplicationInfo.VENDOR);
+
+        // Set general properties
+        initializeGeneral();
 
         // Process the command line arguments
         processCommandLineArguments(args);
