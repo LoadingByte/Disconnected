@@ -62,19 +62,7 @@ public class FileUtils {
 
     private static boolean checkRight(File<?> file, char accessor, char right) {
 
-        if (file.get(File.RIGHTS).get().isRightSet(accessor, right)) {
-            if (right == FileRights.DELETE && file instanceof ParentFile) {
-                for (File<?> child : file.get(ParentFile.CHILDREN).get()) {
-                    if (!checkRight(child, accessor, right)) {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        return false;
+        return file.get(File.RIGHTS).get().isRightSet(accessor, right);
     }
 
     /**
