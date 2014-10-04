@@ -71,6 +71,14 @@ public class PathUtils {
      * Result: /user/home/test2/docs
      * </pre>
      * 
+     * Note that going further up than the root node (/) will just result in the root node:
+     * 
+     * <pre>
+     * Start:  /user/
+     * Change: ../../
+     * Result: /
+     * </pre>
+     * 
      * @param start The absolute path the algorithm starts at.
      * @param path The "change" path which defines where the start path should change (see above).
      * @return The resolved absolute path.
@@ -93,7 +101,9 @@ public class PathUtils {
             for (String pathChange : path.split(SEPARATOR)) {
                 if (!pathChange.equals(".") && !pathChange.isEmpty()) {
                     if (pathChange.equals("..")) {
-                        current.remove(current.size() - 1);
+                        if (!current.isEmpty()) {
+                            current.remove(current.size() - 1);
+                        }
                     } else {
                         current.add(pathChange);
                     }

@@ -34,6 +34,10 @@ public class PathUtilsTest {
 
         assertEquals("Resolved path of absolute one", "/user/homes/test", PathUtils.normalize("/user/homes/test/"));
         assertEquals("Resolved path of absolute one", "/system/bin", PathUtils.normalize("/user/homes/test/../test2/../../../system/bin"));
+
+        assertEquals("Resolved path of relative one", "/", PathUtils.normalize(""));
+        assertEquals("Resolved path of relative one", "/", PathUtils.normalize("/"));
+        assertEquals("Resolved path of relative one", "/", PathUtils.normalize("../"));
     }
 
     @Test
@@ -47,6 +51,11 @@ public class PathUtilsTest {
         assertEquals("Resolved path of absolute one", "/system/bin/kernel", PathUtils.resolve("/", "/system/bin/kernel/"));
         assertEquals("Resolved path of absolute one", "/system/bin/kernel", PathUtils.resolve("/", "/system//bin/kernel"));
         assertEquals("Resolved path of absolute one", "/system/bin/kernel", PathUtils.resolve("/", "/system//bin/kernel/"));
+
+        assertEquals("Resolved path of relative one", "/", PathUtils.resolve("/", ""));
+        assertEquals("Resolved path of relative one", "/", PathUtils.resolve("/", "/"));
+        assertEquals("Resolved path of relative one", "/", PathUtils.resolve("/", "../"));
+        assertEquals("Resolved path of relative one", "/", PathUtils.resolve("/user", "../../"));
     }
 
     @Test
