@@ -19,10 +19,11 @@
 package com.quartercode.disconnected.server.test.world.comp.file;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +33,7 @@ import com.quartercode.disconnected.server.world.comp.file.Directory;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileMoveAction;
+import com.quartercode.disconnected.server.world.comp.file.FileRemoveAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.ParentFile;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
@@ -128,28 +130,75 @@ public class FileMoveActionTest extends AbstractFileActionTest {
         newParentFile.get(File.OWNER).set(user);
         fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(newParentFile, newParentPath).get(FileMoveAction.EXECUTE).invoke();
 
-        boolean[] executable = new boolean[4];
+        actuallyTestIsExecutableBy(action, newParentFile, "", "", false);
+        actuallyTestIsExecutableBy(action, newParentFile, "u:d", "", false);
+        actuallyTestIsExecutableBy(action, newParentFile, "", "u:w", false);
+        actuallyTestIsExecutableBy(action, newParentFile, "u:d", "u:w", true);
+    }
 
-        file.get(File.RIGHTS).set(new FileRights());
-        newParentFile.get(File.RIGHTS).set(new FileRights());
-        executable[0] = action.get(FileMoveAction.IS_EXECUTABLE_BY).invoke(user);
+    private void actuallyTestIsExecutableBy(FileMoveAction action, File<?> newParentFile, String fileRights, String newParentFileRights, boolean expectedResult) {
 
-        file.get(File.RIGHTS).set(new FileRights("u:d"));
-        newParentFile.get(File.RIGHTS).set(new FileRights());
-        executable[1] = action.get(FileMoveAction.IS_EXECUTABLE_BY).invoke(user);
+        file.get(File.RIGHTS).set(new FileRights(fileRights));
+        newParentFile.get(File.RIGHTS).set(new FileRights(newParentFileRights));
 
-        file.get(File.RIGHTS).set(new FileRights());
-        newParentFile.get(File.RIGHTS).set(new FileRights("u:w"));
-        executable[2] = action.get(FileMoveAction.IS_EXECUTABLE_BY).invoke(user);
+        boolean result = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
 
-        file.get(File.RIGHTS).set(new FileRights("u:d"));
-        newParentFile.get(File.RIGHTS).set(new FileRights("u:w"));
-        executable[3] = action.get(FileMoveAction.IS_EXECUTABLE_BY).invoke(user);
+        assertEquals("IS_EXECUTABLE_BY result", expectedResult, result);
+    }
 
-        assertTrue("File move action is executable although no required right is set", !executable[0]);
-        assertTrue("File move action is executable although the write right is not set on the new parent file", !executable[1]);
-        assertTrue("File move action is executable although the delete right is not set on the old file", !executable[2]);
-        assertTrue("File move action is not executable although all required rights are set", executable[3]);
+    @Test
+    public void testGetMissingRights() {
+
+        if (testRights) {
+            FileMoveAction action = createAction(file, newPath);
+            actuallyTestGetMissingRights(action);
+        }
+    }
+
+    @Test
+    public void testFileGetMissingRights() {
+
+        if (testRights) {
+            FileMoveAction action = file.get(File.CREATE_MOVE).invoke(newPath);
+            actuallyTestGetMissingRights(action);
+        }
+    }
+
+    private void actuallyTestGetMissingRights(FileMoveAction action) {
+
+        // Add the directory that would hold the actual file (we need to modify its rights later on)
+        Directory newParentFile = new Directory();
+        newParentFile.get(File.OWNER).set(user);
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(newParentFile, newParentPath).get(FileMoveAction.EXECUTE).invoke();
+
+        // Test 1
+        Map<File<?>, Character[]> test1Result = new HashMap<>();
+        test1Result.put(file, new Character[] { FileRights.DELETE });
+        test1Result.put(newParentFile, new Character[] { FileRights.WRITE });
+        actuallyTestGetMissingRights(action, newParentFile, "", "", test1Result);
+
+        // Test 2
+        Map<File<?>, Character[]> test2Result = new HashMap<>();
+        test2Result.put(newParentFile, new Character[] { FileRights.WRITE });
+        actuallyTestGetMissingRights(action, newParentFile, "u:d", "", test2Result);
+
+        // Test 3
+        Map<File<?>, Character[]> test3Result = new HashMap<>();
+        test3Result.put(file, new Character[] { FileRights.DELETE });
+        actuallyTestGetMissingRights(action, newParentFile, "", "u:w", test3Result);
+
+        // Test 4
+        actuallyTestGetMissingRights(action, newParentFile, "u:d", "u:w", new HashMap<File<?>, Character[]>());
+    }
+
+    private void actuallyTestGetMissingRights(FileMoveAction action, File<?> newParentFile, String fileRights, String newParentFileRights, Map<File<?>, Character[]> expectedResult) {
+
+        file.get(File.RIGHTS).set(new FileRights(fileRights));
+        newParentFile.get(File.RIGHTS).set(new FileRights(newParentFileRights));
+
+        Map<File<?>, Character[]> result = action.get(FileRemoveAction.GET_MISSING_RIGHTS).invoke(user);
+
+        assertEquals("Missing file rights map", prepareMissingRightsMap(expectedResult), prepareMissingRightsMap(result));
     }
 
 }

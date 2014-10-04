@@ -19,6 +19,8 @@
 package com.quartercode.disconnected.server.world.comp.file;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -26,7 +28,6 @@ import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
-import com.quartercode.disconnected.server.world.WorldFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.os.User;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
@@ -39,7 +40,7 @@ import com.quartercode.disconnected.shared.world.comp.file.FileRights;
  * @see FileAction
  * @see File
  */
-public class FileRemoveAction extends WorldFeatureHolder implements FileAction {
+public class FileRemoveAction extends FileAction {
 
     // ----- Properties -----
 
@@ -94,32 +95,32 @@ public class FileRemoveAction extends WorldFeatureHolder implements FileAction {
 
         });
 
-        IS_EXECUTABLE_BY.addExecutor("checkRemoveRight", FileRemoveAction.class, new FunctionExecutor<Boolean>() {
+        GET_MISSING_RIGHTS.addExecutor("checkForDeleteRight", FileRemoveAction.class, new FunctionExecutor<Map<File<?>, Character[]>>() {
 
             @Override
-            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
+            public Map<File<?>, Character[]> invoke(FunctionInvocation<Map<File<?>, Character[]>> invocation, Object... arguments) {
 
                 User executor = (User) arguments[0];
                 File<ParentFile<?>> removeFile = invocation.getHolder().get(FILE).get();
-                boolean result = checkFile(executor, removeFile);
+
+                Map<File<?>, Character[]> missingRights = new HashMap<>();
+                checkFile(executor, removeFile, missingRights);
 
                 invocation.next(arguments);
-                return result;
+                return missingRights;
             }
 
-            private boolean checkFile(User executor, File<?> file) {
+            private void checkFile(User executor, File<?> file, Map<File<?>, Character[]> target) {
 
                 if (!FileUtils.hasRight(executor, file, FileRights.DELETE)) {
-                    return false;
-                } else if (file instanceof ParentFile) {
-                    for (File<?> childFile : file.get(ParentFile.CHILDREN).get()) {
-                        if (!checkFile(executor, childFile)) {
-                            return false;
-                        }
-                    }
+                    target.put(file, new Character[] { FileRights.DELETE });
                 }
 
-                return true;
+                if (file instanceof ParentFile) {
+                    for (File<?> childFile : file.get(ParentFile.CHILDREN).get()) {
+                        checkFile(executor, childFile, target);
+                    }
+                }
             }
 
         });

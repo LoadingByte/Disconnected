@@ -19,13 +19,7 @@
 package com.quartercode.disconnected.server.test.world.comp.file;
 
 import static org.junit.Assert.assertEquals;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
@@ -33,25 +27,9 @@ import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.OccupiedPathException;
 import com.quartercode.disconnected.server.world.comp.file.ParentFile;
 
-@RunWith (Parameterized.class)
 public class FileAddActionRootTest extends AbstractFileActionTest {
 
-    @Parameters
-    public static Collection<Object[]> data() {
-
-        List<Object[]> data = new ArrayList<>();
-
-        data.add(new Object[] { "test.txt" });
-
-        return data;
-    }
-
-    private final String addFilePath;
-
-    public FileAddActionRootTest(String addFilePath) {
-
-        this.addFilePath = addFilePath;
-    }
+    private static final String ADD_FILE_PATH = "test.txt";
 
     private FileAddAction createAction(File<ParentFile<?>> file, String path) {
 
@@ -65,40 +43,40 @@ public class FileAddActionRootTest extends AbstractFileActionTest {
     @Test
     public void testExecute() {
 
-        FileAddAction action = createAction(file, addFilePath);
+        FileAddAction action = createAction(file, ADD_FILE_PATH);
         actuallyTestExecute(action);
     }
 
     @Test
     public void testFileSystemExecute() {
 
-        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
+        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, ADD_FILE_PATH);
         actuallyTestExecute(action);
     }
 
     private void actuallyTestExecute(FileAddAction action) {
 
         action.get(FileAddAction.EXECUTE).invoke();
-        assertEquals("Resolved file", file, fileSystem.get(FileSystem.GET_FILE).invoke(addFilePath));
+        assertEquals("Resolved file", file, fileSystem.get(FileSystem.GET_FILE).invoke(ADD_FILE_PATH));
     }
 
     @Test (expected = OccupiedPathException.class)
     public void testExecutePathAlreadyOccupied() {
 
-        FileAddAction action = createAction(file, addFilePath);
+        FileAddAction action = createAction(file, ADD_FILE_PATH);
         actuallyTestExecutePathAlreadyOccupied(action);
     }
 
     @Test (expected = OccupiedPathException.class)
     public void testFileSystemExecutePathAlreadyOccupied() {
 
-        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
+        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, ADD_FILE_PATH);
         actuallyTestExecutePathAlreadyOccupied(action);
     }
 
     private void actuallyTestExecutePathAlreadyOccupied(FileAddAction action) {
 
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), addFilePath).get(FileAddAction.EXECUTE).invoke();
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), ADD_FILE_PATH).get(FileAddAction.EXECUTE).invoke();
         action.get(FileAddAction.EXECUTE).invoke();
     }
 

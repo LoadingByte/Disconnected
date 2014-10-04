@@ -18,6 +18,12 @@
 
 package com.quartercode.disconnected.server.test.world.comp.file;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.junit.Before;
 import com.quartercode.disconnected.server.world.comp.ByteUnit;
 import com.quartercode.disconnected.server.world.comp.file.Directory;
@@ -41,6 +47,17 @@ public abstract class AbstractFileActionTest {
 
         file = new Directory();
         file.get(File.OWNER).set(user);
+    }
+
+    protected Map<File<?>, List<Character>> prepareMissingRightsMap(Map<File<?>, Character[]> map) {
+
+        Map<File<?>, List<Character>> modMap = new HashMap<>();
+
+        for (Entry<File<?>, Character[]> entry : map.entrySet()) {
+            modMap.put(entry.getKey(), new ArrayList<>(Arrays.asList(entry.getValue())));
+        }
+
+        return modMap;
     }
 
 }

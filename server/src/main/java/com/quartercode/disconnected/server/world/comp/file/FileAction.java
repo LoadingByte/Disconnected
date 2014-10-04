@@ -19,9 +19,12 @@
 package com.quartercode.disconnected.server.world.comp.file;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import java.util.Map;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.FunctionExecutor;
+import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.disconnected.server.world.WorldFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.os.User;
 
 /**
@@ -40,13 +43,13 @@ import com.quartercode.disconnected.server.world.comp.os.User;
  * 
  * @see File
  */
-public interface FileAction extends FeatureHolder {
+public abstract class FileAction extends WorldFeatureHolder {
 
     /**
      * Actually executes the defined action without doing anything else.
      * For example, a file movement action would simply do the file movement here.
      */
-    public static final FunctionDefinition<Void>    EXECUTE          = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "execute", "parameters", new Class[0]);
+    public static final FunctionDefinition<Void>                      EXECUTE            = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "execute", "parameters", new Class[0]);
 
     /**
      * Takes a {@link User} and checks whether the user is allowed to execute the action under the current circumstances.<br>
@@ -68,6 +71,45 @@ public interface FileAction extends FeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Boolean> IS_EXECUTABLE_BY = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "isExecutableBy", "parameters", new Class[] { User.class });
+    public static final FunctionDefinition<Boolean>                   IS_EXECUTABLE_BY   = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "isExecutableBy", "parameters", new Class[] { User.class });
+
+    /**
+     * If {@link #IS_EXECUTABLE_BY} is {@code false}, this method returns the files the user has insufficient access to.
+     * Moreover, a char array containing the missing rights is returned alongside each file.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link User}</td>
+     * <td>user</td>
+     * <td>The {@link User} whose missing rights for the action should be retrieved.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Map<File<?>, Character[]>> GET_MISSING_RIGHTS = create(new TypeLiteral<FunctionDefinition<Map<File<?>, Character[]>>>() {}, "name", "getMissingRights", "parameters", new Class[] { User.class });
+
+    static {
+
+        // By default, IS_EXECUTABLE_BY just checks whether the GET_MISSING_RIGHTS map is empty
+        IS_EXECUTABLE_BY.addExecutor("default", FileAction.class, new FunctionExecutor<Boolean>() {
+
+            @Override
+            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
+
+                boolean result = invocation.getHolder().get(GET_MISSING_RIGHTS).invoke(arguments[0]).isEmpty();
+
+                invocation.next(arguments);
+                return result;
+            }
+
+        });
+
+    }
 
 }

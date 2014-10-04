@@ -19,6 +19,8 @@
 package com.quartercode.disconnected.server.world.comp.file;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -28,7 +30,6 @@ import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.disconnected.server.world.WorldFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.os.User;
 import com.quartercode.disconnected.shared.util.PathUtils;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
@@ -43,7 +44,7 @@ import com.quartercode.disconnected.shared.world.comp.file.FileRights;
  * @see File
  * @see FileSystem
  */
-public class FileAddAction extends WorldFeatureHolder implements FileAction {
+public class FileAddAction extends FileAction {
 
     // ----- Properties -----
 
@@ -183,13 +184,13 @@ public class FileAddAction extends WorldFeatureHolder implements FileAction {
 
         });
 
-        IS_EXECUTABLE_BY.addExecutor("checkFirstUnexisting", FileAddAction.class, new FunctionExecutor<Boolean>() {
+        GET_MISSING_RIGHTS.addExecutor("checkFirstUnexisting", FileAddAction.class, new FunctionExecutor<Map<File<?>, Character[]>>() {
 
             @Override
-            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
+            public Map<File<?>, Character[]> invoke(FunctionInvocation<Map<File<?>, Character[]>> invocation, Object... arguments) {
 
                 User executor = (User) arguments[0];
-                boolean result = true;
+                File<?> missingRightsFile = null;
 
                 FeatureHolder holder = invocation.getHolder();
                 String[] parts = holder.get(PATH).get().split(PathUtils.SEPARATOR);
@@ -201,7 +202,7 @@ public class FileAddAction extends WorldFeatureHolder implements FileAction {
                     if (newCurrent == null) {
                         // Executor user hasn't rights to create the new file
                         if (!FileUtils.hasRight(executor, current, FileRights.WRITE)) {
-                            result = false;
+                            missingRightsFile = current;
                         }
                         break;
                     } else {
@@ -210,8 +211,14 @@ public class FileAddAction extends WorldFeatureHolder implements FileAction {
                     }
                 }
 
+                // Create the missing rights map
+                Map<File<?>, Character[]> missingRights = new HashMap<>();
+                if (missingRightsFile != null) {
+                    missingRights.put(missingRightsFile, new Character[] { FileRights.WRITE });
+                }
+
                 invocation.next(arguments);
-                return result;
+                return missingRights;
             }
 
         });

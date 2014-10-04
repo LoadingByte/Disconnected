@@ -19,6 +19,8 @@
 package com.quartercode.disconnected.server.world.comp.file;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -28,7 +30,6 @@ import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.disconnected.server.world.WorldFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.os.User;
 import com.quartercode.disconnected.shared.util.PathUtils;
 
@@ -42,7 +43,7 @@ import com.quartercode.disconnected.shared.util.PathUtils;
  * @see FileAction
  * @see File
  */
-public class FileMoveAction extends WorldFeatureHolder implements FileAction {
+public class FileMoveAction extends FileAction {
 
     // ----- Properties -----
 
@@ -163,31 +164,28 @@ public class FileMoveAction extends WorldFeatureHolder implements FileAction {
 
         });
 
-        IS_EXECUTABLE_BY.addExecutor("checkSplitActions", FileMoveAction.class, new FunctionExecutor<Boolean>() {
+        GET_MISSING_RIGHTS.addExecutor("checkSplitActions", FileMoveAction.class, new FunctionExecutor<Map<File<?>, Character[]>>() {
 
             @Override
-            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
+            public Map<File<?>, Character[]> invoke(FunctionInvocation<Map<File<?>, Character[]>> invocation, Object... arguments) {
 
                 User executor = (User) arguments[0];
-                boolean result = true;
                 FeatureHolder holder = invocation.getHolder();
+
+                Map<File<?>, Character[]> missingRights = new HashMap<>();
 
                 FileRemoveAction action1 = new FileRemoveAction();
                 action1.get(FileRemoveAction.FILE).set(holder.get(FILE).get());
-                if (!action1.get(IS_EXECUTABLE_BY).invoke(executor)) {
-                    result = false;
-                }
+                missingRights.putAll(action1.get(GET_MISSING_RIGHTS).invoke(executor));
 
                 FileAddAction action2 = new FileAddAction();
                 action2.get(FileAddAction.FILE_SYSTEM).set(holder.get(FILE_SYSTEM).get());
                 action2.get(FileAddAction.FILE).set(holder.get(FILE).get());
                 action2.get(FileAddAction.PATH).set(holder.get(PATH).get());
-                if (!action2.get(IS_EXECUTABLE_BY).invoke(executor)) {
-                    result = false;
-                }
+                missingRights.putAll(action2.get(GET_MISSING_RIGHTS).invoke(executor));
 
                 invocation.next(arguments);
-                return result;
+                return missingRights;
             }
 
         });

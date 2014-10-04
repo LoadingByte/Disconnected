@@ -18,15 +18,10 @@
 
 package com.quartercode.disconnected.server.test.world.comp.file;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import static org.junit.Assert.*;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.Directory;
 import com.quartercode.disconnected.server.world.comp.file.File;
@@ -37,27 +32,10 @@ import com.quartercode.disconnected.server.world.comp.file.OccupiedPathException
 import com.quartercode.disconnected.server.world.comp.file.ParentFile;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
-@RunWith (Parameterized.class)
 public class FileAddActionTest extends AbstractFileActionTest {
 
-    @Parameters
-    public static Collection<Object[]> data() {
-
-        List<Object[]> data = new ArrayList<>();
-
-        data.add(new Object[] { "test1/test2", "test1/test2/test.txt" });
-
-        return data;
-    }
-
-    private final String addFileParentPath;
-    private final String addFilePath;
-
-    public FileAddActionTest(String addFileParentPath, String addFilePath) {
-
-        this.addFileParentPath = addFileParentPath;
-        this.addFilePath = addFilePath;
-    }
+    private static final String ADD_FILE_PARENT_PATH = "test1/test2";
+    private static final String ADD_FILE_PATH        = ADD_FILE_PARENT_PATH + "/test.txt";
 
     private FileAddAction createAction(File<ParentFile<?>> file, String path) {
 
@@ -71,74 +49,74 @@ public class FileAddActionTest extends AbstractFileActionTest {
     @Test
     public void testExecute() {
 
-        FileAddAction action = createAction(file, addFilePath);
+        FileAddAction action = createAction(file, ADD_FILE_PATH);
         actuallyTestExecute(action);
     }
 
     @Test
     public void testFileSystemExecute() {
 
-        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
+        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, ADD_FILE_PATH);
         actuallyTestExecute(action);
     }
 
     private void actuallyTestExecute(FileAddAction action) {
 
         action.get(FileAddAction.EXECUTE).invoke();
-        assertEquals("Resolved file", file, fileSystem.get(FileSystem.GET_FILE).invoke(addFilePath));
+        assertEquals("Resolved file", file, fileSystem.get(FileSystem.GET_FILE).invoke(ADD_FILE_PATH));
     }
 
     @Test (expected = InvalidPathException.class)
     public void testExecuteInvalidPath() {
 
-        FileAddAction action = createAction(file, addFilePath);
+        FileAddAction action = createAction(file, ADD_FILE_PATH);
         actuallyTestExecuteInvalidPath(action);
     }
 
     @Test (expected = InvalidPathException.class)
     public void testFileSystemExecuteInvalidPath() {
 
-        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
+        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, ADD_FILE_PATH);
         actuallyTestExecuteInvalidPath(action);
     }
 
     private void actuallyTestExecuteInvalidPath(FileAddAction action) {
 
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), addFileParentPath).get(FileAddAction.EXECUTE).invoke();
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), ADD_FILE_PARENT_PATH).get(FileAddAction.EXECUTE).invoke();
         action.get(FileAddAction.EXECUTE).invoke();
     }
 
     @Test (expected = OccupiedPathException.class)
     public void testExecutePathAlreadyOccupied() {
 
-        FileAddAction action = createAction(file, addFilePath);
+        FileAddAction action = createAction(file, ADD_FILE_PATH);
         actuallyTestExecutePathAlreadyOccupied(action);
     }
 
     @Test (expected = OccupiedPathException.class)
     public void testFileSystemExecutePathAlreadyOccupied() {
 
-        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
+        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, ADD_FILE_PATH);
         actuallyTestExecutePathAlreadyOccupied(action);
     }
 
     private void actuallyTestExecutePathAlreadyOccupied(FileAddAction action) {
 
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), addFilePath).get(FileAddAction.EXECUTE).invoke();
+        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), ADD_FILE_PATH).get(FileAddAction.EXECUTE).invoke();
         action.get(FileAddAction.EXECUTE).invoke();
     }
 
     @Test
     public void testIsExecutableBy() {
 
-        FileAddAction action = createAction(file, addFilePath);
+        FileAddAction action = createAction(file, ADD_FILE_PATH);
         actuallyTestIsExecutableBy(action);
     }
 
     @Test
     public void testFileSystemIsExecutableBy() {
 
-        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, addFilePath);
+        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, ADD_FILE_PATH);
         actuallyTestIsExecutableBy(action);
     }
 
@@ -147,16 +125,47 @@ public class FileAddActionTest extends AbstractFileActionTest {
         // Add the directory that would hold the actual file (we need to modify its rights later on)
         Directory parentFile = new Directory();
         parentFile.get(File.OWNER).set(user);
-        createAction(parentFile, addFileParentPath).get(FileAddAction.EXECUTE).invoke();
+        createAction(parentFile, ADD_FILE_PARENT_PATH).get(FileAddAction.EXECUTE).invoke();
 
-        boolean[] executable = new boolean[2];
+        // Test 1
         parentFile.get(File.RIGHTS).set(new FileRights("u:w"));
-        executable[0] = action.get(FileAddAction.IS_EXECUTABLE_BY).invoke(user);
-        parentFile.get(File.RIGHTS).set(new FileRights());
-        executable[1] = action.get(FileAddAction.IS_EXECUTABLE_BY).invoke(user);
+        assertTrue("File add action is not executable although the write right is set on the parent directory", action.get(FileAddAction.IS_EXECUTABLE_BY).invoke(user));
 
-        assertTrue("File add action is not executable although the write right is set on the parent directory", executable[0]);
-        assertTrue("File add action is executable although the write right is not set on the parent directory", !executable[1]);
+        // Test 2
+        parentFile.get(File.RIGHTS).set(new FileRights());
+        assertFalse("File add action is executable although the write right is not set on the parent directory", action.get(FileAddAction.IS_EXECUTABLE_BY).invoke(user));
+    }
+
+    @Test
+    public void testGetMissingRights() {
+
+        FileAddAction action = createAction(file, ADD_FILE_PATH);
+        actuallyTestGetMissingRights(action);
+    }
+
+    @Test
+    public void testFileSystemGetMissingRights() {
+
+        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, ADD_FILE_PATH);
+        actuallyTestGetMissingRights(action);
+    }
+
+    private void actuallyTestGetMissingRights(FileAddAction action) {
+
+        // Add the directory that would hold the actual file (we need to modify its rights later on)
+        Directory parentFile = new Directory();
+        parentFile.get(File.OWNER).set(user);
+        createAction(parentFile, ADD_FILE_PARENT_PATH).get(FileAddAction.EXECUTE).invoke();
+
+        // Test 1
+        parentFile.get(File.RIGHTS).set(new FileRights("u:w"));
+        assertEquals("Missing file rights map with write right on parent dir", new HashMap<>(), prepareMissingRightsMap(action.get(FileAddAction.GET_MISSING_RIGHTS).invoke(user)));
+
+        // Test 2
+        parentFile.get(File.RIGHTS).set(new FileRights());
+        Map<File<?>, Character[]> test2Result = new HashMap<>();
+        test2Result.put(parentFile, new Character[] { FileRights.WRITE });
+        assertEquals("Missing file rights map without write right on parent dir", prepareMissingRightsMap(test2Result), prepareMissingRightsMap(action.get(FileAddAction.GET_MISSING_RIGHTS).invoke(user)));
     }
 
 }

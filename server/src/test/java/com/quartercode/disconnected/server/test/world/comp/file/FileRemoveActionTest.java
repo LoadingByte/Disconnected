@@ -19,10 +19,11 @@
 package com.quartercode.disconnected.server.test.world.comp.file;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -115,28 +116,66 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
 
     private void actuallyTestIsExecutableBy(FileRemoveAction action) {
 
-        boolean[] executable = new boolean[4];
+        actuallyTestIsExecutableBy(action, "", "", false);
+        actuallyTestIsExecutableBy(action, "u:d", "", false);
+        actuallyTestIsExecutableBy(action, "", "u:d", false);
+        actuallyTestIsExecutableBy(action, "u:d", "u:d", true);
+    }
 
-        file.get(File.RIGHTS).set(new FileRights());
-        childFile.get(File.RIGHTS).set(new FileRights());
-        executable[0] = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
+    private void actuallyTestIsExecutableBy(FileRemoveAction action, String fileRights, String childFileRights, boolean expectedResult) {
 
-        file.get(File.RIGHTS).set(new FileRights("u:d"));
-        childFile.get(File.RIGHTS).set(new FileRights());
-        executable[1] = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
+        file.get(File.RIGHTS).set(new FileRights(fileRights));
+        childFile.get(File.RIGHTS).set(new FileRights(childFileRights));
 
-        file.get(File.RIGHTS).set(new FileRights());
-        childFile.get(File.RIGHTS).set(new FileRights("u:d"));
-        executable[2] = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
+        boolean result = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
 
-        file.get(File.RIGHTS).set(new FileRights("u:d"));
-        childFile.get(File.RIGHTS).set(new FileRights("u:d"));
-        executable[3] = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
+        assertEquals("IS_EXECUTABLE_BY result", expectedResult, result);
+    }
 
-        assertTrue("File remove action is executable although no required right is set", !executable[0]);
-        assertTrue("File remove action is executable although the delete right is not set on the child file", !executable[1]);
-        assertTrue("File remove action is executable although the delete right is not set on the file for removal", !executable[2]);
-        assertTrue("File remove action is not executable although all required rights are set", executable[3]);
+    @Test
+    public void testGetMissingRights() {
+
+        FileRemoveAction action = createAction(file);
+        actuallyTestGetMissingRights(action);
+    }
+
+    @Test
+    public void testFileGetMissingRights() {
+
+        FileRemoveAction action = file.get(File.CREATE_REMOVE).invoke();
+        actuallyTestGetMissingRights(action);
+    }
+
+    private void actuallyTestGetMissingRights(FileRemoveAction action) {
+
+        // Test 1
+        Map<File<?>, Character[]> test1Result = new HashMap<>();
+        test1Result.put(file, new Character[] { FileRights.DELETE });
+        test1Result.put(childFile, new Character[] { FileRights.DELETE });
+        actuallyTestGetMissingRights(action, "", "", test1Result);
+
+        // Test 2
+        Map<File<?>, Character[]> test2Result = new HashMap<>();
+        test2Result.put(childFile, new Character[] { FileRights.DELETE });
+        actuallyTestGetMissingRights(action, "u:d", "", test2Result);
+
+        // Test 3
+        Map<File<?>, Character[]> test3Result = new HashMap<>();
+        test3Result.put(file, new Character[] { FileRights.DELETE });
+        actuallyTestGetMissingRights(action, "", "u:d", test3Result);
+
+        // Test 4
+        actuallyTestGetMissingRights(action, "u:d", "u:d", new HashMap<File<?>, Character[]>());
+    }
+
+    private void actuallyTestGetMissingRights(FileRemoveAction action, String fileRights, String childFileRights, Map<File<?>, Character[]> expectedResult) {
+
+        file.get(File.RIGHTS).set(new FileRights(fileRights));
+        childFile.get(File.RIGHTS).set(new FileRights(childFileRights));
+
+        Map<File<?>, Character[]> result = action.get(FileRemoveAction.GET_MISSING_RIGHTS).invoke(user);
+
+        assertEquals("Missing file rights map", prepareMissingRightsMap(expectedResult), prepareMissingRightsMap(result));
     }
 
 }
