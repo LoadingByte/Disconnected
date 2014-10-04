@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.shared.event.comp.program.general;
 
 import java.util.List;
-import com.quartercode.disconnected.shared.event.util.FilePlaceholder;
+import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
 
 /**
  * This event requests a list of {@link FilePlaceholder} inside the current directory from a file manager program.
