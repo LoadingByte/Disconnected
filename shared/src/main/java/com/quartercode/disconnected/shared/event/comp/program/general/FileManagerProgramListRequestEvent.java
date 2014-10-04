@@ -19,15 +19,16 @@
 package com.quartercode.disconnected.shared.event.comp.program.general;
 
 import java.util.List;
+import com.quartercode.disconnected.shared.event.comp.program.ProgramMissingFileRightsEvent;
 import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
 
 /**
  * This event requests a list of {@link FilePlaceholder} inside the current directory from a file manager program.
  * 
  * @see FileManagerProgramListSuccessReturnEvent
- * @see FileManagerProgramListMissingRightsReturnEvent
  * @see FileManagerProgramUnknownMountpointEvent
  * @see FileManagerProgramInvalidPathEvent
+ * @see ProgramMissingFileRightsEvent
  */
 public class FileManagerProgramListRequestEvent extends FileManagerProgramEvent {
 
@@ -74,41 +75,6 @@ public class FileManagerProgramListRequestEvent extends FileManagerProgramEvent 
         public List<FilePlaceholder> getFiles() {
 
             return files;
-        }
-
-    }
-
-    /**
-     * This event is returned by a file manager program if the session that runs the program has not enough rights for the file listing.
-     * 
-     * @see FileManagerProgramListRequestEvent
-     */
-    public static class FileManagerProgramListMissingRightsReturnEvent extends FileManagerProgramEvent {
-
-        private final String currentPath;
-
-        /**
-         * Creates a new file manager program list missing rights return event.
-         * 
-         * @param computerId The id of the computer which runs the program the event is fired by.
-         * @param pid The process id of the process which runs the program the event is fired by.
-         * @param currentPath The current path to which the file manager hasn't got sufficient access.
-         */
-        public FileManagerProgramListMissingRightsReturnEvent(String computerId, int pid, String currentPath) {
-
-            super(computerId, pid);
-
-            this.currentPath = computerId;
-        }
-
-        /**
-         * Returns the current path to which the file manager hasn't got sufficient access.
-         * 
-         * @return The current path of the file manager.
-         */
-        public String getCurrentPath() {
-
-            return currentPath;
         }
 
     }

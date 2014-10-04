@@ -20,8 +20,7 @@ package com.quartercode.disconnected.server.test.world.comp.program.general;
 
 import static com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper.getCommonLocation;
 import static com.quartercode.disconnected.shared.util.PathUtils.splitAfterMountpoint;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -48,9 +47,9 @@ import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils.ImportantData;
 import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
 import com.quartercode.disconnected.shared.constant.CommonFiles;
+import com.quartercode.disconnected.shared.event.comp.program.ProgramMissingFileRightsEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramInvalidPathEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramListRequestEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramListRequestEvent.FileManagerProgramListMissingRightsReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramListRequestEvent.FileManagerProgramListSuccessReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramSetCurrentPathRequestEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramUnknownMountpointEvent;
@@ -202,7 +201,7 @@ public class FileManagerProgramListTest extends AbstractProgramTest {
 
         dir.get(File.RIGHTS).set(new FileRights());
 
-        User testUser = new User();
+        final User testUser = new User();
         testUser.get(User.NAME).set("testUser");
 
         ChildProcess sessionProcess = processModule.get(ProcessModule.ROOT_PROCESS).get().get(Process.CREATE_CHILD).invoke();
@@ -217,8 +216,14 @@ public class FileManagerProgramListTest extends AbstractProgramTest {
             @Override
             public void handle(Event event) {
 
-                assertTrue("File manager program did not return missing rights event", event instanceof FileManagerProgramListMissingRightsReturnEvent);
-                assertEquals("Path", PATH, ((FileManagerProgramInvalidPathEvent) event).getPath());
+                assertTrue("File manager program did not return missing rights event", event instanceof ProgramMissingFileRightsEvent);
+
+                ProgramMissingFileRightsEvent missingRightsEvent = (ProgramMissingFileRightsEvent) event;
+                assertEquals("User name", testUser.get(User.NAME).get(), missingRightsEvent.getUser());
+                assertFalse("More than one file is not accessible", missingRightsEvent.containsMultipleFiles());
+                // Just check the path of the file placeholder because the internal routine is the same as the one used in the success test
+                assertEquals("File path", PATH, missingRightsEvent.getSingleFile().getPath());
+                assertArrayEquals("Missing rights", new Character[] { FileRights.READ }, missingRightsEvent.getSingleRights());
             }
 
         });

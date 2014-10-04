@@ -20,7 +20,10 @@ package com.quartercode.disconnected.server.world.comp.program.general;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -46,8 +49,8 @@ import com.quartercode.disconnected.server.world.comp.program.Process;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils.ImportantData;
+import com.quartercode.disconnected.shared.event.comp.program.ProgramMissingFileRightsEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramCreateRequestEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramCreateRequestEvent.FileManagerProgramCreateMissingRightsReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramCreateRequestEvent.FileManagerProgramCreateOccupiedPathReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramCreateRequestEvent.FileManagerProgramCreateOutOfSpaceReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramCreateRequestEvent.FileManagerProgramCreateSuccessReturnEvent;
@@ -55,10 +58,8 @@ import com.quartercode.disconnected.shared.event.comp.program.general.FileManage
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramGetCurrentPathRequestEvent.FileManagerProgramGetCurrentPathReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramInvalidPathEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramListRequestEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramListRequestEvent.FileManagerProgramListMissingRightsReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramListRequestEvent.FileManagerProgramListSuccessReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramRemoveRequestEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramRemoveRequestEvent.FileManagerProgramRemoveMissingRightsReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramRemoveRequestEvent.FileManagerProgramRemoveSuccessReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramSetCurrentPathRequestEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramUnknownMountpointEvent;
@@ -247,15 +248,16 @@ public class FileManagerProgram extends ProgramExecutor {
                 if (! (rawDir instanceof ParentFile)) {
                     sender.send(new FileManagerProgramInvalidPathEvent(data.getComputerId(), data.getPid(), path));
                 } else {
+                    String pathMountpoint = PathUtils.splitAfterMountpoint(path)[0];
                     ParentFile<?> dir = (ParentFile<?>) rawDir;
 
                     User sessionUser = process.get(Process.GET_USER).invoke();
                     if (!FileUtils.hasRight(sessionUser, dir, FileRights.READ)) {
-                        sender.send(new FileManagerProgramListMissingRightsReturnEvent(data.getComputerId(), data.getPid(), path));
+                        FilePlaceholder dirPlaceholder = FileUtils.createFilePlaceholder(pathMountpoint, dir);
+                        sender.send(new ProgramMissingFileRightsEvent(data.getComputerId(), data.getPid(), sessionUser.get(User.NAME).get(), dirPlaceholder, FileRights.READ));
                     } else {
                         List<FilePlaceholder> files = new ArrayList<>();
 
-                        String pathMountpoint = PathUtils.splitAfterMountpoint(path)[0];
                         for (File<?> file : dir.get(ParentFile.CHILDREN).get()) {
                             files.add(FileUtils.createFilePlaceholder(pathMountpoint, file));
                         }
@@ -305,7 +307,9 @@ public class FileManagerProgram extends ProgramExecutor {
             }
 
             if (addAction != null) {
-                if (addAction.get(FileAddAction.IS_EXECUTABLE_BY).invoke(sessionUser)) {
+                Map<File<?>, Character[]> missingRights = addAction.get(FileAddAction.GET_MISSING_RIGHTS).invoke(sessionUser);
+
+                if (missingRights.isEmpty()) {
                     try {
                         addAction.get(FileAddAction.EXECUTE).invoke();
                         sender.send(new FileManagerProgramCreateSuccessReturnEvent(data.getComputerId(), data.getPid()));
@@ -317,7 +321,11 @@ public class FileManagerProgram extends ProgramExecutor {
                         sender.send(new FileManagerProgramCreateOutOfSpaceReturnEvent(data.getComputerId(), data.getPid(), PathUtils.splitAfterMountpoint(path)[0], e.getSize()));
                     }
                 } else {
-                    sender.send(new FileManagerProgramCreateMissingRightsReturnEvent(data.getComputerId(), data.getPid(), path));
+                    // FileAddAction can only return a single missing right, so that single entry is the only one needed
+                    Entry<File<?>, Character[]> missingRight = missingRights.entrySet().iterator().next();
+
+                    FilePlaceholder filePlaceholder = FileUtils.createFilePlaceholder(PathUtils.splitAfterMountpoint(path)[0], missingRight.getKey());
+                    sender.send(new ProgramMissingFileRightsEvent(data.getComputerId(), data.getPid(), sessionUser.get(User.NAME).get(), filePlaceholder, missingRight.getValue()));
                 }
             }
         }
@@ -351,13 +359,21 @@ public class FileManagerProgram extends ProgramExecutor {
                 sender.send(new FileManagerProgramInvalidPathEvent(data.getComputerId(), data.getPid(), path));
             } else {
                 FileRemoveAction removeAction = removeFile.get(File.CREATE_REMOVE).invoke();
-
                 User sessionUser = process.get(Process.GET_USER).invoke();
-                if (removeAction.get(FileAddAction.IS_EXECUTABLE_BY).invoke(sessionUser)) {
+
+                Map<File<?>, Character[]> missingRights = removeAction.get(FileRemoveAction.GET_MISSING_RIGHTS).invoke(sessionUser);
+
+                if (missingRights.isEmpty()) {
                     removeAction.get(FileRemoveAction.EXECUTE).invoke();
                     sender.send(new FileManagerProgramRemoveSuccessReturnEvent(data.getComputerId(), data.getPid()));
                 } else {
-                    sender.send(new FileManagerProgramRemoveMissingRightsReturnEvent(data.getComputerId(), data.getPid(), path));
+                    // Create a missing rights array with serializable file placeholders instead of file objects
+                    Map<FilePlaceholder, Character[]> missingRightsWithPlaceholders = new HashMap<>();
+                    for (Entry<File<?>, Character[]> entry : missingRights.entrySet()) {
+                        missingRightsWithPlaceholders.put(FileUtils.createFilePlaceholder(PathUtils.splitAfterMountpoint(path)[0], entry.getKey()), entry.getValue());
+                    }
+
+                    sender.send(new ProgramMissingFileRightsEvent(data.getComputerId(), data.getPid(), sessionUser.get(User.NAME).get(), missingRightsWithPlaceholders));
                 }
             }
         }

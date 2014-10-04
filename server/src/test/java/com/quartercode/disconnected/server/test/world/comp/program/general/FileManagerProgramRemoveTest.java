@@ -43,9 +43,9 @@ import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils.ImportantData;
 import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
 import com.quartercode.disconnected.shared.constant.CommonFiles;
+import com.quartercode.disconnected.shared.event.comp.program.ProgramMissingFileRightsEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramInvalidPathEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramRemoveRequestEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramRemoveRequestEvent.FileManagerProgramRemoveMissingRightsReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramRemoveRequestEvent.FileManagerProgramRemoveSuccessReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramSetCurrentPathRequestEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramUnknownMountpointEvent;
@@ -163,7 +163,7 @@ public class FileManagerProgramRemoveTest extends AbstractProgramTest {
 
         removeFile.get(File.RIGHTS).set(new FileRights());
 
-        User testUser = new User();
+        final User testUser = new User();
         testUser.get(User.NAME).set("testUser");
 
         ChildProcess sessionProcess = processModule.get(ProcessModule.ROOT_PROCESS).get().get(Process.CREATE_CHILD).invoke();
@@ -178,7 +178,14 @@ public class FileManagerProgramRemoveTest extends AbstractProgramTest {
             @Override
             public void handle(Event event) {
 
-                assertTrue("File manager program did not return missing rights event", event instanceof FileManagerProgramRemoveMissingRightsReturnEvent);
+                assertTrue("File manager program did not return missing rights event", event instanceof ProgramMissingFileRightsEvent);
+
+                ProgramMissingFileRightsEvent missingRightsEvent = (ProgramMissingFileRightsEvent) event;
+                assertEquals("User name", testUser.get(User.NAME).get(), missingRightsEvent.getUser());
+                assertFalse("More than one file is not accessible", missingRightsEvent.containsMultipleFiles());
+                // Just check the path of the file placeholder because the internal routine is tested elsewhere
+                assertEquals("File path", PATH, missingRightsEvent.getSingleFile().getPath());
+                assertArrayEquals("Missing rights", new Character[] { FileRights.DELETE }, missingRightsEvent.getSingleRights());
             }
 
         });

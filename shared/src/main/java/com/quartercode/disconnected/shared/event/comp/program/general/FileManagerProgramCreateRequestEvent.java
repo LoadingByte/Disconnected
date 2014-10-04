@@ -18,6 +18,8 @@
 
 package com.quartercode.disconnected.shared.event.comp.program.general;
 
+import com.quartercode.disconnected.shared.event.comp.program.ProgramMissingFileRightsEvent;
+
 /**
  * This event requests the creation of a file under the current path of the file manager.
  * It transports a subpath, which describes the location of the new file relative to the current path, and the type of the new file.
@@ -25,7 +27,7 @@ package com.quartercode.disconnected.shared.event.comp.program.general;
  * @see FileManagerProgramCreateSuccessReturnEvent
  * @see FileManagerProgramCreateOccupiedPathReturnEvent
  * @see FileManagerProgramCreateOutOfSpaceReturnEvent
- * @see FileManagerProgramCreateMissingRightsReturnEvent
+ * @see ProgramMissingFileRightsEvent
  */
 public class FileManagerProgramCreateRequestEvent extends FileManagerProgramEvent {
 
@@ -179,41 +181,6 @@ public class FileManagerProgramCreateRequestEvent extends FileManagerProgramEven
         public long getRequiredSpace() {
 
             return requiredSpace;
-        }
-
-    }
-
-    /**
-     * This event is returned by a file manager program if the session that runs the program has not enough rights for the file creation.
-     * 
-     * @see FileManagerProgramCreateRequestEvent
-     */
-    public static class FileManagerProgramCreateMissingRightsReturnEvent extends FileManagerProgramEvent {
-
-        private final String path;
-
-        /**
-         * Creates a new file manager program create missing rights return event.
-         * 
-         * @param computerId The id of the computer which runs the program the event is fired by.
-         * @param pid The process id of the process which runs the program the event is fired by.
-         * @param path The global file path of the new file to which the file manager hasn't got sufficient access.
-         */
-        public FileManagerProgramCreateMissingRightsReturnEvent(String computerId, int pid, String path) {
-
-            super(computerId, pid);
-
-            this.path = path;
-        }
-
-        /**
-         * Returns the global file path of the new file to which the file manager hasn't got sufficient access.
-         * 
-         * @return The path for the new file.
-         */
-        public String getPath() {
-
-            return path;
         }
 
     }

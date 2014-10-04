@@ -18,12 +18,14 @@
 
 package com.quartercode.disconnected.shared.event.comp.program.general;
 
+import com.quartercode.disconnected.shared.event.comp.program.ProgramMissingFileRightsEvent;
+
 /**
  * This event requests the deletion of a file under the current path of the file manager.
  * It actually transports a subpath which describes the location of the new file relative to the current path.
  * 
  * @see FileManagerProgramRemoveSuccessReturnEvent
- * @see FileManagerProgramRemoveMissingRightsReturnEvent
+ * @see ProgramMissingFileRightsEvent
  */
 public class FileManagerProgramRemoveRequestEvent extends FileManagerProgramEvent {
 
@@ -71,41 +73,6 @@ public class FileManagerProgramRemoveRequestEvent extends FileManagerProgramEven
         public FileManagerProgramRemoveSuccessReturnEvent(String computerId, int pid) {
 
             super(computerId, pid);
-        }
-
-    }
-
-    /**
-     * This event is returned by a file manager program if the session that runs the program has not enough rights for the file deletion.
-     * 
-     * @see FileManagerProgramRemoveRequestEvent
-     */
-    public static class FileManagerProgramRemoveMissingRightsReturnEvent extends FileManagerProgramEvent {
-
-        private final String path;
-
-        /**
-         * Creates a new file manager program remove missing rights return event.
-         * 
-         * @param computerId The id of the computer which runs the program the event is fired by.
-         * @param pid The process id of the process which runs the program the event is fired by.
-         * @param path The global file path of the file for removal to which the file manager hasn't got sufficient access.
-         */
-        public FileManagerProgramRemoveMissingRightsReturnEvent(String computerId, int pid, String path) {
-
-            super(computerId, pid);
-
-            this.path = path;
-        }
-
-        /**
-         * Returns the global file path of the file for removal to which the file manager hasn't got sufficient access.
-         * 
-         * @return The path of the file for removal.
-         */
-        public String getPath() {
-
-            return path;
         }
 
     }
