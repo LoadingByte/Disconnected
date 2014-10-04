@@ -31,7 +31,6 @@ import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileRemoveAction;
-import com.quartercode.disconnected.server.world.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
 import com.quartercode.disconnected.server.world.comp.file.FileUtils;
@@ -65,6 +64,7 @@ import com.quartercode.disconnected.shared.event.comp.program.general.FileManage
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramUnknownMountpointEvent;
 import com.quartercode.disconnected.shared.event.util.FilePlaceholder;
 import com.quartercode.disconnected.shared.util.PathUtils;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.eventbridge.extra.extension.RequestEventHandler;
 import com.quartercode.eventbridge.extra.extension.ReturnEventSender;
 
@@ -250,7 +250,7 @@ public class FileManagerProgram extends ProgramExecutor {
                     ParentFile<?> dir = (ParentFile<?>) rawDir;
 
                     User sessionUser = process.get(Process.GET_USER).invoke();
-                    if (!FileUtils.hasRight(sessionUser, dir, FileRight.READ)) {
+                    if (!FileUtils.hasRight(sessionUser, dir, FileRights.READ)) {
                         sender.send(new FileManagerProgramListMissingRightsReturnEvent(data.getComputerId(), data.getPid(), path));
                     } else {
                         List<FilePlaceholder> files = new ArrayList<>();

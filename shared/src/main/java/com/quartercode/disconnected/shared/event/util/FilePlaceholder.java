@@ -24,6 +24,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import com.quartercode.disconnected.shared.util.PathUtils;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
 /**
  * A file placeholder represents a file object by storing commonly used data about it.
@@ -34,7 +35,7 @@ public class FilePlaceholder implements Serializable {
     private final String       path;
     private final String       type;
     private final long         size;
-    private final String       rights;
+    private final FileRights   rights;
     private final String       owner;
     private final String       group;
 
@@ -48,16 +49,16 @@ public class FilePlaceholder implements Serializable {
      *        By default, possible strings are {@code rootFile}, {@code directory}, and {@code contentFile}.
      * @param size The total size of the represented file.
      *        If the placeholder represents a file system, the size of that file system should be used.
-     * @param rights A file rights string which stores the file rights of the represented file.
+     * @param rights A {@link FileRights} object that stores the file rights of the represented file.
      * @param owner The name of the user that owns the represented file.
      * @param group The name of the group that is assigned to the represented file.
      */
-    public FilePlaceholder(String path, String type, long size, String rights, String owner, String group) {
+    public FilePlaceholder(String path, String type, long size, FileRights rights, String owner, String group) {
 
         Validate.notNull(path, "File placeholder path cannot be null");
         Validate.notNull(type, "File placeholder type cannot be null");
         Validate.isTrue(size >= 0, "File placeholder size must be >= 0");
-        Validate.notBlank(rights, "File placeholder rights cannot be blank");
+        Validate.notNull(rights, "File placeholder rights cannot be null");
 
         this.path = path;
         this.type = type;
@@ -150,11 +151,11 @@ public class FilePlaceholder implements Serializable {
     }
 
     /**
-     * Returns a file rights string which stores the file rights of the represented file.
+     * Returns a {@link FileRights} object that stores the file rights of the represented file.
      * 
-     * @return The file rights as a string.
+     * @return The file rights.
      */
-    public String getRights() {
+    public FileRights getRights() {
 
         return rights;
     }

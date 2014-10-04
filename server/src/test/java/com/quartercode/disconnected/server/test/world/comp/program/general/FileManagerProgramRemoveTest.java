@@ -28,7 +28,6 @@ import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileRemoveAction;
-import com.quartercode.disconnected.server.world.comp.file.FileRights;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
@@ -50,6 +49,7 @@ import com.quartercode.disconnected.shared.event.comp.program.general.FileManage
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramRemoveRequestEvent.FileManagerProgramRemoveSuccessReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramSetCurrentPathRequestEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramUnknownMountpointEvent;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.eventbridge.bridge.Event;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionRequester;
@@ -161,7 +161,7 @@ public class FileManagerProgramRemoveTest extends AbstractProgramTest {
     @Test
     public void testMissingRights() {
 
-        removeFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
+        removeFile.get(File.RIGHTS).set(new FileRights());
 
         User testUser = new User();
         testUser.get(User.NAME).set("testUser");

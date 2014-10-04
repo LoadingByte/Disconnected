@@ -42,12 +42,12 @@ import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.server.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
-import com.quartercode.disconnected.server.world.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.server.world.comp.file.FileUtils;
 import com.quartercode.disconnected.server.world.comp.os.EnvironmentVariable;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.os.Session;
 import com.quartercode.disconnected.server.world.comp.os.User;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
 /**
  * This class represents a process which is basically a running instance of a program.
@@ -716,7 +716,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
                 // Check read and execution right on source file
                 ContentFile source = holder.get(SOURCE).get();
                 User user = holder.get(GET_USER).invoke();
-                if (!FileUtils.hasRight(user, source, FileRight.READ) || !FileUtils.hasRight(user, source, FileRight.EXECUTE)) {
+                if (!FileUtils.hasRight(user, source, FileRights.READ) || !FileUtils.hasRight(user, source, FileRights.EXECUTE)) {
                     throw new IllegalStateException("Cannot initialize process: No read right and execute right on file");
                 }
 

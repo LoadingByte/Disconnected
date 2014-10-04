@@ -19,13 +19,12 @@
 package com.quartercode.disconnected.server.world.comp.file;
 
 import org.apache.commons.lang3.tuple.Triple;
-import com.quartercode.disconnected.server.world.comp.file.FileRights.FileAccessor;
-import com.quartercode.disconnected.server.world.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
 import com.quartercode.disconnected.server.world.comp.os.Group;
 import com.quartercode.disconnected.server.world.comp.os.User;
 import com.quartercode.disconnected.shared.event.util.FilePlaceholder;
 import com.quartercode.disconnected.shared.util.PathUtils;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
 /**
  * This file utility contains methods related to {@link File}s and {@link FileSystem}s.
@@ -43,28 +42,28 @@ public class FileUtils {
      * @param right The {@link FileRight} the given {@link User} may have.
      * @return True if the given {@link User} has the given {@link FileRight} on the given {@link File}.
      */
-    public static boolean hasRight(User user, File<?> file, FileRight right) {
+    public static boolean hasRight(User user, File<?> file, char right) {
 
         if (user == null || user.get(User.IS_SUPERUSER).invoke()) {
             return true;
         } else if (file instanceof RootFile) {
             // Only superusers (filtered out by the previous check) can add files to the root file
             return false;
-        } else if (checkRight(file, FileAccessor.OWNER, right) && file.get(File.OWNER).get().equals(user)) {
+        } else if (checkRight(file, FileRights.OWNER, right) && file.get(File.OWNER).get().equals(user)) {
             return true;
-        } else if (checkRight(file, FileAccessor.GROUP, right) && user.get(User.GROUPS).get().contains(file.get(File.GROUP).get())) {
+        } else if (checkRight(file, FileRights.GROUP, right) && user.get(User.GROUPS).get().contains(file.get(File.GROUP).get())) {
             return true;
-        } else if (checkRight(file, FileAccessor.OTHERS, right)) {
+        } else if (checkRight(file, FileRights.OTHERS, right)) {
             return true;
         }
 
         return false;
     }
 
-    private static boolean checkRight(File<?> file, FileAccessor accessor, FileRight right) {
+    private static boolean checkRight(File<?> file, char accessor, char right) {
 
-        if (file.get(File.RIGHTS).get().get(FileRights.GET).invoke(accessor, right)) {
-            if (right == FileRight.DELETE && file instanceof ParentFile) {
+        if (file.get(File.RIGHTS).get().isRightSet(accessor, right)) {
+            if (right == FileRights.DELETE && file instanceof ParentFile) {
                 for (File<?> child : file.get(ParentFile.CHILDREN).get()) {
                     if (!checkRight(child, accessor, right)) {
                         return false;
@@ -104,7 +103,7 @@ public class FileUtils {
         String path = PathUtils.SEPARATOR + fileSystem.get(KnownFileSystem.MOUNTPOINT).get();
         String type = StringFileTypeMapper.classToString(RootFile.class);
         long size = actualFs.get(FileSystem.GET_SIZE).invoke();
-        Triple<String, String, String> commonData = getCommonFilePlaceholderData(root);
+        Triple<FileRights, String, String> commonData = getCommonFilePlaceholderData(root);
 
         return new FilePlaceholder(path, type, size, commonData.getLeft(), commonData.getMiddle(), commonData.getRight());
     }
@@ -122,14 +121,14 @@ public class FileUtils {
 
         String type = StringFileTypeMapper.classToString(file.getClass());
         long size = file.get(File.GET_SIZE).invoke();
-        Triple<String, String, String> commonData = getCommonFilePlaceholderData(file);
+        Triple<FileRights, String, String> commonData = getCommonFilePlaceholderData(file);
 
         return new FilePlaceholder(path, type, size, commonData.getLeft(), commonData.getMiddle(), commonData.getRight());
     }
 
-    private static Triple<String, String, String> getCommonFilePlaceholderData(File<?> file) {
+    private static Triple<FileRights, String, String> getCommonFilePlaceholderData(File<?> file) {
 
-        String rights = file.get(File.RIGHTS).get().get(FileRights.TO_STRING).invoke();
+        FileRights rights = file.get(File.RIGHTS).get();
 
         User ownerObject = file.get(File.OWNER).get();
         String owner = ownerObject == null ? null : ownerObject.get(User.NAME).get();

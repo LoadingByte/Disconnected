@@ -27,8 +27,8 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.disconnected.server.world.WorldFeatureHolder;
-import com.quartercode.disconnected.server.world.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.server.world.comp.os.User;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
 /**
  * The file remove action is a simple file action that defines the process of removing a {@link File} from its file system.
@@ -109,7 +109,7 @@ public class FileRemoveAction extends WorldFeatureHolder implements FileAction {
 
             private boolean checkFile(User executor, File<?> file) {
 
-                if (!FileUtils.hasRight(executor, file, FileRight.DELETE)) {
+                if (!FileUtils.hasRight(executor, file, FileRights.DELETE)) {
                     return false;
                 } else if (file instanceof ParentFile) {
                     for (File<?> childFile : file.get(ParentFile.CHILDREN).get()) {

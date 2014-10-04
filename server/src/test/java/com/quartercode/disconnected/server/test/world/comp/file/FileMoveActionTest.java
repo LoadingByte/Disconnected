@@ -32,9 +32,9 @@ import com.quartercode.disconnected.server.world.comp.file.Directory;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileMoveAction;
-import com.quartercode.disconnected.server.world.comp.file.FileRights;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.ParentFile;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
 @RunWith (Parameterized.class)
 public class FileMoveActionTest extends AbstractFileActionTest {
@@ -130,20 +130,20 @@ public class FileMoveActionTest extends AbstractFileActionTest {
 
         boolean[] executable = new boolean[4];
 
-        file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
-        newParentFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
+        file.get(File.RIGHTS).set(new FileRights());
+        newParentFile.get(File.RIGHTS).set(new FileRights());
         executable[0] = action.get(FileMoveAction.IS_EXECUTABLE_BY).invoke(user);
 
-        file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("--d---------");
-        newParentFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
+        file.get(File.RIGHTS).set(new FileRights("u:d"));
+        newParentFile.get(File.RIGHTS).set(new FileRights());
         executable[1] = action.get(FileMoveAction.IS_EXECUTABLE_BY).invoke(user);
 
-        file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
-        newParentFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("-w----------");
+        file.get(File.RIGHTS).set(new FileRights());
+        newParentFile.get(File.RIGHTS).set(new FileRights("u:w"));
         executable[2] = action.get(FileMoveAction.IS_EXECUTABLE_BY).invoke(user);
 
-        file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("--d---------");
-        newParentFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("-w----------");
+        file.get(File.RIGHTS).set(new FileRights("u:d"));
+        newParentFile.get(File.RIGHTS).set(new FileRights("u:w"));
         executable[3] = action.get(FileMoveAction.IS_EXECUTABLE_BY).invoke(user);
 
         assertTrue("File move action is executable although no required right is set", !executable[0]);

@@ -31,7 +31,6 @@ import com.quartercode.disconnected.server.world.comp.Version;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
-import com.quartercode.disconnected.server.world.comp.file.FileRights;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
@@ -57,6 +56,7 @@ import com.quartercode.disconnected.server.world.comp.program.general.FileManage
 import com.quartercode.disconnected.server.world.general.Location;
 import com.quartercode.disconnected.shared.constant.CommonFiles;
 import com.quartercode.disconnected.shared.util.PathUtils;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
 /**
  * The world generator utility generates {@link World}s and parts of worlds.
@@ -314,7 +314,7 @@ public class WorldGenerator {
         program.get(Program.VERSION).set(version);
         program.get(Program.EXECUTOR_CLASS).set(executor);
 
-        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(getCommonLocation(executor).toString())[1], superuser, "r--xr--xr--x", program);
+        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(getCommonLocation(executor).toString())[1], superuser, "o:rx", program);
     }
 
     // Temporary method for generating some unnecessary programs and personal files
@@ -323,7 +323,7 @@ public class WorldGenerator {
         // Generate basic user config
         Configuration userConfig = new Configuration();
         userConfig.get(Configuration.ENTRIES).add(superuser);
-        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(CommonFiles.USER_CONFIG)[1], superuser, "rw----------", userConfig);
+        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(CommonFiles.USER_CONFIG)[1], superuser, "o:r", userConfig);
 
         // Generate basic environment config
         Configuration envConfig = new Configuration();
@@ -331,14 +331,14 @@ public class WorldGenerator {
         pathVariable.get(EnvironmentVariable.NAME).set("PATH");
         pathVariable.get(EnvironmentVariable.SET_VALUE_LIST).invoke(Arrays.asList(CommonFiles.SYS_BIN_DIR, CommonFiles.USER_BIN_DIR));
         envConfig.get(Configuration.ENTRIES).add(pathVariable);
-        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(CommonFiles.ENVIRONMENT_CONFIG)[1], superuser, "rw--r---r---", envConfig);
+        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(CommonFiles.ENVIRONMENT_CONFIG)[1], superuser, "o:r", envConfig);
     }
 
     private static ContentFile createContentFile(User owner, String rights, Object content) {
 
         ContentFile file = new ContentFile();
         file.get(File.OWNER).set(owner);
-        file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke(rights);
+        file.get(File.RIGHTS).set(new FileRights(rights));
         file.get(ContentFile.CONTENT).set(content);
         return file;
     }

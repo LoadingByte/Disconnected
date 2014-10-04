@@ -32,10 +32,10 @@ import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileRemoveAction;
-import com.quartercode.disconnected.server.world.comp.file.FileRights;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.ParentFile;
 import com.quartercode.disconnected.shared.util.PathUtils;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
 @RunWith (Parameterized.class)
 public class FileRemoveActionTest extends AbstractFileActionTest {
@@ -117,20 +117,20 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
 
         boolean[] executable = new boolean[4];
 
-        file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
-        childFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
+        file.get(File.RIGHTS).set(new FileRights());
+        childFile.get(File.RIGHTS).set(new FileRights());
         executable[0] = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
 
-        file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("--d---------");
-        childFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
+        file.get(File.RIGHTS).set(new FileRights("u:d"));
+        childFile.get(File.RIGHTS).set(new FileRights());
         executable[1] = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
 
-        file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("------------");
-        childFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("--d---------");
+        file.get(File.RIGHTS).set(new FileRights());
+        childFile.get(File.RIGHTS).set(new FileRights("u:d"));
         executable[2] = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
 
-        file.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("--d---------");
-        childFile.get(File.RIGHTS).get().get(FileRights.FROM_STRING).invoke("--d---------");
+        file.get(File.RIGHTS).set(new FileRights("u:d"));
+        childFile.get(File.RIGHTS).set(new FileRights("u:d"));
         executable[3] = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
 
         assertTrue("File remove action is executable although no required right is set", !executable[0]);

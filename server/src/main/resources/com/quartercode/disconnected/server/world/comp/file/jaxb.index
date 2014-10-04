@@ -1,7 +1,6 @@
 ContentFile
 Directory
 File
-FileRights
 FileSystem
 FileSystemModule
 FileSystemModule$KnownFileSystem

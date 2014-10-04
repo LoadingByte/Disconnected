@@ -23,11 +23,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
-import com.quartercode.disconnected.server.world.comp.file.FileRights;
-import com.quartercode.disconnected.server.world.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.server.world.comp.file.FileUtils;
 import com.quartercode.disconnected.server.world.comp.os.Group;
 import com.quartercode.disconnected.server.world.comp.os.User;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
 public class FileUtilsTest {
 
@@ -59,22 +58,18 @@ public class FileUtilsTest {
         file.get(File.OWNER).set(owner);
         file.get(File.GROUP).set(group);
 
-        FileRights rights = file.get(File.RIGHTS).get();
+        file.get(File.RIGHTS).set(new FileRights());
+        assertTrue("Owner has read right although it is not set for owner", !FileUtils.hasRight(owner, file, FileRights.READ));
 
-        rights.get(FileRights.FROM_STRING).invoke("------------");
-        assertTrue("Owner has read right although it is not set for owner", !FileUtils.hasRight(owner, file, FileRight.READ));
+        file.get(File.RIGHTS).set(new FileRights("u:r"));
+        assertTrue("Owner hasn't read right although it is set for owner", FileUtils.hasRight(owner, file, FileRights.READ));
+        assertTrue("Group user has read right although it is not set for group", !FileUtils.hasRight(groupuser, file, FileRights.READ));
 
-        rights.get(FileRights.FROM_STRING).invoke("r-----------");
-        assertTrue("Owner hasn't read right although it is set for owner", FileUtils.hasRight(owner, file, FileRight.READ));
-
-        rights.get(FileRights.FROM_STRING).invoke("r-----------");
-        assertTrue("Group user has read right although it is not set for group", !FileUtils.hasRight(groupuser, file, FileRight.READ));
-
-        rights.get(FileRights.FROM_STRING).invoke("-w--r-------");
-        assertTrue("Owner hasn't write right although it is set for owner", FileUtils.hasRight(owner, file, FileRight.WRITE));
-        assertTrue("Owner hasn't read right although it is set for group", FileUtils.hasRight(owner, file, FileRight.READ));
-        assertTrue("Group user has write right although it is not set for group", !FileUtils.hasRight(groupuser, file, FileRight.WRITE));
-        assertTrue("Group user hasn't read right although it is set for group", FileUtils.hasRight(groupuser, file, FileRight.READ));
+        file.get(File.RIGHTS).set(new FileRights("g:r,u:w"));
+        assertTrue("Owner hasn't write right although it is set for owner", FileUtils.hasRight(owner, file, FileRights.WRITE));
+        assertTrue("Owner hasn't read right although it is set for group", FileUtils.hasRight(owner, file, FileRights.READ));
+        assertTrue("Group user has write right although it is not set for group", !FileUtils.hasRight(groupuser, file, FileRights.WRITE));
+        assertTrue("Group user hasn't read right although it is set for group", FileUtils.hasRight(groupuser, file, FileRights.READ));
     }
 
     @Test

@@ -29,9 +29,9 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.server.world.WorldFeatureHolder;
-import com.quartercode.disconnected.server.world.comp.file.FileRights.FileRight;
 import com.quartercode.disconnected.server.world.comp.os.User;
 import com.quartercode.disconnected.shared.util.PathUtils;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
 /**
  * The file add action is a simple file action that defines the process of adding a {@link File} to a {@link FileSystem}.
@@ -143,7 +143,7 @@ public class FileAddAction extends WorldFeatureHolder implements FileAction {
                             directory.get(File.NAME).set(pathPart);
                             directory.get(File.OWNER).set(addFile.get(File.OWNER).get());
                             directory.get(File.GROUP).set(addFile.get(File.GROUP).get());
-                            directory.get(File.RIGHTS).get().get(FileRights.FROM_OBJECT).invoke(addFile.get(File.RIGHTS).get());
+                            directory.get(File.RIGHTS).set(new FileRights(addFile.get(File.RIGHTS).get()));
                             current.get(ParentFile.CHILDREN).add(directory);
                             nextCurrent = directory;
                         } else if (! (nextCurrent instanceof ParentFile)) {
@@ -200,7 +200,7 @@ public class FileAddAction extends WorldFeatureHolder implements FileAction {
                     // Check whether the current file exists
                     if (newCurrent == null) {
                         // Executor user hasn't rights to create the new file
-                        if (!FileUtils.hasRight(executor, current, FileRight.WRITE)) {
+                        if (!FileUtils.hasRight(executor, current, FileRights.WRITE)) {
                             result = false;
                         }
                         break;

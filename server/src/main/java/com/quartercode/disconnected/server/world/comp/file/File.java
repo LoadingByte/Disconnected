@@ -34,6 +34,7 @@ import com.quartercode.disconnected.server.world.comp.SizeUtil.DerivableSize;
 import com.quartercode.disconnected.server.world.comp.os.Group;
 import com.quartercode.disconnected.server.world.comp.os.User;
 import com.quartercode.disconnected.shared.util.PathUtils;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
 /**
  * This class represents a file on a {@link FileSystem}.
@@ -49,9 +50,11 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
 
     /**
      * The default {@link FileRights} string for every new file.
+     * Note that this object is not allowed to be modified.
+     * If you wish to obtain an instance of the default file rights, please use the {@link FileRights#FileRights(FileRights)} copy constructor.
      */
     // TODO: Make the default {@link FileRights} dynamic
-    public static final String                               DEFAULT_FILE_RIGHTS = "rwd-r---r---";
+    public static final FileRights                           DEFAULT_FILE_RIGHTS = new FileRights("o:r,u:dw");
 
     // ----- Properties -----
 
@@ -61,8 +64,8 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
     public static final PropertyDefinition<String>           NAME;
 
     /**
-     * The {@link FileRights} object which stores the UNIX-like file right attributes.
-     * For more documentation on how it works, see the {@link FileRights} class.
+     * The {@link FileRights} object that stores which user groups are allowed to do which operations on the file.
+     * See the {@link FileRights} class for more documentation on how it works.
      */
     public static final PropertyDefinition<FileRights>       RIGHTS;
 
@@ -87,9 +90,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
             @Override
             public FileRights get() {
 
-                FileRights rights = new FileRights();
-                rights.get(FileRights.FROM_STRING).invoke(DEFAULT_FILE_RIGHTS);
-                return rights;
+                return new FileRights(DEFAULT_FILE_RIGHTS);
             }
 
         });
