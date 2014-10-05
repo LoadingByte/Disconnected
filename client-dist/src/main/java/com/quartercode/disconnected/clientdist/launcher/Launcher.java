@@ -18,9 +18,11 @@
 
 package com.quartercode.disconnected.clientdist.launcher;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +40,7 @@ public class Launcher {
     private String              mainClass;
     private String[]            vmArguments;
     private String[]            programArguments;
-    private File                directory;
+    private Path                workingDirectory;
 
     /**
      * Creates a new empty launcher.
@@ -55,7 +57,7 @@ public class Launcher {
     public Launcher(String mainClass) {
 
         this.mainClass = mainClass;
-        directory = new File(".");
+        workingDirectory = Paths.get(".");
     }
 
     /**
@@ -64,14 +66,14 @@ public class Launcher {
      * @param mainClass The main class which get called on launch.
      * @param vmArguments The vm arguments which are set on launch and read by the virtual machine.
      * @param programArguments The program arguments which are set on launch and read by the executed program.
-     * @param directory The directory the new process will be launched in.
+     * @param workingDirectory The directory the new process will be launched in.
      */
-    public Launcher(String mainClass, String[] vmArguments, String[] programArguments, File directory) {
+    public Launcher(String mainClass, String[] vmArguments, String[] programArguments, Path workingDirectory) {
 
         this.mainClass = mainClass;
-        this.vmArguments = vmArguments;
-        this.programArguments = programArguments;
-        this.directory = directory;
+        this.vmArguments = vmArguments.clone();
+        this.programArguments = programArguments.clone();
+        this.workingDirectory = workingDirectory;
     }
 
     /**
@@ -102,7 +104,7 @@ public class Launcher {
      */
     public String[] getVmArguments() {
 
-        return vmArguments;
+        return vmArguments.clone();
     }
 
     /**
@@ -113,7 +115,7 @@ public class Launcher {
      */
     public void setVmArguments(String[] vmArguments) {
 
-        this.vmArguments = vmArguments;
+        this.vmArguments = vmArguments.clone();
     }
 
     /**
@@ -124,7 +126,7 @@ public class Launcher {
      */
     public String[] getProgramArguments() {
 
-        return programArguments;
+        return programArguments.clone();
     }
 
     /**
@@ -135,7 +137,7 @@ public class Launcher {
      */
     public void setProgramArguments(String[] programArguments) {
 
-        this.programArguments = programArguments;
+        this.programArguments = programArguments.clone();
     }
 
     /**
@@ -143,19 +145,19 @@ public class Launcher {
      * 
      * @return The working directory for the new process.
      */
-    public File getDirectory() {
+    public Path getWorkingDirectory() {
 
-        return directory;
+        return workingDirectory;
     }
 
     /**
      * Changes the directory the new process will be launched in.
      * 
-     * @param directory The new working directory for the new process.
+     * @param workingDirectory The new working directory for the new process.
      */
-    public void setDirectory(File directory) {
+    public void setWorkingDirectory(Path workingDirectory) {
 
-        this.directory = directory;
+        this.workingDirectory = workingDirectory;
     }
 
     /**
@@ -163,35 +165,19 @@ public class Launcher {
      */
     public void launch() {
 
-        LOGGER.info("Creating working directory '{}'", directory.getAbsolutePath());
-        directory.mkdirs();
+        LOGGER.info("Creating working directory '{}'", workingDirectory);
+        try {
+            Files.createDirectories(workingDirectory);
+        } catch (IOException e) {
+            LOGGER.error("Cannot create working directory '{}'; terminating launcher", workingDirectory);
+            return;
+        }
 
         LOGGER.info("Launching main class '{}'", mainClass);
 
         try {
-            File file = new File(Launcher.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-
-            List<String> command = new ArrayList<>();
-            command.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
-            LOGGER.info("Java Binary: '{}'", command.get(0));
-            if (vmArguments != null && vmArguments.length > 0) {
-                LOGGER.info("VM Arguments: {}", Arrays.toString(vmArguments));
-                for (String vmArgument : vmArguments) {
-                    command.add(vmArgument);
-                }
-            }
-            command.add("-cp");
-            command.add(file.getAbsolutePath());
-            command.add(mainClass);
-            if (programArguments != null && programArguments.length > 0) {
-                LOGGER.info("Program Arguments: {}", Arrays.toString(programArguments));
-                for (String programArgument : programArguments) {
-                    command.add(programArgument);
-                }
-            }
-
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
-            processBuilder.directory(directory);
+            ProcessBuilder processBuilder = new ProcessBuilder(buildCommand());
+            processBuilder.directory(workingDirectory.toFile());
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
 
@@ -209,10 +195,45 @@ public class Launcher {
         } catch (IOException e) {
             LOGGER.error("Can't build process/read process output", e);
         } catch (InterruptedException e) {
-            LOGGER.error("Interrupted while waiting for launched process", e);
+            LOGGER.error("Interrupted while waiting for launched process to terminate", e);
         }
 
         LOGGER.info("Launcher terminated");
+    }
+
+    private List<String> buildCommand() throws URISyntaxException {
+
+        List<String> command = new ArrayList<>();
+
+        // Append java vm binary
+        String javaBinary = System.getProperty("java.home") + "/bin/java";
+        LOGGER.info("Java Binary: '{}'", javaBinary);
+        command.add(javaBinary);
+
+        // Append java vm arguments
+        LOGGER.info("VM Arguments: {}", Arrays.toString(vmArguments));
+        if (vmArguments != null && vmArguments.length > 0) {
+            for (String vmArgument : vmArguments) {
+                command.add(vmArgument);
+            }
+        }
+
+        // Append current application classpath (it contains the launched class)
+        Path programClasspath = Paths.get(Launcher.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+        LOGGER.info("Program Classpath: '{}'", programClasspath);
+        command.add("-cp");
+        command.add(programClasspath.toString());
+        command.add(mainClass);
+
+        // Append application arguments
+        LOGGER.info("Program Arguments: {}", Arrays.toString(programArguments));
+        if (programArguments != null && programArguments.length > 0) {
+            for (String programArgument : programArguments) {
+                command.add(programArgument);
+            }
+        }
+
+        return command;
     }
 
 }

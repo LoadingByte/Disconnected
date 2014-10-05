@@ -20,12 +20,13 @@ package com.quartercode.disconnected.client.graphics;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -114,9 +115,9 @@ public class GraphicsThread extends Thread {
             initialize();
             startLoop();
         } catch (LWJGLException e) {
-            LOGGER.error("Error while creating lwjgl display", e);
+            LOGGER.error("Error while configuring lwjgl", e);
         } catch (IOException e) {
-            LOGGER.error("Error while loading files", e);
+            LOGGER.error("Error while loading graphics files", e);
         } finally {
             end();
         }
@@ -182,9 +183,9 @@ public class GraphicsThread extends Thread {
 
     private void loadTheme() throws LWJGLException, IOException {
 
-        File themeFile = File.createTempFile(ApplicationInfo.TITLE + "-theme", ".xml");
+        Path themeFile = Files.createTempFile(ApplicationInfo.TITLE + "-theme", ".xml");
 
-        try (PrintWriter themeFileWriter = new PrintWriter(themeFile)) {
+        try (PrintWriter themeFileWriter = new PrintWriter(Files.newOutputStream(themeFile))) {
             themeFileWriter.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             themeFileWriter.println("<!DOCTYPE themes PUBLIC \"-//www.matthiasmann.de//TWL-Theme//EN\"");
             themeFileWriter.println("\"http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd\">");
@@ -194,11 +195,11 @@ public class GraphicsThread extends Thread {
             }
             themeFileWriter.println("</themes>");
             themeFileWriter.flush();
-            theme = ThemeManager.createThemeManager(themeFile.toURI().toURL(), renderer);
+            theme = ThemeManager.createThemeManager(themeFile.toUri().toURL(), renderer);
         } catch (IOException e) {
             throw new IOException("Error while creating temporary theme file", e);
         } finally {
-            themeFile.delete();
+            Files.deleteIfExists(themeFile);
         }
     }
 

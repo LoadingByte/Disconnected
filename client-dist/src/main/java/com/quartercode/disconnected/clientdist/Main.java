@@ -18,8 +18,8 @@
 
 package com.quartercode.disconnected.clientdist;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -71,7 +71,7 @@ public class Main {
 
     static {
 
-        String jarName = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
+        String jarName = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getFileName().toString();
         JAR_NAME = jarName.endsWith(".jar") ? jarName : null;
 
     }
@@ -238,7 +238,7 @@ public class Main {
 
     private static void initializeProfileService() {
 
-        ProfileService profileService = new DefaultProfileService(new File("profiles"));
+        ProfileService profileService = new DefaultProfileService(Paths.get("profiles"));
         ServiceRegistry.register(ProfileService.class, profileService);
 
         DefaultServerData.addDefaultWorldContextPath();

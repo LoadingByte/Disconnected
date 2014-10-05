@@ -18,13 +18,17 @@
 
 package com.quartercode.disconnected.server.sim.profile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.server.sim.TickBridgeProvider;
 import com.quartercode.disconnected.server.sim.TickSchedulerUpdater;
 import com.quartercode.disconnected.server.sim.TickService;
@@ -37,7 +41,9 @@ import com.quartercode.disconnected.shared.util.ServiceRegistry;
  */
 public class DefaultProfileService implements ProfileService {
 
-    private final File          directory;
+    private static final Logger LOGGER   = LoggerFactory.getLogger(DefaultProfileService.class);
+
+    private final Path          directory;
 
     private final List<Profile> profiles = new ArrayList<>();
     private Profile             active;
@@ -48,21 +54,30 @@ public class DefaultProfileService implements ProfileService {
      * 
      * @param directory The directory the new service will store its profiles in.
      */
-    public DefaultProfileService(File directory) {
+    public DefaultProfileService(Path directory) {
 
         this.directory = directory;
 
-        if (directory.exists()) {
-            for (File profileFile : directory.listFiles()) {
-                profiles.add(new Profile(profileFile.getName().substring(0, profileFile.getName().lastIndexOf("."))));
+        if (Files.exists(directory)) {
+            try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directory)) {
+                for (Path profileFile : directoryStream) {
+                    String profileFileName = profileFile.getFileName().toString();
+                    profiles.add(new Profile(profileFileName.substring(0, profileFileName.lastIndexOf("."))));
+                }
+            } catch (IOException e) {
+                LOGGER.error("Cannot index existing profiles in directory '{}'", directory, e);
             }
         } else {
-            directory.mkdirs();
+            try {
+                Files.createDirectories(directory);
+            } catch (IOException e) {
+                LOGGER.error("Cannot create profile directory '{}'", directory, e);
+            }
         }
     }
 
     @Override
-    public File getDirectory() {
+    public Path getDirectory() {
 
         return directory;
     }
@@ -86,7 +101,15 @@ public class DefaultProfileService implements ProfileService {
         for (Profile existingProfile : new ArrayList<>(profiles)) {
             if (existingProfile.getName().equalsIgnoreCase(profile.getName())) {
                 profiles.remove(profile);
-                new File(directory, profile.getName() + ".zip").delete();
+
+                Path profileFile = directory.resolve(profile.getName() + ".zip");
+                try {
+                    Files.delete(profileFile);
+                } catch (IOException e) {
+                    LOGGER.error("Cannot delete profile file '{}'", profileFile, e);
+                }
+
+                break;
             }
         }
     }
@@ -94,12 +117,16 @@ public class DefaultProfileService implements ProfileService {
     @Override
     public void serializeProfile(Profile profile) throws ProfileSerializationException {
 
-        File profileFile = new File(directory, profile.getName() + ".zip");
-        if (profileFile.exists()) {
-            profileFile.delete();
+        Path profileFile = directory.resolve(profile.getName() + ".zip");
+        if (Files.exists(profileFile)) {
+            try {
+                Files.delete(profileFile);
+            } catch (IOException e) {
+                throw new ProfileSerializationException(e, profile);
+            }
         }
 
-        try (FileOutputStream outputStream = new FileOutputStream(profileFile)) {
+        try (OutputStream outputStream = Files.newOutputStream(profileFile)) {
             ProfileSerializer.serializeProfile(outputStream, profile);
         } catch (IOException e) {
             throw new ProfileSerializationException(e, profile);
@@ -124,9 +151,9 @@ public class DefaultProfileService implements ProfileService {
         active = profile;
 
         if (active != null && (active.getWorld() == null || active.getRandom() == null)) {
-            File profileFile = new File(directory, active.getName() + ".zip");
-            if (profileFile.exists()) {
-                try (FileInputStream inputStream = new FileInputStream(profileFile)) {
+            Path profileFile = directory.resolve(active.getName() + ".zip");
+            if (Files.exists(profileFile)) {
+                try (InputStream inputStream = Files.newInputStream(profileFile)) {
                     ProfileSerializer.deserializeProfile(inputStream, active);
                 } catch (IOException e) {
                     throw new ProfileSerializationException(e, profile);

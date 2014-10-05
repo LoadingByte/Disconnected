@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.server.sim.profile;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -35,7 +35,7 @@ public interface ProfileService {
      * 
      * @return The directory the service uses as storage.
      */
-    public File getDirectory();
+    public Path getDirectory();
 
     /**
      * Returns a list of all loaded {@link Profile}s.

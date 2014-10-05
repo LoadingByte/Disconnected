@@ -18,7 +18,9 @@
 
 package com.quartercode.disconnected.clientdist;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import com.quartercode.disconnected.clientdist.launcher.Launcher;
@@ -39,16 +41,19 @@ public class LauncherMain {
         System.setProperty("logName", "launcher");
 
         String mainClass = Main.class.getName();
-        String[] vmArguments = { "-DlogName=disconnected", "-Djava.library.path=" + new File("lib/natives").getAbsolutePath() };
-        File directory = new File(System.getProperty("user.home"), ".disconnected");
+        String[] vmArguments = { "-DlogName=disconnected", "-Djava.library.path=" + Paths.get("lib/natives").toAbsolutePath() };
+        Path workingDirectory = Paths.get(System.getProperty("user.home"), ".disconnected");
 
         // If the first parameter is an existing file, use that one as running dir
-        if (args.length > 0 && new File(args[0]).exists()) {
-            directory = new File(args[0]);
-            args = new ArrayList<>(Arrays.asList(args)).subList(1, args.length).toArray(new String[args.length - 1]);
+        if (args.length > 0) {
+            Path argumentWorkingDirectory = Paths.get(args[0]);
+            if (Files.exists(argumentWorkingDirectory)) {
+                workingDirectory = argumentWorkingDirectory;
+                args = new ArrayList<>(Arrays.asList(args)).subList(1, args.length).toArray(new String[args.length - 1]);
+            }
         }
 
-        Launcher launcher = new Launcher(mainClass, vmArguments, args, directory);
+        Launcher launcher = new Launcher(mainClass, vmArguments, args, workingDirectory);
         launcher.launch();
     }
 

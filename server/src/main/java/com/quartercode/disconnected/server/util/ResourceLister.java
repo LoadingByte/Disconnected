@@ -18,18 +18,28 @@
 
 package com.quartercode.disconnected.server.util;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.JarURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * This utlity class lists classpath resources which can be found under a given path.
  */
 public class ResourceLister {
+
+    private static final String PATH_SEPARATOR = System.getProperty("path.separator");
 
     /**
      * Returns all classpath resources which can be found under the given path.
@@ -44,62 +54,64 @@ public class ResourceLister {
      */
     public static List<String> getResources(String path, boolean directories) throws IOException {
 
-        if (path.startsWith("/")) {
+        if (StringUtils.strip(path, "/").isEmpty()) {
+            throw new IllegalArgumentException("Can't list resources from classpath root ('/')");
+        } else if (!path.startsWith("/")) {
+            throw new IllegalArgumentException("Can't list relative resources, make sure your path starts with '/'");
+        } else {
             List<String> resources = new ArrayList<>();
 
-            for (String entry : System.getProperty("java.class.path", ".").split(System.getProperty("path.separator"))) {
-                File file = new File(entry);
-                if (file.exists()) {
-                    if (file.isDirectory()) {
-                        resources.addAll(getResourcesFromDirectory(file, file, path, directories));
-                    } else {
-                        resources.addAll(getResourcesFromJar(file, path, directories));
+            // Retrieve all occurrences of the given path in the classpath
+            Enumeration<URL> locations = ResourceLister.class.getClassLoader().getResources(StringUtils.stripStart(path, "/"));
+
+            // Iterate over those occurrences
+            while (locations.hasMoreElements()) {
+                URL location = locations.nextElement();
+
+                // Check whether the found location is inside a jar file
+                if (location.getProtocol().equals("jar")) {
+                    // Resolve the path of the jar file and load the resources from there
+                    Path jarFile = Paths.get(toURI( ((JarURLConnection) location.openConnection()).getJarFileURL()));
+
+                    // Load the resources from the jar file
+                    try (FileSystem jarFS = FileSystems.newFileSystem(jarFile, null)) {
+                        return getResourcesFromDirectory(path, directories, null, jarFS.getPath(path));
                     }
                 } else {
-                    throw new IllegalStateException("Classpath entry \"" + entry + "\" doesn't exist");
+                    // Directly load the resources from the main file system
+                    resources.addAll(getResourcesFromDirectory(path, directories, location.getFile(), Paths.get(toURI(location))));
                 }
             }
 
             return resources;
-        } else {
-            throw new IllegalArgumentException("Can't list relative resources, make sure your path starts with \"/\"");
         }
     }
 
-    private static List<String> getResourcesFromDirectory(File classpathEntry, File directory, String path, boolean directories) {
+    private static URI toURI(URL url) {
 
-        List<String> resources = new ArrayList<>();
-
-        for (File file : directory.listFiles()) {
-            if (!file.isDirectory() || directories) {
-                String fileName = file.getAbsolutePath().replace(classpathEntry.getAbsolutePath(), "").replaceAll("\\\\", "/");
-                if (fileName.startsWith(path)) {
-                    resources.add(fileName);
-                }
-            }
-
-            if (file.isDirectory()) {
-                resources.addAll(getResourcesFromDirectory(classpathEntry, file, path, directories));
-            }
+        try {
+            return url.toURI();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Strange error: Cannot convert url '" + url + "' into uri", e);
         }
-
-        return resources;
     }
 
-    private static List<String> getResourcesFromJar(File file, String path, boolean directories) throws IOException {
+    private static List<String> getResourcesFromDirectory(String path, boolean directories, String filter, Path currentDirectory) throws IOException {
 
         List<String> resources = new ArrayList<>();
 
-        try (ZipFile zipFile = new ZipFile(file)) {
-            Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
-            while (enumeration.hasMoreElements()) {
-                ZipEntry entry = enumeration.nextElement();
-
-                if (!entry.isDirectory() || directories) {
-                    String fileName = "/" + entry.getName();
-                    if (fileName.startsWith(path)) {
-                        resources.add(fileName);
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(currentDirectory)) {
+            for (Path file : directoryStream) {
+                if (!Files.isDirectory(file) || directories) {
+                    if (filter == null) {
+                        resources.add(file.toString());
+                    } else {
+                        resources.add(path + file.toString().replace(filter, "").replace(PATH_SEPARATOR, "/"));
                     }
+                }
+
+                if (Files.isDirectory(file)) {
+                    resources.addAll(getResourcesFromDirectory(path, directories, filter, file));
                 }
             }
         }
