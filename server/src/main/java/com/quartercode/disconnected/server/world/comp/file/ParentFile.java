@@ -22,7 +22,7 @@ import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -38,11 +38,11 @@ import com.quartercode.disconnected.server.world.comp.SizeUtil;
  * This class represents a parent file.
  * Parent files contain and hold other {@link File}s.
  * 
- * @param <P> The type of the parent {@link FeatureHolder} which houses the parent file somehow.
+ * @param <P> The type of the parent {@link CFeatureHolder} which houses the parent file somehow.
  * @see File
  * @see FileSystem
  */
-public class ParentFile<P extends FeatureHolder> extends File<P> {
+public class ParentFile<P extends CFeatureHolder> extends File<P> {
 
     // ----- Properties -----
 
@@ -73,10 +73,10 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
             @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FileSystem fileSystem = invocation.getHolder().get(GET_FILE_SYSTEM).invoke();
+                FileSystem fileSystem = invocation.getCHolder().invoke(GET_FILE_SYSTEM);
                 if (fileSystem != null) {
                     long fileSize = SizeUtil.getSize(arguments[0]);
-                    if (fileSize > fileSystem.get(FileSystem.GET_FREE).invoke()) {
+                    if (fileSize > fileSystem.invoke(FileSystem.GET_FREE)) {
                         throw new OutOfSpaceException(fileSystem, fileSize);
                     }
                 }
@@ -118,7 +118,7 @@ public class ParentFile<P extends FeatureHolder> extends File<P> {
             @Override
             public boolean matches(File<ParentFile<?>> element, Object... arguments) {
 
-                return element.get(NAME).get().equals(arguments[0]);
+                return element.getObj(NAME).equals(arguments[0]);
             }
 
         }));

@@ -22,7 +22,7 @@ import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -127,28 +127,28 @@ public class FileAddAction extends FileAction {
             @Prioritized (Prioritized.LEVEL_5)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
-                File<ParentFile<?>> addFile = holder.get(FILE).get();
+                CFeatureHolder holder = invocation.getCHolder();
+                File<ParentFile<?>> addFile = holder.getObj(FILE);
 
-                String path = holder.get(PATH).get();
+                String path = holder.getObj(PATH);
                 String pathToParent = path.contains(PathUtils.SEPARATOR) ? path.substring(0, path.lastIndexOf(PathUtils.SEPARATOR)) : "";
                 String[] pathParts = pathToParent.split(PathUtils.SEPARATOR);
 
-                File<?> current = holder.get(FILE_SYSTEM).get().get(FileSystem.ROOT).get();
+                File<?> current = holder.getObj(FILE_SYSTEM).getObj(FileSystem.ROOT);
                 for (String pathPart : pathParts) {
                     if (!pathPart.isEmpty()) {
-                        File<?> nextCurrent = current.get(ParentFile.GET_CHILD_BY_NAME).invoke(pathPart);
+                        File<?> nextCurrent = current.invoke(ParentFile.GET_CHILD_BY_NAME, pathPart);
 
                         if (nextCurrent == null) {
                             Directory directory = new Directory();
-                            directory.get(File.NAME).set(pathPart);
-                            directory.get(File.OWNER).set(addFile.get(File.OWNER).get());
-                            directory.get(File.GROUP).set(addFile.get(File.GROUP).get());
-                            directory.get(File.RIGHTS).set(new FileRights(addFile.get(File.RIGHTS).get()));
-                            current.get(ParentFile.CHILDREN).add(directory);
+                            directory.setObj(File.NAME, pathPart);
+                            directory.setObj(File.OWNER, addFile.getObj(File.OWNER));
+                            directory.setObj(File.GROUP, addFile.getObj(File.GROUP));
+                            directory.setObj(File.RIGHTS, new FileRights(addFile.getObj(File.RIGHTS)));
+                            current.addCol(ParentFile.CHILDREN, directory);
                             nextCurrent = directory;
                         } else if (! (nextCurrent instanceof ParentFile)) {
-                            throw new InvalidPathException(holder.get(FILE_SYSTEM).get(), path);
+                            throw new InvalidPathException(holder.getObj(FILE_SYSTEM), path);
                         }
 
                         current = nextCurrent;
@@ -164,20 +164,20 @@ public class FileAddAction extends FileAction {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
-                String path = holder.get(PATH).get();
+                String path = holder.getObj(PATH);
                 String pathToParent = path.contains(PathUtils.SEPARATOR) ? path.substring(0, path.lastIndexOf(PathUtils.SEPARATOR)) : "";
-                File<?> parent = holder.get(FILE_SYSTEM).get().get(FileSystem.GET_FILE).invoke(pathToParent);
+                File<?> parent = holder.getObj(FILE_SYSTEM).invoke(FileSystem.GET_FILE, pathToParent);
 
                 String addFileName = path.substring(path.lastIndexOf(PathUtils.SEPARATOR) + 1);
-                if (parent.get(ParentFile.GET_CHILD_BY_NAME).invoke(addFileName) != null) {
-                    throw new OccupiedPathException(holder.get(FILE_SYSTEM).get(), path);
+                if (parent.invoke(ParentFile.GET_CHILD_BY_NAME, addFileName) != null) {
+                    throw new OccupiedPathException(holder.getObj(FILE_SYSTEM), path);
                 }
 
-                File<ParentFile<?>> addFile = holder.get(FILE).get();
-                addFile.get(File.NAME).set(addFileName);
-                parent.get(ParentFile.CHILDREN).add(addFile);
+                File<ParentFile<?>> addFile = holder.getObj(FILE);
+                addFile.setObj(File.NAME, addFileName);
+                parent.addCol(ParentFile.CHILDREN, addFile);
 
                 return invocation.next(arguments);
             }
@@ -192,11 +192,11 @@ public class FileAddAction extends FileAction {
                 User executor = (User) arguments[0];
                 File<?> missingRightsFile = null;
 
-                FeatureHolder holder = invocation.getHolder();
-                String[] parts = holder.get(PATH).get().split(PathUtils.SEPARATOR);
-                File<?> current = holder.get(FILE_SYSTEM).get().get(FileSystem.ROOT).get();
+                CFeatureHolder holder = invocation.getCHolder();
+                String[] parts = holder.getObj(PATH).split(PathUtils.SEPARATOR);
+                File<?> current = holder.getObj(FILE_SYSTEM).getObj(FileSystem.ROOT);
                 for (String part : parts) {
-                    File<?> newCurrent = current.get(ParentFile.GET_CHILD_BY_NAME).invoke(part);
+                    File<?> newCurrent = current.invoke(ParentFile.GET_CHILD_BY_NAME, part);
 
                     // Check whether the current file exists
                     if (newCurrent == null) {

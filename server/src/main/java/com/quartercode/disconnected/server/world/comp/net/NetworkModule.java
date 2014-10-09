@@ -22,7 +22,7 @@ import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -135,12 +135,12 @@ public class NetworkModule extends OSModule {
             @Override
             public Socket invoke(FunctionInvocation<Socket> invocation, Object... arguments) {
 
-                NetworkModule holder = (NetworkModule) invocation.getHolder();
+                NetworkModule holder = (NetworkModule) invocation.getCHolder();
 
                 Socket socket = new Socket();
                 // Set the local port to 0 (random) so applications don't have to do that
-                socket.get(Socket.LOCAL_PORT).set(0);
-                holder.get(SOCKETS).add(socket);
+                socket.setObj(Socket.LOCAL_PORT, 0);
+                holder.addCol(SOCKETS, socket);
 
                 invocation.next(arguments);
                 return socket;
@@ -155,10 +155,10 @@ public class NetworkModule extends OSModule {
             @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_5)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Socket holder = (Socket) invocation.getHolder();
+                Socket holder = (Socket) invocation.getCHolder();
 
-                if (holder.get(Socket.LOCAL_PORT).get() == 0) {
-                    holder.get(Socket.LOCAL_PORT).set(getFreePort(holder));
+                if (holder.getObj(Socket.LOCAL_PORT) == 0) {
+                    holder.setObj(Socket.LOCAL_PORT, getFreePort(holder));
                 }
 
                 return invocation.next(arguments);
@@ -183,10 +183,10 @@ public class NetworkModule extends OSModule {
             }
 
             // Returns whether the given port is already used by another socket
-            private boolean isPortFree(FeatureHolder holder, int port) {
+            private boolean isPortFree(CFeatureHolder holder, int port) {
 
-                for (Socket socket : holder.get(SOCKETS).get()) {
-                    if (socket.get(Socket.LOCAL_PORT).get() == port) {
+                for (Socket socket : holder.getCol(SOCKETS)) {
+                    if (socket.getObj(Socket.LOCAL_PORT) == port) {
                         return false;
                     }
                 }
@@ -203,13 +203,13 @@ public class NetworkModule extends OSModule {
             @Prioritized (Prioritized.LEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Socket holder = (Socket) invocation.getHolder();
-                int localPort = holder.get(Socket.LOCAL_PORT).get();
-                Address destination = holder.get(Socket.DESTINATION).get();
+                Socket holder = (Socket) invocation.getCHolder();
+                int localPort = holder.getObj(Socket.LOCAL_PORT);
+                Address destination = holder.getObj(Socket.DESTINATION);
 
-                for (Socket socket : holder.getParent().get(SOCKETS).get()) {
-                    if (socket.get(Socket.LOCAL_PORT).get() == localPort && socket.get(Socket.DESTINATION).equals(destination)) {
-                        throw new IllegalStateException("Socket with local port '" + localPort + "' and destination '" + destination.get(Address.TO_STRING).invoke() + "' is already bound");
+                for (Socket socket : holder.getParent().getCol(SOCKETS)) {
+                    if (socket.getObj(Socket.LOCAL_PORT) == localPort && socket.getObj(Socket.DESTINATION).equals(destination)) {
+                        throw new IllegalStateException("Socket with local port '" + localPort + "' and destination '" + destination.invoke(Address.TO_STRING) + "' is already bound");
                     }
                 }
 
@@ -225,10 +225,10 @@ public class NetworkModule extends OSModule {
             @Prioritized (Prioritized.LEVEL_2)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Socket holder = (Socket) invocation.getHolder();
+                Socket holder = (Socket) invocation.getCHolder();
 
                 if (holder.getParent() != null) {
-                    holder.getParent().get(SOCKETS).remove(holder);
+                    holder.getParent().removeCol(SOCKETS, holder);
                 }
 
                 return invocation.next(arguments);
@@ -243,13 +243,13 @@ public class NetworkModule extends OSModule {
             @Prioritized (Prioritized.LEVEL_8)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Socket holder = (Socket) invocation.getHolder();
-                boolean stateChangesToConnected = arguments[0] == SocketState.CONNECTED && holder.get(Socket.STATE).get() != SocketState.CONNECTED;
+                Socket holder = (Socket) invocation.getCHolder();
+                boolean stateChangesToConnected = arguments[0] == SocketState.CONNECTED && holder.getObj(Socket.STATE) != SocketState.CONNECTED;
 
                 invocation.next(arguments);
 
                 if (stateChangesToConnected) {
-                    for (SocketConnectionListener connectionListener : holder.get(CONNECTION_LISTENERS).get()) {
+                    for (SocketConnectionListener connectionListener : holder.getCol(CONNECTION_LISTENERS)) {
                         connectionListener.established(holder);
                     }
                 }
@@ -265,7 +265,7 @@ public class NetworkModule extends OSModule {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                NetworkModule holder = (NetworkModule) invocation.getHolder();
+                NetworkModule holder = (NetworkModule) invocation.getCHolder();
                 Socket socket = (Socket) arguments[0];
                 Object data = arguments[1];
 
@@ -274,17 +274,17 @@ public class NetworkModule extends OSModule {
 
                 // Construct the address of the sending socket
                 Address sourceAddress = new Address();
-                sourceAddress.get(Address.NET_ID).set(netInterface.get(NodeNetInterface.NET_ID).get());
-                sourceAddress.get(Address.PORT).set(socket.get(Socket.LOCAL_PORT).get());
+                sourceAddress.setObj(Address.NET_ID, netInterface.getObj(NodeNetInterface.NET_ID));
+                sourceAddress.setObj(Address.PORT, socket.getObj(Socket.LOCAL_PORT));
 
                 // Construct a new packet
                 Packet packet = new Packet();
-                packet.get(Packet.SOURCE).set(sourceAddress);
-                packet.get(Packet.DESTINATION).set(socket.get(Socket.DESTINATION).get());
-                packet.get(Packet.DATA).set(data);
+                packet.setObj(Packet.SOURCE, sourceAddress);
+                packet.setObj(Packet.DESTINATION, socket.getObj(Socket.DESTINATION));
+                packet.setObj(Packet.DATA, data);
 
                 // Send the packet
-                netInterface.get(NodeNetInterface.PROCESS).invoke(packet);
+                netInterface.invoke(NodeNetInterface.PROCESS, packet);
 
                 return invocation.next(arguments);
             }
@@ -292,7 +292,7 @@ public class NetworkModule extends OSModule {
             private NodeNetInterface getNetInterface(NetworkModule holder) {
 
                 Computer computer = holder.getParent().getParent();
-                for (Hardware hardware : computer.get(Computer.HARDWARE).get()) {
+                for (Hardware hardware : computer.getCol(Computer.HARDWARE)) {
                     if (hardware instanceof NodeNetInterface) {
                         return (NodeNetInterface) hardware;
                     }
@@ -309,16 +309,16 @@ public class NetworkModule extends OSModule {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
                 Packet packet = (Packet) arguments[0];
-                Address packetSource = packet.get(Packet.SOURCE).get();
-                Address packetDestination = packet.get(Packet.DESTINATION).get();
-                int packetDestinationPort = packetDestination.get(Address.PORT).get();
+                Address packetSource = packet.getObj(Packet.SOURCE);
+                Address packetDestination = packet.getObj(Packet.DESTINATION);
+                int packetDestinationPort = packetDestination.getObj(Address.PORT);
 
                 // Find the socket the packet was sent to
                 Socket responsibleSocket = null;
-                for (Socket socket : holder.get(SOCKETS).get()) {
-                    if (socket.get(Socket.LOCAL_PORT).get() == packetDestinationPort && socket.get(Socket.DESTINATION).get().equals(packetSource)) {
+                for (Socket socket : holder.getCol(SOCKETS)) {
+                    if (socket.getObj(Socket.LOCAL_PORT) == packetDestinationPort && socket.getObj(Socket.DESTINATION).equals(packetSource)) {
                         responsibleSocket = socket;
                         break;
                     }
@@ -332,17 +332,17 @@ public class NetworkModule extends OSModule {
 
                 // Hand the packet over to the socket so it can handle it
                 if (responsibleSocket != null) {
-                    responsibleSocket.get(Socket.HANDLE).invoke(packet);
+                    responsibleSocket.invoke(Socket.HANDLE, packet);
                 }
 
                 return invocation.next(arguments);
             }
 
-            private Socket tryCreateSocket(FeatureHolder holder, Address requestor, int localPort) {
+            private Socket tryCreateSocket(CFeatureHolder holder, Address requestor, int localPort) {
 
                 // Iterate over the opinions of all connection listeners and
                 boolean allowAfterAll = false;
-                for (SocketConnectionListener connectionListener : holder.get(CONNECTION_LISTENERS).get()) {
+                for (SocketConnectionListener connectionListener : holder.getCol(CONNECTION_LISTENERS)) {
                     ConnectionAllowance allowance = connectionListener.allow(requestor, localPort);
                     if (allowance == ConnectionAllowance.ALLOW_AFTER_ALL) {
                         allowAfterAll = true;
@@ -356,9 +356,9 @@ public class NetworkModule extends OSModule {
 
                 // If the socket creation is allowed, create the socket
                 Socket socket = new Socket();
-                socket.get(Socket.LOCAL_PORT).set(localPort);
-                socket.get(Socket.DESTINATION).set(requestor);
-                holder.get(SOCKETS).add(socket);
+                socket.setObj(Socket.LOCAL_PORT, localPort);
+                socket.setObj(Socket.DESTINATION, requestor);
+                holder.addCol(SOCKETS, socket);
                 return socket;
             }
 
@@ -371,8 +371,8 @@ public class NetworkModule extends OSModule {
 
                 // Only invoke on shutdown
                 if (!(Boolean) arguments[0]) {
-                    for (Socket socket : invocation.getHolder().get(SOCKETS).get()) {
-                        socket.get(Socket.DISCONNECT).invoke();
+                    for (Socket socket : invocation.getCHolder().getCol(SOCKETS)) {
+                        socket.invoke(Socket.DISCONNECT);
                     }
                 }
 

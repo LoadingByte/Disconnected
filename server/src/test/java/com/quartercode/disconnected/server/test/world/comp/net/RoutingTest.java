@@ -609,29 +609,29 @@ public class RoutingTest {
     private static NetID generateNetID(int subnet, int id) {
 
         NetID netId = new NetID();
-        netId.get(NetID.SUBNET).set(subnet);
-        netId.get(NetID.ID).set(id);
+        netId.setObj(NetID.SUBNET, subnet);
+        netId.setObj(NetID.ID, id);
         return netId;
     }
 
     private static Address generateAddress(NetID netId, int port) {
 
         Address address = new Address();
-        address.get(Address.NET_ID).set(netId);
-        address.get(Address.PORT).set(port);
+        address.setObj(Address.NET_ID, netId);
+        address.setObj(Address.PORT, port);
         return address;
     }
 
     private static RouterNetInterface generateRouter(int subnet, Backbone backboneConnection, RouterNetInterface... neighbours) {
 
         RouterNetInterface router = new RouterNetInterface();
-        router.get(RouterNetInterface.SUBNET).set(subnet);
+        router.setObj(RouterNetInterface.SUBNET, subnet);
         if (backboneConnection != null) {
-            router.get(RouterNetInterface.BACKBONE_CONNECTION).set(backboneConnection);
+            router.setObj(RouterNetInterface.BACKBONE_CONNECTION, backboneConnection);
         }
 
         for (RouterNetInterface neighbour : neighbours) {
-            router.get(RouterNetInterface.NEIGHBOURS).add(neighbour);
+            router.addCol(RouterNetInterface.NEIGHBOURS, neighbour);
         }
 
         return router;
@@ -639,12 +639,12 @@ public class RoutingTest {
 
     private static void addNodes(RouterNetInterface router, int amount) {
 
-        int subnet = router.get(RouterNetInterface.SUBNET).get();
+        int subnet = router.getObj(RouterNetInterface.SUBNET);
 
         for (int id = 1; id <= amount; id++) {
             NodeNetInterface child = new NodeNetInterface();
-            child.get(NodeNetInterface.CONNECTION).set(router);
-            child.get(NodeNetInterface.NET_ID).set(generateNetID(subnet, id));
+            child.setObj(NodeNetInterface.CONNECTION, router);
+            child.setObj(NodeNetInterface.NET_ID, generateNetID(subnet, id));
         }
     }
 
@@ -684,7 +684,7 @@ public class RoutingTest {
             @Prioritized (Prioritized.LEVEL_8)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                NetID processorID = generateNetID(invocation.getHolder().get(RouterNetInterface.SUBNET).get(), 0);
+                NetID processorID = generateNetID(invocation.getCHolder().getObj(RouterNetInterface.SUBNET), 0);
                 processPacketCallback.onProcessPacket(processorID, (Packet) arguments[0]);
 
                 return invocation.next(arguments);
@@ -698,7 +698,7 @@ public class RoutingTest {
             @Prioritized (Prioritized.LEVEL_8)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                NetID processorID = invocation.getHolder().get(NodeNetInterface.NET_ID).get();
+                NetID processorID = invocation.getCHolder().getObj(NodeNetInterface.NET_ID);
                 processPacketCallback.onProcessPacket(processorID, (Packet) arguments[0]);
 
                 return invocation.next(arguments);
@@ -734,7 +734,7 @@ public class RoutingTest {
         List<NodeNetInterface> nodes = new ArrayList<>();
         {
             List<RouterNetInterface> visited = new ArrayList<>();
-            for (RouterNetInterface child : root.get(Backbone.CHILDREN).get()) {
+            for (RouterNetInterface child : root.getCol(Backbone.CHILDREN)) {
                 if (!visited.contains(child)) {
                     nodes.addAll(getAllChildren(child, visited));
                 }
@@ -743,8 +743,8 @@ public class RoutingTest {
 
         for (NodeNetInterface node1 : nodes) {
             for (NodeNetInterface node2 : nodes) {
-                NetID sourceID = node1.get(NodeNetInterface.NET_ID).get();
-                NetID destinationID = node2.get(NodeNetInterface.NET_ID).get();
+                NetID sourceID = node1.getObj(NodeNetInterface.NET_ID);
+                NetID destinationID = node2.getObj(NodeNetInterface.NET_ID);
                 // Run a test between the two nodes (might be the same node)
                 new TestExecutor(node1, sourceID, destinationID).run();
             }
@@ -756,12 +756,12 @@ public class RoutingTest {
         visited.add(router);
 
         List<NodeNetInterface> children = new ArrayList<>();
-        for (RouterNetInterface neighbour : router.get(RouterNetInterface.NEIGHBOURS).get()) {
+        for (RouterNetInterface neighbour : router.getCol(RouterNetInterface.NEIGHBOURS)) {
             if (!visited.contains(neighbour)) {
                 children.addAll(getAllChildren(neighbour, visited));
             }
         }
-        children.addAll(router.get(RouterNetInterface.CHILDREN).get());
+        children.addAll(router.getCol(RouterNetInterface.CHILDREN));
 
         return children;
     }
@@ -785,7 +785,7 @@ public class RoutingTest {
                 @Override
                 public void onProcessPacket(NetID processorId, Packet packet) {
 
-                    NetID destination = packet.get(Packet.DESTINATION).get().get(Address.NET_ID).get();
+                    NetID destination = packet.getObj(Packet.DESTINATION).getObj(Address.NET_ID);
 
                     if (destination.equals(processorId) && destination.equals(TestExecutor.this.destinationId)) {
                         receivedPacket = true;
@@ -798,14 +798,14 @@ public class RoutingTest {
         public void run() {
 
             Packet packet = new Packet();
-            packet.get(Packet.SOURCE).set(generateAddress(sourceId, 1));
-            packet.get(Packet.DESTINATION).set(generateAddress(destinationId, 1));
-            packet.get(Packet.DATA).set("testdata");
+            packet.setObj(Packet.SOURCE, generateAddress(sourceId, 1));
+            packet.setObj(Packet.DESTINATION, generateAddress(destinationId, 1));
+            packet.setObj(Packet.DATA, "testdata");
 
-            source.get(PacketProcessor.PROCESS).invoke(packet);
+            source.invoke(PacketProcessor.PROCESS, packet);
 
-            String sourceString = sourceId.get(NetID.TO_STRING).invoke();
-            String destinationString = destinationId.get(NetID.TO_STRING).invoke();
+            String sourceString = sourceId.invoke(NetID.TO_STRING);
+            String destinationString = destinationId.invoke(NetID.TO_STRING);
             assertTrue("Packet wasn't received by planned destination (" + sourceString + " -> " + destinationString + ")", receivedPacket);
         }
 

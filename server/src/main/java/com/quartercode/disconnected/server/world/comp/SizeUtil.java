@@ -23,7 +23,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.CollectionProperty;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -35,13 +35,13 @@ import com.quartercode.disconnected.server.util.NullPreventer;
 
 /**
  * This utility calculates the size of certain objects in bytes (of course, it's a fictional size).
- * It is also useful for deriving the size of {@link FeatureHolder}s.
+ * It is also useful for deriving the size of {@link CFeatureHolder}s.
  */
 public class SizeUtil {
 
     /**
      * Returns the size of an object in bytes (of course, it's a fictional size).
-     * If the object is a {@link FeatureHolder}, the size can be derived using the {@link DerivableSize#GET_SIZE} function.
+     * If the object is a {@link CFeatureHolder}, the size can be derived using the {@link DerivableSize#GET_SIZE} function.
      * In the case of a {@link String}, the size is equally to the length.
      * A {@link Boolean} always has a size of 1, a {@link Number} needs a bit for every digit (ceil rounding to bytes).
      * If the object is an {@link Iterable}, every entry of the collection will add to the size.
@@ -55,7 +55,7 @@ public class SizeUtil {
             return 0; // Nulls have no size
         } else if (object instanceof DerivableSize) {
             // Feature holders which implement DerivableSize have the size provided by DerivableSize.GET_SIZE
-            return NullPreventer.prevent( ((DerivableSize) object).get(DerivableSize.GET_SIZE).invoke());
+            return NullPreventer.prevent( ((DerivableSize) object).invoke(DerivableSize.GET_SIZE));
         } else if (object instanceof Boolean) {
             return 1; // Booleans only need one bit -> one byte
         } else if (object instanceof Character || object instanceof String) {
@@ -102,7 +102,7 @@ public class SizeUtil {
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
-                return SizeUtil.getSize(invocation.getHolder().get(propertyDefinition).get()) + NullPreventer.prevent(invocation.next(arguments));
+                return SizeUtil.getSize(invocation.getCHolder().getObj(propertyDefinition)) + NullPreventer.prevent(invocation.next(arguments));
             }
 
         };
@@ -122,7 +122,7 @@ public class SizeUtil {
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
-                return SizeUtil.getSize(invocation.getHolder().get(propertyDefinition).get()) + NullPreventer.prevent(invocation.next(arguments));
+                return SizeUtil.getSize(invocation.getCHolder().getCol(propertyDefinition)) + NullPreventer.prevent(invocation.next(arguments));
             }
 
         };
@@ -135,10 +135,10 @@ public class SizeUtil {
     /**
      * The derivable size interface declares the {@link #GET_SIZE} function for getting the size of an object.
      */
-    public static interface DerivableSize extends FeatureHolder {
+    public static interface DerivableSize extends CFeatureHolder {
 
         /**
-         * Derives the size of the implementing {@link FeatureHolder} in bytes.
+         * Derives the size of the implementing {@link CFeatureHolder} in bytes.
          */
         public static final FunctionDefinition<Long> GET_SIZE = create(new TypeLiteral<FunctionDefinition<Long>>() {}, "name", "getSize", "parameters", new Class[0]);
 

@@ -34,56 +34,56 @@ public class NodeNetInterfaceTest {
     public void setUp() {
 
         nodeInterface = new NodeNetInterface();
-        nodeInterface.get(NodeNetInterface.NET_ID).set(new NetID());
+        nodeInterface.setObj(NodeNetInterface.NET_ID, new NetID());
 
         connection = new RouterNetInterface();
-        connection.get(RouterNetInterface.SUBNET).set(10);
+        connection.setObj(RouterNetInterface.SUBNET, 10);
     }
 
     @Test
     public void testSetConnectionNullFromNull() {
 
-        nodeInterface.get(NodeNetInterface.CONNECTION).set(null);
+        nodeInterface.setObj(NodeNetInterface.CONNECTION, null);
     }
 
     @Test
     public void testSetConnectionAddReverse() {
 
-        nodeInterface.get(NodeNetInterface.CONNECTION).set(connection);
+        nodeInterface.setObj(NodeNetInterface.CONNECTION, connection);
 
-        assertNull("Net id that should've been cleared", nodeInterface.get(NodeNetInterface.NET_ID).get());
-        assertEquals("Child -> Router connection", connection, nodeInterface.get(NodeNetInterface.CONNECTION).get());
-        assertTrue("Router -> Child connection not added", connection.get(RouterNetInterface.CHILDREN).get().contains(nodeInterface));
+        assertNull("Net id that should've been cleared", nodeInterface.getObj(NodeNetInterface.NET_ID));
+        assertEquals("Child -> Router connection", connection, nodeInterface.getObj(NodeNetInterface.CONNECTION));
+        assertTrue("Router -> Child connection not added", connection.getCol(RouterNetInterface.CHILDREN).contains(nodeInterface));
     }
 
     @Test
     public void testSetConnectionRemoveReverse() {
 
-        nodeInterface.get(NodeNetInterface.CONNECTION).set(connection);
-        nodeInterface.get(NodeNetInterface.CONNECTION).set(null);
+        nodeInterface.setObj(NodeNetInterface.CONNECTION, connection);
+        nodeInterface.setObj(NodeNetInterface.CONNECTION, null);
 
-        assertNull("Child -> Router connection", nodeInterface.get(NodeNetInterface.CONNECTION).get());
-        assertFalse("Router -> Child connection not removed", connection.get(RouterNetInterface.CHILDREN).get().contains(nodeInterface));
+        assertNull("Child -> Router connection", nodeInterface.getObj(NodeNetInterface.CONNECTION));
+        assertFalse("Router -> Child connection not removed", connection.getCol(RouterNetInterface.CHILDREN).contains(nodeInterface));
     }
 
     @Test
     public void testChangeNetIDWithConnection() {
 
-        nodeInterface.get(NodeNetInterface.CONNECTION).set(connection);
+        nodeInterface.setObj(NodeNetInterface.CONNECTION, connection);
 
         NetID netId = new NetID();
-        netId.get(NetID.SUBNET).set(10);
-        nodeInterface.get(NodeNetInterface.NET_ID).set(netId);
+        netId.setObj(NetID.SUBNET, 10);
+        nodeInterface.setObj(NodeNetInterface.NET_ID, netId);
     }
 
     @Test (expected = IllegalArgumentException.class)
     public void testChangeNetIDWithConnectionWrongSubnet() {
 
-        nodeInterface.get(NodeNetInterface.CONNECTION).set(connection);
+        nodeInterface.setObj(NodeNetInterface.CONNECTION, connection);
 
         NetID netId = new NetID();
-        netId.get(NetID.SUBNET).set(11);
-        nodeInterface.get(NodeNetInterface.NET_ID).set(netId);
+        netId.setObj(NetID.SUBNET, 11);
+        nodeInterface.setObj(NodeNetInterface.NET_ID, netId);
     }
 
 }

@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -60,12 +60,12 @@ public class Backbone extends WorldChildFeatureHolder<World> implements PacketPr
             @Prioritized (Prioritized.LEVEL_3)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Backbone holder = (Backbone) invocation.getHolder();
+                Backbone holder = (Backbone) invocation.getCHolder();
                 RouterNetInterface child = (RouterNetInterface) arguments[0];
 
-                Backbone currentChildConnection = child.get(RouterNetInterface.BACKBONE_CONNECTION).get();
+                Backbone currentChildConnection = child.getObj(RouterNetInterface.BACKBONE_CONNECTION);
                 if (currentChildConnection == null || !currentChildConnection.equals(holder)) {
-                    child.get(RouterNetInterface.BACKBONE_CONNECTION).set(holder);
+                    child.setObj(RouterNetInterface.BACKBONE_CONNECTION, holder);
                 }
 
                 return invocation.next(arguments);
@@ -78,12 +78,12 @@ public class Backbone extends WorldChildFeatureHolder<World> implements PacketPr
             @Prioritized (Prioritized.LEVEL_3)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Backbone holder = (Backbone) invocation.getHolder();
+                Backbone holder = (Backbone) invocation.getCHolder();
                 RouterNetInterface child = (RouterNetInterface) arguments[0];
 
-                Backbone currentChildConnection = child.get(RouterNetInterface.BACKBONE_CONNECTION).get();
+                Backbone currentChildConnection = child.getObj(RouterNetInterface.BACKBONE_CONNECTION);
                 if (currentChildConnection != null && currentChildConnection.equals(holder)) {
-                    child.get(RouterNetInterface.BACKBONE_CONNECTION).set(null);
+                    child.setObj(RouterNetInterface.BACKBONE_CONNECTION, null);
                 }
 
                 return invocation.next(arguments);
@@ -102,7 +102,7 @@ public class Backbone extends WorldChildFeatureHolder<World> implements PacketPr
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                routeToChild(invocation.getHolder(), (Packet) arguments[0]);
+                routeToChild(invocation.getCHolder(), (Packet) arguments[0]);
 
                 return invocation.next(arguments);
             }
@@ -110,18 +110,18 @@ public class Backbone extends WorldChildFeatureHolder<World> implements PacketPr
             /*
              * Try to send the packet to a feasible child router.
              */
-            private boolean routeToChild(FeatureHolder backbone, Packet packet) {
+            private boolean routeToChild(CFeatureHolder backbone, Packet packet) {
 
-                NetID packetDest = packet.get(Packet.DESTINATION).get().get(Address.NET_ID).get();
-                int packetDestSubnet = packetDest.get(NetID.SUBNET).get();
+                NetID packetDest = packet.getObj(Packet.DESTINATION).getObj(Address.NET_ID);
+                int packetDestSubnet = packetDest.getObj(NetID.SUBNET);
 
                 Set<Integer> visitedSubnets = new HashSet<>();
-                for (RouterNetInterface child : backbone.get(Backbone.CHILDREN).get()) {
+                for (RouterNetInterface child : backbone.getCol(Backbone.CHILDREN)) {
                     List<NodeNetInterface> nodes = new ArrayList<>();
                     recordAllNodes(child, nodes, visitedSubnets);
                     for (NodeNetInterface node : nodes) {
-                        if (node.get(NodeNetInterface.NET_ID).get().get(NetID.SUBNET).get() == packetDestSubnet) {
-                            child.get(NodeNetInterface.PROCESS).invoke(packet);
+                        if (node.getObj(NodeNetInterface.NET_ID).getObj(NetID.SUBNET) == packetDestSubnet) {
+                            child.invoke(NodeNetInterface.PROCESS, packet);
                             return true;
                         }
                     }
@@ -133,14 +133,14 @@ public class Backbone extends WorldChildFeatureHolder<World> implements PacketPr
 
             private void recordAllNodes(RouterNetInterface router, List<NodeNetInterface> list, Set<Integer> visitedSubnets) {
 
-                int routerSubnet = router.get(RouterNetInterface.SUBNET).get();
+                int routerSubnet = router.getObj(RouterNetInterface.SUBNET);
 
                 if (!visitedSubnets.contains(routerSubnet)) {
                     visitedSubnets.add(routerSubnet);
-                    visitedSubnets.add(router.get(RouterNetInterface.SUBNET).get());
-                    list.addAll(router.get(RouterNetInterface.CHILDREN).get());
+                    visitedSubnets.add(router.getObj(RouterNetInterface.SUBNET));
+                    list.addAll(router.getCol(RouterNetInterface.CHILDREN));
 
-                    for (RouterNetInterface neighbour : router.get(RouterNetInterface.NEIGHBOURS).get()) {
+                    for (RouterNetInterface neighbour : router.getCol(RouterNetInterface.NEIGHBOURS)) {
                         recordAllNodes(neighbour, list, visitedSubnets);
                     }
                 }

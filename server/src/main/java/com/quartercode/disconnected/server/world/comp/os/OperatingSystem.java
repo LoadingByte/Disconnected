@@ -22,7 +22,7 @@ import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -161,8 +161,8 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
             @Override
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
-                boolean running = holder.get(PROC_MODULE).get().get(ProcessModule.ROOT_PROCESS).get().get(Process.STATE).get() != ProcessState.STOPPED;
+                CFeatureHolder holder = invocation.getCHolder();
+                boolean running = holder.getObj(PROC_MODULE).getObj(ProcessModule.ROOT_PROCESS).getObj(Process.STATE) != ProcessState.STOPPED;
 
                 invocation.next(arguments);
                 return running;
@@ -182,7 +182,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                invocation.getHolder().get(FS_MODULE).get().get(OSModule.SET_RUNNING).invoke(arguments);
+                invocation.getCHolder().getObj(FS_MODULE).invoke(OSModule.SET_RUNNING, arguments);
                 return invocation.next(arguments);
             }
 
@@ -192,7 +192,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                invocation.getHolder().get(PROC_MODULE).get().get(OSModule.SET_RUNNING).invoke(arguments);
+                invocation.getCHolder().getObj(PROC_MODULE).invoke(OSModule.SET_RUNNING, arguments);
                 return invocation.next(arguments);
             }
 

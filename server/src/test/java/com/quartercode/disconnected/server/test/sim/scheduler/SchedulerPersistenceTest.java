@@ -24,8 +24,8 @@ import java.io.StringWriter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import org.junit.Test;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
+import com.quartercode.classmod.extra.def.DefaultCFeatureHolder;
 import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
 
@@ -36,7 +36,7 @@ public class SchedulerPersistenceTest {
     @Test
     public void testScheduleWithPersistence() throws JAXBException {
 
-        Scheduler scheduler = new Scheduler("scheduler", new DefaultFeatureHolder());
+        Scheduler scheduler = new Scheduler("scheduler", new DefaultCFeatureHolder());
         scheduler.schedule(new TestSchedulerTask(5, 2));
 
         JAXBContext context = JAXBContext.newInstance(Scheduler.class, TestSchedulerTask.class);
@@ -65,7 +65,7 @@ public class SchedulerPersistenceTest {
         }
 
         @Override
-        public void execute(FeatureHolder holder) {
+        public void execute(CFeatureHolder holder) {
 
             schedulerTaskExecutions++;
         }

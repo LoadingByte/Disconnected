@@ -22,7 +22,7 @@ import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -81,11 +81,11 @@ public class FileRemoveAction extends FileAction {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
-                File<ParentFile<?>> removeFile = holder.get(FILE).get();
+                CFeatureHolder holder = invocation.getCHolder();
+                File<ParentFile<?>> removeFile = holder.getObj(FILE);
 
                 if (removeFile.getParent() != null) {
-                    removeFile.getParent().get(ParentFile.CHILDREN).remove(removeFile);
+                    removeFile.getParent().removeCol(ParentFile.CHILDREN, removeFile);
                 } else {
                     throw new IllegalStateException("File for removal is not stored on any file system (parent file == null)");
                 }
@@ -101,7 +101,7 @@ public class FileRemoveAction extends FileAction {
             public Map<File<?>, Character[]> invoke(FunctionInvocation<Map<File<?>, Character[]>> invocation, Object... arguments) {
 
                 User executor = (User) arguments[0];
-                File<ParentFile<?>> removeFile = invocation.getHolder().get(FILE).get();
+                File<ParentFile<?>> removeFile = invocation.getCHolder().getObj(FILE);
 
                 Map<File<?>, Character[]> missingRights = new HashMap<>();
                 checkFile(executor, removeFile, missingRights);
@@ -117,7 +117,7 @@ public class FileRemoveAction extends FileAction {
                 }
 
                 if (file instanceof ParentFile) {
-                    for (File<?> childFile : file.get(ParentFile.CHILDREN).get()) {
+                    for (File<?> childFile : file.getCol(ParentFile.CHILDREN)) {
                         checkFile(executor, childFile, target);
                     }
                 }

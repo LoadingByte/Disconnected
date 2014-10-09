@@ -76,7 +76,7 @@ public class Session extends ProgramExecutor {
             @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Validate.notNull(invocation.getHolder().get(USER).get(), "Session user cannot be null");
+                Validate.notNull(invocation.getCHolder().getObj(USER), "Session user cannot be null");
 
                 return invocation.next(arguments);
             }
@@ -89,21 +89,21 @@ public class Session extends ProgramExecutor {
             @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_5)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Session holder = (Session) invocation.getHolder();
+                Session holder = (Session) invocation.getCHolder();
 
                 // Determine whether a check is required (parent session != null or parent session user != root)
-                Session parentSession = holder.getParent().get(Process.GET_SESSION).invoke();
-                boolean checkRequired = parentSession != null && !parentSession.get(USER).get().get(User.IS_SUPERUSER).invoke();
+                Session parentSession = holder.getParent().invoke(Process.GET_SESSION);
+                boolean checkRequired = parentSession != null && !parentSession.getObj(USER).invoke(User.IS_SUPERUSER);
 
-                if (checkRequired && holder.get(USER).get().get(User.PASSWORD).get() != null) {
-                    String password = holder.get(PASSWORD).get();
+                if (checkRequired && holder.getObj(USER).getObj(User.PASSWORD) != null) {
+                    String password = holder.getObj(PASSWORD);
                     if (password == null) {
                         fireWrongPasswordEvent(holder, password);
                         return null;
                     }
                     String hashedPassword = HashUtil.sha256(password);
 
-                    String correctPassword = holder.get(USER).get().get(User.PASSWORD).get();
+                    String correctPassword = holder.getObj(USER).getObj(User.PASSWORD);
                     if (!correctPassword.equals(hashedPassword)) {
                         fireWrongPasswordEvent(holder, password);
                         return null;
@@ -115,8 +115,8 @@ public class Session extends ProgramExecutor {
 
             private void fireWrongPasswordEvent(Session holder, String wrongPassword) {
 
-                String computerId = holder.getParent().get(Process.GET_OPERATING_SYSTEM).invoke().getParent().getId();
-                int pid = holder.getParent().get(Process.PID).get();
+                String computerId = holder.getParent().invoke(Process.GET_OPERATING_SYSTEM).getParent().getId();
+                int pid = holder.getParent().getObj(Process.PID);
                 holder.getWorld().getBridge().send(new WrongPasswordEvent(computerId, pid, wrongPassword));
             }
 
@@ -128,9 +128,9 @@ public class Session extends ProgramExecutor {
             @Prioritized (Prioritized.LEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Session holder = (Session) invocation.getHolder();
-                String computerId = holder.getParent().get(Process.GET_OPERATING_SYSTEM).invoke().getParent().getId();
-                int pid = holder.getParent().get(Process.PID).get();
+                Session holder = (Session) invocation.getCHolder();
+                String computerId = holder.getParent().invoke(Process.GET_OPERATING_SYSTEM).getParent().getId();
+                int pid = holder.getParent().getObj(Process.PID);
                 holder.getWorld().getBridge().send(new FinishStartEvent(computerId, pid));
 
                 return invocation.next(arguments);

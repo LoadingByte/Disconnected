@@ -40,7 +40,7 @@ public class RootProcess extends Process<ProcessModule> {
             public RootProcess invoke(FunctionInvocation<RootProcess> invocation, Object... arguments) {
 
                 invocation.next(arguments);
-                return (RootProcess) invocation.getHolder();
+                return (RootProcess) invocation.getCHolder();
             }
 
         });

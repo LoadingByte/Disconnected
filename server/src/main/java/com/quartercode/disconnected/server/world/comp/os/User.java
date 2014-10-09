@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -113,7 +113,7 @@ public class User extends ConfigurationEntry {
             @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                if (invocation.getHolder().get(IS_SUPERUSER).invoke()) {
+                if (invocation.getCHolder().invoke(IS_SUPERUSER)) {
                     // Cancel invocation
                     return null;
                 }
@@ -132,7 +132,7 @@ public class User extends ConfigurationEntry {
             @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Validate.isTrue(!invocation.getHolder().get(IS_SUPERUSER).invoke(), "The superuser can't be a member in any group");
+                Validate.isTrue(!invocation.getCHolder().invoke(IS_SUPERUSER), "The superuser can't be a member in any group");
                 return invocation.next(arguments);
             }
 
@@ -143,7 +143,7 @@ public class User extends ConfigurationEntry {
             @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Validate.isTrue(!invocation.getHolder().get(IS_SUPERUSER).invoke(), "The superuser can't be a member in any group");
+                Validate.isTrue(!invocation.getCHolder().invoke(IS_SUPERUSER), "The superuser can't be a member in any group");
                 return invocation.next(arguments);
             }
 
@@ -154,7 +154,7 @@ public class User extends ConfigurationEntry {
             @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                if (invocation.getHolder().get(GET_PRIMARY_GROUP).invoke().equals(arguments[0])) {
+                if (invocation.getCHolder().invoke(GET_PRIMARY_GROUP).equals(arguments[0])) {
                     throw new IllegalStateException("Can't remove user from its primary group");
                 }
 
@@ -209,10 +209,10 @@ public class User extends ConfigurationEntry {
             @Override
             public Group invoke(FunctionInvocation<Group> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
                 Group primaryGroup = null;
-                if (holder.get(GROUPS).get().size() > 0) {
-                    primaryGroup = holder.get(GROUPS).get().get(0);
+                if (holder.getCol(GROUPS).size() > 0) {
+                    primaryGroup = holder.getCol(GROUPS).get(0);
                 }
 
                 invocation.next(arguments);
@@ -226,19 +226,19 @@ public class User extends ConfigurationEntry {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
                 Group primaryGroup = (Group) arguments[0];
 
-                if (holder.get(GROUPS).get().contains(primaryGroup)) {
+                if (holder.getCol(GROUPS).contains(primaryGroup)) {
                     // Put the new primary group at the front of the list
-                    List<Group> groups = holder.get(GROUPS).get();
+                    List<Group> groups = holder.getCol(GROUPS);
                     groups.remove(primaryGroup);
 
                     for (Group group : groups) {
-                        holder.get(GROUPS).remove(group);
+                        holder.removeCol(GROUPS, group);
                     }
                     for (Group group : groups) {
-                        holder.get(GROUPS).add(group);
+                        holder.addCol(GROUPS, group);
                     }
                 }
 
@@ -253,7 +253,7 @@ public class User extends ConfigurationEntry {
             @Override
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
 
-                String name = invocation.getHolder().get(NAME).get();
+                String name = invocation.getCHolder().getObj(NAME);
                 boolean result = name != null && name.equals(SUPERUSER_NAME);
                 invocation.next(arguments);
                 return result;

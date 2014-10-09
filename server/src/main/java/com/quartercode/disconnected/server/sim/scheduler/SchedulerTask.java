@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.server.sim.scheduler;
 
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 
 /**
  * A scheduler task is a unit that can be scheduled to be executed using a {@link Scheduler}.
@@ -98,9 +98,9 @@ public interface SchedulerTask {
      * Executes the scheduler task.
      * This method should only be used by the {@link Scheduler} in order to execute a task.
      * 
-     * @param holder The {@link FeatureHolder} that contains the {@link Scheduler} which called the method.
+     * @param holder The {@link CFeatureHolder} that contains the {@link Scheduler} which called the method.
      */
-    public void execute(FeatureHolder holder);
+    public void execute(CFeatureHolder holder);
 
     /**
      * Creates a copy of the scheduler task keeping the initial delay, periodic delay, group, and execution behavior.

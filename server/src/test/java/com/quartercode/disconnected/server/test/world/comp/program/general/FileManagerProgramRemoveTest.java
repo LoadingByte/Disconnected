@@ -73,17 +73,17 @@ public class FileManagerProgramRemoveTest extends AbstractProgramTest {
     public void setUp2() {
 
         removeFile = new ContentFile();
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(removeFile, LOCAL_PATH).get(FileAddAction.EXECUTE).invoke();
+        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, removeFile, LOCAL_PATH).invoke(FileAddAction.EXECUTE);
     }
 
     private ImportantData executeProgramAndSetCurrentPath(Process<?> parentProcess, String path) {
 
-        ChildProcess process = parentProcess.get(Process.CREATE_CHILD).invoke();
-        process.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(splitAfterMountpoint(getCommonLocation(FileManagerProgram.class).toString())[1]));
-        process.get(Process.INITIALIZE).invoke(10);
+        ChildProcess process = parentProcess.invoke(Process.CREATE_CHILD);
+        process.setObj(Process.SOURCE, (ContentFile) fileSystem.invoke(FileSystem.GET_FILE, splitAfterMountpoint(getCommonLocation(FileManagerProgram.class).toString())[1]));
+        process.invoke(Process.INITIALIZE, 10);
 
-        ProgramExecutor program = process.get(Process.EXECUTOR).get();
-        program.get(ProgramExecutor.RUN).invoke();
+        ProgramExecutor program = process.getObj(Process.EXECUTOR);
+        program.invoke(ProgramExecutor.RUN);
 
         ImportantData data = ProgramUtils.getImportantData(program);
 
@@ -102,15 +102,15 @@ public class FileManagerProgramRemoveTest extends AbstractProgramTest {
     @Test
     public void testSuccess() {
 
-        assertNotNull("Not yet removed file does not exist", fileSystem.get(FileSystem.GET_FILE).invoke(LOCAL_PATH));
+        assertNotNull("Not yet removed file does not exist", fileSystem.invoke(FileSystem.GET_FILE, LOCAL_PATH));
 
-        sendRemoveRequest(executeProgramAndSetCurrentPath(processModule.get(ProcessModule.ROOT_PROCESS).get(), PARENT_PATH), FILE_NAME, new EventHandler<Event>() {
+        sendRemoveRequest(executeProgramAndSetCurrentPath(processModule.getObj(ProcessModule.ROOT_PROCESS), PARENT_PATH), FILE_NAME, new EventHandler<Event>() {
 
             @Override
             public void handle(Event event) {
 
                 assertTrue("File manager program did not return success event", event instanceof FileManagerProgramRemoveSuccessReturnEvent);
-                assertNull("Removed file does still exist", fileSystem.get(FileSystem.GET_FILE).invoke(LOCAL_PATH));
+                assertNull("Removed file does still exist", fileSystem.invoke(FileSystem.GET_FILE, LOCAL_PATH));
             }
 
         });
@@ -119,11 +119,11 @@ public class FileManagerProgramRemoveTest extends AbstractProgramTest {
     @Test
     public void testUnknownMountpoint() {
 
-        ImportantData data = executeProgramAndSetCurrentPath(processModule.get(ProcessModule.ROOT_PROCESS).get(), PARENT_PATH);
+        ImportantData data = executeProgramAndSetCurrentPath(processModule.getObj(ProcessModule.ROOT_PROCESS), PARENT_PATH);
 
         // Unmount the file system
-        FileSystemModule fsModule = os.get(OperatingSystem.FS_MODULE).get();
-        fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke(fileSystemMountpoint).get(KnownFileSystem.MOUNTED).set(false);
+        FileSystemModule fsModule = os.getObj(OperatingSystem.FS_MODULE);
+        fsModule.invoke(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT, fileSystemMountpoint).setObj(KnownFileSystem.MOUNTED, false);
 
         sendRemoveRequest(data, FILE_NAME, new EventHandler<Event>() {
 
@@ -142,11 +142,11 @@ public class FileManagerProgramRemoveTest extends AbstractProgramTest {
 
         // Replace file's parent with content file -> make the path invalid
         File<?> parentFile = (File<?>) removeFile.getParent();
-        String parentPath = parentFile.get(File.GET_PATH).invoke();
-        parentFile.get(ParentFile.CREATE_REMOVE).invoke().get(FileRemoveAction.EXECUTE).invoke();
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), parentPath).get(FileAddAction.EXECUTE).invoke();
+        String parentPath = parentFile.invoke(File.GET_PATH);
+        parentFile.invoke(ParentFile.CREATE_REMOVE).invoke(FileRemoveAction.EXECUTE);
+        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, new ContentFile(), parentPath).invoke(FileAddAction.EXECUTE);
 
-        sendRemoveRequest(executeProgramAndSetCurrentPath(processModule.get(ProcessModule.ROOT_PROCESS).get(), CommonFiles.SYSTEM_MOUNTPOINT), LOCAL_PATH, new EventHandler<Event>() {
+        sendRemoveRequest(executeProgramAndSetCurrentPath(processModule.getObj(ProcessModule.ROOT_PROCESS), CommonFiles.SYSTEM_MOUNTPOINT), LOCAL_PATH, new EventHandler<Event>() {
 
             @Override
             public void handle(Event event) {
@@ -161,17 +161,17 @@ public class FileManagerProgramRemoveTest extends AbstractProgramTest {
     @Test
     public void testMissingRights() {
 
-        removeFile.get(File.RIGHTS).set(new FileRights());
+        removeFile.setObj(File.RIGHTS, new FileRights());
 
         final User testUser = new User();
-        testUser.get(User.NAME).set("testUser");
+        testUser.setObj(User.NAME, "testUser");
 
-        ChildProcess sessionProcess = processModule.get(ProcessModule.ROOT_PROCESS).get().get(Process.CREATE_CHILD).invoke();
-        sessionProcess.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(splitAfterMountpoint(getCommonLocation(Session.class).toString())[1]));
-        sessionProcess.get(Process.INITIALIZE).invoke(1);
-        ProgramExecutor session = sessionProcess.get(Process.EXECUTOR).get();
-        session.get(Session.USER).set(testUser);
-        session.get(ProgramExecutor.RUN).invoke();
+        ChildProcess sessionProcess = processModule.getObj(ProcessModule.ROOT_PROCESS).invoke(Process.CREATE_CHILD);
+        sessionProcess.setObj(Process.SOURCE, (ContentFile) fileSystem.invoke(FileSystem.GET_FILE, splitAfterMountpoint(getCommonLocation(Session.class).toString())[1]));
+        sessionProcess.invoke(Process.INITIALIZE, 1);
+        ProgramExecutor session = sessionProcess.getObj(Process.EXECUTOR);
+        session.setObj(Session.USER, testUser);
+        session.invoke(ProgramExecutor.RUN);
 
         sendRemoveRequest(executeProgramAndSetCurrentPath(sessionProcess, PARENT_PATH), FILE_NAME, new EventHandler<Event>() {
 
@@ -181,7 +181,7 @@ public class FileManagerProgramRemoveTest extends AbstractProgramTest {
                 assertTrue("File manager program did not return missing rights event", event instanceof ProgramMissingFileRightsEvent);
 
                 ProgramMissingFileRightsEvent missingRightsEvent = (ProgramMissingFileRightsEvent) event;
-                assertEquals("User name", testUser.get(User.NAME).get(), missingRightsEvent.getUser());
+                assertEquals("User name", testUser.getObj(User.NAME), missingRightsEvent.getUser());
                 assertFalse("More than one file is not accessible", missingRightsEvent.containsMultipleFiles());
                 // Just check the path of the file placeholder because the internal routine is tested elsewhere
                 assertEquals("File path", PATH, missingRightsEvent.getSingleFile().getPath());

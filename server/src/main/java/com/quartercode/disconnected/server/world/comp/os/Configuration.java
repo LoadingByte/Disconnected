@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -107,10 +107,11 @@ public class Configuration extends WorldFeatureHolder implements DerivableSize {
                 @Override
                 public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
-                    FeatureHolder holder = invocation.getHolder();
+                    CFeatureHolder holder = invocation.getCHolder();
 
                     long size = 0;
-                    for (ValueSupplierDefinition<?, ?> column : holder.get(GET_COLUMNS).invoke().keySet()) {
+                    for (ValueSupplierDefinition<?, ?> column : holder.invoke(GET_COLUMNS).keySet()) {
+                        // Cannot use the convenient method because the value supplier has generic wildcard parameters
                         Object columnValue = holder.get(column).get();
                         size += SizeUtil.getSize(columnValue);
                     }

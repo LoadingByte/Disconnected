@@ -37,41 +37,41 @@ public class FileSystemTest {
     public void setUp() {
 
         fileSystem = new FileSystem();
-        fileSystem.get(FileSystem.SIZE).set(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
+        fileSystem.setObj(FileSystem.SIZE, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
 
         testFile = new ContentFile();
-        testFile.get(ContentFile.CONTENT).set("Test-Content");
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(testFile, "test1/test2/test.txt").get(FileAddAction.EXECUTE).invoke();
+        testFile.setObj(ContentFile.CONTENT, "Test-Content");
+        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, testFile, "test1/test2/test.txt").invoke(FileAddAction.EXECUTE);
     }
 
     @Test
     public void testGetFile() {
 
-        assertEquals("Resolved file", testFile, fileSystem.get(FileSystem.GET_FILE).invoke("test1/test2/test.txt"));
+        assertEquals("Resolved file", testFile, fileSystem.invoke(FileSystem.GET_FILE, "test1/test2/test.txt"));
     }
 
     @Test
     public void testGetFileNotExisting() {
 
-        assertNull("GET_FILE didn't return null for a not existing path", fileSystem.get(FileSystem.GET_FILE).invoke("test1/test2/test2.txt"));
+        assertNull("GET_FILE didn't return null for a not existing path", fileSystem.invoke(FileSystem.GET_FILE, "test1/test2/test2.txt"));
     }
 
     @Test
     public void testGetFileWithInvalidPath() {
 
-        assertNull("GET_FILE didn't return null for an invalid path (one dir is a content file)", fileSystem.get(FileSystem.GET_FILE).invoke("test1/test2/test.txt/test2.txt"));
+        assertNull("GET_FILE didn't return null for an invalid path (one dir is a content file)", fileSystem.invoke(FileSystem.GET_FILE, "test1/test2/test.txt/test2.txt"));
     }
 
     @Test
     public void testCalcSpace() {
 
         long contentSize = 30;
-        long filled = fileSystem.get(FileSystem.GET_FILLED).invoke();
-        long free = fileSystem.get(FileSystem.GET_FREE).invoke();
+        long filled = fileSystem.invoke(FileSystem.GET_FILLED);
+        long free = fileSystem.invoke(FileSystem.GET_FREE);
 
         assertEquals("Filled bytes", contentSize, filled);
-        assertEquals("Free bytes", fileSystem.get(DerivableSize.GET_SIZE).invoke() - contentSize, free);
-        assertEquals("Size (Filled + free)", (long) fileSystem.get(DerivableSize.GET_SIZE).invoke(), free + filled);
+        assertEquals("Free bytes", fileSystem.invoke(DerivableSize.GET_SIZE) - contentSize, free);
+        assertEquals("Size (Filled + free)", (long) fileSystem.invoke(DerivableSize.GET_SIZE), free + filled);
     }
 
 }

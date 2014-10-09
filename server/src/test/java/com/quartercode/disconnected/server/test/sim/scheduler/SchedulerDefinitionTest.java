@@ -26,8 +26,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
+import com.quartercode.classmod.extra.def.DefaultCFeatureHolder;
 import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerDefinition;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTask;
@@ -141,18 +141,18 @@ public class SchedulerDefinitionTest {
         }
 
         @Override
-        public void execute(FeatureHolder holder) {
+        public void execute(CFeatureHolder holder) {
 
             // Empty
         }
 
     }
 
-    private static class FeatureHolder1 extends DefaultFeatureHolder {
+    private static class FeatureHolder1 extends DefaultCFeatureHolder {
 
     }
 
-    private static class FeatureHolder2 extends DefaultFeatureHolder {
+    private static class FeatureHolder2 extends DefaultCFeatureHolder {
 
     }
 

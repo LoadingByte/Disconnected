@@ -99,7 +99,7 @@ public class Program extends WorldFeatureHolder implements DerivableSize {
             @Override
             public ProgramExecutor invoke(FunctionInvocation<ProgramExecutor> invocation, Object... arguments) {
 
-                Class<? extends ProgramExecutor> executorClass = invocation.getHolder().get(EXECUTOR_CLASS).get();
+                Class<? extends ProgramExecutor> executorClass = invocation.getCHolder().getObj(EXECUTOR_CLASS);
 
                 try {
                     return executorClass.newInstance();

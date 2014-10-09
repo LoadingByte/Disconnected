@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -53,11 +53,11 @@ import com.quartercode.disconnected.shared.world.comp.file.FileRights;
  * This class represents a process which is basically a running instance of a program.
  * On the creation, the program object will be backed up, as well as a new program executor instance.
  * 
- * @param <P> The type of the parent {@link FeatureHolder} which houses the process somehow.
+ * @param <P> The type of the parent {@link CFeatureHolder} which houses the process somehow.
  * @see Program
  * @see ProgramExecutor
  */
-public abstract class Process<P extends FeatureHolder> extends WorldChildFeatureHolder<P> {
+public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatureHolder<P> {
 
     /**
      * The process state defines the global state of the process the os can see.
@@ -174,7 +174,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Validate.isInstanceOf(Program.class, ((ContentFile) arguments[0]).get(ContentFile.CONTENT).get(), "Source must contain a program");
+                Validate.isInstanceOf(Program.class, ((ContentFile) arguments[0]).getObj(ContentFile.CONTENT), "Source must contain a program");
                 return invocation.next(arguments);
             }
 
@@ -189,7 +189,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                ProgramExecutor executor = invocation.getHolder().get(EXECUTOR).get();
+                ProgramExecutor executor = invocation.getCHolder().getObj(EXECUTOR);
 
                 if (executor instanceof SchedulerUser) {
                     boolean active = ((ProcessState) arguments[0]).isTickState();
@@ -436,14 +436,14 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
                 boolean stateApplied = true;
 
-                if (holder.get(STATE).get() != arguments[0]) {
+                if (holder.getObj(STATE) != arguments[0]) {
                     stateApplied = false;
                 } else {
-                    for (Process<?> child : holder.get(CHILDREN).get()) {
-                        if (!child.get(IS_STATE_APPLIED).invoke()) {
+                    for (Process<?> child : holder.getCol(CHILDREN)) {
+                        if (!child.invoke(IS_STATE_APPLIED)) {
                             stateApplied = false;
                             break;
                         }
@@ -461,12 +461,12 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
-                holder.get(STATE).set((ProcessState) arguments[0]);
+                holder.setObj(STATE, (ProcessState) arguments[0]);
                 if ((Boolean) arguments[1]) {
-                    for (Process<?> child : holder.get(CHILDREN).get()) {
-                        child.get(APPLY_STATE).invoke(arguments[0], arguments[1]);
+                    for (Process<?> child : holder.getCol(CHILDREN)) {
+                        child.invoke(APPLY_STATE, arguments[0], arguments[1]);
                     }
                 }
 
@@ -480,10 +480,10 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
-                if (holder.get(STATE).get() == ProcessState.RUNNING) {
-                    holder.get(APPLY_STATE).invoke(ProcessState.SUSPENDED, arguments[0]);
+                if (holder.getObj(STATE) == ProcessState.RUNNING) {
+                    holder.invoke(APPLY_STATE, ProcessState.SUSPENDED, arguments[0]);
                 }
 
                 return invocation.next(arguments);
@@ -496,10 +496,10 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
-                if (holder.get(STATE).get() == ProcessState.SUSPENDED) {
-                    holder.get(APPLY_STATE).invoke(ProcessState.RUNNING, arguments[0]);
+                if (holder.getObj(STATE) == ProcessState.SUSPENDED) {
+                    holder.invoke(APPLY_STATE, ProcessState.RUNNING, arguments[0]);
                 }
 
                 return invocation.next(arguments);
@@ -512,10 +512,10 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
-                if (holder.get(STATE).get() == ProcessState.RUNNING) {
-                    holder.get(APPLY_STATE).invoke(ProcessState.INTERRUPTED, arguments[0]);
+                if (holder.getObj(STATE) == ProcessState.RUNNING) {
+                    holder.invoke(APPLY_STATE, ProcessState.INTERRUPTED, arguments[0]);
                 }
 
                 return invocation.next(arguments);
@@ -528,13 +528,13 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Process<?> holder = (Process<?>) invocation.getHolder();
+                Process<?> holder = (Process<?>) invocation.getCHolder();
 
-                if (holder.get(STATE).get() != ProcessState.STOPPED) {
-                    holder.get(APPLY_STATE).invoke(ProcessState.STOPPED, arguments[0]);
+                if (holder.getObj(STATE) != ProcessState.STOPPED) {
+                    holder.invoke(APPLY_STATE, ProcessState.STOPPED, arguments[0]);
                     // Unregister stopped process from parent
                     if (holder.getParent() != null) {
-                        holder.getParent().get(CHILDREN).remove(holder);
+                        holder.getParent().removeCol(CHILDREN, holder);
                     }
                 }
 
@@ -549,7 +549,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public List<Process<?>> invoke(FunctionInvocation<List<Process<?>>> invocation, Object... arguments) {
 
-                List<Process<?>> children = getAllChildren((Process<?>) invocation.getHolder());
+                List<Process<?>> children = getAllChildren((Process<?>) invocation.getCHolder());
                 invocation.next(arguments);
                 return children;
             }
@@ -557,8 +557,8 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             private List<Process<?>> getAllChildren(Process<?> parent) {
 
                 List<Process<?>> allChildren = new ArrayList<>();
-                for (Process<?> directChild : parent.get(CHILDREN).get()) {
-                    allChildren.addAll(directChild.get(GET_ALL_CHILDREN).invoke());
+                for (Process<?> directChild : parent.getCol(CHILDREN)) {
+                    allChildren.addAll(directChild.invoke(GET_ALL_CHILDREN));
                 }
 
                 return allChildren;
@@ -572,12 +572,12 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public ChildProcess invoke(FunctionInvocation<ChildProcess> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
                 ChildProcess process = new ChildProcess();
                 process.setParent((Process<?>) holder);
-                process.get(ENVIRONMENT).set(new HashMap<>(holder.get(ENVIRONMENT).get()));
-                holder.get(CHILDREN).add(process);
+                process.setObj(ENVIRONMENT, new HashMap<>(holder.getObj(ENVIRONMENT)));
+                holder.addCol(CHILDREN, process);
 
                 invocation.next(arguments);
                 return process;
@@ -591,13 +591,13 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public RootProcess invoke(FunctionInvocation<RootProcess> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
                 RootProcess root = null;
 
                 if (holder instanceof RootProcess) {
                     root = (RootProcess) holder;
                 } else {
-                    root = ((Process<?>) holder).getParent().get(GET_ROOT).invoke();
+                    root = ((Process<?>) holder).getParent().invoke(GET_ROOT);
                 }
 
                 invocation.next(arguments);
@@ -612,7 +612,7 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public OperatingSystem invoke(FunctionInvocation<OperatingSystem> invocation, Object... arguments) {
 
-                OperatingSystem operatingSystem = invocation.getHolder().get(GET_ROOT).invoke().getParent().getParent();
+                OperatingSystem operatingSystem = invocation.getCHolder().invoke(GET_ROOT).getParent().getParent();
                 invocation.next(arguments);
                 return operatingSystem;
             }
@@ -625,16 +625,16 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public Process<?> invoke(FunctionInvocation<Process<?>> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
                 Process<?> sessionProcess = null;
 
                 // Error check
                 if ( ((Process<?>) holder).getParent() != null) {
-                    if ( ((Process<?>) holder).getParent().get(EXECUTOR).get() instanceof Session) {
+                    if ( ((Process<?>) holder).getParent().getObj(EXECUTOR) instanceof Session) {
                         sessionProcess = (Process<?>) ((Process<?>) holder).getParent();
                     } else {
                         // Ask parent process
-                        sessionProcess = ((Process<?>) holder).getParent().get(GET_SESSION_PROCESS).invoke();
+                        sessionProcess = ((Process<?>) holder).getParent().invoke(GET_SESSION_PROCESS);
                     }
                 }
 
@@ -650,11 +650,11 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public Session invoke(FunctionInvocation<Session> invocation, Object... arguments) {
 
-                Process<?> sessionProcess = invocation.getHolder().get(GET_SESSION_PROCESS).invoke();
+                Process<?> sessionProcess = invocation.getCHolder().invoke(GET_SESSION_PROCESS);
                 if (sessionProcess == null) {
                     return null;
                 } else {
-                    Session session = (Session) sessionProcess.get(EXECUTOR).get();
+                    Session session = (Session) sessionProcess.getObj(EXECUTOR);
                     invocation.next(arguments);
                     return session;
                 }
@@ -668,11 +668,11 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Override
             public User invoke(FunctionInvocation<User> invocation, Object... arguments) {
 
-                Session session = invocation.getHolder().get(GET_SESSION).invoke();
+                Session session = invocation.getCHolder().invoke(GET_SESSION);
                 if (session == null) {
                     return null;
                 } else {
-                    User user = session.get(Session.USER).get();
+                    User user = session.getObj(Session.USER);
                     invocation.next(arguments);
                     return user;
                 }
@@ -687,20 +687,20 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
                 int pid = (int) arguments[0];
 
                 // Check given pid
                 Set<Integer> existingPids = new HashSet<>();
-                Process<?> root = holder.get(GET_ROOT).invoke();
-                existingPids.add(root.get(PID).get());
-                for (Process<?> process : root.get(GET_ALL_CHILDREN).invoke()) {
-                    existingPids.add(process.get(PID).get());
+                Process<?> root = holder.invoke(GET_ROOT);
+                existingPids.add(root.getObj(PID));
+                for (Process<?> process : root.invoke(GET_ALL_CHILDREN)) {
+                    existingPids.add(process.getObj(PID));
                 }
                 Validate.isTrue(!existingPids.contains(pid), "Pid {} is already used by another process", pid);
 
-                holder.get(PID).set(pid);
+                holder.setObj(PID, pid);
                 return invocation.next(arguments);
             }
 
@@ -711,21 +711,21 @@ public abstract class Process<P extends FeatureHolder> extends WorldChildFeature
             @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_5)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
                 // Check read and execution right on source file
-                ContentFile source = holder.get(SOURCE).get();
-                User user = holder.get(GET_USER).invoke();
+                ContentFile source = holder.getObj(SOURCE);
+                User user = holder.invoke(GET_USER);
                 if (!FileUtils.hasRight(user, source, FileRights.READ) || !FileUtils.hasRight(user, source, FileRights.EXECUTE)) {
                     throw new IllegalStateException("Cannot initialize process: No read right and execute right on file");
                 }
 
                 // Create new executor
-                Program program = (Program) source.get(ContentFile.CONTENT).get();
-                ProgramExecutor executor = program.get(Program.CREATE_EXECUTOR).invoke();
+                Program program = (Program) source.getObj(ContentFile.CONTENT);
+                ProgramExecutor executor = program.invoke(Program.CREATE_EXECUTOR);
 
                 // Set new executor
-                holder.get(EXECUTOR).set(executor);
+                holder.setObj(EXECUTOR, executor);
 
                 return invocation.next(arguments);
             }

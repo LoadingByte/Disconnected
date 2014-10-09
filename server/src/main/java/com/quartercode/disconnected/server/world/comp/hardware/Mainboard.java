@@ -88,7 +88,7 @@ public class Mainboard extends Hardware {
             @Override
             public boolean matches(MainboardSlot element, Object... arguments) {
 
-                return ((Class<?>) arguments[0]).isAssignableFrom(element.get(MainboardSlot.TYPE).get());
+                return ((Class<?>) arguments[0]).isAssignableFrom(element.getObj(MainboardSlot.TYPE));
             }
 
         }));

@@ -83,11 +83,11 @@ public class SocketConnectionTest {
             @Prioritized (Prioritized.LEVEL_9)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Socket holder = (Socket) invocation.getHolder();
+                Socket holder = (Socket) invocation.getCHolder();
 
                 if ((int) arguments[0] < 0) {
-                    int newSequenceNumber = holder.get(Socket.LOCAL_PORT).get();
-                    holder.get(Socket.CURRENT_SEQ_NUMBER).set(newSequenceNumber);
+                    int newSequenceNumber = holder.getObj(Socket.LOCAL_PORT);
+                    holder.setObj(Socket.CURRENT_SEQ_NUMBER, newSequenceNumber);
 
                     // Cancel the invocation chain; the next generator should not be invoked
                     return null;
@@ -131,8 +131,8 @@ public class SocketConnectionTest {
         // Create the test sockets
         socket1Address = createAddress(createNetId(0, 1), 10);
         socket2Address = createAddress(createNetId(0, 2), 20);
-        socket1 = createSocket(netModule, socket1Address.get(Address.PORT).get(), socket2Address);
-        socket2 = createSocket(netModule, socket2Address.get(Address.PORT).get(), socket1Address);
+        socket1 = createSocket(netModule, socket1Address.getObj(Address.PORT), socket2Address);
+        socket2 = createSocket(netModule, socket2Address.getObj(Address.PORT), socket1Address);
 
         // Apply a simple routing:
         // socket1 -> socket2
@@ -145,16 +145,16 @@ public class SocketConnectionTest {
                 mockNetModuleSendHook.onSend(socket, data);
 
                 Packet packet = new Packet();
-                packet.get(Packet.DATA).set(data);
+                packet.setObj(Packet.DATA, data);
 
                 if (socket == socket1) {
-                    packet.get(Packet.SOURCE).set(socket1Address);
-                    packet.get(Packet.DESTINATION).set(socket2Address);
-                    socket2.get(Socket.HANDLE).invoke(packet);
+                    packet.setObj(Packet.SOURCE, socket1Address);
+                    packet.setObj(Packet.DESTINATION, socket2Address);
+                    socket2.invoke(Socket.HANDLE, packet);
                 } else if (socket == socket2) {
-                    packet.get(Packet.SOURCE).set(socket2Address);
-                    packet.get(Packet.DESTINATION).set(socket1Address);
-                    socket1.get(Socket.HANDLE).invoke(packet);
+                    packet.setObj(Packet.SOURCE, socket2Address);
+                    packet.setObj(Packet.DESTINATION, socket1Address);
+                    socket1.invoke(Socket.HANDLE, packet);
                 }
             }
 
@@ -166,8 +166,8 @@ public class SocketConnectionTest {
     public void testSendAndHandle() {
 
         // Connect the two test sockets
-        socket1.get(Socket.STATE).set(SocketState.CONNECTED);
-        socket2.get(Socket.STATE).set(SocketState.CONNECTED);
+        socket1.setObj(Socket.STATE, SocketState.CONNECTED);
+        socket2.setObj(Socket.STATE, SocketState.CONNECTED);
 
         // Add some packet handlers for checking that the correct packets arrive
         final PacketHandler packetHandler1 = context.mock(PacketHandler.class, "packetHandler1");
@@ -186,12 +186,12 @@ public class SocketConnectionTest {
         }});
         // @formatter:on
 
-        socket1.get(Socket.PACKET_HANDLERS).add(packetHandler1);
-        socket2.get(Socket.PACKET_HANDLERS).add(packetHandler2);
+        socket1.addCol(Socket.PACKET_HANDLERS, packetHandler1);
+        socket2.addCol(Socket.PACKET_HANDLERS, packetHandler2);
 
         // Send test packets
-        socket1.get(Socket.SEND).invoke("testdata1");
-        socket2.get(Socket.SEND).invoke("testdata2");
+        socket1.invoke(Socket.SEND, "testdata1");
+        socket2.invoke(Socket.SEND, "testdata2");
     }
 
     @Test
@@ -213,11 +213,11 @@ public class SocketConnectionTest {
         // @formatter:on
 
         // Connect the two sockets
-        socket1.get(Socket.CONNECT).invoke();
+        socket1.invoke(Socket.CONNECT);
 
         // Check the socket states
-        assertEquals("State of socket 1 after the handshake", SocketState.CONNECTED, socket1.get(Socket.STATE).get());
-        assertEquals("State of socket 2 after the handshake", SocketState.CONNECTED, socket2.get(Socket.STATE).get());
+        assertEquals("State of socket 1 after the handshake", SocketState.CONNECTED, socket1.getObj(Socket.STATE));
+        assertEquals("State of socket 2 after the handshake", SocketState.CONNECTED, socket2.getObj(Socket.STATE));
 
         // Send some packets in order to ensure that the connection functions
         // Note that this test is very basic and not very reliable
@@ -233,15 +233,15 @@ public class SocketConnectionTest {
         }});
         // @formatter:on
 
-        socket1.get(Socket.SEND).invoke("testdata1");
-        socket2.get(Socket.SEND).invoke("testdata2");
+        socket1.invoke(Socket.SEND, "testdata1");
+        socket2.invoke(Socket.SEND, "testdata2");
     }
 
     @Test
     public void testConnectionTimeout() {
 
         // Disconnect socket 2 so it can't send or receive any packets
-        socket2.get(Socket.STATE).set(SocketState.DISCONNECTED);
+        socket2.setObj(Socket.STATE, SocketState.DISCONNECTED);
 
         // @formatter:off
         context.checking(new Expectations() {{
@@ -255,7 +255,7 @@ public class SocketConnectionTest {
         // @formatter:on
 
         // Connect the two sockets
-        socket1.get(Socket.CONNECT).invoke();
+        socket1.invoke(Socket.CONNECT);
 
         // Let socket1 time out
         for (int update = 0; update < Socket.CONNECTION_TIMEOUT; update++) {
@@ -263,16 +263,16 @@ public class SocketConnectionTest {
         }
 
         // Check the socket states
-        assertEquals("State of socket 1 after the connection timeout", SocketState.DISCONNECTED, socket1.get(Socket.STATE).get());
-        assertEquals("State of socket 2 after the connection timeout", SocketState.DISCONNECTED, socket2.get(Socket.STATE).get());
+        assertEquals("State of socket 1 after the connection timeout", SocketState.DISCONNECTED, socket1.getObj(Socket.STATE));
+        assertEquals("State of socket 2 after the connection timeout", SocketState.DISCONNECTED, socket2.getObj(Socket.STATE));
     }
 
     @Test
     public void testKeepalive() {
 
         // Connect the two test sockets
-        socket1.get(Socket.STATE).set(SocketState.CONNECTED);
-        socket2.get(Socket.STATE).set(SocketState.CONNECTED);
+        socket1.setObj(Socket.STATE, SocketState.CONNECTED);
+        socket2.setObj(Socket.STATE, SocketState.CONNECTED);
 
         // @formatter:off
         context.checking(new Expectations() {{
@@ -291,17 +291,17 @@ public class SocketConnectionTest {
         }
 
         // Check the socket states
-        assertEquals("State of socket 1 after the successful keepalive", SocketState.CONNECTED, socket1.get(Socket.STATE).get());
-        assertEquals("State of socket 2 after the successful keepalive", SocketState.CONNECTED, socket2.get(Socket.STATE).get());
+        assertEquals("State of socket 1 after the successful keepalive", SocketState.CONNECTED, socket1.getObj(Socket.STATE));
+        assertEquals("State of socket 2 after the successful keepalive", SocketState.CONNECTED, socket2.getObj(Socket.STATE));
     }
 
     @Test
     public void testKeepaliveNoResponse() {
 
         // Connect socket 1
-        socket1.get(Socket.STATE).set(SocketState.CONNECTED);
+        socket1.setObj(Socket.STATE, SocketState.CONNECTED);
         // Disconnect socket 2 so it can't send or receive any packets
-        socket2.get(Socket.STATE).set(SocketState.DISCONNECTED);
+        socket2.setObj(Socket.STATE, SocketState.DISCONNECTED);
 
         // @formatter:off
         context.checking(new Expectations() {{
@@ -321,16 +321,16 @@ public class SocketConnectionTest {
         }
 
         // Check the socket states
-        assertEquals("State of socket 1 after the unsuccessful handshake", SocketState.DISCONNECTED, socket1.get(Socket.STATE).get());
-        assertEquals("State of socket 2 after the unsuccessful handshake", SocketState.DISCONNECTED, socket2.get(Socket.STATE).get());
+        assertEquals("State of socket 1 after the unsuccessful handshake", SocketState.DISCONNECTED, socket1.getObj(Socket.STATE));
+        assertEquals("State of socket 2 after the unsuccessful handshake", SocketState.DISCONNECTED, socket2.getObj(Socket.STATE));
     }
 
     @Test
     public void testTeardown() {
 
         // Connect the two test sockets
-        socket1.get(Socket.STATE).set(SocketState.CONNECTED);
-        socket2.get(Socket.STATE).set(SocketState.CONNECTED);
+        socket1.setObj(Socket.STATE, SocketState.CONNECTED);
+        socket2.setObj(Socket.STATE, SocketState.CONNECTED);
 
         // @formatter:off
         context.checking(new Expectations() {{
@@ -341,18 +341,18 @@ public class SocketConnectionTest {
         // @formatter:on
 
         // Disconnect the two sockets
-        socket1.get(Socket.DISCONNECT).invoke();
+        socket1.invoke(Socket.DISCONNECT);
 
         // Check the socket states
-        assertEquals("State of socket 1 after the handshake", SocketState.DISCONNECTED, socket1.get(Socket.STATE).get());
-        assertEquals("State of socket 2 after the handshake", SocketState.DISCONNECTED, socket2.get(Socket.STATE).get());
+        assertEquals("State of socket 1 after the handshake", SocketState.DISCONNECTED, socket1.getObj(Socket.STATE));
+        assertEquals("State of socket 2 after the handshake", SocketState.DISCONNECTED, socket2.getObj(Socket.STATE));
     }
 
     private NetID createNetId(int subnet, int id) {
 
         NetID netId = new NetID();
-        netId.get(NetID.SUBNET).set(subnet);
-        netId.get(NetID.ID).set(id);
+        netId.setObj(NetID.SUBNET, subnet);
+        netId.setObj(NetID.ID, id);
 
         return netId;
     }
@@ -360,8 +360,8 @@ public class SocketConnectionTest {
     private Address createAddress(NetID netId, int port) {
 
         Address address = new Address();
-        address.get(Address.NET_ID).set(netId);
-        address.get(Address.PORT).set(port);
+        address.setObj(Address.NET_ID, netId);
+        address.setObj(Address.PORT, port);
 
         return address;
     }
@@ -370,8 +370,8 @@ public class SocketConnectionTest {
 
         Socket socket = new Socket();
         socket.setParent(netModule);
-        socket.get(Socket.LOCAL_PORT).set(localPort);
-        socket.get(Socket.DESTINATION).set(destination);
+        socket.setObj(Socket.LOCAL_PORT, localPort);
+        socket.setObj(Socket.DESTINATION, destination);
 
         return socket;
     }

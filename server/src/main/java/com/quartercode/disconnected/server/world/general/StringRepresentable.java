@@ -20,7 +20,7 @@ package com.quartercode.disconnected.server.world.general;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 
 /**
@@ -36,7 +36,7 @@ import com.quartercode.classmod.extra.FunctionDefinition;
  * 
  * An object converted into a string and then converted back into an object must be equal to the original object.
  */
-public interface StringRepresentable extends FeatureHolder {
+public interface StringRepresentable extends CFeatureHolder {
 
     /**
      * Returns a string which is representating the original object in its current state.

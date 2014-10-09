@@ -18,16 +18,16 @@
 
 package com.quartercode.disconnected.server.sim.scheduler;
 
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 
 /**
- * {@link FeatureHolder}s which implement this interface inherit the {@link #SCHEDULER} feature which is a {@link Scheduler} that
+ * {@link CFeatureHolder}s which implement this interface inherit the {@link #SCHEDULER} feature which is a {@link Scheduler} that
  * is automatically updated by the tick simulator.
- * The simulator visits all {@link FeatureHolder}s of a world and updates all automatic schedulers with all groups in the correct order.
+ * The simulator visits all {@link CFeatureHolder}s of a world and updates all automatic schedulers with all groups in the correct order.
  * 
  * @see Scheduler
  */
-public interface SchedulerUser extends FeatureHolder {
+public interface SchedulerUser extends CFeatureHolder {
 
     /**
      * The {@link Scheduler} which is automatically updated by the tick simulator on every tick.

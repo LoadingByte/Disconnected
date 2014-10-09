@@ -44,14 +44,14 @@ public class FileUtils {
      */
     public static boolean hasRight(User user, File<?> file, char right) {
 
-        if (user == null || user.get(User.IS_SUPERUSER).invoke()) {
+        if (user == null || user.invoke(User.IS_SUPERUSER)) {
             return true;
         } else if (file instanceof RootFile) {
             // Only superusers (filtered out by the previous check) can add files to the root file
             return false;
-        } else if (checkRight(file, FileRights.OWNER, right) && file.get(File.OWNER).get().equals(user)) {
+        } else if (checkRight(file, FileRights.OWNER, right) && file.getObj(File.OWNER).equals(user)) {
             return true;
-        } else if (checkRight(file, FileRights.GROUP, right) && user.get(User.GROUPS).get().contains(file.get(File.GROUP).get())) {
+        } else if (checkRight(file, FileRights.GROUP, right) && user.getCol(User.GROUPS).contains(file.getObj(File.GROUP))) {
             return true;
         } else if (checkRight(file, FileRights.OTHERS, right)) {
             return true;
@@ -62,7 +62,7 @@ public class FileUtils {
 
     private static boolean checkRight(File<?> file, char accessor, char right) {
 
-        return file.get(File.RIGHTS).get().isRightSet(accessor, right);
+        return file.getObj(File.RIGHTS).isRightSet(accessor, right);
     }
 
     /**
@@ -74,7 +74,7 @@ public class FileUtils {
      */
     public static boolean canChangeRights(User user, File<?> file) {
 
-        return file.get(File.OWNER).get().equals(user) || user.get(User.IS_SUPERUSER).invoke();
+        return file.getObj(File.OWNER).equals(user) || user.invoke(User.IS_SUPERUSER);
     }
 
     /**
@@ -85,12 +85,12 @@ public class FileUtils {
      */
     public static FilePlaceholder createFilePlaceholder(KnownFileSystem fileSystem) {
 
-        FileSystem actualFs = fileSystem.get(KnownFileSystem.FILE_SYSTEM).get();
-        RootFile root = actualFs.get(FileSystem.ROOT).get();
+        FileSystem actualFs = fileSystem.getObj(KnownFileSystem.FILE_SYSTEM);
+        RootFile root = actualFs.getObj(FileSystem.ROOT);
 
-        String path = PathUtils.SEPARATOR + fileSystem.get(KnownFileSystem.MOUNTPOINT).get();
+        String path = PathUtils.SEPARATOR + fileSystem.getObj(KnownFileSystem.MOUNTPOINT);
         String type = StringFileTypeMapper.classToString(RootFile.class);
-        long size = actualFs.get(FileSystem.GET_SIZE).invoke();
+        long size = actualFs.invoke(FileSystem.GET_SIZE);
         Triple<FileRights, String, String> commonData = getCommonFilePlaceholderData(root);
 
         return new FilePlaceholder(path, type, size, commonData.getLeft(), commonData.getMiddle(), commonData.getRight());
@@ -105,10 +105,10 @@ public class FileUtils {
      */
     public static FilePlaceholder createFilePlaceholder(String fileSystemMountpoint, File<?> file) {
 
-        String path = PathUtils.resolve(PathUtils.normalize(fileSystemMountpoint), file.get(File.GET_PATH).invoke());
+        String path = PathUtils.resolve(PathUtils.normalize(fileSystemMountpoint), file.invoke(File.GET_PATH));
 
         String type = StringFileTypeMapper.classToString(file.getClass());
-        long size = file.get(File.GET_SIZE).invoke();
+        long size = file.invoke(File.GET_SIZE);
         Triple<FileRights, String, String> commonData = getCommonFilePlaceholderData(file);
 
         return new FilePlaceholder(path, type, size, commonData.getLeft(), commonData.getMiddle(), commonData.getRight());
@@ -116,13 +116,13 @@ public class FileUtils {
 
     private static Triple<FileRights, String, String> getCommonFilePlaceholderData(File<?> file) {
 
-        FileRights rights = file.get(File.RIGHTS).get();
+        FileRights rights = file.getObj(File.RIGHTS);
 
-        User ownerObject = file.get(File.OWNER).get();
-        String owner = ownerObject == null ? null : ownerObject.get(User.NAME).get();
+        User ownerObject = file.getObj(File.OWNER);
+        String owner = ownerObject == null ? null : ownerObject.getObj(User.NAME);
 
-        Group groupObject = file.get(File.GROUP).get();
-        String group = groupObject == null ? null : groupObject.get(Group.NAME).get();
+        Group groupObject = file.getObj(File.GROUP);
+        String group = groupObject == null ? null : groupObject.getObj(Group.NAME);
 
         return Triple.of(rights, owner, group);
     }

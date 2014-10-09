@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -112,9 +112,9 @@ public class ProcessModule extends OSModule implements SchedulerUser {
             public List<Process<?>> invoke(FunctionInvocation<List<Process<?>>> invocation, Object... arguments) {
 
                 List<Process<?>> processes = new ArrayList<>();
-                RootProcess root = invocation.getHolder().get(ROOT_PROCESS).get();
+                RootProcess root = invocation.getCHolder().getObj(ROOT_PROCESS);
                 processes.add(root);
-                processes.addAll(root.get(Process.GET_ALL_CHILDREN).invoke());
+                processes.addAll(root.invoke(Process.GET_ALL_CHILDREN));
 
                 invocation.next(arguments);
                 return processes;
@@ -128,9 +128,9 @@ public class ProcessModule extends OSModule implements SchedulerUser {
             @Override
             public Integer invoke(FunctionInvocation<Integer> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
-                int value = holder.get(NEXT_PID_VALUE).get();
-                holder.get(NEXT_PID_VALUE).set(value + 1);
+                CFeatureHolder holder = invocation.getCHolder();
+                int value = holder.getObj(NEXT_PID_VALUE);
+                holder.setObj(NEXT_PID_VALUE, value + 1);
 
                 invocation.next(arguments);
                 return value;
@@ -144,7 +144,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
             @Prioritized (Prioritized.LEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                invocation.getHolder().get(NEXT_PID_VALUE).set(0);
+                invocation.getCHolder().setObj(NEXT_PID_VALUE, 0);
                 return invocation.next(arguments);
             }
         });
@@ -155,24 +155,24 @@ public class ProcessModule extends OSModule implements SchedulerUser {
             @Prioritized (Prioritized.LEVEL_5 + Prioritized.SUBLEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
                 // Only invoke on bootstrap
                 if ((Boolean) arguments[0]) {
                     RootProcess root = new RootProcess();
 
-                    FileSystemModule fsModule = ((ProcessModule) holder).getParent().get(OperatingSystem.FS_MODULE).get();
+                    FileSystemModule fsModule = ((ProcessModule) holder).getParent().getObj(OperatingSystem.FS_MODULE);
 
                     // Get environment
                     Map<String, String> environment = new HashMap<>();
-                    File<?> environmentFile = fsModule.get(FileSystemModule.GET_FILE).invoke(CommonFiles.ENVIRONMENT_CONFIG);
+                    File<?> environmentFile = fsModule.invoke(FileSystemModule.GET_FILE, CommonFiles.ENVIRONMENT_CONFIG);
                     if (environmentFile != null) {
-                        Configuration environmentConfig = (Configuration) environmentFile.get(ContentFile.CONTENT).get();
-                        for (ConfigurationEntry variable : environmentConfig.get(Configuration.ENTRIES).get()) {
-                            environment.put(variable.get(EnvironmentVariable.NAME).get(), variable.get(EnvironmentVariable.VALUE).get());
+                        Configuration environmentConfig = (Configuration) environmentFile.getObj(ContentFile.CONTENT);
+                        for (ConfigurationEntry variable : environmentConfig.getCol(Configuration.ENTRIES)) {
+                            environment.put(variable.getObj(EnvironmentVariable.NAME), variable.getObj(EnvironmentVariable.VALUE));
                         }
                     }
-                    root.get(Process.ENVIRONMENT).set(environment);
+                    root.setObj(Process.ENVIRONMENT, environment);
 
                     // Get session program
                     List<String> path = Arrays.asList(environment.get("PATH").split(":"));
@@ -180,24 +180,24 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                     if (sessionProgramFile == null) {
                         throw new IllegalStateException("Cannot start process module: Session program not found");
                     }
-                    root.get(Process.SOURCE).set(sessionProgramFile);
+                    root.setObj(Process.SOURCE, sessionProgramFile);
 
                     // Get superuser
-                    File<?> userConfigFile = fsModule.get(FileSystemModule.GET_FILE).invoke(CommonFiles.USER_CONFIG);
-                    Configuration userConfig = (Configuration) userConfigFile.get(ContentFile.CONTENT).get();
+                    File<?> userConfigFile = fsModule.invoke(FileSystemModule.GET_FILE, CommonFiles.USER_CONFIG);
+                    Configuration userConfig = (Configuration) userConfigFile.getObj(ContentFile.CONTENT);
                     User superuser = null;
-                    for (ConfigurationEntry entry : userConfig.get(Configuration.ENTRIES).get()) {
-                        if (entry instanceof User && ((User) entry).get(User.NAME).get().equals(User.SUPERUSER_NAME)) {
+                    for (ConfigurationEntry entry : userConfig.getCol(Configuration.ENTRIES)) {
+                        if (entry instanceof User && ((User) entry).getObj(User.NAME).equals(User.SUPERUSER_NAME)) {
                             superuser = (User) entry;
                         }
                     }
 
                     // Start root process
-                    holder.get(ROOT_PROCESS).set(root);
-                    root.get(Process.INITIALIZE).invoke(holder.get(NEXT_PID).invoke());
-                    ProgramExecutor rootProgram = root.get(Process.EXECUTOR).get();
-                    rootProgram.get(Session.USER).set(superuser);
-                    rootProgram.get(ProgramExecutor.RUN).invoke();
+                    holder.setObj(ROOT_PROCESS, root);
+                    root.invoke(Process.INITIALIZE, holder.invoke(NEXT_PID));
+                    ProgramExecutor rootProgram = root.getObj(Process.EXECUTOR);
+                    rootProgram.setObj(Session.USER, superuser);
+                    rootProgram.invoke(ProgramExecutor.RUN);
                 }
 
                 return invocation.next(arguments);
@@ -210,11 +210,11 @@ public class ProcessModule extends OSModule implements SchedulerUser {
             @Prioritized (Prioritized.LEVEL_5 + Prioritized.SUBLEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
                 // Only invoke on shutdown
                 if (! ((Boolean) arguments[0])) {
-                    holder.get(ROOT_PROCESS).get().get(Process.INTERRUPT).invoke();
+                    holder.getObj(ROOT_PROCESS).invoke(Process.INTERRUPT);
                     // Kill the process tree after 5 seconds
                     FeatureDefinitionReference<FunctionDefinition<?>> killFunction = new FeatureDefinitionReference<FunctionDefinition<?>>(ProcessModule.class, KILL);
                     holder.get(SCHEDULER).schedule(new FunctionCallSchedulerTask("killRootProcess", "computerProgramUpdate", TickService.DEFAULT_TICKS_PER_SECOND * 5, killFunction));
@@ -231,9 +231,9 @@ public class ProcessModule extends OSModule implements SchedulerUser {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
-                holder.get(ROOT_PROCESS).get().get(Process.STOP).invoke();
-                holder.get(ROOT_PROCESS).set(null);
+                CFeatureHolder holder = invocation.getCHolder();
+                holder.getObj(ROOT_PROCESS).invoke(Process.STOP);
+                holder.setObj(ROOT_PROCESS, null);
 
                 return invocation.next(arguments);
             }

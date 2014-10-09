@@ -28,6 +28,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
+import com.quartercode.classmod.extra.CFeatureHolder;
 
 /**
  * The {@link FeatureDefinition} that defines a {@link Scheduler}.
@@ -39,10 +40,10 @@ import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
  */
 public class SchedulerDefinition extends AbstractFeatureDefinition<Scheduler> {
 
-    private final List<Pair<SchedulerTask, Class<? extends FeatureHolder>>> globalTasks = new ArrayList<>();
+    private final List<Pair<SchedulerTask, Class<? extends CFeatureHolder>>> globalTasks = new ArrayList<>();
 
     // Performance: Cache for different holder classes
-    private final Map<Class<? extends FeatureHolder>, List<SchedulerTask>>  classCache  = new HashMap<>();
+    private final Map<Class<? extends CFeatureHolder>, List<SchedulerTask>>  classCache  = new HashMap<>();
 
     /**
      * Creates a new scheduler definition for defining a {@link Scheduler} with the given name.
@@ -55,12 +56,12 @@ public class SchedulerDefinition extends AbstractFeatureDefinition<Scheduler> {
     }
 
     /**
-     * Returns all global {@link SchedulerTask}s that are currently scheduled, along with their {@link FeatureHolder} classes.
+     * Returns all global {@link SchedulerTask}s that are currently scheduled, along with their {@link CFeatureHolder} classes.
      * Such tasks must have been added using {@link #schedule(SchedulerTask, Class)} before.
      * 
      * @return All currently scheduled global tasks.
      */
-    public List<Pair<SchedulerTask, Class<? extends FeatureHolder>>> getGlobalTasks() {
+    public List<Pair<SchedulerTask, Class<? extends CFeatureHolder>>> getGlobalTasks() {
 
         return Collections.unmodifiableList(globalTasks);
     }
@@ -70,16 +71,16 @@ public class SchedulerDefinition extends AbstractFeatureDefinition<Scheduler> {
      * If multiple tasks have the same name, the task that was scheduled first is returned.
      * 
      * @param name The name of the task that should be returned.
-     * @param holderClass The {@link FeatureHolder} class which was used when the task was scheduled.
+     * @param holderClass The {@link CFeatureHolder} class which was used when the task was scheduled.
      *        See {@link #schedule(SchedulerTask, Class)} for more information on holder classes.
      * 
      * @return The first task with the given name.
      */
-    public SchedulerTask getGlobalTask(String name, Class<? extends FeatureHolder> holderClass) {
+    public SchedulerTask getGlobalTask(String name, Class<? extends CFeatureHolder> holderClass) {
 
         Validate.notNull(name, "Can't search for scheduler task with null name");
 
-        for (Pair<SchedulerTask, Class<? extends FeatureHolder>> element : globalTasks) {
+        for (Pair<SchedulerTask, Class<? extends CFeatureHolder>> element : globalTasks) {
             SchedulerTask task = element.getLeft();
 
             if (element.getRight() == holderClass && task.getName() != null && task.getName().equals(name)) {
@@ -96,13 +97,13 @@ public class SchedulerDefinition extends AbstractFeatureDefinition<Scheduler> {
      * See the scheduler task class for more information about when the task will be executed.
      * 
      * @param task The scheduler task that should be globally scheduled for execution.
-     * @param holderClass The {@link FeatureHolder} class to whose schedulers the task will be added to.
+     * @param holderClass The {@link CFeatureHolder} class to whose schedulers the task will be added to.
      *        It will also be used for every subclass of this class.
      *        For example, a task with holder class TestFH is only added to schedulers that are held by instances of TestFH or any subclass.
      */
-    public void schedule(SchedulerTask task, Class<? extends FeatureHolder> holderClass) {
+    public void schedule(SchedulerTask task, Class<? extends CFeatureHolder> holderClass) {
 
-        Pair<SchedulerTask, Class<? extends FeatureHolder>> element = Pair.<SchedulerTask, Class<? extends FeatureHolder>> of(task, holderClass);
+        Pair<SchedulerTask, Class<? extends CFeatureHolder>> element = Pair.<SchedulerTask, Class<? extends CFeatureHolder>> of(task, holderClass);
         globalTasks.add(element);
 
         // Invalidate cache
@@ -113,12 +114,12 @@ public class SchedulerDefinition extends AbstractFeatureDefinition<Scheduler> {
      * Removes the given global {@link SchedulerTask} which is scheduled under the given variant.
      * 
      * @param task The task that should be removed.
-     * @param holderClass The {@link FeatureHolder} class which was used when the task was scheduled.
+     * @param holderClass The {@link CFeatureHolder} class which was used when the task was scheduled.
      *        See {@link #schedule(SchedulerTask, Class)} for more information on holder classes.
      */
-    public void remove(SchedulerTask task, Class<? extends FeatureHolder> holderClass) {
+    public void remove(SchedulerTask task, Class<? extends CFeatureHolder> holderClass) {
 
-        Pair<SchedulerTask, Class<? extends FeatureHolder>> element = Pair.<SchedulerTask, Class<? extends FeatureHolder>> of(task, holderClass);
+        Pair<SchedulerTask, Class<? extends CFeatureHolder>> element = Pair.<SchedulerTask, Class<? extends CFeatureHolder>> of(task, holderClass);
         globalTasks.remove(element);
 
         // Invalidate cache
@@ -131,10 +132,10 @@ public class SchedulerDefinition extends AbstractFeatureDefinition<Scheduler> {
      * If multiple tasks have the same name, the task that was scheduled first is removed.
      * 
      * @param name The name of the task for removal.
-     * @param holderClass The {@link FeatureHolder} class which was used when the task was scheduled.
+     * @param holderClass The {@link CFeatureHolder} class which was used when the task was scheduled.
      *        See {@link #schedule(SchedulerTask, Class)} for more information on holder classes.
      */
-    public void remove(String name, Class<? extends FeatureHolder> holderClass) {
+    public void remove(String name, Class<? extends CFeatureHolder> holderClass) {
 
         SchedulerTask removalTask = getGlobalTask(name, holderClass);
 
@@ -146,23 +147,25 @@ public class SchedulerDefinition extends AbstractFeatureDefinition<Scheduler> {
     @Override
     public Scheduler create(FeatureHolder holder) {
 
-        Scheduler scheduler = new Scheduler(getName(), holder);
+        Validate.isInstanceOf(CFeatureHolder.class, holder, "Only the usage of ConvenientFeatureHolder is allowed");
 
-        for (SchedulerTask globalTask : getGlobalTasksForClass(holder.getClass())) {
+        Scheduler scheduler = new Scheduler(getName(), (CFeatureHolder) holder);
+
+        for (SchedulerTask globalTask : getGlobalTasksForClass( ((CFeatureHolder) holder).getClass())) {
             scheduler.schedule(globalTask);
         }
 
         return scheduler;
     }
 
-    private List<SchedulerTask> getGlobalTasksForClass(Class<? extends FeatureHolder> holderClass) {
+    private List<SchedulerTask> getGlobalTasksForClass(Class<? extends CFeatureHolder> holderClass) {
 
         List<SchedulerTask> classGlobalTasks = classCache.get(holderClass);
 
         if (classGlobalTasks == null) {
             classGlobalTasks = new ArrayList<>();
 
-            for (Pair<SchedulerTask, Class<? extends FeatureHolder>> element : globalTasks) {
+            for (Pair<SchedulerTask, Class<? extends CFeatureHolder>> element : globalTasks) {
                 if (element.getRight().isAssignableFrom(holderClass)) {
                     classGlobalTasks.add(element.getLeft());
                 }

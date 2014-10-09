@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import com.quartercode.classmod.base.Feature;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.ValueSupplier;
 import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTask;
@@ -35,7 +35,7 @@ import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.server.world.World;
 
 /**
- * This class updates all {@link Scheduler}s of {@link World} {@link FeatureHolder}s which implement the {@link SchedulerUser} interface.
+ * This class updates all {@link Scheduler}s of {@link World} {@link CFeatureHolder}s which implement the {@link SchedulerUser} interface.
  * 
  * @see SchedulerUser
  */
@@ -166,8 +166,8 @@ public class TickSchedulerUpdater implements TickAction {
             list.add( ((SchedulerUser) object).get(SchedulerUser.SCHEDULER));
         }
 
-        if (object instanceof FeatureHolder) {
-            for (Feature feature : (FeatureHolder) object) {
+        if (object instanceof CFeatureHolder) {
+            for (Feature feature : (CFeatureHolder) object) {
                 collectSchedulers(feature, list);
             }
         } else if (object instanceof ValueSupplier) {

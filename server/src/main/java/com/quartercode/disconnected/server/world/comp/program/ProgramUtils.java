@@ -59,9 +59,9 @@ public class ProgramUtils {
             String programFilePath = PathUtils.resolve(directoryPath, fileName);
 
             try {
-                File<?> programFile = fsModule.get(FileSystemModule.GET_FILE).invoke(programFilePath);
+                File<?> programFile = fsModule.invoke(FileSystemModule.GET_FILE, programFilePath);
 
-                if (programFile instanceof ContentFile && programFile.get(ContentFile.CONTENT).get() instanceof Program) {
+                if (programFile instanceof ContentFile && programFile.getObj(ContentFile.CONTENT) instanceof Program) {
                     return (ContentFile) programFile;
                 }
             } catch (IllegalArgumentException | UnknownMountpointException e) {
@@ -90,8 +90,8 @@ public class ProgramUtils {
 
         Process<?> process = executor.getParent();
 
-        int pid = process.getParent().get(Process.PID).get();
-        String computerId = process.get(Process.GET_OPERATING_SYSTEM).invoke().getParent().getId();
+        int pid = process.getParent().getObj(Process.PID);
+        String computerId = process.invoke(Process.GET_OPERATING_SYSTEM).getParent().getId();
         Bridge bridge = process.getWorld().getBridge();
 
         return new ImportantData(pid, computerId, bridge);

@@ -57,14 +57,14 @@ public class ProgramLaunchCommandEventHandler implements EventHandler<ProgramLau
 
         // Create a new process
         Process<?> sessionProcess = getSessionProcess(playerComputer);
-        Process<?> process = sessionProcess.get(Process.CREATE_CHILD).invoke();
+        Process<?> process = sessionProcess.invoke(Process.CREATE_CHILD);
 
         // Set the source file
-        process.get(Process.SOURCE).set(source);
+        process.setObj(Process.SOURCE, source);
 
         // Initialize the process
         try {
-            process.get(Process.INITIALIZE).invoke(event.getPid());
+            process.invoke(Process.INITIALIZE, event.getPid());
         } catch (Exception e) {
             LOGGER.warn("Error while initializing process with pid {}; client failure?", event.getPid(), e);
             abort(sessionProcess, process);
@@ -72,9 +72,9 @@ public class ProgramLaunchCommandEventHandler implements EventHandler<ProgramLau
         }
 
         // Run the program
-        ProgramExecutor executor = process.get(Process.EXECUTOR).get();
+        ProgramExecutor executor = process.getObj(Process.EXECUTOR);
         try {
-            executor.get(ProgramExecutor.RUN).invoke();
+            executor.invoke(ProgramExecutor.RUN);
         } catch (Exception e) {
             LOGGER.warn("Program executor '{}' threw unexpected exception on start", executor, e);
             abort(sessionProcess, process);
@@ -83,27 +83,27 @@ public class ProgramLaunchCommandEventHandler implements EventHandler<ProgramLau
 
     private void abort(Process<?> parent, Process<?> process) {
 
-        parent.get(Process.CHILDREN).remove(process);
+        parent.removeCol(Process.CHILDREN, process);
     }
 
     protected Computer getPlayerComputer() {
 
         World world = ServiceRegistry.lookup(ProfileService.class).getActive().getWorld();
         // Just use first available computer as the player's one
-        return world.get(World.COMPUTERS).get().get(0);
+        return world.getCol(World.COMPUTERS).get(0);
     }
 
     protected Process<?> getSessionProcess(Computer computer) {
 
-        OperatingSystem os = computer.get(Computer.OS).get();
+        OperatingSystem os = computer.getObj(Computer.OS);
         // Just use the root process as the player's session
-        return os.get(OperatingSystem.PROC_MODULE).get().get(ProcessModule.ROOT_PROCESS).get();
+        return os.getObj(OperatingSystem.PROC_MODULE).getObj(ProcessModule.ROOT_PROCESS);
     }
 
     protected ContentFile getSourceFile(Computer computer, String path) {
 
-        FileSystemModule fsModule = computer.get(Computer.OS).get().get(OperatingSystem.FS_MODULE).get();
-        return (ContentFile) fsModule.get(FileSystemModule.GET_FILE).invoke(path);
+        FileSystemModule fsModule = computer.getObj(Computer.OS).getObj(OperatingSystem.FS_MODULE);
+        return (ContentFile) fsModule.invoke(FileSystemModule.GET_FILE, path);
     }
 
 }

@@ -21,7 +21,7 @@ package com.quartercode.disconnected.server.world.comp.hardware;
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
@@ -87,11 +87,11 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 NetID netId = (NetID) arguments[0];
-                RouterNetInterface connection = invocation.getHolder().get(CONNECTION).get();
+                RouterNetInterface connection = invocation.getCHolder().getObj(CONNECTION);
 
                 if (netId != null && connection != null) {
-                    int newSubnet = netId.get(NetID.SUBNET).get();
-                    int conSubnet = connection.get(RouterNetInterface.SUBNET).get();
+                    int newSubnet = netId.getObj(NetID.SUBNET);
+                    int conSubnet = connection.getObj(RouterNetInterface.SUBNET);
 
                     Validate.isTrue(newSubnet == conSubnet, "The subnet of the new net id (%d) must be equal to the one connected to (%d)", newSubnet, conSubnet);
                 }
@@ -108,11 +108,11 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
             @Prioritized (Prioritized.LEVEL_5 + Prioritized.LEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
-                RouterNetInterface oldConnection = holder.get(CONNECTION).get();
+                RouterNetInterface oldConnection = holder.getObj(CONNECTION);
                 if (oldConnection == null || !oldConnection.equals(arguments[0])) {
-                    holder.get(NET_ID).set(null);
+                    holder.setObj(NET_ID, null);
                 }
 
                 return invocation.next(arguments);
@@ -126,11 +126,11 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 if (arguments[0] != null) {
-                    NodeNetInterface holder = (NodeNetInterface) invocation.getHolder();
+                    NodeNetInterface holder = (NodeNetInterface) invocation.getCHolder();
                     RouterNetInterface connection = (RouterNetInterface) arguments[0];
 
-                    if (!connection.get(RouterNetInterface.CHILDREN).get().contains(holder)) {
-                        connection.get(RouterNetInterface.CHILDREN).add(holder);
+                    if (!connection.getCol(RouterNetInterface.CHILDREN).contains(holder)) {
+                        connection.addCol(RouterNetInterface.CHILDREN, holder);
                     }
                 }
 
@@ -145,11 +145,11 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 if (arguments[0] == null) {
-                    NodeNetInterface holder = (NodeNetInterface) invocation.getHolder();
-                    RouterNetInterface oldConnection = holder.get(CONNECTION).get();
+                    NodeNetInterface holder = (NodeNetInterface) invocation.getCHolder();
+                    RouterNetInterface oldConnection = holder.getObj(CONNECTION);
 
-                    if (oldConnection != null && oldConnection.get(RouterNetInterface.CHILDREN).get().contains(holder)) {
-                        oldConnection.get(RouterNetInterface.CHILDREN).remove(holder);
+                    if (oldConnection != null && oldConnection.getCol(RouterNetInterface.CHILDREN).contains(holder)) {
+                        oldConnection.removeCol(RouterNetInterface.CHILDREN, holder);
                     }
                 }
 
@@ -169,7 +169,7 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                NodeNetInterface holder = (NodeNetInterface) invocation.getHolder();
+                NodeNetInterface holder = (NodeNetInterface) invocation.getCHolder();
                 Packet packet = (Packet) arguments[0];
 
                 // Routing cascade
@@ -185,17 +185,17 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
              */
             private boolean tryRouteToOs(NodeNetInterface netInterface, Packet packet) {
 
-                NetID destination = packet.get(Packet.DESTINATION).get().get(Address.NET_ID).get();
+                NetID destination = packet.getObj(Packet.DESTINATION).getObj(Address.NET_ID);
 
-                if (!destination.equals(netInterface.get(NET_ID).get())) {
+                if (!destination.equals(netInterface.getObj(NET_ID))) {
                     // Packet destination is not this network interface
                     return false;
                 }
 
                 // Only deliver the packet if the net interface is connected to a computer
                 if (netInterface.getParent() != null) {
-                    NetworkModule netModule = netInterface.getParent().get(Computer.OS).get().get(OperatingSystem.NET_MODULE).get();
-                    netModule.get(NetworkModule.HANDLE).invoke(packet);
+                    NetworkModule netModule = netInterface.getParent().getObj(Computer.OS).getObj(OperatingSystem.NET_MODULE);
+                    netModule.invoke(NetworkModule.HANDLE, packet);
                 }
 
                 return true;
@@ -204,14 +204,14 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
             /*
              * Try to route the packet to a connected router.
              */
-            private boolean tryRouteToRouter(FeatureHolder netInterface, Packet packet) {
+            private boolean tryRouteToRouter(CFeatureHolder netInterface, Packet packet) {
 
-                if (netInterface.get(CONNECTION).get() == null) {
+                if (netInterface.getObj(CONNECTION) == null) {
                     // Network interface is not connected to a router
                     return false;
                 }
 
-                netInterface.get(CONNECTION).get().get(RouterNetInterface.PROCESS).invoke(packet);
+                netInterface.getObj(CONNECTION).invoke(RouterNetInterface.PROCESS, packet);
                 return true;
             }
 

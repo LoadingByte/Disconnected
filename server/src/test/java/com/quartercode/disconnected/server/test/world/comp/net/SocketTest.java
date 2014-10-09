@@ -53,12 +53,12 @@ public class SocketTest {
         // @formatter:on
 
         Socket socket = new Socket();
-        socket.get(Socket.PACKET_HANDLERS).add(packetHandler);
-        socket.get(Socket.STATE).set(SocketState.CONNECTED);
+        socket.addCol(Socket.PACKET_HANDLERS, packetHandler);
+        socket.setObj(Socket.STATE, SocketState.CONNECTED);
 
         Packet packet = new Packet();
-        packet.get(Packet.DATA).set("testdata");
-        socket.get(Socket.HANDLE).invoke(packet);
+        packet.setObj(Packet.DATA, "testdata");
+        socket.invoke(Socket.HANDLE, packet);
     }
 
     @Test
@@ -75,11 +75,11 @@ public class SocketTest {
         // @formatter:on
 
         Socket socket = new Socket();
-        socket.get(Socket.PACKET_HANDLERS).add(packetHandler);
+        socket.addCol(Socket.PACKET_HANDLERS, packetHandler);
 
         Packet packet = new Packet();
-        packet.get(Packet.DATA).set("testdata");
-        socket.get(Socket.HANDLE).invoke(packet);
+        packet.setObj(Packet.DATA, "testdata");
+        socket.invoke(Socket.HANDLE, packet);
     }
 
 }

@@ -120,7 +120,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
             @Override
             public List<String> invoke(FunctionInvocation<List<String>> invocation, Object... arguments) {
 
-                String value = invocation.getHolder().get(VALUE).get();
+                String value = invocation.getCHolder().getObj(VALUE);
                 List<String> valueList = new ArrayList<>();
 
                 if (value != null && !value.isEmpty()) {
@@ -148,7 +148,7 @@ public class EnvironmentVariable extends ConfigurationEntry {
                 for (String listValue : list) {
                     value.append(":").append(listValue);
                 }
-                invocation.getHolder().get(VALUE).set(value.substring(1));
+                invocation.getCHolder().setObj(VALUE, value.substring(1));
 
                 return invocation.next(arguments);
             }

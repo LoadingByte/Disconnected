@@ -26,9 +26,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.base.Feature;
-import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.Persistent;
 import com.quartercode.classmod.base.def.AbstractFeature;
+import com.quartercode.classmod.extra.CFeatureHolder;
 
 /**
  * The scheduler is a {@link Feature} that allows executing actions after a delay or periodically.
@@ -59,12 +59,12 @@ public class Scheduler extends AbstractFeature {
     }
 
     /**
-     * Creates a new scheduler with the given name and {@link FeatureHolder}.
+     * Creates a new scheduler with the given name and {@link CFeatureHolder}.
      * 
      * @param name The name of the scheduler.
      * @param holder The feature holder which has and uses the new scheduler.
      */
-    public Scheduler(String name, FeatureHolder holder) {
+    public Scheduler(String name, CFeatureHolder holder) {
 
         super(name, holder);
 
@@ -168,7 +168,8 @@ public class Scheduler extends AbstractFeature {
                 if (scheduledTask.getTask().isCancelled()) {
                     scheduledTasks.remove(scheduledTask);
                 } else {
-                    scheduledTask.update(getHolder());
+                    // Only the usage of ConvenientFeatureHolder is allowed
+                    scheduledTask.update((CFeatureHolder) getHolder());
                 }
             }
         }
@@ -204,7 +205,7 @@ public class Scheduler extends AbstractFeature {
             return task;
         }
 
-        private void update(FeatureHolder schedulerHolder) {
+        private void update(CFeatureHolder schedulerHolder) {
 
             ticksSinceLastExecution++;
 
@@ -231,7 +232,7 @@ public class Scheduler extends AbstractFeature {
             return task.getPeriodicDelay() > 0;
         }
 
-        private void execute(FeatureHolder schedulerHolder) {
+        private void execute(CFeatureHolder schedulerHolder) {
 
             ticksSinceLastExecution = 0;
             task.execute(schedulerHolder);

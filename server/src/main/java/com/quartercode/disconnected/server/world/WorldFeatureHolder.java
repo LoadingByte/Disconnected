@@ -18,26 +18,26 @@
 
 package com.quartercode.disconnected.server.world;
 
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
+import com.quartercode.classmod.extra.def.DefaultCFeatureHolder;
 
 /**
- * The world feature holder is a special {@link WorldChildFeatureHolder} which may have any {@link FeatureHolder} as parent.
+ * The world feature holder is a special {@link WorldChildFeatureHolder} which may have any {@link CFeatureHolder} as parent.
  * It allows {@link #getWorld()} to be accessed on feature holders which do not have a defined parent.
  * Each feature holder (apart from the root one) which is not a world child feature holder should extend this class.
  * 
  * @see World
- * @see DefaultFeatureHolder
+ * @see DefaultCFeatureHolder
  * @see WorldChildFeatureHolder
  */
-public class WorldFeatureHolder extends WorldChildFeatureHolder<FeatureHolder> {
+public class WorldFeatureHolder extends WorldChildFeatureHolder<CFeatureHolder> {
 
     /**
      * Creates a new world feature holder.
      */
     public WorldFeatureHolder() {
 
-        setParentType(FeatureHolder.class);
+        setParentType(CFeatureHolder.class);
     }
 
 }

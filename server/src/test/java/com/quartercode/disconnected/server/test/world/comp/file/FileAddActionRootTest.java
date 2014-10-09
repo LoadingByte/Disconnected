@@ -34,9 +34,9 @@ public class FileAddActionRootTest extends AbstractFileActionTest {
     private FileAddAction createAction(File<ParentFile<?>> file, String path) {
 
         FileAddAction action = new FileAddAction();
-        action.get(FileAddAction.FILE_SYSTEM).set(fileSystem);
-        action.get(FileAddAction.PATH).set(path);
-        action.get(FileAddAction.FILE).set(file);
+        action.setObj(FileAddAction.FILE_SYSTEM, fileSystem);
+        action.setObj(FileAddAction.PATH, path);
+        action.setObj(FileAddAction.FILE, file);
         return action;
     }
 
@@ -50,14 +50,14 @@ public class FileAddActionRootTest extends AbstractFileActionTest {
     @Test
     public void testFileSystemExecute() {
 
-        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, ADD_FILE_PATH);
+        FileAddAction action = fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, ADD_FILE_PATH);
         actuallyTestExecute(action);
     }
 
     private void actuallyTestExecute(FileAddAction action) {
 
-        action.get(FileAddAction.EXECUTE).invoke();
-        assertEquals("Resolved file", file, fileSystem.get(FileSystem.GET_FILE).invoke(ADD_FILE_PATH));
+        action.invoke(FileAddAction.EXECUTE);
+        assertEquals("Resolved file", file, fileSystem.invoke(FileSystem.GET_FILE, ADD_FILE_PATH));
     }
 
     @Test (expected = OccupiedPathException.class)
@@ -70,14 +70,14 @@ public class FileAddActionRootTest extends AbstractFileActionTest {
     @Test (expected = OccupiedPathException.class)
     public void testFileSystemExecutePathAlreadyOccupied() {
 
-        FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, ADD_FILE_PATH);
+        FileAddAction action = fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, ADD_FILE_PATH);
         actuallyTestExecutePathAlreadyOccupied(action);
     }
 
     private void actuallyTestExecutePathAlreadyOccupied(FileAddAction action) {
 
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), ADD_FILE_PATH).get(FileAddAction.EXECUTE).invoke();
-        action.get(FileAddAction.EXECUTE).invoke();
+        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, new ContentFile(), ADD_FILE_PATH).invoke(FileAddAction.EXECUTE);
+        action.invoke(FileAddAction.EXECUTE);
     }
 
 }

@@ -66,17 +66,17 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
     @Before
     public void setUp2() {
 
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, removeFilePath).get(FileAddAction.EXECUTE).invoke();
+        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, removeFilePath).invoke(FileAddAction.EXECUTE);
 
         childFile = new ContentFile();
-        childFile.get(File.OWNER).set(user);
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(childFile, removeFileChildPath).get(FileAddAction.EXECUTE).invoke();
+        childFile.setObj(File.OWNER, user);
+        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, childFile, removeFileChildPath).invoke(FileAddAction.EXECUTE);
     }
 
     private FileRemoveAction createAction(File<ParentFile<?>> file) {
 
         FileRemoveAction action = new FileRemoveAction();
-        action.get(FileAddAction.FILE).set(file);
+        action.setObj(FileAddAction.FILE, file);
         return action;
     }
 
@@ -90,14 +90,14 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
     @Test
     public void testFileExecute() {
 
-        FileRemoveAction action = file.get(File.CREATE_REMOVE).invoke();
+        FileRemoveAction action = file.invoke(File.CREATE_REMOVE);
         actuallyTestExecute(action);
     }
 
     private void actuallyTestExecute(FileRemoveAction action) {
 
-        action.get(FileRemoveAction.EXECUTE).invoke();
-        assertEquals("Resolved file for deleted file", null, fileSystem.get(FileSystem.GET_FILE).invoke(removeFilePath));
+        action.invoke(FileRemoveAction.EXECUTE);
+        assertEquals("Resolved file for deleted file", null, fileSystem.invoke(FileSystem.GET_FILE, removeFilePath));
     }
 
     @Test
@@ -110,7 +110,7 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
     @Test
     public void testFileIsExecutableBy() {
 
-        FileRemoveAction action = file.get(File.CREATE_REMOVE).invoke();
+        FileRemoveAction action = file.invoke(File.CREATE_REMOVE);
         actuallyTestIsExecutableBy(action);
     }
 
@@ -124,10 +124,10 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
 
     private void actuallyTestIsExecutableBy(FileRemoveAction action, String fileRights, String childFileRights, boolean expectedResult) {
 
-        file.get(File.RIGHTS).set(new FileRights(fileRights));
-        childFile.get(File.RIGHTS).set(new FileRights(childFileRights));
+        file.setObj(File.RIGHTS, new FileRights(fileRights));
+        childFile.setObj(File.RIGHTS, new FileRights(childFileRights));
 
-        boolean result = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
+        boolean result = action.invoke(FileRemoveAction.IS_EXECUTABLE_BY, user);
 
         assertEquals("IS_EXECUTABLE_BY result", expectedResult, result);
     }
@@ -142,7 +142,7 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
     @Test
     public void testFileGetMissingRights() {
 
-        FileRemoveAction action = file.get(File.CREATE_REMOVE).invoke();
+        FileRemoveAction action = file.invoke(File.CREATE_REMOVE);
         actuallyTestGetMissingRights(action);
     }
 
@@ -170,10 +170,10 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
 
     private void actuallyTestGetMissingRights(FileRemoveAction action, String fileRights, String childFileRights, Map<File<?>, Character[]> expectedResult) {
 
-        file.get(File.RIGHTS).set(new FileRights(fileRights));
-        childFile.get(File.RIGHTS).set(new FileRights(childFileRights));
+        file.setObj(File.RIGHTS, new FileRights(fileRights));
+        childFile.setObj(File.RIGHTS, new FileRights(childFileRights));
 
-        Map<File<?>, Character[]> result = action.get(FileRemoveAction.GET_MISSING_RIGHTS).invoke(user);
+        Map<File<?>, Character[]> result = action.invoke(FileRemoveAction.GET_MISSING_RIGHTS, user);
 
         assertEquals("Missing file rights map", prepareMissingRightsMap(expectedResult), prepareMissingRightsMap(result));
     }

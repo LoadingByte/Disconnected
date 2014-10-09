@@ -29,8 +29,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
+import com.quartercode.classmod.extra.def.DefaultCFeatureHolder;
 import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
 
@@ -75,7 +75,7 @@ public class SchedulerTest {
 
         schedulerTaskExecutions = new int[2];
 
-        scheduler = new Scheduler("scheduler", new DefaultFeatureHolder());
+        scheduler = new Scheduler("scheduler", new DefaultCFeatureHolder());
     }
 
     @Test
@@ -165,7 +165,7 @@ public class SchedulerTest {
         }
 
         @Override
-        public void execute(FeatureHolder holder) {
+        public void execute(CFeatureHolder holder) {
 
             schedulerTaskExecutions[trackingIndex]++;
         }

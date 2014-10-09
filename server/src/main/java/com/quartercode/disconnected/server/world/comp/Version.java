@@ -21,7 +21,7 @@ package com.quartercode.disconnected.server.world.comp;
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -129,10 +129,10 @@ public class Version extends WorldFeatureHolder implements StringRepresentable {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
-                holder.get(MAJOR).set( ((Version) arguments[0]).get(MAJOR).get());
-                holder.get(MINOR).set( ((Version) arguments[0]).get(MINOR).get());
-                holder.get(REVISION).set( ((Version) arguments[0]).get(REVISION).get());
+                CFeatureHolder holder = invocation.getCHolder();
+                holder.setObj(MAJOR, ((Version) arguments[0]).getObj(MAJOR));
+                holder.setObj(MINOR, ((Version) arguments[0]).getObj(MINOR));
+                holder.setObj(REVISION, ((Version) arguments[0]).getObj(REVISION));
 
                 return invocation.next(arguments);
             }
@@ -144,8 +144,8 @@ public class Version extends WorldFeatureHolder implements StringRepresentable {
             @Override
             public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
-                String string = holder.get(MAJOR).get() + "." + holder.get(MINOR).get() + "." + holder.get(REVISION).get();
+                CFeatureHolder holder = invocation.getCHolder();
+                String string = holder.getObj(MAJOR) + "." + holder.getObj(MINOR) + "." + holder.getObj(REVISION);
 
                 invocation.next(arguments);
                 return string;
@@ -160,10 +160,10 @@ public class Version extends WorldFeatureHolder implements StringRepresentable {
                 String[] versionParts = ((String) arguments[0]).split("\\.");
                 Validate.isTrue(versionParts.length == 3, "The version string (%s) must be splitted in 3 parts by dots (e.g. 1.2.5)", arguments[0]);
 
-                FeatureHolder holder = invocation.getHolder();
-                holder.get(MAJOR).set(Integer.parseInt(versionParts[0]));
-                holder.get(MINOR).set(Integer.parseInt(versionParts[1]));
-                holder.get(REVISION).set(Integer.parseInt(versionParts[2]));
+                CFeatureHolder holder = invocation.getCHolder();
+                holder.setObj(MAJOR, Integer.parseInt(versionParts[0]));
+                holder.setObj(MINOR, Integer.parseInt(versionParts[1]));
+                holder.setObj(REVISION, Integer.parseInt(versionParts[2]));
 
                 return invocation.next(arguments);
             }

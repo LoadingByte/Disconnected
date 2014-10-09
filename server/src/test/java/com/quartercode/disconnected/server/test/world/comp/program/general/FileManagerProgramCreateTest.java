@@ -66,12 +66,12 @@ public class FileManagerProgramCreateTest extends AbstractProgramTest {
 
     private ImportantData executeProgramAndSetCurrentPath(Process<?> parentProcess, String path) {
 
-        ChildProcess process = parentProcess.get(Process.CREATE_CHILD).invoke();
-        process.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(splitAfterMountpoint(getCommonLocation(FileManagerProgram.class).toString())[1]));
-        process.get(Process.INITIALIZE).invoke(10);
+        ChildProcess process = parentProcess.invoke(Process.CREATE_CHILD);
+        process.setObj(Process.SOURCE, (ContentFile) fileSystem.invoke(FileSystem.GET_FILE, splitAfterMountpoint(getCommonLocation(FileManagerProgram.class).toString())[1]));
+        process.invoke(Process.INITIALIZE, 10);
 
-        ProgramExecutor program = process.get(Process.EXECUTOR).get();
-        program.get(ProgramExecutor.RUN).invoke();
+        ProgramExecutor program = process.getObj(Process.EXECUTOR);
+        program.invoke(ProgramExecutor.RUN);
 
         ImportantData data = ProgramUtils.getImportantData(program);
 
@@ -90,14 +90,14 @@ public class FileManagerProgramCreateTest extends AbstractProgramTest {
     @Test
     public void testSuccess() {
 
-        sendCreateRequest(executeProgramAndSetCurrentPath(processModule.get(ProcessModule.ROOT_PROCESS).get(), CommonFiles.SYSTEM_MOUNTPOINT), LOCAL_PATH, new EventHandler<Event>() {
+        sendCreateRequest(executeProgramAndSetCurrentPath(processModule.getObj(ProcessModule.ROOT_PROCESS), CommonFiles.SYSTEM_MOUNTPOINT), LOCAL_PATH, new EventHandler<Event>() {
 
             @Override
             public void handle(Event event) {
 
                 assertTrue("File manager program did not return success event", event instanceof FileManagerProgramCreateSuccessReturnEvent);
 
-                File<?> file = fileSystem.get(FileSystem.GET_FILE).invoke(LOCAL_PATH);
+                File<?> file = fileSystem.invoke(FileSystem.GET_FILE, LOCAL_PATH);
                 assertNotNull("File wasn't created", file);
                 assertTrue("New file isn't ContentFile", file instanceof ContentFile);
             }
@@ -108,11 +108,11 @@ public class FileManagerProgramCreateTest extends AbstractProgramTest {
     @Test
     public void testUnknownMountpoint() {
 
-        ImportantData data = executeProgramAndSetCurrentPath(processModule.get(ProcessModule.ROOT_PROCESS).get(), CommonFiles.SYSTEM_MOUNTPOINT);
+        ImportantData data = executeProgramAndSetCurrentPath(processModule.getObj(ProcessModule.ROOT_PROCESS), CommonFiles.SYSTEM_MOUNTPOINT);
 
         // Unmount the file system
-        FileSystemModule fsModule = os.get(OperatingSystem.FS_MODULE).get();
-        fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke(fileSystemMountpoint).get(KnownFileSystem.MOUNTED).set(false);
+        FileSystemModule fsModule = os.getObj(OperatingSystem.FS_MODULE);
+        fsModule.invoke(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT, fileSystemMountpoint).setObj(KnownFileSystem.MOUNTED, false);
 
         sendCreateRequest(data, LOCAL_PATH, new EventHandler<Event>() {
 
@@ -130,9 +130,9 @@ public class FileManagerProgramCreateTest extends AbstractProgramTest {
     public void testInvalidPath() {
 
         // Add content file that makes the path invalid
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), LOCAL_PARENT_PATH).get(FileAddAction.EXECUTE).invoke();
+        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, new ContentFile(), LOCAL_PARENT_PATH).invoke(FileAddAction.EXECUTE);
 
-        sendCreateRequest(executeProgramAndSetCurrentPath(processModule.get(ProcessModule.ROOT_PROCESS).get(), CommonFiles.SYSTEM_MOUNTPOINT), LOCAL_PATH, new EventHandler<Event>() {
+        sendCreateRequest(executeProgramAndSetCurrentPath(processModule.getObj(ProcessModule.ROOT_PROCESS), CommonFiles.SYSTEM_MOUNTPOINT), LOCAL_PATH, new EventHandler<Event>() {
 
             @Override
             public void handle(Event event) {
@@ -148,9 +148,9 @@ public class FileManagerProgramCreateTest extends AbstractProgramTest {
     public void testOccupiedPath() {
 
         // Add content file that makes the path occupied
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), LOCAL_PATH).get(FileAddAction.EXECUTE).invoke();
+        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, new ContentFile(), LOCAL_PATH).invoke(FileAddAction.EXECUTE);
 
-        sendCreateRequest(executeProgramAndSetCurrentPath(processModule.get(ProcessModule.ROOT_PROCESS).get(), CommonFiles.SYSTEM_MOUNTPOINT), LOCAL_PATH, new EventHandler<Event>() {
+        sendCreateRequest(executeProgramAndSetCurrentPath(processModule.getObj(ProcessModule.ROOT_PROCESS), CommonFiles.SYSTEM_MOUNTPOINT), LOCAL_PATH, new EventHandler<Event>() {
 
             @Override
             public void handle(Event event) {
@@ -166,9 +166,9 @@ public class FileManagerProgramCreateTest extends AbstractProgramTest {
     public void testOutOfSpace() {
 
         // Set size of the file system to something very small
-        fileSystem.get(FileSystem.SIZE).set(40L);
+        fileSystem.setObj(FileSystem.SIZE, 40L);
 
-        sendCreateRequest(executeProgramAndSetCurrentPath(processModule.get(ProcessModule.ROOT_PROCESS).get(), CommonFiles.SYSTEM_MOUNTPOINT), PATH, new EventHandler<Event>() {
+        sendCreateRequest(executeProgramAndSetCurrentPath(processModule.getObj(ProcessModule.ROOT_PROCESS), CommonFiles.SYSTEM_MOUNTPOINT), PATH, new EventHandler<Event>() {
 
             @Override
             public void handle(Event event) {
@@ -187,14 +187,14 @@ public class FileManagerProgramCreateTest extends AbstractProgramTest {
     public void testMissingRights() {
 
         final User testUser = new User();
-        testUser.get(User.NAME).set("testUser");
+        testUser.setObj(User.NAME, "testUser");
 
-        ChildProcess sessionProcess = processModule.get(ProcessModule.ROOT_PROCESS).get().get(Process.CREATE_CHILD).invoke();
-        sessionProcess.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(splitAfterMountpoint(getCommonLocation(Session.class).toString())[1]));
-        sessionProcess.get(Process.INITIALIZE).invoke(1);
-        ProgramExecutor session = sessionProcess.get(Process.EXECUTOR).get();
-        session.get(Session.USER).set(testUser);
-        session.get(ProgramExecutor.RUN).invoke();
+        ChildProcess sessionProcess = processModule.getObj(ProcessModule.ROOT_PROCESS).invoke(Process.CREATE_CHILD);
+        sessionProcess.setObj(Process.SOURCE, (ContentFile) fileSystem.invoke(FileSystem.GET_FILE, splitAfterMountpoint(getCommonLocation(Session.class).toString())[1]));
+        sessionProcess.invoke(Process.INITIALIZE, 1);
+        ProgramExecutor session = sessionProcess.getObj(Process.EXECUTOR);
+        session.setObj(Session.USER, testUser);
+        session.invoke(ProgramExecutor.RUN);
 
         sendCreateRequest(executeProgramAndSetCurrentPath(sessionProcess, CommonFiles.SYSTEM_MOUNTPOINT), PATH, new EventHandler<Event>() {
 
@@ -204,7 +204,7 @@ public class FileManagerProgramCreateTest extends AbstractProgramTest {
                 assertTrue("File manager program did not return missing rights event", event instanceof ProgramMissingFileRightsEvent);
 
                 ProgramMissingFileRightsEvent missingRightsEvent = (ProgramMissingFileRightsEvent) event;
-                assertEquals("User name", testUser.get(User.NAME).get(), missingRightsEvent.getUser());
+                assertEquals("User name", testUser.getObj(User.NAME), missingRightsEvent.getUser());
                 assertFalse("More than one file is not accessible", missingRightsEvent.containsMultipleFiles());
                 // Just check the path of the file placeholder because the internal routine is tested elsewhere
                 assertEquals("File path", "/" + CommonFiles.SYSTEM_MOUNTPOINT, missingRightsEvent.getSingleFile().getPath());

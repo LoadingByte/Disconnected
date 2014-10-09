@@ -33,14 +33,14 @@ public class FileUtilsTest {
     private User createUser(String name) {
 
         User user = new User();
-        user.get(User.NAME).set(name);
+        user.setObj(User.NAME, name);
         return user;
     }
 
     private Group createGroup(String name) {
 
         Group group = new Group();
-        group.get(Group.NAME).set(name);
+        group.setObj(Group.NAME, name);
         return group;
     }
 
@@ -52,20 +52,20 @@ public class FileUtilsTest {
         User groupuser = createUser("groupusers");
 
         Group group = createGroup("group");
-        owner.get(User.GROUPS).add(group);
-        groupuser.get(User.GROUPS).add(group);
+        owner.addCol(User.GROUPS, group);
+        groupuser.addCol(User.GROUPS, group);
 
-        file.get(File.OWNER).set(owner);
-        file.get(File.GROUP).set(group);
+        file.setObj(File.OWNER, owner);
+        file.setObj(File.GROUP, group);
 
-        file.get(File.RIGHTS).set(new FileRights());
+        file.setObj(File.RIGHTS, new FileRights());
         assertTrue("Owner has read right although it is not set for owner", !FileUtils.hasRight(owner, file, FileRights.READ));
 
-        file.get(File.RIGHTS).set(new FileRights("u:r"));
+        file.setObj(File.RIGHTS, new FileRights("u:r"));
         assertTrue("Owner hasn't read right although it is set for owner", FileUtils.hasRight(owner, file, FileRights.READ));
         assertTrue("Group user has read right although it is not set for group", !FileUtils.hasRight(groupuser, file, FileRights.READ));
 
-        file.get(File.RIGHTS).set(new FileRights("g:r,u:w"));
+        file.setObj(File.RIGHTS, new FileRights("g:r,u:w"));
         assertTrue("Owner hasn't write right although it is set for owner", FileUtils.hasRight(owner, file, FileRights.WRITE));
         assertTrue("Owner hasn't read right although it is set for group", FileUtils.hasRight(owner, file, FileRights.READ));
         assertTrue("Group user has write right although it is not set for group", !FileUtils.hasRight(groupuser, file, FileRights.WRITE));
@@ -78,7 +78,7 @@ public class FileUtilsTest {
         ContentFile file = new ContentFile();
         User owner = createUser("owner");
         User other = createUser("other");
-        file.get(File.OWNER).set(owner);
+        file.setObj(File.OWNER, owner);
 
         assertTrue("Owner can't change rights", FileUtils.canChangeRights(owner, file));
         assertFalse("Other user can change rights", FileUtils.canChangeRights(other, file));

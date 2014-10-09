@@ -74,8 +74,8 @@ public class LocationGenerator {
             int y = random.nextInt(height);
             if (map.getRGB(x, y) == blackRGB) {
                 Location location = new Location();
-                location.get(Location.X).set((float) x / (float) width);
-                location.get(Location.Y).set((float) y / (float) height);
+                location.setObj(Location.X, (float) x / (float) width);
+                location.setObj(Location.Y, (float) y / (float) height);
                 if (!ignore.contains(location) && !result.contains(location)) {
                     result.add(location);
                 }

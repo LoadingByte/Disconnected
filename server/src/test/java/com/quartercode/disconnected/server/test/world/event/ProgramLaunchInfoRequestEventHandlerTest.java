@@ -64,7 +64,7 @@ public class ProgramLaunchInfoRequestEventHandlerTest {
         sendAndAssert(3);
         sendAndAssert(4);
 
-        procModule.get(ProcessModule.NEXT_PID_VALUE).set(10);
+        procModule.setObj(ProcessModule.NEXT_PID_VALUE, 10);
         sendAndAssert(10);
         sendAndAssert(11);
         sendAndAssert(12);

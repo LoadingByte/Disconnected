@@ -20,7 +20,7 @@ package com.quartercode.disconnected.server.world.comp.net;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 
 /**
@@ -29,7 +29,7 @@ import com.quartercode.classmod.extra.FunctionDefinition;
  * 
  * @see Packet
  */
-public interface PacketProcessor extends FeatureHolder {
+public interface PacketProcessor extends CFeatureHolder {
 
     /**
      * Processes the given {@link Packet} in terms of the packet processor context.

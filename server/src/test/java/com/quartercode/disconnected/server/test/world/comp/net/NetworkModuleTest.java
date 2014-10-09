@@ -101,43 +101,43 @@ public class NetworkModuleTest {
 
         nodeNetInterfaceProcessHook = null;
 
-        computer.get(Computer.OS).set(operatingSystem);
-        operatingSystem.get(OperatingSystem.NET_MODULE).set(netModule);
+        computer.setObj(Computer.OS, operatingSystem);
+        operatingSystem.setObj(OperatingSystem.NET_MODULE, netModule);
 
-        computer.get(Computer.HARDWARE).add(netInterface);
+        computer.addCol(Computer.HARDWARE, netInterface);
     }
 
     @Test
     public void testCreateSocket() {
 
-        Socket socket = netModule.get(NetworkModule.CREATE_SOCKET).invoke();
+        Socket socket = netModule.invoke(NetworkModule.CREATE_SOCKET);
 
         assertEquals("Bound network interface of the socket that was created", netModule, socket.getParent());
-        assertTrue("Created socket wasn't added to the network module's socket list", netModule.get(NetworkModule.SOCKETS).get().contains(socket));
+        assertTrue("Created socket wasn't added to the network module's socket list", netModule.getCol(NetworkModule.SOCKETS).contains(socket));
     }
 
     @Test
     public void testDisconnectCreatedSocket() {
 
-        Socket socket = netModule.get(NetworkModule.CREATE_SOCKET).invoke();
-        socket.get(Socket.LOCAL_PORT).set(1);
-        socket.get(Socket.DISCONNECT).invoke();
+        Socket socket = netModule.invoke(NetworkModule.CREATE_SOCKET);
+        socket.setObj(Socket.LOCAL_PORT, 1);
+        socket.invoke(Socket.DISCONNECT);
 
-        assertTrue("Created socket wasn't removed from the network module's socket list", !netModule.get(NetworkModule.SOCKETS).get().contains(socket));
+        assertTrue("Created socket wasn't removed from the network module's socket list", !netModule.getCol(NetworkModule.SOCKETS).contains(socket));
     }
 
     @Test
     public void testSetRunningFalseDisconnectCreatedSockets() {
 
-        Socket socket1 = netModule.get(NetworkModule.CREATE_SOCKET).invoke();
-        socket1.get(Socket.LOCAL_PORT).set(1);
-        Socket socket2 = netModule.get(NetworkModule.CREATE_SOCKET).invoke();
-        socket2.get(Socket.LOCAL_PORT).set(2);
+        Socket socket1 = netModule.invoke(NetworkModule.CREATE_SOCKET);
+        socket1.setObj(Socket.LOCAL_PORT, 1);
+        Socket socket2 = netModule.invoke(NetworkModule.CREATE_SOCKET);
+        socket2.setObj(Socket.LOCAL_PORT, 2);
 
-        netModule.get(NetworkModule.SET_RUNNING).invoke(false);
+        netModule.invoke(NetworkModule.SET_RUNNING, false);
 
-        assertTrue("Created socket 1 wasn't removed from the network module's socket list", !netModule.get(NetworkModule.SOCKETS).get().contains(socket1));
-        assertTrue("Created socket 2 wasn't removed from the network module's socket list", !netModule.get(NetworkModule.SOCKETS).get().contains(socket2));
+        assertTrue("Created socket 1 wasn't removed from the network module's socket list", !netModule.getCol(NetworkModule.SOCKETS).contains(socket1));
+        assertTrue("Created socket 2 wasn't removed from the network module's socket list", !netModule.getCol(NetworkModule.SOCKETS).contains(socket2));
     }
 
     @Test
@@ -148,17 +148,17 @@ public class NetworkModuleTest {
         Address sourceAddress = createAddress(0, 1, sourcePort);
         Address destinationAddress = createAddress(0, 1, destinationPort);
 
-        netInterface.get(NodeNetInterface.NET_ID).set(sourceAddress.get(Address.NET_ID).get());
+        netInterface.setObj(NodeNetInterface.NET_ID, sourceAddress.getObj(Address.NET_ID));
 
-        Socket socket = netModule.get(NetworkModule.CREATE_SOCKET).invoke();
-        socket.get(Socket.LOCAL_PORT).set(sourcePort);
-        socket.get(Socket.DESTINATION).set(destinationAddress);
-        socket.get(Socket.STATE).set(SocketState.CONNECTED);
+        Socket socket = netModule.invoke(NetworkModule.CREATE_SOCKET);
+        socket.setObj(Socket.LOCAL_PORT, sourcePort);
+        socket.setObj(Socket.DESTINATION, destinationAddress);
+        socket.setObj(Socket.STATE, SocketState.CONNECTED);
 
         final Packet expectedPacket = new Packet();
-        expectedPacket.get(Packet.SOURCE).set(sourceAddress);
-        expectedPacket.get(Packet.DESTINATION).set(destinationAddress);
-        expectedPacket.get(Packet.DATA).set(new ObjArray("testdata"));
+        expectedPacket.setObj(Packet.SOURCE, sourceAddress);
+        expectedPacket.setObj(Packet.DESTINATION, destinationAddress);
+        expectedPacket.setObj(Packet.DATA, new ObjArray("testdata"));
 
         nodeNetInterfaceProcessHook = context.mock(NodeNetInterfaceProcessHook.class);
 
@@ -170,7 +170,7 @@ public class NetworkModuleTest {
         }});
         // @formatter:on
 
-        netModule.get(NetworkModule.SEND).invoke(socket, new ObjArray("testdata"));
+        netModule.invoke(NetworkModule.SEND, socket, new ObjArray("testdata"));
     }
 
     @Test
@@ -181,17 +181,17 @@ public class NetworkModuleTest {
         int destinationPort = 54321;
 
         Packet packet = new Packet();
-        packet.get(Packet.SOURCE).set(sourceAddress);
-        packet.get(Packet.DESTINATION).set(createAddress(0, 2, destinationPort));
-        packet.get(Packet.DATA).set(new ObjArray("testdata"));
+        packet.setObj(Packet.SOURCE, sourceAddress);
+        packet.setObj(Packet.DESTINATION, createAddress(0, 2, destinationPort));
+        packet.setObj(Packet.DATA, new ObjArray("testdata"));
 
-        Socket receiverSocket = netModule.get(NetworkModule.CREATE_SOCKET).invoke();
-        receiverSocket.get(Socket.LOCAL_PORT).set(destinationPort);
-        receiverSocket.get(Socket.DESTINATION).set(sourceAddress);
-        receiverSocket.get(Socket.STATE).set(SocketState.CONNECTED);
+        Socket receiverSocket = netModule.invoke(NetworkModule.CREATE_SOCKET);
+        receiverSocket.setObj(Socket.LOCAL_PORT, destinationPort);
+        receiverSocket.setObj(Socket.DESTINATION, sourceAddress);
+        receiverSocket.setObj(Socket.STATE, SocketState.CONNECTED);
 
         final PacketHandler packetHandler = context.mock(PacketHandler.class);
-        receiverSocket.get(Socket.PACKET_HANDLERS).add(packetHandler);
+        receiverSocket.addCol(Socket.PACKET_HANDLERS, packetHandler);
 
         // @formatter:off
         context.checking(new Expectations() {{
@@ -201,18 +201,18 @@ public class NetworkModuleTest {
         }});
         // @formatter:on
 
-        netModule.get(NetworkModule.HANDLE).invoke(packet);
+        netModule.invoke(NetworkModule.HANDLE, packet);
     }
 
     private Address createAddress(int subnet, int id, int port) {
 
         NetID netId = new NetID();
-        netId.get(NetID.SUBNET).set(subnet);
-        netId.get(NetID.ID).set(id);
+        netId.setObj(NetID.SUBNET, subnet);
+        netId.setObj(NetID.ID, id);
 
         Address address = new Address();
-        address.get(Address.NET_ID).set(netId);
-        address.get(Address.PORT).set(port);
+        address.setObj(Address.NET_ID, netId);
+        address.setObj(Address.PORT, port);
 
         return address;
     }

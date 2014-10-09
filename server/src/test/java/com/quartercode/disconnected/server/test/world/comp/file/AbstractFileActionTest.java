@@ -41,12 +41,12 @@ public abstract class AbstractFileActionTest {
     public void setUp() {
 
         fileSystem = new FileSystem();
-        fileSystem.get(FileSystem.SIZE).set(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
+        fileSystem.setObj(FileSystem.SIZE, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
 
         user = new User();
 
         file = new Directory();
-        file.get(File.OWNER).set(user);
+        file.setObj(File.OWNER, user);
     }
 
     protected Map<File<?>, List<Character>> prepareMissingRightsMap(Map<File<?>, Character[]> map) {

@@ -22,7 +22,7 @@ import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -81,11 +81,11 @@ public class FileMoveAction extends FileAction {
             @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
-                if (holder.get(FILE_SYSTEM).get() == null) {
+                if (holder.getObj(FILE_SYSTEM) == null) {
                     File<?> file = (File<?>) arguments[0];
-                    holder.get(FILE_SYSTEM).set(file.get(File.GET_FILE_SYSTEM).invoke());
+                    holder.setObj(FILE_SYSTEM, file.invoke(File.GET_FILE_SYSTEM));
                 }
 
                 return invocation.next(arguments);
@@ -141,21 +141,21 @@ public class FileMoveAction extends FileAction {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
-                FileSystem targetFileSystem = holder.get(FILE_SYSTEM).get();
-                File<ParentFile<?>> moveFile = holder.get(FILE).get();
-                String targetPath = holder.get(PATH).get();
+                CFeatureHolder holder = invocation.getCHolder();
+                FileSystem targetFileSystem = holder.getObj(FILE_SYSTEM);
+                File<ParentFile<?>> moveFile = holder.getObj(FILE);
+                String targetPath = holder.getObj(PATH);
 
                 // Retrieve the old parent file before the movement
                 ParentFile<?> oldParent = moveFile.getParent();
 
                 // Add the file to the target file system under the target path
-                targetFileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(moveFile, targetPath).get(FileAddAction.EXECUTE).invoke();
+                targetFileSystem.invoke(FileSystem.CREATE_ADD_FILE, moveFile, targetPath).invoke(FileAddAction.EXECUTE);
                 // Retrieve the new parent file after the file was added under the new location
                 ParentFile<?> newParent = moveFile.getParent();
 
                 // Manually remove the file from its old parent file
-                oldParent.get(ParentFile.CHILDREN).remove(moveFile);
+                oldParent.removeCol(ParentFile.CHILDREN, moveFile);
                 // Set the new parent file again because the removal automatically setthe parent object to null
                 moveFile.setParent(newParent);
 
@@ -170,19 +170,19 @@ public class FileMoveAction extends FileAction {
             public Map<File<?>, Character[]> invoke(FunctionInvocation<Map<File<?>, Character[]>> invocation, Object... arguments) {
 
                 User executor = (User) arguments[0];
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
                 Map<File<?>, Character[]> missingRights = new HashMap<>();
 
                 FileRemoveAction action1 = new FileRemoveAction();
-                action1.get(FileRemoveAction.FILE).set(holder.get(FILE).get());
-                missingRights.putAll(action1.get(GET_MISSING_RIGHTS).invoke(executor));
+                action1.setObj(FileRemoveAction.FILE, holder.getObj(FILE));
+                missingRights.putAll(action1.invoke(GET_MISSING_RIGHTS, executor));
 
                 FileAddAction action2 = new FileAddAction();
-                action2.get(FileAddAction.FILE_SYSTEM).set(holder.get(FILE_SYSTEM).get());
-                action2.get(FileAddAction.FILE).set(holder.get(FILE).get());
-                action2.get(FileAddAction.PATH).set(holder.get(PATH).get());
-                missingRights.putAll(action2.get(GET_MISSING_RIGHTS).invoke(executor));
+                action2.setObj(FileAddAction.FILE_SYSTEM, holder.getObj(FILE_SYSTEM));
+                action2.setObj(FileAddAction.FILE, holder.getObj(FILE));
+                action2.setObj(FileAddAction.PATH, holder.getObj(PATH));
+                missingRights.putAll(action2.invoke(GET_MISSING_RIGHTS, executor));
 
                 invocation.next(arguments);
                 return missingRights;

@@ -24,7 +24,7 @@ import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.Feature;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -87,7 +87,7 @@ public class FileSystemModule extends OSModule {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 KnownFileSystem element = (KnownFileSystem) arguments[0];
-                Validate.isTrue(!element.get(KnownFileSystem.MOUNTED).get(), "Can't register known file system '%s' while it is mounted", element.get(KnownFileSystem.MOUNTPOINT).get());
+                Validate.isTrue(!element.getObj(KnownFileSystem.MOUNTED), "Can't register known file system '%s' while it is mounted", element.getObj(KnownFileSystem.MOUNTPOINT));
                 return invocation.next(arguments);
             }
 
@@ -248,8 +248,8 @@ public class FileSystemModule extends OSModule {
             public List<FileSystem> invoke(FunctionInvocation<List<FileSystem>> invocation, Object... arguments) {
 
                 List<FileSystem> available = new ArrayList<>();
-                Computer computer = ((FileSystemModule) invocation.getHolder()).getParent().get(Process.GET_OPERATING_SYSTEM).invoke().getParent();
-                for (Hardware hardware : computer.get(Computer.HARDWARE).get()) {
+                Computer computer = ((FileSystemModule) invocation.getCHolder()).getParent().invoke(Process.GET_OPERATING_SYSTEM).getParent();
+                for (Hardware hardware : computer.getCol(Computer.HARDWARE)) {
                     for (Feature feature : hardware) {
                         if (feature instanceof Iterable) {
                             for (Object child : (Iterable<?>) feature) {
@@ -273,7 +273,7 @@ public class FileSystemModule extends OSModule {
             @Override
             public boolean matches(KnownFileSystem element, Object... arguments) {
 
-                return element.get(KnownFileSystem.FILE_SYSTEM).get().equals(arguments[0]);
+                return element.getObj(KnownFileSystem.FILE_SYSTEM).equals(arguments[0]);
             }
 
         }));
@@ -284,7 +284,7 @@ public class FileSystemModule extends OSModule {
             @Override
             public boolean matches(KnownFileSystem element, Object... arguments) {
 
-                return element.get(KnownFileSystem.MOUNTED).get();
+                return element.getObj(KnownFileSystem.MOUNTED);
             }
 
         }));
@@ -294,7 +294,7 @@ public class FileSystemModule extends OSModule {
             @Override
             public boolean matches(KnownFileSystem element, Object... arguments) {
 
-                return element.get(KnownFileSystem.MOUNTED).get() && element.get(KnownFileSystem.MOUNTPOINT).get().equals(arguments[0]);
+                return element.getObj(KnownFileSystem.MOUNTED) && element.getObj(KnownFileSystem.MOUNTPOINT).equals(arguments[0]);
             }
 
         }));
@@ -309,13 +309,13 @@ public class FileSystemModule extends OSModule {
                 String[] pathComponents = PathUtils.splitAfterMountpoint(path);
                 Validate.isTrue(pathComponents[0] != null, "Must provide a path containing a mountpoint ('%s' is invalid)", path);
 
-                KnownFileSystem knownFs = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]);
+                KnownFileSystem knownFs = invocation.getCHolder().invoke(GET_MOUNTED_BY_MOUNTPOINT, pathComponents[0]);
                 if (knownFs == null) {
-                    throw new UnknownMountpointException((FileSystemModule) invocation.getHolder(), pathComponents[0]);
+                    throw new UnknownMountpointException((FileSystemModule) invocation.getCHolder(), pathComponents[0]);
                 }
 
-                FileSystem fileSystem = knownFs.get(KnownFileSystem.FILE_SYSTEM).get();
-                File<?> result = fileSystem.get(FileSystem.GET_FILE).invoke(pathComponents[1] == null ? "" : pathComponents[1]);
+                FileSystem fileSystem = knownFs.getObj(KnownFileSystem.FILE_SYSTEM);
+                File<?> result = fileSystem.invoke(FileSystem.GET_FILE, pathComponents[1] == null ? "" : pathComponents[1]);
 
                 invocation.next(arguments);
                 return result;
@@ -334,13 +334,13 @@ public class FileSystemModule extends OSModule {
                 String[] pathComponents = PathUtils.splitAfterMountpoint(path);
                 Validate.isTrue(pathComponents[0] != null && pathComponents[1] != null, "Must provide an absolute path ('%s' is invalid)", path);
 
-                KnownFileSystem knownFs = invocation.getHolder().get(GET_MOUNTED_BY_MOUNTPOINT).invoke(pathComponents[0]);
+                KnownFileSystem knownFs = invocation.getCHolder().invoke(GET_MOUNTED_BY_MOUNTPOINT, pathComponents[0]);
                 if (knownFs == null) {
-                    throw new UnknownMountpointException((FileSystemModule) invocation.getHolder(), pathComponents[0]);
+                    throw new UnknownMountpointException((FileSystemModule) invocation.getCHolder(), pathComponents[0]);
                 }
 
-                FileSystem fileSystem = knownFs.get(KnownFileSystem.FILE_SYSTEM).get();
-                FileAddAction action = fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, pathComponents[1]);
+                FileSystem fileSystem = knownFs.getObj(KnownFileSystem.FILE_SYSTEM);
+                FileAddAction action = fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, pathComponents[1]);
 
                 invocation.next(arguments);
                 return action;
@@ -355,10 +355,10 @@ public class FileSystemModule extends OSModule {
 
                 // Only invoke on bootstrap
                 if ((Boolean) arguments[0]) {
-                    for (KnownFileSystem fileSystem : invocation.getHolder().get(KNOWN_FS).get()) {
+                    for (KnownFileSystem fileSystem : invocation.getCHolder().getCol(KNOWN_FS)) {
                         // TODO: Temp: Mount every available file system until a fs table is implemented
-                        // if (fileSystem.get(KnownFileSystem.MOUNTPOINT).get().equals(CommonFiles.SYSTEM_MOUNTPOINT)) {
-                        fileSystem.get(KnownFileSystem.MOUNTED).set(true);
+                        // if (fileSystem.getProp(KnownFileSystem.MOUNTPOINT).equals(CommonFiles.SYSTEM_MOUNTPOINT)) {
+                        fileSystem.setObj(KnownFileSystem.MOUNTED, true);
                         // break;
                         // }
                     }
@@ -435,9 +435,9 @@ public class FileSystemModule extends OSModule {
                 @Prioritized (Prioritized.LEVEL_6)
                 public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                    FeatureHolder holder = invocation.getHolder();
-                    if (holder.get(MOUNTED).get()) {
-                        throw new IllegalStateException("Can't change mountpoint of known file system '" + holder.get(MOUNTPOINT).get() + "' while mounted");
+                    CFeatureHolder holder = invocation.getCHolder();
+                    if (holder.getObj(MOUNTED)) {
+                        throw new IllegalStateException("Can't change mountpoint of known file system '" + holder.getObj(MOUNTPOINT) + "' while mounted");
                     }
                     return invocation.next(arguments);
                 }
@@ -451,9 +451,9 @@ public class FileSystemModule extends OSModule {
                 @Prioritized (Prioritized.LEVEL_6)
                 public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                    FeatureHolder holder = invocation.getHolder();
+                    CFeatureHolder holder = invocation.getCHolder();
                     FileSystemModule parent = ((KnownFileSystem) holder).getParent();
-                    if ((Boolean) arguments[0] && parent.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke(holder.get(MOUNTPOINT).get()) != null) {
+                    if ((Boolean) arguments[0] && parent.invoke(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT, holder.getObj(MOUNTPOINT)) != null) {
                         throw new IllegalStateException("Other known file system with same mountpoint already mounted");
                     }
 

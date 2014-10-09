@@ -20,7 +20,7 @@ package com.quartercode.disconnected.server.world.comp.file;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -41,12 +41,12 @@ import com.quartercode.disconnected.shared.world.comp.file.FileRights;
  * Every file knows its name and can resolve its path.
  * There are different variants of a file: A {@link ContentFile} holds content, a {@link ParentFile} holds other files.
  * 
- * @param <P> The type of the parent {@link FeatureHolder} which houses the file somehow.
+ * @param <P> The type of the parent {@link CFeatureHolder} which houses the file somehow.
  * @see ContentFile
  * @see ParentFile
  * @see FileSystem
  */
-public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHolder<P> implements DerivableSize {
+public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHolder<P> implements DerivableSize {
 
     /**
      * The default {@link FileRights} string for every new file.
@@ -194,12 +194,12 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
             @Override
             public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
-                File<?> holder = (File<?>) invocation.getHolder();
+                File<?> holder = (File<?>) invocation.getCHolder();
                 String path = null;
                 // Check for removed files
                 if (holder.getParent() != null) {
-                    String parentPath = holder.getParent().get(GET_PATH).invoke();
-                    path = parentPath + (parentPath.isEmpty() ? "" : PathUtils.SEPARATOR) + holder.get(NAME).get();
+                    String parentPath = holder.getParent().invoke(GET_PATH);
+                    path = parentPath + (parentPath.isEmpty() ? "" : PathUtils.SEPARATOR) + holder.getObj(NAME);
                 }
 
                 invocation.next(arguments);
@@ -214,11 +214,11 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
             @Override
             public FileMoveAction invoke(FunctionInvocation<FileMoveAction> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
                 String path = (String) arguments[0];
-                FileSystem fileSystem = holder.get(GET_FILE_SYSTEM).invoke();
-                FileMoveAction action = holder.get(CREATE_MOVE_TO_OTHER_FS).invoke(path, fileSystem);
+                FileSystem fileSystem = holder.invoke(GET_FILE_SYSTEM);
+                FileMoveAction action = holder.invoke(CREATE_MOVE_TO_OTHER_FS, path, fileSystem);
 
                 invocation.next(arguments);
                 return action;
@@ -234,9 +234,9 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
             public FileMoveAction invoke(FunctionInvocation<FileMoveAction> invocation, Object... arguments) {
 
                 FileMoveAction action = new FileMoveAction();
-                action.get(FileMoveAction.FILE_SYSTEM).set((FileSystem) arguments[1]);
-                action.get(FileMoveAction.FILE).set((File<ParentFile<?>>) invocation.getHolder());
-                action.get(FileMoveAction.PATH).set((String) arguments[0]);
+                action.setObj(FileMoveAction.FILE_SYSTEM, (FileSystem) arguments[1]);
+                action.setObj(FileMoveAction.FILE, (File<ParentFile<?>>) invocation.getCHolder());
+                action.setObj(FileMoveAction.PATH, (String) arguments[0]);
 
                 invocation.next(arguments);
                 return action;
@@ -252,7 +252,7 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
             public FileRemoveAction invoke(FunctionInvocation<FileRemoveAction> invocation, Object... arguments) {
 
                 FileRemoveAction action = new FileRemoveAction();
-                action.get(FileAddAction.FILE).set((File<ParentFile<?>>) invocation.getHolder());
+                action.setObj(FileAddAction.FILE, (File<ParentFile<?>>) invocation.getCHolder());
 
                 invocation.next(arguments);
                 return action;
@@ -266,13 +266,13 @@ public abstract class File<P extends FeatureHolder> extends WorldChildFeatureHol
             @Override
             public FileSystem invoke(FunctionInvocation<FileSystem> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
                 FileSystem fileSystem = null;
                 if (holder instanceof RootFile) {
                     fileSystem = ((RootFile) holder).getParent();
                 } else if (holder instanceof File && ((File<?>) holder).getParent() != null) {
-                    fileSystem = ((File<?>) holder).getParent().get(GET_FILE_SYSTEM).invoke();
+                    fileSystem = ((File<?>) holder).getParent().invoke(GET_FILE_SYSTEM);
                 }
 
                 invocation.next(arguments);

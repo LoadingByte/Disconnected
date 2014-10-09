@@ -37,16 +37,16 @@ public class FileTest {
     public void setUp() {
 
         fileSystem = new FileSystem();
-        fileSystem.get(FileSystem.SIZE).set(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
+        fileSystem.setObj(FileSystem.SIZE, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
 
         testFile = new ContentFile();
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(testFile, "test1/test2/test.txt").get(FileAddAction.EXECUTE).invoke();
+        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, testFile, "test1/test2/test.txt").invoke(FileAddAction.EXECUTE);
     }
 
     @Test
     public void testGetPath() {
 
-        assertEquals("File path", "test1/test2/test.txt", testFile.get(File.GET_PATH).invoke());
+        assertEquals("File path", "test1/test2/test.txt", testFile.invoke(File.GET_PATH));
     }
 
     /*
@@ -56,11 +56,11 @@ public class FileTest {
     @Test
     public void testSetName() {
 
-        testFile.get(File.NAME).set("test3.txt");
+        testFile.setObj(File.NAME, "test3.txt");
 
-        assertTrue("Renamed file doesn't exist", testFile.equals(fileSystem.get(FileSystem.GET_FILE).invoke("test1/test2/test3.txt")));
-        assertTrue("Removed file does exist", fileSystem.get(FileSystem.GET_FILE).invoke("test1/test2/test.txt") == null);
-        assertEquals("Path of renamed file", "test1/test2/test3.txt", testFile.get(File.GET_PATH).invoke());
+        assertTrue("Renamed file doesn't exist", testFile.equals(fileSystem.invoke(FileSystem.GET_FILE, "test1/test2/test3.txt")));
+        assertTrue("Removed file does exist", fileSystem.invoke(FileSystem.GET_FILE, "test1/test2/test.txt") == null);
+        assertEquals("Path of renamed file", "test1/test2/test3.txt", testFile.invoke(File.GET_PATH));
     }
 
 }

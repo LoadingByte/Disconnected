@@ -36,16 +36,16 @@ public class BackboneTest {
         backbone = new Backbone();
 
         child1 = new RouterNetInterface();
-        child1.get(RouterNetInterface.SUBNET).set(10);
+        child1.setObj(RouterNetInterface.SUBNET, 10);
 
         child2 = new RouterNetInterface();
-        child2.get(RouterNetInterface.SUBNET).set(15);
+        child2.setObj(RouterNetInterface.SUBNET, 15);
     }
 
     @Test
     public void testAddChildAddReverse() {
 
-        backbone.get(Backbone.CHILDREN).add(child1);
+        backbone.addCol(Backbone.CHILDREN, child1);
 
         assertConnected(backbone, child1, true);
     }
@@ -53,8 +53,8 @@ public class BackboneTest {
     @Test
     public void testRemoveChildRemoveReverse() {
 
-        backbone.get(Backbone.CHILDREN).add(child1);
-        backbone.get(Backbone.CHILDREN).remove(child1);
+        backbone.addCol(Backbone.CHILDREN, child1);
+        backbone.removeCol(Backbone.CHILDREN, child1);
 
         assertConnected(backbone, child1, false);
     }
@@ -62,8 +62,8 @@ public class BackboneTest {
     @Test
     public void testAddMultipleChildrenAddReverse() {
 
-        backbone.get(Backbone.CHILDREN).add(child1);
-        backbone.get(Backbone.CHILDREN).add(child2);
+        backbone.addCol(Backbone.CHILDREN, child1);
+        backbone.addCol(Backbone.CHILDREN, child2);
 
         assertConnected(backbone, child1, true);
         assertConnected(backbone, child2, true);
@@ -72,10 +72,10 @@ public class BackboneTest {
     @Test
     public void testRemoveMultipleChildrenRemoveReverse() {
 
-        backbone.get(Backbone.CHILDREN).add(child1);
-        backbone.get(Backbone.CHILDREN).add(child2);
-        backbone.get(Backbone.CHILDREN).remove(child1);
-        backbone.get(Backbone.CHILDREN).remove(child2);
+        backbone.addCol(Backbone.CHILDREN, child1);
+        backbone.addCol(Backbone.CHILDREN, child2);
+        backbone.removeCol(Backbone.CHILDREN, child1);
+        backbone.removeCol(Backbone.CHILDREN, child2);
 
         assertConnected(backbone, child1, false);
         assertConnected(backbone, child2, false);
@@ -84,9 +84,9 @@ public class BackboneTest {
     @Test
     public void testAddRemoveMixedMultipleChildrenAddRemoveReverse() {
 
-        backbone.get(Backbone.CHILDREN).add(child1);
-        backbone.get(Backbone.CHILDREN).add(child2);
-        backbone.get(Backbone.CHILDREN).remove(child1);
+        backbone.addCol(Backbone.CHILDREN, child1);
+        backbone.addCol(Backbone.CHILDREN, child2);
+        backbone.removeCol(Backbone.CHILDREN, child1);
 
         assertConnected(backbone, child1, false);
         assertConnected(backbone, child2, true);
@@ -96,8 +96,8 @@ public class BackboneTest {
 
         String messageEnd = " connection" + (connected ? " " : " not ") + "available";
 
-        assertTrue("Router -> Child" + messageEnd, backbone.get(Backbone.CHILDREN).get().contains(child) == connected);
-        assertTrue("Child -> Router" + messageEnd, backbone.equals(child.get(RouterNetInterface.BACKBONE_CONNECTION).get()) == connected);
+        assertTrue("Router -> Child" + messageEnd, backbone.getCol(Backbone.CHILDREN).contains(child) == connected);
+        assertTrue("Child -> Router" + messageEnd, backbone.equals(child.getObj(RouterNetInterface.BACKBONE_CONNECTION)) == connected);
     }
 
 }

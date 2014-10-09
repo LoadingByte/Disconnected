@@ -18,18 +18,17 @@
 
 package com.quartercode.disconnected.server.world;
 
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.extra.ChildFeatureHolder;
-import com.quartercode.classmod.extra.def.DefaultChildFeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
+import com.quartercode.classmod.extra.def.DefaultCChildFeatureHolder;
 
 /**
- * The world child feature holder is a special {@link ChildFeatureHolder} which allows to resolve the holding {@link World}.
+ * The world child feature holder is a special {@link CFeatureHolder} which allows to resolve the holding {@link World}.
  * 
- * @param <P> The type the parent {@link FeatureHolder} has to have.
+ * @param <P> The type the parent {@link CFeatureHolder} has to have.
  * @see World
- * @see DefaultChildFeatureHolder
+ * @see DefaultCChildFeatureHolder
  */
-public class WorldChildFeatureHolder<P extends FeatureHolder> extends DefaultChildFeatureHolder<P> {
+public class WorldChildFeatureHolder<P extends CFeatureHolder> extends DefaultCChildFeatureHolder<P> {
 
     /**
      * Resolves the {@link World} this world child feature holder is in.

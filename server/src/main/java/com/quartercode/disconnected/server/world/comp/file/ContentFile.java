@@ -65,8 +65,8 @@ public class ContentFile extends File<ParentFile<?>> {
             @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FileSystem fileSystem = invocation.getHolder().get(GET_FILE_SYSTEM).invoke();
-                if (fileSystem != null && SizeUtil.getSize(arguments[0]) > fileSystem.get(FileSystem.GET_FREE).invoke()) {
+                FileSystem fileSystem = invocation.getCHolder().invoke(GET_FILE_SYSTEM);
+                if (fileSystem != null && SizeUtil.getSize(arguments[0]) > fileSystem.invoke(FileSystem.GET_FREE)) {
                     throw new OutOfSpaceException(fileSystem, SizeUtil.getSize(arguments[0]));
                 }
 

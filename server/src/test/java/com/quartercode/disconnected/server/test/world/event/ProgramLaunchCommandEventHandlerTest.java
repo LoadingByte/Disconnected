@@ -46,8 +46,8 @@ public class ProgramLaunchCommandEventHandlerTest {
 
         sourceFile = new ContentFile();
         Program program = new Program();
-        program.get(Program.EXECUTOR_CLASS).set(TestProgram.class);
-        sourceFile.get(ContentFile.CONTENT).set(program);
+        program.setObj(Program.EXECUTOR_CLASS, TestProgram.class);
+        sourceFile.setObj(ContentFile.CONTENT, program);
 
         handler = new ProgramLaunchCommandEventHandlerMock(playerComputer, sessionProcess, sourceFile);
     }
@@ -58,10 +58,10 @@ public class ProgramLaunchCommandEventHandlerTest {
         ProgramLaunchCommandEvent event = new ProgramLaunchCommandEvent(10, null);
         handler.handle(event);
 
-        Process<?> child = sessionProcess.get(Process.CHILDREN).get().get(0);
+        Process<?> child = sessionProcess.getCol(Process.CHILDREN).get(0);
         assertNotNull("Child process was not created", child);
-        assertEquals("Pid of child process", 10, (int) child.get(Process.PID).get());
-        ProgramExecutor executor = child.get(Process.EXECUTOR).get();
+        assertEquals("Pid of child process", 10, (int) child.getObj(Process.PID));
+        ProgramExecutor executor = child.getObj(Process.EXECUTOR);
         assertNotNull("Child process has no program executor", executor);
         assertTrue("Child process has an incorrect program executor (wrong type)", executor instanceof TestProgram);
     }

@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.ValueFactory;
+import com.quartercode.classmod.extra.def.DefaultCFeatureHolder;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.server.util.RandomPool;
@@ -39,7 +39,7 @@ import com.quartercode.eventbridge.bridge.Bridge;
  * It basically is the root of all logic objects the game uses.
  */
 @XmlRootElement (namespace = "http://quartercode.com/")
-public class World extends DefaultFeatureHolder {
+public class World extends DefaultCFeatureHolder {
 
     // ----- Properties -----
 

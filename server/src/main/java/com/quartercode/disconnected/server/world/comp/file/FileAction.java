@@ -102,7 +102,7 @@ public abstract class FileAction extends WorldFeatureHolder {
             @Override
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
 
-                boolean result = invocation.getHolder().get(GET_MISSING_RIGHTS).invoke(arguments[0]).isEmpty();
+                boolean result = invocation.getCHolder().invoke(GET_MISSING_RIGHTS, arguments[0]).isEmpty();
 
                 invocation.next(arguments);
                 return result;

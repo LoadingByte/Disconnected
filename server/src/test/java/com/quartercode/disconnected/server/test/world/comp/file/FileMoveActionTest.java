@@ -70,15 +70,15 @@ public class FileMoveActionTest extends AbstractFileActionTest {
     @Before
     public void setUp2() {
 
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, oldPath).get(FileAddAction.EXECUTE).invoke();
+        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, oldPath).invoke(FileAddAction.EXECUTE);
     }
 
     private FileMoveAction createAction(File<ParentFile<?>> file, String newPath) {
 
         FileMoveAction action = new FileMoveAction();
-        action.get(FileMoveAction.FILE_SYSTEM).set(fileSystem);
-        action.get(FileMoveAction.PATH).set(newPath);
-        action.get(FileMoveAction.FILE).set(file);
+        action.setObj(FileMoveAction.FILE_SYSTEM, fileSystem);
+        action.setObj(FileMoveAction.PATH, newPath);
+        action.setObj(FileMoveAction.FILE, file);
         return action;
     }
 
@@ -92,17 +92,17 @@ public class FileMoveActionTest extends AbstractFileActionTest {
     @Test
     public void testFileExecute() {
 
-        FileMoveAction action = file.get(File.CREATE_MOVE).invoke(newPath);
+        FileMoveAction action = file.invoke(File.CREATE_MOVE, newPath);
         actuallyTestExecute(action);
     }
 
     private void actuallyTestExecute(FileMoveAction action) {
 
-        action.get(FileMoveAction.EXECUTE).invoke();
+        action.invoke(FileMoveAction.EXECUTE);
 
-        assertEquals("Resolved file for new path", file, fileSystem.get(FileSystem.GET_FILE).invoke(newPath));
-        assertEquals("Resolved file for old path", null, fileSystem.get(FileSystem.GET_FILE).invoke(oldPath));
-        assertEquals("Path of moved file", newPath, file.get(File.GET_PATH).invoke());
+        assertEquals("Resolved file for new path", file, fileSystem.invoke(FileSystem.GET_FILE, newPath));
+        assertEquals("Resolved file for old path", null, fileSystem.invoke(FileSystem.GET_FILE, oldPath));
+        assertEquals("Path of moved file", newPath, file.invoke(File.GET_PATH));
     }
 
     @Test
@@ -118,7 +118,7 @@ public class FileMoveActionTest extends AbstractFileActionTest {
     public void testFileIsExecutableBy() {
 
         if (testRights) {
-            FileMoveAction action = file.get(File.CREATE_MOVE).invoke(newPath);
+            FileMoveAction action = file.invoke(File.CREATE_MOVE, newPath);
             actuallyTestIsExecutableBy(action);
         }
     }
@@ -127,8 +127,8 @@ public class FileMoveActionTest extends AbstractFileActionTest {
 
         // Add the directory that would hold the actual file (we need to modify its rights later on)
         Directory newParentFile = new Directory();
-        newParentFile.get(File.OWNER).set(user);
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(newParentFile, newParentPath).get(FileMoveAction.EXECUTE).invoke();
+        newParentFile.setObj(File.OWNER, user);
+        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, newParentFile, newParentPath).invoke(FileMoveAction.EXECUTE);
 
         actuallyTestIsExecutableBy(action, newParentFile, "", "", false);
         actuallyTestIsExecutableBy(action, newParentFile, "u:d", "", false);
@@ -138,10 +138,10 @@ public class FileMoveActionTest extends AbstractFileActionTest {
 
     private void actuallyTestIsExecutableBy(FileMoveAction action, File<?> newParentFile, String fileRights, String newParentFileRights, boolean expectedResult) {
 
-        file.get(File.RIGHTS).set(new FileRights(fileRights));
-        newParentFile.get(File.RIGHTS).set(new FileRights(newParentFileRights));
+        file.setObj(File.RIGHTS, new FileRights(fileRights));
+        newParentFile.setObj(File.RIGHTS, new FileRights(newParentFileRights));
 
-        boolean result = action.get(FileRemoveAction.IS_EXECUTABLE_BY).invoke(user);
+        boolean result = action.invoke(FileRemoveAction.IS_EXECUTABLE_BY, user);
 
         assertEquals("IS_EXECUTABLE_BY result", expectedResult, result);
     }
@@ -159,7 +159,7 @@ public class FileMoveActionTest extends AbstractFileActionTest {
     public void testFileGetMissingRights() {
 
         if (testRights) {
-            FileMoveAction action = file.get(File.CREATE_MOVE).invoke(newPath);
+            FileMoveAction action = file.invoke(File.CREATE_MOVE, newPath);
             actuallyTestGetMissingRights(action);
         }
     }
@@ -168,8 +168,8 @@ public class FileMoveActionTest extends AbstractFileActionTest {
 
         // Add the directory that would hold the actual file (we need to modify its rights later on)
         Directory newParentFile = new Directory();
-        newParentFile.get(File.OWNER).set(user);
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(newParentFile, newParentPath).get(FileMoveAction.EXECUTE).invoke();
+        newParentFile.setObj(File.OWNER, user);
+        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, newParentFile, newParentPath).invoke(FileMoveAction.EXECUTE);
 
         // Test 1
         Map<File<?>, Character[]> test1Result = new HashMap<>();
@@ -193,10 +193,10 @@ public class FileMoveActionTest extends AbstractFileActionTest {
 
     private void actuallyTestGetMissingRights(FileMoveAction action, File<?> newParentFile, String fileRights, String newParentFileRights, Map<File<?>, Character[]> expectedResult) {
 
-        file.get(File.RIGHTS).set(new FileRights(fileRights));
-        newParentFile.get(File.RIGHTS).set(new FileRights(newParentFileRights));
+        file.setObj(File.RIGHTS, new FileRights(fileRights));
+        newParentFile.setObj(File.RIGHTS, new FileRights(newParentFileRights));
 
-        Map<File<?>, Character[]> result = action.get(FileRemoveAction.GET_MISSING_RIGHTS).invoke(user);
+        Map<File<?>, Character[]> result = action.invoke(FileRemoveAction.GET_MISSING_RIGHTS, user);
 
         assertEquals("Missing file rights map", prepareMissingRightsMap(expectedResult), prepareMissingRightsMap(result));
     }

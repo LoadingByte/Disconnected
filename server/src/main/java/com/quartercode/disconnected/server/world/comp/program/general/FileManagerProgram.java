@@ -99,7 +99,7 @@ public class FileManagerProgram extends ProgramExecutor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FileManagerProgram holder = (FileManagerProgram) invocation.getHolder();
+                FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
                 GetCurrentPathRequestEventHandler handler = new GetCurrentPathRequestEventHandler();
                 handler.holder = holder;
                 ProgramUtils.registerRequestEventHandler(holder, FileManagerProgramGetCurrentPathRequestEvent.class, handler);
@@ -113,7 +113,7 @@ public class FileManagerProgram extends ProgramExecutor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FileManagerProgram holder = (FileManagerProgram) invocation.getHolder();
+                FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
                 SetCurrentPathRequestEventHandler handler = new SetCurrentPathRequestEventHandler();
                 handler.holder = holder;
                 ProgramUtils.registerRequestEventHandler(holder, FileManagerProgramSetCurrentPathRequestEvent.class, handler);
@@ -127,7 +127,7 @@ public class FileManagerProgram extends ProgramExecutor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FileManagerProgram holder = (FileManagerProgram) invocation.getHolder();
+                FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
                 ListRequestEventHandler handler = new ListRequestEventHandler();
                 handler.holder = holder;
                 ProgramUtils.registerRequestEventHandler(holder, FileManagerProgramListRequestEvent.class, handler);
@@ -141,7 +141,7 @@ public class FileManagerProgram extends ProgramExecutor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FileManagerProgram holder = (FileManagerProgram) invocation.getHolder();
+                FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
                 CreateRequestEventHandler handler = new CreateRequestEventHandler();
                 handler.holder = holder;
                 ProgramUtils.registerRequestEventHandler(holder, FileManagerProgramCreateRequestEvent.class, handler);
@@ -155,7 +155,7 @@ public class FileManagerProgram extends ProgramExecutor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FileManagerProgram holder = (FileManagerProgram) invocation.getHolder();
+                FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
                 RemoveRequestEventHandler handler = new RemoveRequestEventHandler();
                 handler.holder = holder;
                 ProgramUtils.registerRequestEventHandler(holder, FileManagerProgramRemoveRequestEvent.class, handler);
@@ -175,7 +175,7 @@ public class FileManagerProgram extends ProgramExecutor {
         public void handle(FileManagerProgramGetCurrentPathRequestEvent request, ReturnEventSender sender) {
 
             ImportantData data = ProgramUtils.getImportantData(holder);
-            sender.send(new FileManagerProgramGetCurrentPathReturnEvent(data.getComputerId(), data.getPid(), holder.get(CURRENT_PATH).get()));
+            sender.send(new FileManagerProgramGetCurrentPathReturnEvent(data.getComputerId(), data.getPid(), holder.getObj(CURRENT_PATH)));
         }
 
     }
@@ -191,13 +191,13 @@ public class FileManagerProgram extends ProgramExecutor {
 
             ImportantData data = ProgramUtils.getImportantData(holder);
             Process<?> process = holder.getParent();
-            OperatingSystem os = process.get(Process.GET_OPERATING_SYSTEM).invoke();
-            FileSystemModule fsModule = os.get(OperatingSystem.FS_MODULE).get();
+            OperatingSystem os = process.invoke(Process.GET_OPERATING_SYSTEM);
+            FileSystemModule fsModule = os.getObj(OperatingSystem.FS_MODULE);
 
             if (!path.equals(PathUtils.SEPARATOR)) {
                 File<?> rawDir = null;
                 try {
-                    rawDir = fsModule.get(FileSystemModule.GET_FILE).invoke(path);
+                    rawDir = fsModule.invoke(FileSystemModule.GET_FILE, path);
                 } catch (UnknownMountpointException e) {
                     sender.send(new FileManagerProgramUnknownMountpointEvent(data.getComputerId(), data.getPid(), e.getMountpoint()));
                     return;
@@ -209,7 +209,7 @@ public class FileManagerProgram extends ProgramExecutor {
                 }
             }
 
-            holder.get(CURRENT_PATH).set(path);
+            holder.setObj(CURRENT_PATH, path);
         }
 
     }
@@ -221,17 +221,17 @@ public class FileManagerProgram extends ProgramExecutor {
         @Override
         public void handle(FileManagerProgramListRequestEvent request, ReturnEventSender sender) {
 
-            String path = holder.get(CURRENT_PATH).get();
+            String path = holder.getObj(CURRENT_PATH);
 
             ImportantData data = ProgramUtils.getImportantData(holder);
             Process<?> process = holder.getParent();
-            OperatingSystem os = process.get(Process.GET_OPERATING_SYSTEM).invoke();
-            FileSystemModule fsModule = os.get(OperatingSystem.FS_MODULE).get();
+            OperatingSystem os = process.invoke(Process.GET_OPERATING_SYSTEM);
+            FileSystemModule fsModule = os.getObj(OperatingSystem.FS_MODULE);
 
             if (path.equals(PathUtils.SEPARATOR)) {
                 List<FilePlaceholder> files = new ArrayList<>();
 
-                for (KnownFileSystem fileSystem : fsModule.get(FileSystemModule.GET_MOUNTED).invoke()) {
+                for (KnownFileSystem fileSystem : fsModule.invoke(FileSystemModule.GET_MOUNTED)) {
                     files.add(FileUtils.createFilePlaceholder(fileSystem));
                 }
 
@@ -239,7 +239,7 @@ public class FileManagerProgram extends ProgramExecutor {
             } else {
                 File<?> rawDir = null;
                 try {
-                    rawDir = fsModule.get(FileSystemModule.GET_FILE).invoke(path);
+                    rawDir = fsModule.invoke(FileSystemModule.GET_FILE, path);
                 } catch (UnknownMountpointException e) {
                     sender.send(new FileManagerProgramUnknownMountpointEvent(data.getComputerId(), data.getPid(), e.getMountpoint()));
                     return;
@@ -251,14 +251,14 @@ public class FileManagerProgram extends ProgramExecutor {
                     String pathMountpoint = PathUtils.splitAfterMountpoint(path)[0];
                     ParentFile<?> dir = (ParentFile<?>) rawDir;
 
-                    User sessionUser = process.get(Process.GET_USER).invoke();
+                    User sessionUser = process.invoke(Process.GET_USER);
                     if (!FileUtils.hasRight(sessionUser, dir, FileRights.READ)) {
                         FilePlaceholder dirPlaceholder = FileUtils.createFilePlaceholder(pathMountpoint, dir);
-                        sender.send(new ProgramMissingFileRightsEvent(data.getComputerId(), data.getPid(), sessionUser.get(User.NAME).get(), dirPlaceholder, FileRights.READ));
+                        sender.send(new ProgramMissingFileRightsEvent(data.getComputerId(), data.getPid(), sessionUser.getObj(User.NAME), dirPlaceholder, FileRights.READ));
                     } else {
                         List<FilePlaceholder> files = new ArrayList<>();
 
-                        for (File<?> file : dir.get(ParentFile.CHILDREN).get()) {
+                        for (File<?> file : dir.getCol(ParentFile.CHILDREN)) {
                             files.add(FileUtils.createFilePlaceholder(pathMountpoint, file));
                         }
 
@@ -278,14 +278,14 @@ public class FileManagerProgram extends ProgramExecutor {
         public void handle(FileManagerProgramCreateRequestEvent request, ReturnEventSender sender) {
 
             Validate.notNull(request.getSubpath(), "File creation subpath cannot be null");
-            String path = PathUtils.resolve(holder.get(CURRENT_PATH).get(), request.getSubpath());
+            String path = PathUtils.resolve(holder.getObj(CURRENT_PATH), request.getSubpath());
             Validate.notNull(request.getType(), "File type cannot be null");
             Class<? extends File<?>> fileType = StringFileTypeMapper.stringToClass(request.getType());
             Validate.notNull(request.getType(), "File type '%s' is unknown", request.getType());
 
             ImportantData data = ProgramUtils.getImportantData(holder);
             Process<?> process = holder.getParent();
-            OperatingSystem os = process.get(Process.GET_OPERATING_SYSTEM).invoke();
+            OperatingSystem os = process.invoke(Process.GET_OPERATING_SYSTEM);
 
             File<?> addFile = null;
             try {
@@ -294,24 +294,24 @@ public class FileManagerProgram extends ProgramExecutor {
                 throw new IllegalArgumentException("Cannot create instance of file type '" + fileType.getName() + "'", e);
             }
 
-            User sessionUser = process.get(Process.GET_USER).invoke();
-            addFile.get(File.OWNER).set(sessionUser);
-            addFile.get(File.GROUP).set(sessionUser.get(User.GET_PRIMARY_GROUP).invoke());
+            User sessionUser = process.invoke(Process.GET_USER);
+            addFile.setObj(File.OWNER, sessionUser);
+            addFile.setObj(File.GROUP, sessionUser.invoke(User.GET_PRIMARY_GROUP));
 
             FileAddAction addAction = null;
             try {
-                FileSystemModule fsModule = os.get(OperatingSystem.FS_MODULE).get();
-                addAction = fsModule.get(FileSystemModule.CREATE_ADD_FILE).invoke(addFile, path);
+                FileSystemModule fsModule = os.getObj(OperatingSystem.FS_MODULE);
+                addAction = fsModule.invoke(FileSystemModule.CREATE_ADD_FILE, addFile, path);
             } catch (UnknownMountpointException e) {
                 sender.send(new FileManagerProgramUnknownMountpointEvent(data.getComputerId(), data.getPid(), e.getMountpoint()));
             }
 
             if (addAction != null) {
-                Map<File<?>, Character[]> missingRights = addAction.get(FileAddAction.GET_MISSING_RIGHTS).invoke(sessionUser);
+                Map<File<?>, Character[]> missingRights = addAction.invoke(FileAddAction.GET_MISSING_RIGHTS, sessionUser);
 
                 if (missingRights.isEmpty()) {
                     try {
-                        addAction.get(FileAddAction.EXECUTE).invoke();
+                        addAction.invoke(FileAddAction.EXECUTE);
                         sender.send(new FileManagerProgramCreateSuccessReturnEvent(data.getComputerId(), data.getPid()));
                     } catch (InvalidPathException e) {
                         sender.send(new FileManagerProgramInvalidPathEvent(data.getComputerId(), data.getPid(), path));
@@ -325,7 +325,7 @@ public class FileManagerProgram extends ProgramExecutor {
                     Entry<File<?>, Character[]> missingRight = missingRights.entrySet().iterator().next();
 
                     FilePlaceholder filePlaceholder = FileUtils.createFilePlaceholder(PathUtils.splitAfterMountpoint(path)[0], missingRight.getKey());
-                    sender.send(new ProgramMissingFileRightsEvent(data.getComputerId(), data.getPid(), sessionUser.get(User.NAME).get(), filePlaceholder, missingRight.getValue()));
+                    sender.send(new ProgramMissingFileRightsEvent(data.getComputerId(), data.getPid(), sessionUser.getObj(User.NAME), filePlaceholder, missingRight.getValue()));
                 }
             }
         }
@@ -340,16 +340,16 @@ public class FileManagerProgram extends ProgramExecutor {
         public void handle(FileManagerProgramRemoveRequestEvent request, ReturnEventSender sender) {
 
             Validate.notNull(request.getSubpath(), "File creation subpath cannot be null");
-            String path = PathUtils.resolve(holder.get(CURRENT_PATH).get(), request.getSubpath());
+            String path = PathUtils.resolve(holder.getObj(CURRENT_PATH), request.getSubpath());
 
             ImportantData data = ProgramUtils.getImportantData(holder);
             Process<?> process = holder.getParent();
-            OperatingSystem os = process.get(Process.GET_OPERATING_SYSTEM).invoke();
-            FileSystemModule fsModule = os.get(OperatingSystem.FS_MODULE).get();
+            OperatingSystem os = process.invoke(Process.GET_OPERATING_SYSTEM);
+            FileSystemModule fsModule = os.getObj(OperatingSystem.FS_MODULE);
 
             File<?> removeFile = null;
             try {
-                removeFile = fsModule.get(FileSystemModule.GET_FILE).invoke(path);
+                removeFile = fsModule.invoke(FileSystemModule.GET_FILE, path);
             } catch (UnknownMountpointException e) {
                 sender.send(new FileManagerProgramUnknownMountpointEvent(data.getComputerId(), data.getPid(), e.getMountpoint()));
                 return;
@@ -358,13 +358,13 @@ public class FileManagerProgram extends ProgramExecutor {
             if (removeFile == null) {
                 sender.send(new FileManagerProgramInvalidPathEvent(data.getComputerId(), data.getPid(), path));
             } else {
-                FileRemoveAction removeAction = removeFile.get(File.CREATE_REMOVE).invoke();
-                User sessionUser = process.get(Process.GET_USER).invoke();
+                FileRemoveAction removeAction = removeFile.invoke(File.CREATE_REMOVE);
+                User sessionUser = process.invoke(Process.GET_USER);
 
-                Map<File<?>, Character[]> missingRights = removeAction.get(FileRemoveAction.GET_MISSING_RIGHTS).invoke(sessionUser);
+                Map<File<?>, Character[]> missingRights = removeAction.invoke(FileRemoveAction.GET_MISSING_RIGHTS, sessionUser);
 
                 if (missingRights.isEmpty()) {
-                    removeAction.get(FileRemoveAction.EXECUTE).invoke();
+                    removeAction.invoke(FileRemoveAction.EXECUTE);
                     sender.send(new FileManagerProgramRemoveSuccessReturnEvent(data.getComputerId(), data.getPid()));
                 } else {
                     // Create a missing rights array with serializable file placeholders instead of file objects
@@ -373,7 +373,7 @@ public class FileManagerProgram extends ProgramExecutor {
                         missingRightsWithPlaceholders.put(FileUtils.createFilePlaceholder(PathUtils.splitAfterMountpoint(path)[0], entry.getKey()), entry.getValue());
                     }
 
-                    sender.send(new ProgramMissingFileRightsEvent(data.getComputerId(), data.getPid(), sessionUser.get(User.NAME).get(), missingRightsWithPlaceholders));
+                    sender.send(new ProgramMissingFileRightsEvent(data.getComputerId(), data.getPid(), sessionUser.getObj(User.NAME), missingRightsWithPlaceholders));
                 }
             }
         }

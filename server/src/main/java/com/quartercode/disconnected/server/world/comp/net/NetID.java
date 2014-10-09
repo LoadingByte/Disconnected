@@ -21,7 +21,7 @@ package com.quartercode.disconnected.server.world.comp.net;
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -190,11 +190,11 @@ public class NetID extends WorldFeatureHolder implements StringRepresentable {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
                 NetID object = (NetID) arguments[0];
 
-                holder.get(SUBNET).set(object.get(SUBNET).get());
-                holder.get(ID).set(object.get(ID).get());
+                holder.setObj(SUBNET, object.getObj(SUBNET));
+                holder.setObj(ID, object.getObj(ID));
 
                 return invocation.next(arguments);
             }
@@ -206,10 +206,10 @@ public class NetID extends WorldFeatureHolder implements StringRepresentable {
             @Override
             public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
-                int subnet = holder.get(SUBNET).get();
-                int id = holder.get(ID).get();
+                int subnet = holder.getObj(SUBNET);
+                int id = holder.getObj(ID);
 
                 invocation.next(arguments);
                 return new StringBuilder().append(subnet).append(".").append(id).toString();
@@ -221,13 +221,13 @@ public class NetID extends WorldFeatureHolder implements StringRepresentable {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
                 String[] stringParts = ((String) arguments[0]).split(".");
                 Validate.isTrue(stringParts.length == 2, "Net id (%s) must be provided in the format SUBNET.ID", arguments[0]);
 
-                holder.get(SUBNET).set(Integer.parseInt(stringParts[0]));
-                holder.get(ID).set(Integer.parseInt(stringParts[1]));
+                holder.setObj(SUBNET, Integer.parseInt(stringParts[0]));
+                holder.setObj(ID, Integer.parseInt(stringParts[1]));
 
                 return invocation.next(arguments);
             }

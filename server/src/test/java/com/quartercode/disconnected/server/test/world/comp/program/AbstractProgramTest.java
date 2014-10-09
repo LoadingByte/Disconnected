@@ -88,17 +88,17 @@ public abstract class AbstractProgramTest {
         world.injectBridge(bridge);
 
         computer = WorldGenerator.generateComputer(false);
-        world.get(World.COMPUTERS).add(computer);
+        world.addCol(World.COMPUTERS, computer);
 
-        os = computer.get(Computer.OS).get();
-        os.get(OperatingSystem.SET_RUNNING).invoke(true);
+        os = computer.getObj(Computer.OS);
+        os.invoke(OperatingSystem.SET_RUNNING, true);
 
-        processModule = os.get(OperatingSystem.PROC_MODULE).get();
+        processModule = os.getObj(OperatingSystem.PROC_MODULE);
 
-        FileSystemModule fsModule = os.get(OperatingSystem.FS_MODULE).get();
-        for (KnownFileSystem knownFs : fsModule.get(FileSystemModule.KNOWN_FS).get()) {
-            if (knownFs.get(KnownFileSystem.MOUNTPOINT).get().equals(fileSystemMountpoint)) {
-                fileSystem = knownFs.get(KnownFileSystem.FILE_SYSTEM).get();
+        FileSystemModule fsModule = os.getObj(OperatingSystem.FS_MODULE);
+        for (KnownFileSystem knownFs : fsModule.getCol(FileSystemModule.KNOWN_FS)) {
+            if (knownFs.getObj(KnownFileSystem.MOUNTPOINT).equals(fileSystemMountpoint)) {
+                fileSystem = knownFs.getObj(KnownFileSystem.FILE_SYSTEM);
                 break;
             }
         }
@@ -107,13 +107,13 @@ public abstract class AbstractProgramTest {
     protected Program createProgram(Class<? extends ProgramExecutor> executorClass, int majorVersion, int minorVersion, int revisionVersion) {
 
         Program program = new Program();
-        program.get(Program.EXECUTOR_CLASS).set(executorClass);
+        program.setObj(Program.EXECUTOR_CLASS, executorClass);
 
         Version version = new Version();
-        version.get(Version.MAJOR).set(majorVersion);
-        version.get(Version.MINOR).set(minorVersion);
-        version.get(Version.REVISION).set(revisionVersion);
-        program.get(Program.VERSION).set(version);
+        version.setObj(Version.MAJOR, majorVersion);
+        version.setObj(Version.MINOR, minorVersion);
+        version.setObj(Version.REVISION, revisionVersion);
+        program.setObj(Program.VERSION, version);
 
         return program;
     }
@@ -121,8 +121,8 @@ public abstract class AbstractProgramTest {
     protected ContentFile addProgram(FileSystem fileSystem, Program program, String path) {
 
         ContentFile file = new ContentFile();
-        file.get(ContentFile.CONTENT).set(program);
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(file, path).get(FileAddAction.EXECUTE).invoke();
+        file.setObj(ContentFile.CONTENT, program);
+        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, path).invoke(FileAddAction.EXECUTE);
         return file;
     }
 

@@ -21,7 +21,7 @@ package com.quartercode.disconnected.server.world.comp.net;
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
@@ -153,14 +153,14 @@ public class Address extends WorldFeatureHolder implements StringRepresentable {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
                 Address object = (Address) arguments[0];
 
                 NetID netId = new NetID();
-                netId.get(NetID.FROM_OBJECT).invoke(object.get(NET_ID).get());
-                holder.get(NET_ID).set(netId);
+                netId.invoke(NetID.FROM_OBJECT, object.getObj(NET_ID));
+                holder.setObj(NET_ID, netId);
 
-                holder.get(PORT).set(object.get(PORT).get());
+                holder.setObj(PORT, object.getObj(PORT));
 
                 return invocation.next(arguments);
             }
@@ -172,10 +172,10 @@ public class Address extends WorldFeatureHolder implements StringRepresentable {
             @Override
             public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
-                String netId = holder.get(NET_ID).get().get(NetID.TO_STRING).invoke();
-                int port = holder.get(PORT).get();
+                String netId = holder.getObj(NET_ID).invoke(NetID.TO_STRING);
+                int port = holder.getObj(PORT);
 
                 invocation.next(arguments);
                 return new StringBuilder(netId).append(":").append(port).toString();
@@ -187,16 +187,16 @@ public class Address extends WorldFeatureHolder implements StringRepresentable {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FeatureHolder holder = invocation.getHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
                 String[] stringParts = ((String) arguments[0]).split(":");
                 Validate.isTrue(stringParts.length == 2, "Address (%s) must be provided in the format NET_ID:PORT", arguments[0]);
 
                 NetID netId = new NetID();
-                netId.get(NetID.FROM_STRING).invoke(stringParts[0]);
-                holder.get(NET_ID).set(netId);
+                netId.invoke(NetID.FROM_STRING, stringParts[0]);
+                holder.setObj(NET_ID, netId);
 
-                holder.get(PORT).set(Integer.parseInt(stringParts[1]));
+                holder.setObj(PORT, Integer.parseInt(stringParts[1]));
 
                 return invocation.next(arguments);
             }

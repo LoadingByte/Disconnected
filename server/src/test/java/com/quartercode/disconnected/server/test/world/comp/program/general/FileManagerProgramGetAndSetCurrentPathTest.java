@@ -62,17 +62,17 @@ public class FileManagerProgramGetAndSetCurrentPathTest extends AbstractProgramT
     @Before
     public void setUp2() {
 
-        fileSystem.get(FileSystem.CREATE_ADD_FILE).invoke(new ContentFile(), LOCAL_PATH_2).get(FileAddAction.EXECUTE).invoke();
+        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, new ContentFile(), LOCAL_PATH_2).invoke(FileAddAction.EXECUTE);
     }
 
     private ImportantData executeProgram(Process<?> parentProcess) {
 
-        ChildProcess process = parentProcess.get(Process.CREATE_CHILD).invoke();
-        process.get(Process.SOURCE).set((ContentFile) fileSystem.get(FileSystem.GET_FILE).invoke(splitAfterMountpoint(getCommonLocation(FileManagerProgram.class).toString())[1]));
-        process.get(Process.INITIALIZE).invoke(10);
+        ChildProcess process = parentProcess.invoke(Process.CREATE_CHILD);
+        process.setObj(Process.SOURCE, (ContentFile) fileSystem.invoke(FileSystem.GET_FILE, splitAfterMountpoint(getCommonLocation(FileManagerProgram.class).toString())[1]));
+        process.invoke(Process.INITIALIZE, 10);
 
-        ProgramExecutor program = process.get(Process.EXECUTOR).get();
-        program.get(ProgramExecutor.RUN).invoke();
+        ProgramExecutor program = process.getObj(Process.EXECUTOR);
+        program.invoke(ProgramExecutor.RUN);
 
         return ProgramUtils.getImportantData(program);
     }
@@ -92,7 +92,7 @@ public class FileManagerProgramGetAndSetCurrentPathTest extends AbstractProgramT
     @Test
     public void testSetAndGetSuccess() {
 
-        ImportantData data = executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get());
+        ImportantData data = executeProgram(processModule.getObj(ProcessModule.ROOT_PROCESS));
 
         sendSetRequest(data, PATH_1, new EventHandler<Event>() {
 
@@ -119,7 +119,7 @@ public class FileManagerProgramGetAndSetCurrentPathTest extends AbstractProgramT
     @Test
     public void testSetSuccessWithAbsoluteRoot() {
 
-        sendSetRequest(executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get()), "/", new EventHandler<Event>() {
+        sendSetRequest(executeProgram(processModule.getObj(ProcessModule.ROOT_PROCESS)), "/", new EventHandler<Event>() {
 
             @Override
             public void handle(Event event) {
@@ -133,7 +133,7 @@ public class FileManagerProgramGetAndSetCurrentPathTest extends AbstractProgramT
     @Test
     public void testSetSuccessWithRootFiles() {
 
-        sendSetRequest(executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get()), CommonFiles.SYSTEM_MOUNTPOINT, new EventHandler<Event>() {
+        sendSetRequest(executeProgram(processModule.getObj(ProcessModule.ROOT_PROCESS)), CommonFiles.SYSTEM_MOUNTPOINT, new EventHandler<Event>() {
 
             @Override
             public void handle(Event event) {
@@ -147,7 +147,7 @@ public class FileManagerProgramGetAndSetCurrentPathTest extends AbstractProgramT
     @Test
     public void testUnknownMountpoint() {
 
-        sendSetRequest(executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get()), "/testunknown/" + LOCAL_PATH_1, new EventHandler<Event>() {
+        sendSetRequest(executeProgram(processModule.getObj(ProcessModule.ROOT_PROCESS)), "/testunknown/" + LOCAL_PATH_1, new EventHandler<Event>() {
 
             @Override
             public void handle(Event event) {
@@ -162,7 +162,7 @@ public class FileManagerProgramGetAndSetCurrentPathTest extends AbstractProgramT
     @Test
     public void testInvalidPathWithContentFilePath() {
 
-        sendSetRequest(executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get()), PATH_2, new EventHandler<Event>() {
+        sendSetRequest(executeProgram(processModule.getObj(ProcessModule.ROOT_PROCESS)), PATH_2, new EventHandler<Event>() {
 
             @Override
             public void handle(Event event) {
@@ -177,7 +177,7 @@ public class FileManagerProgramGetAndSetCurrentPathTest extends AbstractProgramT
     @Test
     public void testInvalidPathWithUnexistingPath() {
 
-        sendSetRequest(executeProgram(processModule.get(ProcessModule.ROOT_PROCESS).get()), PATH_3, new EventHandler<Event>() {
+        sendSetRequest(executeProgram(processModule.getObj(ProcessModule.ROOT_PROCESS)), PATH_3, new EventHandler<Event>() {
 
             @Override
             public void handle(Event event) {

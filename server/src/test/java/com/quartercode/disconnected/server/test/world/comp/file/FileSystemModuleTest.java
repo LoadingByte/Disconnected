@@ -53,18 +53,18 @@ public class FileSystemModuleTest {
     private FileSystem createFileSystem(long size) {
 
         FileSystem fileSystem = new FileSystem();
-        fileSystem.get(FileSystem.SIZE).set(size);
+        fileSystem.setObj(FileSystem.SIZE, size);
         return fileSystem;
     }
 
     private KnownFileSystem addKnown(FileSystemModule fsModule, FileSystem fileSystem, String mountpoint, boolean mounted) {
 
         KnownFileSystem known = new KnownFileSystem();
-        known.get(KnownFileSystem.FILE_SYSTEM).set(fileSystem);
-        known.get(KnownFileSystem.MOUNTPOINT).set(mountpoint);
+        known.setObj(KnownFileSystem.FILE_SYSTEM, fileSystem);
+        known.setObj(KnownFileSystem.MOUNTPOINT, mountpoint);
 
-        fsModule.get(FileSystemModule.KNOWN_FS).add(known);
-        known.get(KnownFileSystem.MOUNTED).set(mounted);
+        fsModule.addCol(FileSystemModule.KNOWN_FS, known);
+        known.setObj(KnownFileSystem.MOUNTED, mounted);
 
         return known;
     }
@@ -73,16 +73,16 @@ public class FileSystemModuleTest {
     public void testGetKnown() {
 
         List<KnownFileSystem> expected = Arrays.asList(knownFileSystems);
-        assertEquals("Known file systems", expected, fsModule.get(FileSystemModule.KNOWN_FS).get());
+        assertEquals("Known file systems", expected, fsModule.getCol(FileSystemModule.KNOWN_FS));
     }
 
     @Test
     public void testGetMountedByMountpoint() {
 
-        assertEquals("Mounted file system fs1", fileSystems[0], fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs1").get(KnownFileSystem.FILE_SYSTEM).get());
-        assertEquals("Mounted file system fs2", fileSystems[1], fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs2").get(KnownFileSystem.FILE_SYSTEM).get());
+        assertEquals("Mounted file system fs1", fileSystems[0], fsModule.invoke(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT, "fs1").getObj(KnownFileSystem.FILE_SYSTEM));
+        assertEquals("Mounted file system fs2", fileSystems[1], fsModule.invoke(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT, "fs2").getObj(KnownFileSystem.FILE_SYSTEM));
         // File system 3 isn't mounted
-        assertEquals("No mounted file system fs3", null, fsModule.get(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT).invoke("fs3"));
+        assertEquals("No mounted file system fs3", null, fsModule.invoke(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT, "fs3"));
     }
 
     @Test (expected = IllegalStateException.class)
@@ -96,20 +96,20 @@ public class FileSystemModuleTest {
     public void testGetFile() {
 
         File<?> file = new ContentFile();
-        fileSystems[0].get(FileSystem.CREATE_ADD_FILE).invoke(file, "some/path/to/file").get(FileAddAction.EXECUTE).invoke();
+        fileSystems[0].invoke(FileSystem.CREATE_ADD_FILE, file, "some/path/to/file").invoke(FileAddAction.EXECUTE);
 
-        assertEquals("Added file", file, fsModule.get(FileSystemModule.GET_FILE).invoke("/fs1/some/path/to/file"));
-        assertEquals("No added file", null, fsModule.get(FileSystemModule.GET_FILE).invoke("/fs2/some/path/to/file"));
+        assertEquals("Added file", file, fsModule.invoke(FileSystemModule.GET_FILE, "/fs1/some/path/to/file"));
+        assertEquals("No added file", null, fsModule.invoke(FileSystemModule.GET_FILE, "/fs2/some/path/to/file"));
     }
 
     @Test
     public void testAddFile() {
 
         File<?> file = new ContentFile();
-        fsModule.get(FileSystemModule.CREATE_ADD_FILE).invoke(file, "/fs1/some/path/to/file").get(FileAddAction.EXECUTE).invoke();
+        fsModule.invoke(FileSystemModule.CREATE_ADD_FILE, file, "/fs1/some/path/to/file").invoke(FileAddAction.EXECUTE);
 
-        assertEquals("Added file", file, fileSystems[0].get(FileSystem.GET_FILE).invoke("some/path/to/file"));
-        assertEquals("No added file", null, fileSystems[1].get(FileSystem.GET_FILE).invoke("some/path/to/file"));
+        assertEquals("Added file", file, fileSystems[0].invoke(FileSystem.GET_FILE, "some/path/to/file"));
+        assertEquals("No added file", null, fileSystems[1].invoke(FileSystem.GET_FILE, "some/path/to/file"));
     }
 
 }

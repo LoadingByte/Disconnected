@@ -43,7 +43,7 @@ public class ProgramLaunchInfoRequestEventHandler implements RequestEventHandler
         Computer playerComputer = getPlayerComputer();
 
         ProcessModule procModule = getProcessModule(playerComputer);
-        int pid = procModule.get(ProcessModule.NEXT_PID).invoke();
+        int pid = procModule.invoke(ProcessModule.NEXT_PID);
 
         sender.send(new ProgramLaunchInfoReturnEvent(playerComputer.getId(), pid));
     }
@@ -52,12 +52,12 @@ public class ProgramLaunchInfoRequestEventHandler implements RequestEventHandler
 
         World world = ServiceRegistry.lookup(ProfileService.class).getActive().getWorld();
         // Just use first available computer as the player's one
-        return world.get(World.COMPUTERS).get().get(0);
+        return world.getCol(World.COMPUTERS).get(0);
     }
 
     protected ProcessModule getProcessModule(Computer computer) {
 
-        return computer.get(Computer.OS).get().get(OperatingSystem.PROC_MODULE).get();
+        return computer.getObj(Computer.OS).getObj(OperatingSystem.PROC_MODULE);
     }
 
 }

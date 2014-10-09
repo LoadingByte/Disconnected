@@ -27,9 +27,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.def.DefaultCFeatureHolder;
 import com.quartercode.disconnected.server.util.NullPreventer;
 import com.quartercode.disconnected.server.world.comp.SizeUtil;
 import com.quartercode.disconnected.server.world.comp.SizeUtil.DerivableSize;
@@ -110,7 +110,7 @@ public class SizeUtilTest {
         assertEquals("Calculated Size", expectedSize, SizeUtil.getSize(object));
     }
 
-    private static class TestFeatureHolder extends DefaultFeatureHolder implements DerivableSize {
+    private static class TestFeatureHolder extends DefaultCFeatureHolder implements DerivableSize {
 
     }
 

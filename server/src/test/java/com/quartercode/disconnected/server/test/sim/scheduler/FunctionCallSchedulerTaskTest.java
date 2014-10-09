@@ -29,10 +29,10 @@ import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.def.DefaultCFeatureHolder;
 import com.quartercode.classmod.util.FeatureDefinitionReference;
 import com.quartercode.disconnected.server.sim.scheduler.FunctionCallSchedulerTask;
 import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
@@ -77,7 +77,7 @@ public class FunctionCallSchedulerTaskTest {
     }
 
     @XmlRootElement
-    private static class TestFeatureHolder extends DefaultFeatureHolder {
+    private static class TestFeatureHolder extends DefaultCFeatureHolder {
 
         public static final FeatureDefinition<Scheduler> SCHEDULER = new SchedulerDefinition("scheduler");
 

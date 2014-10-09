@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.server.sim.scheduler;
 
 import javax.xml.bind.annotation.XmlElement;
-import com.quartercode.classmod.base.FeatureHolder;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.Function;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.util.FeatureDefinitionReference;
@@ -92,9 +92,9 @@ public class FunctionCallSchedulerTask extends SchedulerTaskAdapter {
     }
 
     @Override
-    public void execute(FeatureHolder holder) {
+    public void execute(CFeatureHolder holder) {
 
-        holder.get(functionDefinition.getDefinition()).invoke();
+        holder.invoke(functionDefinition.getDefinition());
     }
 
 }

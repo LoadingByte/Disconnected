@@ -150,13 +150,13 @@ public class FileSystem extends WorldFeatureHolder implements DerivableSize {
                 String path = PathUtils.normalize((String) arguments[0]);
 
                 String[] parts = path.split(PathUtils.SEPARATOR);
-                File<?> current = invocation.getHolder().get(ROOT).get();
+                File<?> current = invocation.getCHolder().getObj(ROOT);
                 for (int index = 0; index < parts.length; index++) {
                     String part = parts[index];
 
                     if (!part.isEmpty()) {
                         if (current instanceof ParentFile) {
-                            current = current.get(ParentFile.GET_CHILD_BY_NAME).invoke(part);
+                            current = current.invoke(ParentFile.GET_CHILD_BY_NAME, part);
 
                             // Return null if the next file is not a parent file and not the last file (invalid path)
                             if (! (current instanceof ParentFile) && index != parts.length - 1) {
@@ -185,9 +185,9 @@ public class FileSystem extends WorldFeatureHolder implements DerivableSize {
             public FileAddAction invoke(FunctionInvocation<FileAddAction> invocation, Object... arguments) {
 
                 FileAddAction action = new FileAddAction();
-                action.get(FileAddAction.FILE_SYSTEM).set((FileSystem) invocation.getHolder());
-                action.get(FileAddAction.FILE).set((File<ParentFile<?>>) arguments[0]);
-                action.get(FileAddAction.PATH).set((String) arguments[1]);
+                action.setObj(FileAddAction.FILE_SYSTEM, (FileSystem) invocation.getCHolder());
+                action.setObj(FileAddAction.FILE, (File<ParentFile<?>>) arguments[0]);
+                action.setObj(FileAddAction.PATH, (String) arguments[1]);
 
                 invocation.next(arguments);
                 return action;
@@ -201,7 +201,7 @@ public class FileSystem extends WorldFeatureHolder implements DerivableSize {
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
-                long filled = SizeUtil.getSize(invocation.getHolder().get(ROOT).get());
+                long filled = SizeUtil.getSize(invocation.getCHolder().getObj(ROOT));
                 invocation.next(arguments);
                 return filled;
             }
@@ -214,7 +214,7 @@ public class FileSystem extends WorldFeatureHolder implements DerivableSize {
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
-                long free = invocation.getHolder().get(GET_SIZE).invoke() - invocation.getHolder().get(GET_FILLED).invoke();
+                long free = invocation.getCHolder().invoke(GET_SIZE) - invocation.getCHolder().invoke(GET_FILLED);
                 invocation.next(arguments);
                 return free;
             }
