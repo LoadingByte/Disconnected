@@ -25,6 +25,8 @@ import com.quartercode.disconnected.shared.event.comp.program.ProgramMissingFile
  * It transports a subpath, which describes the location of the new file relative to the current path, and the type of the new file.
  * 
  * @see FileManagerProgramCreateSuccessReturnEvent
+ * @see FileManagerProgramUnknownMountpointEvent
+ * @see FileManagerProgramInvalidPathEvent
  * @see FileManagerProgramCreateOccupiedPathReturnEvent
  * @see FileManagerProgramCreateOutOfSpaceReturnEvent
  * @see ProgramMissingFileRightsEvent

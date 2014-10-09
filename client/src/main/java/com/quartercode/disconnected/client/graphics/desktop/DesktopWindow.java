@@ -58,6 +58,7 @@ public class DesktopWindow extends ResizableFrame {
 
                 close();
             }
+
         });
     }
 

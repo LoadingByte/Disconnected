@@ -48,7 +48,7 @@ public class ProgramLaunchCommandEvent extends EventBase {
     private final String filePath;
 
     /**
-     * Creates a new program launch command event
+     * Creates a new program launch command event.
      * 
      * @param pid The pid the newly launched program will have.
      * @param filePath The path under which the program file, which will be used for the new program instance, can be found.
