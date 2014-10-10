@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.shared.constant;
 
-import com.quartercode.disconnected.shared.util.SeparatedPath;
+import com.quartercode.disconnected.shared.file.SeparatedPath;
 
 /**
  * Constants for system programs (e.g. common locations).

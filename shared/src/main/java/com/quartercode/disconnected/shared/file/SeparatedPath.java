@@ -16,9 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.util;
-
-import com.quartercode.disconnected.shared.constant.CommonFiles;
+package com.quartercode.disconnected.shared.file;
 
 /**
  * A separated path data object stores a file path that is split into a directory and a file name component.

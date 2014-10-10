@@ -36,7 +36,7 @@ import com.quartercode.disconnected.server.world.comp.file.FileMoveAction;
 import com.quartercode.disconnected.server.world.comp.file.FileRemoveAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.ParentFile;
-import com.quartercode.disconnected.shared.world.comp.file.FileRights;
+import com.quartercode.disconnected.shared.file.FileRights;
 
 @RunWith (Parameterized.class)
 public class FileMoveActionTest extends AbstractFileActionTest {

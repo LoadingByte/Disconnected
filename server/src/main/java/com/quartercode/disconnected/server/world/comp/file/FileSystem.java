@@ -30,7 +30,7 @@ import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.server.world.WorldFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.SizeUtil;
 import com.quartercode.disconnected.server.world.comp.SizeUtil.DerivableSize;
-import com.quartercode.disconnected.shared.util.PathUtils;
+import com.quartercode.disconnected.shared.file.PathUtils;
 
 /**
  * This class represents a file system.

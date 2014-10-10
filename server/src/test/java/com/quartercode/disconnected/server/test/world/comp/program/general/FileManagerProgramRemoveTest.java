@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.server.test.world.comp.program.general;
 
 import static com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper.getCommonLocation;
-import static com.quartercode.disconnected.shared.util.PathUtils.splitAfterMountpoint;
+import static com.quartercode.disconnected.shared.file.PathUtils.splitAfterMountpoint;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,14 +42,14 @@ import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils.ImportantData;
 import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
-import com.quartercode.disconnected.shared.constant.CommonFiles;
 import com.quartercode.disconnected.shared.event.comp.program.ProgramMissingFileRightsEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramInvalidPathEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramRemoveRequestEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramRemoveRequestEvent.FileManagerProgramRemoveSuccessReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramSetCurrentPathRequestEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramUnknownMountpointEvent;
-import com.quartercode.disconnected.shared.world.comp.file.FileRights;
+import com.quartercode.disconnected.shared.file.CommonFiles;
+import com.quartercode.disconnected.shared.file.FileRights;
 import com.quartercode.eventbridge.bridge.Event;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionRequester;

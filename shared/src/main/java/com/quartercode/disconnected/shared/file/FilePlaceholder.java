@@ -16,14 +16,13 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.world.comp.file;
+package com.quartercode.disconnected.shared.file;
 
 import java.io.Serializable;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import com.quartercode.disconnected.shared.util.PathUtils;
 
 /**
  * A file placeholder represents a file object by storing commonly used data about it.

@@ -30,7 +30,7 @@ import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.InvalidPathException;
 import com.quartercode.disconnected.server.world.comp.file.OccupiedPathException;
 import com.quartercode.disconnected.server.world.comp.file.ParentFile;
-import com.quartercode.disconnected.shared.world.comp.file.FileRights;
+import com.quartercode.disconnected.shared.file.FileRights;
 
 public class FileAddActionTest extends AbstractFileActionTest {
 

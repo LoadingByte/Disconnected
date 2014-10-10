@@ -29,7 +29,7 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.disconnected.server.world.comp.os.User;
-import com.quartercode.disconnected.shared.world.comp.file.FileRights;
+import com.quartercode.disconnected.shared.file.FileRights;
 
 /**
  * The file remove action is a simple file action that defines the process of removing a {@link File} from its file system.

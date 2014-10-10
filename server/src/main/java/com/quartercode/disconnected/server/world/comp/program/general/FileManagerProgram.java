@@ -63,9 +63,9 @@ import com.quartercode.disconnected.shared.event.comp.program.general.FileManage
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramRemoveRequestEvent.FileManagerProgramRemoveSuccessReturnEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramSetCurrentPathRequestEvent;
 import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramUnknownMountpointEvent;
-import com.quartercode.disconnected.shared.util.PathUtils;
-import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
-import com.quartercode.disconnected.shared.world.comp.file.FileRights;
+import com.quartercode.disconnected.shared.file.FilePlaceholder;
+import com.quartercode.disconnected.shared.file.FileRights;
+import com.quartercode.disconnected.shared.file.PathUtils;
 import com.quartercode.eventbridge.extra.extension.RequestEventHandler;
 import com.quartercode.eventbridge.extra.extension.ReturnEventSender;
 

@@ -31,7 +31,7 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.server.world.comp.os.User;
-import com.quartercode.disconnected.shared.util.PathUtils;
+import com.quartercode.disconnected.shared.file.PathUtils;
 
 /**
  * The file move action is a simple file action that defines the process of moving a {@link File} to a new location.

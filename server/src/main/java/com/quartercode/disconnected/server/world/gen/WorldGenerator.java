@@ -54,9 +54,9 @@ import com.quartercode.disconnected.server.world.comp.program.Program;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
 import com.quartercode.disconnected.server.world.general.Location;
-import com.quartercode.disconnected.shared.constant.CommonFiles;
-import com.quartercode.disconnected.shared.util.PathUtils;
-import com.quartercode.disconnected.shared.world.comp.file.FileRights;
+import com.quartercode.disconnected.shared.file.CommonFiles;
+import com.quartercode.disconnected.shared.file.FileRights;
+import com.quartercode.disconnected.shared.file.PathUtils;
 
 /**
  * The world generator utility generates {@link World}s and parts of worlds.

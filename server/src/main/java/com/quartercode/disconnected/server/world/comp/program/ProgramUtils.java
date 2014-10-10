@@ -24,7 +24,7 @@ import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.UnknownMountpointException;
 import com.quartercode.disconnected.shared.event.comp.program.ProgramEventPredicate;
-import com.quartercode.disconnected.shared.util.PathUtils;
+import com.quartercode.disconnected.shared.file.PathUtils;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.Event;
 import com.quartercode.eventbridge.bridge.module.EventHandler;

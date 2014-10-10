@@ -22,9 +22,9 @@ import org.apache.commons.lang3.tuple.Triple;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
 import com.quartercode.disconnected.server.world.comp.os.Group;
 import com.quartercode.disconnected.server.world.comp.os.User;
-import com.quartercode.disconnected.shared.util.PathUtils;
-import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
-import com.quartercode.disconnected.shared.world.comp.file.FileRights;
+import com.quartercode.disconnected.shared.file.FilePlaceholder;
+import com.quartercode.disconnected.shared.file.FileRights;
+import com.quartercode.disconnected.shared.file.PathUtils;
 
 /**
  * This file utility contains methods related to {@link File}s and {@link FileSystem}s.
