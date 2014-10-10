@@ -166,6 +166,35 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
         PACKET_HANDLERS = create(new TypeLiteral<CollectionPropertyDefinition<PacketHandler, List<PacketHandler>>>() {}, "name", "packetHandlers", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
 
         STATE = create(new TypeLiteral<PropertyDefinition<SocketState>>() {}, "name", "state", "storage", new StandardStorage<>(), "initialValue", new ConstantValueFactory<>(SocketState.INACTIVE));
+        STATE.addSetterExecutor("scheduleConnectionTimeout", Socket.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.LEVEL_7)
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                CFeatureHolder holder = invocation.getCHolder();
+                boolean stateChangesToHandshakeSyn = arguments[0] == SocketState.HANDSHAKE_SYN && holder.getObj(Socket.STATE) != SocketState.HANDSHAKE_SYN;
+
+                invocation.next(arguments);
+
+                if (stateChangesToHandshakeSyn) {
+                    holder.get(SCHEDULER).schedule(new SchedulerTaskAdapter("connectionTimeout", "computerNetworkUpdate", CONNECTION_TIMEOUT) {
+
+                        @Override
+                        public void execute(CFeatureHolder holder) {
+
+                            if (holder.getObj(STATE) != SocketState.CONNECTED) {
+                                holder.invoke(DISCONNECT);
+                            }
+                        }
+
+                    });
+                }
+
+                return null;
+            }
+
+        });
         STATE.addSetterExecutor("scheduleKeepalive", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -307,30 +336,6 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                 CFeatureHolder holder = invocation.getCHolder();
 
                 Validate.notNull(holder.getObj(DESTINATION), "Socket destination cannot be null");
-
-                return invocation.next(arguments);
-            }
-
-        });
-        CONNECT.addExecutor("scheduleTimeout", Socket.class, new FunctionExecutor<Void>() {
-
-            @Override
-            @Prioritized (Prioritized.LEVEL_6)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                CFeatureHolder holder = invocation.getCHolder();
-
-                holder.get(SCHEDULER).schedule(new SchedulerTaskAdapter("connectionTimeout", "computerNetworkUpdate", CONNECTION_TIMEOUT) {
-
-                    @Override
-                    public void execute(CFeatureHolder holder) {
-
-                        if (holder.getObj(STATE) != SocketState.CONNECTED) {
-                            holder.invoke(DISCONNECT);
-                        }
-                    }
-
-                });
 
                 return invocation.next(arguments);
             }
