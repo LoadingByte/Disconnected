@@ -16,8 +16,9 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.constant;
+package com.quartercode.disconnected.shared.program;
 
+import com.quartercode.disconnected.shared.file.CommonFiles;
 import com.quartercode.disconnected.shared.file.SeparatedPath;
 
 /**
