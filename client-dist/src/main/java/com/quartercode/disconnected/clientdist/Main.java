@@ -51,6 +51,7 @@ import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.gen.WorldGenerator;
+import com.quartercode.disconnected.shared.DefaultSharedData;
 import com.quartercode.disconnected.shared.util.ApplicationInfo;
 import com.quartercode.disconnected.shared.util.ExitUtil;
 import com.quartercode.disconnected.shared.util.ExitUtil.ExitProcessor;
@@ -167,6 +168,7 @@ public class Main {
         });
 
         // Add custom mappings to EventBridgeFactory
+        DefaultSharedData.addCustomEventBridgeFactoryMappings();
         DefaultServerData.addCustomEventBridgeFactoryMappings();
     }
 

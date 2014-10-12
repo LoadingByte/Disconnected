@@ -66,7 +66,6 @@ public class DefaultServerData {
 
         FactoryManager factoryManager = EventBridgeFactory.getFactoryManager();
 
-        factoryManager.setFactory(HandleInvocationProviderExtension.class, new DefaultHandleInvocationProviderExtensionFactory());
     }
 
     /**
