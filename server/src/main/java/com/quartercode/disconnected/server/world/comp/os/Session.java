@@ -31,7 +31,7 @@ import com.quartercode.disconnected.server.util.HashUtil;
 import com.quartercode.disconnected.server.world.comp.program.ChildProcess;
 import com.quartercode.disconnected.server.world.comp.program.Process;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
-import com.quartercode.disconnected.shared.event.comp.program.ProgramEvent;
+import com.quartercode.disconnected.shared.event.comp.program.ServerProcessCommand;
 
 /**
  * This class represents a program which opens a session.
@@ -152,7 +152,7 @@ public class Session extends ProgramExecutor {
      * 
      * @see Session
      */
-    public static class SessionEvent extends ProgramEvent {
+    public static class SessionEvent extends WorldProcessCommand {
 
         /**
          * Creates a new session event.

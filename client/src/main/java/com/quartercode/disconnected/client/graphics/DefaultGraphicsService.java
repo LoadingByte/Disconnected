@@ -29,7 +29,6 @@ import com.quartercode.eventbridge.EventBridgeFactory;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionRequester;
 import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
-import com.quartercode.eventbridge.extra.extension.SendPredicateCheckExtension;
 
 /**
  * This is the default implementation of the {@link GraphicsService}.
@@ -53,7 +52,6 @@ public class DefaultGraphicsService implements GraphicsService {
 
         bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionRequester.class));
         bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionReturner.class));
-        bridge.addModule(EventBridgeFactory.create(SendPredicateCheckExtension.class));
         bridge.addModule(EventBridgeFactory.create(HandleInvocationProviderExtension.class));
 
         bridge.getModule(HandleInvocationProviderExtension.class).setInvocationProvider(this);

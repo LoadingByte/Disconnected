@@ -16,40 +16,43 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world.event;
+package com.quartercode.disconnected.server.world.comp.program;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.quartercode.disconnected.server.bridge.ClientAwareEventHandler;
+import com.quartercode.disconnected.server.sim.TickBridgeProvider;
+import com.quartercode.disconnected.server.sim.TickService;
 import com.quartercode.disconnected.server.sim.profile.ProfileService;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.server.world.comp.program.Process;
-import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
-import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
-import com.quartercode.disconnected.shared.event.comp.program.ProgramLaunchCommandEvent;
+import com.quartercode.disconnected.shared.client.ClientIdentity;
+import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchAcknowledgement;
+import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
+import com.quartercode.disconnected.shared.program.ClientProcessId;
+import com.quartercode.disconnected.shared.program.WorldProcessId;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
-import com.quartercode.eventbridge.bridge.module.EventHandler;
+import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
- * The program launch command event handler executes {@link ProgramLaunchCommandEvent}s.
- * It should run on every tick server.
+ * The world process launch command handler executes incoming {@link WorldProcessLaunchCommand} events.
  * 
- * @see ProgramLaunchCommandEvent
+ * @see WorldProcessLaunchCommand
  */
-public class ProgramLaunchCommandEventHandler implements EventHandler<ProgramLaunchCommandEvent> {
+public class WorldProcessLaunchCommandHandler implements ClientAwareEventHandler<WorldProcessLaunchCommand> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProgramLaunchCommandEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorldProcessLaunchCommandHandler.class);
 
     @Override
-    public void handle(ProgramLaunchCommandEvent event) {
+    public void handle(WorldProcessLaunchCommand event, ClientIdentity client) {
 
-        Computer playerComputer = getPlayerComputer();
+        Computer playerComputer = getClientComputer(client);
 
         // Get the source file
-        ContentFile source = getSourceFile(playerComputer, event.getFilePath());
+        ContentFile source = getSourceFile(playerComputer, event.getProgramFilePath());
         // Cancel if the program cannot be found
         if (source == null) {
             return;
@@ -59,14 +62,20 @@ public class ProgramLaunchCommandEventHandler implements EventHandler<ProgramLau
         Process<?> sessionProcess = getSessionProcess(playerComputer);
         Process<?> process = sessionProcess.invoke(Process.CREATE_CHILD);
 
+        // Set the client process id
+        process.setObj(Process.CLIENT_PROCESS, new ClientProcessId(client, event.getClientProcessId()));
+
         // Set the source file
         process.setObj(Process.SOURCE, source);
 
+        // Retrieve a new pid
+        int pid = getProcessModule(playerComputer).invoke(ProcessModule.NEXT_PID);
+
         // Initialize the process
         try {
-            process.invoke(Process.INITIALIZE, event.getPid());
+            process.invoke(Process.INITIALIZE, pid);
         } catch (Exception e) {
-            LOGGER.warn("Error while initializing process with pid {}; client failure?", event.getPid(), e);
+            LOGGER.warn("Error while initializing process with pid {}; client failure?", pid, e);
             abort(sessionProcess, process);
             return;
         }
@@ -79,6 +88,9 @@ public class ProgramLaunchCommandEventHandler implements EventHandler<ProgramLau
             LOGGER.warn("Program executor '{}' threw unexpected exception on start", executor, e);
             abort(sessionProcess, process);
         }
+
+        // Send an acknowledgemend event
+        getBridge().send(new WorldProcessLaunchAcknowledgement(new ClientProcessId(client, event.getClientProcessId()), getProcessId(executor)));
     }
 
     private void abort(Process<?> parent, Process<?> process) {
@@ -86,24 +98,38 @@ public class ProgramLaunchCommandEventHandler implements EventHandler<ProgramLau
         parent.removeCol(Process.CHILDREN, process);
     }
 
-    protected Computer getPlayerComputer() {
+    protected Bridge getBridge() {
+
+        return ServiceRegistry.lookup(TickService.class).getAction(TickBridgeProvider.class).getBridge();
+    }
+
+    protected Computer getClientComputer(ClientIdentity client) {
 
         World world = ServiceRegistry.lookup(ProfileService.class).getActive().getWorld();
         // Just use first available computer as the player's one
         return world.getCol(World.COMPUTERS).get(0);
     }
 
+    protected ProcessModule getProcessModule(Computer computer) {
+
+        return computer.getObj(Computer.OS).getObj(OperatingSystem.PROC_MODULE);
+    }
+
     protected Process<?> getSessionProcess(Computer computer) {
 
-        OperatingSystem os = computer.getObj(Computer.OS);
         // Just use the root process as the player's session
-        return os.getObj(OperatingSystem.PROC_MODULE).getObj(ProcessModule.ROOT_PROCESS);
+        return getProcessModule(computer).getObj(ProcessModule.ROOT_PROCESS);
     }
 
     protected ContentFile getSourceFile(Computer computer, String path) {
 
         FileSystemModule fsModule = computer.getObj(Computer.OS).getObj(OperatingSystem.FS_MODULE);
         return (ContentFile) fsModule.invoke(FileSystemModule.GET_FILE, path);
+    }
+
+    protected WorldProcessId getProcessId(ProgramExecutor executor) {
+
+        return ProgramUtils.getProcessId(executor);
     }
 
 }

@@ -51,6 +51,10 @@ public class DesktopLaunchButtonModule extends AbstractGraphicsModule {
             public void run() {
 
                 // TODO: Display launch menu
+
+                // Temp: Choose first available program
+                DesktopProgramDescriptor program = DesktopPrograms.getDescriptors().iterator().next();
+                program.create(state, programContext).setVisible(true);
             }
 
         });

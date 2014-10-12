@@ -38,6 +38,8 @@ import com.quartercode.disconnected.client.graphics.DefaultGraphicsService;
 import com.quartercode.disconnected.client.graphics.DefaultStates;
 import com.quartercode.disconnected.client.graphics.GraphicsService;
 import com.quartercode.disconnected.server.DefaultServerData;
+import com.quartercode.disconnected.server.client.ClientIdentityService;
+import com.quartercode.disconnected.server.client.DefaultClientIdentityService;
 import com.quartercode.disconnected.server.sim.DefaultTickService;
 import com.quartercode.disconnected.server.sim.TickBridgeProvider;
 import com.quartercode.disconnected.server.sim.TickSchedulerUpdater;
@@ -225,6 +227,10 @@ public class Main {
         LOGGER.info("Initializing profile service and loading stored profiles");
         initializeProfileService();
 
+        // Initialize client identity service
+        LOGGER.info("Initializing client identity service");
+        initializeClientIdentityService();
+
         // Initialize tick service
         LOGGER.info("Initializing tick service");
         initializeTickService();
@@ -257,6 +263,12 @@ public class Main {
 
         DefaultServerData.addDefaultSchedulerGroups(tickService.getAction(TickSchedulerUpdater.class));
         DefaultServerData.addDefaultServerHandlers(tickService.getAction(TickBridgeProvider.class).getBridge());
+    }
+
+    private static void initializeClientIdentityService() {
+
+        ClientIdentityService clientIdentityService = new DefaultClientIdentityService();
+        ServiceRegistry.register(ClientIdentityService.class, clientIdentityService);
     }
 
     private static void initializeGraphicsService() {

@@ -21,6 +21,11 @@ package com.quartercode.disconnected.server;
 import java.io.IOException;
 import com.quartercode.classmod.Classmod;
 import com.quartercode.classmod.util.TreeInitializer;
+import com.quartercode.disconnected.server.bridge.ClientAwareEventHandler;
+import com.quartercode.disconnected.server.bridge.ClientAwareHandlerExtension;
+import com.quartercode.disconnected.server.bridge.ClientIdentityExtension;
+import com.quartercode.disconnected.server.bridge.DefaultClientAwareHandlerExtension.DefaultClientAwareHandlerExtensionFactory;
+import com.quartercode.disconnected.server.bridge.DefaultClientIdentityExtension.DefaultClientIdentityExtensionFactory;
 import com.quartercode.disconnected.server.sim.TickSchedulerUpdater;
 import com.quartercode.disconnected.server.sim.profile.ProfileSerializer;
 import com.quartercode.disconnected.server.util.ResourceStore;
@@ -32,27 +37,20 @@ import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
 import com.quartercode.disconnected.server.world.comp.os.Session;
 import com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper;
+import com.quartercode.disconnected.server.world.comp.program.WorldProcessLaunchCommandHandler;
 import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
-import com.quartercode.disconnected.server.world.event.ProgramLaunchCommandEventHandler;
-import com.quartercode.disconnected.server.world.event.ProgramLaunchInfoRequestEventHandler;
-import com.quartercode.disconnected.shared.bridge.DefaultHandleInvocationProviderExtension.DefaultHandleInvocationProviderExtensionFactory;
-import com.quartercode.disconnected.shared.bridge.HandleInvocationProviderExtension;
-import com.quartercode.disconnected.shared.event.comp.program.ProgramLaunchCommandEvent;
-import com.quartercode.disconnected.shared.event.comp.program.ProgramLaunchInfoRequestEvent;
+import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.program.GeneralProgramConstants;
 import com.quartercode.disconnected.shared.program.SystemProgramConstants;
 import com.quartercode.eventbridge.EventBridgeFactory;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.EventPredicate;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
-import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
-import com.quartercode.eventbridge.extra.extension.RequestEventHandler;
-import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
 import com.quartercode.eventbridge.extra.predicate.TypePredicate;
 import com.quartercode.eventbridge.factory.FactoryManager;
 
 /**
- * This class contains methods that configure everything in the game.
+ * This class contains methods that configure everything the server needs.
  * For example, a method could load some data into a storage class or add some values to a service configuration.
  */
 public class DefaultServerData {
@@ -60,12 +58,14 @@ public class DefaultServerData {
     // ----- General -----
 
     /**
-     * Adds the default custom mappings to the {@link EventBridgeFactory}.
+     * Adds the default custom server mappings to the {@link EventBridgeFactory}.
      */
     public static void addCustomEventBridgeFactoryMappings() {
 
         FactoryManager factoryManager = EventBridgeFactory.getFactoryManager();
 
+        factoryManager.setFactory(ClientIdentityExtension.class, new DefaultClientIdentityExtensionFactory());
+        factoryManager.setFactory(ClientAwareHandlerExtension.class, new DefaultClientAwareHandlerExtensionFactory());
     }
 
     /**
@@ -143,18 +143,12 @@ public class DefaultServerData {
      */
     public static void addDefaultServerHandlers(Bridge bridge) {
 
-        addRequestHandler(bridge, new ProgramLaunchInfoRequestEventHandler(), new TypePredicate<>(ProgramLaunchInfoRequestEvent.class));
-        addEventHandler(bridge, new ProgramLaunchCommandEventHandler(), new TypePredicate<>(ProgramLaunchCommandEvent.class));
+        addClientAwareEventHandler(bridge, new WorldProcessLaunchCommandHandler(), new TypePredicate<>(WorldProcessLaunchCommand.class));
     }
 
-    private static void addEventHandler(Bridge bridge, EventHandler<?> handler, EventPredicate<?> predicate) {
+    private static void addClientAwareEventHandler(Bridge bridge, ClientAwareEventHandler<?> handler, EventPredicate<?> predicate) {
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(handler, predicate);
-    }
-
-    private static void addRequestHandler(Bridge bridge, RequestEventHandler<?> requestEventHandler, EventPredicate<?> predicate) {
-
-        bridge.getModule(ReturnEventExtensionReturner.class).addRequestHandler(requestEventHandler, predicate);
+        bridge.getModule(ClientAwareHandlerExtension.class).addHandler(handler, predicate);
     }
 
     /**

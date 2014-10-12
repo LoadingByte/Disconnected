@@ -18,12 +18,15 @@
 
 package com.quartercode.disconnected.server.sim;
 
+import com.quartercode.disconnected.server.bridge.ClientAwareHandlerExtension;
+import com.quartercode.disconnected.server.bridge.ClientIdentityExtension;
+import com.quartercode.disconnected.server.client.ClientIdentityService;
 import com.quartercode.disconnected.shared.bridge.HandleInvocationProviderExtension;
+import com.quartercode.disconnected.shared.util.ServiceRegistry;
 import com.quartercode.eventbridge.EventBridgeFactory;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionRequester;
 import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
-import com.quartercode.eventbridge.extra.extension.SendPredicateCheckExtension;
 
 /**
  * The tick bridge provider extends the {@link TickRunnableInvoker} by providing a {@link Bridge} for the parent {@link TickService}.
@@ -42,10 +45,15 @@ public class TickBridgeProvider extends TickRunnableInvoker {
 
         bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionRequester.class));
         bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionReturner.class));
-        bridge.addModule(EventBridgeFactory.create(SendPredicateCheckExtension.class));
         bridge.addModule(EventBridgeFactory.create(HandleInvocationProviderExtension.class));
+        bridge.addModule(EventBridgeFactory.create(ClientIdentityExtension.class));
+        bridge.addModule(EventBridgeFactory.create(ClientAwareHandlerExtension.class));
 
         bridge.getModule(HandleInvocationProviderExtension.class).setInvocationProvider(this);
+
+        ClientIdentityService clientIdentityService = ServiceRegistry.lookup(ClientIdentityService.class);
+        bridge.getModule(ClientIdentityExtension.class).setIdentityService(clientIdentityService);
+        bridge.getModule(ClientAwareHandlerExtension.class).setIdentityService(clientIdentityService);
     }
 
     /**

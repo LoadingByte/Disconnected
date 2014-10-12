@@ -19,13 +19,17 @@
 package com.quartercode.disconnected.server.world.comp.program;
 
 import java.util.List;
+import com.quartercode.disconnected.server.bridge.ClientAwareEventHandler;
+import com.quartercode.disconnected.server.bridge.ClientAwareHandlerExtension;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.UnknownMountpointException;
-import com.quartercode.disconnected.shared.event.comp.program.ProgramEventPredicate;
+import com.quartercode.disconnected.shared.client.ClientIdentity;
+import com.quartercode.disconnected.shared.event.program.WorldProcessCommand;
+import com.quartercode.disconnected.shared.event.program.WorldProcessCommandPredicate;
 import com.quartercode.disconnected.shared.file.PathUtils;
-import com.quartercode.eventbridge.bridge.Bridge;
+import com.quartercode.disconnected.shared.program.WorldProcessId;
 import com.quartercode.eventbridge.bridge.Event;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
@@ -73,44 +77,35 @@ public class ProgramUtils {
     }
 
     /**
-     * Returns an {@link ImportantData} storage object that contains the following information for the given {@link ProgramExecutor}:
-     * 
-     * <ul>
-     * <li>The pid of the process which created the program executor.</li>
-     * <li>The id of the computer the process which created the program executor is running on.</li>
-     * <li>The {@link Bridge} of the server.</li>
-     * </ul>
-     * 
+     * Returns a {@link WorldProcessId} object that identifies the {@link Process} that runs the given {@link ProgramExecutor}.
+     * A process is identified using the id of the computer it is running on, as well as the actual process id (pid).
      * This utility method should be used by program executor implementations.
      * 
-     * @param executor The program executor that requests the information.
-     * @return An important data object that contains the requested information.
+     * @param executor The program executor that requests the identification object.
+     * @return The identification object for the given program executor.
      */
-    public static ImportantData getImportantData(ProgramExecutor executor) {
+    public static WorldProcessId getProcessId(ProgramExecutor executor) {
 
         Process<?> process = executor.getParent();
 
-        int pid = process.getParent().getObj(Process.PID);
+        int pid = process.getObj(Process.PID);
         String computerId = process.invoke(Process.GET_OPERATING_SYSTEM).getParent().getId();
-        Bridge bridge = process.getWorld().getBridge();
 
-        return new ImportantData(pid, computerId, bridge);
+        return new WorldProcessId(computerId, pid);
     }
 
     /**
-     * Registers the given {@link EventHandler} for the given {@link ProgramExecutor} and makes it listen for the given type of {@link Event}s.
+     * Registers the given {@link EventHandler} for the given {@link ProgramExecutor} and makes it listen for the given type of {@link WorldProcessCommand} events.
      * This is a shortcut that should be used by program executor implementations.
      * 
      * @param executor The program executor that wants to listen for events.
      * @param eventType The event type all handled events must have.
      * @param handler The event handler that should handle the incoming events.
      */
-    public static void registerEventHandler(ProgramExecutor executor, Class<? extends Event> eventType, EventHandler<?> handler) {
+    public static void registerEventHandler(ProgramExecutor executor, Class<? extends WorldProcessCommand> eventType, EventHandler<?> handler) {
 
-        ImportantData data = getImportantData(executor);
-
-        data.getBridge().getModule(StandardHandlerModule.class).addHandler(handler,
-                MultiPredicates.and(new TypePredicate<>(eventType), new ProgramEventPredicate<>(data.getComputerId(), data.getPid())));
+        executor.getBridge().getModule(StandardHandlerModule.class).addHandler(handler,
+                MultiPredicates.and(new TypePredicate<>(eventType), new WorldProcessCommandPredicate<>(getProcessId(executor))));
     }
 
     /**
@@ -123,60 +118,42 @@ public class ProgramUtils {
      */
     public static void registerRequestEventHandler(ProgramExecutor executor, Class<? extends Event> requestEventType, RequestEventHandler<?> requestHandler) {
 
-        ImportantData data = getImportantData(executor);
-
-        data.getBridge().getModule(ReturnEventExtensionReturner.class).addRequestHandler(requestHandler,
-                MultiPredicates.and(new TypePredicate<>(requestEventType), new ProgramEventPredicate<>(data.getComputerId(), data.getPid())));
+        executor.getBridge().getModule(ReturnEventExtensionReturner.class).addRequestHandler(requestHandler,
+                MultiPredicates.and(new TypePredicate<>(requestEventType), new WorldProcessCommandPredicate<>(getProcessId(executor))));
     }
 
     /**
-     * A storage class for some important data used by nearly every {@link ProgramExecutor}.
+     * Registers the given {@link ClientAwareEventHandler} for the given {@link ProgramExecutor} and makes it listen for the given type of {@link WorldProcessCommand} events.
+     * It is also possible to let the handler automatically verify that the sending client is allowed to access the program executor.
+     * This is a shortcut that should be used by program executor implementations.
      * 
-     * @see ProgramExecutor
+     * @param executor The program executor that wants to listen for events.
+     * @param eventType The event type all handled events must have.
+     * @param handler The client-aware event handler that should handle the incoming events.
+     * @param verifyClient Whether the handler should automatically verify that the sending client is allowed to access the program executor.
      */
-    public static class ImportantData {
+    public static <E extends WorldProcessCommand> void registerClientAwareEventHandler(final ProgramExecutor executor, Class<? extends E> eventType, final ClientAwareEventHandler<E> handler, boolean verifyClient) {
 
-        private final int    pid;
-        private final String computerId;
-        private final Bridge bridge;
+        ClientAwareEventHandler<E> effectiveHandler;
+        if (verifyClient) {
+            effectiveHandler = new ClientAwareEventHandler<E>() {
 
-        private ImportantData(int pid, String computerId, Bridge bridge) {
+                @Override
+                public void handle(E event, ClientIdentity client) {
 
-            this.pid = pid;
-            this.computerId = computerId;
-            this.bridge = bridge;
+                    // Verify the client
+                    if (client.equals(executor.getParent().getObj(Process.CLIENT_PROCESS).getClient())) {
+                        handler.handle(event, client);
+                    }
+                }
+
+            };
+        } else {
+            effectiveHandler = handler;
         }
 
-        /**
-         * Returns the pid of the process which created the program executor.
-         * 
-         * @return The pid.
-         */
-        public int getPid() {
-
-            return pid;
-        }
-
-        /**
-         * Returns the id of the computer the process which created the program executor is running on.
-         * 
-         * @return The computer id.
-         */
-        public String getComputerId() {
-
-            return computerId;
-        }
-
-        /**
-         * Returns the {@link Bridge} of the server.
-         * 
-         * @return The bridge.
-         */
-        public Bridge getBridge() {
-
-            return bridge;
-        }
-
+        executor.getBridge().getModule(ClientAwareHandlerExtension.class).addHandler(effectiveHandler,
+                MultiPredicates.and(new TypePredicate<>(eventType), new WorldProcessCommandPredicate<>(getProcessId(executor))));
     }
 
     private ProgramUtils() {
