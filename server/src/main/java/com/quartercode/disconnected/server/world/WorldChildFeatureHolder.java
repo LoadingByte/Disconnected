@@ -20,6 +20,8 @@ package com.quartercode.disconnected.server.world;
 
 import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.def.DefaultCChildFeatureHolder;
+import com.quartercode.disconnected.server.util.RandomPool;
+import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
  * The world child feature holder is a special {@link CFeatureHolder} which allows to resolve the holding {@link World}.
@@ -44,6 +46,30 @@ public class WorldChildFeatureHolder<P extends CFeatureHolder> extends DefaultCC
         } else {
             return null;
         }
+    }
+
+    /**
+     * Returns the {@link Bridge} that should be used for sending events by the world child feature holder.
+     * Actually, this returns the bridge of the {@link World} the feature holder is in.
+     * 
+     * @return The bridge for the feature holder.
+     * @see World#getBridge()
+     */
+    public Bridge getBridge() {
+
+        return getWorld().getBridge();
+    }
+
+    /**
+     * Returns the {@link RandomPool} that can be used by the world child feature holder.
+     * Actually, this returns the random pool of the {@link World} the feature holder is in.
+     * 
+     * @return The random pool the feature holder can use.
+     * @see World#getRandom()
+     */
+    public RandomPool getRandom() {
+
+        return getWorld().getRandom();
     }
 
 }

@@ -170,7 +170,7 @@ public class NetworkModule extends OSModule {
              */
             private int getFreePort(Socket holder) {
 
-                RandomPool random = holder.getWorld().getRandom();
+                RandomPool random = holder.getRandom();
                 int minPort = 49152;
                 int maxPort = 65535;
 

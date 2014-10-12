@@ -251,7 +251,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                 Socket holder = (Socket) invocation.getCHolder();
 
                 if ((int) arguments[0] < 0) {
-                    RandomPool random = holder.getWorld().getRandom();
+                    RandomPool random = holder.getRandom();
                     int newSequenceNumber = random.nextInt();
 
                     holder.setObj(CURRENT_SEQ_NUMBER, newSequenceNumber);

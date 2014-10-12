@@ -117,7 +117,7 @@ public class Session extends ProgramExecutor {
 
                 String computerId = holder.getParent().invoke(Process.GET_OPERATING_SYSTEM).getParent().getId();
                 int pid = holder.getParent().getObj(Process.PID);
-                holder.getWorld().getBridge().send(new WrongPasswordEvent(computerId, pid, wrongPassword));
+                holder.getBridge().send(new WrongPasswordEvent(computerId, pid, wrongPassword));
             }
 
         });
@@ -131,7 +131,7 @@ public class Session extends ProgramExecutor {
                 Session holder = (Session) invocation.getCHolder();
                 String computerId = holder.getParent().invoke(Process.GET_OPERATING_SYSTEM).getParent().getId();
                 int pid = holder.getParent().getObj(Process.PID);
-                holder.getWorld().getBridge().send(new FinishStartEvent(computerId, pid));
+                holder.getBridge().send(new FinishStartEvent(computerId, pid));
 
                 return invocation.next(arguments);
             }
