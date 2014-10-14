@@ -25,6 +25,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +70,7 @@ public class ValueInjector {
 
         Class<?> type = object.getClass();
 
-        for (Field field : type.getDeclaredFields()) {
+        for (Field field : FieldUtils.getAllFields(type)) {
             InjectValue injectAnnotation = field.getAnnotation(InjectValue.class);
             if (injectAnnotation != null) {
                 String valueName = injectAnnotation.value();
@@ -77,16 +78,12 @@ public class ValueInjector {
 
                 Object value = values.get(valueName);
                 if (value != null) {
-                    field.setAccessible(true);
-
                     try {
-                        field.set(object, value);
+                        FieldUtils.writeField(field, object, value, true);
                     } catch (IllegalArgumentException e) {
                         fail("Available value '" + valueName + "' for injection into '" + type.getName() + "." + field.getName() + "' is of wrong type", e, !allowNull);
                     } catch (IllegalAccessException e) {
                         fail("Cannot access field '" + type.getName() + "." + field.getName() + "' for value injection", e, !allowNull);
-                    } finally {
-                        field.setAccessible(false);
                     }
                 } else if (!allowNull) {
                     throw new IllegalStateException("Field '" + type.getName() + "." + field.getName() + "' requires injection of unknown value '" + valueName + "'");

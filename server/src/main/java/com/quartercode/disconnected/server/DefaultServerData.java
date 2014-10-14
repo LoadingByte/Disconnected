@@ -105,8 +105,8 @@ public class DefaultServerData {
         ProfileSerializer.appendToWorldContextPath("com.quartercode.disconnected.server.world.comp.program");
         ProfileSerializer.appendToWorldContextPath("com.quartercode.disconnected.server.world.general");
 
-        // World shared
-        ProfileSerializer.appendToWorldContextPath("com.quartercode.disconnected.shared.world.comp.file");
+        // Shared
+        ProfileSerializer.appendToWorldContextPath("com.quartercode.disconnected.shared.file");
     }
 
     /**

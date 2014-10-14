@@ -35,12 +35,12 @@ import com.quartercode.disconnected.shared.file.PathUtils;
 public class FileUtils {
 
     /**
-     * Returns if the given {@link User} has the given {@link FileRight} on the given {@link File}.
+     * Returns if the given {@link User} has the given file right on the given {@link File}.
      * 
-     * @param user The {@link User} who may have the given {@link FileRight} on the given {@link File}.
+     * @param user The {@link User} who may have the given file right on the given {@link File}.
      * @param file The {@link File} the given {@link User} may have access to.
-     * @param right The {@link FileRight} the given {@link User} may have.
-     * @return True if the given {@link User} has the given {@link FileRight} on the given {@link File}.
+     * @param right The file right character the given {@link User} may have.
+     * @return True if the given {@link User} has the given file right on the given {@link File}.
      */
     public static boolean hasRight(User user, File<?> file, char right) {
 

@@ -18,12 +18,17 @@
 
 package com.quartercode.disconnected.server.test.world.comp.program;
 
+import org.jmock.Expectations;
+import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import com.quartercode.disconnected.server.DefaultServerData;
+import com.quartercode.disconnected.server.bridge.ClientAwareHandlerExtension;
+import com.quartercode.disconnected.server.bridge.ClientIdentityExtension;
+import com.quartercode.disconnected.server.client.ClientIdentityService;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.Version;
@@ -39,6 +44,7 @@ import com.quartercode.disconnected.server.world.comp.program.Program;
 import com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.gen.WorldGenerator;
+import com.quartercode.disconnected.shared.client.ClientIdentity;
 import com.quartercode.eventbridge.EventBridgeFactory;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionRequester;
@@ -46,9 +52,12 @@ import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
 
 public abstract class AbstractProgramTest {
 
+    protected static final ClientIdentity CLIENT = new ClientIdentity("client");
+
     @BeforeClass
     public static void setUpBeforeClass() {
 
+        DefaultServerData.addCustomEventBridgeFactoryMappings();
         DefaultServerData.addDefaultStringFileTypeMappings();
         DefaultServerData.addDefaultProgramCommonLocationMappings();
     }
@@ -61,16 +70,18 @@ public abstract class AbstractProgramTest {
     }
 
     @Rule
-    public JUnitRuleMockery   context = new JUnitRuleMockery();
+    public JUnitRuleMockery         context = new JUnitRuleMockery();
 
-    protected final String    fileSystemMountpoint;
+    protected final String          fileSystemMountpoint;
 
-    protected Bridge          bridge;
-    protected World           world;
-    protected Computer        computer;
-    protected OperatingSystem os;
-    protected ProcessModule   processModule;
-    protected FileSystem      fileSystem;
+    @Mock
+    protected ClientIdentityService clientIdentityService;
+    protected Bridge                bridge;
+    protected World                 world;
+    protected Computer              computer;
+    protected OperatingSystem       os;
+    protected ProcessModule         processModule;
+    protected FileSystem            fileSystem;
 
     protected AbstractProgramTest(String fileSystemMountpoint) {
 
@@ -80,9 +91,24 @@ public abstract class AbstractProgramTest {
     @Before
     public void setUp() {
 
+        // @formatter:off
+        context.checking(new Expectations() {{
+
+            // Use null BridgeConnector because no bridge connector is used for the test
+            allowing(clientIdentityService).getIdentity(null);
+                will(returnValue(CLIENT));
+
+        }});
+        // @formatter:on
+
         bridge = EventBridgeFactory.create(Bridge.class);
         bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionRequester.class));
         bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionReturner.class));
+        bridge.addModule(EventBridgeFactory.create(ClientIdentityExtension.class));
+        bridge.addModule(EventBridgeFactory.create(ClientAwareHandlerExtension.class));
+
+        bridge.getModule(ClientIdentityExtension.class).setIdentityService(clientIdentityService);
+        bridge.getModule(ClientAwareHandlerExtension.class).setIdentityService(clientIdentityService);
 
         world = new World();
         world.injectBridge(bridge);

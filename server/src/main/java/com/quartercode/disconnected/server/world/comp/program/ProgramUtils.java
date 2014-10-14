@@ -30,11 +30,8 @@ import com.quartercode.disconnected.shared.event.program.WorldProcessCommand;
 import com.quartercode.disconnected.shared.event.program.WorldProcessCommandPredicate;
 import com.quartercode.disconnected.shared.file.PathUtils;
 import com.quartercode.disconnected.shared.program.WorldProcessId;
-import com.quartercode.eventbridge.bridge.Event;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
-import com.quartercode.eventbridge.extra.extension.RequestEventHandler;
-import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
 import com.quartercode.eventbridge.extra.predicate.MultiPredicates;
 import com.quartercode.eventbridge.extra.predicate.TypePredicate;
 
@@ -106,20 +103,6 @@ public class ProgramUtils {
 
         executor.getBridge().getModule(StandardHandlerModule.class).addHandler(handler,
                 MultiPredicates.and(new TypePredicate<>(eventType), new WorldProcessCommandPredicate<>(getProcessId(executor))));
-    }
-
-    /**
-     * Registers the given {@link RequestEventHandler} for the given {@link ProgramExecutor} and makes it listen for the given type of request {@link Event}s.
-     * This is a shortcut that should be used by program executor implementations.
-     * 
-     * @param executor The program executor that wants to listen for request events.
-     * @param requestEventType The event type all handled request events must have.
-     * @param requestHandler The request event handler that should handle the incoming request events.
-     */
-    public static void registerRequestEventHandler(ProgramExecutor executor, Class<? extends Event> requestEventType, RequestEventHandler<?> requestHandler) {
-
-        executor.getBridge().getModule(ReturnEventExtensionReturner.class).addRequestHandler(requestHandler,
-                MultiPredicates.and(new TypePredicate<>(requestEventType), new WorldProcessCommandPredicate<>(getProcessId(executor))));
     }
 
     /**

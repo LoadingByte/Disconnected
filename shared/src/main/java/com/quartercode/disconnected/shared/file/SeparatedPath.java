@@ -18,10 +18,14 @@
 
 package com.quartercode.disconnected.shared.file;
 
+import java.io.Serializable;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * A separated path data object stores a file path that is split into a directory and a file name component.
  */
-public class SeparatedPath {
+public class SeparatedPath implements Serializable {
 
     private final String dir;
     private final String file;
@@ -93,6 +97,18 @@ public class SeparatedPath {
     public String[] toArray() {
 
         return new String[] { dir, file };
+    }
+
+    @Override
+    public int hashCode() {
+
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        return EqualsBuilder.reflectionEquals(this, obj);
     }
 
     /**

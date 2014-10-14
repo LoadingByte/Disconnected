@@ -72,6 +72,7 @@ public class DesktopProgramWindow extends DesktopWindow {
 
                 setVisible(!isVisible());
             }
+
         });
 
         // Right click on the taskbar button closes the window
@@ -82,6 +83,7 @@ public class DesktopProgramWindow extends DesktopWindow {
 
                 close();
             }
+
         });
     }
 

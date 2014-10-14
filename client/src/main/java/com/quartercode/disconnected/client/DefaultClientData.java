@@ -31,7 +31,7 @@ import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowAreaMod
 import com.quartercode.disconnected.client.graphics.desktop.program.FileManagerDesktopProgram;
 
 /**
- * This class contains methods that configure everything in the game.
+ * This class contains methods that configure everything the client needs.
  * For example, a method could load some data into a storage class or add some values to a service configuration.
  */
 public class DefaultClientData {
