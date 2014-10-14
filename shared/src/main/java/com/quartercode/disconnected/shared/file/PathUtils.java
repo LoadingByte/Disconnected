@@ -212,6 +212,9 @@ public class PathUtils {
      * 
      * Path: home/user1/file
      * =&gt; [null, home/user1/file]
+     * 
+     * Path: /
+     * =&gt; [null, null]
      * </pre>
      * 
      * @param path The path which should be split into a mountpoint and a local path.
@@ -224,7 +227,7 @@ public class PathUtils {
 
         if (matcher.find()) {
             String[] result = { StringUtils.defaultIfEmpty(matcher.group(2), null), StringUtils.defaultIfEmpty(matcher.group(4), null) };
-            return result[0] == null && result[1] == null ? null : result;
+            return result;
         }
 
         return null;
@@ -245,6 +248,9 @@ public class PathUtils {
      * 
      * Path: home/user1/file
      * =&gt; [home/user1, file]
+     * 
+     * Path: /
+     * =&gt; [null, null]
      * </pre>
      * 
      * Note that the file name will never contain a separator.
@@ -263,7 +269,7 @@ public class PathUtils {
             return new String[] { dirPath, matcher.group(3) };
         }
 
-        return null;
+        return new String[] { null, null };
     }
 
     private PathUtils() {
