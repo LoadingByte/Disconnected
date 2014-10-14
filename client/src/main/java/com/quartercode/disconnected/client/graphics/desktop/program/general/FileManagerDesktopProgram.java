@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.client.graphics.desktop.program;
+package com.quartercode.disconnected.client.graphics.desktop.program.general;
 
 import static java.text.MessageFormat.format;
 import lombok.RequiredArgsConstructor;

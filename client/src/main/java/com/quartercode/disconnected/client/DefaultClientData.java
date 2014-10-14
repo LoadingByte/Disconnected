@@ -28,7 +28,7 @@ import com.quartercode.disconnected.client.graphics.desktop.DesktopPrograms;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopTaskbarModule;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopWidgetModule;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowAreaModule;
-import com.quartercode.disconnected.client.graphics.desktop.program.FileManagerDesktopProgram;
+import com.quartercode.disconnected.client.graphics.desktop.program.general.FileManagerDesktopProgram;
 
 /**
  * This class contains methods that configure everything the client needs.
