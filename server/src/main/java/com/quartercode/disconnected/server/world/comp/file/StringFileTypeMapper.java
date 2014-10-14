@@ -76,6 +76,28 @@ public class StringFileTypeMapper {
     }
 
     /**
+     * Creates a new instance of the file class object represented by the given string.
+     * Throws a {@link RuntimeException} if an error occurres while creating the new object.
+     * 
+     * @param stringType The string representation whose file class should be used for creating the new instance.
+     * @return The new instance of the file type class object represented by the given string.
+     *         Returns {@code null} if the string type isn't mapped.
+     */
+    public static File<?> stringToNewInstance(String stringType) {
+
+        Class<? extends File<?>> classType = stringToClass(stringType);
+        if (classType == null) {
+            return null;
+        }
+
+        try {
+            return classType.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException("Error while creating new instance of file type '" + classType + "'", e);
+        }
+    }
+
+    /**
      * Adds the given mapping in order to make it available through the accessor methods.
      * Note that all mappings with the same class or string are removed.
      * 
