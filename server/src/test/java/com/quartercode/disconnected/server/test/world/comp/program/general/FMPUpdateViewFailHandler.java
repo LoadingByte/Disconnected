@@ -16,24 +16,18 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.event.comp.program.general;
+package com.quartercode.disconnected.server.test.world.comp.program.general;
 
-import com.quartercode.disconnected.shared.event.comp.program.ProgramEvent;
+import static org.junit.Assert.fail;
+import com.quartercode.disconnected.shared.event.program.general.FMPClientUpdateViewCommand;
+import com.quartercode.eventbridge.bridge.module.EventHandler;
 
-/**
- * Subclasses of this event are events that are fired by the file manager program.
- */
-public class FileManagerProgramEvent extends ProgramEvent {
+public class FMPUpdateViewFailHandler implements EventHandler<FMPClientUpdateViewCommand> {
 
-    /**
-     * Creates a new file manager program event.
-     * 
-     * @param computerId The id of the computer which runs the program the event is fired by.
-     * @param pid The process id of the process which runs the program the event is fired by.
-     */
-    public FileManagerProgramEvent(String computerId, int pid) {
+    @Override
+    public void handle(FMPClientUpdateViewCommand event) {
 
-        super(computerId, pid);
+        fail("View was updated although nothing should have happened");
     }
 
 }

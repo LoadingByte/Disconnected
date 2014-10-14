@@ -20,10 +20,7 @@ package com.quartercode.disconnected.server.world.comp.program.general;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionExecutor;
@@ -31,13 +28,13 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
+import com.quartercode.disconnected.server.bridge.ClientAwareEventHandler;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileRemoveAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
 import com.quartercode.disconnected.server.world.comp.file.FileUtils;
-import com.quartercode.disconnected.server.world.comp.file.InvalidPathException;
 import com.quartercode.disconnected.server.world.comp.file.OccupiedPathException;
 import com.quartercode.disconnected.server.world.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.server.world.comp.file.ParentFile;
@@ -48,26 +45,18 @@ import com.quartercode.disconnected.server.world.comp.os.User;
 import com.quartercode.disconnected.server.world.comp.program.Process;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
-import com.quartercode.disconnected.server.world.comp.program.ProgramUtils.ImportantData;
-import com.quartercode.disconnected.shared.event.comp.program.ProgramMissingFileRightsEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramCreateRequestEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramCreateRequestEvent.FileManagerProgramCreateOccupiedPathReturnEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramCreateRequestEvent.FileManagerProgramCreateOutOfSpaceReturnEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramCreateRequestEvent.FileManagerProgramCreateSuccessReturnEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramGetCurrentPathRequestEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramGetCurrentPathRequestEvent.FileManagerProgramGetCurrentPathReturnEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramInvalidPathEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramListRequestEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramListRequestEvent.FileManagerProgramListSuccessReturnEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramRemoveRequestEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramRemoveRequestEvent.FileManagerProgramRemoveSuccessReturnEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramSetCurrentPathRequestEvent;
-import com.quartercode.disconnected.shared.event.comp.program.general.FileManagerProgramUnknownMountpointEvent;
+import com.quartercode.disconnected.shared.client.ClientIdentity;
+import com.quartercode.disconnected.shared.event.program.general.FMPClientAddErrorEvent;
+import com.quartercode.disconnected.shared.event.program.general.FMPClientMissingRightEvent;
+import com.quartercode.disconnected.shared.event.program.general.FMPClientUpdateViewCommand;
+import com.quartercode.disconnected.shared.event.program.general.FMPWorldAddFileCommand;
+import com.quartercode.disconnected.shared.event.program.general.FMPWorldChangeDirCommand;
+import com.quartercode.disconnected.shared.event.program.general.FMPWorldRemoveFileCommand;
 import com.quartercode.disconnected.shared.file.FilePlaceholder;
 import com.quartercode.disconnected.shared.file.FileRights;
 import com.quartercode.disconnected.shared.file.PathUtils;
-import com.quartercode.eventbridge.extra.extension.RequestEventHandler;
-import com.quartercode.eventbridge.extra.extension.ReturnEventSender;
+import com.quartercode.disconnected.shared.program.ClientProcessId;
+import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
  * The file manager program is used to list, create, and remove {@link File}s.
@@ -76,17 +65,30 @@ import com.quartercode.eventbridge.extra.extension.ReturnEventSender;
  */
 public class FileManagerProgram extends ProgramExecutor {
 
+    /**
+     * This list contains all file types the program is allowed to create.
+     * It can be modified in order to add new file types.
+     */
+    public static final List<String>               ALLOWED_FILE_TYPES = new ArrayList<>();
+
+    static {
+
+        ALLOWED_FILE_TYPES.add("contentFile");
+        ALLOWED_FILE_TYPES.add("directory");
+
+    }
+
     // ----- Properties -----
 
     /**
      * The current path of the file manager.
      * All operations are done in the directory represented by this path.
      */
-    public static final PropertyDefinition<String> CURRENT_PATH;
+    public static final PropertyDefinition<String> CURRENT_DIR;
 
     static {
 
-        CURRENT_PATH = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "currentPath", "storage", new StandardStorage<>(), "initialValue", new ConstantValueFactory<>(PathUtils.SEPARATOR));
+        CURRENT_DIR = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "currentPath", "storage", new StandardStorage<>(), "initialValue", new ConstantValueFactory<>(PathUtils.SEPARATOR));
 
     }
 
@@ -94,71 +96,43 @@ public class FileManagerProgram extends ProgramExecutor {
 
     static {
 
-        RUN.addExecutor("registerGetCurrentPathHandler", FileManagerProgram.class, new FunctionExecutor<Void>() {
+        RUN.addExecutor("registerChangeDirCommandHandler", FileManagerProgram.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
-                GetCurrentPathRequestEventHandler handler = new GetCurrentPathRequestEventHandler();
+                ChangeDirCommandHandler handler = new ChangeDirCommandHandler();
                 handler.holder = holder;
-                ProgramUtils.registerRequestEventHandler(holder, FileManagerProgramGetCurrentPathRequestEvent.class, handler);
+                ProgramUtils.registerClientAwareEventHandler(holder, FMPWorldChangeDirCommand.class, handler, true);
 
                 return invocation.next(arguments);
             }
 
         });
-        RUN.addExecutor("registerSetCurrentPathHandler", FileManagerProgram.class, new FunctionExecutor<Void>() {
+        RUN.addExecutor("registerAddFileCommandHandler", FileManagerProgram.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
-                SetCurrentPathRequestEventHandler handler = new SetCurrentPathRequestEventHandler();
+                AddFileCommandHandler handler = new AddFileCommandHandler();
                 handler.holder = holder;
-                ProgramUtils.registerRequestEventHandler(holder, FileManagerProgramSetCurrentPathRequestEvent.class, handler);
+                ProgramUtils.registerClientAwareEventHandler(holder, FMPWorldAddFileCommand.class, handler, true);
 
                 return invocation.next(arguments);
             }
 
         });
-        RUN.addExecutor("registerListHandler", FileManagerProgram.class, new FunctionExecutor<Void>() {
+        RUN.addExecutor("registerRemoveFileCommandHandler", FileManagerProgram.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
-                ListRequestEventHandler handler = new ListRequestEventHandler();
+                RemoveFileCommandHandler handler = new RemoveFileCommandHandler();
                 handler.holder = holder;
-                ProgramUtils.registerRequestEventHandler(holder, FileManagerProgramListRequestEvent.class, handler);
-
-                return invocation.next(arguments);
-            }
-
-        });
-        RUN.addExecutor("registerCreateHandler", FileManagerProgram.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
-                CreateRequestEventHandler handler = new CreateRequestEventHandler();
-                handler.holder = holder;
-                ProgramUtils.registerRequestEventHandler(holder, FileManagerProgramCreateRequestEvent.class, handler);
-
-                return invocation.next(arguments);
-            }
-
-        });
-        RUN.addExecutor("registerRemoveHandler", FileManagerProgram.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
-                RemoveRequestEventHandler handler = new RemoveRequestEventHandler();
-                handler.holder = holder;
-                ProgramUtils.registerRequestEventHandler(holder, FileManagerProgramRemoveRequestEvent.class, handler);
+                ProgramUtils.registerClientAwareEventHandler(holder, FMPWorldRemoveFileCommand.class, handler, true);
 
                 return invocation.next(arguments);
             }
@@ -167,217 +141,235 @@ public class FileManagerProgram extends ProgramExecutor {
 
     }
 
-    private static class GetCurrentPathRequestEventHandler implements RequestEventHandler<FileManagerProgramGetCurrentPathRequestEvent> {
+    private static class ChangeDirCommandHandler implements ClientAwareEventHandler<FMPWorldChangeDirCommand> {
 
         private FileManagerProgram holder;
 
         @Override
-        public void handle(FileManagerProgramGetCurrentPathRequestEvent request, ReturnEventSender sender) {
+        public void handle(FMPWorldChangeDirCommand event, ClientIdentity client) {
 
-            ImportantData data = ProgramUtils.getImportantData(holder);
-            sender.send(new FileManagerProgramGetCurrentPathReturnEvent(data.getComputerId(), data.getPid(), holder.getObj(CURRENT_PATH)));
+            String change = event.getChange();
+            Validate.notBlank(change, "Path change cannot be blank");
+
+            changeCurrentDir(change);
         }
 
-    }
+        private void changeCurrentDir(String change) {
 
-    private static class SetCurrentPathRequestEventHandler implements RequestEventHandler<FileManagerProgramSetCurrentPathRequestEvent> {
+            // Verify that the currently set dir is still valid before updating.
+            // If it is, the change update is applied to the valid current dir.
+            // If it isn't, the current is set to the next valid dir and the requested change is ignored.
+            if (verifyAndUpdateCurrentDir(holder.getObj(CURRENT_DIR))) {
+                String newDirPath = PathUtils.resolve(holder.getObj(CURRENT_DIR), change);
 
-        private FileManagerProgram holder;
+                int validationResult = verifyDir(newDirPath);
 
-        @Override
-        public void handle(FileManagerProgramSetCurrentPathRequestEvent request, ReturnEventSender sender) {
+                if (validationResult == 0) {
+                    // New dir is valid -> update current dir and send change to client later on
+                    holder.setObj(CURRENT_DIR, newDirPath);
+                } else if (validationResult == 3) {
+                    // Missing read right on new dir -> do not update current dir and send error message to client
+                    ClientProcessId clientProcessId = holder.getParent().getObj(Process.CLIENT_PROCESS);
+                    holder.getBridge().send(new FMPClientMissingRightEvent(clientProcessId, newDirPath, FileRights.READ));
+                    return;
+                } else {
+                    // New dir does not exist or is not a directory -> do not update current dir
+                    return;
+                }
 
-            String path = PathUtils.normalize(request.getPath());
+                holder.setObj(CURRENT_DIR, newDirPath);
+            }
 
-            ImportantData data = ProgramUtils.getImportantData(holder);
-            Process<?> process = holder.getParent();
-            OperatingSystem os = process.invoke(Process.GET_OPERATING_SYSTEM);
-            FileSystemModule fsModule = os.getObj(OperatingSystem.FS_MODULE);
+            // Send the updated dir to the client
+            sendUpdateView(holder.getParent(), holder.getBridge(), holder.getObj(CURRENT_DIR));
+        }
+
+        /*
+         * This method verifies that the given dir is valid before.
+         * If it isn't, this method jumps up one file in the file hierarchy and checks again.
+         * When it finally reaches a valid directory, it stops and sets that directory as the new current dir.
+         * Note that this method only returns true if the first input dir is already valid.
+         */
+        private boolean verifyAndUpdateCurrentDir(String currentDir) {
+
+            if (verifyDir(currentDir) != 0) {
+                verifyAndUpdateCurrentDir(PathUtils.resolve(currentDir, ".."));
+                return false;
+            } else {
+                holder.setObj(CURRENT_DIR, currentDir);
+                return true;
+            }
+        }
+
+        /*
+         * Return codes:
+         * 0 -> Valid dir
+         * 1 -> Unknown mountpoint
+         * 2 -> File does not exist or isn't a dir
+         * 3 -> Missing read right
+         */
+        private int verifyDir(String path) {
 
             if (!path.equals(PathUtils.SEPARATOR)) {
-                File<?> rawDir = null;
                 try {
-                    rawDir = fsModule.invoke(FileSystemModule.GET_FILE, path);
-                } catch (UnknownMountpointException e) {
-                    sender.send(new FileManagerProgramUnknownMountpointEvent(data.getComputerId(), data.getPid(), e.getMountpoint()));
-                    return;
-                }
+                    Process<?> process = holder.getParent();
+                    FileSystemModule fsModule = process.invoke(Process.GET_OPERATING_SYSTEM).getObj(OperatingSystem.FS_MODULE);
+                    File<?> dir = fsModule.invoke(FileSystemModule.GET_FILE, path);
 
-                if (! (rawDir instanceof ParentFile)) {
-                    sender.send(new FileManagerProgramInvalidPathEvent(data.getComputerId(), data.getPid(), path));
-                    return;
-                }
-            }
-
-            holder.setObj(CURRENT_PATH, path);
-        }
-
-    }
-
-    private static class ListRequestEventHandler implements RequestEventHandler<FileManagerProgramListRequestEvent> {
-
-        private FileManagerProgram holder;
-
-        @Override
-        public void handle(FileManagerProgramListRequestEvent request, ReturnEventSender sender) {
-
-            String path = holder.getObj(CURRENT_PATH);
-
-            ImportantData data = ProgramUtils.getImportantData(holder);
-            Process<?> process = holder.getParent();
-            OperatingSystem os = process.invoke(Process.GET_OPERATING_SYSTEM);
-            FileSystemModule fsModule = os.getObj(OperatingSystem.FS_MODULE);
-
-            if (path.equals(PathUtils.SEPARATOR)) {
-                List<FilePlaceholder> files = new ArrayList<>();
-
-                for (KnownFileSystem fileSystem : fsModule.invoke(FileSystemModule.GET_MOUNTED)) {
-                    files.add(FileUtils.createFilePlaceholder(fileSystem));
-                }
-
-                sender.send(new FileManagerProgramListSuccessReturnEvent(data.getComputerId(), data.getPid(), files));
-            } else {
-                File<?> rawDir = null;
-                try {
-                    rawDir = fsModule.invoke(FileSystemModule.GET_FILE, path);
-                } catch (UnknownMountpointException e) {
-                    sender.send(new FileManagerProgramUnknownMountpointEvent(data.getComputerId(), data.getPid(), e.getMountpoint()));
-                    return;
-                }
-
-                if (! (rawDir instanceof ParentFile)) {
-                    sender.send(new FileManagerProgramInvalidPathEvent(data.getComputerId(), data.getPid(), path));
-                } else {
-                    String pathMountpoint = PathUtils.splitAfterMountpoint(path)[0];
-                    ParentFile<?> dir = (ParentFile<?>) rawDir;
+                    if (! (dir instanceof ParentFile)) {
+                        // File does not exist or is not a directory
+                        return 2;
+                    }
 
                     User sessionUser = process.invoke(Process.GET_USER);
                     if (!FileUtils.hasRight(sessionUser, dir, FileRights.READ)) {
-                        FilePlaceholder dirPlaceholder = FileUtils.createFilePlaceholder(pathMountpoint, dir);
-                        sender.send(new ProgramMissingFileRightsEvent(data.getComputerId(), data.getPid(), sessionUser.getObj(User.NAME), dirPlaceholder, FileRights.READ));
-                    } else {
-                        List<FilePlaceholder> files = new ArrayList<>();
-
-                        for (File<?> file : dir.getCol(ParentFile.CHILDREN)) {
-                            files.add(FileUtils.createFilePlaceholder(pathMountpoint, file));
-                        }
-
-                        sender.send(new FileManagerProgramListSuccessReturnEvent(data.getComputerId(), data.getPid(), files));
+                        // Missing read right on directory
+                        return 3;
                     }
+                } catch (UnknownMountpointException e) {
+                    // No file system with referenced mountpoint is mounted
+                    return 1;
                 }
             }
+
+            return 0;
         }
 
     }
 
-    private static class CreateRequestEventHandler implements RequestEventHandler<FileManagerProgramCreateRequestEvent> {
+    private static class AddFileCommandHandler implements ClientAwareEventHandler<FMPWorldAddFileCommand> {
 
         private FileManagerProgram holder;
 
         @Override
-        public void handle(FileManagerProgramCreateRequestEvent request, ReturnEventSender sender) {
+        public void handle(FMPWorldAddFileCommand event, ClientIdentity client) {
 
-            Validate.notNull(request.getSubpath(), "File creation subpath cannot be null");
-            String path = PathUtils.resolve(holder.getObj(CURRENT_PATH), request.getSubpath());
-            Validate.notNull(request.getType(), "File type cannot be null");
-            Class<? extends File<?>> fileType = StringFileTypeMapper.stringToClass(request.getType());
-            Validate.notNull(request.getType(), "File type '%s' is unknown", request.getType());
-
-            ImportantData data = ProgramUtils.getImportantData(holder);
-            Process<?> process = holder.getParent();
-            OperatingSystem os = process.invoke(Process.GET_OPERATING_SYSTEM);
-
-            File<?> addFile = null;
-            try {
-                addFile = fileType.newInstance();
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Cannot create instance of file type '" + fileType.getName() + "'", e);
+            if (holder.getObj(CURRENT_DIR).equals(PathUtils.SEPARATOR)) {
+                throw new IllegalStateException("Cannot create a file when the current path is set to the absolute root");
             }
 
-            User sessionUser = process.invoke(Process.GET_USER);
-            addFile.setObj(File.OWNER, sessionUser);
-            addFile.setObj(File.GROUP, sessionUser.invoke(User.GET_PRIMARY_GROUP));
+            String fileName = event.getFileName();
+            Validate.notBlank(fileName, "File name cannot be blank");
+            Validate.isTrue(PathUtils.split(fileName).length == 1, "File name may not contain any separators");
 
-            FileAddAction addAction = null;
-            try {
-                FileSystemModule fsModule = os.getObj(OperatingSystem.FS_MODULE);
-                addAction = fsModule.invoke(FileSystemModule.CREATE_ADD_FILE, addFile, path);
-            } catch (UnknownMountpointException e) {
-                sender.send(new FileManagerProgramUnknownMountpointEvent(data.getComputerId(), data.getPid(), e.getMountpoint()));
-            }
+            String fileType = event.getFileType();
+            Validate.notBlank(fileName, "File type cannot be blank");
+            Validate.isTrue(ALLOWED_FILE_TYPES.contains(fileType), "File type ('%s') must be one of the allowed ones: %s", fileType, ALLOWED_FILE_TYPES);
 
-            if (addAction != null) {
-                Map<File<?>, Character[]> missingRights = addAction.invoke(FileAddAction.GET_MISSING_RIGHTS, sessionUser);
-
-                if (missingRights.isEmpty()) {
-                    try {
-                        addAction.invoke(FileAddAction.EXECUTE);
-                        sender.send(new FileManagerProgramCreateSuccessReturnEvent(data.getComputerId(), data.getPid()));
-                    } catch (InvalidPathException e) {
-                        sender.send(new FileManagerProgramInvalidPathEvent(data.getComputerId(), data.getPid(), path));
-                    } catch (OccupiedPathException e) {
-                        sender.send(new FileManagerProgramCreateOccupiedPathReturnEvent(data.getComputerId(), data.getPid(), path));
-                    } catch (OutOfSpaceException e) {
-                        sender.send(new FileManagerProgramCreateOutOfSpaceReturnEvent(data.getComputerId(), data.getPid(), PathUtils.splitAfterMountpoint(path)[0], e.getSize()));
-                    }
-                } else {
-                    // FileAddAction can only return a single missing right, so that single entry is the only one needed
-                    Entry<File<?>, Character[]> missingRight = missingRights.entrySet().iterator().next();
-
-                    FilePlaceholder filePlaceholder = FileUtils.createFilePlaceholder(PathUtils.splitAfterMountpoint(path)[0], missingRight.getKey());
-                    sender.send(new ProgramMissingFileRightsEvent(data.getComputerId(), data.getPid(), sessionUser.getObj(User.NAME), filePlaceholder, missingRight.getValue()));
-                }
-            }
+            addFile(fileName, fileType);
         }
 
-    }
+        private void addFile(String fileName, String fileType) {
 
-    private static class RemoveRequestEventHandler implements RequestEventHandler<FileManagerProgramRemoveRequestEvent> {
-
-        private FileManagerProgram holder;
-
-        @Override
-        public void handle(FileManagerProgramRemoveRequestEvent request, ReturnEventSender sender) {
-
-            Validate.notNull(request.getSubpath(), "File creation subpath cannot be null");
-            String path = PathUtils.resolve(holder.getObj(CURRENT_PATH), request.getSubpath());
-
-            ImportantData data = ProgramUtils.getImportantData(holder);
+            ClientProcessId clientProcessId = holder.getParent().getObj(Process.CLIENT_PROCESS);
             Process<?> process = holder.getParent();
-            OperatingSystem os = process.invoke(Process.GET_OPERATING_SYSTEM);
-            FileSystemModule fsModule = os.getObj(OperatingSystem.FS_MODULE);
+            FileSystemModule fsModule = process.invoke(Process.GET_OPERATING_SYSTEM).getObj(OperatingSystem.FS_MODULE);
 
-            File<?> removeFile = null;
-            try {
-                removeFile = fsModule.invoke(FileSystemModule.GET_FILE, path);
-            } catch (UnknownMountpointException e) {
-                sender.send(new FileManagerProgramUnknownMountpointEvent(data.getComputerId(), data.getPid(), e.getMountpoint()));
+            String currentDir = holder.getObj(CURRENT_DIR);
+            String filePath = PathUtils.resolve(currentDir, fileName);
+            Validate.isTrue(!filePath.equals(currentDir), "Cannot create the current directory");
+
+            File<?> file = StringFileTypeMapper.stringToNewInstance(fileType);
+            if (file == null) {
                 return;
             }
 
-            if (removeFile == null) {
-                sender.send(new FileManagerProgramInvalidPathEvent(data.getComputerId(), data.getPid(), path));
-            } else {
-                FileRemoveAction removeAction = removeFile.invoke(File.CREATE_REMOVE);
-                User sessionUser = process.invoke(Process.GET_USER);
+            FileAddAction addAction = fsModule.invoke(FileSystemModule.CREATE_ADD_FILE, file, filePath);
+            User sessionUser = process.invoke(Process.GET_USER);
 
-                Map<File<?>, Character[]> missingRights = removeAction.invoke(FileRemoveAction.GET_MISSING_RIGHTS, sessionUser);
-
-                if (missingRights.isEmpty()) {
-                    removeAction.invoke(FileRemoveAction.EXECUTE);
-                    sender.send(new FileManagerProgramRemoveSuccessReturnEvent(data.getComputerId(), data.getPid()));
-                } else {
-                    // Create a missing rights array with serializable file placeholders instead of file objects
-                    Map<FilePlaceholder, Character[]> missingRightsWithPlaceholders = new HashMap<>();
-                    for (Entry<File<?>, Character[]> entry : missingRights.entrySet()) {
-                        missingRightsWithPlaceholders.put(FileUtils.createFilePlaceholder(PathUtils.splitAfterMountpoint(path)[0], entry.getKey()), entry.getValue());
-                    }
-
-                    sender.send(new ProgramMissingFileRightsEvent(data.getComputerId(), data.getPid(), sessionUser.getObj(User.NAME), missingRightsWithPlaceholders));
+            if (addAction.invoke(FileAddAction.IS_EXECUTABLE_BY, sessionUser)) {
+                try {
+                    addAction.invoke(FileAddAction.EXECUTE);
+                    sendUpdateView(process, holder.getBridge(), holder.getObj(CURRENT_DIR));
+                } catch (OccupiedPathException e) {
+                    holder.getBridge().send(new FMPClientAddErrorEvent(clientProcessId, filePath, "occupiedPath"));
+                } catch (OutOfSpaceException e) {
+                    holder.getBridge().send(new FMPClientAddErrorEvent(clientProcessId, filePath, "outOfSpace"));
                 }
+            } else {
+                holder.getBridge().send(new FMPClientMissingRightEvent(clientProcessId, filePath, FileRights.WRITE));
             }
         }
 
+    }
+
+    private static class RemoveFileCommandHandler implements ClientAwareEventHandler<FMPWorldRemoveFileCommand> {
+
+        private FileManagerProgram holder;
+
+        @Override
+        public void handle(FMPWorldRemoveFileCommand event, ClientIdentity client) {
+
+            if (holder.getObj(CURRENT_DIR).equals(PathUtils.SEPARATOR)) {
+                throw new IllegalStateException("Cannot delete a file when the current path is set to the absolute root");
+            }
+
+            String fileName = event.getFileName();
+            Validate.notBlank(fileName, "File name cannot be blank");
+            Validate.isTrue(PathUtils.split(fileName).length == 1, "File name may not contain any separators");
+
+            removeFile(fileName);
+        }
+
+        private void removeFile(String fileName) {
+
+            ClientProcessId clientProcessId = holder.getParent().getObj(Process.CLIENT_PROCESS);
+            Process<?> process = holder.getParent();
+            FileSystemModule fsModule = process.invoke(Process.GET_OPERATING_SYSTEM).getObj(OperatingSystem.FS_MODULE);
+
+            String currentDir = holder.getObj(CURRENT_DIR);
+            String filePath = PathUtils.resolve(currentDir, fileName);
+            Validate.isTrue(!filePath.equals(currentDir), "Cannot delete the current directory");
+
+            File<?> file;
+            try {
+                file = fsModule.invoke(FileSystemModule.GET_FILE, filePath);
+            } catch (UnknownMountpointException e) {
+                return;
+            }
+
+            FileRemoveAction removeAction = file.invoke(File.CREATE_REMOVE);
+            User sessionUser = process.invoke(Process.GET_USER);
+
+            if (removeAction.invoke(FileRemoveAction.IS_EXECUTABLE_BY, sessionUser)) {
+                removeAction.invoke(FileRemoveAction.EXECUTE);
+                sendUpdateView(process, holder.getBridge(), holder.getObj(CURRENT_DIR));
+            } else {
+                holder.getBridge().send(new FMPClientMissingRightEvent(clientProcessId, filePath, FileRights.DELETE));
+            }
+        }
+
+    }
+
+    private static void sendUpdateView(Process<?> process, Bridge bridge, String currentDir) {
+
+        ClientProcessId clientProcessId = process.getObj(Process.CLIENT_PROCESS);
+        FileSystemModule fsModule = process.invoke(Process.GET_OPERATING_SYSTEM).getObj(OperatingSystem.FS_MODULE);
+
+        // Current dir is absolute root
+        if (currentDir.equals(PathUtils.SEPARATOR)) {
+            List<FilePlaceholder> files = new ArrayList<>();
+
+            for (KnownFileSystem fileSystem : fsModule.invoke(FileSystemModule.GET_MOUNTED)) {
+                files.add(FileUtils.createFilePlaceholder(fileSystem));
+            }
+
+            FilePlaceholder[] fileArray = files.toArray(new FilePlaceholder[files.size()]);
+            bridge.send(new FMPClientUpdateViewCommand(clientProcessId, currentDir, fileArray));
+        }
+        // Current dir is normal dir
+        else {
+            String pathMountpoint = PathUtils.splitAfterMountpoint(currentDir)[0];
+            List<FilePlaceholder> files = new ArrayList<>();
+
+            ParentFile<?> dir = (ParentFile<?>) fsModule.invoke(FileSystemModule.GET_FILE, currentDir);
+            for (File<?> file : dir.getCol(ParentFile.CHILDREN)) {
+                files.add(FileUtils.createFilePlaceholder(pathMountpoint, file));
+            }
+
+            FilePlaceholder[] fileArray = files.toArray(new FilePlaceholder[files.size()]);
+            bridge.send(new FMPClientUpdateViewCommand(clientProcessId, currentDir, fileArray));
+        }
     }
 
 }
