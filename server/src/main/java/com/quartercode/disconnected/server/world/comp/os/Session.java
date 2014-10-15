@@ -31,7 +31,6 @@ import com.quartercode.disconnected.server.util.HashUtil;
 import com.quartercode.disconnected.server.world.comp.program.ChildProcess;
 import com.quartercode.disconnected.server.world.comp.program.Process;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
-import com.quartercode.disconnected.shared.event.comp.program.ServerProcessCommand;
 
 /**
  * This class represents a program which opens a session.
@@ -98,14 +97,14 @@ public class Session extends ProgramExecutor {
                 if (checkRequired && holder.getObj(USER).getObj(User.PASSWORD) != null) {
                     String password = holder.getObj(PASSWORD);
                     if (password == null) {
-                        fireWrongPasswordEvent(holder, password);
+                        // Wrong password
                         return null;
                     }
                     String hashedPassword = HashUtil.sha256(password);
 
                     String correctPassword = holder.getObj(USER).getObj(User.PASSWORD);
                     if (!correctPassword.equals(hashedPassword)) {
-                        fireWrongPasswordEvent(holder, password);
+                        // Wrong password
                         return null;
                     }
                 }
@@ -113,125 +112,7 @@ public class Session extends ProgramExecutor {
                 return invocation.next(arguments);
             }
 
-            private void fireWrongPasswordEvent(Session holder, String wrongPassword) {
-
-                String computerId = holder.getParent().invoke(Process.GET_OPERATING_SYSTEM).getParent().getId();
-                int pid = holder.getParent().getObj(Process.PID);
-                holder.getBridge().send(new WrongPasswordEvent(computerId, pid, wrongPassword));
-            }
-
         });
-
-        RUN.addExecutor("fireFinishStart", Session.class, new FunctionExecutor<Void>() {
-
-            @Override
-            @Prioritized (Prioritized.LEVEL_7)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                Session holder = (Session) invocation.getCHolder();
-                String computerId = holder.getParent().invoke(Process.GET_OPERATING_SYSTEM).getParent().getId();
-                int pid = holder.getParent().getObj(Process.PID);
-                holder.getBridge().send(new FinishStartEvent(computerId, pid));
-
-                return invocation.next(arguments);
-            }
-
-        });
-
-    }
-
-    /**
-     * Session events are events that are fired by the {@link Session} program.<br>
-     * <br>
-     * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.
-     * For example, an instanceof check should look like this:
-     * 
-     * <pre>
-     * if ( event instanceof <b>Session.</b>SessionEvent )
-     * </pre>
-     * 
-     * @see Session
-     */
-    public static class SessionEvent extends WorldProcessCommand {
-
-        /**
-         * Creates a new session event.
-         * 
-         * @param computerId The id of the computer which runs the program the event is fired by.
-         * @param pid The process id of the process which runs the program the event is fired by.
-         */
-        public SessionEvent(String computerId, int pid) {
-
-            super(computerId, pid);
-        }
-
-    }
-
-    /**
-     * The success event is fired by the {@link Session} when the startup process is finished.<br>
-     * <br>
-     * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.
-     * For example, an instanceof check should look like this:
-     * 
-     * <pre>
-     * if ( event instanceof <b>Session.</b>FinishStartEvent )
-     * </pre>
-     * 
-     * @see Session
-     */
-    public static class FinishStartEvent extends SessionEvent {
-
-        /**
-         * Creates a new session finish start event.
-         * 
-         * @param computerId The id of the computer which runs the program the event is fired by.
-         * @param pid The process id of the process which runs the program the event is fired by.
-         */
-        public FinishStartEvent(String computerId, int pid) {
-
-            super(computerId, pid);
-        }
-
-    }
-
-    /**
-     * The wrong password event is fired by the {@link Session} when a password is required and the provided password is not correct.<br>
-     * <br>
-     * Please note that all program events should be used through their program classes in order to prevent name collisions from happening.
-     * For example, an instanceof check should look like this:
-     * 
-     * <pre>
-     * if ( event instanceof <b>Session.</b>WrongPasswordEvent )
-     * </pre>
-     * 
-     * @see Session
-     */
-    public static class WrongPasswordEvent extends SessionEvent {
-
-        private final String wrongPassword;
-
-        /**
-         * Creates a new session wrong password event.
-         * 
-         * @param computerId The id of the computer which runs the program the event is fired by.
-         * @param pid The process id of the process which runs the program the event is fired by.
-         * @param wrongPassword The provided password which is not correct (may be {@code null}).
-         */
-        public WrongPasswordEvent(String computerId, int pid, String wrongPassword) {
-
-            super(computerId, pid);
-            this.wrongPassword = wrongPassword;
-        }
-
-        /**
-         * Returns the provided password which is not correct (may be {@code null}).
-         * 
-         * @return The wrong password.
-         */
-        public String getWrongPassword() {
-
-            return wrongPassword;
-        }
 
     }
 
