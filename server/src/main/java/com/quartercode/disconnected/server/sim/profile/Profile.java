@@ -18,30 +18,25 @@
 
 package com.quartercode.disconnected.server.sim.profile;
 
-import com.quartercode.disconnected.server.util.RandomPool;
+import java.util.Random;
 import com.quartercode.disconnected.server.world.World;
 
 /**
  * A profile has a name and an associated {@link World}.
- * It also holds a {@link RandomPool}.
+ * It also holds a {@link Random} object for generating random values.
  * 
  * @see ProfileService
  */
 public class Profile {
 
-    /**
-     * The default size that a {@link RandomPool}, which is used for a profile, should have.
-     */
-    public static final int DEFAULT_RANDOM_POOL_SIZE = 10;
+    private String name;
 
-    private String          name;
-
-    private World           world;
-    private RandomPool      random;
+    private World  world;
+    private Random random;
 
     /**
      * Creates a new profile with the given name.
-     * Please note that the {@link World} and the {@link RandomPool} the profile stores must be set later on.
+     * Please note that the {@link World} and the {@link Random} object the profile stores must be set later on.
      * 
      * @param name The name for the new profile.
      */
@@ -83,45 +78,45 @@ public class Profile {
     /**
      * Changes the {@link World} which is associated with the name of the profile.
      * This method should only be used by deserialization algorithms.<br>
-     * This method also injects the set {@link RandomPool} into the new world.
+     * This method also injects the set {@link Random} object into the new world.
      * 
      * @param world The new world for the profile.
      */
     public void setWorld(World world) {
 
-        // Clear the random from the old world
+        // Clear the random object from the old world
         if (this.world != null) {
             this.world.injectRandom(null);
         }
 
         this.world = world;
 
-        // Inject the random into the new world
+        // Inject the random object into the new world
         injectRandomIntoWorld();
     }
 
     /**
-     * Returns the {@link RandomPool} that can be used by the stored {@link World}.
+     * Returns the {@link Random} object that can be used by the stored {@link World}.
      * 
-     * @return The random pool for the stored world.
+     * @return The random object for the stored world.
      */
-    public RandomPool getRandom() {
+    public Random getRandom() {
 
         return random;
     }
 
     /**
-     * Changes the {@link RandomPool} that can be used by the stored {@link World}.
+     * Changes the {@link Random} object that can be used by the stored {@link World}.
      * This method should only be used by deserialization algorithms.<br>
-     * This method also injects the new random poll into the current world.
+     * This method also injects the new random object into the current world.
      * 
-     * @param random The new random pool for the stored world.
+     * @param random The new random object for the stored world.
      */
-    public void setRandom(RandomPool random) {
+    public void setRandom(Random random) {
 
         this.random = random;
 
-        // Inject the new random into the current world
+        // Inject the new random object into the current world
         injectRandomIntoWorld();
     }
 

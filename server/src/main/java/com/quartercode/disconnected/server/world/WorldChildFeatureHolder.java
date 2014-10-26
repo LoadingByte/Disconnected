@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.server.world;
 
+import java.util.Random;
 import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.def.DefaultCChildFeatureHolder;
-import com.quartercode.disconnected.server.util.RandomPool;
 import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
@@ -61,13 +61,13 @@ public class WorldChildFeatureHolder<P extends CFeatureHolder> extends DefaultCC
     }
 
     /**
-     * Returns the {@link RandomPool} that can be used by the world child feature holder.
-     * Actually, this returns the random pool of the {@link World} the feature holder is in.
+     * Returns the {@link Random} object that can be used by the world child feature holder.
+     * Actually, this returns the random object of the {@link World} the feature holder is in.
      * 
-     * @return The random pool the feature holder can use.
+     * @return The random object the feature holder can use.
      * @see World#getRandom()
      */
-    public RandomPool getRandom() {
+    public Random getRandom() {
 
         return getWorld().getRandom();
     }

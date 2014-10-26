@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -31,7 +32,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import com.quartercode.classmod.util.TreeInitializer;
-import com.quartercode.disconnected.server.util.RandomPool;
 import com.quartercode.disconnected.server.world.World;
 
 /**
@@ -118,7 +118,7 @@ public class ProfileSerializer {
     }
 
     /**
-     * Deserializes the data of a {@link Profile} (the {@link World} and the {@link RandomPool}) from the given {@link InputStream}.
+     * Deserializes the data of a {@link Profile} (the {@link World} and the {@link Random} object) from the given {@link InputStream}.
      * This reads a zip from the stream which contains the data of the given profile.
      * 
      * @param inputStream The input stream to read the data from.
@@ -128,7 +128,7 @@ public class ProfileSerializer {
     public static void deserializeProfile(InputStream inputStream, Profile target) throws ProfileSerializationException {
 
         World world = null;
-        RandomPool random = null;
+        Random random = null;
 
         try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
             ZipEntry zipEntry = null;
@@ -144,7 +144,7 @@ public class ProfileSerializer {
         }
 
         if (world == null || random == null) {
-            throw new ProfileSerializationException(new IllegalStateException("No valid world or random pool object found"), target);
+            throw new ProfileSerializationException(new IllegalStateException("No valid world or random object found"), target);
         }
 
         target.setWorld(world);
@@ -195,13 +195,13 @@ public class ProfileSerializer {
     }
 
     /**
-     * Serializes the given {@link RandomPool} to the given {@link OutputStream}.
+     * Serializes the given {@link Random} object to the given {@link OutputStream}.
      * 
-     * @param outputStream The output stream to write the random pool to.
-     * @param random The random pool to serialize to the given output stream.
+     * @param outputStream The output stream to write the random object to.
+     * @param random The random object to serialize to the given output stream.
      * @throws IOException Something goes wrong while writing to the stream.
      */
-    public static void serializeRandom(OutputStream outputStream, RandomPool random) throws IOException {
+    public static void serializeRandom(OutputStream outputStream, Random random) throws IOException {
 
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
         objectOutputStream.writeObject(random);
@@ -209,17 +209,17 @@ public class ProfileSerializer {
     }
 
     /**
-     * Deserializes a {@link RandomPool} from the given {@link InputStream}.
+     * Deserializes a {@link Random} object from the given {@link InputStream}.
      * 
-     * @param inputStream The input stream to read the random pool from.
-     * @return The deserialized random pool.
+     * @param inputStream The input stream to read the random object from.
+     * @return The deserialized random object.
      * @throws IOException Something goes wrong while reading from the stream.
-     * @throws ClassNotFoundException A class which is used by the random pool can't be found.
+     * @throws ClassNotFoundException A class which is used by the random object can't be found.
      */
-    public static RandomPool deserializeRandom(InputStream inputStream) throws IOException, ClassNotFoundException {
+    public static Random deserializeRandom(InputStream inputStream) throws IOException, ClassNotFoundException {
 
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-        return (RandomPool) objectInputStream.readObject();
+        return (Random) objectInputStream.readObject();
     }
 
     private ProfileSerializer() {

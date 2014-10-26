@@ -22,8 +22,8 @@ import static com.quartercode.disconnected.server.world.comp.program.ProgramComm
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import com.quartercode.disconnected.server.util.ProbabilityUtil;
-import com.quartercode.disconnected.server.util.RandomPool;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
@@ -66,13 +66,13 @@ import com.quartercode.disconnected.shared.general.Location;
 public class WorldGenerator {
 
     /**
-     * Generates a new {@link World} with the given amount of {@link Computer}s using the given {@link RandomPool}.
+     * Generates a new {@link World} with the given amount of {@link Computer}s using the given {@link Random} object.
      * 
-     * @param random A {@link RandomPool} that is used for randomizing the generation process.
+     * @param random A random object that is used for randomizing the generation process.
      * @param computers The amount of computers the generator should generate.
      * @return The newly generated world object.
      */
-    public static World generateWorld(RandomPool random, int computers) {
+    public static World generateWorld(Random random, int computers) {
 
         World world = new World();
 
@@ -87,25 +87,25 @@ public class WorldGenerator {
     /**
      * Generates the given amount of {@link Computer}s randomly.
      * 
-     * @param random The {@link RandomPool} which is used for generating the computers.
+     * @param random The {@link Random} object which is used for generating the computers.
      * @param amount The amount of computers the generator should generate.
      * @return The generated list of computers.
      */
-    public static List<Computer> generateComputers(RandomPool random, int amount, Backbone backbone) {
+    public static List<Computer> generateComputers(Random random, int amount, Backbone backbone) {
 
         return generateComputers(random, amount, backbone, null);
     }
 
     /**
-     * Generates the given amount of {@link Computer}s randomly while excluding the {@link Location}s of the given computerss.
+     * Generates the given amount of {@link Computer}s randomly while excluding the {@link Location}s of the given computers.
      * 
-     * @param random The {@link RandomPool} which is used for generating the computers.
+     * @param random The {@link Random} object which is used for generating the computers.
      * @param amount The amount of computers the generator should generate.
      * @param backbone The {@link Backbone} that should be used for connecting some routers to the internet.
      * @param ignore There won't be any computers with one of those locations.
      * @return The generated list of computers.
      */
-    public static List<Computer> generateComputers(RandomPool random, int amount, Backbone backbone, List<Computer> ignore) {
+    public static List<Computer> generateComputers(Random random, int amount, Backbone backbone, List<Computer> ignore) {
 
         List<Computer> computers = new ArrayList<>();
 

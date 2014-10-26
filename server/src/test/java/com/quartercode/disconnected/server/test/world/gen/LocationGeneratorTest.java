@@ -21,10 +21,10 @@ package com.quartercode.disconnected.server.test.world.gen;
 import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import com.quartercode.disconnected.server.DefaultServerData;
-import com.quartercode.disconnected.server.util.RandomPool;
 import com.quartercode.disconnected.server.world.gen.LocationGenerator;
 import com.quartercode.disconnected.shared.general.Location;
 
@@ -39,7 +39,7 @@ public class LocationGeneratorTest {
     @Test
     public void testGenerateLocations() {
 
-        List<Location> locations = LocationGenerator.generateLocations(100, new RandomPool(1));
+        List<Location> locations = LocationGenerator.generateLocations(100, new Random(1));
         for (Location location : locations) {
             for (Location location2 : locations) {
                 if (location != location2 && location.equals(location2)) {

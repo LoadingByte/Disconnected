@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 import javax.xml.bind.JAXBException;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -37,9 +38,7 @@ import com.quartercode.classmod.extra.CollectionProperty;
 import com.quartercode.classmod.extra.Storage;
 import com.quartercode.classmod.extra.ValueSupplier;
 import com.quartercode.disconnected.server.DefaultServerData;
-import com.quartercode.disconnected.server.sim.profile.Profile;
 import com.quartercode.disconnected.server.sim.profile.ProfileSerializer;
-import com.quartercode.disconnected.server.util.RandomPool;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper;
 import com.quartercode.disconnected.server.world.gen.WorldGenerator;
@@ -67,7 +66,7 @@ public class ProfileSerializerTest {
     @Before
     public void setUp() {
 
-        world = WorldGenerator.generateWorld(new RandomPool(Profile.DEFAULT_RANDOM_POOL_SIZE), 10);
+        world = WorldGenerator.generateWorld(new Random(1), 10);
     }
 
     @Test

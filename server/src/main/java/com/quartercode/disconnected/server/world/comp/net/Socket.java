@@ -38,7 +38,6 @@ import com.quartercode.disconnected.server.sim.scheduler.SchedulerTask;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.server.util.ObjArray;
-import com.quartercode.disconnected.server.util.RandomPool;
 import com.quartercode.disconnected.server.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.server.world.general.StringRepresentable;
 import com.quartercode.disconnected.shared.comp.net.Address;
@@ -252,10 +251,8 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                 Socket holder = (Socket) invocation.getCHolder();
 
                 if ((int) arguments[0] < 0) {
-                    RandomPool random = holder.getRandom();
-                    int newSequenceNumber = random.nextInt();
-
-                    holder.setObj(CURRENT_SEQ_NUMBER, newSequenceNumber);
+                    // Generate a new sequence number
+                    holder.setObj(CURRENT_SEQ_NUMBER, holder.getRandom().nextInt());
                 }
 
                 return invocation.next(arguments);

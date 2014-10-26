@@ -21,6 +21,7 @@ package com.quartercode.disconnected.server.world;
 import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
@@ -29,7 +30,6 @@ import com.quartercode.classmod.extra.ValueFactory;
 import com.quartercode.classmod.extra.def.DefaultCFeatureHolder;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
-import com.quartercode.disconnected.server.util.RandomPool;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.net.Backbone;
 import com.quartercode.eventbridge.bridge.Bridge;
@@ -70,7 +70,7 @@ public class World extends DefaultCFeatureHolder {
     }
 
     private Bridge                                                             bridge;
-    private RandomPool                                                         random;
+    private Random                                                             random;
 
     /**
      * Returns the {@link Bridge} that should be used for sending events by any object in the world tree.
@@ -84,12 +84,12 @@ public class World extends DefaultCFeatureHolder {
     }
 
     /**
-     * Returns the {@link RandomPool} that can be used by the world.
-     * It is must be injected using {@link #injectRandom(RandomPool)}.
+     * Returns the {@link Random} object that can be used by the world.
+     * It is must be injected using {@link #injectRandom(Random)}.
      * 
-     * @return The random pool the world can use.
+     * @return The random object the world can use.
      */
-    public RandomPool getRandom() {
+    public Random getRandom() {
 
         return random;
     }
@@ -106,12 +106,12 @@ public class World extends DefaultCFeatureHolder {
     }
 
     /**
-     * Injects a {@link RandomPool} that can be used by the world.
+     * Injects a {@link Random} object that can be used by the world.
      * It can be retrieved with {@link #getRandom()}.
      * 
-     * @param random The random pool the world can use.
+     * @param random The random object the world can use.
      */
-    public void injectRandom(RandomPool random) {
+    public void injectRandom(Random random) {
 
         this.random = random;
     }

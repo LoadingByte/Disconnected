@@ -21,6 +21,7 @@ package com.quartercode.disconnected.clientdist;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Locale;
+import java.util.Random;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
@@ -48,7 +49,6 @@ import com.quartercode.disconnected.server.sim.profile.DefaultProfileService;
 import com.quartercode.disconnected.server.sim.profile.Profile;
 import com.quartercode.disconnected.server.sim.profile.ProfileSerializationException;
 import com.quartercode.disconnected.server.sim.profile.ProfileService;
-import com.quartercode.disconnected.server.util.RandomPool;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
@@ -122,7 +122,7 @@ public class Main {
 
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG: Generating new simulation");
-        RandomPool random = new RandomPool(Profile.DEFAULT_RANDOM_POOL_SIZE);
+        Random random = new Random(1);
         World world = WorldGenerator.generateWorld(random, 10);
 
         Profile profile = new Profile("test");

@@ -59,19 +59,6 @@ public class ProbabilityUtil {
     }
 
     /**
-     * Generates a random boolean result which is true if the probability is hit using the given random pool.
-     * The distribution of the results is equally to the probability.
-     * 
-     * @param probability The probability to use for generation.
-     * @param random The random pool to use for generating a random float.
-     * @return The generated random boolean result.
-     */
-    public static boolean gen(float probability, RandomPool random) {
-
-        return random.nextFloat() < probability;
-    }
-
-    /**
      * Generates a random boolean result which is true if the probability is hit using the given random number generator.
      * The probability will get prepared before calculation.
      * The distribution of the results is equally to the probability.
@@ -81,20 +68,6 @@ public class ProbabilityUtil {
      * @return The generated random boolean result.
      */
     public static boolean genPseudo(float pseudoProbability, Random random) {
-
-        return gen(prepare(pseudoProbability), random);
-    }
-
-    /**
-     * Generates a random boolean result which is true if the probability is hit using the given random pool.
-     * The probability will get prepared before calculation.
-     * The distribution of the results is equally to the probability.
-     * 
-     * @param pseudoProbability The pseudo probability to use for generation. It will get prepared before calculation.
-     * @param random The random pool to use for generating a random float.
-     * @return The generated random boolean result.
-     */
-    public static boolean genPseudo(float pseudoProbability, RandomPool random) {
 
         return gen(prepare(pseudoProbability), random);
     }

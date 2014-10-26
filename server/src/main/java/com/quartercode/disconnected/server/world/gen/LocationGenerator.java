@@ -22,8 +22,8 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import org.apache.commons.lang3.Validate;
-import com.quartercode.disconnected.server.util.RandomPool;
 import com.quartercode.disconnected.server.util.ResourceStore;
 import com.quartercode.disconnected.shared.general.Location;
 
@@ -38,10 +38,10 @@ public class LocationGenerator {
      * Generates the given amount of locations on an earth map.
      * 
      * @param amount The amount of locations to generate.
-     * @param random The random pool to use for generating the random locations.
+     * @param random The random object to use for generating the random locations.
      * @return The generated locations.
      */
-    public static List<Location> generateLocations(int amount, RandomPool random) {
+    public static List<Location> generateLocations(int amount, Random random) {
 
         return generateLocations(amount, null, random);
     }
@@ -51,10 +51,10 @@ public class LocationGenerator {
      * 
      * @param amount The amount of locations to generate.
      * @param ignore The method will definiteley not return any of these locations.
-     * @param random The random pool to use for generating the random locations.
+     * @param random The random object to use for generating the random locations.
      * @return The generated locations.
      */
-    public static List<Location> generateLocations(int amount, List<Location> ignore, RandomPool random) {
+    public static List<Location> generateLocations(int amount, List<Location> ignore, Random random) {
 
         Validate.isTrue(amount > 0, "Generation amount (%d) must be > 0", amount);
 

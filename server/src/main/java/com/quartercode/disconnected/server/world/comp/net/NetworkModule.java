@@ -30,7 +30,6 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
-import com.quartercode.disconnected.server.util.RandomPool;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
@@ -171,13 +170,12 @@ public class NetworkModule extends OSModule {
              */
             private int getFreePort(Socket holder) {
 
-                RandomPool random = holder.getRandom();
                 int minPort = 49152;
                 int maxPort = 65535;
 
                 int port;
                 do {
-                    port = random.nextInt(maxPort + 1 - minPort) + minPort;
+                    port = holder.getRandom().nextInt(maxPort + 1 - minPort) + minPort;
                 } while (!isPortFree(holder, port));
 
                 return port;
