@@ -19,8 +19,8 @@
 package com.quartercode.disconnected.shared.event.program;
 
 import com.quartercode.disconnected.shared.client.ClientIdentity;
+import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
 import com.quartercode.disconnected.shared.event.LimitedClientEvent;
-import com.quartercode.disconnected.shared.program.ClientProcessId;
 import com.quartercode.eventbridge.basic.EventBase;
 
 /**

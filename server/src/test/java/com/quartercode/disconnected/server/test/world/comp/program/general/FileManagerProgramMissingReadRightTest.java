@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.server.test.world.comp.program.general;
 
 import static com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper.getCommonLocation;
-import static com.quartercode.disconnected.shared.file.PathUtils.splitAfterMountpoint;
+import static com.quartercode.disconnected.shared.comp.file.PathUtils.splitAfterMountpoint;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.apache.commons.lang3.mutable.MutableBoolean;
@@ -39,12 +39,12 @@ import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
 import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
+import com.quartercode.disconnected.shared.comp.file.CommonFiles;
+import com.quartercode.disconnected.shared.comp.file.FileRights;
+import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
 import com.quartercode.disconnected.shared.event.program.general.FMPClientMissingRightEvent;
 import com.quartercode.disconnected.shared.event.program.general.FMPClientUpdateViewCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldChangeDirCommand;
-import com.quartercode.disconnected.shared.file.CommonFiles;
-import com.quartercode.disconnected.shared.file.FileRights;
-import com.quartercode.disconnected.shared.program.ClientProcessId;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 import com.quartercode.eventbridge.extra.predicate.TypePredicate;

@@ -16,13 +16,13 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.test.file;
+package com.quartercode.disconnected.shared.test.comp.file;
 
 import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.TreeSet;
 import org.junit.Test;
-import com.quartercode.disconnected.shared.file.FileRights;
+import com.quartercode.disconnected.shared.comp.file.FileRights;
 
 public class FileRightsTest {
 

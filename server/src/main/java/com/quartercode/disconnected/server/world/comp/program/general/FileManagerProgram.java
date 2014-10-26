@@ -46,16 +46,16 @@ import com.quartercode.disconnected.server.world.comp.program.Process;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
 import com.quartercode.disconnected.shared.client.ClientIdentity;
+import com.quartercode.disconnected.shared.comp.file.FilePlaceholder;
+import com.quartercode.disconnected.shared.comp.file.FileRights;
+import com.quartercode.disconnected.shared.comp.file.PathUtils;
+import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
 import com.quartercode.disconnected.shared.event.program.general.FMPClientAddErrorEvent;
 import com.quartercode.disconnected.shared.event.program.general.FMPClientMissingRightEvent;
 import com.quartercode.disconnected.shared.event.program.general.FMPClientUpdateViewCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldAddFileCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldChangeDirCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldRemoveFileCommand;
-import com.quartercode.disconnected.shared.file.FilePlaceholder;
-import com.quartercode.disconnected.shared.file.FileRights;
-import com.quartercode.disconnected.shared.file.PathUtils;
-import com.quartercode.disconnected.shared.program.ClientProcessId;
 import com.quartercode.eventbridge.bridge.Bridge;
 
 /**

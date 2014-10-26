@@ -20,7 +20,7 @@ package com.quartercode.disconnected.shared.event.program;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import com.quartercode.disconnected.shared.program.ClientProcessId;
+import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
 import com.quartercode.eventbridge.basic.EventPredicateBase;
 
 /**

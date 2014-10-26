@@ -20,7 +20,7 @@ package com.quartercode.disconnected.server.world.comp.program;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.quartercode.disconnected.shared.file.SeparatedPath;
+import com.quartercode.disconnected.shared.comp.file.SeparatedPath;
 
 /**
  * This utility class is used to map {@link ProgramExecutor} types (class objects) to their common locations.

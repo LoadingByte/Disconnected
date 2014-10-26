@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.shared.event.program.control;
 
-import com.quartercode.disconnected.shared.program.ClientProcessId;
+import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
 import com.quartercode.eventbridge.basic.EventBase;
 
 /**

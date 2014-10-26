@@ -16,47 +16,49 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.program;
+package com.quartercode.disconnected.shared.comp.program;
 
 import java.io.Serializable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import com.quartercode.disconnected.shared.client.ClientIdentity;
 
 /**
- * A data object that stores information in order to identify a server-side world process that runs a program.
+ * A data object that stores information in order to identify a client-side client process that runs a graphical client program.
  */
-public class WorldProcessId implements Serializable {
+public class ClientProcessId implements Serializable {
 
-    private final String computerId;
-    private final int    pid;
+    private final ClientIdentity client;
+    private final int            pid;
 
     /**
-     * Creates a new world process id.
+     * Creates a new client process id.
      * 
-     * @param computerId The id of the computer which runs the identifiable process.
-     * @param pid The process id of the identifiable process.
+     * @param client The {@link ClientIdentity} of the client that runs the identifiable client process.
+     * @param pid The unique id of the identifiable client process.
      */
-    public WorldProcessId(String computerId, int pid) {
+    public ClientProcessId(ClientIdentity client, int pid) {
 
-        this.computerId = computerId;
+        this.client = client;
         this.pid = pid;
     }
 
     /**
-     * Returns the id of the computer which runs the identifiable process.
+     * Returns the {@link ClientIdentity} of the client that runs the identifiable client process.
      * 
-     * @return The computer id.
+     * @return The identity of the client.
      */
-    public String getComputerId() {
+    public ClientIdentity getClient() {
 
-        return computerId;
+        return client;
     }
 
     /**
-     * Returns the process id of the identifiable process.
+     * Returns the unique id of the identifiable client process.
+     * Most likely it is just a sequential number.
      * 
-     * @return The process id.
+     * @return The client process id.
      */
     public int getPid() {
 

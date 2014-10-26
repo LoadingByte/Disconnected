@@ -16,9 +16,9 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.file;
+package com.quartercode.disconnected.shared.comp.file;
 
-import static com.quartercode.disconnected.shared.file.PathUtils.SEPARATOR;
+import static com.quartercode.disconnected.shared.comp.file.PathUtils.SEPARATOR;
 
 /**
  * This class offers some constants which represent commonly used files.

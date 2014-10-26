@@ -16,10 +16,10 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.program;
+package com.quartercode.disconnected.shared.comp.program;
 
-import com.quartercode.disconnected.shared.file.CommonFiles;
-import com.quartercode.disconnected.shared.file.SeparatedPath;
+import com.quartercode.disconnected.shared.comp.file.CommonFiles;
+import com.quartercode.disconnected.shared.comp.file.SeparatedPath;
 
 /**
  * Constants for general programs (e.g. common locations).

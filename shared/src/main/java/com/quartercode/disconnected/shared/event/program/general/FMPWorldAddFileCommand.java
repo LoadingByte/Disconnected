@@ -20,8 +20,8 @@ package com.quartercode.disconnected.shared.event.program.general;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
 import com.quartercode.disconnected.shared.event.program.WorldProcessCommand;
-import com.quartercode.disconnected.shared.program.WorldProcessId;
 
 @RequiredArgsConstructor
 @Getter

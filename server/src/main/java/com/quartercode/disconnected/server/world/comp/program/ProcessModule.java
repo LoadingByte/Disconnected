@@ -49,7 +49,7 @@ import com.quartercode.disconnected.server.world.comp.os.OSModule;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.os.Session;
 import com.quartercode.disconnected.server.world.comp.os.User;
-import com.quartercode.disconnected.shared.file.CommonFiles;
+import com.quartercode.disconnected.shared.comp.file.CommonFiles;
 
 /**
  * This class represents an {@link OperatingSystem} module which is used to manage the {@link RootProcess}.

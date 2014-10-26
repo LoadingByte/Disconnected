@@ -34,10 +34,10 @@ import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.RootProcess;
 import com.quartercode.disconnected.server.world.comp.program.WorldProcessLaunchCommandHandler;
 import com.quartercode.disconnected.shared.client.ClientIdentity;
+import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
+import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchAcknowledgement;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
-import com.quartercode.disconnected.shared.program.ClientProcessId;
-import com.quartercode.disconnected.shared.program.WorldProcessId;
 import com.quartercode.eventbridge.bridge.Bridge;
 
 public class WorldProcessLaunchCommandHandlerTest {

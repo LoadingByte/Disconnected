@@ -31,6 +31,10 @@ import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup.O
 import com.quartercode.disconnected.client.graphics.desktop.popup.MessagePopup;
 import com.quartercode.disconnected.client.graphics.desktop.popup.TextInputPopup;
 import com.quartercode.disconnected.client.util.ResourceBundles;
+import com.quartercode.disconnected.shared.comp.file.FilePlaceholder;
+import com.quartercode.disconnected.shared.comp.file.FileRights;
+import com.quartercode.disconnected.shared.comp.file.PathUtils;
+import com.quartercode.disconnected.shared.comp.program.GeneralProgramConstants;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPClientAddErrorEvent;
 import com.quartercode.disconnected.shared.event.program.general.FMPClientMissingRightEvent;
@@ -38,10 +42,6 @@ import com.quartercode.disconnected.shared.event.program.general.FMPClientUpdate
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldAddFileCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldChangeDirCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldRemoveFileCommand;
-import com.quartercode.disconnected.shared.file.FilePlaceholder;
-import com.quartercode.disconnected.shared.file.FileRights;
-import com.quartercode.disconnected.shared.file.PathUtils;
-import com.quartercode.disconnected.shared.program.GeneralProgramConstants;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 import de.matthiasmann.twl.Button;

@@ -20,9 +20,9 @@ package com.quartercode.disconnected.shared.event.program.general;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import com.quartercode.disconnected.shared.comp.file.FilePlaceholder;
+import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
 import com.quartercode.disconnected.shared.event.program.ClientProcessCommand;
-import com.quartercode.disconnected.shared.file.FilePlaceholder;
-import com.quartercode.disconnected.shared.program.ClientProcessId;
 
 @RequiredArgsConstructor
 @Getter

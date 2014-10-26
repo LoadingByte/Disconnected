@@ -43,7 +43,7 @@ import com.quartercode.disconnected.server.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.server.world.comp.os.OSModule;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.program.Process;
-import com.quartercode.disconnected.shared.file.PathUtils;
+import com.quartercode.disconnected.shared.comp.file.PathUtils;
 
 /**
  * This class represents an {@link OperatingSystem} module which is used to access the available {@link FileSystem}s.

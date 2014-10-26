@@ -16,12 +16,12 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.test.file;
+package com.quartercode.disconnected.shared.test.comp.file;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import com.quartercode.disconnected.shared.file.PathUtils;
+import com.quartercode.disconnected.shared.comp.file.PathUtils;
 
 public class PathUtilsTest {
 
