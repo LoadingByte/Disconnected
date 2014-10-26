@@ -34,6 +34,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import ch.qos.logback.classic.Level;
 import com.quartercode.disconnected.client.DefaultClientData;
 import com.quartercode.disconnected.client.graphics.DefaultGraphicsService;
 import com.quartercode.disconnected.client.graphics.DefaultStates;
@@ -186,11 +187,23 @@ public class Main {
         Settings.setSettingsFile(Paths.get("settings.properties"));
 
         // Initialize the default settings
-        // ...
+        Settings.initializeSetting("debugLogging", "false");
+        Settings.initializeSetting("debugLoggingAll", "false");
     }
 
     private static void processDefaultSettings() {
 
+        // debugLogging
+        if (Settings.getSetting("debugLogging").equals("true")) {
+            // Retrieve the root logger for the quartercode packages and set its level to debug
+            ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger("com.quartercode")).setLevel(Level.DEBUG);
+        }
+
+        // debugLoggingAll
+        if (Settings.getSetting("debugLoggingAll").equals("true")) {
+            // Retrieve the root logger and set its level to debug
+            ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).setLevel(Level.DEBUG);
+        }
     }
 
     private static void processCommandLineArguments(String[] arguments) {
