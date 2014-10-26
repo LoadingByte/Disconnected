@@ -27,30 +27,32 @@ import de.matthiasmann.twl.Event;
 import de.matthiasmann.twl.Widget;
 
 /**
- * A desktop program window is the core component of a desktop program.
- * It extends the {@link DesktopWindow} class and adds some extra functionality that is exclusive to programs.<br>
+ * A client program window is the core component of a client program.
+ * It extends the {@link DesktopWindow} class and adds some extra functionality that is exclusive to program guis.<br>
  * <br>
- * Implementations inherit from this class and add their components and program logic.
- * Desktop program windows are declared and created by {@link DesktopProgramDescriptor}s that also store common data.
+ * Implementations inherit from this class and add their components and communication logic.
+ * They are declared and created by {@link ClientProgramDescriptor}s that also store common data.
+ * 
+ * @see ClientProgramDescriptor
  */
-public class DesktopProgramWindow extends DesktopWindow {
+public class ClientProgramWindow extends DesktopWindow {
 
-    private final DesktopProgramDescriptor descriptor;
-    private final DesktopProgramContext    context;
-    private final MultiactionButton        taskbarButton;
+    private final ClientProgramDescriptor descriptor;
+    private final ClientProgramContext    context;
+    private final MultiactionButton       taskbarButton;
 
-    private final List<DesktopWindow>      openPopups = new ArrayList<>();
+    private final List<DesktopWindow>     openPopups = new ArrayList<>();
 
     /**
-     * Creates a new desktop program window in the given desktop {@link GraphicsState}.
-     * The constructor was called by the given {@link DesktopProgramDescriptor}.
+     * Creates a new client program window in the given desktop {@link GraphicsState}.
+     * The constructor was called by the given {@link ClientProgramDescriptor}.
      * The new window is <b>not</b> added to the desktop automatically.
      * 
      * @param state The desktop state the new program will be running in.
      * @param descriptor The program descriptor that created the object.
-     * @param context The {@link DesktopProgramContext} that contains information about the environment of the program.
+     * @param context The {@link ClientProgramContext} that contains information about the environment of the program.
      */
-    public DesktopProgramWindow(GraphicsState state, DesktopProgramDescriptor descriptor, DesktopProgramContext context) {
+    public ClientProgramWindow(GraphicsState state, ClientProgramDescriptor descriptor, ClientProgramContext context) {
 
         super(state);
 
@@ -88,22 +90,22 @@ public class DesktopProgramWindow extends DesktopWindow {
     }
 
     /**
-     * Returns the {@link DesktopProgramDescriptor} that created the window.
+     * Returns the {@link ClientProgramDescriptor} that created the window.
      * It defines all the properties of the window.
      * 
-     * @return The desktop program descriptor that defines the window.
+     * @return The client program descriptor that defines the window.
      */
-    public DesktopProgramDescriptor getDescriptor() {
+    public ClientProgramDescriptor getDescriptor() {
 
         return descriptor;
     }
 
     /**
-     * Returns a {@link DesktopProgramContext} which contains information about the environment of the program.
+     * Returns a {@link ClientProgramContext} which contains information about the environment of the program.
      * 
-     * @return The {@link DesktopProgramContext} which is assigned to the program.
+     * @return The {@link ClientProgramContext} which is assigned to the program.
      */
-    public DesktopProgramContext getContext() {
+    public ClientProgramContext getContext() {
 
         return context;
     }

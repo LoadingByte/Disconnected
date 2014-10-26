@@ -20,7 +20,7 @@ package com.quartercode.disconnected.client.util;
 
 /**
  * This is a simple class which enumerates some important {@link ResourceBundleGroup}s as constants.
- * It also enables quick access to typical bundle groups like desktop program resources.
+ * It also enables quick access to typical bundle groups like client program resources.
  * 
  * @see ResourceBundleGroup
  */
@@ -28,15 +28,15 @@ public class ResourceBundles {
 
     /**
      * The desktop bundle contains all objects related to the desktop ui (launch menu etc.).
-     * This does not contain anything related to desktop programs.
+     * This does not contain anything related to client programs.
      */
     public static final ResourceBundleGroup DESKTOP = new ResourceBundleGroup("desktop");
 
     /**
-     * Returns the {@link ResourceBundleGroup} of the desktop program with the given name.
+     * Returns the {@link ResourceBundleGroup} of the client program with the given name.
      * 
-     * @param name The name of the desktop program the returned bundle group belongs to.
-     * @return The {@link ResourceBundleGroup} of the desktop program which has the given name.
+     * @param name The name of the client program the returned bundle group belongs to.
+     * @return The {@link ResourceBundleGroup} of the client program which has the given name.
      */
     public static ResourceBundleGroup forProgram(String name) {
 

@@ -22,13 +22,13 @@ import com.quartercode.disconnected.client.graphics.DefaultStates;
 import com.quartercode.disconnected.client.graphics.GraphicsModule;
 import com.quartercode.disconnected.client.graphics.GraphicsService;
 import com.quartercode.disconnected.client.graphics.GraphicsState;
+import com.quartercode.disconnected.client.graphics.desktop.ClientProgramDescriptor;
+import com.quartercode.disconnected.client.graphics.desktop.ClientPrograms;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopLaunchButtonModule;
-import com.quartercode.disconnected.client.graphics.desktop.DesktopProgramDescriptor;
-import com.quartercode.disconnected.client.graphics.desktop.DesktopPrograms;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopTaskbarModule;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopWidgetModule;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowAreaModule;
-import com.quartercode.disconnected.client.graphics.desktop.program.general.FileManagerDesktopProgram;
+import com.quartercode.disconnected.client.graphics.desktop.program.general.FileManagerClientProgram;
 
 /**
  * This class contains methods that configure everything the client needs.
@@ -38,7 +38,7 @@ public class DefaultClientData {
 
     /**
      * Adds the default {@link GraphicsModule}s to the default {@link GraphicsState}s that are declared in {@link DefaultStates}.
-     * Also invokes the {@link #addDefaultDesktopPrograms()} method.
+     * Also invokes the {@link #addDefaultClientPrograms()} method.
      */
     public static void initializeDefaultGraphicsStates() {
 
@@ -47,17 +47,17 @@ public class DefaultClientData {
         DefaultStates.DESKTOP.addModule(DesktopLaunchButtonModule.class, "launchButton", 80);
         DefaultStates.DESKTOP.addModule(DesktopTaskbarModule.class, "taskbar", 80);
 
-        addDefaultDesktopPrograms();
+        addDefaultClientPrograms();
     }
 
     /**
-     * Adds the default {@link DesktopProgramDescriptor}s to the {@link DesktopPrograms} list.
+     * Adds the default {@link ClientProgramDescriptor}s to the {@link ClientPrograms} list.
      * 
-     * @see DesktopPrograms
+     * @see ClientPrograms
      */
-    public static void addDefaultDesktopPrograms() {
+    public static void addDefaultClientPrograms() {
 
-        DesktopPrograms.addDescriptor(new FileManagerDesktopProgram());
+        ClientPrograms.addDescriptor(new FileManagerClientProgram());
     }
 
     /**

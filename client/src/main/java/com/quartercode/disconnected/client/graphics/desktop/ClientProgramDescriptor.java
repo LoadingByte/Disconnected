@@ -22,27 +22,29 @@ import com.quartercode.disconnected.client.graphics.GraphicsState;
 import com.quartercode.disconnected.client.util.ResourceBundleGroup;
 
 /**
- * A desktop program descriptor declares some generic data of a desktop program and allows to create new instances.
- * The class should be inherited for each desktop program in order to make the {@link #create(GraphicsState, DesktopProgramContext)} method type-safe.<br>
+ * A client program descriptor declares some generic data of a client program and allows to create new instances.
+ * The class should be inherited for each client program in order to make the {@link #create(GraphicsState, ClientProgramContext)} method type-safe.<br>
  * <br>
- * Desktop programs are programs that only have a gui and don't run as a process. They only support the ui.
- * However, such programs create normal processes in order to execute operations.
+ * Client programs are the counterpart of regular world programs that run on a server.
+ * They only have a gui and don't implement any logic.
+ * That means that all logic is performed by the server-side world processes. The results are sent to the client programs.
+ * In order to establish the client-server program connection, client programs create normal world processes on the server.
  * 
- * @see DesktopProgramWindow
+ * @see ClientProgramWindow
  */
-public abstract class DesktopProgramDescriptor {
+public abstract class ClientProgramDescriptor {
 
     private final ResourceBundleGroup resourceBundle;
     private final String              nameKey;
 
     /**
-     * Creates a new desktop program descriptor.
+     * Creates a new client program descriptor.
      * The name is retrieved from the given {@link ResourceBundleGroup} with the given key.
      * 
      * @param resourceBundle The resource bundle group that provides resources for the program descriptor.
      * @param nameKey The key the name of the described program is provided under in the given resource bundle group.
      */
-    public DesktopProgramDescriptor(ResourceBundleGroup resourceBundle, String nameKey) {
+    public ClientProgramDescriptor(ResourceBundleGroup resourceBundle, String nameKey) {
 
         this.resourceBundle = resourceBundle;
         this.nameKey = nameKey;
@@ -61,7 +63,7 @@ public abstract class DesktopProgramDescriptor {
 
     /**
      * Returns the {@link ResourceBundleGroup} that provides resources for the program descriptor.
-     * It may be used by any provided {@link DesktopProgramWindow}.
+     * It may be used by any provided {@link ClientProgramWindow}.
      * 
      * @return The resource bundle group of the defined program.
      */
@@ -71,14 +73,14 @@ public abstract class DesktopProgramDescriptor {
     }
 
     /**
-     * Creates a new instance of the described desktop program that is running in the given {@link GraphicsState}.
-     * The method actually returns a {@link DesktopProgramWindow}.
-     * It should be implemented by every desktop program for keeping type-safety.
+     * Creates a new instance of the described client program that is running in the given {@link GraphicsState}.
+     * The method actually returns a {@link ClientProgramWindow}.
+     * It should be implemented by every client program for keeping type-safety.
      * 
-     * @param state The {@link GraphicsState} the created {@link DesktopProgramWindow} is running in.
-     * @param context The {@link DesktopProgramContext} that contains information about the environment of the program.
-     * @return The new instance of the described program as a {@link DesktopProgramWindow}.
+     * @param state The {@link GraphicsState} the created {@link ClientProgramWindow} is running in.
+     * @param context The {@link ClientProgramContext} that contains information about the environment of the program.
+     * @return The new instance of the described program as a {@link ClientProgramWindow}.
      */
-    public abstract DesktopProgramWindow create(GraphicsState state, DesktopProgramContext context);
+    public abstract ClientProgramWindow create(GraphicsState state, ClientProgramContext context);
 
 }

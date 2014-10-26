@@ -34,7 +34,7 @@ import com.quartercode.eventbridge.extra.predicate.MultiPredicates;
 import com.quartercode.eventbridge.extra.predicate.TypePredicate;
 
 /**
- * An abstract implementation of {@link DesktopProgramWindow} that provides a skeletal structure for real desktop programs.
+ * An abstract implementation of {@link ClientProgramWindow} that provides a skeletal structure for real client programs.
  * Using this class, a lot of boilerplate code is removed from the actual implementations.<br>
  * <br>
  * The following preset fields are available:
@@ -42,11 +42,11 @@ import com.quartercode.eventbridge.extra.predicate.TypePredicate;
  * <table>
  * <tr>
  * <td>{@link #bridge}</td>
- * <td>The {@link Bridge} to use for server communication. It is injected using the {@link DesktopProgramContext}.</td>
+ * <td>The {@link Bridge} to use for server communication. It is injected using the {@link ClientProgramContext}.</td>
  * </tr>
  * <tr>
  * <td>{@link #clientProcessId}</td>
- * <td>A {@link ClientProcessId} that identifies the running desktop program. It is used for receiving server events.</td>
+ * <td>A {@link ClientProcessId} that identifies the running client program. It is used for receiving server events.</td>
  * </tr>
  * <tr>
  * <td>{@link #worldProcessId}</td>
@@ -83,19 +83,19 @@ import com.quartercode.eventbridge.extra.predicate.TypePredicate;
  * </tr>
  * </table>
  * 
- * @see DesktopProgramWindow
+ * @see ClientProgramWindow
  */
-public class DesktopProgramWindowSkeleton extends DesktopProgramWindow {
+public class ClientProgramWindowSkeleton extends ClientProgramWindow {
 
     /**
      * The {@link Bridge} that should be used for communicating with the server.
-     * It is injected using the {@link DesktopProgramContext}.
+     * It is injected using the {@link ClientProgramContext}.
      */
     @InjectValue ("bridge")
     protected Bridge          bridge;
 
     /**
-     * A {@link ClientProcessId} that identifies the running desktop program.
+     * A {@link ClientProcessId} that identifies the running client program.
      * It is used for receiving server events.
      */
     protected ClientProcessId clientProcessId;
@@ -107,14 +107,14 @@ public class DesktopProgramWindowSkeleton extends DesktopProgramWindow {
     protected WorldProcessId  worldProcessId;
 
     /**
-     * Creates a new desktop program window skeleton with the given parameters.
+     * Creates a new client program window skeleton with the given parameters.
      * 
      * @param state The desktop state the new program will be running in.
      * @param descriptor The program descriptor that created the object.
-     * @param context The {@link DesktopProgramContext} that contains information about the environment of the program.
-     * @see DesktopProgramWindow#DesktopProgramWindow(GraphicsState, DesktopProgramDescriptor, DesktopProgramContext)
+     * @param context The {@link ClientProgramContext} that contains information about the environment of the program.
+     * @see ClientProgramWindow#ClientProgramWindow(GraphicsState, ClientProgramDescriptor, ClientProgramContext)
      */
-    public DesktopProgramWindowSkeleton(GraphicsState state, DesktopProgramDescriptor descriptor, DesktopProgramContext context) {
+    public ClientProgramWindowSkeleton(GraphicsState state, ClientProgramDescriptor descriptor, ClientProgramContext context) {
 
         super(state, descriptor, context);
 
@@ -200,7 +200,7 @@ public class DesktopProgramWindowSkeleton extends DesktopProgramWindow {
     // ----- Utility methods -----
 
     /**
-     * Registers the given {@link EventHandler} for the desktop program and makes it listen for the given type of {@link ClientProcessCommand} events that are sent to it.
+     * Registers the given {@link EventHandler} for the client program and makes it listen for the given type of {@link ClientProcessCommand} events that are sent to it.
      * 
      * @param eventType The event type all handled events must have.
      * @param handler The event handler that should handle the incoming events.

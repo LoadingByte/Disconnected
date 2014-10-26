@@ -34,8 +34,8 @@ import de.matthiasmann.twl.Widget;
  */
 public class DesktopLaunchButtonModule extends AbstractGraphicsModule {
 
-    private Button                button;
-    private DesktopProgramContext programContext;
+    private Button               button;
+    private ClientProgramContext programContext;
 
     @Override
     public void add(final GraphicsState state) {
@@ -53,7 +53,7 @@ public class DesktopLaunchButtonModule extends AbstractGraphicsModule {
                 // TODO: Display launch menu
 
                 // Temp: Choose first available program
-                DesktopProgramDescriptor program = DesktopPrograms.getDescriptors().iterator().next();
+                ClientProgramDescriptor program = ClientPrograms.getDescriptors().iterator().next();
                 program.create(state, programContext).setVisible(true);
             }
 
@@ -62,12 +62,12 @@ public class DesktopLaunchButtonModule extends AbstractGraphicsModule {
         setValue("button", button);
     }
 
-    private DesktopProgramContext createProgramContext() {
+    private ClientProgramContext createProgramContext() {
 
         ValueInjector valueInjector = new ValueInjector();
         valueInjector.put("bridge", ServiceRegistry.lookup(GraphicsService.class).getBridge());
 
-        return new DesktopProgramContext(valueInjector);
+        return new ClientProgramContext(valueInjector);
     }
 
     @Override

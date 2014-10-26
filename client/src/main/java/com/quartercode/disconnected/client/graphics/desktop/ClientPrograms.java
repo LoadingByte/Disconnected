@@ -23,44 +23,44 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A storage class that holds all available {@link DesktopProgramDescriptor}s.
+ * A storage class that holds all available {@link ClientProgramDescriptor}s.
  * All descriptors that should be available must be registered here.
  * 
- * @see DesktopProgramDescriptor
+ * @see ClientProgramDescriptor
  */
-public class DesktopPrograms {
+public class ClientPrograms {
 
-    private static Set<DesktopProgramDescriptor> descriptors = new HashSet<>();
+    private static Set<ClientProgramDescriptor> descriptors = new HashSet<>();
 
     /**
-     * Retunrs all the {@link DesktopProgramDescriptor}s that are registered so far.
+     * Retunrs all the {@link ClientProgramDescriptor}s that are registered so far.
      * The returned descriptors are available for usage in the launch menu.
      * 
-     * @return The available {@link DesktopProgramDescriptor}s.
+     * @return The available {@link ClientProgramDescriptor}s.
      */
-    public static Set<DesktopProgramDescriptor> getDescriptors() {
+    public static Set<ClientProgramDescriptor> getDescriptors() {
 
         return Collections.unmodifiableSet(descriptors);
     }
 
     /**
-     * Registers a {@link DesktopProgramDescriptor} to the list.
+     * Registers a {@link ClientProgramDescriptor} to the list.
      * Such descriptors are available for usage in the launch menu.
      * 
-     * @param descriptor The {@link DesktopProgramDescriptor} to make available.
+     * @param descriptor The {@link ClientProgramDescriptor} to make available.
      */
-    public static void addDescriptor(DesktopProgramDescriptor descriptor) {
+    public static void addDescriptor(ClientProgramDescriptor descriptor) {
 
         descriptors.add(descriptor);
     }
 
     /**
-     * Unregisters a {@link DesktopProgramDescriptor} from the list.
+     * Unregisters a {@link ClientProgramDescriptor} from the list.
      * Such descriptors are available for usage in the launch menu.
      * 
-     * @param descriptor The {@link DesktopProgramDescriptor} to make no longer available.
+     * @param descriptor The {@link ClientProgramDescriptor} to make no longer available.
      */
-    public static void removeDescriptor(DesktopProgramDescriptor descriptor) {
+    public static void removeDescriptor(ClientProgramDescriptor descriptor) {
 
         descriptors.remove(descriptor);
     }

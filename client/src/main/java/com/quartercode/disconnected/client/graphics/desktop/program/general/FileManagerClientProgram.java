@@ -21,10 +21,10 @@ package com.quartercode.disconnected.client.graphics.desktop.program.general;
 import static java.text.MessageFormat.format;
 import lombok.RequiredArgsConstructor;
 import com.quartercode.disconnected.client.graphics.GraphicsState;
-import com.quartercode.disconnected.client.graphics.desktop.DesktopProgramContext;
-import com.quartercode.disconnected.client.graphics.desktop.DesktopProgramDescriptor;
-import com.quartercode.disconnected.client.graphics.desktop.DesktopProgramWindow;
-import com.quartercode.disconnected.client.graphics.desktop.DesktopProgramWindowSkeleton;
+import com.quartercode.disconnected.client.graphics.desktop.ClientProgramContext;
+import com.quartercode.disconnected.client.graphics.desktop.ClientProgramDescriptor;
+import com.quartercode.disconnected.client.graphics.desktop.ClientProgramWindow;
+import com.quartercode.disconnected.client.graphics.desktop.ClientProgramWindowSkeleton;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowDefaultSizeMediator;
 import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup;
 import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup.Option;
@@ -56,25 +56,25 @@ import de.matthiasmann.twl.TableBase.Callback;
 import de.matthiasmann.twl.model.SimpleTableModel;
 
 /**
- * The file manager desktop program allows the user to view and manipulate the files on all mounted file systems.
+ * The file manager client program allows the user to view and manipulate the files on all mounted file systems.
  */
-public class FileManagerDesktopProgram extends DesktopProgramDescriptor {
+public class FileManagerClientProgram extends ClientProgramDescriptor {
 
     /**
-     * Creates a new file manager desktop program descriptor.
+     * Creates a new file manager client program descriptor.
      */
-    public FileManagerDesktopProgram() {
+    public FileManagerClientProgram() {
 
         super(ResourceBundles.forProgram("file-manager"), "name");
     }
 
     @Override
-    public DesktopProgramWindow create(GraphicsState state, DesktopProgramContext context) {
+    public ClientProgramWindow create(GraphicsState state, ClientProgramContext context) {
 
-        return new FileManagerDesktopProgramWindow(state, this, context);
+        return new FileManagerClientProgramWindow(state, this, context);
     }
 
-    private static class FileManagerDesktopProgramWindow extends DesktopProgramWindowSkeleton {
+    private static class FileManagerClientProgramWindow extends ClientProgramWindowSkeleton {
 
         private Label            currentDirectoryLabel;
         private Button           createFileButton;
@@ -83,7 +83,7 @@ public class FileManagerDesktopProgram extends DesktopProgramDescriptor {
         private Table            fileListTable;
         private SimpleTableModel fileListModel;
 
-        private FileManagerDesktopProgramWindow(GraphicsState state, DesktopProgramDescriptor descriptor, DesktopProgramContext context) {
+        private FileManagerClientProgramWindow(GraphicsState state, ClientProgramDescriptor descriptor, ClientProgramContext context) {
 
             super(state, descriptor, context);
         }

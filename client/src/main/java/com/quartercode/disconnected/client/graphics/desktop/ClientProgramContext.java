@@ -21,26 +21,26 @@ package com.quartercode.disconnected.client.graphics.desktop;
 import com.quartercode.disconnected.client.util.ValueInjector;
 
 /**
- * A desktop program context stores information about the environment of a running desktop program.
+ * A client program context stores information about the environment of a running client program.
  * For example, the context might store the computer the program is running on or the parent session that controls it.<br>
  * <br>
- * Every program should store a program context that defines its environment.
- * Programs can access the stored values by using the internal {@link ValueInjector} with {@link #injectValues(Object)} on themselves.
+ * Every client program should store a program context that defines its environment.
+ * Client programs can access the stored values by using the internal {@link ValueInjector} with {@link #injectValues(Object)} on themselves.
  * 
- * @see DesktopProgramWindow
+ * @see ClientProgramWindow
  * @see ValueInjector
  */
-public class DesktopProgramContext {
+public class ClientProgramContext {
 
     private final ValueInjector valueInjector;
 
     /**
-     * Creates a new desktop program context that uses the values that are stored in the given {@link ValueInjector}.
+     * Creates a new client program context that uses the values that are stored in the given {@link ValueInjector}.
      * Modifications to the injector object automatically transfer into the program context.
      * 
      * @param valueInjector The value injector whose stored values should be used in the context.
      */
-    public DesktopProgramContext(ValueInjector valueInjector) {
+    public ClientProgramContext(ValueInjector valueInjector) {
 
         this.valueInjector = valueInjector;
     }

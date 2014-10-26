@@ -25,7 +25,7 @@ import de.matthiasmann.twl.Widget;
 
 /**
  * The desktop window area module makes a {@link DesktopArea} available.
- * The area spans over the whole screen and can hold {@link DesktopProgramWindow}s.
+ * The area spans over the whole screen and can hold {@link ClientProgramWindow}s.
  * It is available under the key {@code area}.
  */
 public class DesktopWindowAreaModule extends AbstractGraphicsModule {
