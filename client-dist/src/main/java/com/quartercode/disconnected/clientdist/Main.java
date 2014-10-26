@@ -59,6 +59,7 @@ import com.quartercode.disconnected.shared.util.ExitUtil;
 import com.quartercode.disconnected.shared.util.ExitUtil.ExitProcessor;
 import com.quartercode.disconnected.shared.util.LogExceptionHandler;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
+import com.quartercode.disconnected.shared.util.Settings;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.BridgeConnectorException;
 import com.quartercode.eventbridge.extra.connector.LocalBridgeConnector;
@@ -91,6 +92,10 @@ public class Main {
 
         // Set general properties
         initializeGeneral();
+
+        // Initialize settings and process default ones
+        initializeSettings();
+        processDefaultSettings();
 
         // Process the command line arguments
         processCommandLineArguments(args);
@@ -174,6 +179,20 @@ public class Main {
         DefaultServerData.addCustomEventBridgeFactoryMappings();
     }
 
+    private static void initializeSettings() {
+
+        // Load the settings
+        LOGGER.info("Loading settings file");
+        Settings.setSettingsFile(Paths.get("settings.properties"));
+
+        // Initialize the default settings
+        // ...
+    }
+
+    private static void processDefaultSettings() {
+
+    }
+
     private static void processCommandLineArguments(String[] arguments) {
 
         // Parse command line arguments
@@ -212,7 +231,7 @@ public class Main {
     private static void fillResourceStore() {
 
         // Load the resource store data
-        LOGGER.info("Loading resource store data");
+        LOGGER.debug("Loading resource store data");
         try {
             DefaultServerData.fillResourceStore();
         } catch (IOException | RuntimeException e) {
@@ -282,7 +301,7 @@ public class Main {
 
     private static void addOtherData() {
 
-        LOGGER.info("Adding other data");
+        LOGGER.debug("Adding other data");
 
         DefaultServerData.addDefaultStringFileTypeMappings();
         DefaultServerData.addDefaultProgramCommonLocationMappings();
