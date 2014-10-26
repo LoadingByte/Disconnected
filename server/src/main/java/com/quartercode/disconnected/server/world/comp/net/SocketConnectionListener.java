@@ -18,6 +18,8 @@
 
 package com.quartercode.disconnected.server.world.comp.net;
 
+import com.quartercode.disconnected.shared.comp.net.Address;
+
 /**
  * A stream socket connection listener is called when another computer would like to set up a {@link Socket} connection.
  * It can prevent the creation of the connection as well as be notified when the connection was established successfully.<br>

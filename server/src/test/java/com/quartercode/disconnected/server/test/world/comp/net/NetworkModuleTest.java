@@ -35,14 +35,14 @@ import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.disconnected.server.util.ObjArray;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
-import com.quartercode.disconnected.server.world.comp.net.Address;
-import com.quartercode.disconnected.server.world.comp.net.NetID;
 import com.quartercode.disconnected.server.world.comp.net.NetworkModule;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.Socket;
 import com.quartercode.disconnected.server.world.comp.net.Socket.PacketHandler;
 import com.quartercode.disconnected.server.world.comp.net.Socket.SocketState;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.shared.comp.net.Address;
+import com.quartercode.disconnected.shared.comp.net.NetID;
 
 public class NetworkModuleTest {
 
@@ -101,6 +101,8 @@ public class NetworkModuleTest {
 
         nodeNetInterfaceProcessHook = null;
 
+        netInterface.setObj(NodeNetInterface.NET_ID, new NetID());
+
         computer.setObj(Computer.OS, operatingSystem);
         operatingSystem.setObj(OperatingSystem.NET_MODULE, netModule);
 
@@ -145,10 +147,10 @@ public class NetworkModuleTest {
 
         int sourcePort = 12345;
         int destinationPort = 54321;
-        Address sourceAddress = createAddress(0, 1, sourcePort);
-        Address destinationAddress = createAddress(0, 1, destinationPort);
+        Address sourceAddress = new Address(new NetID(0, 1), sourcePort);
+        Address destinationAddress = new Address(new NetID(0, 1), destinationPort);
 
-        netInterface.setObj(NodeNetInterface.NET_ID, sourceAddress.getObj(Address.NET_ID));
+        netInterface.setObj(NodeNetInterface.NET_ID, sourceAddress.getNetId());
 
         Socket socket = netModule.invoke(NetworkModule.CREATE_SOCKET);
         socket.setObj(Socket.LOCAL_PORT, sourcePort);
@@ -177,12 +179,12 @@ public class NetworkModuleTest {
     public void testHandle() {
 
         int sourcePort = 12345;
-        Address sourceAddress = createAddress(0, 1, sourcePort);
+        Address sourceAddress = new Address(new NetID(0, 1), sourcePort);
         int destinationPort = 54321;
 
         Packet packet = new Packet();
         packet.setObj(Packet.SOURCE, sourceAddress);
-        packet.setObj(Packet.DESTINATION, createAddress(0, 2, destinationPort));
+        packet.setObj(Packet.DESTINATION, new Address(new NetID(0, 2), destinationPort));
         packet.setObj(Packet.DATA, new ObjArray("testdata"));
 
         Socket receiverSocket = netModule.invoke(NetworkModule.CREATE_SOCKET);
@@ -202,19 +204,6 @@ public class NetworkModuleTest {
         // @formatter:on
 
         netModule.invoke(NetworkModule.HANDLE, packet);
-    }
-
-    private Address createAddress(int subnet, int id, int port) {
-
-        NetID netId = new NetID();
-        netId.setObj(NetID.SUBNET, subnet);
-        netId.setObj(NetID.ID, id);
-
-        Address address = new Address();
-        address.setObj(Address.NET_ID, netId);
-        address.setObj(Address.PORT, port);
-
-        return address;
     }
 
 }

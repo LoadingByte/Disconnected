@@ -30,7 +30,7 @@ import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.server.world.general.Location;
+import com.quartercode.disconnected.shared.general.Location;
 
 /**
  * This class stores information about a computer, like the {@link Location} or the {@link Hardware} parts.

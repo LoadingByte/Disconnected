@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.server.util.RandomPool;
 import com.quartercode.disconnected.server.util.ResourceStore;
-import com.quartercode.disconnected.server.world.general.Location;
+import com.quartercode.disconnected.shared.general.Location;
 
 /**
  * This utility class generates random locations on an earth map.
@@ -73,9 +73,7 @@ public class LocationGenerator {
             int x = random.nextInt(width);
             int y = random.nextInt(height);
             if (map.getRGB(x, y) == blackRGB) {
-                Location location = new Location();
-                location.setObj(Location.X, (float) x / (float) width);
-                location.setObj(Location.Y, (float) y / (float) height);
+                Location location = new Location((float) x / (float) width, (float) y / (float) height);
                 if (!ignore.contains(location) && !result.contains(location)) {
                     result.add(location);
                 }

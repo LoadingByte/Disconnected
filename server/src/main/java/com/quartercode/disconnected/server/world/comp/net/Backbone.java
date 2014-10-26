@@ -35,6 +35,7 @@ import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
+import com.quartercode.disconnected.shared.comp.net.NetID;
 
 /**
  * Backbones are <i>"magical connectors"</i> that connect different {@link RouterNetInterface}s together.
@@ -112,15 +113,15 @@ public class Backbone extends WorldChildFeatureHolder<World> implements PacketPr
              */
             private boolean routeToChild(CFeatureHolder backbone, Packet packet) {
 
-                NetID packetDest = packet.getObj(Packet.DESTINATION).getObj(Address.NET_ID);
-                int packetDestSubnet = packetDest.getObj(NetID.SUBNET);
+                NetID packetDest = packet.getObj(Packet.DESTINATION).getNetId();
+                int packetDestSubnet = packetDest.getSubnet();
 
                 Set<Integer> visitedSubnets = new HashSet<>();
                 for (RouterNetInterface child : backbone.getCol(Backbone.CHILDREN)) {
                     List<NodeNetInterface> nodes = new ArrayList<>();
                     recordAllNodes(child, nodes, visitedSubnets);
                     for (NodeNetInterface node : nodes) {
-                        if (node.getObj(NodeNetInterface.NET_ID).getObj(NetID.SUBNET) == packetDestSubnet) {
+                        if (node.getObj(NodeNetInterface.NET_ID).getSubnet() == packetDestSubnet) {
                             child.invoke(NodeNetInterface.PROCESS, packet);
                             return true;
                         }

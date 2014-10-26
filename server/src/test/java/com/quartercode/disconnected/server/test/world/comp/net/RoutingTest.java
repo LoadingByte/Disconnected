@@ -33,11 +33,11 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
-import com.quartercode.disconnected.server.world.comp.net.Address;
 import com.quartercode.disconnected.server.world.comp.net.Backbone;
-import com.quartercode.disconnected.server.world.comp.net.NetID;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.PacketProcessor;
+import com.quartercode.disconnected.shared.comp.net.Address;
+import com.quartercode.disconnected.shared.comp.net.NetID;
 
 @RunWith (Parameterized.class)
 public class RoutingTest {
@@ -606,22 +606,6 @@ public class RoutingTest {
 
     // ----- Utility -----
 
-    private static NetID generateNetID(int subnet, int id) {
-
-        NetID netId = new NetID();
-        netId.setObj(NetID.SUBNET, subnet);
-        netId.setObj(NetID.ID, id);
-        return netId;
-    }
-
-    private static Address generateAddress(NetID netId, int port) {
-
-        Address address = new Address();
-        address.setObj(Address.NET_ID, netId);
-        address.setObj(Address.PORT, port);
-        return address;
-    }
-
     private static RouterNetInterface generateRouter(int subnet, Backbone backboneConnection, RouterNetInterface... neighbours) {
 
         RouterNetInterface router = new RouterNetInterface();
@@ -644,7 +628,7 @@ public class RoutingTest {
         for (int id = 1; id <= amount; id++) {
             NodeNetInterface child = new NodeNetInterface();
             child.setObj(NodeNetInterface.CONNECTION, router);
-            child.setObj(NodeNetInterface.NET_ID, generateNetID(subnet, id));
+            child.setObj(NodeNetInterface.NET_ID, new NetID(subnet, id));
         }
     }
 
@@ -684,7 +668,7 @@ public class RoutingTest {
             @Prioritized (Prioritized.LEVEL_8)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                NetID processorID = generateNetID(invocation.getCHolder().getObj(RouterNetInterface.SUBNET), 0);
+                NetID processorID = new NetID(invocation.getCHolder().getObj(RouterNetInterface.SUBNET), 0);
                 processPacketCallback.onProcessPacket(processorID, (Packet) arguments[0]);
 
                 return invocation.next(arguments);
@@ -785,7 +769,7 @@ public class RoutingTest {
                 @Override
                 public void onProcessPacket(NetID processorId, Packet packet) {
 
-                    NetID destination = packet.getObj(Packet.DESTINATION).getObj(Address.NET_ID);
+                    NetID destination = packet.getObj(Packet.DESTINATION).getNetId();
 
                     if (destination.equals(processorId) && destination.equals(TestExecutor.this.destinationId)) {
                         receivedPacket = true;
@@ -798,14 +782,14 @@ public class RoutingTest {
         public void run() {
 
             Packet packet = new Packet();
-            packet.setObj(Packet.SOURCE, generateAddress(sourceId, 1));
-            packet.setObj(Packet.DESTINATION, generateAddress(destinationId, 1));
+            packet.setObj(Packet.SOURCE, new Address(sourceId, 1));
+            packet.setObj(Packet.DESTINATION, new Address(destinationId, 1));
             packet.setObj(Packet.DATA, "testdata");
 
             source.invoke(PacketProcessor.PROCESS, packet);
 
-            String sourceString = sourceId.invoke(NetID.TO_STRING);
-            String destinationString = destinationId.invoke(NetID.TO_STRING);
+            String sourceString = sourceId.toString();
+            String destinationString = destinationId.toString();
             assertTrue("Packet wasn't received by planned destination (" + sourceString + " -> " + destinationString + ")", receivedPacket);
         }
 

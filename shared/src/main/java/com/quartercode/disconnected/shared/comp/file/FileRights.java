@@ -295,7 +295,7 @@ public class FileRights implements Serializable {
         }
 
         @Override
-        public SortedMap<Character, SortedSet<Character>> unmarshal(String v) throws Exception {
+        public SortedMap<Character, SortedSet<Character>> unmarshal(String v) {
 
             return FileRights.fromString(v);
         }

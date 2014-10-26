@@ -25,11 +25,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.junit.Before;
-import com.quartercode.disconnected.server.world.comp.ByteUnit;
 import com.quartercode.disconnected.server.world.comp.file.Directory;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.os.User;
+import com.quartercode.disconnected.shared.comp.ByteUnit;
 
 public abstract class AbstractFileActionTest {
 

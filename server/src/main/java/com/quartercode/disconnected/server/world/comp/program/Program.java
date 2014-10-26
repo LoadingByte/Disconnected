@@ -32,8 +32,8 @@ import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.server.util.NullPreventer;
 import com.quartercode.disconnected.server.world.WorldFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.SizeUtil.DerivableSize;
-import com.quartercode.disconnected.server.world.comp.Version;
 import com.quartercode.disconnected.server.world.comp.Vulnerability;
+import com.quartercode.disconnected.shared.comp.Version;
 
 /**
  * This class stores information about a program.

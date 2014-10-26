@@ -37,12 +37,11 @@ import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.server.world.comp.hardware.Mainboard.NeedsMainboardSlot;
-import com.quartercode.disconnected.server.world.comp.net.Address;
 import com.quartercode.disconnected.server.world.comp.net.Backbone;
-import com.quartercode.disconnected.server.world.comp.net.NetID;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.PacketProcessor;
 import com.quartercode.disconnected.server.world.comp.net.RoutedPacket;
+import com.quartercode.disconnected.shared.comp.net.NetID;
 
 /**
  * This class represents a router network interface that may be used by a router computer.
@@ -274,9 +273,9 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
              */
             private boolean tryHandOverToChild(CFeatureHolder router, Packet packet) {
 
-                NetID destination = packet.getObj(Packet.DESTINATION).getObj(Address.NET_ID);
-                int destinationSubnet = destination.getObj(NetID.SUBNET);
-                int destinationId = destination.getObj(NetID.ID);
+                NetID destination = packet.getObj(Packet.DESTINATION).getNetId();
+                int destinationSubnet = destination.getSubnet();
+                int destinationId = destination.getId();
 
                 if (destinationSubnet != router.getObj(SUBNET)) {
                     // Packet destination subnet does not equal the router's subnet
@@ -284,7 +283,7 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
                 }
 
                 for (NodeNetInterface child : router.getCol(CHILDREN)) {
-                    int childId = child.getObj(NodeNetInterface.NET_ID).getObj(NetID.ID);
+                    int childId = child.getObj(NodeNetInterface.NET_ID).getId();
                     if (childId == destinationId) {
                         child.invoke(NodeNetInterface.PROCESS, packet);
                         return true;
@@ -332,7 +331,7 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
 
     private static void routePacket(CFeatureHolder router, Packet packet) {
 
-        final int destinationSubnet = packet.getObj(Packet.DESTINATION).getObj(Address.NET_ID).getObj(NetID.SUBNET);
+        final int destinationSubnet = packet.getObj(Packet.DESTINATION).getNetId().getSubnet();
         List<Integer> path = calculatePathToDestination(new DestinationMatcher() {
 
             @Override

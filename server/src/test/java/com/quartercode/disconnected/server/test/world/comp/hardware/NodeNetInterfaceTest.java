@@ -23,7 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
-import com.quartercode.disconnected.server.world.comp.net.NetID;
+import com.quartercode.disconnected.shared.comp.net.NetID;
 
 public class NodeNetInterfaceTest {
 
@@ -70,20 +70,14 @@ public class NodeNetInterfaceTest {
     public void testChangeNetIDWithConnection() {
 
         nodeInterface.setObj(NodeNetInterface.CONNECTION, connection);
-
-        NetID netId = new NetID();
-        netId.setObj(NetID.SUBNET, 10);
-        nodeInterface.setObj(NodeNetInterface.NET_ID, netId);
+        nodeInterface.setObj(NodeNetInterface.NET_ID, new NetID(10, 0));
     }
 
     @Test (expected = IllegalArgumentException.class)
     public void testChangeNetIDWithConnectionWrongSubnet() {
 
         nodeInterface.setObj(NodeNetInterface.CONNECTION, connection);
-
-        NetID netId = new NetID();
-        netId.setObj(NetID.SUBNET, 11);
-        nodeInterface.setObj(NodeNetInterface.NET_ID, netId);
+        nodeInterface.setObj(NodeNetInterface.NET_ID, new NetID(11, 0));
     }
 
 }

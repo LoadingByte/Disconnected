@@ -41,6 +41,7 @@ import com.quartercode.disconnected.server.util.ObjArray;
 import com.quartercode.disconnected.server.util.RandomPool;
 import com.quartercode.disconnected.server.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.server.world.general.StringRepresentable;
+import com.quartercode.disconnected.shared.comp.net.Address;
 
 /**
  * Sockets allow the sending of {@link Packet}s between two {@link Address}es.

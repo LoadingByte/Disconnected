@@ -173,8 +173,8 @@ public class ProfileSerializer {
     public static void serializeWorld(OutputStream outputStream, World world) throws JAXBException {
 
         Marshaller marshaller = createWorldContext().createMarshaller();
-        // We do not want formatted output
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
+        // Turn this option on for debugging:
+        // marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         marshaller.marshal(world, outputStream);
     }
 

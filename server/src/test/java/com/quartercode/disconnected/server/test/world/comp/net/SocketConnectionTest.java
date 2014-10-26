@@ -34,13 +34,13 @@ import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.disconnected.server.util.ObjArray;
-import com.quartercode.disconnected.server.world.comp.net.Address;
-import com.quartercode.disconnected.server.world.comp.net.NetID;
 import com.quartercode.disconnected.server.world.comp.net.NetworkModule;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.Socket;
 import com.quartercode.disconnected.server.world.comp.net.Socket.PacketHandler;
 import com.quartercode.disconnected.server.world.comp.net.Socket.SocketState;
+import com.quartercode.disconnected.shared.comp.net.Address;
+import com.quartercode.disconnected.shared.comp.net.NetID;
 
 public class SocketConnectionTest {
 
@@ -129,10 +129,10 @@ public class SocketConnectionTest {
         netModule = new NetworkModule();
 
         // Create the test sockets
-        socket1Address = createAddress(createNetId(0, 1), 10);
-        socket2Address = createAddress(createNetId(0, 2), 20);
-        socket1 = createSocket(netModule, socket1Address.getObj(Address.PORT), socket2Address);
-        socket2 = createSocket(netModule, socket2Address.getObj(Address.PORT), socket1Address);
+        socket1Address = new Address(new NetID(0, 1), 10);
+        socket2Address = new Address(new NetID(0, 2), 20);
+        socket1 = createSocket(netModule, socket1Address.getPort(), socket2Address);
+        socket2 = createSocket(netModule, socket2Address.getPort(), socket1Address);
 
         // Apply a simple routing:
         // socket1 -> socket2
@@ -346,24 +346,6 @@ public class SocketConnectionTest {
         // Check the socket states
         assertEquals("State of socket 1 after the handshake", SocketState.DISCONNECTED, socket1.getObj(Socket.STATE));
         assertEquals("State of socket 2 after the handshake", SocketState.DISCONNECTED, socket2.getObj(Socket.STATE));
-    }
-
-    private NetID createNetId(int subnet, int id) {
-
-        NetID netId = new NetID();
-        netId.setObj(NetID.SUBNET, subnet);
-        netId.setObj(NetID.ID, id);
-
-        return netId;
-    }
-
-    private Address createAddress(NetID netId, int port) {
-
-        Address address = new Address();
-        address.setObj(Address.NET_ID, netId);
-        address.setObj(Address.PORT, port);
-
-        return address;
     }
 
     private Socket createSocket(NetworkModule netModule, int localPort, Address destination) {

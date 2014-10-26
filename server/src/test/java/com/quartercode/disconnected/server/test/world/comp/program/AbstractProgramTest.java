@@ -31,18 +31,13 @@ import com.quartercode.disconnected.server.bridge.ClientIdentityExtension;
 import com.quartercode.disconnected.server.client.ClientIdentityService;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
-import com.quartercode.disconnected.server.world.comp.Version;
-import com.quartercode.disconnected.server.world.comp.file.ContentFile;
-import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
 import com.quartercode.disconnected.server.world.comp.file.StringFileTypeMapper;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
-import com.quartercode.disconnected.server.world.comp.program.Program;
 import com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper;
-import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.gen.WorldGenerator;
 import com.quartercode.disconnected.shared.client.ClientIdentity;
 import com.quartercode.eventbridge.EventBridgeFactory;
@@ -128,28 +123,6 @@ public abstract class AbstractProgramTest {
                 break;
             }
         }
-    }
-
-    protected Program createProgram(Class<? extends ProgramExecutor> executorClass, int majorVersion, int minorVersion, int revisionVersion) {
-
-        Program program = new Program();
-        program.setObj(Program.EXECUTOR_CLASS, executorClass);
-
-        Version version = new Version();
-        version.setObj(Version.MAJOR, majorVersion);
-        version.setObj(Version.MINOR, minorVersion);
-        version.setObj(Version.REVISION, revisionVersion);
-        program.setObj(Program.VERSION, version);
-
-        return program;
-    }
-
-    protected ContentFile addProgram(FileSystem fileSystem, Program program, String path) {
-
-        ContentFile file = new ContentFile();
-        file.setObj(ContentFile.CONTENT, program);
-        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, path).invoke(FileAddAction.EXECUTE);
-        return file;
     }
 
 }

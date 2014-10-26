@@ -38,6 +38,7 @@ import com.quartercode.disconnected.server.world.comp.net.Socket.SocketState;
 import com.quartercode.disconnected.server.world.comp.net.SocketConnectionListener.ConnectionAllowance;
 import com.quartercode.disconnected.server.world.comp.os.OSModule;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.shared.comp.net.Address;
 
 /**
  * This class represents an {@link OperatingSystem} module which is used to send and receive network {@link Packet}s.
@@ -209,7 +210,7 @@ public class NetworkModule extends OSModule {
 
                 for (Socket socket : holder.getParent().getCol(SOCKETS)) {
                     if (socket.getObj(Socket.LOCAL_PORT) == localPort && socket.getObj(Socket.DESTINATION).equals(destination)) {
-                        throw new IllegalStateException("Socket with local port '" + localPort + "' and destination '" + destination.invoke(Address.TO_STRING) + "' is already bound");
+                        throw new IllegalStateException("Socket with local port '" + localPort + "' and destination '" + destination + "' is already bound");
                     }
                 }
 
@@ -273,9 +274,7 @@ public class NetworkModule extends OSModule {
                 NodeNetInterface netInterface = getNetInterface(holder);
 
                 // Construct the address of the sending socket
-                Address sourceAddress = new Address();
-                sourceAddress.setObj(Address.NET_ID, netInterface.getObj(NodeNetInterface.NET_ID));
-                sourceAddress.setObj(Address.PORT, socket.getObj(Socket.LOCAL_PORT));
+                Address sourceAddress = new Address(netInterface.getObj(NodeNetInterface.NET_ID), socket.getObj(Socket.LOCAL_PORT));
 
                 // Construct a new packet
                 Packet packet = new Packet();
@@ -313,7 +312,7 @@ public class NetworkModule extends OSModule {
                 Packet packet = (Packet) arguments[0];
                 Address packetSource = packet.getObj(Packet.SOURCE);
                 Address packetDestination = packet.getObj(Packet.DESTINATION);
-                int packetDestinationPort = packetDestination.getObj(Address.PORT);
+                int packetDestinationPort = packetDestination.getPort();
 
                 // Find the socket the packet was sent to
                 Socket responsibleSocket = null;

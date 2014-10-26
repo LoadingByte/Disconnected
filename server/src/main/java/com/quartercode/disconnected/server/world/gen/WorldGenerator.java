@@ -25,9 +25,7 @@ import java.util.List;
 import com.quartercode.disconnected.server.util.ProbabilityUtil;
 import com.quartercode.disconnected.server.util.RandomPool;
 import com.quartercode.disconnected.server.world.World;
-import com.quartercode.disconnected.server.world.comp.ByteUnit;
 import com.quartercode.disconnected.server.world.comp.Computer;
-import com.quartercode.disconnected.server.world.comp.Version;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
@@ -44,7 +42,6 @@ import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.hardware.RAM;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
 import com.quartercode.disconnected.server.world.comp.net.Backbone;
-import com.quartercode.disconnected.server.world.comp.net.NetID;
 import com.quartercode.disconnected.server.world.comp.os.Configuration;
 import com.quartercode.disconnected.server.world.comp.os.EnvironmentVariable;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
@@ -53,10 +50,13 @@ import com.quartercode.disconnected.server.world.comp.os.User;
 import com.quartercode.disconnected.server.world.comp.program.Program;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
-import com.quartercode.disconnected.server.world.general.Location;
+import com.quartercode.disconnected.shared.comp.ByteUnit;
+import com.quartercode.disconnected.shared.comp.Version;
 import com.quartercode.disconnected.shared.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.comp.file.FileRights;
 import com.quartercode.disconnected.shared.comp.file.PathUtils;
+import com.quartercode.disconnected.shared.comp.net.NetID;
+import com.quartercode.disconnected.shared.general.Location;
 
 /**
  * The world generator utility generates {@link World}s and parts of worlds.
@@ -157,10 +157,7 @@ public class WorldGenerator {
                 // Connect the computer to its router
                 netInterface.setObj(NodeNetInterface.CONNECTION, lastRouter);
                 // Set the interface's net id
-                NetID netId = new NetID();
-                netId.setObj(NetID.SUBNET, lastSubnet);
-                netId.setObj(NetID.ID, lastNetID);
-                netInterface.setObj(NodeNetInterface.NET_ID, netId);
+                netInterface.setObj(NodeNetInterface.NET_ID, new NetID(lastSubnet, lastNetID));
             }
 
             computer.setObj(Computer.LOCATION, locations.get(index));
@@ -241,7 +238,7 @@ public class WorldGenerator {
 
         OperatingSystem operatingSystem = new OperatingSystem();
         operatingSystem.setObj(OperatingSystem.NAME, "Frames");
-        operatingSystem.setObj(OperatingSystem.VERSION, createVersion(3, 7, 65));
+        operatingSystem.setObj(OperatingSystem.VERSION, new Version(3, 7, 65));
         computer.setObj(Computer.OS, operatingSystem);
 
         // Generate superuser object
@@ -272,15 +269,6 @@ public class WorldGenerator {
         return hardwareByType;
     }
 
-    private static Version createVersion(int major, int minor, int revision) {
-
-        Version version = new Version();
-        version.setObj(Version.MAJOR, major);
-        version.setObj(Version.MINOR, major);
-        version.setObj(Version.REVISION, revision);
-        return version;
-    }
-
     private static MainboardSlot generateMainboardSlot(Class<? extends Hardware> type) {
 
         MainboardSlot slot = new MainboardSlot();
@@ -302,10 +290,10 @@ public class WorldGenerator {
     private static void addSystemFiles(FileSystem fileSystem, User superuser) {
 
         // Add system programs
-        addProgramFile(fileSystem, superuser, Session.class, createVersion(1, 0, 0));
+        addProgramFile(fileSystem, superuser, Session.class, new Version(1, 0, 0));
 
         // Add general programs
-        addProgramFile(fileSystem, superuser, FileManagerProgram.class, createVersion(1, 0, 0));
+        addProgramFile(fileSystem, superuser, FileManagerProgram.class, new Version(1, 0, 0));
     }
 
     private static void addProgramFile(FileSystem fileSystem, User superuser, Class<? extends ProgramExecutor> executor, Version version) {

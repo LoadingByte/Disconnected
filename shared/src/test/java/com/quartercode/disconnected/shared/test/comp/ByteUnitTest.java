@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.test.world.comp.net;
+package com.quartercode.disconnected.shared.test.comp;
 
 import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
@@ -26,32 +26,32 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import com.quartercode.disconnected.server.world.comp.net.SpeedUnit;
+import com.quartercode.disconnected.shared.comp.ByteUnit;
 
 @RunWith (Parameterized.class)
-public class SpeedUnitTest {
+public class ByteUnitTest {
 
     @Parameters
     public static Collection<Object[]> data() {
 
         List<Object[]> data = new ArrayList<>();
 
-        data.add(new Object[] { 10, SpeedUnit.BYTE, 10, SpeedUnit.BYTE });
-        data.add(new Object[] { 10, SpeedUnit.KILOBYTE, 10000, SpeedUnit.BYTE });
-        data.add(new Object[] { 10000, SpeedUnit.BYTE, 10, SpeedUnit.KILOBYTE });
+        data.add(new Object[] { 10, ByteUnit.BYTE, 10, ByteUnit.BYTE });
+        data.add(new Object[] { 10, ByteUnit.KILOBYTE, 10240, ByteUnit.BYTE });
+        data.add(new Object[] { 10240, ByteUnit.BYTE, 10, ByteUnit.KILOBYTE });
 
-        data.add(new Object[] { 10, SpeedUnit.TERABYTE, 10000000, SpeedUnit.MEGABYTE });
-        data.add(new Object[] { 5, SpeedUnit.PETABYTE, 5000000000000000L, SpeedUnit.BYTE });
+        data.add(new Object[] { 10, ByteUnit.TERABYTE, 10485760, ByteUnit.MEGABYTE });
+        data.add(new Object[] { 5, ByteUnit.PETABYTE, 5629499534213120L, ByteUnit.BYTE });
 
         return data;
     }
 
-    private final long      source;
-    private final SpeedUnit sourceUnit;
-    private final long      target;
-    private final SpeedUnit targetUnit;
+    private final long     source;
+    private final ByteUnit sourceUnit;
+    private final long     target;
+    private final ByteUnit targetUnit;
 
-    public SpeedUnitTest(long source, SpeedUnit sourceUnit, long target, SpeedUnit targetUnit) {
+    public ByteUnitTest(long source, ByteUnit sourceUnit, long target, ByteUnit targetUnit) {
 
         this.source = source;
         this.sourceUnit = sourceUnit;

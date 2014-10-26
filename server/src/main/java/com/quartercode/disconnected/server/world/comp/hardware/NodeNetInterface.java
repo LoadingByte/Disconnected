@@ -30,12 +30,11 @@ import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.hardware.Mainboard.NeedsMainboardSlot;
-import com.quartercode.disconnected.server.world.comp.net.Address;
-import com.quartercode.disconnected.server.world.comp.net.NetID;
 import com.quartercode.disconnected.server.world.comp.net.NetworkModule;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.PacketProcessor;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.shared.comp.net.NetID;
 
 /**
  * This class represents a node network interface that may be used by a normal computer.
@@ -90,7 +89,7 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
                 RouterNetInterface connection = invocation.getCHolder().getObj(CONNECTION);
 
                 if (netId != null && connection != null) {
-                    int newSubnet = netId.getObj(NetID.SUBNET);
+                    int newSubnet = netId.getSubnet();
                     int conSubnet = connection.getObj(RouterNetInterface.SUBNET);
 
                     Validate.isTrue(newSubnet == conSubnet, "The subnet of the new net id (%d) must be equal to the one connected to (%d)", newSubnet, conSubnet);
@@ -185,7 +184,7 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
              */
             private boolean tryRouteToOs(NodeNetInterface netInterface, Packet packet) {
 
-                NetID destination = packet.getObj(Packet.DESTINATION).getObj(Address.NET_ID);
+                NetID destination = packet.getObj(Packet.DESTINATION).getNetId();
 
                 if (!destination.equals(netInterface.getObj(NET_ID))) {
                     // Packet destination is not this network interface

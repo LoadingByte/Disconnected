@@ -24,7 +24,7 @@ import org.junit.Test;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
 import com.quartercode.disconnected.server.world.comp.net.Backbone;
-import com.quartercode.disconnected.server.world.comp.net.NetID;
+import com.quartercode.disconnected.shared.comp.net.NetID;
 
 public class RouterNetInterfaceTest {
 
@@ -50,18 +50,10 @@ public class RouterNetInterfaceTest {
         neighbour2.setObj(RouterNetInterface.SUBNET, 20);
 
         child1 = new NodeNetInterface();
-        child1.setObj(NodeNetInterface.NET_ID, generateNetID(10, 1));
+        child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
 
         child2 = new NodeNetInterface();
-        child2.setObj(NodeNetInterface.NET_ID, generateNetID(10, 2));
-    }
-
-    private NetID generateNetID(int subnet, int id) {
-
-        NetID netId = new NetID();
-        netId.setObj(NetID.SUBNET, subnet);
-        netId.setObj(NetID.ID, id);
-        return netId;
+        child2.setObj(NodeNetInterface.NET_ID, new NetID(10, 2));
     }
 
     @Test
@@ -144,7 +136,7 @@ public class RouterNetInterfaceTest {
     public void testAddChildAddReverse() {
 
         routerInterface.addCol(RouterNetInterface.CHILDREN, child1);
-        child1.setObj(NodeNetInterface.NET_ID, generateNetID(10, 1));
+        child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
 
         assertConnected(routerInterface, child1, true);
     }
@@ -153,10 +145,10 @@ public class RouterNetInterfaceTest {
     public void testRemoveChildRemoveReverse() {
 
         routerInterface.addCol(RouterNetInterface.CHILDREN, child1);
-        child1.setObj(NodeNetInterface.NET_ID, generateNetID(10, 1));
+        child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
 
         routerInterface.removeCol(RouterNetInterface.CHILDREN, child1);
-        child1.setObj(NodeNetInterface.NET_ID, generateNetID(10, 1));
+        child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
 
         assertConnected(routerInterface, child1, false);
     }
@@ -165,9 +157,9 @@ public class RouterNetInterfaceTest {
     public void testAddMultipleChildrenAddReverse() {
 
         routerInterface.addCol(RouterNetInterface.CHILDREN, child1);
-        child1.setObj(NodeNetInterface.NET_ID, generateNetID(10, 1));
+        child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
         routerInterface.addCol(RouterNetInterface.CHILDREN, child2);
-        child2.setObj(NodeNetInterface.NET_ID, generateNetID(10, 2));
+        child2.setObj(NodeNetInterface.NET_ID, new NetID(10, 2));
 
         assertConnected(routerInterface, child1, true);
         assertConnected(routerInterface, child2, true);
@@ -177,14 +169,14 @@ public class RouterNetInterfaceTest {
     public void testRemoveMultipleChildrenRemoveReverse() {
 
         routerInterface.addCol(RouterNetInterface.CHILDREN, child1);
-        child1.setObj(NodeNetInterface.NET_ID, generateNetID(10, 1));
+        child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
         routerInterface.addCol(RouterNetInterface.CHILDREN, child2);
-        child2.setObj(NodeNetInterface.NET_ID, generateNetID(10, 2));
+        child2.setObj(NodeNetInterface.NET_ID, new NetID(10, 2));
 
         routerInterface.removeCol(RouterNetInterface.CHILDREN, child1);
-        child1.setObj(NodeNetInterface.NET_ID, generateNetID(10, 1));
+        child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
         routerInterface.removeCol(RouterNetInterface.CHILDREN, child2);
-        child2.setObj(NodeNetInterface.NET_ID, generateNetID(10, 2));
+        child2.setObj(NodeNetInterface.NET_ID, new NetID(10, 2));
 
         assertConnected(routerInterface, child1, false);
         assertConnected(routerInterface, child2, false);
@@ -194,12 +186,12 @@ public class RouterNetInterfaceTest {
     public void testAddRemoveMixedMultipleChildrenAddRemoveReverse() {
 
         routerInterface.addCol(RouterNetInterface.CHILDREN, child1);
-        child1.setObj(NodeNetInterface.NET_ID, generateNetID(10, 1));
+        child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
         routerInterface.addCol(RouterNetInterface.CHILDREN, child2);
-        child2.setObj(NodeNetInterface.NET_ID, generateNetID(10, 2));
+        child2.setObj(NodeNetInterface.NET_ID, new NetID(10, 2));
 
         routerInterface.removeCol(RouterNetInterface.CHILDREN, child1);
-        child1.setObj(NodeNetInterface.NET_ID, generateNetID(10, 1));
+        child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
 
         assertConnected(routerInterface, child1, false);
         assertConnected(routerInterface, child2, true);
