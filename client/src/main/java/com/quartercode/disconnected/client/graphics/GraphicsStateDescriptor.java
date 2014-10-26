@@ -108,7 +108,7 @@ public class GraphicsStateDescriptor {
      */
     public GraphicsState create() {
 
-        LOGGER.info("Creating instance of graphics state '{}'", name);
+        LOGGER.debug("Creating instance of graphics state '{}'", name);
 
         List<GraphicsModule> moduleObjects = new ArrayList<>();
         // Create module objects

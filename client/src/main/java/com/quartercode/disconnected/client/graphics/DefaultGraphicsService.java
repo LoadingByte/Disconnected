@@ -85,12 +85,12 @@ public class DefaultGraphicsService implements GraphicsService {
     public void setRunning(boolean running) {
 
         if (running && !isRunning()) {
-            LOGGER.info("Starting up graphics thread");
+            LOGGER.debug("Starting up graphics thread");
             thread = new GraphicsThread(themes);
             thread.changeState(state);
             thread.start();
         } else if (!running && isRunning()) {
-            LOGGER.info("Shutting down graphics thread");
+            LOGGER.debug("Shutting down graphics thread");
             thread.exit();
             thread = null;
         }

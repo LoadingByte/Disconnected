@@ -61,6 +61,8 @@ public class DefaultProfileService implements ProfileService {
         if (Files.exists(directory)) {
             try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directory)) {
                 for (Path profileFile : directoryStream) {
+                    LOGGER.debug("Indexing profile under '{}'", profileFile);
+
                     String profileFileName = profileFile.getFileName().toString();
                     profiles.add(new Profile(profileFileName.substring(0, profileFileName.lastIndexOf("."))));
                 }
@@ -100,9 +102,11 @@ public class DefaultProfileService implements ProfileService {
 
         for (Profile existingProfile : new ArrayList<>(profiles)) {
             if (existingProfile.getName().equalsIgnoreCase(profile.getName())) {
+                Path profileFile = directory.resolve(profile.getName() + ".zip");
+                LOGGER.debug("Removing profile '{}' from '{}'", profile.getName(), profileFile);
+
                 profiles.remove(profile);
 
-                Path profileFile = directory.resolve(profile.getName() + ".zip");
                 try {
                     Files.delete(profileFile);
                 } catch (IOException e) {
@@ -118,6 +122,8 @@ public class DefaultProfileService implements ProfileService {
     public void serializeProfile(Profile profile) throws ProfileSerializationException {
 
         Path profileFile = directory.resolve(profile.getName() + ".zip");
+        LOGGER.debug("Serializing (saving) profile '{}' to '{}'", profile.getName(), profileFile);
+
         if (Files.exists(profileFile)) {
             try {
                 Files.delete(profileFile);
@@ -152,6 +158,8 @@ public class DefaultProfileService implements ProfileService {
 
         if (active != null && (active.getWorld() == null || active.getRandom() == null)) {
             Path profileFile = directory.resolve(active.getName() + ".zip");
+            LOGGER.debug("Loading profile '{}' from '{}'", profile.getName(), profileFile);
+
             if (Files.exists(profileFile)) {
                 try (InputStream inputStream = Files.newInputStream(profileFile)) {
                     ProfileSerializer.deserializeProfile(inputStream, active);
@@ -160,6 +168,8 @@ public class DefaultProfileService implements ProfileService {
                 }
             }
         }
+
+        LOGGER.debug("Injecting profile '{}' into tick service", profile.getName());
 
         TickService tickService = ServiceRegistry.lookup(TickService.class);
         if (tickService != null) {

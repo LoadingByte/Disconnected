@@ -102,11 +102,11 @@ public class DefaultTickService implements TickService {
     public void setRunning(boolean running) {
 
         if (running && !isRunning()) {
-            LOGGER.info("Starting up tick thread");
+            LOGGER.debug("Starting up tick thread");
             thread = new TickThread(this);
             thread.start();
         } else if (!running && isRunning()) {
-            LOGGER.info("Shutting down tick thread");
+            LOGGER.debug("Shutting down tick thread");
             thread.interrupt();
             thread = null;
         }

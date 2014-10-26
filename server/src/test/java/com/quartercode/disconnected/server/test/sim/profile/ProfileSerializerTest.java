@@ -66,7 +66,7 @@ public class ProfileSerializerTest {
     @Before
     public void setUp() {
 
-        world = WorldGenerator.generateWorld(new Random(1), 10);
+        world = WorldGenerator.generateWorld(new Random(1), 2);
     }
 
     @Test
