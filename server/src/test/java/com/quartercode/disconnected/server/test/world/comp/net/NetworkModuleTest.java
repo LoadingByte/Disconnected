@@ -40,6 +40,7 @@ import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.Socket;
 import com.quartercode.disconnected.server.world.comp.net.Socket.PacketHandler;
 import com.quartercode.disconnected.server.world.comp.net.Socket.SocketState;
+import com.quartercode.disconnected.server.world.comp.net.TCPPacket;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.shared.comp.net.Address;
 import com.quartercode.disconnected.shared.comp.net.NetID;
@@ -145,6 +146,29 @@ public class NetworkModuleTest {
     @Test
     public void testSend() {
 
+        int destinationPort = 54321;
+        Address destinationAddress = new Address(new NetID(0, 1), destinationPort);
+
+        final Packet packet = new Packet();
+        packet.setObj(Packet.DESTINATION, destinationAddress);
+        packet.setObj(Packet.DATA, new ObjArray("testdata"));
+
+        nodeNetInterfaceProcessHook = context.mock(NodeNetInterfaceProcessHook.class);
+
+        // @formatter:off
+        context.checking(new Expectations() {{
+
+            oneOf(nodeNetInterfaceProcessHook).onProcess(packet);
+
+        }});
+        // @formatter:on
+
+        netModule.invoke(NetworkModule.SEND, packet);
+    }
+
+    @Test
+    public void testSendTcp() {
+
         int sourcePort = 12345;
         int destinationPort = 54321;
         Address sourceAddress = new Address(new NetID(0, 1), sourcePort);
@@ -157,10 +181,10 @@ public class NetworkModuleTest {
         socket.setObj(Socket.DESTINATION, destinationAddress);
         socket.setObj(Socket.STATE, SocketState.CONNECTED);
 
-        final Packet expectedPacket = new Packet();
-        expectedPacket.setObj(Packet.SOURCE, sourceAddress);
-        expectedPacket.setObj(Packet.DESTINATION, destinationAddress);
-        expectedPacket.setObj(Packet.DATA, new ObjArray("testdata"));
+        final TCPPacket expectedPacket = new TCPPacket();
+        expectedPacket.setObj(TCPPacket.SOURCE, sourceAddress);
+        expectedPacket.setObj(TCPPacket.DESTINATION, destinationAddress);
+        expectedPacket.setObj(TCPPacket.DATA, new ObjArray("testdata"));
 
         nodeNetInterfaceProcessHook = context.mock(NodeNetInterfaceProcessHook.class);
 
@@ -172,20 +196,20 @@ public class NetworkModuleTest {
         }});
         // @formatter:on
 
-        netModule.invoke(NetworkModule.SEND, socket, new ObjArray("testdata"));
+        netModule.invoke(NetworkModule.SEND_TCP, socket, new ObjArray("testdata"));
     }
 
     @Test
-    public void testHandle() {
+    public void testHandleTcp() {
 
         int sourcePort = 12345;
         Address sourceAddress = new Address(new NetID(0, 1), sourcePort);
         int destinationPort = 54321;
 
-        Packet packet = new Packet();
-        packet.setObj(Packet.SOURCE, sourceAddress);
-        packet.setObj(Packet.DESTINATION, new Address(new NetID(0, 2), destinationPort));
-        packet.setObj(Packet.DATA, new ObjArray("testdata"));
+        TCPPacket packet = new TCPPacket();
+        packet.setObj(TCPPacket.SOURCE, sourceAddress);
+        packet.setObj(TCPPacket.DESTINATION, new Address(new NetID(0, 2), destinationPort));
+        packet.setObj(TCPPacket.DATA, new ObjArray("testdata"));
 
         Socket receiverSocket = netModule.invoke(NetworkModule.CREATE_SOCKET);
         receiverSocket.setObj(Socket.LOCAL_PORT, destinationPort);

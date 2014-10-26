@@ -389,7 +389,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                 Socket holder = (Socket) invocation.getCHolder();
 
                 if (holder.getParent() != null) {
-                    holder.getParent().invoke(NetworkModule.SEND, holder, arguments[0]);
+                    holder.getParent().invoke(NetworkModule.SEND_TCP, holder, arguments[0]);
                 }
 
                 return invocation.next(arguments);

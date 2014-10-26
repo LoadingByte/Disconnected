@@ -41,10 +41,11 @@ import com.quartercode.disconnected.shared.comp.net.Address;
 
 /**
  * This class represents an {@link OperatingSystem} module which is used to send and receive network {@link Packet}s.
- * The module also abstracts the concept of {@link Packet}s and introduces {@link Socket}s for easier data transfer.
+ * The module also abstracts the concept of {@link TCPPacket}s and introduces {@link Socket}s for easier data transfer.
  * It is an essential part of the {@link OperatingSystem} and is directly used by it.
  * 
  * @see Packet
+ * @see TCPPacket
  * @see Socket
  * @see OSModule
  * @see OperatingSystem
@@ -82,33 +83,8 @@ public class NetworkModule extends OSModule {
     public static final FunctionDefinition<Socket>                                                             CREATE_SOCKET;
 
     /**
-     * This is an internal function that sends a new {@link Packet} with the given data object over the network.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Socket}</td>
-     * <td>socket</td>
-     * <td>The socket which called the function and likes to send the packet.</td>
-     * </tr>
-     * <tr>
-     * <td>1</td>
-     * <td>{@link Object}</td>
-     * <td>data</td>
-     * <td>The data object which should be put into {@link Packet#DATA}.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Void>                                                               SEND;
-
-    /**
-     * This is an internal function that delivers the given {@link Packet} to the {@link Socket} which has opened the connection.
+     * This is an internal function that sends a provided generic {@link Packet} over the network.
+     * Note that this function should be used by other functions which send a specific type of packet.
      * 
      * <table>
      * <tr>
@@ -121,7 +97,54 @@ public class NetworkModule extends OSModule {
      * <td>0</td>
      * <td>{@link Packet}</td>
      * <td>packet</td>
-     * <td>The packet which should be delivered to its destination socket.</td>
+     * <td>The generic packet that should be sent by the network module.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                                               SEND;
+
+    /**
+     * This is an internal function that sends a new {@link TCPPacket}, which was caused by the given {@link Socket}, with the given data object over the network.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Socket}</td>
+     * <td>socket</td>
+     * <td>The socket which called the function and likes to send the tcp packet.</td>
+     * </tr>
+     * <tr>
+     * <td>1</td>
+     * <td>{@link Object}</td>
+     * <td>data</td>
+     * <td>The data object which should be put into {@link Packet#DATA}.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void>                                                               SEND_TCP;
+
+    /**
+     * This is an internal function that delivers the given generic {@link Packet} to some sort of handler.
+     * For example, a {@link TCPPacket} is delivered to the {@link Socket} which has opened the connection.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Packet}</td>
+     * <td>packet</td>
+     * <td>The generic packet which should be delivered to a handler.</td>
      * </tr>
      * </table>
      */
@@ -258,8 +281,28 @@ public class NetworkModule extends OSModule {
 
         });
 
-        SEND = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "send", "parameters", new Class[] { Socket.class, Object.class });
+        SEND = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "send", "parameters", new Class[] { Packet.class });
         SEND.addExecutor("default", NetworkModule.class, new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                NetworkModule holder = (NetworkModule) invocation.getCHolder();
+                Packet packet = (Packet) arguments[0];
+
+                // Retrieve the network interface the packet will be sent by
+                NodeNetInterface netInterface = holder.getNetInterface();
+
+                // Send the packet
+                netInterface.invoke(NodeNetInterface.PROCESS, packet);
+
+                return invocation.next(arguments);
+            }
+
+        });
+
+        SEND_TCP = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "sendTcp", "parameters", new Class[] { Socket.class, Object.class });
+        SEND_TCP.addExecutor("default", NetworkModule.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
@@ -268,68 +311,58 @@ public class NetworkModule extends OSModule {
                 Socket socket = (Socket) arguments[0];
                 Object data = arguments[1];
 
-                // Retrieve the network interface the packet will be sent by
-                NodeNetInterface netInterface = getNetInterface(holder);
-
                 // Construct the address of the sending socket
+                NodeNetInterface netInterface = holder.getNetInterface();
                 Address sourceAddress = new Address(netInterface.getObj(NodeNetInterface.NET_ID), socket.getObj(Socket.LOCAL_PORT));
 
-                // Construct a new packet
-                Packet packet = new Packet();
-                packet.setObj(Packet.SOURCE, sourceAddress);
-                packet.setObj(Packet.DESTINATION, socket.getObj(Socket.DESTINATION));
-                packet.setObj(Packet.DATA, data);
+                // Construct a new tcp packet
+                TCPPacket packet = new TCPPacket();
+                packet.setObj(TCPPacket.SOURCE, sourceAddress);
+                packet.setObj(TCPPacket.DESTINATION, socket.getObj(Socket.DESTINATION));
+                packet.setObj(TCPPacket.DATA, data);
 
                 // Send the packet
-                netInterface.invoke(NodeNetInterface.PROCESS, packet);
+                holder.invoke(SEND, packet);
 
                 return invocation.next(arguments);
-            }
-
-            private NodeNetInterface getNetInterface(NetworkModule holder) {
-
-                Computer computer = holder.getParent().getParent();
-                for (Hardware hardware : computer.getCol(Computer.HARDWARE)) {
-                    if (hardware instanceof NodeNetInterface) {
-                        return (NodeNetInterface) hardware;
-                    }
-                }
-
-                return null;
             }
 
         });
 
         HANDLE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "handle", "parameters", new Class[] { Packet.class });
-        HANDLE.addExecutor("default", NetworkModule.class, new FunctionExecutor<Void>() {
+        HANDLE.addExecutor("tcpSockets", NetworkModule.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
-                Packet packet = (Packet) arguments[0];
-                Address packetSource = packet.getObj(Packet.SOURCE);
-                Address packetDestination = packet.getObj(Packet.DESTINATION);
-                int packetDestinationPort = packetDestination.getPort();
 
-                // Find the socket the packet was sent to
-                Socket responsibleSocket = null;
-                for (Socket socket : holder.getCol(SOCKETS)) {
-                    if (socket.getObj(Socket.LOCAL_PORT) == packetDestinationPort && socket.getObj(Socket.DESTINATION).equals(packetSource)) {
-                        responsibleSocket = socket;
-                        break;
+                if (arguments[0] instanceof TCPPacket) {
+                    TCPPacket packet = (TCPPacket) arguments[0];
+                    Address packetSource = packet.getObj(TCPPacket.SOURCE);
+                    Address packetDestination = packet.getObj(TCPPacket.DESTINATION);
+
+                    int packetDestinationPort = packetDestination.getPort();
+
+                    // Find the socket the packet was sent to
+                    Socket responsibleSocket = null;
+                    for (Socket socket : holder.getCol(SOCKETS)) {
+                        if (socket.getObj(Socket.LOCAL_PORT) == packetDestinationPort && socket.getObj(Socket.DESTINATION).equals(packetSource)) {
+                            responsibleSocket = socket;
+                            break;
+                        }
                     }
-                }
 
-                // Create a new socket if the destination of the packet is not yet bound
-                // Note that this creation must be allowed by the connection listeners
-                if (responsibleSocket == null) {
-                    responsibleSocket = tryCreateSocket(holder, packetSource, packetDestinationPort);
-                }
+                    // Create a new socket if the destination of the packet is not yet bound
+                    // Note that this creation must be allowed by the connection listeners
+                    if (responsibleSocket == null) {
+                        responsibleSocket = tryCreateSocket(holder, packetSource, packetDestinationPort);
+                    }
 
-                // Hand the packet over to the socket so it can handle it
-                if (responsibleSocket != null) {
-                    responsibleSocket.invoke(Socket.HANDLE, packet);
+                    // Hand the packet over to the socket so it can handle it
+                    if (responsibleSocket != null) {
+                        responsibleSocket.invoke(Socket.HANDLE, packet);
+                    }
                 }
 
                 return invocation.next(arguments);
@@ -378,6 +411,21 @@ public class NetworkModule extends OSModule {
 
         });
 
+    }
+
+    /*
+     * A utility method that returns the NodeNetInterface which should be used for sending packets through the network module.
+     */
+    private NodeNetInterface getNetInterface() {
+
+        Computer computer = getParent().getParent();
+        for (Hardware hardware : computer.getCol(Computer.HARDWARE)) {
+            if (hardware instanceof NodeNetInterface) {
+                return (NodeNetInterface) hardware;
+            }
+        }
+
+        return null;
     }
 
 }

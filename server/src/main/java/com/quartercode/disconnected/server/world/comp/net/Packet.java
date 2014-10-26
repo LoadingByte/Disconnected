@@ -28,17 +28,16 @@ import com.quartercode.disconnected.server.world.comp.SizeUtil.DerivableSize;
 import com.quartercode.disconnected.shared.comp.net.Address;
 
 /**
- * This class represents a packet which can be sent between network interfaces.
- * A packet contains a source, a destination (both represented by addresses) and a data payload {@link Object} which should be sent.
+ * This class represents a generic packet which can be sent to a network interface.
+ * Every packet contains a destination {@link Address} and the data payload {@link Object} which should be sent.
+ * Note that no source address is stored. That means that generic packets must not be sent from a network interface.
+ * Such functionality can be added by subclasses, e.g. {@link TCPPacket}.
+ * 
+ * @see TCPPacket
  */
 public class Packet extends WorldFeatureHolder implements DerivableSize {
 
     // ----- Properties -----
-
-    /**
-     * The network {@link Address} of the {@link Socket} which sent the packet.
-     */
-    public static final PropertyDefinition<Address> SOURCE;
 
     /**
      * The network {@link Address} of the {@link Socket} the packet is sent to.
@@ -53,7 +52,6 @@ public class Packet extends WorldFeatureHolder implements DerivableSize {
 
     static {
 
-        SOURCE = create(new TypeLiteral<PropertyDefinition<Address>>() {}, "name", "source", "storage", new StandardStorage<>());
         DESTINATION = create(new TypeLiteral<PropertyDefinition<Address>>() {}, "name", "destination", "storage", new StandardStorage<>());
         DATA = create(new TypeLiteral<PropertyDefinition<Object>>() {}, "name", "data", "storage", new StandardStorage<>());
 
