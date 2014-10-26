@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
@@ -74,41 +73,7 @@ public class Program extends WorldFeatureHolder implements DerivableSize {
 
     // ----- Functions -----
 
-    /**
-     * Creates a new {@link ProgramExecutor} out of the set executor class.
-     * The executor class must have a default constructor.
-     * 
-     * <table>
-     * <tr>
-     * <th>Exception</th>
-     * <th>When?</th>
-     * </tr>
-     * <tr>
-     * <td>{@link RuntimeException}</td>
-     * <td>Unexpected exception during the creation of a new program executor instance.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<ProgramExecutor>                             CREATE_EXECUTOR;
-
     static {
-
-        CREATE_EXECUTOR = create(new TypeLiteral<FunctionDefinition<ProgramExecutor>>() {}, "name", "createExecutor", "parameters", new Class[0]);
-        CREATE_EXECUTOR.addExecutor("default", Program.class, new FunctionExecutor<ProgramExecutor>() {
-
-            @Override
-            public ProgramExecutor invoke(FunctionInvocation<ProgramExecutor> invocation, Object... arguments) {
-
-                Class<? extends ProgramExecutor> executorClass = invocation.getCHolder().getObj(EXECUTOR_CLASS);
-
-                try {
-                    return executorClass.newInstance();
-                } catch (Exception e) {
-                    throw new RuntimeException("Unexpected exception during initialization of new program executor (class '" + executorClass.getName() + "'", e);
-                }
-            }
-
-        });
 
         GET_SIZE.addExecutor("executor", Program.class, new FunctionExecutor<Long>() {
 

@@ -729,8 +729,13 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                 }
 
                 // Create new executor
-                Program program = (Program) source.getObj(ContentFile.CONTENT);
-                ProgramExecutor executor = program.invoke(Program.CREATE_EXECUTOR);
+                Class<? extends ProgramExecutor> executorClass = ((Program) source.getObj(ContentFile.CONTENT)).getObj(Program.EXECUTOR_CLASS);
+                ProgramExecutor executor;
+                try {
+                    executor = executorClass.newInstance();
+                } catch (Exception e) {
+                    throw new RuntimeException("Unexpected exception during initialization of new program executor (class '" + executorClass.getName() + "'", e);
+                }
 
                 // Set new executor
                 holder.setObj(EXECUTOR, executor);
