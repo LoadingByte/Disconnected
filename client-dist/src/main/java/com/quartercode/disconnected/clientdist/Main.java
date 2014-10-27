@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.clientdist;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Random;
@@ -61,6 +62,7 @@ import com.quartercode.disconnected.shared.util.ExitUtil.ExitProcessor;
 import com.quartercode.disconnected.shared.util.LogExceptionHandler;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 import com.quartercode.disconnected.shared.util.Settings;
+import com.quartercode.disconnected.shared.util.TempFileManager;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.BridgeConnectorException;
 import com.quartercode.eventbridge.extra.connector.LocalBridgeConnector;
@@ -97,6 +99,9 @@ public class Main {
         // Initialize settings and process default ones
         initializeSettings();
         processDefaultSettings();
+
+        // Initialize temp file manager
+        initializeTempFileManager();
 
         // Process the command line arguments
         processCommandLineArguments(args);
@@ -203,6 +208,18 @@ public class Main {
         if (Settings.getSetting("debugLoggingAll").equals("true")) {
             // Retrieve the root logger and set its level to debug
             ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).setLevel(Level.DEBUG);
+        }
+    }
+
+    private static void initializeTempFileManager() {
+
+        Path parentTempDir = Paths.get("tmp");
+
+        LOGGER.debug("Initializing temp file manager under '{}'", parentTempDir);
+        try {
+            TempFileManager.initialize(parentTempDir);
+        } catch (IOException e) {
+            throw new RuntimeException("Error while initializing temp file manager under '" + parentTempDir + "'", e);
         }
     }
 

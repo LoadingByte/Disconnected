@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.shared.util.ApplicationInfo;
 import com.quartercode.disconnected.shared.util.ExitUtil;
+import com.quartercode.disconnected.shared.util.TempFileManager;
 import de.matthiasmann.twl.Container;
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
@@ -183,7 +184,7 @@ public class GraphicsThread extends Thread {
 
     private void loadTheme() throws LWJGLException, IOException {
 
-        Path themeFile = Files.createTempFile(ApplicationInfo.TITLE + "-theme", ".xml");
+        Path themeFile = TempFileManager.getTempDir().resolve("twlConfigFinal.xml");
 
         try (PrintWriter themeFileWriter = new PrintWriter(Files.newOutputStream(themeFile))) {
             themeFileWriter.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
@@ -198,8 +199,6 @@ public class GraphicsThread extends Thread {
             theme = ThemeManager.createThemeManager(themeFile.toUri().toURL(), renderer);
         } catch (IOException e) {
             throw new IOException("Error while creating temporary theme file", e);
-        } finally {
-            Files.deleteIfExists(themeFile);
         }
     }
 
