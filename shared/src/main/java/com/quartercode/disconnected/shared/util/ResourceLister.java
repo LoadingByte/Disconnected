@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.util;
+package com.quartercode.disconnected.shared.util;
 
 import java.io.Closeable;
 import java.io.IOException;
