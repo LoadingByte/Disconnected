@@ -18,15 +18,14 @@
 
 package com.quartercode.disconnected.server.util;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -35,34 +34,36 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * This utlity class lists classpath resources which can be found under a given path.
+ * This class is able to list classpath resources from multiple classpath entries.
+ * For example, if two classpath entries (e.g. jars) contain the directory {@code /test1/test2}, this class returns both.
  */
-public class ResourceLister {
+public class ResourceLister implements Closeable {
 
-    private static final String PATH_SEPARATOR = System.getProperty("path.separator");
+    private final List<Path>       resourcePaths  = new ArrayList<>();
+    private final List<FileSystem> jarFileSystems = new ArrayList<>();
 
     /**
-     * Returns all classpath resources which can be found under the given path.
-     * This can only list absoulte resources, so make sure that your path starts with "/".
+     * Creates a new resource lister that lists all occurrences of the given classpath resource on the classpath as {@link Path}s.
+     * It is possible that multiple paths are listed if multiple classpath entries (e.g. jars) contain the resource.
+     * For example, if two jars contain the directory {@code /test1/test2}, this class lists both both.<br>
+     * <br>
+     * Note that this class uses a workaround to create path objects for files which are located inside a jar.
+     * Because of that, each instance of this class should be closed after the paths have been used.
+     * However, the paths might no longer be accessible after the lister has been closed.
      * 
-     * @param path The parent classpath directory to search in. Has to start with "/".
-     * @param directories If enabled, all directories will also be returned.
-     * @return All classpath resources which can be found under the given path.
-     * @throws IOException Something goes wrong while reading from the jar file (if it's a jar).
-     * @throws IllegalStateException One of the classpath entries on this process doesn't exist.
-     * @throws IllegalArgumentException The parts doesn't start with "/" (this can't list relative resources).
+     * @param resourcePath The path that defines the classpath resource whose occurrences should be listed.
+     * @throws IOException Something goes wrong while retrieving the resource occurrences.
+     *         If an occurrence is located inside a jar, a jar reading exception is also possible.
+     * @throws IllegalArgumentException The resource path doesn't start with "/" (this method cannot list relative resources).
+     * @see #getResourcePaths()
      */
-    public static List<String> getResources(String path, boolean directories) throws IOException {
+    public ResourceLister(String resourcePath) throws IOException {
 
-        if (StringUtils.strip(path, "/").isEmpty()) {
-            throw new IllegalArgumentException("Can't list resources from classpath root ('/')");
-        } else if (!path.startsWith("/")) {
-            throw new IllegalArgumentException("Can't list relative resources, make sure your path starts with '/'");
+        if (!resourcePath.startsWith("/")) {
+            throw new IllegalArgumentException("Cannot retrieve relative resources, make sure your path starts with '/'");
         } else {
-            List<String> resources = new ArrayList<>();
-
             // Retrieve all occurrences of the given path in the classpath
-            Enumeration<URL> locations = ResourceLister.class.getClassLoader().getResources(StringUtils.stripStart(path, "/"));
+            Enumeration<URL> locations = ResourceLister.class.getClassLoader().getResources(StringUtils.stripStart(resourcePath, "/"));
 
             // Iterate over those occurrences
             while (locations.hasMoreElements()) {
@@ -74,16 +75,32 @@ public class ResourceLister {
                     Path jarFile = Paths.get(toURI( ((JarURLConnection) location.openConnection()).getJarFileURL()));
 
                     // Load the resources from the jar file
-                    try (FileSystem jarFS = FileSystems.newFileSystem(jarFile, null)) {
-                        return getResourcesFromDirectory(path, directories, null, jarFS.getPath(path));
-                    }
+                    FileSystem jarFS = FileSystems.newFileSystem(jarFile, null);
+                    resourcePaths.add(jarFS.getPath(resourcePath));
+                    jarFileSystems.add(jarFS);
                 } else {
                     // Directly load the resources from the main file system
-                    resources.addAll(getResourcesFromDirectory(path, directories, location.getFile(), Paths.get(toURI(location))));
+                    resourcePaths.add(Paths.get(toURI(location)));
                 }
             }
+        }
+    }
 
-            return resources;
+    /**
+     * Returns all listed occurrences of the classpath resource.
+     * 
+     * @return All resource occurrences.
+     */
+    public List<Path> getResourcePaths() {
+
+        return resourcePaths;
+    }
+
+    @Override
+    public void close() throws IOException {
+
+        for (FileSystem jarFileSystem : jarFileSystems) {
+            jarFileSystem.close();
         }
     }
 
@@ -94,29 +111,6 @@ public class ResourceLister {
         } catch (URISyntaxException e) {
             throw new RuntimeException("Strange error: Cannot convert url '" + url + "' into uri", e);
         }
-    }
-
-    private static List<String> getResourcesFromDirectory(String path, boolean directories, String filter, Path currentDirectory) throws IOException {
-
-        List<String> resources = new ArrayList<>();
-
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(currentDirectory)) {
-            for (Path file : directoryStream) {
-                if (!Files.isDirectory(file) || directories) {
-                    if (filter == null) {
-                        resources.add(file.toString());
-                    } else {
-                        resources.add(path + file.toString().replace(filter, "").replace(PATH_SEPARATOR, "/"));
-                    }
-                }
-
-                if (Files.isDirectory(file)) {
-                    resources.addAll(getResourcesFromDirectory(path, directories, filter, file));
-                }
-            }
-        }
-
-        return resources;
     }
 
 }

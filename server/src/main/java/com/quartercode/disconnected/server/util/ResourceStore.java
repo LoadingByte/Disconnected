@@ -19,8 +19,13 @@
 package com.quartercode.disconnected.server.util;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,25 +74,39 @@ public class ResourceStore {
      */
     public static void loadFromClasspath(String path) throws IOException {
 
-        for (String resourcePath : ResourceLister.getResources(path, false)) {
-            URL resource = ResourceStore.class.getResource(resourcePath);
+        try (ResourceLister resourceLister = new ResourceLister(path)) {
+            for (final Path resource : resourceLister.getResourcePaths()) {
+                Files.walkFileTree(resource, new SimpleFileVisitor<Path>() {
 
-            Object resourceObject = null;
-            if (resourcePath.endsWith(".txt")) {
-                resourceObject = new Scanner(new InputStreamReader(resource.openStream())).useDelimiter("\\Z").next();
-            } else if (resourcePath.endsWith(".png")) {
-                resourceObject = ImageIO.read(resource);
-            }
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 
-            if (resourceObject == null) {
-                throw new RuntimeException("Can't find parser for " + resourcePath);
-            } else {
-                String name = resourcePath.replace(path, "");
-                if (name.startsWith("/")) {
-                    name = name.substring(1);
-                }
-                loadedResources.put(name, resourceObject);
+                        loadResource(resource.relativize(file).toString(), file);
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                });
             }
+        }
+    }
+
+    private static void loadResource(String name, Path file) throws IOException {
+
+        Object resourceObject = null;
+        if (name.endsWith(".txt")) {
+            try (Scanner scanner = new Scanner(Files.newBufferedReader(file, Charset.forName("UTF-8")))) {
+                resourceObject = scanner.useDelimiter("\\Z").next();
+            }
+        } else if (name.endsWith(".png")) {
+            try (InputStream inputStream = Files.newInputStream(file)) {
+                resourceObject = ImageIO.read(inputStream);
+            }
+        }
+
+        if (resourceObject == null) {
+            throw new RuntimeException("Can't find parser for " + file);
+        } else {
+            loadedResources.put(name, resourceObject);
         }
     }
 
