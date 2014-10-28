@@ -3,89 +3,79 @@
 <themes>
     <include filename="cursors.xml"/>
 
-    <images file="images/components.png">
-        <!-- General -->
-        <area name="color" xywh="19,24,1,1"/>
-        <area name="flatarea1" border="3" xywh="2,24,3,3" splitx="L1,R1" splity="T1,B1"/>
-        <area name="flatarea2" border="3" xywh="8,24,3,3" splitx="L1,R1" splity="T1,B1"/>
-
+    <images>
         <!-- Tooltip -->
-        <alias name="tooltip.background" ref="flatarea2" tint="#008AEE"/>
+        <alias name="tooltip.background" ref="default_flatarea2" tint="#008AEE"/>
 
         <!-- Button -->
-        <area name="button.background.normal" xywh="2,2,19,19" splitx="L1,R1" splity="T1,B1"/>
         <select name="button.background">
-            <alias ref="button.background.normal" if="disabled" tint="#0051DE"/>
-            <alias ref="button.background.normal" if="pressed" tint="#007800"/>
-            <alias ref="button.background.normal" if="hover" tint="#00B900"/>
-            <alias ref="button.background.normal" tint="#3D69FF"/>
+            <alias ref="default_button.background" if="disabled" tint="#0051DE"/>
+            <alias ref="default_button.background" if="pressed" tint="#007800"/>
+            <alias ref="default_button.background" if="hover" tint="#00B900"/>
+            <alias ref="default_button.background" tint="#3D69FF"/>
         </select>
 
         <!-- Editfield -->
-        <alias name="editfield.background.normal" ref="flatarea2"/>
         <select name="editfield.background">
-            <alias ref="editfield.background.normal" tint="#0099FA" if="keyboardFocus"/>
-            <alias ref="editfield.background.normal" tint="#2525FF"/>
+            <alias ref="default_flatarea2" tint="#0099FA" if="keyboardFocus"/>
+            <alias ref="default_flatarea2" tint="#2525FF"/>
         </select>
-        <alias name="-editfield.cursor" ref="color" tint="#CCCCCC"/>
+        <alias name="-editfield.cursor" ref="default_white" tint="#CCCCCC"/>
         <animation name="editfield.cursor" timeSource="keyboardFocus">
             <frame ref="-editfield.cursor" duration="500"/>
             <frame ref="none" duration="500"/>
         </animation>
-        <alias name="editfield.selection" ref="color" tint="#E000FEFF"/>
+        <alias name="editfield.selection" ref="default_white" tint="#E000FEFF"/>
 
         <!-- Scrollbar Background -->
-        <area name="scrollbar.background" tiled="true" xywh="14,24,2,2" tint="#0007FA"/>
+        <alias name="scrollbar.background" ref="default_scrollbar.background" tint="#0007FA"/>
 
         <!-- Scrollbar Buttons -->
-        <alias name="scrollbar.button.background.normal" ref="flatarea2"/>
-        <area name="scrollbar.button.up" xywh="32,9,7,4" inset="5,3,5,4" center="true"/>
-        <area name="scrollbar.button.down" xywh="32,2,7,4" inset="5,3,5,4" center="true"/>
-        <area name="scrollbar.button.left" xywh="42,2,4,7" inset="3,4,4,6" center="true"/>
-        <area name="scrollbar.button.right" xywh="49,2,4,7" inset="3,4,4,6" center="true"/>
-        <select name="scrollbar.button.background">
-            <alias ref="scrollbar.button.background.normal" if="disabled" tint="#0076C9"/>
-            <alias ref="scrollbar.button.background.normal" if="pressed" tint="#008B00"/>
-            <alias ref="scrollbar.button.background.normal" if="hover" tint="#00C800"/>
-            <alias ref="scrollbar.button.background.normal" tint="#0196FF"/>
+        <alias name="scrollbar.button.up" ref="default_arrow-up" inset="5,3,5,4" center="true"/>
+        <alias name="scrollbar.button.down" ref="default_arrow-down" inset="5,3,5,4" center="true"/>
+        <alias name="scrollbar.button.left" ref="default_arrow-left" inset="3,4,4,6" center="true"/>
+        <alias name="scrollbar.button.right" ref="default_arrow-right" inset="3,4,4,6" center="true"/>
+        <select name="-scrollbar.button.background">
+            <alias ref="default_flatarea2" if="disabled" tint="#0076C9"/>
+            <alias ref="default_flatarea2" if="pressed" tint="#008B00"/>
+            <alias ref="default_flatarea2" if="hover" tint="#00C800"/>
+            <alias ref="default_flatarea2" tint="#0196FF"/>
         </select>
         <composed name="scrollbar.button.up.background">
-            <alias ref="scrollbar.button.background"/>
+            <alias ref="-scrollbar.button.background"/>
             <alias ref="scrollbar.button.up"/>
         </composed>
         <composed name="scrollbar.button.down.background">
-            <alias ref="scrollbar.button.background"/>
+            <alias ref="-scrollbar.button.background"/>
             <alias ref="scrollbar.button.down"/>
         </composed>
         <composed name="scrollbar.button.left.background">
-            <alias ref="scrollbar.button.background"/>
+            <alias ref="-scrollbar.button.background"/>
             <alias ref="scrollbar.button.left"/>
         </composed>
         <composed name="scrollbar.button.right.background">
-            <alias ref="scrollbar.button.background"/>
+            <alias ref="-scrollbar.button.background"/>
             <alias ref="scrollbar.button.right"/>
         </composed>
 
         <!-- Scrollbar Thumb -->
-        <alias name="scrollbar.thumb.background.normal" ref="flatarea2"/>
         <select name="scrollbar.thumb.background">
-            <alias ref="scrollbar.thumb.background.normal" if="disabled" tint="#0076C9"/>
-            <alias ref="scrollbar.thumb.background.normal" if="pressed" tint="#008B00"/>
-            <alias ref="scrollbar.thumb.background.normal" if="hover" tint="#00C800"/>
-            <alias ref="scrollbar.thumb.background.normal" tint="#0196FF"/>
+            <alias ref="default_flatarea2" if="disabled" tint="#0076C9"/>
+            <alias ref="default_flatarea2" if="pressed" tint="#008B00"/>
+            <alias ref="default_flatarea2" if="hover" tint="#00C800"/>
+            <alias ref="default_flatarea2" tint="#0196FF"/>
         </select>
 
         <!-- Table -->
-        <alias name="table.columnHeader.background" ref="flatarea2" inset="-3,0" tint="#005EFF"/>
-        <area name="table.row.selection" xywh="24,2,5,5" nocenter="true" splitx="L2,R2" splity="T2,B2"/>
+        <alias name="table.columnHeader.background" ref="default_flatarea2" inset="-3,0" tint="#005EFF"/>
         <alias name="table.row.background" ref="none"/>
-        <alias name="table.row.overlay" ref="table.row.selection" inset="1" if="keyboardFocus + !hasFocusedChild + leadRow"/>
+        <alias name="table.row.overlay" ref="default_table.row.selection" inset="1" if="keyboardFocus + !hasFocusedChild + leadRow"/>
         <alias name="table.row.dropmarker" ref="none"/>
 
         <!-- Tree Table Buttons -->
         <select name="treetable.treebutton.background" inset="2,1,0,4" tint="#00B4FF">
-            <area xywh="24,18,5,5" if="selected"/>
-            <area xywh="24,10,5,5"/>
+            <alias ref="default_minus" if="selected"/>
+            <alias ref="default_plus"/>
         </select>
     </images>
 

@@ -1,43 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE themes PUBLIC "-//www.matthiasmann.de//TWL-Theme//EN" "http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd">
 <themes>
-    <images file="images/background.png">
+    <images>
         <!-- Background Image -->
-        <area name="background-image" xywh="*"/>
-    </images>
+        <alias name="background-image" ref="desktop_background"/>
 
-    <images file="images/components.png">
         <!-- Launch Button -->
-        <area name="launch-button.normal" xywh="22,2,17,16" splitx="L3,R3" splity="T1,B1"/>
         <select name="launch-button.background">
-            <alias ref="launch-button.normal" if="disabled" tint="#0093BD"/>
-            <alias ref="launch-button.normal" if="pressed" tint="#00C800"/>
-            <alias ref="launch-button.normal" if="hover" tint="#00FF00"/>
-            <alias ref="launch-button.normal" tint="#00C7FF"/>
+            <alias ref="desktop_taskbar-button-active.background" if="disabled" tint="#0093BD"/>
+            <alias ref="desktop_taskbar-button-active.background" if="pressed" tint="#00C800"/>
+            <alias ref="desktop_taskbar-button-active.background" if="hover" tint="#00FF00"/>
+            <alias ref="desktop_taskbar-button-active.background" tint="#00C7FF"/>
         </select>
 
-        <!-- Taskbar Button -->
-        <area name="taskbar-button-active.normal" xywh="22,2,17,16" splitx="L3,R3" splity="T1,B1"/>
+        <!-- Taskbar Buttons -->
         <select name="taskbar-button-active.background">
-            <alias ref="taskbar-button-active.normal" if="disabled" tint="#00B4B4"/>
-            <alias ref="taskbar-button-active.normal" if="pressed" tint="#00C800"/>
-            <alias ref="taskbar-button-active.normal" if="hover" tint="#00FF00"/>
-            <alias ref="taskbar-button-active.normal" tint="#00FFFF"/>
+            <alias ref="desktop_taskbar-button-active.background" if="disabled" tint="#00B4B4"/>
+            <alias ref="desktop_taskbar-button-active.background" if="pressed" tint="#00C800"/>
+            <alias ref="desktop_taskbar-button-active.background" if="hover" tint="#00FF00"/>
+            <alias ref="desktop_taskbar-button-active.background" tint="#00FFFF"/>
         </select>
-        <area name="taskbar-button-inactive.normal" xywh="2,2,17,16" splitx="L3,R3" splity="T1,B1" nocenter="true"/>
         <select name="taskbar-button-inactive.background">
-            <alias ref="taskbar-button-inactive.normal" if="disabled" tint="#00D589"/>
-            <alias ref="taskbar-button-inactive.normal" if="pressed" tint="#00C800"/>
-            <alias ref="taskbar-button-inactive.normal" if="hover" tint="#00FF00"/>
-            <alias ref="taskbar-button-inactive.normal" tint="#63FFC7"/>
+            <alias ref="desktop_taskbar-button-inactive.background" if="disabled" tint="#00D589"/>
+            <alias ref="desktop_taskbar-button-inactive.background" if="pressed" tint="#00C800"/>
+            <alias ref="desktop_taskbar-button-inactive.background" if="hover" tint="#00FF00"/>
+            <alias ref="desktop_taskbar-button-inactive.background" tint="#63FFC7"/>
         </select>
 
         <!-- Frame Background -->
         <composed name="frame.background" border="30,5,5,5">
-            <area xywh="2,21,3,3" splitx="L1,R1" splity="T1,B1" tint="#0000D5"/>
+            <alias ref="default_flatarea1" tint="#0000D5"/>
             <grid weightsX="0,1,0" weightsY="0,1" inset="4">
                 <alias ref="none"/>
-                <area xywh="8,21,1,1" tint="#0063FF" sizeOverwriteV="20"/>
+                <alias ref="default_white" tint="#0063FF" sizeOverwriteV="20"/>
                 <alias ref="none"/>
                 <alias ref="none"/>
                 <alias ref="none"/>
@@ -46,7 +41,7 @@
         </composed>
 
         <!-- Frame Closebutton -->
-        <area name="frame.closebutton.normal" xywh="42,2,7,7" sizeOverwriteH="10" sizeOverwriteV="10"/>
+        <alias name="frame.closebutton.normal" ref="desktop_cross" sizeOverwriteH="10" sizeOverwriteV="10"/>
         <select name="frame.closebutton.background">
             <alias ref="frame.closebutton.normal" if="disabled" tint="#00D1D1"/>
             <alias ref="frame.closebutton.normal" if="pressed" tint="#00EA00"/>
