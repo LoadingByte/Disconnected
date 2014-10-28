@@ -155,12 +155,20 @@ public class ClientProgramWindow extends DesktopWindow {
      * @param key The key the returned value is associated with.
      * @return The i18n string which is associated with the given key.
      */
-    protected String getString(String key) {
+    public String getString(String key) {
 
         return descriptor.getResourceBundle().getString(key);
     }
 
-    protected void openPopup(final DesktopWindow popup, boolean modal) {
+    /**
+     * Opens the given popup {@link DesktopWindow} and registers it as owned by this window.
+     * All owned open popups are closed when the window is closed.
+     * 
+     * @param popup The popup window that should be opened.
+     * @param modal Whether the popup should block any interaction on the main window.
+     *        That block is removed when the popup is closed.
+     */
+    public void openPopup(final DesktopWindow popup, boolean modal) {
 
         // Can't open new popup while a modal popup is present
         if (!isEnabled()) {
