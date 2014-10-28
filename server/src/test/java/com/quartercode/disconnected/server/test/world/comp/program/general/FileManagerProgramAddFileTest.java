@@ -21,8 +21,7 @@ package com.quartercode.disconnected.server.test.world.comp.program.general;
 import static com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper.getCommonLocation;
 import static com.quartercode.disconnected.shared.comp.file.PathUtils.splitAfterMountpoint;
 import static com.quartercode.disconnected.shared.comp.file.PathUtils.splitBeforeName;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,11 +44,10 @@ import com.quartercode.disconnected.shared.comp.file.FilePlaceholder;
 import com.quartercode.disconnected.shared.comp.file.FileRights;
 import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
 import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
-import com.quartercode.disconnected.shared.event.program.general.FMPClientAddErrorEvent;
-import com.quartercode.disconnected.shared.event.program.general.FMPClientMissingRightEvent;
 import com.quartercode.disconnected.shared.event.program.general.FMPClientUpdateViewCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldAddFileCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldChangeDirCommand;
+import com.quartercode.disconnected.shared.event.program.generic.GPClientErrorEvent;
 import com.quartercode.eventbridge.bridge.EventPredicate;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
@@ -125,24 +123,56 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
         assertTrue("Update view handler hasn't been invoked", invoked.getValue());
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test
     public void testWithFileNameWithSeparators() {
 
         executeProgramAndSendChangeDirCommand(processModule.getObj(ProcessModule.ROOT_PROCESS), PARENT_PATH);
 
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
 
+        final MutableBoolean invoked = new MutableBoolean();
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPClientErrorEvent>() {
+
+            @Override
+            public void handle(GPClientErrorEvent event) {
+
+                assertEquals("Error type", "createFile.invalidFileName", event.getType());
+                assertArrayEquals("Error arguments (file path)", new String[] { PATH_2_PART_2 }, event.getArguments());
+
+                invoked.setTrue();
+            }
+
+        }, new TypePredicate<>(GPClientErrorEvent.class));
+
         sendAddFileCommand(PATH_2_PART_2);
+
+        assertTrue("Error event handler hasn't been invoked", invoked.getValue());
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test
     public void testWithCurrentDir() {
 
         executeProgramAndSendChangeDirCommand(processModule.getObj(ProcessModule.ROOT_PROCESS), PARENT_PATH);
 
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
 
+        final MutableBoolean invoked = new MutableBoolean();
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPClientErrorEvent>() {
+
+            @Override
+            public void handle(GPClientErrorEvent event) {
+
+                assertEquals("Error type", "createFile.invalidFileName", event.getType());
+                assertArrayEquals("Error arguments (file path)", new String[] { "." }, event.getArguments());
+
+                invoked.setTrue();
+            }
+
+        }, new TypePredicate<>(GPClientErrorEvent.class));
+
         sendAddFileCommand(".");
+
+        assertTrue("Error event handler hasn't been invoked", invoked.getValue());
     }
 
     @Test (expected = IllegalStateException.class)
@@ -176,22 +206,22 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMPClientAddErrorEvent>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPClientErrorEvent>() {
 
             @Override
-            public void handle(FMPClientAddErrorEvent event) {
+            public void handle(GPClientErrorEvent event) {
 
-                assertEquals("File path", PATH_1, event.getFilePath());
-                assertEquals("Error type", "occupiedPath", event.getErrorType());
+                assertEquals("Error type", "createFile.occupiedPath", event.getType());
+                assertArrayEquals("Error arguments (file path)", new String[] { PATH_1 }, event.getArguments());
 
                 invoked.setTrue();
             }
 
-        }, new TypePredicate<>(FMPClientAddErrorEvent.class));
+        }, new TypePredicate<>(GPClientErrorEvent.class));
 
         sendAddFileCommand(splitBeforeName(PATH_1)[1]);
 
-        assertTrue("Add error event handler hasn't been invoked", invoked.getValue());
+        assertTrue("Error event handler hasn't been invoked", invoked.getValue());
     }
 
     @Test
@@ -205,22 +235,22 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMPClientAddErrorEvent>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPClientErrorEvent>() {
 
             @Override
-            public void handle(FMPClientAddErrorEvent event) {
+            public void handle(GPClientErrorEvent event) {
 
-                assertEquals("File path", PATH_1, event.getFilePath());
-                assertEquals("Error type", "outOfSpace", event.getErrorType());
+                assertEquals("Error type", "createFile.outOfSpace", event.getType());
+                assertArrayEquals("Error arguments (file path)", new String[] { PATH_1 }, event.getArguments());
 
                 invoked.setTrue();
             }
 
-        }, new TypePredicate<>(FMPClientAddErrorEvent.class));
+        }, new TypePredicate<>(GPClientErrorEvent.class));
 
         sendAddFileCommand(splitBeforeName(PATH_1)[1]);
 
-        assertTrue("Add error event handler hasn't been invoked", invoked.getValue());
+        assertTrue("Error event handler hasn't been invoked", invoked.getValue());
     }
 
     @Test
@@ -244,22 +274,22 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMPClientMissingRightEvent>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPClientErrorEvent>() {
 
             @Override
-            public void handle(FMPClientMissingRightEvent event) {
+            public void handle(GPClientErrorEvent event) {
 
-                assertEquals("File path of returned missing read right event", PATH_1, event.getFilePath());
-                assertEquals("Missing right", FileRights.WRITE, event.getMissingRight());
+                assertEquals("Error type", "createFile.missingWriteRight", event.getType());
+                assertArrayEquals("Error arguments (file path)", new String[] { PATH_1 }, event.getArguments());
 
                 invoked.setTrue();
             }
 
-        }, new TypePredicate<>(FMPClientMissingRightEvent.class));
+        }, new TypePredicate<>(GPClientErrorEvent.class));
 
         sendAddFileCommand(splitBeforeName(PATH_1)[1]);
 
-        assertTrue("Missing right event handler hasn't been invoked", invoked.getValue());
+        assertTrue("Missing right error event handler hasn't been invoked", invoked.getValue());
     }
 
 }

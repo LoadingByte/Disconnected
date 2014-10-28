@@ -20,8 +20,7 @@ package com.quartercode.disconnected.server.test.world.comp.program.general;
 
 import static com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper.getCommonLocation;
 import static com.quartercode.disconnected.shared.comp.file.PathUtils.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,10 +41,10 @@ import com.quartercode.disconnected.shared.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.comp.file.FileRights;
 import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
 import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
-import com.quartercode.disconnected.shared.event.program.general.FMPClientMissingRightEvent;
 import com.quartercode.disconnected.shared.event.program.general.FMPClientUpdateViewCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldChangeDirCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldRemoveFileCommand;
+import com.quartercode.disconnected.shared.event.program.generic.GPClientErrorEvent;
 import com.quartercode.eventbridge.bridge.EventPredicate;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
@@ -118,24 +117,56 @@ public class FileManagerProgramRemoveFileTest extends AbstractProgramTest {
         assertTrue("Update view handler hasn't been invoked", invoked.getValue());
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test
     public void testWithFileNameWithSeparators() {
 
         executeProgramAndSendChangeDirCommand(processModule.getObj(ProcessModule.ROOT_PROCESS), PATH_2_PART_1);
 
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
 
+        final MutableBoolean invoked = new MutableBoolean();
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPClientErrorEvent>() {
+
+            @Override
+            public void handle(GPClientErrorEvent event) {
+
+                assertEquals("Error type", "removeFile.invalidFileName", event.getType());
+                assertArrayEquals("Error arguments (file path)", new String[] { PATH_2_PART_2 }, event.getArguments());
+
+                invoked.setTrue();
+            }
+
+        }, new TypePredicate<>(GPClientErrorEvent.class));
+
         sendRemoveFileCommand(PATH_2_PART_2);
+
+        assertTrue("Error event handler hasn't been invoked", invoked.getValue());
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test
     public void testWithCurrentDir() {
 
         executeProgramAndSendChangeDirCommand(processModule.getObj(ProcessModule.ROOT_PROCESS), splitBeforeName(PATH_1)[0]);
 
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
 
+        final MutableBoolean invoked = new MutableBoolean();
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPClientErrorEvent>() {
+
+            @Override
+            public void handle(GPClientErrorEvent event) {
+
+                assertEquals("Error type", "removeFile.invalidFileName", event.getType());
+                assertArrayEquals("Error arguments (file path)", new String[] { "." }, event.getArguments());
+
+                invoked.setTrue();
+            }
+
+        }, new TypePredicate<>(GPClientErrorEvent.class));
+
         sendRemoveFileCommand(".");
+
+        assertTrue("Error event handler hasn't been invoked", invoked.getValue());
     }
 
     @Test (expected = IllegalStateException.class)
@@ -179,18 +210,18 @@ public class FileManagerProgramRemoveFileTest extends AbstractProgramTest {
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMPClientMissingRightEvent>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPClientErrorEvent>() {
 
             @Override
-            public void handle(FMPClientMissingRightEvent event) {
+            public void handle(GPClientErrorEvent event) {
 
-                assertEquals("File path of returned missing read right event", PATH_1, event.getFilePath());
-                assertEquals("Missing right", FileRights.DELETE, event.getMissingRight());
+                assertEquals("Error type", "removeFile.missingDeleteRight", event.getType());
+                assertArrayEquals("Error arguments (file path)", new String[] { PATH_1 }, event.getArguments());
 
                 invoked.setTrue();
             }
 
-        }, new TypePredicate<>(FMPClientMissingRightEvent.class));
+        }, new TypePredicate<>(GPClientErrorEvent.class));
 
         sendRemoveFileCommand(splitBeforeName(PATH_1)[1]);
 

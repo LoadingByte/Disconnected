@@ -50,12 +50,11 @@ import com.quartercode.disconnected.shared.comp.file.FilePlaceholder;
 import com.quartercode.disconnected.shared.comp.file.FileRights;
 import com.quartercode.disconnected.shared.comp.file.PathUtils;
 import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
-import com.quartercode.disconnected.shared.event.program.general.FMPClientAddErrorEvent;
-import com.quartercode.disconnected.shared.event.program.general.FMPClientMissingRightEvent;
 import com.quartercode.disconnected.shared.event.program.general.FMPClientUpdateViewCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldAddFileCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldChangeDirCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldRemoveFileCommand;
+import com.quartercode.disconnected.shared.event.program.generic.GPClientErrorEvent;
 import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
@@ -170,7 +169,7 @@ public class FileManagerProgram extends ProgramExecutor {
                 } else if (validationResult == 3) {
                     // Missing read right on new dir -> do not update current dir and send error message to client
                     ClientProcessId clientProcessId = holder.getParent().getObj(Process.CLIENT_PROCESS);
-                    holder.getBridge().send(new FMPClientMissingRightEvent(clientProcessId, newDirPath, FileRights.READ));
+                    holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "fileList.missingReadRight", new String[] { newDirPath }));
                     return;
                 } else {
                     // New dir does not exist or is not a directory -> do not update current dir
@@ -250,7 +249,12 @@ public class FileManagerProgram extends ProgramExecutor {
 
             String fileName = event.getFileName();
             Validate.notBlank(fileName, "File name cannot be blank");
-            Validate.isTrue(PathUtils.split(fileName).length == 1, "File name may not contain any separators");
+
+            if (PathUtils.split(fileName).length != 1) {
+                ClientProcessId clientProcessId = holder.getParent().getObj(Process.CLIENT_PROCESS);
+                holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "createFile.invalidFileName", new String[] { fileName }));
+                return;
+            }
 
             String fileType = event.getFileType();
             Validate.notBlank(fileName, "File type cannot be blank");
@@ -267,12 +271,14 @@ public class FileManagerProgram extends ProgramExecutor {
 
             String currentDir = holder.getObj(CURRENT_DIR);
             String filePath = PathUtils.resolve(currentDir, fileName);
-            Validate.isTrue(!filePath.equals(currentDir), "Cannot create the current directory");
 
-            File<?> file = StringFileTypeMapper.stringToNewInstance(fileType);
-            if (file == null) {
+            if (filePath.equals(currentDir)) {
+                holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "createFile.invalidFileName", new String[] { fileName }));
                 return;
             }
+
+            File<?> file = StringFileTypeMapper.stringToNewInstance(fileType);
+            Validate.notNull(file, "Allowed file type ('%s') is not known", fileType);
 
             FileAddAction addAction = fsModule.invoke(FileSystemModule.CREATE_ADD_FILE, file, filePath);
             User sessionUser = process.invoke(Process.GET_USER);
@@ -282,12 +288,12 @@ public class FileManagerProgram extends ProgramExecutor {
                     addAction.invoke(FileAddAction.EXECUTE);
                     sendUpdateView(process, holder.getBridge(), holder.getObj(CURRENT_DIR));
                 } catch (OccupiedPathException e) {
-                    holder.getBridge().send(new FMPClientAddErrorEvent(clientProcessId, filePath, "occupiedPath"));
+                    holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "createFile.occupiedPath", new String[] { filePath }));
                 } catch (OutOfSpaceException e) {
-                    holder.getBridge().send(new FMPClientAddErrorEvent(clientProcessId, filePath, "outOfSpace"));
+                    holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "createFile.outOfSpace", new String[] { filePath }));
                 }
             } else {
-                holder.getBridge().send(new FMPClientMissingRightEvent(clientProcessId, filePath, FileRights.WRITE));
+                holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "createFile.missingWriteRight", new String[] { filePath }));
             }
         }
 
@@ -306,7 +312,12 @@ public class FileManagerProgram extends ProgramExecutor {
 
             String fileName = event.getFileName();
             Validate.notBlank(fileName, "File name cannot be blank");
-            Validate.isTrue(PathUtils.split(fileName).length == 1, "File name may not contain any separators");
+
+            if (PathUtils.split(fileName).length != 1) {
+                ClientProcessId clientProcessId = holder.getParent().getObj(Process.CLIENT_PROCESS);
+                holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "removeFile.invalidFileName", new String[] { fileName }));
+                return;
+            }
 
             removeFile(fileName);
         }
@@ -319,7 +330,11 @@ public class FileManagerProgram extends ProgramExecutor {
 
             String currentDir = holder.getObj(CURRENT_DIR);
             String filePath = PathUtils.resolve(currentDir, fileName);
-            Validate.isTrue(!filePath.equals(currentDir), "Cannot delete the current directory");
+
+            if (filePath.equals(currentDir)) {
+                holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "removeFile.invalidFileName", new String[] { fileName }));
+                return;
+            }
 
             File<?> file;
             try {
@@ -335,7 +350,7 @@ public class FileManagerProgram extends ProgramExecutor {
                 removeAction.invoke(FileRemoveAction.EXECUTE);
                 sendUpdateView(process, holder.getBridge(), holder.getObj(CURRENT_DIR));
             } else {
-                holder.getBridge().send(new FMPClientMissingRightEvent(clientProcessId, filePath, FileRights.DELETE));
+                holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "removeFile.missingDeleteRight", new String[] { filePath }));
             }
         }
 

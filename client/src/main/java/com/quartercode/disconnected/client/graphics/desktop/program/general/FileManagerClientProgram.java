@@ -28,20 +28,18 @@ import com.quartercode.disconnected.client.graphics.desktop.ClientProgramWindowS
 import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowDefaultSizeMediator;
 import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup;
 import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup.Option;
-import com.quartercode.disconnected.client.graphics.desktop.popup.MessagePopup;
 import com.quartercode.disconnected.client.graphics.desktop.popup.TextInputPopup;
+import com.quartercode.disconnected.client.graphics.desktop.program.util.GPClientErrorEventPopupHandler;
 import com.quartercode.disconnected.client.util.ResourceBundles;
 import com.quartercode.disconnected.shared.comp.file.FilePlaceholder;
-import com.quartercode.disconnected.shared.comp.file.FileRights;
 import com.quartercode.disconnected.shared.comp.file.PathUtils;
 import com.quartercode.disconnected.shared.comp.program.GeneralProgramConstants;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
-import com.quartercode.disconnected.shared.event.program.general.FMPClientAddErrorEvent;
-import com.quartercode.disconnected.shared.event.program.general.FMPClientMissingRightEvent;
 import com.quartercode.disconnected.shared.event.program.general.FMPClientUpdateViewCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldAddFileCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldChangeDirCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldRemoveFileCommand;
+import com.quartercode.disconnected.shared.event.program.generic.GPClientErrorEvent;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 import de.matthiasmann.twl.Button;
@@ -202,12 +200,10 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
         protected void registerEventHandlers() {
 
             final UpdateViewCommandHandler updateViewCommandHandler = new UpdateViewCommandHandler();
-            final MissingReadRightEventHandler missingReadRightEventHandler = new MissingReadRightEventHandler();
-            final AddErrorEventHandler addErrorCommandHandler = new AddErrorEventHandler();
+            final GPClientErrorEventPopupHandler genericErrorEventHandler = new GPClientErrorEventPopupHandler(this, "", "Popup.message", true);
 
             registerEventHandler(FMPClientUpdateViewCommand.class, updateViewCommandHandler);
-            registerEventHandler(FMPClientMissingRightEvent.class, missingReadRightEventHandler);
-            registerEventHandler(FMPClientAddErrorEvent.class, addErrorCommandHandler);
+            registerEventHandler(GPClientErrorEvent.class, genericErrorEventHandler);
 
             addCloseListener(new Runnable() {
 
@@ -216,8 +212,7 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
 
                     StandardHandlerModule handlerModule = bridge.getModule(StandardHandlerModule.class);
                     handlerModule.removeHandler(updateViewCommandHandler);
-                    handlerModule.removeHandler(missingReadRightEventHandler);
-                    handlerModule.removeHandler(addErrorCommandHandler);
+                    handlerModule.removeHandler(genericErrorEventHandler);
                 }
 
             });
@@ -319,40 +314,6 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
             public void handle(FMPClientUpdateViewCommand event) {
 
                 updateView(event.getCurrentDir(), event.getFiles());
-            }
-
-        }
-
-        private class MissingReadRightEventHandler implements EventHandler<FMPClientMissingRightEvent> {
-
-            @Override
-            public void handle(FMPClientMissingRightEvent event) {
-
-                String messageKey = null;
-                switch (event.getMissingRight()) {
-                    case FileRights.READ:
-                        messageKey = "fileList.missingReadRightPopup.message";
-                    case FileRights.WRITE:
-                        messageKey = "createFile.missingWriteRightPopup.message";
-                    case FileRights.DELETE:
-                        messageKey = "removeFile.missingDeleteRightPopup.message";
-                }
-
-                if (messageKey != null) {
-                    String fileName = PathUtils.splitBeforeName(event.getFilePath())[1];
-                    openPopup(new MessagePopup(getState(), format(getString(messageKey), fileName)), true);
-                }
-            }
-
-        }
-
-        private class AddErrorEventHandler implements EventHandler<FMPClientAddErrorEvent> {
-
-            @Override
-            public void handle(FMPClientAddErrorEvent event) {
-
-                String fileName = PathUtils.splitBeforeName(event.getFilePath())[1];
-                openPopup(new MessagePopup(getState(), format(getString("createFile." + event.getErrorType() + "Popup.message"), fileName)), true);
             }
 
         }
