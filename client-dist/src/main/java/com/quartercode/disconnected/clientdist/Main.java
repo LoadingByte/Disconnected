@@ -40,6 +40,7 @@ import com.quartercode.disconnected.client.DefaultClientData;
 import com.quartercode.disconnected.client.graphics.DefaultGraphicsService;
 import com.quartercode.disconnected.client.graphics.DefaultStates;
 import com.quartercode.disconnected.client.graphics.GraphicsService;
+import com.quartercode.disconnected.client.util.TWLSpritesheetGenerator;
 import com.quartercode.disconnected.server.DefaultServerData;
 import com.quartercode.disconnected.server.client.ClientIdentityService;
 import com.quartercode.disconnected.server.client.DefaultClientIdentityService;
@@ -59,7 +60,9 @@ import com.quartercode.disconnected.shared.DefaultSharedData;
 import com.quartercode.disconnected.shared.util.ApplicationInfo;
 import com.quartercode.disconnected.shared.util.ExitUtil;
 import com.quartercode.disconnected.shared.util.ExitUtil.ExitProcessor;
+import com.quartercode.disconnected.shared.util.IOFileUtils;
 import com.quartercode.disconnected.shared.util.LogExceptionHandler;
+import com.quartercode.disconnected.shared.util.ResourceLister;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 import com.quartercode.disconnected.shared.util.Settings;
 import com.quartercode.disconnected.shared.util.TempFileManager;
@@ -325,8 +328,30 @@ public class Main {
         GraphicsService graphicsService = new DefaultGraphicsService();
         ServiceRegistry.register(GraphicsService.class, graphicsService);
 
+        generateSpritesheets(graphicsService);
+
         DefaultClientData.addDefaultGraphicsServiceThemes(graphicsService);
         DefaultClientData.initializeDefaultGraphicsStates();
+    }
+
+    private static void generateSpritesheets(GraphicsService graphicsService) {
+
+        // Generate spritesheets
+        LOGGER.debug("Generating spritesheets");
+        try (ResourceLister resourceLister = new ResourceLister("/ui/sprites")) {
+            // Assume that there is only one sprites directory on the classpath
+            Path spritesDir = resourceLister.getResourcePaths().get(0);
+
+            // Copy the sprites into a temporary directory to avoid jar problems
+            Path tmpSpritesDir = TempFileManager.getTempDir().resolve("sprites");
+            IOFileUtils.copyDirectory(spritesDir, tmpSpritesDir);
+
+            // Generate the spritesheets and add the resulting twl config theme
+            Path spriteTheme = TWLSpritesheetGenerator.generate(tmpSpritesDir, TempFileManager.getTempDir().resolve("spritesheets"));
+            graphicsService.addTheme(spriteTheme.toUri().toURL());
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot generate sprite theme", e);
+        }
     }
 
     private static void addOtherData() {

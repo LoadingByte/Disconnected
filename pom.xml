@@ -31,6 +31,7 @@
         <slf4j.version>1.7.7</slf4j.version>
         <lombok.version>1.14.8</lombok.version>
         <eventbridge.version>0.1.0</eventbridge.version>
+        <jdom2.version>2.0.5</jdom2.version>
         <junit.version>4.11</junit.version>
         <jmock.version>2.6.0</jmock.version>
 
@@ -40,6 +41,7 @@
         <classmod.version>0.3.0-SNAPSHOT</classmod.version>
         <lwjgl.version>2.9.1</lwjgl.version>
         <twl.version>1.0</twl.version>
+        <gdx.version>1.4.1</gdx.version>
     </properties>
 
     <organization>
@@ -107,6 +109,11 @@
             <groupId>com.quartercode</groupId>
             <artifactId>eventbridge</artifactId>
             <version>${eventbridge.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom2</artifactId>
+            <version>${jdom2.version}</version>
         </dependency>
 
         <!-- Logging -->
