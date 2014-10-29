@@ -24,12 +24,13 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import com.quartercode.disconnected.server.bridge.DefaultClientIdentityExtension;
-import com.quartercode.disconnected.server.client.ClientIdentityService;
+import com.quartercode.disconnected.server.bridge.DefaultSBPIdentityExtension;
+import com.quartercode.disconnected.server.identity.SBPIdentityService;
 import com.quartercode.disconnected.server.test.bridge.DummyEvents.Event1;
-import com.quartercode.disconnected.server.test.bridge.DummyEvents.TestLimitedClientEvent;
-import com.quartercode.disconnected.shared.client.ClientIdentity;
-import com.quartercode.disconnected.shared.event.LimitedClientEvent;
+import com.quartercode.disconnected.server.test.bridge.DummyEvents.TestLimitedSBPEvent;
+import com.quartercode.disconnected.shared.event.LimitedSBPEvent;
+import com.quartercode.disconnected.shared.identity.ClientIdentity;
+import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.BridgeConnector;
 import com.quartercode.eventbridge.bridge.BridgeConnectorException;
@@ -41,13 +42,13 @@ import com.quartercode.eventbridge.def.bridge.DefaultBridge;
 import com.quartercode.eventbridge.extra.connector.LocalBridgeConnector;
 
 @SuppressWarnings ("unchecked")
-public class DefaultClientIdentityBridgeExtensionTest {
+public class DefaultSBPIdentityBridgeExtensionTest {
 
-    private static final ClientIdentity      CLIENT_2 = new ClientIdentity("client2");
-    private static final ClientIdentity      CLIENT_3 = new ClientIdentity("client3");
+    private static final SBPIdentity         SBP_2   = new ClientIdentity("sbp2");
+    private static final SBPIdentity         SBP_3   = new ClientIdentity("sbp3");
 
     @Rule
-    public JUnitRuleMockery                  context  = new JUnitRuleMockery();
+    public JUnitRuleMockery                  context = new JUnitRuleMockery();
 
     private Bridge                           bridge1;
     private Bridge                           bridge2;
@@ -57,12 +58,12 @@ public class DefaultClientIdentityBridgeExtensionTest {
     @Mock
     private SpecificConnectorSendInterceptor interceptor;
 
-    private DefaultClientIdentityExtension   bridge1Extension;
-    private DefaultClientIdentityExtension   bridge2Extension;
-    private DefaultClientIdentityExtension   bridge3Extension;
+    private DefaultSBPIdentityExtension      bridge1Extension;
+    private DefaultSBPIdentityExtension      bridge2Extension;
+    private DefaultSBPIdentityExtension      bridge3Extension;
 
     @Mock
-    private ClientIdentityService            clientIdentityService;
+    private SBPIdentityService               sbpIdentityService;
 
     @Before
     public void setUp() {
@@ -78,39 +79,39 @@ public class DefaultClientIdentityBridgeExtensionTest {
         bridge1.getModule(ConnectorSenderModule.class).getSpecificChannel().addInterceptor(new DummySpecificConnectorSendInterceptor(interceptor), 1);
 
         // Install the extensions on all bridges
-        bridge1Extension = new DefaultClientIdentityExtension();
-        bridge2Extension = new DefaultClientIdentityExtension();
-        bridge3Extension = new DefaultClientIdentityExtension();
-        bridge1Extension.setIdentityService(clientIdentityService);
-        bridge2Extension.setIdentityService(clientIdentityService);
-        bridge3Extension.setIdentityService(clientIdentityService);
+        bridge1Extension = new DefaultSBPIdentityExtension();
+        bridge2Extension = new DefaultSBPIdentityExtension();
+        bridge3Extension = new DefaultSBPIdentityExtension();
+        bridge1Extension.setIdentityService(sbpIdentityService);
+        bridge2Extension.setIdentityService(sbpIdentityService);
+        bridge3Extension.setIdentityService(sbpIdentityService);
         bridge1.addModule(bridge1Extension);
         bridge2.addModule(bridge2Extension);
         bridge3.addModule(bridge3Extension);
 
-        // Initialize the client identities for the bridge connectors
+        // Initialize the SBP identities for the bridge connectors
         // @formatter:off
         context.checking(new Expectations() {{
 
-            allowing(clientIdentityService).getIdentity(bridge1To2Connector);
-                will(returnValue(CLIENT_2));
-            allowing(clientIdentityService).getIdentity(bridge1To3Connector);
-                will(returnValue(CLIENT_3));
+            allowing(sbpIdentityService).getIdentity(bridge1To2Connector);
+                will(returnValue(SBP_2));
+            allowing(sbpIdentityService).getIdentity(bridge1To3Connector);
+                will(returnValue(SBP_3));
 
         }});
         // @formatter:on
     }
 
-    private void expectClientIdentityServiceConnectionListener() {
+    private void expectSBPIdentityServiceConnectionListener() {
 
         // @formatter:off
         context.checking(new Expectations() {{
 
             // Connections from bridge1 (for now, dummy identities are used by the extension)
-            oneOf(clientIdentityService).putIdentity(bridge1To2Connector, new ClientIdentity("client"));
-            oneOf(clientIdentityService).putIdentity(bridge1To3Connector, new ClientIdentity("client"));
+            oneOf(sbpIdentityService).putIdentity(bridge1To2Connector, new ClientIdentity("client"));
+            oneOf(sbpIdentityService).putIdentity(bridge1To3Connector, new ClientIdentity("client"));
             // Reverse connections from bridge2 and bridge3
-            exactly(2).of(clientIdentityService).putIdentity(with(any(BridgeConnector.class)), with(new ClientIdentity("client")));
+            exactly(2).of(sbpIdentityService).putIdentity(with(any(BridgeConnector.class)), with(new ClientIdentity("client")));
 
         }});
         // @formatter:on
@@ -135,7 +136,7 @@ public class DefaultClientIdentityBridgeExtensionTest {
     @Test
     public void testRemoveBeforeConnect() throws BridgeConnectorException {
 
-        final LimitedClientEvent event = new TestLimitedClientEvent(CLIENT_2);
+        final LimitedSBPEvent event = new TestLimitedSBPEvent(SBP_2);
 
         // @formatter:off
         context.checking(new Expectations() {{
@@ -155,7 +156,7 @@ public class DefaultClientIdentityBridgeExtensionTest {
     @Test
     public void testRemoveAfterConnect() throws BridgeConnectorException {
 
-        final LimitedClientEvent event = new TestLimitedClientEvent(CLIENT_2);
+        final LimitedSBPEvent event = new TestLimitedSBPEvent(SBP_2);
 
         // @formatter:off
         context.checking(new Expectations() {{
@@ -167,7 +168,7 @@ public class DefaultClientIdentityBridgeExtensionTest {
         }});
         // @formatter:on
 
-        expectClientIdentityServiceConnectionListener();
+        expectSBPIdentityServiceConnectionListener();
         connect();
         removeExtensions();
         bridge1.send(event);
@@ -180,15 +181,15 @@ public class DefaultClientIdentityBridgeExtensionTest {
         context.checking(new Expectations() {{
 
             // Connections from bridge1 (for now, dummy identities are used by the extension)
-            oneOf(clientIdentityService).removeIdentity(bridge1To2Connector);
-            oneOf(clientIdentityService).removeIdentity(bridge1To3Connector);
+            oneOf(sbpIdentityService).removeIdentity(bridge1To2Connector);
+            oneOf(sbpIdentityService).removeIdentity(bridge1To3Connector);
             // Reverse connections from bridge2 and bridge3
-            exactly(2).of(clientIdentityService).removeIdentity(with(any(BridgeConnector.class)));
+            exactly(2).of(sbpIdentityService).removeIdentity(with(any(BridgeConnector.class)));
 
         }});
         // @formatter:on
 
-        expectClientIdentityServiceConnectionListener();
+        expectSBPIdentityServiceConnectionListener();
         connect();
         bridge1.removeConnector(bridge1To2Connector);
         bridge1.removeConnector(bridge1To3Connector);
@@ -209,7 +210,7 @@ public class DefaultClientIdentityBridgeExtensionTest {
         }});
         // @formatter:on
 
-        expectClientIdentityServiceConnectionListener();
+        expectSBPIdentityServiceConnectionListener();
         connect();
         bridge1.send(event);
     }
@@ -217,18 +218,18 @@ public class DefaultClientIdentityBridgeExtensionTest {
     @Test
     public void testSendLimitTo2() throws BridgeConnectorException {
 
-        final LimitedClientEvent event = new TestLimitedClientEvent(CLIENT_2);
+        final LimitedSBPEvent event = new TestLimitedSBPEvent(SBP_2);
 
         // @formatter:off
         context.checking(new Expectations() {{
 
-            // Limited to client 2
+            // Limited to SBP 2
             oneOf(interceptor).send(with(any(ChannelInvocation.class)), with(event), with(bridge1To2Connector));
 
         }});
         // @formatter:on
 
-        expectClientIdentityServiceConnectionListener();
+        expectSBPIdentityServiceConnectionListener();
         connect();
         bridge1.send(event);
     }
@@ -236,18 +237,18 @@ public class DefaultClientIdentityBridgeExtensionTest {
     @Test
     public void testSendLimitTo3() throws BridgeConnectorException {
 
-        final LimitedClientEvent event = new TestLimitedClientEvent(CLIENT_3);
+        final LimitedSBPEvent event = new TestLimitedSBPEvent(SBP_3);
 
         // @formatter:off
         context.checking(new Expectations() {{
 
-            // Limited to client 3
+            // Limited to SBP 3
             oneOf(interceptor).send(with(any(ChannelInvocation.class)), with(event), with(bridge1To3Connector));
 
         }});
         // @formatter:on
 
-        expectClientIdentityServiceConnectionListener();
+        expectSBPIdentityServiceConnectionListener();
         connect();
         bridge1.send(event);
     }
@@ -255,19 +256,19 @@ public class DefaultClientIdentityBridgeExtensionTest {
     @Test
     public void testSendLimitToBoth() throws BridgeConnectorException {
 
-        final LimitedClientEvent event = new TestLimitedClientEvent(CLIENT_2, CLIENT_3);
+        final LimitedSBPEvent event = new TestLimitedSBPEvent(SBP_2, SBP_3);
 
         // @formatter:off
         context.checking(new Expectations() {{
 
-            // Limited to client 2 and 3
+            // Limited to SBPs 2 and 3
             oneOf(interceptor).send(with(any(ChannelInvocation.class)), with(event), with(bridge1To2Connector));
             oneOf(interceptor).send(with(any(ChannelInvocation.class)), with(event), with(bridge1To3Connector));
 
         }});
         // @formatter:on
 
-        expectClientIdentityServiceConnectionListener();
+        expectSBPIdentityServiceConnectionListener();
         connect();
         bridge1.send(event);
     }
@@ -275,18 +276,18 @@ public class DefaultClientIdentityBridgeExtensionTest {
     @Test
     public void testSendLimitToNothing() throws BridgeConnectorException {
 
-        final LimitedClientEvent event = new TestLimitedClientEvent();
+        final LimitedSBPEvent event = new TestLimitedSBPEvent();
 
         // @formatter:off
         context.checking(new Expectations() {{
 
-            // Limited to neither client 2 nor client 3 -> should not be sent to any connector
+            // Limited to neither SBP 2 nor SBP 3 -> should not be sent to any connector
             never(interceptor).send(with(any(ChannelInvocation.class)), with(event), with(any(BridgeConnector.class)));
 
         }});
         // @formatter:on
 
-        expectClientIdentityServiceConnectionListener();
+        expectSBPIdentityServiceConnectionListener();
         connect();
         bridge1.send(event);
     }

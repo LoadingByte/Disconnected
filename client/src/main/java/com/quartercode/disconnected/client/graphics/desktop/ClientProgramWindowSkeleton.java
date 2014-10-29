@@ -20,11 +20,10 @@ package com.quartercode.disconnected.client.graphics.desktop;
 
 import com.quartercode.disconnected.client.graphics.GraphicsState;
 import com.quartercode.disconnected.client.util.ValueInjector.InjectValue;
-import com.quartercode.disconnected.shared.client.ClientIdentity;
-import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
+import com.quartercode.disconnected.shared.comp.program.ClientProcessDetails;
 import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
-import com.quartercode.disconnected.shared.event.program.ClientProcessCommand;
-import com.quartercode.disconnected.shared.event.program.ClientProcessCommandPredicate;
+import com.quartercode.disconnected.shared.event.program.SBPWorldProcessUserCommand;
+import com.quartercode.disconnected.shared.event.program.SBPWorldProcessUserCommandPredicate;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchAcknowledgement;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
 import com.quartercode.eventbridge.bridge.Bridge;
@@ -35,7 +34,7 @@ import com.quartercode.eventbridge.extra.predicate.TypePredicate;
 
 /**
  * An abstract implementation of {@link ClientProgramWindow} that provides a skeletal structure for real client programs.
- * Using this class, a lot of boilerplate code is removed from the actual implementations.<br>
+ * This class is used to remove a lot of boilerplate code from the actual client program implementations.<br>
  * <br>
  * The following preset fields are available:
  * 
@@ -45,8 +44,8 @@ import com.quartercode.eventbridge.extra.predicate.TypePredicate;
  * <td>The {@link Bridge} to use for server communication. It is injected using the {@link ClientProgramContext}.</td>
  * </tr>
  * <tr>
- * <td>{@link #clientProcessId}</td>
- * <td>A {@link ClientProcessId} that identifies the running client program. It is used for receiving server events.</td>
+ * <td>{@link #clientProcessDetails}</td>
+ * <td>A {@link ClientProcessDetails} object that identifies the running client program. It is used for receiving server events.</td>
  * </tr>
  * <tr>
  * <td>{@link #worldProcessId}</td>
@@ -75,7 +74,7 @@ import com.quartercode.eventbridge.extra.predicate.TypePredicate;
  * </tr>
  * <tr>
  * <td>{@link #doLaunchWorldProcess()}</td>
- * <td>Called by {@link #launchWorldProcess()}; a {@link WorldProcessLaunchCommand} with the stored {@link #clientProcessId} to launch the actual world process should be sent here.</td>
+ * <td>Called by {@link #launchWorldProcess()}; a {@link WorldProcessLaunchCommand} with the stored {@link #clientProcessDetails} to launch the actual world process should be sent here.</td>
  * </tr>
  * <tr>
  * <td>{@link #registerEventHandlersAfterLaunch()}</td>
@@ -92,19 +91,19 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
      * It is injected using the {@link ClientProgramContext}.
      */
     @InjectValue ("bridge")
-    protected Bridge          bridge;
+    protected Bridge               bridge;
 
     /**
-     * A {@link ClientProcessId} that identifies the running client program.
+     * A {@link ClientProcessDetails} object that identifies the running client program.
      * It is used for receiving server events.
      */
-    protected ClientProcessId clientProcessId;
+    protected ClientProcessDetails clientProcessDetails;
 
     /**
      * A {@link WorldProcessId} that identifies the running process on the server.
      * It should be used for sending server events
      */
-    protected WorldProcessId  worldProcessId;
+    protected WorldProcessId       worldProcessId;
 
     /**
      * Creates a new client program window skeleton with the given parameters.
@@ -121,7 +120,7 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
         context.injectValues(this);
 
         // Use a dummy client process id
-        clientProcessId = new ClientProcessId(new ClientIdentity("client"), (int) (Math.random() * 10000D));
+        clientProcessDetails = new ClientProcessDetails((int) (Math.random() * 10000D));
 
         initializeGraphics();
         initializeInteractions();
@@ -182,7 +181,7 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
     }
 
     /**
-     * This method should send a {@link WorldProcessLaunchCommand} with the stored {@link #clientProcessId} to launch the actual world process.
+     * This method should send a {@link WorldProcessLaunchCommand} with the stored {@link #clientProcessDetails} to launch the actual world process.
      * It is called by {@link #launchWorldProcess()}.
      */
     protected void doLaunchWorldProcess() {
@@ -200,15 +199,15 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
     // ----- Utility methods -----
 
     /**
-     * Registers the given {@link EventHandler} for the client program and makes it listen for the given type of {@link ClientProcessCommand} events that are sent to it.
+     * Registers the given {@link EventHandler} for the client program and makes it listen for the given type of {@link SBPWorldProcessUserCommand} events that are sent to it.
      * 
      * @param eventType The event type all handled events must have.
      * @param handler The event handler that should handle the incoming events.
      */
-    protected void registerEventHandler(Class<? extends ClientProcessCommand> eventType, EventHandler<?> handler) {
+    protected void registerEventHandler(Class<? extends SBPWorldProcessUserCommand> eventType, EventHandler<?> handler) {
 
         bridge.getModule(StandardHandlerModule.class).addHandler(handler,
-                MultiPredicates.and(new TypePredicate<>(eventType), new ClientProcessCommandPredicate<>(clientProcessId)));
+                MultiPredicates.and(new TypePredicate<>(eventType), new SBPWorldProcessUserCommandPredicate<>(clientProcessDetails)));
     }
 
 }

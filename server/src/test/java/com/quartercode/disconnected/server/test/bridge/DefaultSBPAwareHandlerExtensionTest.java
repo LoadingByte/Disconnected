@@ -32,15 +32,16 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import com.quartercode.disconnected.server.bridge.ClientAwareEventHandler;
-import com.quartercode.disconnected.server.bridge.ClientAwareHandlerExtension.ClientAwareHandleInterceptor;
-import com.quartercode.disconnected.server.bridge.ClientAwareHandlerExtension.ModifyClientAwareHandlerListListener;
-import com.quartercode.disconnected.server.bridge.DefaultClientAwareHandlerExtension;
-import com.quartercode.disconnected.server.client.ClientIdentityService;
+import com.quartercode.disconnected.server.bridge.DefaultSBPAwareHandlerExtension;
+import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
+import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension.ModifySBPAwareHandlerListListener;
+import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension.SBPAwareHandleInterceptor;
+import com.quartercode.disconnected.server.identity.SBPIdentityService;
 import com.quartercode.disconnected.server.test.bridge.DummyEvents.CallableEvent;
 import com.quartercode.disconnected.server.test.bridge.DummyEvents.Event1;
 import com.quartercode.disconnected.server.test.bridge.DummyEvents.Event2;
-import com.quartercode.disconnected.shared.client.ClientIdentity;
+import com.quartercode.disconnected.shared.identity.ClientIdentity;
+import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.BridgeConnector;
 import com.quartercode.eventbridge.bridge.Event;
@@ -49,32 +50,32 @@ import com.quartercode.eventbridge.bridge.module.LowLevelHandler;
 import com.quartercode.eventbridge.bridge.module.LowLevelHandlerModule;
 import com.quartercode.eventbridge.channel.ChannelInvocation;
 
-public class DefaultClientAwareHandlerExtensionTest {
+public class DefaultSBPAwareHandlerExtensionTest {
 
-    private static final ClientIdentity        CLIENT_1 = new ClientIdentity("client1");
-    private static final ClientIdentity        CLIENT_2 = new ClientIdentity("client1");
+    private static final SBPIdentity        SBP_1   = new ClientIdentity("sbp1");
+    private static final SBPIdentity        SBP_2   = new ClientIdentity("sbp2");
 
     @Rule
-    public JUnitRuleMockery                    context  = new JUnitRuleMockery();
+    public JUnitRuleMockery                 context = new JUnitRuleMockery();
 
     @Mock
-    private Bridge                             bridge;
+    private Bridge                          bridge;
     @Mock
-    private BridgeConnector                    source1;
+    private BridgeConnector                 source1;
     @Mock
-    private BridgeConnector                    source2;
+    private BridgeConnector                 source2;
     @Mock
-    private LowLevelHandlerModule              lowLevelHandlerModule;
+    private LowLevelHandlerModule           lowLevelHandlerModule;
     @Mock
-    private ClientIdentityService              clientIdentityService;
+    private SBPIdentityService              sbpIdentityService;
 
-    private DefaultClientAwareHandlerExtension extension;
+    private DefaultSBPAwareHandlerExtension extension;
 
     @Before
     public void setUp() {
 
-        extension = new DefaultClientAwareHandlerExtension();
-        extension.setIdentityService(clientIdentityService);
+        extension = new DefaultSBPAwareHandlerExtension();
+        extension.setIdentityService(sbpIdentityService);
 
         // @formatter:off
         context.checking(new Expectations() {{
@@ -82,11 +83,11 @@ public class DefaultClientAwareHandlerExtensionTest {
             allowing(bridge).getModule(LowLevelHandlerModule.class);
                 will(returnValue(lowLevelHandlerModule));
 
-            // Initialize the client identities for the bridge connectors
-            allowing(clientIdentityService).getIdentity(source1);
-                will(returnValue(CLIENT_1));
-            allowing(clientIdentityService).getIdentity(source2);
-                will(returnValue(CLIENT_2));
+            // Initialize the SBP identities for the bridge connectors
+            allowing(sbpIdentityService).getIdentity(source1);
+                will(returnValue(SBP_1));
+            allowing(sbpIdentityService).getIdentity(source2);
+                will(returnValue(SBP_2));
 
         }});
         // @formatter:on
@@ -98,8 +99,8 @@ public class DefaultClientAwareHandlerExtensionTest {
     @Test
     public void testRemove() {
 
-        ClientAwareEventHandler<Event1> handler1 = context.mock(ClientAwareEventHandler.class, "handler1");
-        ClientAwareEventHandler<Event2> handler2 = context.mock(ClientAwareEventHandler.class, "handler2");
+        SBPAwareEventHandler<Event1> handler1 = context.mock(SBPAwareEventHandler.class, "handler1");
+        SBPAwareEventHandler<Event2> handler2 = context.mock(SBPAwareEventHandler.class, "handler2");
         final EventPredicate<Event1> dummyPredicate1 = context.mock(EventPredicate.class, "dummyPredicate1");
         final EventPredicate<Event2> dummyPredicate2 = context.mock(EventPredicate.class, "dummyPredicate2");
 
@@ -126,16 +127,16 @@ public class DefaultClientAwareHandlerExtensionTest {
     @Test
     public void testHandlerStorage() {
 
-        ClientAwareEventHandler<Event1> handler1 = context.mock(ClientAwareEventHandler.class, "handler1");
-        ClientAwareEventHandler<Event2> handler2 = context.mock(ClientAwareEventHandler.class, "handler2");
-        ClientAwareEventHandler<Event2> handler3 = context.mock(ClientAwareEventHandler.class, "handler3");
+        SBPAwareEventHandler<Event1> handler1 = context.mock(SBPAwareEventHandler.class, "handler1");
+        SBPAwareEventHandler<Event2> handler2 = context.mock(SBPAwareEventHandler.class, "handler2");
+        SBPAwareEventHandler<Event2> handler3 = context.mock(SBPAwareEventHandler.class, "handler3");
         final EventPredicate<Event1> dummyPredicate1 = context.mock(EventPredicate.class, "dummyPredicate1");
         final EventPredicate<Event2> dummyPredicate2 = context.mock(EventPredicate.class, "dummyPredicate2");
         final EventPredicate<Event2> dummyPredicate3 = context.mock(EventPredicate.class, "dummyPredicate3");
 
-        Pair<ClientAwareEventHandler<Event1>, EventPredicate<Event1>> pair1 = Pair.of(handler1, dummyPredicate1);
-        Pair<ClientAwareEventHandler<Event2>, EventPredicate<Event2>> pair2 = Pair.of(handler2, dummyPredicate2);
-        Pair<ClientAwareEventHandler<Event2>, EventPredicate<Event2>> pair3 = Pair.of(handler3, dummyPredicate3);
+        Pair<SBPAwareEventHandler<Event1>, EventPredicate<Event1>> pair1 = Pair.of(handler1, dummyPredicate1);
+        Pair<SBPAwareEventHandler<Event2>, EventPredicate<Event2>> pair2 = Pair.of(handler2, dummyPredicate2);
+        Pair<SBPAwareEventHandler<Event2>, EventPredicate<Event2>> pair3 = Pair.of(handler3, dummyPredicate3);
 
         // @formatter:off
         context.checking(new Expectations() {{
@@ -181,9 +182,9 @@ public class DefaultClientAwareHandlerExtensionTest {
     @Test
     public void testHandlerStorageListeners() {
 
-        final ClientAwareEventHandler<Event1> handler = context.mock(ClientAwareEventHandler.class, "handler");
+        final SBPAwareEventHandler<Event1> handler = context.mock(SBPAwareEventHandler.class, "handler");
         final EventPredicate<Event1> dummyPredicate = context.mock(EventPredicate.class, "dummyPredicate");
-        final ModifyClientAwareHandlerListListener listener = context.mock(ModifyClientAwareHandlerListListener.class);
+        final ModifySBPAwareHandlerListListener listener = context.mock(ModifySBPAwareHandlerListListener.class);
 
         // @formatter:off
         context.checking(new Expectations() {{
@@ -216,11 +217,11 @@ public class DefaultClientAwareHandlerExtensionTest {
         final Event1 event1 = new Event1();
         final Event2 event2 = new Event2();
 
-        final ClientAwareEventHandler<Event> handler = context.mock(ClientAwareEventHandler.class, "handler");
+        final SBPAwareEventHandler<Event> handler = context.mock(SBPAwareEventHandler.class, "handler");
         final EventPredicate<Event> dummyPredicate = context.mock(EventPredicate.class, "dummyPredicate");
 
-        final ClientAwareHandleInterceptor interceptor = context.mock(ClientAwareHandleInterceptor.class);
-        extension.getChannel().addInterceptor(new DummyClientAwareHandleInterceptor(interceptor), 1);
+        final SBPAwareHandleInterceptor interceptor = context.mock(SBPAwareHandleInterceptor.class);
+        extension.getChannel().addInterceptor(new DummySBPAwareHandleInterceptor(interceptor), 1);
 
         final Mutable<LowLevelHandler> lowLevelHandler = new MutableObject<>();
 
@@ -232,12 +233,12 @@ public class DefaultClientAwareHandlerExtensionTest {
                 will(storeArgument(0).in(lowLevelHandler));
 
             final Sequence handleChain = context.sequence("handleChain");
-            // Event 1 fired by client 1
-            oneOf(interceptor).handle(with(any(ChannelInvocation.class)), with(event1), with(source1), with(CLIENT_1), with(handler)); inSequence(handleChain);
-            oneOf(handler).handle(event1, CLIENT_1); inSequence(handleChain);
-            // Event 2 fired by client 2
-            oneOf(interceptor).handle(with(any(ChannelInvocation.class)), with(event2), with(source2), with(CLIENT_2), with(handler)); inSequence(handleChain);
-            oneOf(handler).handle(event2, CLIENT_2); inSequence(handleChain);
+            // Event 1 fired by SBP 1
+            oneOf(interceptor).handle(with(any(ChannelInvocation.class)), with(event1), with(source1), with(SBP_1), with(handler)); inSequence(handleChain);
+            oneOf(handler).handle(event1, SBP_1); inSequence(handleChain);
+            // Event 2 fired by SBP 2
+            oneOf(interceptor).handle(with(any(ChannelInvocation.class)), with(event2), with(source2), with(SBP_2), with(handler)); inSequence(handleChain);
+            oneOf(handler).handle(event2, SBP_2); inSequence(handleChain);
 
         }});
         // @formatter:on
@@ -255,11 +256,11 @@ public class DefaultClientAwareHandlerExtensionTest {
         final Event1 regularEvent = new Event1();
         final Event2 otherEvent = new Event2();
 
-        final ClientAwareEventHandler<Event> handler = context.mock(ClientAwareEventHandler.class, "handler");
+        final SBPAwareEventHandler<Event> handler = context.mock(SBPAwareEventHandler.class, "handler");
         final EventPredicate<Event> predicate = context.mock(EventPredicate.class, "predicate");
 
-        final ClientAwareHandleInterceptor interceptor = context.mock(ClientAwareHandleInterceptor.class);
-        extension.getChannel().addInterceptor(new DummyClientAwareHandleInterceptor(interceptor), 1);
+        final SBPAwareHandleInterceptor interceptor = context.mock(SBPAwareHandleInterceptor.class);
+        extension.getChannel().addInterceptor(new DummySBPAwareHandleInterceptor(interceptor), 1);
 
         final Mutable<LowLevelHandler> lowLevelHandler = new MutableObject<>();
 
@@ -278,13 +279,13 @@ public class DefaultClientAwareHandlerExtensionTest {
 
             final Sequence handleChain = context.sequence("handleChain");
             // Regular event
-            oneOf(interceptor).handle(with(any(ChannelInvocation.class)), with(regularEvent), with(source1), with(CLIENT_1), with(handler)); inSequence(handleChain);
-            oneOf(handler).handle(regularEvent, CLIENT_1); inSequence(handleChain);
+            oneOf(interceptor).handle(with(any(ChannelInvocation.class)), with(regularEvent), with(source1), with(SBP_1), with(handler)); inSequence(handleChain);
+            oneOf(handler).handle(regularEvent, SBP_1); inSequence(handleChain);
             // Other event
             // Expect the unwanted event to be invoked since the predicate is not tested by the StandardHandlerModule
             // In fact, the predicate is tested by the LowLevelHandlerModule
-            oneOf(interceptor).handle(with(any(ChannelInvocation.class)), with(otherEvent), with(source1), with(CLIENT_1), with(handler)); inSequence(handleChain);
-            oneOf(handler).handle(otherEvent, CLIENT_1); inSequence(handleChain);
+            oneOf(interceptor).handle(with(any(ChannelInvocation.class)), with(otherEvent), with(source1), with(SBP_1), with(handler)); inSequence(handleChain);
+            oneOf(handler).handle(otherEvent, SBP_1); inSequence(handleChain);
 
         }});
         // @formatter:on
@@ -300,12 +301,11 @@ public class DefaultClientAwareHandlerExtensionTest {
     public void testCallHandlerWrongTypeInPredicate() {
 
         final EventPredicate<Event> predicate = context.mock(EventPredicate.class);
-        final ClientAwareEventHandler<CallableEvent> handler = new ClientAwareEventHandler<CallableEvent>() {
+        final SBPAwareEventHandler<CallableEvent> handler = new SBPAwareEventHandler<CallableEvent>() {
 
             @Override
-            public void handle(CallableEvent event, ClientIdentity client) {
+            public void handle(CallableEvent event, SBPIdentity sender) {
 
-                // Provoke a ClassCastException
                 event.call();
             }
 
@@ -327,20 +327,20 @@ public class DefaultClientAwareHandlerExtensionTest {
         lowLevelHandler.getValue().handle(new Event1(), source1);
     }
 
-    private static class DummyClientAwareHandleInterceptor implements ClientAwareHandleInterceptor {
+    private static class DummySBPAwareHandleInterceptor implements SBPAwareHandleInterceptor {
 
-        private final ClientAwareHandleInterceptor dummy;
+        private final SBPAwareHandleInterceptor dummy;
 
-        private DummyClientAwareHandleInterceptor(ClientAwareHandleInterceptor dummy) {
+        private DummySBPAwareHandleInterceptor(SBPAwareHandleInterceptor dummy) {
 
             this.dummy = dummy;
         }
 
         @Override
-        public void handle(ChannelInvocation<ClientAwareHandleInterceptor> invocation, Event event, BridgeConnector source, ClientIdentity client, ClientAwareEventHandler<?> handler) {
+        public void handle(ChannelInvocation<SBPAwareHandleInterceptor> invocation, Event event, BridgeConnector source, SBPIdentity sender, SBPAwareEventHandler<?> handler) {
 
-            dummy.handle(invocation, event, source, client, handler);
-            invocation.next().handle(invocation, event, source, client, handler);
+            dummy.handle(invocation, event, source, sender, handler);
+            invocation.next().handle(invocation, event, source, sender, handler);
         }
 
     }

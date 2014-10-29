@@ -44,9 +44,9 @@ import com.quartercode.disconnected.shared.comp.ByteUnit;
 import com.quartercode.disconnected.shared.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.comp.file.FilePlaceholder;
 import com.quartercode.disconnected.shared.comp.file.PathUtils;
-import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
+import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
 import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
-import com.quartercode.disconnected.shared.event.program.general.FMPClientUpdateViewCommand;
+import com.quartercode.disconnected.shared.event.program.general.FMPWPUUpdateViewCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldChangeDirCommand;
 import com.quartercode.eventbridge.bridge.EventPredicate;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
@@ -56,7 +56,7 @@ import com.quartercode.eventbridge.extra.predicate.TypePredicate;
 public class FileManagerProgramUpdateViewTest extends AbstractProgramTest {
 
     private static final String            PATH               = "/" + CommonFiles.SYSTEM_MOUNTPOINT + "/test1/test2";
-    private static final EventPredicate<?> RESPONSE_PREDICATE = new TypePredicate<>(FMPClientUpdateViewCommand.class);
+    private static final EventPredicate<?> RESPONSE_PREDICATE = new TypePredicate<>(FMPWPUUpdateViewCommand.class);
 
     public FileManagerProgramUpdateViewTest() {
 
@@ -79,7 +79,7 @@ public class FileManagerProgramUpdateViewTest extends AbstractProgramTest {
         // Launch the program
         ChildProcess process = processModule.getObj(ProcessModule.ROOT_PROCESS).invoke(Process.CREATE_CHILD);
         process.setObj(Process.SOURCE, (ContentFile) fileSystem.invoke(FileSystem.GET_FILE, splitAfterMountpoint(getCommonLocation(FileManagerProgram.class).toString())[1]));
-        process.setObj(Process.CLIENT_PROCESS, new ClientProcessId(CLIENT, 0));
+        process.setObj(Process.WORLD_PROCESS_USER, new SBPWorldProcessUserId(SBP, null));
         process.invoke(Process.INITIALIZE, 10);
 
         ProgramExecutor program = process.getObj(Process.EXECUTOR);
@@ -98,10 +98,10 @@ public class FileManagerProgramUpdateViewTest extends AbstractProgramTest {
 
         final MutableBoolean invoked = new MutableBoolean();
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMPClientUpdateViewCommand>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMPWPUUpdateViewCommand>() {
 
             @Override
-            public void handle(FMPClientUpdateViewCommand event) {
+            public void handle(FMPWPUUpdateViewCommand event) {
 
                 assertEquals("File path", PATH, event.getCurrentDir());
 
@@ -131,10 +131,10 @@ public class FileManagerProgramUpdateViewTest extends AbstractProgramTest {
 
         final MutableBoolean invoked = new MutableBoolean();
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMPClientUpdateViewCommand>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMPWPUUpdateViewCommand>() {
 
             @Override
-            public void handle(FMPClientUpdateViewCommand event) {
+            public void handle(FMPWPUUpdateViewCommand event) {
 
                 assertEquals("File path", "/", event.getCurrentDir());
 

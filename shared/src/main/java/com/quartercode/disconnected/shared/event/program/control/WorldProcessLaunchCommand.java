@@ -18,40 +18,38 @@
 
 package com.quartercode.disconnected.shared.event.program.control;
 
-import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
+import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserDetails;
 import com.quartercode.eventbridge.basic.EventBase;
 
 /**
- * This event starts a world process on the computer of the client that sends it.
+ * This event starts a world process on the computer of the server bridge partner that sends it.
  * Such an event must be sent to a server bridge which handles it.
  */
 public class WorldProcessLaunchCommand extends EventBase {
 
-    private final int    clientProcessId;
-    private final String programFilePath;
+    private final SBPWorldProcessUserDetails worldProcessUserDetails;
+    private final String                     programFilePath;
 
     /**
      * Creates a new process launch command.
      * 
-     * @param clientProcessId The unique id of the identifiable client process.
+     * @param worldProcessUserDetails A {@link SBPWorldProcessUserDetails} object that is used by the SBP to identify the correct world process user.
      * @param programFilePath The path under which the program file, which will be used for the new world process, can be found.
      */
-    public WorldProcessLaunchCommand(int clientProcessId, String programFilePath) {
+    public WorldProcessLaunchCommand(SBPWorldProcessUserDetails worldProcessUserDetails, String programFilePath) {
 
-        this.clientProcessId = clientProcessId;
+        this.worldProcessUserDetails = worldProcessUserDetails;
         this.programFilePath = programFilePath;
     }
 
     /**
-     * Returns the unique id of the identifiable client process that launched the world process.
-     * Most likely it is just a sequential number.
+     * Returns a {@link SBPWorldProcessUserDetails} object that is used by the SBP to identify the correct world process user.
      * 
-     * @return The client process id.
-     * @see ClientProcessId#getPid()
+     * @return The world process user identity details.
      */
-    public int getClientProcessId() {
+    public SBPWorldProcessUserDetails getWorldProcessUserDetails() {
 
-        return clientProcessId;
+        return worldProcessUserDetails;
     }
 
     /**

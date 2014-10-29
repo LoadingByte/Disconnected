@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.server.sim;
 
-import com.quartercode.disconnected.server.bridge.ClientAwareHandlerExtension;
-import com.quartercode.disconnected.server.bridge.ClientIdentityExtension;
-import com.quartercode.disconnected.server.client.ClientIdentityService;
+import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension;
+import com.quartercode.disconnected.server.bridge.SBPIdentityExtension;
+import com.quartercode.disconnected.server.identity.SBPIdentityService;
 import com.quartercode.disconnected.shared.bridge.HandleInvocationProviderExtension;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 import com.quartercode.eventbridge.EventBridgeFactory;
@@ -46,14 +46,14 @@ public class TickBridgeProvider extends TickRunnableInvoker {
         bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionRequester.class));
         bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionReturner.class));
         bridge.addModule(EventBridgeFactory.create(HandleInvocationProviderExtension.class));
-        bridge.addModule(EventBridgeFactory.create(ClientIdentityExtension.class));
-        bridge.addModule(EventBridgeFactory.create(ClientAwareHandlerExtension.class));
+        bridge.addModule(EventBridgeFactory.create(SBPIdentityExtension.class));
+        bridge.addModule(EventBridgeFactory.create(SBPAwareHandlerExtension.class));
 
         bridge.getModule(HandleInvocationProviderExtension.class).setInvocationProvider(this);
 
-        ClientIdentityService clientIdentityService = ServiceRegistry.lookup(ClientIdentityService.class);
-        bridge.getModule(ClientIdentityExtension.class).setIdentityService(clientIdentityService);
-        bridge.getModule(ClientAwareHandlerExtension.class).setIdentityService(clientIdentityService);
+        SBPIdentityService sbpIdentityService = ServiceRegistry.lookup(SBPIdentityService.class);
+        bridge.getModule(SBPIdentityExtension.class).setIdentityService(sbpIdentityService);
+        bridge.getModule(SBPAwareHandlerExtension.class).setIdentityService(sbpIdentityService);
     }
 
     /**

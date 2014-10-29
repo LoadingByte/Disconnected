@@ -18,39 +18,39 @@
 
 package com.quartercode.disconnected.server.bridge;
 
-import com.quartercode.disconnected.server.client.ClientIdentityService;
-import com.quartercode.disconnected.shared.client.ClientIdentity;
-import com.quartercode.disconnected.shared.event.LimitedClientEvent;
+import com.quartercode.disconnected.server.identity.SBPIdentityService;
+import com.quartercode.disconnected.shared.event.LimitedSBPEvent;
+import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.BridgeConnector;
 import com.quartercode.eventbridge.bridge.BridgeModule;
 
 /**
- * An internal bridge extension that adds hooks to a {@link Bridge} for implementing the functionality of a {@link ClientIdentityService}.
+ * An internal bridge extension that adds hooks to a {@link Bridge} for implementing the functionality of an {@link SBPIdentityService}.
  * It adds the following actions:
  * 
  * <ul>
- * <li>It adds the correct {@link ClientIdentity} if a {@link BridgeConnector} is added and a new connection with a client is established.</li>
- * <li>It removes a {@link ClientIdentity} if the associated {@link BridgeConnector} is removed.</li>
- * <li>It limits {@link LimitedClientEvent}s to the clients which are allowed to receive the event.</li>
+ * <li>It adds the correct {@link SBPIdentity} if a {@link BridgeConnector} is added and a new connection with a server bridge partner is established.</li>
+ * <li>It removes an {@link SBPIdentity} if the associated {@link BridgeConnector} is removed.</li>
+ * <li>It limits {@link LimitedSBPEvent}s to the server bridge partners which are allowed to receive the event.</li>
  * </ul>
  */
-public interface ClientIdentityExtension extends BridgeModule {
+public interface SBPIdentityExtension extends BridgeModule {
 
     /**
-     * Returns the {@link ClientIdentityService} the extension is linked with.
+     * Returns the {@link SBPIdentityService} the extension is linked with.
      * All actions are performed with that service.
      * 
-     * @return The linked client identity service.
+     * @return The linked SBP identity service.
      */
-    public ClientIdentityService getIdentityService();
+    public SBPIdentityService getIdentityService();
 
     /**
-     * Changes the {@link ClientIdentityService} the extension is linked with.
+     * Changes the {@link SBPIdentityService} the extension is linked with.
      * All actions will be performed with that service.
      * 
-     * @param identityService The new linked client identity service.
+     * @param identityService The new linked SBP identity service.
      */
-    public void setIdentityService(ClientIdentityService identityService);
+    public void setIdentityService(SBPIdentityService identityService);
 
 }

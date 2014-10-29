@@ -21,15 +21,15 @@ package com.quartercode.disconnected.client.graphics.desktop.program.util;
 import static java.text.MessageFormat.format;
 import com.quartercode.disconnected.client.graphics.desktop.ClientProgramWindow;
 import com.quartercode.disconnected.client.graphics.desktop.popup.MessagePopup;
-import com.quartercode.disconnected.shared.event.program.generic.GPClientErrorEvent;
+import com.quartercode.disconnected.shared.event.program.generic.GPWPUErrorEvent;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 
 /**
- * A simple {@link EventHandler} for {@link GPClientErrorEvent}s that just opens a {@link MessagePopup} window when an error event arrives.
+ * A simple {@link EventHandler} for {@link GPWPUErrorEvent}s that just opens a {@link MessagePopup} window when an error event arrives.
  * 
- * @see GPClientErrorEvent
+ * @see GPWPUErrorEvent
  */
-public class GPClientErrorEventPopupHandler implements EventHandler<GPClientErrorEvent> {
+public class GPClientErrorEventPopupHandler implements EventHandler<GPWPUErrorEvent> {
 
     private final ClientProgramWindow programWindow;
     private final String              keyPrefix;
@@ -39,7 +39,7 @@ public class GPClientErrorEventPopupHandler implements EventHandler<GPClientErro
     /**
      * Creates a new generic program client error event popup handler.
      * 
-     * @param programWindow The {@link ClientProgramWindow} of the client program whose {@link GPClientErrorEvent}s should be processed.
+     * @param programWindow The {@link ClientProgramWindow} of the client program whose {@link GPWPUErrorEvent}s should be processed.
      * @param keyPrefix A prefix that is put in front of the error type before it is used as an i18n key.
      * @param keySuffix A suffix that is put behind the error type before it is used as an i18n key.
      * @param modal Whether the popup window should be modal.
@@ -53,7 +53,7 @@ public class GPClientErrorEventPopupHandler implements EventHandler<GPClientErro
     }
 
     @Override
-    public void handle(GPClientErrorEvent event) {
+    public void handle(GPWPUErrorEvent event) {
 
         String key = keyPrefix + event.getType() + keySuffix;
         String message = format(programWindow.getString(key), (Object[]) event.getArguments());

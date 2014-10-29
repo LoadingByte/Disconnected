@@ -23,8 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import com.quartercode.disconnected.server.client.ClientIdentityService;
-import com.quartercode.disconnected.shared.client.ClientIdentity;
+import com.quartercode.disconnected.server.identity.SBPIdentityService;
+import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.eventbridge.basic.AbstractBridgeModule;
 import com.quartercode.eventbridge.bridge.BridgeConnector;
 import com.quartercode.eventbridge.bridge.Event;
@@ -37,26 +37,26 @@ import com.quartercode.eventbridge.def.channel.DefaultChannel;
 import com.quartercode.eventbridge.factory.Factory;
 
 /**
- * The default default implementation of the {@link ClientAwareHandlerExtension} interface.
+ * The default default implementation of the {@link SBPAwareHandlerExtension} interface.
  * 
- * @see ClientAwareHandlerExtension
+ * @see SBPAwareHandlerExtension
  */
-public class DefaultClientAwareHandlerExtension extends AbstractBridgeModule implements ClientAwareHandlerExtension {
+public class DefaultSBPAwareHandlerExtension extends AbstractBridgeModule implements SBPAwareHandlerExtension {
 
-    private final Channel<ClientAwareHandleInterceptor>              channel                    = new DefaultChannel<>(ClientAwareHandleInterceptor.class);
+    private final Channel<SBPAwareHandleInterceptor>              channel                    = new DefaultChannel<>(SBPAwareHandleInterceptor.class);
 
-    private ClientIdentityService                                    identityService;
-    private final Map<ClientAwareEventHandler<?>, EventPredicate<?>> handlers                   = new ConcurrentHashMap<>();
-    private final Map<ClientAwareEventHandler<?>, LowLevelHandler>   lowLevelHandlers           = new ConcurrentHashMap<>();
-    private final List<ModifyClientAwareHandlerListListener>         modifyHandlerListListeners = new ArrayList<>();
-    private Map<ClientAwareEventHandler<?>, EventPredicate<?>>       handlersUnmodifiableCache;
+    private SBPIdentityService                                    identityService;
+    private final Map<SBPAwareEventHandler<?>, EventPredicate<?>> handlers                   = new ConcurrentHashMap<>();
+    private final Map<SBPAwareEventHandler<?>, LowLevelHandler>   lowLevelHandlers           = new ConcurrentHashMap<>();
+    private final List<ModifySBPAwareHandlerListListener>         modifyHandlerListListeners = new ArrayList<>();
+    private Map<SBPAwareEventHandler<?>, EventPredicate<?>>       handlersUnmodifiableCache;
 
     /**
-     * Creates a new default client-aware handler extension.
+     * Creates a new default SBP-aware handler extension.
      */
-    public DefaultClientAwareHandlerExtension() {
+    public DefaultSBPAwareHandlerExtension() {
 
-        channel.addInterceptor(new LastClientAwareHandleInterceptor(), 0);
+        channel.addInterceptor(new LastSBPAwareHandleInterceptor(), 0);
     }
 
     @Override
@@ -70,19 +70,19 @@ public class DefaultClientAwareHandlerExtension extends AbstractBridgeModule imp
     }
 
     @Override
-    public ClientIdentityService getIdentityService() {
+    public SBPIdentityService getIdentityService() {
 
         return identityService;
     }
 
     @Override
-    public void setIdentityService(ClientIdentityService identityService) {
+    public void setIdentityService(SBPIdentityService identityService) {
 
         this.identityService = identityService;
     }
 
     @Override
-    public Map<ClientAwareEventHandler<?>, EventPredicate<?>> getHandlers() {
+    public Map<SBPAwareEventHandler<?>, EventPredicate<?>> getHandlers() {
 
         if (handlersUnmodifiableCache == null) {
             handlersUnmodifiableCache = Collections.unmodifiableMap(handlers);
@@ -92,7 +92,7 @@ public class DefaultClientAwareHandlerExtension extends AbstractBridgeModule imp
     }
 
     @Override
-    public void addHandler(ClientAwareEventHandler<?> handler, EventPredicate<?> predicate) {
+    public void addHandler(SBPAwareEventHandler<?> handler, EventPredicate<?> predicate) {
 
         handlers.put(handler, predicate);
         handlersUnmodifiableCache = null;
@@ -101,18 +101,18 @@ public class DefaultClientAwareHandlerExtension extends AbstractBridgeModule imp
         lowLevelHandlers.put(handler, lowLevelHandler);
         getBridge().getModule(LowLevelHandlerModule.class).addHandler(lowLevelHandler);
 
-        for (ModifyClientAwareHandlerListListener listener : modifyHandlerListListeners) {
+        for (ModifySBPAwareHandlerListListener listener : modifyHandlerListListeners) {
             listener.onAddHandler(handler, predicate, this);
         }
     }
 
     @Override
-    public void removeHandler(ClientAwareEventHandler<?> handler) {
+    public void removeHandler(SBPAwareEventHandler<?> handler) {
 
         if (handlers.containsKey(handler)) {
             if (!modifyHandlerListListeners.isEmpty()) {
                 EventPredicate<?> predicate = handlers.get(handler);
-                for (ModifyClientAwareHandlerListListener listener : modifyHandlerListListeners) {
+                for (ModifySBPAwareHandlerListListener listener : modifyHandlerListListeners) {
                     listener.onRemoveHandler(handler, predicate, this);
                 }
             }
@@ -127,37 +127,37 @@ public class DefaultClientAwareHandlerExtension extends AbstractBridgeModule imp
     }
 
     @Override
-    public void addModifyHandlerListListener(ModifyClientAwareHandlerListListener listener) {
+    public void addModifyHandlerListListener(ModifySBPAwareHandlerListListener listener) {
 
         modifyHandlerListListeners.add(listener);
     }
 
     @Override
-    public void removeModifyHandlerListListener(ModifyClientAwareHandlerListListener listener) {
+    public void removeModifyHandlerListListener(ModifySBPAwareHandlerListListener listener) {
 
         modifyHandlerListListeners.remove(listener);
     }
 
     @Override
-    public Channel<ClientAwareHandleInterceptor> getChannel() {
+    public Channel<SBPAwareHandleInterceptor> getChannel() {
 
         return channel;
     }
 
-    private void handle(Event event, BridgeConnector source, ClientAwareEventHandler<?> handler) {
+    private void handle(Event event, BridgeConnector source, SBPAwareEventHandler<?> handler) {
 
-        ClientIdentity client = identityService.getIdentity(source);
+        SBPIdentity sender = identityService.getIdentity(source);
 
-        ChannelInvocation<ClientAwareHandleInterceptor> invocation = channel.invoke();
-        invocation.next().handle(invocation, event, source, client, handler);
+        ChannelInvocation<SBPAwareHandleInterceptor> invocation = channel.invoke();
+        invocation.next().handle(invocation, event, source, sender, handler);
     }
 
     private class LowLevelHandlerAdapter implements LowLevelHandler {
 
-        private final ClientAwareEventHandler<?> handler;
-        private final EventPredicate<?>          predicate;
+        private final SBPAwareEventHandler<?> handler;
+        private final EventPredicate<?>       predicate;
 
-        private LowLevelHandlerAdapter(ClientAwareEventHandler<?> handler, EventPredicate<?> predicate) {
+        private LowLevelHandlerAdapter(SBPAwareEventHandler<?> handler, EventPredicate<?> predicate) {
 
             this.handler = handler;
             this.predicate = predicate;
@@ -172,27 +172,27 @@ public class DefaultClientAwareHandlerExtension extends AbstractBridgeModule imp
         @Override
         public void handle(Event event, BridgeConnector source) {
 
-            DefaultClientAwareHandlerExtension.this.handle(event, source, handler);
+            DefaultSBPAwareHandlerExtension.this.handle(event, source, handler);
         }
 
     }
 
-    private class LastClientAwareHandleInterceptor implements ClientAwareHandleInterceptor {
+    private class LastSBPAwareHandleInterceptor implements SBPAwareHandleInterceptor {
 
         @Override
-        public void handle(ChannelInvocation<ClientAwareHandleInterceptor> invocation, Event event, BridgeConnector source, ClientIdentity client, ClientAwareEventHandler<?> handler) {
+        public void handle(ChannelInvocation<SBPAwareHandleInterceptor> invocation, Event event, BridgeConnector source, SBPIdentity sender, SBPAwareEventHandler<?> handler) {
 
-            tryHandle(handler, event, client);
+            tryHandle(handler, event, sender);
 
-            invocation.next().handle(invocation, event, source, client, handler);
+            invocation.next().handle(invocation, event, source, sender, handler);
         }
 
-        private <T extends Event> void tryHandle(ClientAwareEventHandler<T> handler, Event event, ClientIdentity client) {
+        private <T extends Event> void tryHandle(SBPAwareEventHandler<T> handler, Event event, SBPIdentity sender) {
 
             try {
                 @SuppressWarnings ("unchecked")
                 T castedEvent = (T) event;
-                handler.handle(castedEvent, client);
+                handler.handle(castedEvent, sender);
             } catch (ClassCastException e) {
                 // Do nothing
             }
@@ -201,14 +201,14 @@ public class DefaultClientAwareHandlerExtension extends AbstractBridgeModule imp
     }
 
     /**
-     * A {@link Factory} for the {@link DefaultClientAwareHandlerExtension} object.
+     * A {@link Factory} for the {@link DefaultSBPAwareHandlerExtension} object.
      */
-    public static class DefaultClientAwareHandlerExtensionFactory implements Factory {
+    public static class DefaultSBPAwareHandlerExtensionFactory implements Factory {
 
         @Override
         public Object create() {
 
-            return new DefaultClientAwareHandlerExtension();
+            return new DefaultSBPAwareHandlerExtension();
         }
 
     }

@@ -40,10 +40,10 @@ import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
 import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
 import com.quartercode.disconnected.shared.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.comp.file.FileRights;
-import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
-import com.quartercode.disconnected.shared.event.program.general.FMPClientUpdateViewCommand;
+import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.event.program.general.FMPWPUUpdateViewCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldChangeDirCommand;
-import com.quartercode.disconnected.shared.event.program.generic.GPClientErrorEvent;
+import com.quartercode.disconnected.shared.event.program.generic.GPWPUErrorEvent;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 import com.quartercode.eventbridge.extra.predicate.TypePredicate;
@@ -70,7 +70,7 @@ public class FileManagerProgramMissingReadRightTest extends AbstractProgramTest 
 
         ChildProcess process = parentProcess.invoke(Process.CREATE_CHILD);
         process.setObj(Process.SOURCE, (ContentFile) fileSystem.invoke(FileSystem.GET_FILE, splitAfterMountpoint(getCommonLocation(FileManagerProgram.class).toString())[1]));
-        process.setObj(Process.CLIENT_PROCESS, new ClientProcessId(CLIENT, 0));
+        process.setObj(Process.WORLD_PROCESS_USER, new SBPWorldProcessUserId(SBP, null));
         process.invoke(Process.INITIALIZE, 10);
 
         ProgramExecutor program = process.getObj(Process.EXECUTOR);
@@ -95,13 +95,13 @@ public class FileManagerProgramMissingReadRightTest extends AbstractProgramTest 
         session.setObj(Session.USER, testUser);
         session.invoke(ProgramExecutor.RUN);
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), new TypePredicate<>(FMPClientUpdateViewCommand.class));
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), new TypePredicate<>(FMPWPUUpdateViewCommand.class));
 
         final MutableBoolean invoked = new MutableBoolean();
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPClientErrorEvent>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPWPUErrorEvent>() {
 
             @Override
-            public void handle(GPClientErrorEvent event) {
+            public void handle(GPWPUErrorEvent event) {
 
                 assertEquals("Error type", "fileList.missingReadRight", event.getType());
                 assertArrayEquals("Error arguments (file path)", new String[] { PATH }, event.getArguments());
@@ -109,7 +109,7 @@ public class FileManagerProgramMissingReadRightTest extends AbstractProgramTest 
                 invoked.setTrue();
             }
 
-        }, new TypePredicate<>(GPClientErrorEvent.class));
+        }, new TypePredicate<>(GPWPUErrorEvent.class));
 
         executeProgramAndSendChangeDirCommand(sessionProcess, PATH);
 

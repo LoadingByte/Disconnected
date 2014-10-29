@@ -35,11 +35,11 @@ import com.quartercode.disconnected.shared.comp.file.FilePlaceholder;
 import com.quartercode.disconnected.shared.comp.file.PathUtils;
 import com.quartercode.disconnected.shared.comp.program.GeneralProgramConstants;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
-import com.quartercode.disconnected.shared.event.program.general.FMPClientUpdateViewCommand;
+import com.quartercode.disconnected.shared.event.program.general.FMPWPUUpdateViewCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldAddFileCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldChangeDirCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldRemoveFileCommand;
-import com.quartercode.disconnected.shared.event.program.generic.GPClientErrorEvent;
+import com.quartercode.disconnected.shared.event.program.generic.GPWPUErrorEvent;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 import de.matthiasmann.twl.Button;
@@ -202,8 +202,8 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
             final UpdateViewCommandHandler updateViewCommandHandler = new UpdateViewCommandHandler();
             final GPClientErrorEventPopupHandler genericErrorEventHandler = new GPClientErrorEventPopupHandler(this, "", "Popup.message", true);
 
-            registerEventHandler(FMPClientUpdateViewCommand.class, updateViewCommandHandler);
-            registerEventHandler(GPClientErrorEvent.class, genericErrorEventHandler);
+            registerEventHandler(FMPWPUUpdateViewCommand.class, updateViewCommandHandler);
+            registerEventHandler(GPWPUErrorEvent.class, genericErrorEventHandler);
 
             addCloseListener(new Runnable() {
 
@@ -222,7 +222,7 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
         protected void doLaunchWorldProcess() {
 
             // Launch process
-            bridge.send(new WorldProcessLaunchCommand(clientProcessId.getPid(), GeneralProgramConstants.COMLOC_FILE_MANAGER.toString()));
+            bridge.send(new WorldProcessLaunchCommand(clientProcessDetails, GeneralProgramConstants.COMLOC_FILE_MANAGER.toString()));
 
             // Set initial directory in order to receive an update view command
             changeDirectory(PathUtils.SEPARATOR);
@@ -308,10 +308,10 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
 
         }
 
-        private class UpdateViewCommandHandler implements EventHandler<FMPClientUpdateViewCommand> {
+        private class UpdateViewCommandHandler implements EventHandler<FMPWPUUpdateViewCommand> {
 
             @Override
-            public void handle(FMPClientUpdateViewCommand event) {
+            public void handle(FMPWPUUpdateViewCommand event) {
 
                 updateView(event.getCurrentDir(), event.getFiles());
             }

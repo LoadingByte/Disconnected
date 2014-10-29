@@ -18,8 +18,8 @@
 
 package com.quartercode.disconnected.server.test.bridge;
 
-import com.quartercode.disconnected.shared.client.ClientIdentity;
-import com.quartercode.disconnected.shared.event.LimitedClientEvent;
+import com.quartercode.disconnected.shared.event.LimitedSBPEvent;
+import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.eventbridge.basic.EventBase;
 import com.quartercode.eventbridge.bridge.Event;
 
@@ -45,19 +45,19 @@ public class DummyEvents {
     }
 
     @SuppressWarnings ("serial")
-    public static class TestLimitedClientEvent extends EventBase implements LimitedClientEvent {
+    public static class TestLimitedSBPEvent extends EventBase implements LimitedSBPEvent {
 
-        private final ClientIdentity[] clients;
+        private final SBPIdentity[] sbps;
 
-        public TestLimitedClientEvent(ClientIdentity... clients) {
+        public TestLimitedSBPEvent(SBPIdentity... sbps) {
 
-            this.clients = clients;
+            this.sbps = sbps;
         }
 
         @Override
-        public ClientIdentity[] getClients() {
+        public SBPIdentity[] getSBPs() {
 
-            return clients;
+            return sbps;
         }
 
     }

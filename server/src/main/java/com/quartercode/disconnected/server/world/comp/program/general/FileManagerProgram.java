@@ -28,7 +28,7 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
-import com.quartercode.disconnected.server.bridge.ClientAwareEventHandler;
+import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileRemoveAction;
@@ -45,16 +45,16 @@ import com.quartercode.disconnected.server.world.comp.os.User;
 import com.quartercode.disconnected.server.world.comp.program.Process;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
-import com.quartercode.disconnected.shared.client.ClientIdentity;
 import com.quartercode.disconnected.shared.comp.file.FilePlaceholder;
 import com.quartercode.disconnected.shared.comp.file.FileRights;
 import com.quartercode.disconnected.shared.comp.file.PathUtils;
-import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
-import com.quartercode.disconnected.shared.event.program.general.FMPClientUpdateViewCommand;
+import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.event.program.general.FMPWPUUpdateViewCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldAddFileCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldChangeDirCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldRemoveFileCommand;
-import com.quartercode.disconnected.shared.event.program.generic.GPClientErrorEvent;
+import com.quartercode.disconnected.shared.event.program.generic.GPWPUErrorEvent;
+import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
@@ -103,7 +103,7 @@ public class FileManagerProgram extends ProgramExecutor {
                 FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
                 ChangeDirCommandHandler handler = new ChangeDirCommandHandler();
                 handler.holder = holder;
-                ProgramUtils.registerClientAwareEventHandler(holder, FMPWorldChangeDirCommand.class, handler, true);
+                ProgramUtils.registerSBPAwareEventHandler(holder, FMPWorldChangeDirCommand.class, handler, true);
 
                 return invocation.next(arguments);
             }
@@ -117,7 +117,7 @@ public class FileManagerProgram extends ProgramExecutor {
                 FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
                 AddFileCommandHandler handler = new AddFileCommandHandler();
                 handler.holder = holder;
-                ProgramUtils.registerClientAwareEventHandler(holder, FMPWorldAddFileCommand.class, handler, true);
+                ProgramUtils.registerSBPAwareEventHandler(holder, FMPWorldAddFileCommand.class, handler, true);
 
                 return invocation.next(arguments);
             }
@@ -131,7 +131,7 @@ public class FileManagerProgram extends ProgramExecutor {
                 FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
                 RemoveFileCommandHandler handler = new RemoveFileCommandHandler();
                 handler.holder = holder;
-                ProgramUtils.registerClientAwareEventHandler(holder, FMPWorldRemoveFileCommand.class, handler, true);
+                ProgramUtils.registerSBPAwareEventHandler(holder, FMPWorldRemoveFileCommand.class, handler, true);
 
                 return invocation.next(arguments);
             }
@@ -140,12 +140,12 @@ public class FileManagerProgram extends ProgramExecutor {
 
     }
 
-    private static class ChangeDirCommandHandler implements ClientAwareEventHandler<FMPWorldChangeDirCommand> {
+    private static class ChangeDirCommandHandler implements SBPAwareEventHandler<FMPWorldChangeDirCommand> {
 
         private FileManagerProgram holder;
 
         @Override
-        public void handle(FMPWorldChangeDirCommand event, ClientIdentity client) {
+        public void handle(FMPWorldChangeDirCommand event, SBPIdentity sender) {
 
             String change = event.getChange();
             Validate.notBlank(change, "Path change cannot be blank");
@@ -164,12 +164,12 @@ public class FileManagerProgram extends ProgramExecutor {
                 int validationResult = verifyDir(newDirPath);
 
                 if (validationResult == 0) {
-                    // New dir is valid -> update current dir and send change to client later on
+                    // New dir is valid -> update current dir and send change to sbp later on
                     holder.setObj(CURRENT_DIR, newDirPath);
                 } else if (validationResult == 3) {
-                    // Missing read right on new dir -> do not update current dir and send error message to client
-                    ClientProcessId clientProcessId = holder.getParent().getObj(Process.CLIENT_PROCESS);
-                    holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "fileList.missingReadRight", new String[] { newDirPath }));
+                    // Missing read right on new dir -> do not update current dir and send error message to sbp
+                    SBPWorldProcessUserId wpuId = holder.getParent().getObj(Process.WORLD_PROCESS_USER);
+                    holder.getBridge().send(new GPWPUErrorEvent(wpuId, "fileList.missingReadRight", new String[] { newDirPath }));
                     return;
                 } else {
                     // New dir does not exist or is not a directory -> do not update current dir
@@ -179,7 +179,7 @@ public class FileManagerProgram extends ProgramExecutor {
                 holder.setObj(CURRENT_DIR, newDirPath);
             }
 
-            // Send the updated dir to the client
+            // Send the updated dir to the sbp
             sendUpdateView(holder.getParent(), holder.getBridge(), holder.getObj(CURRENT_DIR));
         }
 
@@ -236,12 +236,12 @@ public class FileManagerProgram extends ProgramExecutor {
 
     }
 
-    private static class AddFileCommandHandler implements ClientAwareEventHandler<FMPWorldAddFileCommand> {
+    private static class AddFileCommandHandler implements SBPAwareEventHandler<FMPWorldAddFileCommand> {
 
         private FileManagerProgram holder;
 
         @Override
-        public void handle(FMPWorldAddFileCommand event, ClientIdentity client) {
+        public void handle(FMPWorldAddFileCommand event, SBPIdentity sender) {
 
             if (holder.getObj(CURRENT_DIR).equals(PathUtils.SEPARATOR)) {
                 throw new IllegalStateException("Cannot create a file when the current path is set to the absolute root");
@@ -251,8 +251,8 @@ public class FileManagerProgram extends ProgramExecutor {
             Validate.notBlank(fileName, "File name cannot be blank");
 
             if (PathUtils.split(fileName).length != 1) {
-                ClientProcessId clientProcessId = holder.getParent().getObj(Process.CLIENT_PROCESS);
-                holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "createFile.invalidFileName", new String[] { fileName }));
+                SBPWorldProcessUserId wpuId = holder.getParent().getObj(Process.WORLD_PROCESS_USER);
+                holder.getBridge().send(new GPWPUErrorEvent(wpuId, "createFile.invalidFileName", new String[] { fileName }));
                 return;
             }
 
@@ -265,7 +265,7 @@ public class FileManagerProgram extends ProgramExecutor {
 
         private void addFile(String fileName, String fileType) {
 
-            ClientProcessId clientProcessId = holder.getParent().getObj(Process.CLIENT_PROCESS);
+            SBPWorldProcessUserId wpuId = holder.getParent().getObj(Process.WORLD_PROCESS_USER);
             Process<?> process = holder.getParent();
             FileSystemModule fsModule = process.invoke(Process.GET_OPERATING_SYSTEM).getObj(OperatingSystem.FS_MODULE);
 
@@ -273,7 +273,7 @@ public class FileManagerProgram extends ProgramExecutor {
             String filePath = PathUtils.resolve(currentDir, fileName);
 
             if (filePath.equals(currentDir)) {
-                holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "createFile.invalidFileName", new String[] { fileName }));
+                holder.getBridge().send(new GPWPUErrorEvent(wpuId, "createFile.invalidFileName", new String[] { fileName }));
                 return;
             }
 
@@ -288,23 +288,23 @@ public class FileManagerProgram extends ProgramExecutor {
                     addAction.invoke(FileAddAction.EXECUTE);
                     sendUpdateView(process, holder.getBridge(), holder.getObj(CURRENT_DIR));
                 } catch (OccupiedPathException e) {
-                    holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "createFile.occupiedPath", new String[] { filePath }));
+                    holder.getBridge().send(new GPWPUErrorEvent(wpuId, "createFile.occupiedPath", new String[] { filePath }));
                 } catch (OutOfSpaceException e) {
-                    holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "createFile.outOfSpace", new String[] { filePath }));
+                    holder.getBridge().send(new GPWPUErrorEvent(wpuId, "createFile.outOfSpace", new String[] { filePath }));
                 }
             } else {
-                holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "createFile.missingWriteRight", new String[] { filePath }));
+                holder.getBridge().send(new GPWPUErrorEvent(wpuId, "createFile.missingWriteRight", new String[] { filePath }));
             }
         }
 
     }
 
-    private static class RemoveFileCommandHandler implements ClientAwareEventHandler<FMPWorldRemoveFileCommand> {
+    private static class RemoveFileCommandHandler implements SBPAwareEventHandler<FMPWorldRemoveFileCommand> {
 
         private FileManagerProgram holder;
 
         @Override
-        public void handle(FMPWorldRemoveFileCommand event, ClientIdentity client) {
+        public void handle(FMPWorldRemoveFileCommand event, SBPIdentity sender) {
 
             if (holder.getObj(CURRENT_DIR).equals(PathUtils.SEPARATOR)) {
                 throw new IllegalStateException("Cannot delete a file when the current path is set to the absolute root");
@@ -314,8 +314,8 @@ public class FileManagerProgram extends ProgramExecutor {
             Validate.notBlank(fileName, "File name cannot be blank");
 
             if (PathUtils.split(fileName).length != 1) {
-                ClientProcessId clientProcessId = holder.getParent().getObj(Process.CLIENT_PROCESS);
-                holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "removeFile.invalidFileName", new String[] { fileName }));
+                SBPWorldProcessUserId wpuId = holder.getParent().getObj(Process.WORLD_PROCESS_USER);
+                holder.getBridge().send(new GPWPUErrorEvent(wpuId, "removeFile.invalidFileName", new String[] { fileName }));
                 return;
             }
 
@@ -324,7 +324,7 @@ public class FileManagerProgram extends ProgramExecutor {
 
         private void removeFile(String fileName) {
 
-            ClientProcessId clientProcessId = holder.getParent().getObj(Process.CLIENT_PROCESS);
+            SBPWorldProcessUserId wpuId = holder.getParent().getObj(Process.WORLD_PROCESS_USER);
             Process<?> process = holder.getParent();
             FileSystemModule fsModule = process.invoke(Process.GET_OPERATING_SYSTEM).getObj(OperatingSystem.FS_MODULE);
 
@@ -332,7 +332,7 @@ public class FileManagerProgram extends ProgramExecutor {
             String filePath = PathUtils.resolve(currentDir, fileName);
 
             if (filePath.equals(currentDir)) {
-                holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "removeFile.invalidFileName", new String[] { fileName }));
+                holder.getBridge().send(new GPWPUErrorEvent(wpuId, "removeFile.invalidFileName", new String[] { fileName }));
                 return;
             }
 
@@ -350,7 +350,7 @@ public class FileManagerProgram extends ProgramExecutor {
                 removeAction.invoke(FileRemoveAction.EXECUTE);
                 sendUpdateView(process, holder.getBridge(), holder.getObj(CURRENT_DIR));
             } else {
-                holder.getBridge().send(new GPClientErrorEvent(clientProcessId, "removeFile.missingDeleteRight", new String[] { filePath }));
+                holder.getBridge().send(new GPWPUErrorEvent(wpuId, "removeFile.missingDeleteRight", new String[] { filePath }));
             }
         }
 
@@ -358,7 +358,7 @@ public class FileManagerProgram extends ProgramExecutor {
 
     private static void sendUpdateView(Process<?> process, Bridge bridge, String currentDir) {
 
-        ClientProcessId clientProcessId = process.getObj(Process.CLIENT_PROCESS);
+        SBPWorldProcessUserId wpuId = process.getObj(Process.WORLD_PROCESS_USER);
         FileSystemModule fsModule = process.invoke(Process.GET_OPERATING_SYSTEM).getObj(OperatingSystem.FS_MODULE);
 
         // Current dir is absolute root
@@ -370,7 +370,7 @@ public class FileManagerProgram extends ProgramExecutor {
             }
 
             FilePlaceholder[] fileArray = files.toArray(new FilePlaceholder[files.size()]);
-            bridge.send(new FMPClientUpdateViewCommand(clientProcessId, currentDir, fileArray));
+            bridge.send(new FMPWPUUpdateViewCommand(wpuId, currentDir, fileArray));
         }
         // Current dir is normal dir
         else {
@@ -383,7 +383,7 @@ public class FileManagerProgram extends ProgramExecutor {
             }
 
             FilePlaceholder[] fileArray = files.toArray(new FilePlaceholder[files.size()]);
-            bridge.send(new FMPClientUpdateViewCommand(clientProcessId, currentDir, fileArray));
+            bridge.send(new FMPWPUUpdateViewCommand(wpuId, currentDir, fileArray));
         }
     }
 

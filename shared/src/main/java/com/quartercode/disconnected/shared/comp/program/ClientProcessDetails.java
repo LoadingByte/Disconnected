@@ -18,40 +18,27 @@
 
 package com.quartercode.disconnected.shared.comp.program;
 
-import java.io.Serializable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import com.quartercode.disconnected.shared.client.ClientIdentity;
 
 /**
- * A data object that stores information in order to identify a client-side client process that runs a graphical client program.
+ * A data object that identifies a client-side client process which runs a graphical client program.
+ * 
+ * @see SBPWorldProcessUserDetails
  */
-public class ClientProcessId implements Serializable {
+public class ClientProcessDetails implements SBPWorldProcessUserDetails {
 
-    private final ClientIdentity client;
-    private final int            pid;
-
-    /**
-     * Creates a new client process id.
-     * 
-     * @param client The {@link ClientIdentity} of the client that runs the identifiable client process.
-     * @param pid The unique id of the identifiable client process.
-     */
-    public ClientProcessId(ClientIdentity client, int pid) {
-
-        this.client = client;
-        this.pid = pid;
-    }
+    private final int clientPid;
 
     /**
-     * Returns the {@link ClientIdentity} of the client that runs the identifiable client process.
+     * Creates a new client process details object.
      * 
-     * @return The identity of the client.
+     * @param clientPid The unique id of the identifiable client process.
      */
-    public ClientIdentity getClient() {
+    public ClientProcessDetails(int clientPid) {
 
-        return client;
+        this.clientPid = clientPid;
     }
 
     /**
@@ -60,9 +47,9 @@ public class ClientProcessId implements Serializable {
      * 
      * @return The client process id.
      */
-    public int getPid() {
+    public int getClientPid() {
 
-        return pid;
+        return clientPid;
     }
 
     @Override

@@ -42,12 +42,12 @@ import com.quartercode.disconnected.server.world.comp.program.general.FileManage
 import com.quartercode.disconnected.shared.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.comp.file.FilePlaceholder;
 import com.quartercode.disconnected.shared.comp.file.FileRights;
-import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
+import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
 import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
-import com.quartercode.disconnected.shared.event.program.general.FMPClientUpdateViewCommand;
+import com.quartercode.disconnected.shared.event.program.general.FMPWPUUpdateViewCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldAddFileCommand;
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldChangeDirCommand;
-import com.quartercode.disconnected.shared.event.program.generic.GPClientErrorEvent;
+import com.quartercode.disconnected.shared.event.program.generic.GPWPUErrorEvent;
 import com.quartercode.eventbridge.bridge.EventPredicate;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
@@ -59,7 +59,7 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
     private static final String            PATH_1        = PARENT_PATH + "/test.txt";
     private static final String            PATH_2_PART_2 = "test3/test.txt";
 
-    private static final EventPredicate<?> UW_PREDICATE  = new TypePredicate<>(FMPClientUpdateViewCommand.class);
+    private static final EventPredicate<?> UW_PREDICATE  = new TypePredicate<>(FMPWPUUpdateViewCommand.class);
 
     public FileManagerProgramAddFileTest() {
 
@@ -79,7 +79,7 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
 
         ChildProcess process = parentProcess.invoke(Process.CREATE_CHILD);
         process.setObj(Process.SOURCE, (ContentFile) fileSystem.invoke(FileSystem.GET_FILE, splitAfterMountpoint(getCommonLocation(FileManagerProgram.class).toString())[1]));
-        process.setObj(Process.CLIENT_PROCESS, new ClientProcessId(CLIENT, 0));
+        process.setObj(Process.WORLD_PROCESS_USER, new SBPWorldProcessUserId(SBP, null));
         process.invoke(Process.INITIALIZE, 10);
 
         ProgramExecutor program = process.getObj(Process.EXECUTOR);
@@ -101,10 +101,10 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
         executeProgramAndSendChangeDirCommand(processModule.getObj(ProcessModule.ROOT_PROCESS), PARENT_PATH);
 
         final MutableBoolean invoked = new MutableBoolean();
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMPClientUpdateViewCommand>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMPWPUUpdateViewCommand>() {
 
             @Override
-            public void handle(FMPClientUpdateViewCommand event) {
+            public void handle(FMPWPUUpdateViewCommand event) {
 
                 assertEquals("File path", PARENT_PATH, event.getCurrentDir());
 
@@ -131,10 +131,10 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPClientErrorEvent>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPWPUErrorEvent>() {
 
             @Override
-            public void handle(GPClientErrorEvent event) {
+            public void handle(GPWPUErrorEvent event) {
 
                 assertEquals("Error type", "createFile.invalidFileName", event.getType());
                 assertArrayEquals("Error arguments (file path)", new String[] { PATH_2_PART_2 }, event.getArguments());
@@ -142,7 +142,7 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
                 invoked.setTrue();
             }
 
-        }, new TypePredicate<>(GPClientErrorEvent.class));
+        }, new TypePredicate<>(GPWPUErrorEvent.class));
 
         sendAddFileCommand(PATH_2_PART_2);
 
@@ -157,10 +157,10 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPClientErrorEvent>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPWPUErrorEvent>() {
 
             @Override
-            public void handle(GPClientErrorEvent event) {
+            public void handle(GPWPUErrorEvent event) {
 
                 assertEquals("Error type", "createFile.invalidFileName", event.getType());
                 assertArrayEquals("Error arguments (file path)", new String[] { "." }, event.getArguments());
@@ -168,7 +168,7 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
                 invoked.setTrue();
             }
 
-        }, new TypePredicate<>(GPClientErrorEvent.class));
+        }, new TypePredicate<>(GPWPUErrorEvent.class));
 
         sendAddFileCommand(".");
 
@@ -206,10 +206,10 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPClientErrorEvent>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPWPUErrorEvent>() {
 
             @Override
-            public void handle(GPClientErrorEvent event) {
+            public void handle(GPWPUErrorEvent event) {
 
                 assertEquals("Error type", "createFile.occupiedPath", event.getType());
                 assertArrayEquals("Error arguments (file path)", new String[] { PATH_1 }, event.getArguments());
@@ -217,7 +217,7 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
                 invoked.setTrue();
             }
 
-        }, new TypePredicate<>(GPClientErrorEvent.class));
+        }, new TypePredicate<>(GPWPUErrorEvent.class));
 
         sendAddFileCommand(splitBeforeName(PATH_1)[1]);
 
@@ -235,10 +235,10 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPClientErrorEvent>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPWPUErrorEvent>() {
 
             @Override
-            public void handle(GPClientErrorEvent event) {
+            public void handle(GPWPUErrorEvent event) {
 
                 assertEquals("Error type", "createFile.outOfSpace", event.getType());
                 assertArrayEquals("Error arguments (file path)", new String[] { PATH_1 }, event.getArguments());
@@ -246,7 +246,7 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
                 invoked.setTrue();
             }
 
-        }, new TypePredicate<>(GPClientErrorEvent.class));
+        }, new TypePredicate<>(GPWPUErrorEvent.class));
 
         sendAddFileCommand(splitBeforeName(PATH_1)[1]);
 
@@ -274,10 +274,10 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPClientErrorEvent>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPWPUErrorEvent>() {
 
             @Override
-            public void handle(GPClientErrorEvent event) {
+            public void handle(GPWPUErrorEvent event) {
 
                 assertEquals("Error type", "createFile.missingWriteRight", event.getType());
                 assertArrayEquals("Error arguments (file path)", new String[] { PATH_1 }, event.getArguments());
@@ -285,7 +285,7 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
                 invoked.setTrue();
             }
 
-        }, new TypePredicate<>(GPClientErrorEvent.class));
+        }, new TypePredicate<>(GPWPUErrorEvent.class));
 
         sendAddFileCommand(splitBeforeName(PATH_1)[1]);
 

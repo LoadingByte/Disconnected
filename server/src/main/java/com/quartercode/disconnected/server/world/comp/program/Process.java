@@ -48,7 +48,7 @@ import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.os.Session;
 import com.quartercode.disconnected.server.world.comp.os.User;
 import com.quartercode.disconnected.shared.comp.file.FileRights;
-import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
+import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
 
 /**
  * This class represents a process which is basically a running instance of a program.
@@ -165,10 +165,10 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
     public static final CollectionPropertyDefinition<Process<?>, List<Process<?>>> CHILDREN;
 
     /**
-     * If the process was launched by a client, this property stores the {@link ClientProcessId} that identifies the client-side process.
+     * If the process was launched by an SBP, this property stores the {@link SBPWorldProcessUserId} that identifies the SBP and the world process user.
      * Such a remote launch is done using a command event.
      */
-    public static final PropertyDefinition<ClientProcessId>                        CLIENT_PROCESS;
+    public static final PropertyDefinition<SBPWorldProcessUserId>                  WORLD_PROCESS_USER;
 
     static {
 
@@ -210,7 +210,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
         EXECUTOR = create(new TypeLiteral<PropertyDefinition<ProgramExecutor>>() {}, "name", "executor", "storage", new StandardStorage<>());
         CHILDREN = create(new TypeLiteral<CollectionPropertyDefinition<Process<?>, List<Process<?>>>>() {}, "name", "children", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
-        CLIENT_PROCESS = create(new TypeLiteral<PropertyDefinition<ClientProcessId>>() {}, "name", "clientProcess", "storage", new StandardStorage<>());
+        WORLD_PROCESS_USER = create(new TypeLiteral<PropertyDefinition<SBPWorldProcessUserId>>() {}, "name", "worldProcessParnter", "storage", new StandardStorage<>());
 
     }
 

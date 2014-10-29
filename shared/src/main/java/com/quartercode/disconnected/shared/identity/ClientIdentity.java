@@ -16,22 +16,20 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.client;
+package com.quartercode.disconnected.shared.identity;
 
-import java.io.Serializable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import com.quartercode.eventbridge.bridge.BridgeConnector;
 
 /**
- * An object that represents an identified client which is connected to a server.
- * That identification is achieved using an authentication system.
- * Once a client is identified, its identity is assigned to its {@link BridgeConnector}, which is used by him to connect to the server.<br>
- * <br>
+ * An {@link SBPIdentity} that represents an identified client which is connected to a server.
+ * That identification is achieved using a client authentication system.
  * Currently, a client identity just stores a player name.
+ * 
+ * @see SBPIdentity
  */
-public class ClientIdentity implements Serializable {
+public class ClientIdentity implements SBPIdentity {
 
     private final String name;
 

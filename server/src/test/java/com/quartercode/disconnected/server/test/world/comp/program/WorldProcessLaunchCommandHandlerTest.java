@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.server.test.world.comp.program;
 
 import static org.junit.Assert.*;
+import lombok.RequiredArgsConstructor;
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -33,11 +34,14 @@ import com.quartercode.disconnected.server.world.comp.program.Program;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.RootProcess;
 import com.quartercode.disconnected.server.world.comp.program.WorldProcessLaunchCommandHandler;
-import com.quartercode.disconnected.shared.client.ClientIdentity;
-import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
+import com.quartercode.disconnected.shared.comp.program.ClientProcessDetails;
+import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserDetails;
+import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
 import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchAcknowledgement;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
+import com.quartercode.disconnected.shared.identity.ClientIdentity;
+import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.eventbridge.bridge.Bridge;
 
 public class WorldProcessLaunchCommandHandlerTest {
@@ -49,7 +53,7 @@ public class WorldProcessLaunchCommandHandlerTest {
 
     @Mock
     private Bridge                               bridge;
-    private Computer                             clientComputer;
+    private Computer                             sbpComputer;
     private ProcessModule                        procModule;
     private Process<?>                           sessionProcess;
     private ContentFile                          sourceFile;
@@ -57,7 +61,7 @@ public class WorldProcessLaunchCommandHandlerTest {
     @Before
     public void setUp() {
 
-        clientComputer = new Computer();
+        sbpComputer = new Computer();
         procModule = new ProcessModule();
         sessionProcess = new RootProcess();
 
@@ -66,7 +70,7 @@ public class WorldProcessLaunchCommandHandlerTest {
         program.setObj(Program.EXECUTOR_CLASS, TestProgram.class);
         sourceFile.setObj(ContentFile.CONTENT, program);
 
-        handler = new WorldProcessLaunchCommandHandlerMock(bridge, clientComputer, procModule, sessionProcess, sourceFile);
+        handler = new WorldProcessLaunchCommandHandlerMock(bridge, sbpComputer, procModule, sessionProcess, sourceFile);
     }
 
     @Test
@@ -90,48 +94,40 @@ public class WorldProcessLaunchCommandHandlerTest {
 
         handler.currentLaunchedProcessId = expectedPid;
 
-        final ClientIdentity clientIdentity = new ClientIdentity("client");
-        final int clientPid = 20;
+        final SBPIdentity sbpIdentity = new ClientIdentity("client");
+        final SBPWorldProcessUserDetails wpuDetails = new ClientProcessDetails(20);
 
         // @formatter:off
         context.checking(new Expectations() {{
 
-            oneOf(bridge).send(new WorldProcessLaunchAcknowledgement(new ClientProcessId(clientIdentity, clientPid), new WorldProcessId(clientComputer.getId(), expectedPid)));
+            oneOf(bridge).send(new WorldProcessLaunchAcknowledgement(new SBPWorldProcessUserId(sbpIdentity, wpuDetails), new WorldProcessId(sbpComputer.getId(), expectedPid)));
 
         }});
         // @formatter:on
 
-        WorldProcessLaunchCommand event = new WorldProcessLaunchCommand(clientPid, "testPath");
-        handler.handle(event, clientIdentity);
+        WorldProcessLaunchCommand event = new WorldProcessLaunchCommand(wpuDetails, "testPath");
+        handler.handle(event, sbpIdentity);
 
         Process<?> child = sessionProcess.getCol(Process.CHILDREN).get(run - 1);
         assertNotNull("Child process was not created", child);
         assertEquals("Pid of child process", expectedPid, (int) child.getObj(Process.PID));
-        assertEquals("Client process id of child process", new ClientProcessId(clientIdentity, clientPid), child.getObj(Process.CLIENT_PROCESS));
+        assertEquals("World process user id of child process", new SBPWorldProcessUserId(sbpIdentity, wpuDetails), child.getObj(Process.WORLD_PROCESS_USER));
 
         ProgramExecutor executor = child.getObj(Process.EXECUTOR);
         assertNotNull("Child process has no program executor", executor);
         assertTrue("Child process has an incorrect program executor (wrong type)", executor instanceof TestProgram);
     }
 
+    @RequiredArgsConstructor
     private static class WorldProcessLaunchCommandHandlerMock extends WorldProcessLaunchCommandHandler {
 
         private final Bridge        bridge;
-        private final Computer      clientComputer;
+        private final Computer      sbpComputer;
         private final ProcessModule procModule;
         private final Process<?>    sessionProcess;
         private final ContentFile   sourceFile;
 
         private int                 currentLaunchedProcessId;
-
-        private WorldProcessLaunchCommandHandlerMock(Bridge bridge, Computer clientComputer, ProcessModule procModule, Process<?> sessionProcess, ContentFile sourceFile) {
-
-            this.bridge = bridge;
-            this.clientComputer = clientComputer;
-            this.procModule = procModule;
-            this.sessionProcess = sessionProcess;
-            this.sourceFile = sourceFile;
-        }
 
         @Override
         protected Bridge getBridge() {
@@ -140,9 +136,9 @@ public class WorldProcessLaunchCommandHandlerTest {
         }
 
         @Override
-        protected Computer getClientComputer(ClientIdentity client) {
+        protected Computer getSBPComputer(SBPIdentity sbp) {
 
-            return clientComputer;
+            return sbpComputer;
         }
 
         @Override
@@ -168,7 +164,7 @@ public class WorldProcessLaunchCommandHandlerTest {
         @Override
         protected WorldProcessId getProcessId(ProgramExecutor executor) {
 
-            return new WorldProcessId(clientComputer.getId(), currentLaunchedProcessId);
+            return new WorldProcessId(sbpComputer.getId(), currentLaunchedProcessId);
         }
 
     }

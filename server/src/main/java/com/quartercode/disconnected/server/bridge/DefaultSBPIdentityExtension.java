@@ -18,9 +18,10 @@
 
 package com.quartercode.disconnected.server.bridge;
 
-import com.quartercode.disconnected.server.client.ClientIdentityService;
-import com.quartercode.disconnected.shared.client.ClientIdentity;
-import com.quartercode.disconnected.shared.event.LimitedClientEvent;
+import com.quartercode.disconnected.server.identity.SBPIdentityService;
+import com.quartercode.disconnected.shared.event.LimitedSBPEvent;
+import com.quartercode.disconnected.shared.identity.ClientIdentity;
+import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.eventbridge.basic.AbstractBridgeModule;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.Bridge.ModifyConnectorListListener;
@@ -32,16 +33,16 @@ import com.quartercode.eventbridge.channel.ChannelInvocation;
 import com.quartercode.eventbridge.factory.Factory;
 
 /**
- * The default default implementation of the {@link ClientIdentityExtension} interface.
+ * The default default implementation of the {@link SBPIdentityExtension} interface.
  * 
- * @see ClientIdentityExtension
+ * @see SBPIdentityExtension
  */
-public class DefaultClientIdentityExtension extends AbstractBridgeModule implements ClientIdentityExtension {
+public class DefaultSBPIdentityExtension extends AbstractBridgeModule implements SBPIdentityExtension {
 
     private final CIBEModifyConnectorListListener      modifyConnectorListListener      = new CIBEModifyConnectorListListener();
     private final CIBESpecificConnectorSendInterceptor specificConnectorSendInterceptor = new CIBESpecificConnectorSendInterceptor();
 
-    private ClientIdentityService                      identityService;
+    private SBPIdentityService                         identityService;
 
     @Override
     public void add(Bridge bridge) {
@@ -62,13 +63,13 @@ public class DefaultClientIdentityExtension extends AbstractBridgeModule impleme
     }
 
     @Override
-    public ClientIdentityService getIdentityService() {
+    public SBPIdentityService getIdentityService() {
 
         return identityService;
     }
 
     @Override
-    public void setIdentityService(ClientIdentityService identityService) {
+    public void setIdentityService(SBPIdentityService identityService) {
 
         this.identityService = identityService;
     }
@@ -80,7 +81,8 @@ public class DefaultClientIdentityExtension extends AbstractBridgeModule impleme
 
             // TODO: Identify connector
 
-            // This code just adds a dummy identity for a single player
+            // This code just adds a dummy identity for a client
+            // For further testing, other types of SBPs must also be identifiable
             identityService.putIdentity(connector, new ClientIdentity("client"));
         }
 
@@ -104,12 +106,12 @@ public class DefaultClientIdentityExtension extends AbstractBridgeModule impleme
 
         private boolean isAllowed(Event event, BridgeConnector connector) {
 
-            if (! (event instanceof LimitedClientEvent)) {
+            if (! (event instanceof LimitedSBPEvent)) {
                 return true;
             } else {
-                ClientIdentity connectorIdentity = identityService.getIdentity(connector);
+                SBPIdentity connectorIdentity = identityService.getIdentity(connector);
 
-                for (ClientIdentity eventIdentity : ((LimitedClientEvent) event).getClients()) {
+                for (SBPIdentity eventIdentity : ((LimitedSBPEvent) event).getSBPs()) {
                     if (eventIdentity.equals(connectorIdentity)) {
                         return true;
                     }
@@ -122,14 +124,14 @@ public class DefaultClientIdentityExtension extends AbstractBridgeModule impleme
     }
 
     /**
-     * A {@link Factory} for the {@link DefaultClientIdentityExtension} object.
+     * A {@link Factory} for the {@link DefaultSBPIdentityExtension} object.
      */
-    public static class DefaultClientIdentityExtensionFactory implements Factory {
+    public static class DefaultSBPIdentityExtensionFactory implements Factory {
 
         @Override
         public Object create() {
 
-            return new DefaultClientIdentityExtension();
+            return new DefaultSBPIdentityExtension();
         }
 
     }

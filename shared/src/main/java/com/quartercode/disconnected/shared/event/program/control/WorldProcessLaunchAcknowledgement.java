@@ -18,38 +18,38 @@
 
 package com.quartercode.disconnected.shared.event.program.control;
 
-import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
+import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
 import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
-import com.quartercode.disconnected.shared.event.program.ClientProcessCommand;
+import com.quartercode.disconnected.shared.event.program.SBPWorldProcessUserCommand;
 
 /**
- * This event is sent when a program is launched on the computer of the receiving client using a {@link WorldProcessLaunchCommand}.
+ * This event is sent when a program is launched using a {@link WorldProcessLaunchCommand} on the computer of the receiving world process user.
  * It contains the {@link WorldProcessId} of the newly launched process, which is required for further communication.
  * 
  * @see WorldProcessLaunchCommand
  */
-public class WorldProcessLaunchAcknowledgement extends ClientProcessCommand {
+public class WorldProcessLaunchAcknowledgement extends SBPWorldProcessUserCommand {
 
-    private final ClientProcessId clientProcessId;
-    private final WorldProcessId  worldProcessId;
+    private final SBPWorldProcessUserId worldProcessUserId;
+    private final WorldProcessId        worldProcessId;
 
     /**
      * Creates a new world process launch acknowledgement event.
      * 
-     * @param clientProcessId The {@link ClientProcessId} that points to the graphical client process that should receive the event.
-     *        That process must have launched the new world process.
+     * @param worldProcessUserId The {@link SBPWorldProcessUserId} that should receive the event.
+     *        That world process user must have launched the new world process.
      * @param worldProcessId The {@link WorldProcessId} of the newly launched world process.
      */
-    public WorldProcessLaunchAcknowledgement(ClientProcessId clientProcessId, WorldProcessId worldProcessId) {
+    public WorldProcessLaunchAcknowledgement(SBPWorldProcessUserId worldProcessUserId, WorldProcessId worldProcessId) {
 
-        this.clientProcessId = clientProcessId;
+        this.worldProcessUserId = worldProcessUserId;
         this.worldProcessId = worldProcessId;
     }
 
     @Override
-    public ClientProcessId getClientProcessId() {
+    public SBPWorldProcessUserId getWorldProcessUserId() {
 
-        return clientProcessId;
+        return worldProcessUserId;
     }
 
     /**

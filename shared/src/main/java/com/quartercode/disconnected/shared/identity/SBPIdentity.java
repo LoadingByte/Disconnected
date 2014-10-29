@@ -16,21 +16,19 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.event.program.general;
+package com.quartercode.disconnected.shared.identity;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import com.quartercode.disconnected.shared.comp.file.FilePlaceholder;
-import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
-import com.quartercode.disconnected.shared.event.program.ClientProcessCommand;
+import java.io.Serializable;
+import com.quartercode.eventbridge.bridge.Bridge;
+import com.quartercode.eventbridge.bridge.BridgeConnector;
 
-@RequiredArgsConstructor
-@Getter
-public class FMPClientUpdateViewCommand extends ClientProcessCommand {
-
-    private final ClientProcessId   clientProcessId;
-
-    private final String            currentDir;
-    private final FilePlaceholder[] files;
+/**
+ * A server bridge identity represents something which is connected to a server using a {@link Bridge}.
+ * Once a server bridge partner is identified, its identity is assigned to its {@link BridgeConnector}, which is used by him to connect to the server.<br>
+ * <br>
+ * For example, a graphical client used by players could be a server bridge partner.
+ * Another possibility is a modue that connects with the server and implements a certain functionality (e.g. AI).
+ */
+public interface SBPIdentity extends Serializable {
 
 }

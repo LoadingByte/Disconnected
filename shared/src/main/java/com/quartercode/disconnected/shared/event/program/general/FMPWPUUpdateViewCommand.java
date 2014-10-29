@@ -16,18 +16,21 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.test.world.comp.program.general;
+package com.quartercode.disconnected.shared.event.program.general;
 
-import static org.junit.Assert.fail;
-import com.quartercode.disconnected.shared.event.program.general.FMPWPUUpdateViewCommand;
-import com.quartercode.eventbridge.bridge.module.EventHandler;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import com.quartercode.disconnected.shared.comp.file.FilePlaceholder;
+import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.event.program.SBPWorldProcessUserCommand;
 
-public class FMPUpdateViewFailHandler implements EventHandler<FMPWPUUpdateViewCommand> {
+@RequiredArgsConstructor
+@Getter
+public class FMPWPUUpdateViewCommand extends SBPWorldProcessUserCommand {
 
-    @Override
-    public void handle(FMPWPUUpdateViewCommand event) {
+    private final SBPWorldProcessUserId worldProcessUserId;
 
-        fail("View was updated although nothing should have happened");
-    }
+    private final String                currentDir;
+    private final FilePlaceholder[]     files;
 
 }

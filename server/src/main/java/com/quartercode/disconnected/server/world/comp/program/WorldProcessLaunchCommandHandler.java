@@ -20,7 +20,7 @@ package com.quartercode.disconnected.server.world.comp.program;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.quartercode.disconnected.server.bridge.ClientAwareEventHandler;
+import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
 import com.quartercode.disconnected.server.sim.TickBridgeProvider;
 import com.quartercode.disconnected.server.sim.TickService;
 import com.quartercode.disconnected.server.sim.profile.ProfileService;
@@ -29,11 +29,11 @@ import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.shared.client.ClientIdentity;
-import com.quartercode.disconnected.shared.comp.program.ClientProcessId;
+import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
 import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchAcknowledgement;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
+import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 import com.quartercode.eventbridge.bridge.Bridge;
 
@@ -42,14 +42,14 @@ import com.quartercode.eventbridge.bridge.Bridge;
  * 
  * @see WorldProcessLaunchCommand
  */
-public class WorldProcessLaunchCommandHandler implements ClientAwareEventHandler<WorldProcessLaunchCommand> {
+public class WorldProcessLaunchCommandHandler implements SBPAwareEventHandler<WorldProcessLaunchCommand> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WorldProcessLaunchCommandHandler.class);
 
     @Override
-    public void handle(WorldProcessLaunchCommand event, ClientIdentity client) {
+    public void handle(WorldProcessLaunchCommand event, SBPIdentity sender) {
 
-        Computer playerComputer = getClientComputer(client);
+        Computer playerComputer = getSBPComputer(sender);
 
         // Get the source file
         ContentFile source = getSourceFile(playerComputer, event.getProgramFilePath());
@@ -62,8 +62,9 @@ public class WorldProcessLaunchCommandHandler implements ClientAwareEventHandler
         Process<?> sessionProcess = getSessionProcess(playerComputer);
         Process<?> process = sessionProcess.invoke(Process.CREATE_CHILD);
 
-        // Set the client process id
-        process.setObj(Process.CLIENT_PROCESS, new ClientProcessId(client, event.getClientProcessId()));
+        // Set the world process user
+        SBPWorldProcessUserId worldProcessUserId = new SBPWorldProcessUserId(sender, event.getWorldProcessUserDetails());
+        process.setObj(Process.WORLD_PROCESS_USER, worldProcessUserId);
 
         // Set the source file
         process.setObj(Process.SOURCE, source);
@@ -75,7 +76,7 @@ public class WorldProcessLaunchCommandHandler implements ClientAwareEventHandler
         try {
             process.invoke(Process.INITIALIZE, pid);
         } catch (Exception e) {
-            LOGGER.warn("Error while initializing process with pid {}; client failure?", pid, e);
+            LOGGER.warn("Error while initializing process with pid {}; sbp failure?", pid, e);
             abort(sessionProcess, process);
             return;
         }
@@ -90,7 +91,7 @@ public class WorldProcessLaunchCommandHandler implements ClientAwareEventHandler
         }
 
         // Send an acknowledgemend event
-        getBridge().send(new WorldProcessLaunchAcknowledgement(new ClientProcessId(client, event.getClientProcessId()), getProcessId(executor)));
+        getBridge().send(new WorldProcessLaunchAcknowledgement(worldProcessUserId, getProcessId(executor)));
     }
 
     private void abort(Process<?> parent, Process<?> process) {
@@ -103,7 +104,7 @@ public class WorldProcessLaunchCommandHandler implements ClientAwareEventHandler
         return ServiceRegistry.lookup(TickService.class).getAction(TickBridgeProvider.class).getBridge();
     }
 
-    protected Computer getClientComputer(ClientIdentity client) {
+    protected Computer getSBPComputer(SBPIdentity sbp) {
 
         World world = ServiceRegistry.lookup(ProfileService.class).getActive().getWorld();
         // Just use first available computer as the player's one

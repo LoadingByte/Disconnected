@@ -26,9 +26,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import com.quartercode.disconnected.server.DefaultServerData;
-import com.quartercode.disconnected.server.bridge.ClientAwareHandlerExtension;
-import com.quartercode.disconnected.server.bridge.ClientIdentityExtension;
-import com.quartercode.disconnected.server.client.ClientIdentityService;
+import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension;
+import com.quartercode.disconnected.server.bridge.SBPIdentityExtension;
+import com.quartercode.disconnected.server.identity.SBPIdentityService;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
@@ -39,7 +39,8 @@ import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper;
 import com.quartercode.disconnected.server.world.gen.WorldGenerator;
-import com.quartercode.disconnected.shared.client.ClientIdentity;
+import com.quartercode.disconnected.shared.identity.ClientIdentity;
+import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.eventbridge.EventBridgeFactory;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionRequester;
@@ -47,7 +48,7 @@ import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
 
 public abstract class AbstractProgramTest {
 
-    protected static final ClientIdentity CLIENT = new ClientIdentity("client");
+    protected static final SBPIdentity SBP = new ClientIdentity("client");
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -65,18 +66,18 @@ public abstract class AbstractProgramTest {
     }
 
     @Rule
-    public JUnitRuleMockery         context = new JUnitRuleMockery();
+    public JUnitRuleMockery      context = new JUnitRuleMockery();
 
-    protected final String          fileSystemMountpoint;
+    protected final String       fileSystemMountpoint;
 
     @Mock
-    protected ClientIdentityService clientIdentityService;
-    protected Bridge                bridge;
-    protected World                 world;
-    protected Computer              computer;
-    protected OperatingSystem       os;
-    protected ProcessModule         processModule;
-    protected FileSystem            fileSystem;
+    protected SBPIdentityService sbpIdentityService;
+    protected Bridge             bridge;
+    protected World              world;
+    protected Computer           computer;
+    protected OperatingSystem    os;
+    protected ProcessModule      processModule;
+    protected FileSystem         fileSystem;
 
     protected AbstractProgramTest(String fileSystemMountpoint) {
 
@@ -90,8 +91,8 @@ public abstract class AbstractProgramTest {
         context.checking(new Expectations() {{
 
             // Use null BridgeConnector because no bridge connector is used for the test
-            allowing(clientIdentityService).getIdentity(null);
-                will(returnValue(CLIENT));
+            allowing(sbpIdentityService).getIdentity(null);
+                will(returnValue(SBP));
 
         }});
         // @formatter:on
@@ -99,11 +100,11 @@ public abstract class AbstractProgramTest {
         bridge = EventBridgeFactory.create(Bridge.class);
         bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionRequester.class));
         bridge.addModule(EventBridgeFactory.create(ReturnEventExtensionReturner.class));
-        bridge.addModule(EventBridgeFactory.create(ClientIdentityExtension.class));
-        bridge.addModule(EventBridgeFactory.create(ClientAwareHandlerExtension.class));
+        bridge.addModule(EventBridgeFactory.create(SBPIdentityExtension.class));
+        bridge.addModule(EventBridgeFactory.create(SBPAwareHandlerExtension.class));
 
-        bridge.getModule(ClientIdentityExtension.class).setIdentityService(clientIdentityService);
-        bridge.getModule(ClientAwareHandlerExtension.class).setIdentityService(clientIdentityService);
+        bridge.getModule(SBPIdentityExtension.class).setIdentityService(sbpIdentityService);
+        bridge.getModule(SBPAwareHandlerExtension.class).setIdentityService(sbpIdentityService);
 
         world = new World();
         world.injectBridge(bridge);

@@ -21,11 +21,11 @@ package com.quartercode.disconnected.server;
 import java.io.IOException;
 import com.quartercode.classmod.Classmod;
 import com.quartercode.classmod.util.TreeInitializer;
-import com.quartercode.disconnected.server.bridge.ClientAwareEventHandler;
-import com.quartercode.disconnected.server.bridge.ClientAwareHandlerExtension;
-import com.quartercode.disconnected.server.bridge.ClientIdentityExtension;
-import com.quartercode.disconnected.server.bridge.DefaultClientAwareHandlerExtension.DefaultClientAwareHandlerExtensionFactory;
-import com.quartercode.disconnected.server.bridge.DefaultClientIdentityExtension.DefaultClientIdentityExtensionFactory;
+import com.quartercode.disconnected.server.bridge.DefaultSBPAwareHandlerExtension.DefaultSBPAwareHandlerExtensionFactory;
+import com.quartercode.disconnected.server.bridge.DefaultSBPIdentityExtension.DefaultSBPIdentityExtensionFactory;
+import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
+import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension;
+import com.quartercode.disconnected.server.bridge.SBPIdentityExtension;
 import com.quartercode.disconnected.server.sim.TickSchedulerUpdater;
 import com.quartercode.disconnected.server.sim.profile.ProfileSerializer;
 import com.quartercode.disconnected.server.util.ResourceStore;
@@ -64,8 +64,8 @@ public class DefaultServerData {
 
         FactoryManager factoryManager = EventBridgeFactory.getFactoryManager();
 
-        factoryManager.setFactory(ClientIdentityExtension.class, new DefaultClientIdentityExtensionFactory());
-        factoryManager.setFactory(ClientAwareHandlerExtension.class, new DefaultClientAwareHandlerExtensionFactory());
+        factoryManager.setFactory(SBPIdentityExtension.class, new DefaultSBPIdentityExtensionFactory());
+        factoryManager.setFactory(SBPAwareHandlerExtension.class, new DefaultSBPAwareHandlerExtensionFactory());
     }
 
     /**
@@ -145,12 +145,12 @@ public class DefaultServerData {
      */
     public static void addDefaultServerHandlers(Bridge bridge) {
 
-        addClientAwareEventHandler(bridge, new WorldProcessLaunchCommandHandler(), new TypePredicate<>(WorldProcessLaunchCommand.class));
+        addSBPAwareEventHandler(bridge, new WorldProcessLaunchCommandHandler(), new TypePredicate<>(WorldProcessLaunchCommand.class));
     }
 
-    private static void addClientAwareEventHandler(Bridge bridge, ClientAwareEventHandler<?> handler, EventPredicate<?> predicate) {
+    private static void addSBPAwareEventHandler(Bridge bridge, SBPAwareEventHandler<?> handler, EventPredicate<?> predicate) {
 
-        bridge.getModule(ClientAwareHandlerExtension.class).addHandler(handler, predicate);
+        bridge.getModule(SBPAwareHandlerExtension.class).addHandler(handler, predicate);
     }
 
     /**

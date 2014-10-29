@@ -18,21 +18,21 @@
 
 package com.quartercode.disconnected.shared.event;
 
-import com.quartercode.disconnected.shared.client.ClientIdentity;
+import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.eventbridge.bridge.Event;
 
 /**
- * An event that is only sent to a limited set of clients.
- * Those clients are identified with {@link ClientIdentity} objects.
+ * An event that is only sent to a limited set of server bridge partners.
+ * Those SBPs are identified with {@link SBPIdentity} objects.
  */
-public interface LimitedClientEvent extends Event {
+public interface LimitedSBPEvent extends Event {
 
     /**
-     * Returns the {@link ClientIdentity} objects that identify the clients who are allowed to receive the event.
-     * It is permitted to provide only one client.
+     * Returns the {@link SBPIdentity} objects that identify the server bridge partners who are allowed to receive the event.
+     * It is permitted to provide only one SBP.
      * 
-     * @return The clients who are allowed to receive the event.
+     * @return The SBPs who are allowed to receive the event.
      */
-    public ClientIdentity[] getClients();
+    public SBPIdentity[] getSBPs();
 
 }
