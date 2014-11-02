@@ -30,6 +30,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.LocaleUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
@@ -177,21 +178,18 @@ public class Main {
 
         // Initialize the default settings
         Settings.initializeSetting("debugLogging", "false");
-        Settings.initializeSetting("debugLoggingAll", "false");
+        Settings.initializeSetting("debugLoggingPackages", "com.quartercode");
     }
 
     private static void processDefaultSettings() {
 
-        // debugLogging
+        // debugLogging and debugLoggingPackages
         if (Settings.getSetting("debugLogging").equals("true")) {
-            // Retrieve the root logger for the quartercode packages and set its level to debug
-            ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger("com.quartercode")).setLevel(Level.DEBUG);
-        }
-
-        // debugLoggingAll
-        if (Settings.getSetting("debugLoggingAll").equals("true")) {
-            // Retrieve the root logger and set its level to debug
-            ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).setLevel(Level.DEBUG);
+            // Iterate over all packages which are marked for debug logging
+            for (String loggerPackage : StringUtils.split(Settings.getSetting("debugLoggingPackages"), ',')) {
+                // Retrieve the root logger for the current package and set its level to debug
+                ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(loggerPackage)).setLevel(Level.DEBUG);
+            }
         }
     }
 
