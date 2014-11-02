@@ -16,11 +16,12 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.registry;
+package com.quartercode.disconnected.shared.registry.extra;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import com.quartercode.disconnected.shared.registry.Registry;
 
 /**
  * A single value registry is a {@link Registry} that only stores one value.

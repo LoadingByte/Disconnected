@@ -25,7 +25,8 @@ import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.shared.config.ConfigCommandParser;
-import com.quartercode.disconnected.shared.registry.MultipleValueRegistry;
+import com.quartercode.disconnected.shared.registry.extra.MultipleValueRegistry;
+import com.quartercode.disconnected.shared.registry.extra.NamedValue;
 import com.quartercode.disconnected.shared.util.VariableReferenceResolver;
 
 /**

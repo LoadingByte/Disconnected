@@ -16,53 +16,38 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.registry;
+package com.quartercode.disconnected.shared.registry.extra;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
- * A {@link MultipleValueRegistry} that uses a {@link Set} as internal data structure.
- * This implementation uses a {@link HashSet}.
+ * A {@link MultipleValueRegistry} that uses a {@link List} as internal data structure.
+ * This implementation uses an {@link ArrayList}.
  * 
- * @param <V> The type of the values that can be stored inside the set registry.
+ * @param <V> The type of the values that can be stored inside the list registry.
  * @see MultipleValueRegistry
  */
-public class SetRegistry<V> implements MultipleValueRegistry<V> {
+public class ListRegistry<V> implements MultipleValueRegistry<V> {
 
-    private final Set<V> values = new HashSet<>();
-    private List<V>      listCache;
+    private final List<V> values = new ArrayList<>();
 
     @Override
     public List<V> getValues() {
 
-        // Update the list cache
-        if (listCache == null) {
-            listCache = Collections.unmodifiableList(new ArrayList<>(values));
-        }
-
-        return listCache;
+        return values;
     }
 
     @Override
     public void addValue(V value) {
 
         values.add(value);
-
-        // Invalidate the list cache
-        listCache = null;
     }
 
     @Override
     public void removeValue(V value) {
 
         values.remove(value);
-
-        // Invalidate the list cache
-        listCache = null;
     }
 
 }

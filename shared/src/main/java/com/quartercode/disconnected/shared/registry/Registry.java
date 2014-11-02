@@ -19,12 +19,14 @@
 package com.quartercode.disconnected.shared.registry;
 
 import java.util.List;
+import com.quartercode.disconnected.shared.registry.extra.MultipleValueRegistry;
+import com.quartercode.disconnected.shared.registry.extra.SingleValueRegistry;
 
 /**
  * A registry is an object that stores a certain number of other objects (like a list).
  * All objects must be an instance of a certain generic type.
  * Different {@link MultipleValueRegistry} registry implementations are used for implementing different types of storages.
- * However ,the {@link SingleValueRegistry} is used to only store a single value.
+ * However, the {@link SingleValueRegistry} is used to only store a single value.
  * 
  * @param <V> The type of value that can be stored inside the registry.
  * @see RegistryDefinition
