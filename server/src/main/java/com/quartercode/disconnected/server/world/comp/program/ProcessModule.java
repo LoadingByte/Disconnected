@@ -19,7 +19,6 @@
 package com.quartercode.disconnected.server.world.comp.program;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
-import static com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper.getCommonLocation;
 import static com.quartercode.disconnected.server.world.comp.program.ProgramUtils.getProgramFileFromPath;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +49,8 @@ import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.os.Session;
 import com.quartercode.disconnected.server.world.comp.os.User;
 import com.quartercode.disconnected.shared.comp.file.CommonFiles;
+import com.quartercode.disconnected.shared.registry.Registries;
+import com.quartercode.disconnected.shared.registrydef.SharedRegistries;
 
 /**
  * This class represents an {@link OperatingSystem} module which is used to manage the {@link RootProcess}.
@@ -176,7 +177,8 @@ public class ProcessModule extends OSModule implements SchedulerUser {
 
                     // Get session program
                     List<String> path = Arrays.asList(environment.get("PATH").split(":"));
-                    ContentFile sessionProgramFile = getProgramFileFromPath(fsModule, path, getCommonLocation(Session.class).getFile());
+                    String sessionProgramFileName = Registries.get(SharedRegistries.WORLD_PROGRAM_COMLOCS).getRight("session").getFile();
+                    ContentFile sessionProgramFile = getProgramFileFromPath(fsModule, path, sessionProgramFileName);
                     if (sessionProgramFile == null) {
                         throw new IllegalStateException("Cannot start process module: Session program not found");
                     }

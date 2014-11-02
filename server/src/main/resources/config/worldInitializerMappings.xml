@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <addWorldInitializerMapping>
+        <holderType>com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface</holderType>
+        <feature>com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface.CONNECTION</feature>
+    </addWorldInitializerMapping>
+    <addWorldInitializerMapping>
+        <holderType>com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface</holderType>
+        <feature>com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface.BACKBONE_CONNECTION</feature>
+    </addWorldInitializerMapping>
+    <addWorldInitializerMapping>
+        <holderType>com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface</holderType>
+        <feature>com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface.NEIGHBOURS</feature>
+    </addWorldInitializerMapping>
+</config>

@@ -29,6 +29,7 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
 import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
+import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileRemoveAction;
@@ -38,7 +39,6 @@ import com.quartercode.disconnected.server.world.comp.file.FileUtils;
 import com.quartercode.disconnected.server.world.comp.file.OccupiedPathException;
 import com.quartercode.disconnected.server.world.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.server.world.comp.file.ParentFile;
-import com.quartercode.disconnected.server.world.comp.file.StringFileTypeMapper;
 import com.quartercode.disconnected.server.world.comp.file.UnknownMountpointException;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.os.User;
@@ -55,6 +55,7 @@ import com.quartercode.disconnected.shared.event.program.general.FMPWorldChangeD
 import com.quartercode.disconnected.shared.event.program.general.FMPWorldRemoveFileCommand;
 import com.quartercode.disconnected.shared.event.program.generic.GPWPUErrorEvent;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
+import com.quartercode.disconnected.shared.registry.Registries;
 import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
@@ -277,8 +278,14 @@ public class FileManagerProgram extends ProgramExecutor {
                 return;
             }
 
-            File<?> file = StringFileTypeMapper.stringToNewInstance(fileType);
-            Validate.notNull(file, "Allowed file type ('%s') is not known", fileType);
+            Class<?> fileClass = Registries.get(ServerRegistries.FILE_TYPES).getRight(fileType);
+            Validate.notNull(fileClass, "Allowed file type ('%s') is not known", fileType);
+            File<?> file;
+            try {
+                file = (File<?>) fileClass.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new RuntimeException("Error while creating new instance of file type '" + fileType + "'", e);
+            }
 
             FileAddAction addAction = fsModule.invoke(FileSystemModule.CREATE_ADD_FILE, file, filePath);
             User sessionUser = process.invoke(Process.GET_USER);

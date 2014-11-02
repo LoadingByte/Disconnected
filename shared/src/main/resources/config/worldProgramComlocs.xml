@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <configureWorldProgramComloc name="session">
+        <location>$C{com.quartercode.disconnected.shared.comp.file.CommonFiles.SYS_BIN_DIR}/session.exe</location>
+    </configureWorldProgramComloc>
+    <configureWorldProgramComloc name="fileManager">
+        <location>$C{com.quartercode.disconnected.shared.comp.file.CommonFiles.SYS_BIN_DIR}/filemanager.exe</location>
+    </configureWorldProgramComloc>
+</config>

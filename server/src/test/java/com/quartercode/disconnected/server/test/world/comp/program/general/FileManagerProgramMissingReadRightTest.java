@@ -18,7 +18,6 @@
 
 package com.quartercode.disconnected.server.test.world.comp.program.general;
 
-import static com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper.getCommonLocation;
 import static com.quartercode.disconnected.shared.comp.file.PathUtils.splitAfterMountpoint;
 import static org.junit.Assert.*;
 import org.apache.commons.lang3.mutable.MutableBoolean;

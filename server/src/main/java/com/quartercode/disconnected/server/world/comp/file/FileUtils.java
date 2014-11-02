@@ -19,12 +19,14 @@
 package com.quartercode.disconnected.server.world.comp.file;
 
 import org.apache.commons.lang3.tuple.Triple;
+import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
 import com.quartercode.disconnected.server.world.comp.os.Group;
 import com.quartercode.disconnected.server.world.comp.os.User;
 import com.quartercode.disconnected.shared.comp.file.FilePlaceholder;
 import com.quartercode.disconnected.shared.comp.file.FileRights;
 import com.quartercode.disconnected.shared.comp.file.PathUtils;
+import com.quartercode.disconnected.shared.registry.Registries;
 
 /**
  * This file utility contains methods related to {@link File}s and {@link FileSystem}s.
@@ -89,7 +91,7 @@ public class FileUtils {
         RootFile root = actualFs.getObj(FileSystem.ROOT);
 
         String path = PathUtils.SEPARATOR + fileSystem.getObj(KnownFileSystem.MOUNTPOINT);
-        String type = StringFileTypeMapper.classToString(RootFile.class);
+        String type = Registries.get(ServerRegistries.FILE_TYPES).getLeft(RootFile.class);
         long size = actualFs.invoke(FileSystem.GET_SIZE);
         Triple<FileRights, String, String> commonData = getCommonFilePlaceholderData(root);
 
@@ -107,7 +109,7 @@ public class FileUtils {
 
         String path = PathUtils.resolve(PathUtils.normalize(fileSystemMountpoint), file.invoke(File.GET_PATH));
 
-        String type = StringFileTypeMapper.classToString(file.getClass());
+        String type = Registries.get(ServerRegistries.FILE_TYPES).getLeft(file.getClass());
         long size = file.invoke(File.GET_SIZE);
         Triple<FileRights, String, String> commonData = getCommonFilePlaceholderData(file);
 

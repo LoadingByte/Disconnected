@@ -16,22 +16,32 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.comp.program;
-
-import com.quartercode.disconnected.shared.comp.file.CommonFiles;
-import com.quartercode.disconnected.shared.comp.file.SeparatedPath;
+package com.quartercode.disconnected.shared.registry.extra;
 
 /**
- * Constants for general programs (e.g. common locations).
+ * A utility class for working with {@link NamedValue} objects.
  */
-public class GeneralProgramConstants {
+public class NamedValueUtils {
 
     /**
-     * The location the file manager program can be commonly found under.
+     * Iterates over the given {@link Iterable} object, that contains {@link NamedValue}s, and returns the value which has the given name.
+     * 
+     * @param values The iterable object that contains the named values.
+     * @param name The name the returned named value must have.
+     * @return The named value with the given name.
      */
-    public static final SeparatedPath COMLOC_FILE_MANAGER = new SeparatedPath(CommonFiles.SYS_BIN_DIR, "filemanager.exe");
+    public static <T extends NamedValue> T getByName(Iterable<T> values, String name) {
 
-    private GeneralProgramConstants() {
+        for (T value : values) {
+            if (value != null && value.getName().equals(name)) {
+                return value;
+            }
+        }
+
+        return null;
+    }
+
+    private NamedValueUtils() {
 
     }
 

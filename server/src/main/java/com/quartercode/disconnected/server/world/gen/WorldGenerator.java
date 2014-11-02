@@ -18,11 +18,12 @@
 
 package com.quartercode.disconnected.server.world.gen;
 
-import static com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper.getCommonLocation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import com.quartercode.disconnected.server.registry.ServerRegistries;
+import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.util.ProbabilityUtil;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
@@ -45,11 +46,9 @@ import com.quartercode.disconnected.server.world.comp.net.Backbone;
 import com.quartercode.disconnected.server.world.comp.os.Configuration;
 import com.quartercode.disconnected.server.world.comp.os.EnvironmentVariable;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.server.world.comp.os.Session;
 import com.quartercode.disconnected.server.world.comp.os.User;
 import com.quartercode.disconnected.server.world.comp.program.Program;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
-import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
 import com.quartercode.disconnected.shared.comp.ByteUnit;
 import com.quartercode.disconnected.shared.comp.Version;
 import com.quartercode.disconnected.shared.comp.file.CommonFiles;
@@ -57,6 +56,9 @@ import com.quartercode.disconnected.shared.comp.file.FileRights;
 import com.quartercode.disconnected.shared.comp.file.PathUtils;
 import com.quartercode.disconnected.shared.comp.net.NetID;
 import com.quartercode.disconnected.shared.general.Location;
+import com.quartercode.disconnected.shared.registry.Registries;
+import com.quartercode.disconnected.shared.registry.extra.NamedValueUtils;
+import com.quartercode.disconnected.shared.registrydef.SharedRegistries;
 
 /**
  * The world generator utility generates {@link World}s and parts of worlds.
@@ -290,19 +292,24 @@ public class WorldGenerator {
     private static void addSystemFiles(FileSystem fileSystem, User superuser) {
 
         // Add system programs
-        addProgramFile(fileSystem, superuser, Session.class, new Version(1, 0, 0));
+        addProgramFile(fileSystem, superuser, "session", new Version(1, 0, 0));
 
         // Add general programs
-        addProgramFile(fileSystem, superuser, FileManagerProgram.class, new Version(1, 0, 0));
+        addProgramFile(fileSystem, superuser, "fileManager", new Version(1, 0, 0));
     }
 
-    private static void addProgramFile(FileSystem fileSystem, User superuser, Class<? extends ProgramExecutor> executor, Version version) {
+    private static void addProgramFile(FileSystem fileSystem, User superuser, String programName, Version version) {
+
+        WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS).getValues(), programName);
+        @SuppressWarnings ("unchecked")
+        Class<? extends ProgramExecutor> executor = (Class<? extends ProgramExecutor>) programData.getType();
 
         Program program = new Program();
         program.setObj(Program.VERSION, version);
         program.setObj(Program.EXECUTOR_CLASS, executor);
 
-        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(getCommonLocation(executor).toString())[1], superuser, "o:rx", program);
+        String programPath = Registries.get(SharedRegistries.WORLD_PROGRAM_COMLOCS).getRight(programName).toString();
+        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(programPath)[1], superuser, "o:rx", program);
     }
 
     // Temporary method for generating some unnecessary programs and personal files

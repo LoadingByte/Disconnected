@@ -22,11 +22,15 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.Writer;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -38,6 +42,9 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.quartercode.disconnected.client.registry.ClientRegistries;
+import com.quartercode.disconnected.client.registry.Theme;
+import com.quartercode.disconnected.shared.registry.Registries;
 import com.quartercode.disconnected.shared.util.ApplicationInfo;
 import com.quartercode.disconnected.shared.util.ExitUtil;
 import com.quartercode.disconnected.shared.util.TempFileManager;
@@ -56,8 +63,6 @@ public class GraphicsThread extends Thread {
 
     private static final Logger   LOGGER   = LoggerFactory.getLogger(GraphicsThread.class);
 
-    private final List<URL>       themes;
-
     private LWJGLRenderer         renderer;
     private GUI                   gui;
     private ThemeManager          theme;
@@ -68,15 +73,11 @@ public class GraphicsThread extends Thread {
     private boolean               exit;
 
     /**
-     * Creates a new graphics update thread which loads the given twl themes.
-     * 
-     * @param themes The {@link URL}s of the themes that should be loaded.
+     * Creates a new graphics update thread.
      */
-    public GraphicsThread(List<URL> themes) {
+    public GraphicsThread() {
 
         super("graphis");
-
-        this.themes = themes;
     }
 
     /**
@@ -186,20 +187,33 @@ public class GraphicsThread extends Thread {
 
         Path themeFile = TempFileManager.getTempDir().resolve("twlConfigFinal.xml");
 
-        try (PrintWriter themeFileWriter = new PrintWriter(Files.newOutputStream(themeFile))) {
-            themeFileWriter.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            themeFileWriter.println("<!DOCTYPE themes PUBLIC \"-//www.matthiasmann.de//TWL-Theme//EN\"");
-            themeFileWriter.println("\"http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd\">");
-            themeFileWriter.println("<themes>");
-            for (URL themeURL : themes) {
-                themeFileWriter.println("<include filename=\"" + themeURL + "\"/>");
+        try (Writer themeFileWriter = Files.newBufferedWriter(themeFile, Charset.forName("UTF-8"))) {
+            themeFileWriter.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            themeFileWriter.write("<!DOCTYPE themes PUBLIC \"-//www.matthiasmann.de//TWL-Theme//EN\" ");
+            themeFileWriter.write("\"http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd\">");
+            themeFileWriter.write("<themes>");
+
+            List<Theme> themes = new ArrayList<>(Registries.get(ClientRegistries.THEMES).getValues());
+            Collections.sort(themes, new Comparator<Theme>() {
+
+                @Override
+                public int compare(Theme o1, Theme o2) {
+
+                    return Integer.compare(o2.getPriority(), o1.getPriority());
+                }
+
+            });
+
+            for (Theme theme : themes) {
+                themeFileWriter.write("<include filename=\"" + theme.getURL() + "\"/>");
             }
-            themeFileWriter.println("</themes>");
-            themeFileWriter.flush();
-            theme = ThemeManager.createThemeManager(themeFile.toUri().toURL(), renderer);
+
+            themeFileWriter.write("</themes>");
         } catch (IOException e) {
             throw new IOException("Error while creating temporary theme file", e);
         }
+
+        theme = ThemeManager.createThemeManager(themeFile.toUri().toURL(), renderer);
     }
 
     private void startLoop() {

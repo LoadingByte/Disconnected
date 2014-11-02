@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import javax.xml.bind.JAXBException;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,28 +36,20 @@ import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionProperty;
 import com.quartercode.classmod.extra.Storage;
 import com.quartercode.classmod.extra.ValueSupplier;
-import com.quartercode.disconnected.server.DefaultServerData;
+import com.quartercode.disconnected.server.ServerInitializer;
 import com.quartercode.disconnected.server.sim.profile.ProfileSerializer;
 import com.quartercode.disconnected.server.world.World;
-import com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper;
 import com.quartercode.disconnected.server.world.gen.WorldGenerator;
+import com.quartercode.disconnected.shared.SharedInitializer;
 
 public class ProfileSerializerTest {
 
     @BeforeClass
-    public static void setUpBeforeClass() throws IOException {
+    public static void setUpBeforeClass() {
 
-        DefaultServerData.fillResourceStore();
-        DefaultServerData.addDefaultWorldContextPath();
-        DefaultServerData.addDefaultWorldInitializerMappings();
-        DefaultServerData.addDefaultProgramCommonLocationMappings();
-    }
-
-    @AfterClass
-    public static void tearDownAfterClass() {
-
-        ProfileSerializer.clearWorldContextPath();
-        ProgramCommonLocationMapper.clearMappings();
+        SharedInitializer.initialize();
+        ServerInitializer.initialize();
+        SharedInitializer.initializeFinal();
     }
 
     private World world;

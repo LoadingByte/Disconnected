@@ -21,26 +21,29 @@ package com.quartercode.disconnected.server.test.world.comp.program;
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
-import com.quartercode.disconnected.server.DefaultServerData;
+import com.quartercode.disconnected.server.ServerInitializer;
 import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension;
 import com.quartercode.disconnected.server.bridge.SBPIdentityExtension;
 import com.quartercode.disconnected.server.identity.SBPIdentityService;
+import com.quartercode.disconnected.server.registry.ServerRegistries;
+import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
-import com.quartercode.disconnected.server.world.comp.file.StringFileTypeMapper;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
-import com.quartercode.disconnected.server.world.comp.program.ProgramCommonLocationMapper;
 import com.quartercode.disconnected.server.world.gen.WorldGenerator;
+import com.quartercode.disconnected.shared.SharedInitializer;
+import com.quartercode.disconnected.shared.comp.file.SeparatedPath;
 import com.quartercode.disconnected.shared.identity.ClientIdentity;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
+import com.quartercode.disconnected.shared.registry.Registries;
+import com.quartercode.disconnected.shared.registrydef.SharedRegistries;
 import com.quartercode.eventbridge.EventBridgeFactory;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionRequester;
@@ -53,16 +56,9 @@ public abstract class AbstractProgramTest {
     @BeforeClass
     public static void setUpBeforeClass() {
 
-        DefaultServerData.addCustomEventBridgeFactoryMappings();
-        DefaultServerData.addDefaultStringFileTypeMappings();
-        DefaultServerData.addDefaultProgramCommonLocationMappings();
-    }
-
-    @AfterClass
-    public static void tearDownAfterClass() {
-
-        StringFileTypeMapper.clearMappings();
-        ProgramCommonLocationMapper.clearMappings();
+        SharedInitializer.initialize();
+        ServerInitializer.initialize();
+        SharedInitializer.initializeFinal();
     }
 
     @Rule
@@ -124,6 +120,18 @@ public abstract class AbstractProgramTest {
                 break;
             }
         }
+    }
+
+    protected SeparatedPath getCommonLocation(Class<?> programExecutor) {
+
+        String programName = null;
+        for (WorldProgram program : Registries.get(ServerRegistries.WORLD_PROGRAMS).getValues()) {
+            if (program.getType() == programExecutor) {
+                programName = program.getName();
+            }
+        }
+
+        return Registries.get(SharedRegistries.WORLD_PROGRAM_COMLOCS).getRight(programName);
     }
 
 }

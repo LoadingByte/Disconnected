@@ -32,7 +32,7 @@ import com.quartercode.classmod.extra.CFeatureHolder;
  * Any delay is defined inclusive. For example, a task with an initial delay of 5 is executed on the fifth tick after it was scheduled.<br>
  * <br>
  * The group, which is provided by the {@link #getGroup()} method, defines at which point inside a tick the task should be executed.
- * A list of groups with their priorities is stored by the caller of the {@link Scheduler#update(String)} method.
+ * A list of groups with their priorities is used by the caller of the {@link Scheduler#update(String)} method.
  * All tasks with a group which has the priority 2 are executed before all tasks of a priority 1 group.<br>
  * <br>
  * Finally, setting the {@link #isCancelled()} flag to {@code true} cancels the task and removes it from its scheduler.
@@ -59,7 +59,7 @@ public interface SchedulerTask {
     /**
      * Returns the group which defines at which point inside a tick the scheduler task should be executed.
      * For example, all tasks with a group which has the priority 2 are executed before all tasks of a priority 1 group.
-     * Note that a list of groups with their priorities is stored by the caller of the {@link Scheduler#update(String)} method.
+     * Note that a list of groups with their priorities is used by the caller of the {@link Scheduler#update(String)} method.
      * 
      * @return The group of the scheduler task.
      */

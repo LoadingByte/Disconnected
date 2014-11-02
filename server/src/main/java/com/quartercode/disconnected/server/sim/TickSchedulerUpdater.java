@@ -22,17 +22,16 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import com.quartercode.classmod.base.Feature;
 import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.ValueSupplier;
+import com.quartercode.disconnected.server.registry.SchedulerGroup;
+import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
-import com.quartercode.disconnected.server.sim.scheduler.SchedulerTask;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.server.world.World;
+import com.quartercode.disconnected.shared.registry.Registries;
 
 /**
  * This class updates all {@link Scheduler}s of {@link World} {@link CFeatureHolder}s which implement the {@link SchedulerUser} interface.
@@ -41,83 +40,8 @@ import com.quartercode.disconnected.server.world.World;
  */
 public class TickSchedulerUpdater implements TickAction {
 
-    private final Map<String, Integer>    groups       = new HashMap<>();
-    private final List<String>            sortedGroups = new ArrayList<>();
-
+    private List<String>                  sortedGroups;
     private volatile WeakReference<World> world;
-
-    // ----- Static -----
-
-    /**
-     * Returns the defined groups with their priorities.
-     * 
-     * @return All defined groups.
-     * @see SchedulerTask#getGroup()
-     */
-    public Map<String, Integer> getGroups() {
-
-        return Collections.unmodifiableMap(groups);
-    }
-
-    /**
-     * Returns the defined groups sorted by their priorities in descending order.
-     * 
-     * @return All defined groups in a sorted list.
-     * @see #getGroups()
-     * @see SchedulerTask#getGroup()
-     */
-    public List<String> getSortedGroups() {
-
-        return Collections.unmodifiableList(sortedGroups);
-    }
-
-    /**
-     * Defines the given group and assigns the given priority to it.
-     * Groups with high priority values are updated before groups with small priority values.
-     * 
-     * @param group The name of the group which should be defined.
-     * @param priority The priority of the new group.
-     * @see SchedulerTask#getGroup()
-     */
-    public void addGroup(String group, int priority) {
-
-        groups.put(group, priority);
-        updateSortedGroups();
-    }
-
-    /**
-     * Removes the definition of the given group.
-     * That just means that all {@link SchedulerTask}s which are assigned to that group are no longer executed.
-     * 
-     * @param group The name of the group which should be removed.
-     * @see SchedulerTask#getGroup()
-     */
-    public void removeGroup(String group) {
-
-        groups.remove(group);
-        updateSortedGroups();
-    }
-
-    private void updateSortedGroups() {
-
-        List<Entry<String, Integer>> groupEntries = new ArrayList<>(groups.entrySet());
-        Collections.sort(groupEntries, new Comparator<Entry<String, Integer>>() {
-
-            @Override
-            public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-
-                return o2.getValue().compareTo(o1.getValue());
-            }
-
-        });
-
-        sortedGroups.clear();
-        for (Entry<String, Integer> entry : groupEntries) {
-            sortedGroups.add(entry.getKey());
-        }
-    }
-
-    // ----- Dynamic -----
 
     /**
      * Returns the {@link World} that is currently updated by the tick scheduler updater.
@@ -152,7 +76,7 @@ public class TickSchedulerUpdater implements TickAction {
             collectSchedulers(world, schedulers);
 
             // Update each scheduler with each group in the correct order
-            for (String group : sortedGroups) {
+            for (String group : getSortedGroups()) {
                 for (Scheduler scheduler : schedulers) {
                     scheduler.update(group);
                 }
@@ -173,6 +97,29 @@ public class TickSchedulerUpdater implements TickAction {
         } else if (object instanceof ValueSupplier) {
             collectSchedulers( ((ValueSupplier<?>) object).get(), list);
         }
+    }
+
+    private List<String> getSortedGroups() {
+
+        if (sortedGroups == null) {
+            List<SchedulerGroup> groupObjects = new ArrayList<>(Registries.get(ServerRegistries.SCHEDULER_GROUPS).getValues());
+            Collections.sort(groupObjects, new Comparator<SchedulerGroup>() {
+
+                @Override
+                public int compare(SchedulerGroup o1, SchedulerGroup o2) {
+
+                    return Integer.compare(o2.getPriority(), o1.getPriority());
+                }
+
+            });
+
+            sortedGroups = new ArrayList<>();
+            for (SchedulerGroup entry : groupObjects) {
+                sortedGroups.add(entry.getName());
+            }
+        }
+
+        return sortedGroups;
     }
 
 }

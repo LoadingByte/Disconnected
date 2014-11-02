@@ -21,8 +21,10 @@ package com.quartercode.disconnected.client.graphics.desktop;
 import com.quartercode.disconnected.client.graphics.AbstractGraphicsModule;
 import com.quartercode.disconnected.client.graphics.GraphicsService;
 import com.quartercode.disconnected.client.graphics.GraphicsState;
+import com.quartercode.disconnected.client.registry.ClientRegistries;
 import com.quartercode.disconnected.client.util.ResourceBundles;
 import com.quartercode.disconnected.client.util.ValueInjector;
+import com.quartercode.disconnected.shared.registry.Registries;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 import de.matthiasmann.twl.Button;
 import de.matthiasmann.twl.Widget;
@@ -53,7 +55,7 @@ public class DesktopLaunchButtonModule extends AbstractGraphicsModule {
                 // TODO: Display launch menu
 
                 // Temp: Choose first available program
-                ClientProgramDescriptor program = ClientPrograms.getDescriptors().iterator().next();
+                ClientProgramDescriptor program = (ClientProgramDescriptor) Registries.get(ClientRegistries.CLIENT_PROGRAMS).getValues().get(0).getRight();
                 program.create(state, programContext).setVisible(true);
             }
 

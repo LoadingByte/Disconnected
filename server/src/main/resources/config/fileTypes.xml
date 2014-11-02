@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <configureFileType name="rootFile">
+        <class>com.quartercode.disconnected.server.world.comp.file.RootFile</class>
+    </configureFileType>
+    <configureFileType name="contentFile">
+        <class>com.quartercode.disconnected.server.world.comp.file.ContentFile</class>
+    </configureFileType>
+    <configureFileType name="directory">
+        <class>com.quartercode.disconnected.server.world.comp.file.Directory</class>
+    </configureFileType>
+</config>

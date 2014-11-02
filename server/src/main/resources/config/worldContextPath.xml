@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <!-- Classmod -->
+    <addWorldContextPathEntry>$C{com.quartercode.classmod.Classmod.CONTEXT_PATH}</addWorldContextPathEntry>
+
+    <!-- Utility -->
+    <addWorldContextPathEntry>com.quartercode.disconnected.server.sim.scheduler</addWorldContextPathEntry>
+
+    <!-- World -->
+    <addWorldContextPathEntry>com.quartercode.disconnected.server.world</addWorldContextPathEntry>
+    <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp</addWorldContextPathEntry>
+    <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp.attack</addWorldContextPathEntry>
+    <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp.file</addWorldContextPathEntry>
+    <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp.hardware</addWorldContextPathEntry>
+    <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp.net</addWorldContextPathEntry>
+    <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp.os</addWorldContextPathEntry>
+    <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp.program</addWorldContextPathEntry>
+
+    <!-- Shared -->
+    <addWorldContextPathEntry>com.quartercode.disconnected.shared.comp</addWorldContextPathEntry>
+    <addWorldContextPathEntry>com.quartercode.disconnected.shared.comp.file</addWorldContextPathEntry>
+    <addWorldContextPathEntry>com.quartercode.disconnected.shared.comp.net</addWorldContextPathEntry>
+    <addWorldContextPathEntry>com.quartercode.disconnected.shared.general</addWorldContextPathEntry>
+</config>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <configureWorldProgram name="session">
+        <class>com.quartercode.disconnected.server.world.comp.os.Session</class>
+        <size>1024</size>
+    </configureWorldProgram>
+    <configureWorldProgram name="fileManager">
+        <class>com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram</class>
+        <size>1024</size>
+    </configureWorldProgram>
+</config>

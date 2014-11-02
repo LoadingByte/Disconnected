@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <configureTheme name="default">
+        <url>/ui/default/default.xml</url>
+        <priority>1000</priority>
+    </configureTheme>
+    <configureTheme name="desktop">
+        <url>/ui/desktop/desktop.xml</url>
+        <priority>500</priority>
+    </configureTheme>
+</config>

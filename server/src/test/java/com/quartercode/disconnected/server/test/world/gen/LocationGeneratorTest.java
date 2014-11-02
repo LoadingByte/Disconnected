@@ -19,21 +19,20 @@
 package com.quartercode.disconnected.server.test.world.gen;
 
 import static org.junit.Assert.fail;
-import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import com.quartercode.disconnected.server.DefaultServerData;
+import com.quartercode.disconnected.server.ServerInitializer;
 import com.quartercode.disconnected.server.world.gen.LocationGenerator;
 import com.quartercode.disconnected.shared.general.Location;
 
 public class LocationGeneratorTest {
 
     @BeforeClass
-    public static void setUpBeforeClass() throws IOException {
+    public static void setUpBeforeClass() {
 
-        DefaultServerData.fillResourceStore();
+        ServerInitializer.initialize();
     }
 
     @Test
