@@ -157,12 +157,12 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
 
     /**
      * By default, this method calls {@link #doLaunchWorldProcess()} and does some other things required for the program to work.
-     * It is called fourth on construction and should not be overriden if {@link #doLaunchWorldProcess()} or {@link #registerEventHandlersAfterLaunch()} is used.
+     * It is called fourth on construction and should not be overridden if {@link #doLaunchWorldProcess()} or {@link #registerEventHandlersAfterLaunch()} is used.
      */
     protected void launchWorldProcess() {
 
-        // Register a handler for catching the acknowledgement event and store the world process identity
         registerEventHandler(WorldProcessLaunchAcknowledgement.class, new EventHandler<WorldProcessLaunchAcknowledgement>() {
+        // Register a handler for catching the acknowledgment event and store the world process identity
 
             @Override
             public void handle(WorldProcessLaunchAcknowledgement event) {
@@ -171,7 +171,7 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
 
                 registerEventHandlersAfterLaunch();
 
-                // Remove the handler after the acknowledgement arrived
+                // Remove the handler after the acknowledgment arrived
                 bridge.getModule(StandardHandlerModule.class).removeHandler(this);
             }
 

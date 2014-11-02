@@ -90,8 +90,8 @@ public class WorldProcessLaunchCommandHandler implements SBPAwareEventHandler<Wo
             abort(sessionProcess, process);
         }
 
-        // Send an acknowledgemend event
         getBridge().send(new WorldProcessLaunchAcknowledgement(worldProcessUserId, getProcessId(executor)));
+        // Send an acknowledgment event
     }
 
     private void abort(Process<?> parent, Process<?> process) {
