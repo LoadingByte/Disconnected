@@ -24,7 +24,7 @@ import com.quartercode.disconnected.shared.comp.program.ClientProcessDetails;
 import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
 import com.quartercode.disconnected.shared.event.program.SBPWorldProcessUserCommand;
 import com.quartercode.disconnected.shared.event.program.SBPWorldProcessUserCommandPredicate;
-import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchAcknowledgement;
+import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchAcknowledgmentEvent;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
@@ -161,11 +161,11 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
      */
     protected void launchWorldProcess() {
 
-        registerEventHandler(WorldProcessLaunchAcknowledgement.class, new EventHandler<WorldProcessLaunchAcknowledgement>() {
         // Register a handler for catching the acknowledgment event and store the world process identity
+        registerEventHandler(WorldProcessLaunchAcknowledgmentEvent.class, new EventHandler<WorldProcessLaunchAcknowledgmentEvent>() {
 
             @Override
-            public void handle(WorldProcessLaunchAcknowledgement event) {
+            public void handle(WorldProcessLaunchAcknowledgmentEvent event) {
 
                 worldProcessId = event.getWorldProcessId();
 

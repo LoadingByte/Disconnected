@@ -38,7 +38,7 @@ import com.quartercode.disconnected.shared.comp.program.ClientProcessDetails;
 import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserDetails;
 import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
 import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
-import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchAcknowledgement;
+import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchAcknowledgmentEvent;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.identity.ClientIdentity;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
@@ -100,7 +100,7 @@ public class WorldProcessLaunchCommandHandlerTest {
         // @formatter:off
         context.checking(new Expectations() {{
 
-            oneOf(bridge).send(new WorldProcessLaunchAcknowledgement(new SBPWorldProcessUserId(sbpIdentity, wpuDetails), new WorldProcessId(sbpComputer.getId(), expectedPid)));
+            oneOf(bridge).send(new WorldProcessLaunchAcknowledgmentEvent(new SBPWorldProcessUserId(sbpIdentity, wpuDetails), new WorldProcessId(sbpComputer.getId(), expectedPid)));
 
         }});
         // @formatter:on

@@ -31,7 +31,7 @@ import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
 import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
-import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchAcknowledgement;
+import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchAcknowledgmentEvent;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
@@ -90,8 +90,8 @@ public class WorldProcessLaunchCommandHandler implements SBPAwareEventHandler<Wo
             abort(sessionProcess, process);
         }
 
-        getBridge().send(new WorldProcessLaunchAcknowledgement(worldProcessUserId, getProcessId(executor)));
         // Send an acknowledgment event
+        getBridge().send(new WorldProcessLaunchAcknowledgmentEvent(worldProcessUserId, getProcessId(executor)));
     }
 
     private void abort(Process<?> parent, Process<?> process) {

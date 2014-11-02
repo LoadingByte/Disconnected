@@ -28,19 +28,19 @@ import com.quartercode.disconnected.shared.event.program.SBPWorldProcessUserComm
  * 
  * @see WorldProcessLaunchCommand
  */
-public class WorldProcessLaunchAcknowledgement extends SBPWorldProcessUserCommand {
+public class WorldProcessLaunchAcknowledgmentEvent extends SBPWorldProcessUserCommand {
 
     private final SBPWorldProcessUserId worldProcessUserId;
     private final WorldProcessId        worldProcessId;
 
     /**
-     * Creates a new world process launch acknowledgement event.
+     * Creates a new world process launch acknowledgment event.
      * 
      * @param worldProcessUserId The {@link SBPWorldProcessUserId} that should receive the event.
      *        That world process user must have launched the new world process.
      * @param worldProcessId The {@link WorldProcessId} of the newly launched world process.
      */
-    public WorldProcessLaunchAcknowledgement(SBPWorldProcessUserId worldProcessUserId, WorldProcessId worldProcessId) {
+    public WorldProcessLaunchAcknowledgmentEvent(SBPWorldProcessUserId worldProcessUserId, WorldProcessId worldProcessId) {
 
         this.worldProcessUserId = worldProcessUserId;
         this.worldProcessId = worldProcessId;
