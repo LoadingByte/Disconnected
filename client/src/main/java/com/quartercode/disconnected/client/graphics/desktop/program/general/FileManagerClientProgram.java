@@ -26,6 +26,7 @@ import com.quartercode.disconnected.client.graphics.desktop.ClientProgramDescrip
 import com.quartercode.disconnected.client.graphics.desktop.ClientProgramWindow;
 import com.quartercode.disconnected.client.graphics.desktop.ClientProgramWindowSkeleton;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowDefaultSizeMediator;
+import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowSizeLimitsMediator;
 import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup;
 import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup.Option;
 import com.quartercode.disconnected.client.graphics.desktop.popup.TextInputPopup;
@@ -90,6 +91,7 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
         @Override
         protected void initializeGraphics() {
 
+            new DesktopWindowSizeLimitsMediator(this, new Dimension(500, 150), null);
             new DesktopWindowDefaultSizeMediator(this, new Dimension(700, 300));
 
             currentDirectoryLabel = new Label();
@@ -125,6 +127,16 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
             layout.setHorizontalGroup(layout.createParallelGroup(currentDirectoryLabel).addGroup(hButtons).addWidget(scrollPane));
             layout.setVerticalGroup(layout.createSequentialGroup(currentDirectoryLabel).addGroup(vButtons).addWidget(scrollPane));
             add(layout);
+
+            fileListTable.adjustSize();
+            adjustColumnWidth(fileListTable, 0, 0.4F);
+            adjustColumnWidth(fileListTable, 1, 0.3F);
+            adjustColumnWidth(fileListTable, 2, 0.3F);
+        }
+
+        private void adjustColumnWidth(Table table, int column, float width) {
+
+            table.setColumnWidth(column, (int) (table.getWidth() * width));
         }
 
         @Override
@@ -263,24 +275,6 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
                 String size = file.getSize() + " B";
                 fileListModel.addRow(file.getName(), type, size);
             }
-        }
-
-        @Override
-        protected void layout() {
-
-            super.layout();
-
-            setMinSize(500, 150);
-
-            fileListTable.adjustSize();
-            adjustColumnWidth(fileListTable, 0, 0.5F);
-            adjustColumnWidth(fileListTable, 1, 0.25F);
-            adjustColumnWidth(fileListTable, 2, 0.25F);
-        }
-
-        private void adjustColumnWidth(Table table, int column, float width) {
-
-            table.setColumnWidth(column, (int) (table.getWidth() * width));
         }
 
         @RequiredArgsConstructor
