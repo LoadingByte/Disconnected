@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sprites>
+    <sprite name="active.background" splitx="L3,R3" splity="T1,B1" />
+    <sprite name="inactive.background" splitx="L3,R3" splity="T1,B1" />
+</sprites>

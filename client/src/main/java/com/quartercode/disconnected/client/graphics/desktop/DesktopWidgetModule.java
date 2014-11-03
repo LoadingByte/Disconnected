@@ -35,7 +35,7 @@ public class DesktopWidgetModule extends AbstractGraphicsModule {
     public void add(GraphicsState state) {
 
         desktopWidget = new Widget();
-        desktopWidget.setTheme("desktop");
+        desktopWidget.setTheme("/desktop");
         state.add(desktopWidget);
         setValue("widget", desktopWidget);
     }

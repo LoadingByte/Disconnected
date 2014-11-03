@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE themes PUBLIC "-//www.matthiasmann.de//TWL-Theme//EN" "http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd">
+<themes>
+    <images>
+        <!-- Background -->
+        <select name="editfield.background">
+            <alias ref="default_area2" tint="#0099FA" if="keyboardFocus"/>
+            <alias ref="default_area2" tint="#2525FF"/>
+        </select>
+
+        <!-- Cursor animation -->
+        <alias name="-editfield.cursor" ref="default_white" tint="#CCCCCC"/>
+        <animation name="editfield.cursor" timeSource="keyboardFocus">
+            <frame ref="-editfield.cursor" duration="500"/>
+            <frame ref="none" duration="500"/>
+        </animation>
+
+        <!-- Selection background -->
+        <alias name="editfield.selection" ref="default_white" tint="#E000FEFF"/>
+    </images>
+
+    <theme name="editfield" ref="-defaults">
+        <param name="background"><image>editfield.background</image></param>
+        <param name="border"><border>3</border></param>
+        <param name="cursor"><image>editfield.cursor</image></param>
+        <param name="selection"><image>editfield.selection</image></param>
+        <param name="passwordChar"><int>0x25CF</int></param>
+        <param name="columns"><int>5</int></param>
+        <theme name="renderer" ref="-defaults"/>
+        <param name="autocompletion-height"><int>150</int></param>
+        <param name="mouseCursor"><cursor>cursor.text</cursor></param>
+    </theme>
+</themes>

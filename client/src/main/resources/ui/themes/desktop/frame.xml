@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE themes PUBLIC "-//www.matthiasmann.de//TWL-Theme//EN" "http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd">
+<themes>
+    <images>
+        <!-- Background -->
+        <composed name="desktop.frame.background" border="30,5,5,5">
+            <alias ref="default_area1" tint="#0000D5"/>
+            <grid weightsX="0,1,0" weightsY="0,1" inset="4">
+                <alias ref="none"/>
+                <alias ref="default_white" tint="#0063FF" sizeOverwriteV="20"/>
+                <alias ref="none"/>
+                <alias ref="none"/>
+                <alias ref="none"/>
+                <alias ref="none"/>
+            </grid>
+        </composed>
+
+        <!-- Close button -->
+        <alias name="-desktop.frame.closeButton.normal" ref="desktop_cross" sizeOverwriteH="10" sizeOverwriteV="10"/>
+        <select name="desktop.frame.closeButton.background">
+            <alias ref="-desktop.frame.closeButton.normal" if="disabled" tint="#00D1D1"/>
+            <alias ref="-desktop.frame.closeButton.normal" if="pressed" tint="#00EA00"/>
+            <alias ref="-desktop.frame.closeButton.normal" if="hover" tint="#45FF45"/>
+            <alias ref="-desktop.frame.closeButton.normal" tint="#6FFFFF"/>
+        </select>
+    </images>
+
+    <theme name="desktop-frame" ref="-defaults">
+        <param name="background"><image>desktop.frame.background</image></param>
+        <param name="border"><border>background.border</border></param>
+        <param name="titleAreaTop"><int>8</int></param>
+        <param name="titleAreaLeft"><int>20</int></param>
+        <param name="titleAreaRight"><int>-40</int></param>
+        <param name="titleAreaBottom"><int>28</int></param>
+        <param name="hasCloseButton"><bool>true</bool></param>
+        <param name="closeButtonX"><int>-23</int></param>
+        <param name="closeButtonY"><int>9</int></param>
+        <param name="hasResizeHandle"><bool>false</bool></param>
+        <param name="resizeHandleX"><int>0</int></param>
+        <param name="resizeHandleY"><int>0</int></param>
+        <param name="fadeColorInactive"><color>white</color></param>
+        <param name="fadeDurationActivate"><int>0</int></param>
+        <param name="fadeDurationDeactivate"><int>0</int></param>
+        <param name="fadeDurationShow"><int>0</int></param>
+        <param name="fadeDurationHide"><int>0</int></param>
+        <param name="mouseCursor"><cursor>arrow.*</cursor></param>
+        <theme name="title" ref="label">
+            <param name="textAlignment"><enum type="alignment">center</enum></param>
+            <param name="border"><border>0,0,10,0</border></param>
+        </theme>
+        <theme name="closeButton" ref="-defaults">
+            <param name="background"><image>desktop.frame.closeButton.background</image></param>
+            <param name="mouseCursor"><cursor>cursor.finger</cursor></param>
+        </theme>
+    </theme>
+</themes>

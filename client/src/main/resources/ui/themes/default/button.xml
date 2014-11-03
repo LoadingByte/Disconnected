@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE themes PUBLIC "-//www.matthiasmann.de//TWL-Theme//EN" "http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd">
+<themes>
+    <images>
+        <select name="button.background">
+            <alias ref="default_button_background" if="disabled" tint="#0051DE"/>
+            <alias ref="default_button_background" if="pressed" tint="#007800"/>
+            <alias ref="default_button_background" if="hover" tint="#00B900"/>
+            <alias ref="default_button_background" tint="#3D69FF"/>
+        </select>
+    </images>
+
+    <theme name="button" ref="-defaults">
+        <param name="background"><image>button.background</image></param>
+        <param name="font"><font>button.white</font></param>
+        <param name="border"><border>10,5</border></param>
+        <param name="mouseCursor"><cursor>cursor.finger</cursor></param>
+    </theme>
+</themes>

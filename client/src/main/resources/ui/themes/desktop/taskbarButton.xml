@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE themes PUBLIC "-//www.matthiasmann.de//TWL-Theme//EN" "http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd">
+<themes>
+    <images>
+        <select name="desktop.taskbarButton.active.background">
+            <alias ref="desktop_taskbarButton_active.background" if="disabled" tint="#00B4B4"/>
+            <alias ref="desktop_taskbarButton_active.background" if="pressed" tint="#00C800"/>
+            <alias ref="desktop_taskbarButton_active.background" if="hover" tint="#00FF00"/>
+            <alias ref="desktop_taskbarButton_active.background" tint="#00FFFF"/>
+        </select>
+        <select name="desktop.taskbarButton.inactive.background">
+            <alias ref="desktop_taskbarButton_inactive.background" if="disabled" tint="#00D589"/>
+            <alias ref="desktop_taskbarButton_inactive.background" if="pressed" tint="#00C800"/>
+            <alias ref="desktop_taskbarButton_inactive.background" if="hover" tint="#00FF00"/>
+            <alias ref="desktop_taskbarButton_inactive.background" tint="#63FFC7"/>
+        </select>
+    </images>
+
+    <theme name="desktop-taskbarButton-active" ref="button">
+        <param name="background"><image>desktop.taskbarButton.active.background</image></param>
+        <param name="font"><font>button.black</font></param>
+        <param name="border"><border>10,5</border></param>
+    </theme>
+
+    <theme name="desktop-taskbarButton-inactive" ref="button">
+        <param name="background"><image>desktop.taskbarButton.inactive.background</image></param>
+        <param name="font"><font>button.white</font></param>
+        <param name="border"><border>10,5</border></param>
+    </theme>
+</themes>

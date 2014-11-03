@@ -45,7 +45,7 @@ public class DesktopLaunchButtonModule extends AbstractGraphicsModule {
         programContext = createProgramContext();
 
         button = new Button();
-        button.setTheme("launch-button");
+        button.setTheme("/desktop-launchButton");
         button.setText(ResourceBundles.DESKTOP.getString("launchButton.text"));
         button.addCallback(new Runnable() {
 

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE themes PUBLIC "-//www.matthiasmann.de//TWL-Theme//EN" "http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd">
+<themes>
+    <images>
+        <select name="desktop.launchButton.background">
+            <alias ref="desktop_taskbarButton_active.background" if="disabled" tint="#0093BD"/>
+            <alias ref="desktop_taskbarButton_active.background" if="pressed" tint="#00C800"/>
+            <alias ref="desktop_taskbarButton_active.background" if="hover" tint="#00FF00"/>
+            <alias ref="desktop_taskbarButton_active.background" tint="#00C7FF"/>
+        </select>
+    </images>
+
+    <theme name="desktop-launchButton" ref="button">
+        <param name="background"><image>desktop.launchButton.background</image></param>
+        <param name="font"><font>button.black</font></param>
+        <param name="border"><border>12,7</border></param>
+    </theme>
+</themes>

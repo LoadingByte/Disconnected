@@ -48,7 +48,7 @@ public class DesktopWindow extends ResizableFrame {
 
         this.state = state;
 
-        setTheme("frame");
+        setTheme("/desktop-frame");
 
         // Clicking on the exit button of the window close it
         addCloseCallback(new Runnable() {

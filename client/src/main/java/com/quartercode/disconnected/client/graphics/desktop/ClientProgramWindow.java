@@ -63,7 +63,7 @@ public class ClientProgramWindow extends DesktopWindow {
         setTitle(descriptor.getName());
 
         taskbarButton = new MultiactionButton();
-        taskbarButton.setTheme("taskbar-button-active");
+        taskbarButton.setTheme("/desktop-taskbarButton-active");
         taskbarButton.setText(descriptor.getName());
 
         // Left click on the taskbar button minimizes/maximizes the window
@@ -115,7 +115,7 @@ public class ClientProgramWindow extends DesktopWindow {
 
         super.setVisible(visible);
 
-        taskbarButton.setTheme(visible ? "taskbar-button-active" : "taskbar-button-inactive");
+        taskbarButton.setTheme(visible ? "/desktop-taskbarButton-active" : "/desktop-taskbarButton-inactive");
         taskbarButton.reapplyTheme();
 
         // Toggle visibility for all popups

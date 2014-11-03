@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE themes PUBLIC "-//www.matthiasmann.de//TWL-Theme//EN" "http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd">
+<themes>
+    <images>
+        <!-- Background -->
+        <alias name="scrollbar.background" ref="default_scrollbar_background" tint="#0007FA"/>
+
+        <!-- Up/down/left/right buttons -->
+        <select name="-scrollbar.button.background">
+            <alias ref="default_area2" if="disabled" tint="#0076C9"/>
+            <alias ref="default_area2" if="pressed" tint="#008B00"/>
+            <alias ref="default_area2" if="hover" tint="#00C800"/>
+            <alias ref="default_area2" tint="#0196FF"/>
+        </select>
+        <composed name="scrollbar.button.up.background">
+            <alias ref="-scrollbar.button.background"/>
+            <alias ref="default_arrow-up" center="true"/>
+        </composed>
+        <composed name="scrollbar.button.down.background">
+            <alias ref="-scrollbar.button.background"/>
+            <alias ref="default_arrow-down" center="true"/>
+        </composed>
+        <composed name="scrollbar.button.left.background">
+            <alias ref="-scrollbar.button.background"/>
+            <alias ref="default_arrow-left" center="true"/>
+        </composed>
+        <composed name="scrollbar.button.right.background">
+            <alias ref="-scrollbar.button.background"/>
+            <alias ref="default_arrow-right" center="true"/>
+        </composed>
+
+        <!-- Thumb -->
+        <alias name="scrollbar.thumb.background" ref="-scrollbar.button.background"/>
+    </images>
+
+    <!-- Horizontal bar -->
+    <theme name="hscrollbar" ref="-defaults">
+        <param name="background"><image>scrollbar.background</image></param>
+        <theme name="leftbutton" ref="-defaults">
+            <param name="background"><image>scrollbar.button.left.background</image></param>
+            <param name="minWidth"><int>16</int></param>
+        </theme>
+        <theme name="rightbutton" ref="-defaults">
+            <param name="background"><image>scrollbar.button.right.background</image></param>
+            <param name="minWidth"><int>16</int></param>
+        </theme>
+        <theme name="thumb" ref="-defaults">
+            <param name="background"><image>scrollbar.thumb.background</image></param>
+        </theme>
+        <param name="scaleThumb"><bool>true</bool></param>
+        <param name="minWidth"><int>48</int></param>
+        <param name="minHeight"><int>16</int></param>
+    </theme>
+
+    <!-- Vertical bar -->
+    <theme name="vscrollbar" ref="-defaults">
+        <param name="background"><image>scrollbar.background</image></param>
+        <theme name="upbutton" ref="-defaults">
+            <param name="background"><image>scrollbar.button.up.background</image></param>
+            <param name="minHeight"><int>16</int></param>
+        </theme>
+        <theme name="downbutton" ref="-defaults">
+            <param name="background"><image>scrollbar.button.down.background</image></param>
+            <param name="minHeight"><int>16</int></param>
+        </theme>
+        <theme name="thumb" ref="-defaults">
+            <param name="background"><image>scrollbar.thumb.background</image></param>
+        </theme>
+        <param name="scaleThumb"><bool>true</bool></param>
+        <param name="minWidth"><int>16</int></param>
+        <param name="minHeight"><int>48</int></param>
+    </theme>
+</themes>

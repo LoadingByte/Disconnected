@@ -1,11 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <configureTheme name="default">
-        <url>/ui/default/default.xml</url>
-        <priority>1000</priority>
+    <!-- Priority ranges: -->
+    <!-- >= 10000 - Default (generic themes) -->
+    <!-- < 10000 - Custom (themes for certain parts; e.g. desktop) -->
+
+    <!-- ############# -->
+    <!-- ## Default ## -->
+    <!-- ############# -->
+
+    <!-- Absolute defaults -->
+    <configureTheme name="font">
+        <url>/ui/themes/default/font.xml</url>
+        <priority>15100</priority>
     </configureTheme>
+    <configureTheme name="defaults">
+        <url>/ui/themes/default/defaults.xml</url>
+        <priority>15000</priority>
+    </configureTheme>
+    <configureTheme name="cursors">
+        <url>/ui/themes/default/cursors.xml</url>
+        <priority>15000</priority>
+    </configureTheme>
+
+    <!-- Simple components -->
+    <configureTheme name="tooltipwindow">
+        <url>/ui/themes/default/tooltipwindow.xml</url>
+        <priority>14000</priority>
+    </configureTheme>
+    <configureTheme name="label">
+        <url>/ui/themes/default/label.xml</url>
+        <priority>14000</priority>
+    </configureTheme>
+    <configureTheme name="button">
+        <url>/ui/themes/default/button.xml</url>
+        <priority>14000</priority>
+    </configureTheme>
+    <configureTheme name="editfield">
+        <url>/ui/themes/default/editfield.xml</url>
+        <priority>14000</priority>
+    </configureTheme>
+
+    <!-- Scrolling -->
+    <configureTheme name="scrollbar">
+        <url>/ui/themes/default/scrollbar.xml</url>
+        <priority>13100</priority>
+    </configureTheme>
+    <configureTheme name="scrollpane">
+        <url>/ui/themes/default/scrollpane.xml</url>
+        <priority>13000</priority>
+    </configureTheme>
+
+    <!-- Table -->
+    <configureTheme name="table">
+        <url>/ui/themes/default/table.xml</url>
+        <priority>13000</priority>
+    </configureTheme>
+
+    <!-- ############# -->
+    <!-- ## Desktop ## -->
+    <!-- ############# -->
+
     <configureTheme name="desktop">
-        <url>/ui/desktop/desktop.xml</url>
-        <priority>500</priority>
+        <url>/ui/themes/desktop/desktop.xml</url>
+        <priority>8000</priority>
+    </configureTheme>
+    <configureTheme name="frame">
+        <url>/ui/themes/desktop/frame.xml</url>
+        <priority>8000</priority>
+    </configureTheme>
+    <configureTheme name="launchButton">
+        <url>/ui/themes/desktop/launchButton.xml</url>
+        <priority>8000</priority>
+    </configureTheme>
+    <configureTheme name="taskbarButton">
+        <url>/ui/themes/desktop/taskbarButton.xml</url>
+        <priority>8000</priority>
     </configureTheme>
 </config>

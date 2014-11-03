@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sprites>
+    <sprite name="row.selection" nocenter="true" splitx="L2,R2" splity="T2,B2" />
+</sprites>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE themes PUBLIC "-//www.matthiasmann.de//TWL-Theme//EN" "http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd">
+<themes>
+    <theme name="scrollpane" ref="-defaults">
+        <theme name="hscrollbar" ref="hscrollbar"/>
+        <theme name="vscrollbar" ref="vscrollbar"/>
+        <param name="minWidth"><int>100</int></param>
+        <param name="minHeight"><int>100</int></param>
+        <param name="maxWidth"><int>32767</int></param>
+        <param name="maxHeight"><int>32767</int></param>
+        <param name="hasDragButton"><bool>false</bool></param>
+        <param name="autoScrollArea"><int>5</int></param>
+        <param name="autoScrollSpeed"><int>10</int></param>
+        <param name="scrollbarsAlwaysVisible"><bool>false</bool></param>
+    </theme>
+</themes>

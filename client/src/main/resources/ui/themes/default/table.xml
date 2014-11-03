@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE themes PUBLIC "-//www.matthiasmann.de//TWL-Theme//EN" "http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd">
+<themes>
+    <images>
+        <!-- Header -->
+        <alias name="table.columnHeader.background" ref="default_area2" inset="-3,0" tint="#005EFF"/>
+
+        <!-- Rows -->
+        <alias name="table.row.background" ref="none"/>
+        <alias name="table.row.overlay" ref="default_table_row.selection" inset="0,1" if="keyboardFocus + !hasFocusedChild + leadRow"/>
+        <alias name="table.row.dropmarker" ref="none"/>
+
+        <!-- Tree expand/collapse buttons -->
+        <select name="treetable.treebutton.background" inset="2,2,0,4" tint="#00B4FF">
+            <alias ref="default_minus" if="selected"/>
+            <alias ref="default_plus"/>
+        </select>
+    </images>
+
+    <theme name="-cellrenderer" ref="-defaults">
+        <param name="treeIndent"><int>15</int></param>
+        <param name="treeButtonSize"><dimension>14,11</dimension></param>
+    </theme>
+    <theme name="table" ref="-defaults">
+        <param name="rowHeight"><int>font.lineHeight + 6</int></param>
+        <theme name="stringcellrenderer" ref="-defaults">
+            <param name="border"><border>0,3,0,0</border></param>
+        </theme>
+        <theme name="TreeLeafCellRenderer" ref="-cellrenderer"/>
+        <theme name="TreeNodeCellRenderer" ref="-cellrenderer"/>
+        <theme name="PropertyEditorCellRender" ref="-cellrenderer"/>
+        <theme name="PropertyListCellRenderer" ref="-cellrenderer">
+            <param name=""><image>propertysheet.sublist.*</image></param>
+            <theme name="label" ref="label"/>
+        </theme>
+        <theme name="spanrenderer" ref="-defaults"/>
+        <theme name="treeButton" ref="-defaults">
+            <param name="background"><image>treetable.treebutton.background</image></param>
+        </theme>
+        <theme name="columnHeader" ref="label">
+            <param name="background"><image>table.columnHeader.background</image></param>
+        </theme>
+        <param name="columnHeaderWidth"><int>256</int></param>
+        <param name="columnHeaderHeight"><int>20</int></param>
+        <param name="columnDividerDragableDistance"><int>3</int></param>
+        <param name="columnResizeCursor"><cursor>cursor.resizecolumn</cursor></param>
+        <param name="columnDivider"><image>none</image></param>
+        <param name="columnWidths"><map/></param>
+        <param name="ensureColumnHeaderMinWidth"><bool>true</bool></param>
+        <param name="row"><image>table.row.*</image></param>
+        <param name="inputMap"><inputMapDef ref="-defaultInputMap">
+            <action name="toggleSelectionOnLeadRow">ctrl SPACE</action>
+            <action name="selectNextRow">DOWN</action>
+            <action name="selectPreviousRow">UP</action>
+            <action name="selectNextPage">NEXT</action>
+            <action name="selectPreviousPage">PRIOR</action>
+            <action name="selectFirstRow">HOME</action>
+            <action name="selectLastRow">END</action>
+            <action name="extendSelectionToNextRow">shift DOWN</action>
+            <action name="extendSelectionToPreviousRow">shift UP</action>
+            <action name="extendSelectionToNextPage">shift NEXT</action>
+            <action name="extendSelectionToPreviousPage">shift PRIOR</action>
+            <action name="extendSelectionToFirstRow">shift HOME</action>
+            <action name="extendSelectionToLastRow">shift END</action>
+            <action name="moveLeadToNextRow">ctrl DOWN</action>
+            <action name="moveLeadToPreviousRow">ctrl UP</action>
+            <action name="moveLeadToNextPage">ctrl NEXT</action>
+            <action name="moveLeadToPreviousPage">ctrl PRIOR</action>
+            <action name="moveLeadToFirstRow">ctrl HOME</action>
+            <action name="moveLeadToLastRow">ctrl END</action>
+            <action name="expandLeadRow">ADD</action>
+            <action name="collapseLeadRow">SUBTRACT</action>
+        </inputMapDef></param>
+        <theme name="ComboBoxCellRenderer">
+            <param name="comboBoxHeight"><int>20</int></param>
+        </theme>
+        <theme name="EditFieldCellRenderer">
+            <param name="editFieldHeight"><int>20</int></param>
+        </theme>
+    </theme>
+</themes>

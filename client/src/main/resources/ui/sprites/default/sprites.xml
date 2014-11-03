@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sprites>
-    <!-- General -->
-    <sprite name="flatarea1" splitx="L1,R1" splity="T1,B1" />
-    <sprite name="flatarea2" splitx="L1,R1" splity="T1,B1" />
-
-    <!-- Button -->
-    <sprite name="button.background" splitx="L1,R1" splity="T1,B1" />
-
-    <!-- Scrollbar Background -->
-    <sprite name="scrollbar.background" tiled="true" />
-
-    <!-- Table -->
-    <sprite name="table.row.selection" nocenter="true" splitx="L2,R2" splity="T2,B2" />
+    <sprite name="area1" splitx="L1,R1" splity="T1,B1" />
+    <sprite name="area2" splitx="L1,R1" splity="T1,B1" />
 </sprites>

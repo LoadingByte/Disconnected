@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE themes PUBLIC "-//www.matthiasmann.de//TWL-Theme//EN" "http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd">
 <themes>
-    <images file="images/cursors.png">
+    <images file="resources/cursors.png">
         <cursor name="cursor.finger" hotSpotX="5" hotSpotY="1" xywh="47,0,17,22"/>
         <cursor name="cursor.text" hotSpotX="3" hotSpotY="8" xywh="38,22,7,17"/>
         <cursor name="cursor.resizecolumn" hotSpotX="10" hotSpotY="7" xywh="0,26,21,15"/>
