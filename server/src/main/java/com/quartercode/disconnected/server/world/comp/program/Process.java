@@ -551,7 +551,8 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
                 List<Process<?>> allChildren = new ArrayList<>();
                 for (Process<?> directChild : parent.getCol(CHILDREN)) {
-                    allChildren.addAll(directChild.invoke(GET_ALL_CHILDREN));
+                    allChildren.add(directChild);
+                    allChildren.addAll(getAllChildren(directChild));
                 }
 
                 return allChildren;

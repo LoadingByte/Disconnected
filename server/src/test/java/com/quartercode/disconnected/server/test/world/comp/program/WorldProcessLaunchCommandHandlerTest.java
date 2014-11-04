@@ -46,6 +46,8 @@ import com.quartercode.eventbridge.bridge.Bridge;
 
 public class WorldProcessLaunchCommandHandlerTest {
 
+    private static final SBPIdentity             SBP     = new ClientIdentity("client");
+
     @Rule
     public JUnitRuleMockery                      context = new JUnitRuleMockery();
 
@@ -94,24 +96,23 @@ public class WorldProcessLaunchCommandHandlerTest {
 
         handler.currentLaunchedProcessId = expectedPid;
 
-        final SBPIdentity sbpIdentity = new ClientIdentity("client");
         final SBPWorldProcessUserDetails wpuDetails = new ClientProcessDetails(20);
 
         // @formatter:off
         context.checking(new Expectations() {{
 
-            oneOf(bridge).send(new WorldProcessLaunchAcknowledgmentEvent(new SBPWorldProcessUserId(sbpIdentity, wpuDetails), new WorldProcessId(sbpComputer.getId(), expectedPid)));
+            oneOf(bridge).send(new WorldProcessLaunchAcknowledgmentEvent(new SBPWorldProcessUserId(SBP, wpuDetails), new WorldProcessId(sbpComputer.getId(), expectedPid)));
 
         }});
         // @formatter:on
 
         WorldProcessLaunchCommand event = new WorldProcessLaunchCommand(wpuDetails, "testPath");
-        handler.handle(event, sbpIdentity);
+        handler.handle(event, SBP);
 
         Process<?> child = sessionProcess.getCol(Process.CHILDREN).get(run - 1);
         assertNotNull("Child process was not created", child);
         assertEquals("Pid of child process", expectedPid, (int) child.getObj(Process.PID));
-        assertEquals("World process user id of child process", new SBPWorldProcessUserId(sbpIdentity, wpuDetails), child.getObj(Process.WORLD_PROCESS_USER));
+        assertEquals("World process user id of child process", new SBPWorldProcessUserId(SBP, wpuDetails), child.getObj(Process.WORLD_PROCESS_USER));
 
         ProgramExecutor executor = child.getObj(Process.EXECUTOR);
         assertNotNull("Child process has no program executor", executor);

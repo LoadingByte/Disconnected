@@ -78,7 +78,10 @@ public abstract class SocketConnectionListener {
      * If the connection request is allowed, the {@link #established(Socket)} will be called with the created socket after some time.
      * 
      * @param requestor The address of the socket/service which wants to build a connection.
-     * @return Whether the building of the connection is allowed.
+     * @param localPort The local port the request is sent to.
+     *        If the connection request is allowed, it is used for the new socket.
+     * @return A connection allowance entry that controls the whether the building of the connection is allowed.
+     *         See {@link ConnectionAllowance} for more information on the usage.
      */
     public abstract ConnectionAllowance allow(Address requestor, int localPort);
 
