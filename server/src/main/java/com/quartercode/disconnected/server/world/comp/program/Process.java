@@ -514,12 +514,20 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Process<?> holder = (Process<?>) invocation.getCHolder();
+                boolean recursive = (boolean) arguments[0];
 
                 if (holder.getObj(STATE) != ProcessState.STOPPED) {
-                    holder.invoke(APPLY_STATE, ProcessState.STOPPED, arguments[0]);
+                    holder.invoke(APPLY_STATE, ProcessState.STOPPED, recursive);
+
                     // Unregister stopped process from parent
                     if (holder.getParent() != null) {
                         holder.getParent().removeCol(CHILDREN, holder);
+                    }
+
+                    // Promote the old child processes of this process to child processes of the parent process
+                    for (Process<?> child : new ArrayList<>(holder.getCol(CHILDREN))) {
+                        holder.removeCol(CHILDREN, child);
+                        holder.getParent().addCol(CHILDREN, child);
                     }
                 }
 
