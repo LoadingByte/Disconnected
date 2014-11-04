@@ -44,9 +44,11 @@ import com.quartercode.disconnected.server.sim.TickService;
 import com.quartercode.disconnected.server.sim.profile.DefaultProfileService;
 import com.quartercode.disconnected.server.sim.profile.ProfileService;
 import com.quartercode.disconnected.server.util.ResourceStore;
+import com.quartercode.disconnected.server.world.comp.program.WorldProcessInterruptCommandHandler;
 import com.quartercode.disconnected.server.world.comp.program.WorldProcessLaunchCommandHandler;
 import com.quartercode.disconnected.shared.config.ConfigService;
 import com.quartercode.disconnected.shared.config.util.RemoveNamedValueCommand;
+import com.quartercode.disconnected.shared.event.program.control.WorldProcessInterruptCommand;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.registry.Registries;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
@@ -141,6 +143,7 @@ public class ServerInitializer {
     private static void addEventHandlers(Bridge bridge) {
 
         addSBPAwareEventHandler(bridge, new WorldProcessLaunchCommandHandler(), new TypePredicate<>(WorldProcessLaunchCommand.class));
+        addSBPAwareEventHandler(bridge, new WorldProcessInterruptCommandHandler(), new TypePredicate<>(WorldProcessInterruptCommand.class));
     }
 
     private static void addSBPAwareEventHandler(Bridge bridge, SBPAwareEventHandler<?> handler, EventPredicate<?> predicate) {
