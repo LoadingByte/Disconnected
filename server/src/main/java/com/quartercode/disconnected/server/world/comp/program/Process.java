@@ -60,63 +60,13 @@ import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
  */
 public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatureHolder<P> {
 
-    /**
-     * The process state defines the global state of the process the os can see.
-     * It stores if the process is running, interrupted etc.
-     */
-    public static enum ProcessState {
-
-        /**
-         * The process is running and the update executes every tick.
-         * This is the default state of a process.
-         */
-        RUNNING (false),
-        /**
-         * The execution is suspended, tick updates will be ignored.
-         */
-        SUSPENDED (true),
-        /**
-         * The execution is interrupted friendly and should be stopped soon.
-         * If a process notes this state, it should try to execute last activities and then stop the execution.
-         */
-        INTERRUPTED (true),
-        /**
-         * The execution is permanently stopped.
-         * If a process is stopped, it won't be able to start again.
-         */
-        STOPPED (true);
-
-        private final boolean tickState;
-
-        /**
-         * Creates a new process state enumeration entry.
-         * 
-         * @param tickState True if the state should allow execution of the program it is applied on.
-         */
-        private ProcessState(boolean tickState) {
-
-            this.tickState = tickState;
-        }
-
-        /**
-         * Returns true if the state should allow execution of the program it is applied on.
-         * 
-         * @return Whether the state should allow the execution of the program it is applied on.
-         */
-        public boolean isTickState() {
-
-            return tickState;
-        }
-
-    }
-
     // ----- Properties -----
 
     /**
      * The unique id the process has.
      * It is used to identify the process.
      */
-    public static final PropertyDefinition<Integer>                                PID;
+    public static final PropertyDefinition<Integer>                                                    PID;
 
     /**
      * The {@link File} which contains the {@link Program} the process runs.<br>

@@ -39,8 +39,8 @@ import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.net.NetworkModule;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.program.Process;
-import com.quartercode.disconnected.server.world.comp.program.Process.ProcessState;
 import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
+import com.quartercode.disconnected.server.world.comp.program.ProcessState;
 import com.quartercode.disconnected.server.world.comp.program.RootProcess;
 import com.quartercode.disconnected.shared.comp.Version;
 
