@@ -84,13 +84,13 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
      * </tr>
      * </table>
      */
-    public static final PropertyDefinition<ContentFile>                            SOURCE;
+    public static final PropertyDefinition<ContentFile>                                                SOURCE;
 
     /**
      * The environment variables that are assigned to the process.
      * See {@link EnvironmentVariable} for more information.
      */
-    public static final PropertyDefinition<Map<String, String>>                    ENVIRONMENT;
+    public static final PropertyDefinition<Map<String, String>>                                        ENVIRONMENT;
 
     /**
      * The {@link ProcessState} which defines the global state of the process the os can see.
@@ -98,7 +98,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
      * Note that using the {@link #APPLY_STATE} or {@link #SUSPEND}/{@link #RESUME}/{@link #INTERRUPT}/{@link #STOP} methods
      * is preferred over directly accessing the property.
      */
-    public static final PropertyDefinition<ProcessState>                           STATE;
+    public static final PropertyDefinition<ProcessState>                                               STATE;
 
     /**
      * The {@link ProgramExecutor} which contains the logic of the process.
@@ -106,19 +106,25 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
      * Argument properties should be passed to this object.<br>
      * The {@link ProgramExecutor#RUN} method on the stored value finally starts the process.
      */
-    public static final PropertyDefinition<ProgramExecutor>                        EXECUTOR;
+    public static final PropertyDefinition<ProgramExecutor>                                            EXECUTOR;
 
     /**
      * The child processes the process launched.<br>
      * Note that using the {@link #CREATE_CHILD} method is preferred over directly accessing the property.
      */
-    public static final CollectionPropertyDefinition<Process<?>, List<Process<?>>> CHILDREN;
+    public static final CollectionPropertyDefinition<Process<?>, List<Process<?>>>                     CHILDREN;
+
+    /**
+     * The {@link ProcessStateListener} which are called after the process {@link #STATE} has changed.
+     * Listeners can be directly added to this list and must not be removed after the program execution has finished.
+     */
+    public static final CollectionPropertyDefinition<ProcessStateListener, List<ProcessStateListener>> STATE_LISTENERS;
 
     /**
      * If the process was launched by an SBP, this property stores the {@link SBPWorldProcessUserId} that identifies the SBP and the world process user.
      * Such a remote launch is done using a command event.
      */
-    public static final PropertyDefinition<SBPWorldProcessUserId>                  WORLD_PROCESS_USER;
+    public static final PropertyDefinition<SBPWorldProcessUserId>                                      WORLD_PROCESS_USER;
 
     static {
 
@@ -140,6 +146,26 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
         ENVIRONMENT = create(new TypeLiteral<PropertyDefinition<Map<String, String>>>() {}, "name", "environment", "storage", new StandardStorage<>(), "initialValue", new CloneValueFactory<>(new HashMap<>()));
 
         STATE = create(new TypeLiteral<PropertyDefinition<ProcessState>>() {}, "name", "state", "storage", new StandardStorage<>(), "initialValue", new ConstantValueFactory<>(ProcessState.RUNNING));
+        STATE.addSetterExecutor("callStateListeners", Process.class, new FunctionExecutor<Void>() {
+
+            @Override
+            @Prioritized (Prioritized.LEVEL_6)
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                Process<?> holder = (Process<?>) invocation.getCHolder();
+                ProcessState oldState = holder.getObj(STATE);
+
+                invocation.next(arguments);
+
+                ProcessState newState = (ProcessState) arguments[0];
+                for (ProcessStateListener stateListener : holder.getCol(STATE_LISTENERS)) {
+                    stateListener.changedState(holder, oldState, newState);
+                }
+
+                return null;
+            }
+
+        });
         STATE.addSetterExecutor("setExecutorSchedulerActive", Process.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -160,6 +186,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
         EXECUTOR = create(new TypeLiteral<PropertyDefinition<ProgramExecutor>>() {}, "name", "executor", "storage", new StandardStorage<>());
         CHILDREN = create(new TypeLiteral<CollectionPropertyDefinition<Process<?>, List<Process<?>>>>() {}, "name", "children", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
+        STATE_LISTENERS = create(new TypeLiteral<CollectionPropertyDefinition<ProcessStateListener, List<ProcessStateListener>>>() {}, "name", "stateListeners", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
         WORLD_PROCESS_USER = create(new TypeLiteral<PropertyDefinition<SBPWorldProcessUserId>>() {}, "name", "worldProcessParnter", "storage", new StandardStorage<>());
 
     }
@@ -185,7 +212,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Boolean>                                IS_STATE_APPLIED;
+    public static final FunctionDefinition<Boolean>                                                    IS_STATE_APPLIED;
 
     /**
      * Changes the {@link ProcessState} which defines the global state of the process the os can see.
@@ -218,7 +245,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
      * @see #INTERRUPT
      * @see #STOP
      */
-    public static final FunctionDefinition<Void>                                   APPLY_STATE;
+    public static final FunctionDefinition<Void>                                                       APPLY_STATE;
 
     /**
      * Suspends the execution temporarily, tick updates will be ignored.
@@ -240,7 +267,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                   SUSPEND;
+    public static final FunctionDefinition<Void>                                                       SUSPEND;
 
     /**
      * Resumes a suspended process.
@@ -262,7 +289,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                   RESUME;
+    public static final FunctionDefinition<Void>                                                       RESUME;
 
     /**
      * Interrupts the execution friendly and expresses that it should be stopped as soon as possible.
@@ -285,7 +312,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                   INTERRUPT;
+    public static final FunctionDefinition<Void>                                                       INTERRUPT;
 
     /**
      * Forces the process to stop the execution.
@@ -307,47 +334,47 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                   STOP;
+    public static final FunctionDefinition<Void>                                                       STOP;
 
     /**
      * Returns all child processes the process launched.
      * That includes all children which are present in the child datastructure of this object, all child objects etc.
      */
-    public static final FunctionDefinition<List<Process<?>>>                       GET_ALL_CHILDREN;
+    public static final FunctionDefinition<List<Process<?>>>                                           GET_ALL_CHILDREN;
 
     /**
      * Creates a new empty {@link ChildProcess} which uses the same environment variables as this one.
      * You can run the returned process after creation using {@link Process#INITIALIZE} and then {@link ProgramExecutor#RUN} on {@link Process#EXECUTOR}.
      */
-    public static final FunctionDefinition<ChildProcess>                           CREATE_CHILD;
+    public static final FunctionDefinition<ChildProcess>                                               CREATE_CHILD;
 
     /**
      * Returns the root {@link RootProcess} which is the parent of every other process somewhere in the tree.
      */
-    public static final FunctionDefinition<RootProcess>                            GET_ROOT;
+    public static final FunctionDefinition<RootProcess>                                                GET_ROOT;
 
     /**
      * Returns the {@link OperatingSystem} which is hosting the {@link RootProcess} which is the parent of every other process.
      */
-    public static final FunctionDefinition<OperatingSystem>                        GET_OPERATING_SYSTEM;
+    public static final FunctionDefinition<OperatingSystem>                                            GET_OPERATING_SYSTEM;
 
     /**
      * Resolves the {@link Session} process this process is running under.
      * This process is running with the rights of that {@link Session}.
      */
-    public static final FunctionDefinition<Process<?>>                             GET_SESSION_PROCESS;
+    public static final FunctionDefinition<Process<?>>                                                 GET_SESSION_PROCESS;
 
     /**
      * Resolves the actual {@link Session} executor this process is running under.
      * This process is running with the rights of that {@link Session}.
      */
-    public static final FunctionDefinition<Session>                                GET_SESSION;
+    public static final FunctionDefinition<Session>                                                    GET_SESSION;
 
     /**
      * Resolves the {@link User} this process is running under.
      * This uses the {@link #GET_SESSION} function for resolving the Session} object.
      */
-    public static final FunctionDefinition<User>                                   GET_USER;
+    public static final FunctionDefinition<User>                                                       GET_USER;
 
     /**
      * Initializes the process using the {@link Program} that is stored in the set source {@link ContentFile}.
@@ -384,7 +411,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                   INITIALIZE;
+    public static final FunctionDefinition<Void>                                                       INITIALIZE;
 
     static {
 
