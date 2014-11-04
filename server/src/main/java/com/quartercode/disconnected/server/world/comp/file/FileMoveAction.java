@@ -155,7 +155,7 @@ public class FileMoveAction extends FileAction {
                 ParentFile<?> newParent = moveFile.getParent();
 
                 // Manually remove the file from its old parent file
-                oldParent.removeCol(ParentFile.CHILDREN, moveFile);
+                oldParent.removeFromColl(ParentFile.CHILDREN, moveFile);
                 // Set the new parent file again because the removal automatically setthe parent object to null
                 moveFile.setParent(newParent);
 

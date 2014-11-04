@@ -541,7 +541,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
 
                 Object data = ((Packet) arguments[0]).getObj(Packet.DATA);
 
-                for (PacketHandler packetHandler : holder.getCol(PACKET_HANDLERS)) {
+                for (PacketHandler packetHandler : holder.getColl(PACKET_HANDLERS)) {
                     packetHandler.handle(data);
                 }
 

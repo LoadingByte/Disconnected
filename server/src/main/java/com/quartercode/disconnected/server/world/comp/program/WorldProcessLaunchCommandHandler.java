@@ -96,7 +96,7 @@ public class WorldProcessLaunchCommandHandler implements SBPAwareEventHandler<Wo
 
     private void abort(Process<?> parent, Process<?> process) {
 
-        parent.removeCol(Process.CHILDREN, process);
+        parent.removeFromColl(Process.CHILDREN, process);
     }
 
     protected Bridge getBridge() {
@@ -108,7 +108,7 @@ public class WorldProcessLaunchCommandHandler implements SBPAwareEventHandler<Wo
 
         World world = ServiceRegistry.lookup(ProfileService.class).getActive().getWorld();
         // Just use first available computer as the player's one
-        return world.getCol(World.COMPUTERS).get(0);
+        return world.getColl(World.COMPUTERS).get(0);
     }
 
     protected ProcessModule getProcessModule(Computer computer) {

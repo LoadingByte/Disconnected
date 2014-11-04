@@ -62,7 +62,7 @@ public class RouterNetInterfaceTest {
         routerInterface.setObj(RouterNetInterface.BACKBONE_CONNECTION, backbone);
 
         assertEquals("Router -> Backbone connection", backbone, routerInterface.getObj(RouterNetInterface.BACKBONE_CONNECTION));
-        assertTrue("Backbone -> Router connection not added", backbone.getCol(Backbone.CHILDREN).contains(routerInterface));
+        assertTrue("Backbone -> Router connection not added", backbone.getColl(Backbone.CHILDREN).contains(routerInterface));
     }
 
     @Test
@@ -72,13 +72,13 @@ public class RouterNetInterfaceTest {
         routerInterface.setObj(RouterNetInterface.BACKBONE_CONNECTION, null);
 
         assertNull("Router -> Backbone connection", routerInterface.getObj(RouterNetInterface.BACKBONE_CONNECTION));
-        assertFalse("Backbone -> Router connection not removed", backbone.getCol(Backbone.CHILDREN).contains(routerInterface));
+        assertFalse("Backbone -> Router connection not removed", backbone.getColl(Backbone.CHILDREN).contains(routerInterface));
     }
 
     @Test
     public void testAddNeighbourAddReverse() {
 
-        routerInterface.addCol(RouterNetInterface.NEIGHBOURS, neighbour1);
+        routerInterface.addToColl(RouterNetInterface.NEIGHBOURS, neighbour1);
 
         assertConnected(routerInterface, neighbour1, true);
     }
@@ -86,8 +86,8 @@ public class RouterNetInterfaceTest {
     @Test
     public void testRemoveNeighbourRemoveReverse() {
 
-        routerInterface.addCol(RouterNetInterface.NEIGHBOURS, neighbour1);
-        routerInterface.removeCol(RouterNetInterface.NEIGHBOURS, neighbour1);
+        routerInterface.addToColl(RouterNetInterface.NEIGHBOURS, neighbour1);
+        routerInterface.removeFromColl(RouterNetInterface.NEIGHBOURS, neighbour1);
 
         assertConnected(routerInterface, neighbour1, false);
     }
@@ -95,8 +95,8 @@ public class RouterNetInterfaceTest {
     @Test
     public void testAddMultipleNeighboursAddReverse() {
 
-        routerInterface.addCol(RouterNetInterface.NEIGHBOURS, neighbour1);
-        routerInterface.addCol(RouterNetInterface.NEIGHBOURS, neighbour2);
+        routerInterface.addToColl(RouterNetInterface.NEIGHBOURS, neighbour1);
+        routerInterface.addToColl(RouterNetInterface.NEIGHBOURS, neighbour2);
 
         assertConnected(routerInterface, neighbour1, true);
         assertConnected(routerInterface, neighbour2, true);
@@ -105,10 +105,10 @@ public class RouterNetInterfaceTest {
     @Test
     public void testRemoveMultipleNeighboursRemoveReverse() {
 
-        routerInterface.addCol(RouterNetInterface.NEIGHBOURS, neighbour1);
-        routerInterface.addCol(RouterNetInterface.NEIGHBOURS, neighbour2);
-        routerInterface.removeCol(RouterNetInterface.NEIGHBOURS, neighbour1);
-        routerInterface.removeCol(RouterNetInterface.NEIGHBOURS, neighbour2);
+        routerInterface.addToColl(RouterNetInterface.NEIGHBOURS, neighbour1);
+        routerInterface.addToColl(RouterNetInterface.NEIGHBOURS, neighbour2);
+        routerInterface.removeFromColl(RouterNetInterface.NEIGHBOURS, neighbour1);
+        routerInterface.removeFromColl(RouterNetInterface.NEIGHBOURS, neighbour2);
 
         assertConnected(routerInterface, neighbour1, false);
         assertConnected(routerInterface, neighbour2, false);
@@ -117,9 +117,9 @@ public class RouterNetInterfaceTest {
     @Test
     public void testAddRemoveMixedMultipleNeighboursAddRemoveReverse() {
 
-        routerInterface.addCol(RouterNetInterface.NEIGHBOURS, neighbour1);
-        routerInterface.addCol(RouterNetInterface.NEIGHBOURS, neighbour2);
-        routerInterface.removeCol(RouterNetInterface.NEIGHBOURS, neighbour1);
+        routerInterface.addToColl(RouterNetInterface.NEIGHBOURS, neighbour1);
+        routerInterface.addToColl(RouterNetInterface.NEIGHBOURS, neighbour2);
+        routerInterface.removeFromColl(RouterNetInterface.NEIGHBOURS, neighbour1);
 
         assertConnected(routerInterface, neighbour1, false);
         assertConnected(routerInterface, neighbour2, true);
@@ -128,14 +128,14 @@ public class RouterNetInterfaceTest {
     private void assertConnected(RouterNetInterface routerInterface, RouterNetInterface neighbour, boolean connected) {
 
         String messageEnd = " connection" + (connected ? " " : " not ") + "available";
-        assertTrue("Router -> Neighbour" + messageEnd, routerInterface.getCol(RouterNetInterface.NEIGHBOURS).contains(neighbour) == connected);
-        assertTrue("Neighbour -> Router" + messageEnd, neighbour.getCol(RouterNetInterface.NEIGHBOURS).contains(routerInterface) == connected);
+        assertTrue("Router -> Neighbour" + messageEnd, routerInterface.getColl(RouterNetInterface.NEIGHBOURS).contains(neighbour) == connected);
+        assertTrue("Neighbour -> Router" + messageEnd, neighbour.getColl(RouterNetInterface.NEIGHBOURS).contains(routerInterface) == connected);
     }
 
     @Test
     public void testAddChildAddReverse() {
 
-        routerInterface.addCol(RouterNetInterface.CHILDREN, child1);
+        routerInterface.addToColl(RouterNetInterface.CHILDREN, child1);
         child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
 
         assertConnected(routerInterface, child1, true);
@@ -144,10 +144,10 @@ public class RouterNetInterfaceTest {
     @Test
     public void testRemoveChildRemoveReverse() {
 
-        routerInterface.addCol(RouterNetInterface.CHILDREN, child1);
+        routerInterface.addToColl(RouterNetInterface.CHILDREN, child1);
         child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
 
-        routerInterface.removeCol(RouterNetInterface.CHILDREN, child1);
+        routerInterface.removeFromColl(RouterNetInterface.CHILDREN, child1);
         child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
 
         assertConnected(routerInterface, child1, false);
@@ -156,9 +156,9 @@ public class RouterNetInterfaceTest {
     @Test
     public void testAddMultipleChildrenAddReverse() {
 
-        routerInterface.addCol(RouterNetInterface.CHILDREN, child1);
+        routerInterface.addToColl(RouterNetInterface.CHILDREN, child1);
         child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
-        routerInterface.addCol(RouterNetInterface.CHILDREN, child2);
+        routerInterface.addToColl(RouterNetInterface.CHILDREN, child2);
         child2.setObj(NodeNetInterface.NET_ID, new NetID(10, 2));
 
         assertConnected(routerInterface, child1, true);
@@ -168,14 +168,14 @@ public class RouterNetInterfaceTest {
     @Test
     public void testRemoveMultipleChildrenRemoveReverse() {
 
-        routerInterface.addCol(RouterNetInterface.CHILDREN, child1);
+        routerInterface.addToColl(RouterNetInterface.CHILDREN, child1);
         child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
-        routerInterface.addCol(RouterNetInterface.CHILDREN, child2);
+        routerInterface.addToColl(RouterNetInterface.CHILDREN, child2);
         child2.setObj(NodeNetInterface.NET_ID, new NetID(10, 2));
 
-        routerInterface.removeCol(RouterNetInterface.CHILDREN, child1);
+        routerInterface.removeFromColl(RouterNetInterface.CHILDREN, child1);
         child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
-        routerInterface.removeCol(RouterNetInterface.CHILDREN, child2);
+        routerInterface.removeFromColl(RouterNetInterface.CHILDREN, child2);
         child2.setObj(NodeNetInterface.NET_ID, new NetID(10, 2));
 
         assertConnected(routerInterface, child1, false);
@@ -185,12 +185,12 @@ public class RouterNetInterfaceTest {
     @Test
     public void testAddRemoveMixedMultipleChildrenAddRemoveReverse() {
 
-        routerInterface.addCol(RouterNetInterface.CHILDREN, child1);
+        routerInterface.addToColl(RouterNetInterface.CHILDREN, child1);
         child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
-        routerInterface.addCol(RouterNetInterface.CHILDREN, child2);
+        routerInterface.addToColl(RouterNetInterface.CHILDREN, child2);
         child2.setObj(NodeNetInterface.NET_ID, new NetID(10, 2));
 
-        routerInterface.removeCol(RouterNetInterface.CHILDREN, child1);
+        routerInterface.removeFromColl(RouterNetInterface.CHILDREN, child1);
         child1.setObj(NodeNetInterface.NET_ID, new NetID(10, 1));
 
         assertConnected(routerInterface, child1, false);
@@ -201,7 +201,7 @@ public class RouterNetInterfaceTest {
 
         String messageEnd = " connection" + (connected ? " " : " not ") + "available";
 
-        assertTrue("Router -> Child" + messageEnd, routerInterface.getCol(RouterNetInterface.CHILDREN).contains(child) == connected);
+        assertTrue("Router -> Child" + messageEnd, routerInterface.getColl(RouterNetInterface.CHILDREN).contains(child) == connected);
         assertTrue("Child -> Router" + messageEnd, routerInterface.equals(child.getObj(NodeNetInterface.CONNECTION)) == connected);
     }
 

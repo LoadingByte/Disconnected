@@ -99,7 +99,7 @@ public class ProgramUtils {
      */
     public static void registerInterruptionStopper(Process<?> process) {
 
-        process.addCol(Process.STATE_LISTENERS, new ProcessStateListener() {
+        process.addToColl(Process.STATE_LISTENERS, new ProcessStateListener() {
 
             @Override
             public void changedState(Process<?> process, ProcessState oldState, ProcessState newState) {
@@ -128,7 +128,7 @@ public class ProgramUtils {
                 MultiPredicates.and(new TypePredicate<>(eventType), new WorldProcessCommandPredicate<>(getProcessId(executor))));
 
         // Register a callback that removes the listener once the process is stopped
-        executor.getParent().addCol(Process.STATE_LISTENERS, new ProcessStateListener() {
+        executor.getParent().addToColl(Process.STATE_LISTENERS, new ProcessStateListener() {
 
             @Override
             public void changedState(Process<?> process, ProcessState oldState, ProcessState newState) {
@@ -179,7 +179,7 @@ public class ProgramUtils {
                 MultiPredicates.and(new TypePredicate<>(eventType), new WorldProcessCommandPredicate<>(getProcessId(executor))));
 
         // Register a callback that removes the handler once the process is stopped
-        executor.getParent().addCol(Process.STATE_LISTENERS, new ProcessStateListener() {
+        executor.getParent().addToColl(Process.STATE_LISTENERS, new ProcessStateListener() {
 
             @Override
             public void changedState(Process<?> process, ProcessState oldState, ProcessState newState) {

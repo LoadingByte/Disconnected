@@ -117,7 +117,7 @@ public class Backbone extends WorldChildFeatureHolder<World> implements PacketPr
                 int packetDestSubnet = packetDest.getSubnet();
 
                 Set<Integer> visitedSubnets = new HashSet<>();
-                for (RouterNetInterface child : backbone.getCol(Backbone.CHILDREN)) {
+                for (RouterNetInterface child : backbone.getColl(Backbone.CHILDREN)) {
                     List<NodeNetInterface> nodes = new ArrayList<>();
                     recordAllNodes(child, nodes, visitedSubnets);
                     for (NodeNetInterface node : nodes) {
@@ -139,9 +139,9 @@ public class Backbone extends WorldChildFeatureHolder<World> implements PacketPr
                 if (!visitedSubnets.contains(routerSubnet)) {
                     visitedSubnets.add(routerSubnet);
                     visitedSubnets.add(router.getObj(RouterNetInterface.SUBNET));
-                    list.addAll(router.getCol(RouterNetInterface.CHILDREN));
+                    list.addAll(router.getColl(RouterNetInterface.CHILDREN));
 
-                    for (RouterNetInterface neighbour : router.getCol(RouterNetInterface.NEIGHBOURS)) {
+                    for (RouterNetInterface neighbour : router.getColl(RouterNetInterface.NEIGHBOURS)) {
                         recordAllNodes(neighbour, list, visitedSubnets);
                     }
                 }

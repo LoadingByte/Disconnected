@@ -53,7 +53,7 @@ public class SocketTest {
         // @formatter:on
 
         Socket socket = new Socket();
-        socket.addCol(Socket.PACKET_HANDLERS, packetHandler);
+        socket.addToColl(Socket.PACKET_HANDLERS, packetHandler);
         socket.setObj(Socket.STATE, SocketState.CONNECTED);
 
         Packet packet = new Packet();
@@ -75,7 +75,7 @@ public class SocketTest {
         // @formatter:on
 
         Socket socket = new Socket();
-        socket.addCol(Socket.PACKET_HANDLERS, packetHandler);
+        socket.addToColl(Socket.PACKET_HANDLERS, packetHandler);
 
         Packet packet = new Packet();
         packet.setObj(Packet.DATA, "testdata");

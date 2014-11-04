@@ -128,8 +128,8 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
                     NodeNetInterface holder = (NodeNetInterface) invocation.getCHolder();
                     RouterNetInterface connection = (RouterNetInterface) arguments[0];
 
-                    if (!connection.getCol(RouterNetInterface.CHILDREN).contains(holder)) {
-                        connection.addCol(RouterNetInterface.CHILDREN, holder);
+                    if (!connection.getColl(RouterNetInterface.CHILDREN).contains(holder)) {
+                        connection.addToColl(RouterNetInterface.CHILDREN, holder);
                     }
                 }
 
@@ -147,8 +147,8 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
                     NodeNetInterface holder = (NodeNetInterface) invocation.getCHolder();
                     RouterNetInterface oldConnection = holder.getObj(CONNECTION);
 
-                    if (oldConnection != null && oldConnection.getCol(RouterNetInterface.CHILDREN).contains(holder)) {
-                        oldConnection.removeCol(RouterNetInterface.CHILDREN, holder);
+                    if (oldConnection != null && oldConnection.getColl(RouterNetInterface.CHILDREN).contains(holder)) {
+                        oldConnection.removeFromColl(RouterNetInterface.CHILDREN, holder);
                     }
                 }
 

@@ -95,8 +95,8 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
                     RouterNetInterface holder = (RouterNetInterface) invocation.getCHolder();
                     Backbone connection = (Backbone) arguments[0];
 
-                    if (!connection.getCol(Backbone.CHILDREN).contains(holder)) {
-                        connection.addCol(Backbone.CHILDREN, holder);
+                    if (!connection.getColl(Backbone.CHILDREN).contains(holder)) {
+                        connection.addToColl(Backbone.CHILDREN, holder);
                     }
                 }
 
@@ -114,8 +114,8 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
                     RouterNetInterface holder = (RouterNetInterface) invocation.getCHolder();
                     Backbone oldConnection = holder.getObj(BACKBONE_CONNECTION);
 
-                    if (oldConnection != null && oldConnection.getCol(Backbone.CHILDREN).contains(holder)) {
-                        oldConnection.removeCol(Backbone.CHILDREN, holder);
+                    if (oldConnection != null && oldConnection.getColl(Backbone.CHILDREN).contains(holder)) {
+                        oldConnection.removeFromColl(Backbone.CHILDREN, holder);
                     }
                 }
 
@@ -134,8 +134,8 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
                 RouterNetInterface holder = (RouterNetInterface) invocation.getCHolder();
                 RouterNetInterface neighbour = (RouterNetInterface) arguments[0];
 
-                if (!neighbour.getCol(NEIGHBOURS).contains(holder)) {
-                    neighbour.addCol(NEIGHBOURS, holder);
+                if (!neighbour.getColl(NEIGHBOURS).contains(holder)) {
+                    neighbour.addToColl(NEIGHBOURS, holder);
                 }
 
                 return invocation.next(arguments);
@@ -151,8 +151,8 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
                 RouterNetInterface holder = (RouterNetInterface) invocation.getCHolder();
                 RouterNetInterface neighbour = (RouterNetInterface) arguments[0];
 
-                if (neighbour.getCol(NEIGHBOURS).contains(holder)) {
-                    neighbour.removeCol(NEIGHBOURS, holder);
+                if (neighbour.getColl(NEIGHBOURS).contains(holder)) {
+                    neighbour.removeFromColl(NEIGHBOURS, holder);
                 }
 
                 return invocation.next(arguments);
@@ -247,14 +247,14 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
                 RoutedPacket routedPacket = (RoutedPacket) arguments[0];
                 Packet packet = routedPacket.getObj(RoutedPacket.PACKET);
 
-                if (routedPacket.getCol(RoutedPacket.PATH).isEmpty()) {
+                if (routedPacket.getColl(RoutedPacket.PATH).isEmpty()) {
                     if (!tryHandOverToChild(holder, packet)) {
                         routePacket(holder, packet);
                     }
                 } else {
                     // Poll the next subnet from the path pseudo-queue
-                    int nextSubnet = routedPacket.getCol(RoutedPacket.PATH).get(0);
-                    routedPacket.removeCol(RoutedPacket.PATH, nextSubnet);
+                    int nextSubnet = routedPacket.getColl(RoutedPacket.PATH).get(0);
+                    routedPacket.removeFromColl(RoutedPacket.PATH, nextSubnet);
 
                     if (nextSubnet < 0) {
                         if (!tryHandOverToBackbone(holder, packet)) {
@@ -282,7 +282,7 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
                     return false;
                 }
 
-                for (NodeNetInterface child : router.getCol(CHILDREN)) {
+                for (NodeNetInterface child : router.getColl(CHILDREN)) {
                     int childId = child.getObj(NodeNetInterface.NET_ID).getId();
                     if (childId == destinationId) {
                         child.invoke(NodeNetInterface.PROCESS, packet);
@@ -313,7 +313,7 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
              */
             private boolean tryHandOverToNeighbour(CFeatureHolder router, RoutedPacket routedPacket, Packet packet, int nextSubnet) {
 
-                for (RouterNetInterface neighbour : router.getCol(NEIGHBOURS)) {
+                for (RouterNetInterface neighbour : router.getColl(NEIGHBOURS)) {
                     int neighbourSubnet = neighbour.getObj(SUBNET);
                     if (neighbourSubnet == nextSubnet) {
                         neighbour.invoke(PROCESS_ROUTED, routedPacket);
@@ -364,7 +364,7 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
         RoutedPacket routedPacket = new RoutedPacket();
         routedPacket.setObj(RoutedPacket.PACKET, packet);
         for (int pathEntry : path) {
-            routedPacket.addCol(RoutedPacket.PATH, pathEntry);
+            routedPacket.addToColl(RoutedPacket.PATH, pathEntry);
         }
 
         router.invoke(PROCESS_ROUTED, routedPacket);
@@ -385,7 +385,7 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
         visitedSubnets.add(startSubnet);
 
         List<Integer> shortestPath = null;
-        for (RouterNetInterface neighbour : currentRouter.getCol(NEIGHBOURS)) {
+        for (RouterNetInterface neighbour : currentRouter.getColl(NEIGHBOURS)) {
             int neighbourSubnet = neighbour.getObj(SUBNET);
 
             if (!visitedSubnets.contains(neighbourSubnet)) {

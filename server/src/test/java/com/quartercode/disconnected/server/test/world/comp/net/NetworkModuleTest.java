@@ -107,7 +107,7 @@ public class NetworkModuleTest {
         computer.setObj(Computer.OS, operatingSystem);
         operatingSystem.setObj(OperatingSystem.NET_MODULE, netModule);
 
-        computer.addCol(Computer.HARDWARE, netInterface);
+        computer.addToColl(Computer.HARDWARE, netInterface);
     }
 
     @Test
@@ -116,7 +116,7 @@ public class NetworkModuleTest {
         Socket socket = netModule.invoke(NetworkModule.CREATE_SOCKET);
 
         assertEquals("Bound network interface of the socket that was created", netModule, socket.getParent());
-        assertTrue("Created socket wasn't added to the network module's socket list", netModule.getCol(NetworkModule.SOCKETS).contains(socket));
+        assertTrue("Created socket wasn't added to the network module's socket list", netModule.getColl(NetworkModule.SOCKETS).contains(socket));
     }
 
     @Test
@@ -126,7 +126,7 @@ public class NetworkModuleTest {
         socket.setObj(Socket.LOCAL_PORT, 1);
         socket.invoke(Socket.DISCONNECT);
 
-        assertTrue("Created socket wasn't removed from the network module's socket list", !netModule.getCol(NetworkModule.SOCKETS).contains(socket));
+        assertTrue("Created socket wasn't removed from the network module's socket list", !netModule.getColl(NetworkModule.SOCKETS).contains(socket));
     }
 
     @Test
@@ -139,8 +139,8 @@ public class NetworkModuleTest {
 
         netModule.invoke(NetworkModule.SET_RUNNING, false);
 
-        assertTrue("Created socket 1 wasn't removed from the network module's socket list", !netModule.getCol(NetworkModule.SOCKETS).contains(socket1));
-        assertTrue("Created socket 2 wasn't removed from the network module's socket list", !netModule.getCol(NetworkModule.SOCKETS).contains(socket2));
+        assertTrue("Created socket 1 wasn't removed from the network module's socket list", !netModule.getColl(NetworkModule.SOCKETS).contains(socket1));
+        assertTrue("Created socket 2 wasn't removed from the network module's socket list", !netModule.getColl(NetworkModule.SOCKETS).contains(socket2));
     }
 
     @Test
@@ -217,7 +217,7 @@ public class NetworkModuleTest {
         receiverSocket.setObj(Socket.STATE, SocketState.CONNECTED);
 
         final PacketHandler packetHandler = context.mock(PacketHandler.class);
-        receiverSocket.addCol(Socket.PACKET_HANDLERS, packetHandler);
+        receiverSocket.addToColl(Socket.PACKET_HANDLERS, packetHandler);
 
         // @formatter:off
         context.checking(new Expectations() {{

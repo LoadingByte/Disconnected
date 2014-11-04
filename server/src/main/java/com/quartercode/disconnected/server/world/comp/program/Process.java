@@ -158,7 +158,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                 invocation.next(arguments);
 
                 ProcessState newState = (ProcessState) arguments[0];
-                for (ProcessStateListener stateListener : holder.getCol(STATE_LISTENERS)) {
+                for (ProcessStateListener stateListener : holder.getColl(STATE_LISTENERS)) {
                     stateListener.changedState(holder, oldState, newState);
                 }
 
@@ -427,7 +427,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                 if (holder.getObj(STATE) != arguments[0]) {
                     stateApplied = false;
                 } else {
-                    for (Process<?> child : holder.getCol(CHILDREN)) {
+                    for (Process<?> child : holder.getColl(CHILDREN)) {
                         if (!child.invoke(IS_STATE_APPLIED)) {
                             stateApplied = false;
                             break;
@@ -450,7 +450,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
                 holder.setObj(STATE, (ProcessState) arguments[0]);
                 if ((Boolean) arguments[1]) {
-                    for (Process<?> child : holder.getCol(CHILDREN)) {
+                    for (Process<?> child : holder.getColl(CHILDREN)) {
                         child.invoke(APPLY_STATE, arguments[0], arguments[1]);
                     }
                 }
@@ -521,13 +521,13 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
                     // Unregister stopped process from parent
                     if (holder.getParent() != null) {
-                        holder.getParent().removeCol(CHILDREN, holder);
+                        holder.getParent().removeFromColl(CHILDREN, holder);
                     }
 
                     // Promote the old child processes of this process to child processes of the parent process
-                    for (Process<?> child : new ArrayList<>(holder.getCol(CHILDREN))) {
-                        holder.removeCol(CHILDREN, child);
-                        holder.getParent().addCol(CHILDREN, child);
+                    for (Process<?> child : new ArrayList<>(holder.getColl(CHILDREN))) {
+                        holder.removeFromColl(CHILDREN, child);
+                        holder.getParent().addToColl(CHILDREN, child);
                     }
                 }
 
@@ -550,7 +550,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             private List<Process<?>> getAllChildren(Process<?> parent) {
 
                 List<Process<?>> allChildren = new ArrayList<>();
-                for (Process<?> directChild : parent.getCol(CHILDREN)) {
+                for (Process<?> directChild : parent.getColl(CHILDREN)) {
                     allChildren.add(directChild);
                     allChildren.addAll(getAllChildren(directChild));
                 }
@@ -571,7 +571,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                 ChildProcess process = new ChildProcess();
                 process.setParent((Process<?>) holder);
                 process.setObj(ENVIRONMENT, new HashMap<>(holder.getObj(ENVIRONMENT)));
-                holder.addCol(CHILDREN, process);
+                holder.addToColl(CHILDREN, process);
 
                 invocation.next(arguments);
                 return process;

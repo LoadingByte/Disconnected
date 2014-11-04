@@ -145,7 +145,7 @@ public class FileAddAction extends FileAction {
                             directory.setObj(File.OWNER, addFile.getObj(File.OWNER));
                             directory.setObj(File.GROUP, addFile.getObj(File.GROUP));
                             directory.setObj(File.RIGHTS, new FileRights(addFile.getObj(File.RIGHTS)));
-                            current.addCol(ParentFile.CHILDREN, directory);
+                            current.addToColl(ParentFile.CHILDREN, directory);
                             nextCurrent = directory;
                         } else if (! (nextCurrent instanceof ParentFile)) {
                             throw new InvalidPathException(holder.getObj(FILE_SYSTEM), path);
@@ -177,7 +177,7 @@ public class FileAddAction extends FileAction {
 
                 File<ParentFile<?>> addFile = holder.getObj(FILE);
                 addFile.setObj(File.NAME, addFileName);
-                parent.addCol(ParentFile.CHILDREN, addFile);
+                parent.addToColl(ParentFile.CHILDREN, addFile);
 
                 return invocation.next(arguments);
             }

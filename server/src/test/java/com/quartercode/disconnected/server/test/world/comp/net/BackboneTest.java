@@ -45,7 +45,7 @@ public class BackboneTest {
     @Test
     public void testAddChildAddReverse() {
 
-        backbone.addCol(Backbone.CHILDREN, child1);
+        backbone.addToColl(Backbone.CHILDREN, child1);
 
         assertConnected(backbone, child1, true);
     }
@@ -53,8 +53,8 @@ public class BackboneTest {
     @Test
     public void testRemoveChildRemoveReverse() {
 
-        backbone.addCol(Backbone.CHILDREN, child1);
-        backbone.removeCol(Backbone.CHILDREN, child1);
+        backbone.addToColl(Backbone.CHILDREN, child1);
+        backbone.removeFromColl(Backbone.CHILDREN, child1);
 
         assertConnected(backbone, child1, false);
     }
@@ -62,8 +62,8 @@ public class BackboneTest {
     @Test
     public void testAddMultipleChildrenAddReverse() {
 
-        backbone.addCol(Backbone.CHILDREN, child1);
-        backbone.addCol(Backbone.CHILDREN, child2);
+        backbone.addToColl(Backbone.CHILDREN, child1);
+        backbone.addToColl(Backbone.CHILDREN, child2);
 
         assertConnected(backbone, child1, true);
         assertConnected(backbone, child2, true);
@@ -72,10 +72,10 @@ public class BackboneTest {
     @Test
     public void testRemoveMultipleChildrenRemoveReverse() {
 
-        backbone.addCol(Backbone.CHILDREN, child1);
-        backbone.addCol(Backbone.CHILDREN, child2);
-        backbone.removeCol(Backbone.CHILDREN, child1);
-        backbone.removeCol(Backbone.CHILDREN, child2);
+        backbone.addToColl(Backbone.CHILDREN, child1);
+        backbone.addToColl(Backbone.CHILDREN, child2);
+        backbone.removeFromColl(Backbone.CHILDREN, child1);
+        backbone.removeFromColl(Backbone.CHILDREN, child2);
 
         assertConnected(backbone, child1, false);
         assertConnected(backbone, child2, false);
@@ -84,9 +84,9 @@ public class BackboneTest {
     @Test
     public void testAddRemoveMixedMultipleChildrenAddRemoveReverse() {
 
-        backbone.addCol(Backbone.CHILDREN, child1);
-        backbone.addCol(Backbone.CHILDREN, child2);
-        backbone.removeCol(Backbone.CHILDREN, child1);
+        backbone.addToColl(Backbone.CHILDREN, child1);
+        backbone.addToColl(Backbone.CHILDREN, child2);
+        backbone.removeFromColl(Backbone.CHILDREN, child1);
 
         assertConnected(backbone, child1, false);
         assertConnected(backbone, child2, true);
@@ -96,7 +96,7 @@ public class BackboneTest {
 
         String messageEnd = " connection" + (connected ? " " : " not ") + "available";
 
-        assertTrue("Router -> Child" + messageEnd, backbone.getCol(Backbone.CHILDREN).contains(child) == connected);
+        assertTrue("Router -> Child" + messageEnd, backbone.getColl(Backbone.CHILDREN).contains(child) == connected);
         assertTrue("Child -> Router" + messageEnd, backbone.equals(child.getObj(RouterNetInterface.BACKBONE_CONNECTION)) == connected);
     }
 

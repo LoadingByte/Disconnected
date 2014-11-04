@@ -122,7 +122,7 @@ public class SizeUtil {
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
-                return SizeUtil.getSize(invocation.getCHolder().getCol(propertyDefinition)) + NullPreventer.prevent(invocation.next(arguments));
+                return SizeUtil.getSize(invocation.getCHolder().getColl(propertyDefinition)) + NullPreventer.prevent(invocation.next(arguments));
             }
 
         };

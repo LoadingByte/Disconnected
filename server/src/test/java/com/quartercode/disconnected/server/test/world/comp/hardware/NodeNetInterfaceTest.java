@@ -53,7 +53,7 @@ public class NodeNetInterfaceTest {
 
         assertNull("Net id that should've been cleared", nodeInterface.getObj(NodeNetInterface.NET_ID));
         assertEquals("Child -> Router connection", connection, nodeInterface.getObj(NodeNetInterface.CONNECTION));
-        assertTrue("Router -> Child connection not added", connection.getCol(RouterNetInterface.CHILDREN).contains(nodeInterface));
+        assertTrue("Router -> Child connection not added", connection.getColl(RouterNetInterface.CHILDREN).contains(nodeInterface));
     }
 
     @Test
@@ -63,7 +63,7 @@ public class NodeNetInterfaceTest {
         nodeInterface.setObj(NodeNetInterface.CONNECTION, null);
 
         assertNull("Child -> Router connection", nodeInterface.getObj(NodeNetInterface.CONNECTION));
-        assertFalse("Router -> Child connection not removed", connection.getCol(RouterNetInterface.CHILDREN).contains(nodeInterface));
+        assertFalse("Router -> Child connection not removed", connection.getColl(RouterNetInterface.CHILDREN).contains(nodeInterface));
     }
 
     @Test

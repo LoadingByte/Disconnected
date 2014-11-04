@@ -85,7 +85,7 @@ public class FileRemoveAction extends FileAction {
                 File<ParentFile<?>> removeFile = holder.getObj(FILE);
 
                 if (removeFile.getParent() != null) {
-                    removeFile.getParent().removeCol(ParentFile.CHILDREN, removeFile);
+                    removeFile.getParent().removeFromColl(ParentFile.CHILDREN, removeFile);
                 } else {
                     throw new IllegalStateException("File for removal is not stored on any file system (parent file == null)");
                 }
@@ -117,7 +117,7 @@ public class FileRemoveAction extends FileAction {
                 }
 
                 if (file instanceof ParentFile) {
-                    for (File<?> childFile : file.getCol(ParentFile.CHILDREN)) {
+                    for (File<?> childFile : file.getColl(ParentFile.CHILDREN)) {
                         checkFile(executor, childFile, target);
                     }
                 }

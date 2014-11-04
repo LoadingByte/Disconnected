@@ -109,7 +109,7 @@ public class WorldProcessLaunchCommandHandlerTest {
         WorldProcessLaunchCommand event = new WorldProcessLaunchCommand(wpuDetails, "testPath");
         handler.handle(event, SBP);
 
-        Process<?> child = sessionProcess.getCol(Process.CHILDREN).get(run - 1);
+        Process<?> child = sessionProcess.getColl(Process.CHILDREN).get(run - 1);
         assertNotNull("Child process was not created", child);
         assertEquals("Pid of child process", expectedPid, (int) child.getObj(Process.PID));
         assertEquals("World process user id of child process", new SBPWorldProcessUserId(SBP, wpuDetails), child.getObj(Process.WORLD_PROCESS_USER));

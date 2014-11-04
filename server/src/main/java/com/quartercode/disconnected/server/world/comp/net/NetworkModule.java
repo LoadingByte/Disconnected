@@ -163,7 +163,7 @@ public class NetworkModule extends OSModule {
                 Socket socket = new Socket();
                 // Set the local port to 0 (random) so applications don't have to do that
                 socket.setObj(Socket.LOCAL_PORT, 0);
-                holder.addCol(SOCKETS, socket);
+                holder.addToColl(SOCKETS, socket);
 
                 invocation.next(arguments);
                 return socket;
@@ -207,7 +207,7 @@ public class NetworkModule extends OSModule {
             // Returns whether the given port is already used by another socket
             private boolean isPortFree(CFeatureHolder holder, int port) {
 
-                for (Socket socket : holder.getCol(SOCKETS)) {
+                for (Socket socket : holder.getColl(SOCKETS)) {
                     if (socket.getObj(Socket.LOCAL_PORT) == port) {
                         return false;
                     }
@@ -229,7 +229,7 @@ public class NetworkModule extends OSModule {
                 int localPort = holder.getObj(Socket.LOCAL_PORT);
                 Address destination = holder.getObj(Socket.DESTINATION);
 
-                for (Socket socket : holder.getParent().getCol(SOCKETS)) {
+                for (Socket socket : holder.getParent().getColl(SOCKETS)) {
                     if (socket.getObj(Socket.LOCAL_PORT) == localPort && socket.getObj(Socket.DESTINATION).equals(destination)) {
                         throw new IllegalStateException("Socket with local port '" + localPort + "' and destination '" + destination + "' is already bound");
                     }
@@ -250,7 +250,7 @@ public class NetworkModule extends OSModule {
                 Socket holder = (Socket) invocation.getCHolder();
 
                 if (holder.getParent() != null) {
-                    holder.getParent().removeCol(SOCKETS, holder);
+                    holder.getParent().removeFromColl(SOCKETS, holder);
                 }
 
                 return invocation.next(arguments);
@@ -271,7 +271,7 @@ public class NetworkModule extends OSModule {
                 invocation.next(arguments);
 
                 if (stateChangesToConnected) {
-                    for (SocketConnectionListener connectionListener : holder.getCol(CONNECTION_LISTENERS)) {
+                    for (SocketConnectionListener connectionListener : holder.getColl(CONNECTION_LISTENERS)) {
                         connectionListener.established(holder);
                     }
                 }
@@ -346,7 +346,7 @@ public class NetworkModule extends OSModule {
 
                     // Find the socket the packet was sent to
                     Socket responsibleSocket = null;
-                    for (Socket socket : holder.getCol(SOCKETS)) {
+                    for (Socket socket : holder.getColl(SOCKETS)) {
                         if (socket.getObj(Socket.LOCAL_PORT) == packetDestinationPort && socket.getObj(Socket.DESTINATION).equals(packetSource)) {
                             responsibleSocket = socket;
                             break;
@@ -372,7 +372,7 @@ public class NetworkModule extends OSModule {
 
                 // Iterate over the opinions of all connection listeners and
                 boolean allowAfterAll = false;
-                for (SocketConnectionListener connectionListener : holder.getCol(CONNECTION_LISTENERS)) {
+                for (SocketConnectionListener connectionListener : holder.getColl(CONNECTION_LISTENERS)) {
                     ConnectionAllowance allowance = connectionListener.allow(requestor, localPort);
                     if (allowance == ConnectionAllowance.ALLOW_AFTER_ALL) {
                         allowAfterAll = true;
@@ -388,7 +388,7 @@ public class NetworkModule extends OSModule {
                 Socket socket = new Socket();
                 socket.setObj(Socket.LOCAL_PORT, localPort);
                 socket.setObj(Socket.DESTINATION, requestor);
-                holder.addCol(SOCKETS, socket);
+                holder.addToColl(SOCKETS, socket);
                 return socket;
             }
 
@@ -401,7 +401,7 @@ public class NetworkModule extends OSModule {
 
                 // Only invoke on shutdown
                 if (!(Boolean) arguments[0]) {
-                    for (Socket socket : invocation.getCHolder().getCol(SOCKETS)) {
+                    for (Socket socket : invocation.getCHolder().getColl(SOCKETS)) {
                         socket.invoke(Socket.DISCONNECT);
                     }
                 }
@@ -419,7 +419,7 @@ public class NetworkModule extends OSModule {
     private NodeNetInterface getNetInterface() {
 
         Computer computer = getParent().getParent();
-        for (Hardware hardware : computer.getCol(Computer.HARDWARE)) {
+        for (Hardware hardware : computer.getColl(Computer.HARDWARE)) {
             if (hardware instanceof NodeNetInterface) {
                 return (NodeNetInterface) hardware;
             }

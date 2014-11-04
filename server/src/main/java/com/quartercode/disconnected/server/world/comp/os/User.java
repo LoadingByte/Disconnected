@@ -211,8 +211,8 @@ public class User extends ConfigurationEntry {
 
                 CFeatureHolder holder = invocation.getCHolder();
                 Group primaryGroup = null;
-                if (holder.getCol(GROUPS).size() > 0) {
-                    primaryGroup = holder.getCol(GROUPS).get(0);
+                if (holder.getColl(GROUPS).size() > 0) {
+                    primaryGroup = holder.getColl(GROUPS).get(0);
                 }
 
                 invocation.next(arguments);
@@ -229,16 +229,16 @@ public class User extends ConfigurationEntry {
                 CFeatureHolder holder = invocation.getCHolder();
                 Group primaryGroup = (Group) arguments[0];
 
-                if (holder.getCol(GROUPS).contains(primaryGroup)) {
+                if (holder.getColl(GROUPS).contains(primaryGroup)) {
                     // Put the new primary group at the front of the list
-                    List<Group> groups = holder.getCol(GROUPS);
+                    List<Group> groups = holder.getColl(GROUPS);
                     groups.remove(primaryGroup);
 
                     for (Group group : groups) {
-                        holder.removeCol(GROUPS, group);
+                        holder.removeFromColl(GROUPS, group);
                     }
                     for (Group group : groups) {
-                        holder.addCol(GROUPS, group);
+                        holder.addToColl(GROUPS, group);
                     }
                 }
 

@@ -169,7 +169,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                     File<?> environmentFile = fsModule.invoke(FileSystemModule.GET_FILE, CommonFiles.ENVIRONMENT_CONFIG);
                     if (environmentFile != null) {
                         Configuration environmentConfig = (Configuration) environmentFile.getObj(ContentFile.CONTENT);
-                        for (ConfigurationEntry variable : environmentConfig.getCol(Configuration.ENTRIES)) {
+                        for (ConfigurationEntry variable : environmentConfig.getColl(Configuration.ENTRIES)) {
                             environment.put(variable.getObj(EnvironmentVariable.NAME), variable.getObj(EnvironmentVariable.VALUE));
                         }
                     }
@@ -188,7 +188,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                     File<?> userConfigFile = fsModule.invoke(FileSystemModule.GET_FILE, CommonFiles.USER_CONFIG);
                     Configuration userConfig = (Configuration) userConfigFile.getObj(ContentFile.CONTENT);
                     User superuser = null;
-                    for (ConfigurationEntry entry : userConfig.getCol(Configuration.ENTRIES)) {
+                    for (ConfigurationEntry entry : userConfig.getColl(Configuration.ENTRIES)) {
                         if (entry instanceof User && ((User) entry).getObj(User.NAME).equals(User.SUPERUSER_NAME)) {
                             superuser = (User) entry;
                         }

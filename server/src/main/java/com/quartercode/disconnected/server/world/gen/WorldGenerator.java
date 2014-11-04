@@ -80,7 +80,7 @@ public class WorldGenerator {
 
         Backbone backbone = world.getObj(World.BACKBONE);
         for (Computer computer : generateComputers(random, computers, backbone)) {
-            world.addCol(World.COMPUTERS, computer);
+            world.addToColl(World.COMPUTERS, computer);
         }
 
         return world;
@@ -147,14 +147,14 @@ public class WorldGenerator {
 
             // Configure the network interfaces
             if (router) {
-                List<Hardware> netInterfaces = getHardwareByType(computer.getCol(Computer.HARDWARE), RouterNetInterface.class);
+                List<Hardware> netInterfaces = getHardwareByType(computer.getColl(Computer.HARDWARE), RouterNetInterface.class);
                 lastRouter = (RouterNetInterface) netInterfaces.get(0);
                 // Connect the router to the backbone
-                backbone.addCol(Backbone.CHILDREN, lastRouter);
+                backbone.addToColl(Backbone.CHILDREN, lastRouter);
                 // Set the router's subnet
                 lastRouter.setObj(RouterNetInterface.SUBNET, lastSubnet);
             } else {
-                List<Hardware> netInterfaces = getHardwareByType(computer.getCol(Computer.HARDWARE), NodeNetInterface.class);
+                List<Hardware> netInterfaces = getHardwareByType(computer.getColl(Computer.HARDWARE), NodeNetInterface.class);
                 NodeNetInterface netInterface = (NodeNetInterface) netInterfaces.get(0);
                 // Connect the computer to its router
                 netInterface.setObj(NodeNetInterface.CONNECTION, lastRouter);
@@ -181,24 +181,24 @@ public class WorldGenerator {
 
         Mainboard mainboard = new Mainboard();
         mainboard.setObj(Mainboard.NAME, "MB XYZ 2000 Pro");
-        mainboard.addCol(Mainboard.SLOTS, generateMainboardSlot(CPU.class));
-        mainboard.addCol(Mainboard.SLOTS, generateMainboardSlot(RAM.class));
-        mainboard.addCol(Mainboard.SLOTS, generateMainboardSlot(HardDrive.class));
-        mainboard.addCol(Mainboard.SLOTS, generateMainboardSlot(HardDrive.class));
-        mainboard.addCol(Mainboard.SLOTS, generateMainboardSlot(NodeNetInterface.class));
-        computer.addCol(Computer.HARDWARE, mainboard);
+        mainboard.addToColl(Mainboard.SLOTS, generateMainboardSlot(CPU.class));
+        mainboard.addToColl(Mainboard.SLOTS, generateMainboardSlot(RAM.class));
+        mainboard.addToColl(Mainboard.SLOTS, generateMainboardSlot(HardDrive.class));
+        mainboard.addToColl(Mainboard.SLOTS, generateMainboardSlot(HardDrive.class));
+        mainboard.addToColl(Mainboard.SLOTS, generateMainboardSlot(NodeNetInterface.class));
+        computer.addToColl(Computer.HARDWARE, mainboard);
 
         CPU cpu = new CPU();
         cpu.setObj(CPU.NAME, "Intel Core i7-4950HQ");
         cpu.setObj(CPU.THREADS, 8);
         cpu.setObj(CPU.FREQUENCY, 2400000000L);
-        computer.addCol(Computer.HARDWARE, cpu);
+        computer.addToColl(Computer.HARDWARE, cpu);
 
         RAM ram = new RAM();
         ram.setObj(RAM.NAME, "EpicRAM 4194304");
         ram.setObj(RAM.SIZE, ByteUnit.BYTE.convert(4, ByteUnit.MEGABYTE));
         ram.setObj(RAM.FREQUENCY, 1600000000L);
-        computer.addCol(Computer.HARDWARE, ram);
+        computer.addToColl(Computer.HARDWARE, ram);
 
         Hardware netInterface = null;
         if (router) {
@@ -208,23 +208,23 @@ public class WorldGenerator {
             netInterface = new NodeNetInterface();
             netInterface.setObj(NodeNetInterface.NAME, "NNI FiberScore Ultimate");
         }
-        computer.addCol(Computer.HARDWARE, netInterface);
+        computer.addToColl(Computer.HARDWARE, netInterface);
 
         HardDrive systemMedium = new HardDrive();
         systemMedium.setObj(HardDrive.NAME, "TheHardDrive 1TB");
         FileSystem systemFs = systemMedium.getObj(HardDrive.FILE_SYSTEM);
         systemFs.setObj(FileSystem.SIZE, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
-        computer.addCol(Computer.HARDWARE, systemMedium);
+        computer.addToColl(Computer.HARDWARE, systemMedium);
 
         HardDrive userMedium = new HardDrive();
         userMedium.setObj(HardDrive.NAME, "TheHardDrive 1TB");
         FileSystem userFs = userMedium.getObj(HardDrive.FILE_SYSTEM);
         userFs.setObj(FileSystem.SIZE, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
-        computer.addCol(Computer.HARDWARE, userMedium);
+        computer.addToColl(Computer.HARDWARE, userMedium);
 
-        for (MainboardSlot slot : getHardwareByType(computer.getCol(Computer.HARDWARE), Mainboard.class).get(0).getCol(Mainboard.SLOTS)) {
+        for (MainboardSlot slot : getHardwareByType(computer.getColl(Computer.HARDWARE), Mainboard.class).get(0).getColl(Mainboard.SLOTS)) {
             Hardware useHardware = null;
-            for (Hardware hardware : computer.getCol(Computer.HARDWARE)) {
+            for (Hardware hardware : computer.getColl(Computer.HARDWARE)) {
                 if (!hardware.equals(mainboard)) {
                     if (hardware.getClass().isAnnotationPresent(NeedsMainboardSlot.class) && slot.getObj(MainboardSlot.TYPE).isInstance(hardware)) {
                         useHardware = hardware;
@@ -283,7 +283,7 @@ public class WorldGenerator {
         KnownFileSystem known = new KnownFileSystem();
         known.setObj(KnownFileSystem.FILE_SYSTEM, fileSystem);
         known.setObj(KnownFileSystem.MOUNTPOINT, mountpoint);
-        fsModule.addCol(FileSystemModule.KNOWN_FS, known);
+        fsModule.addToColl(FileSystemModule.KNOWN_FS, known);
 
         return known;
     }
@@ -317,7 +317,7 @@ public class WorldGenerator {
 
         // Generate basic user config
         Configuration userConfig = new Configuration();
-        userConfig.addCol(Configuration.ENTRIES, superuser);
+        userConfig.addToColl(Configuration.ENTRIES, superuser);
         addContentFile(fileSystem, PathUtils.splitAfterMountpoint(CommonFiles.USER_CONFIG)[1], superuser, "o:r", userConfig);
 
         // Generate basic environment config
@@ -325,7 +325,7 @@ public class WorldGenerator {
         EnvironmentVariable pathVariable = new EnvironmentVariable();
         pathVariable.setObj(EnvironmentVariable.NAME, "PATH");
         pathVariable.invoke(EnvironmentVariable.SET_VALUE_LIST, Arrays.asList(CommonFiles.SYS_BIN_DIR, CommonFiles.USER_BIN_DIR));
-        envConfig.addCol(Configuration.ENTRIES, pathVariable);
+        envConfig.addToColl(Configuration.ENTRIES, pathVariable);
         addContentFile(fileSystem, PathUtils.splitAfterMountpoint(CommonFiles.ENVIRONMENT_CONFIG)[1], superuser, "o:r", envConfig);
     }
 

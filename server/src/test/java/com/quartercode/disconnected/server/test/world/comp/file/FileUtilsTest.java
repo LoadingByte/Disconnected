@@ -52,8 +52,8 @@ public class FileUtilsTest {
         User groupuser = createUser("groupusers");
 
         Group group = createGroup("group");
-        owner.addCol(User.GROUPS, group);
-        groupuser.addCol(User.GROUPS, group);
+        owner.addToColl(User.GROUPS, group);
+        groupuser.addToColl(User.GROUPS, group);
 
         file.setObj(File.OWNER, owner);
         file.setObj(File.GROUP, group);

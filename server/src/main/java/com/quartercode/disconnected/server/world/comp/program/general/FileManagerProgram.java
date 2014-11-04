@@ -396,7 +396,7 @@ public class FileManagerProgram extends ProgramExecutor {
             List<FilePlaceholder> files = new ArrayList<>();
 
             ParentFile<?> dir = (ParentFile<?>) fsModule.invoke(FileSystemModule.GET_FILE, currentDir);
-            for (File<?> file : dir.getCol(ParentFile.CHILDREN)) {
+            for (File<?> file : dir.getColl(ParentFile.CHILDREN)) {
                 files.add(FileUtils.createFilePlaceholder(pathMountpoint, file));
             }
 

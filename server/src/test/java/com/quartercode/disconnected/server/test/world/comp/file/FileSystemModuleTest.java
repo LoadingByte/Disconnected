@@ -63,7 +63,7 @@ public class FileSystemModuleTest {
         known.setObj(KnownFileSystem.FILE_SYSTEM, fileSystem);
         known.setObj(KnownFileSystem.MOUNTPOINT, mountpoint);
 
-        fsModule.addCol(FileSystemModule.KNOWN_FS, known);
+        fsModule.addToColl(FileSystemModule.KNOWN_FS, known);
         known.setObj(KnownFileSystem.MOUNTED, mounted);
 
         return known;
@@ -73,7 +73,7 @@ public class FileSystemModuleTest {
     public void testGetKnown() {
 
         List<KnownFileSystem> expected = Arrays.asList(knownFileSystems);
-        assertEquals("Known file systems", expected, fsModule.getCol(FileSystemModule.KNOWN_FS));
+        assertEquals("Known file systems", expected, fsModule.getColl(FileSystemModule.KNOWN_FS));
     }
 
     @Test

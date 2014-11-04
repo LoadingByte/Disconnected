@@ -186,8 +186,8 @@ public class SocketConnectionTest {
         }});
         // @formatter:on
 
-        socket1.addCol(Socket.PACKET_HANDLERS, packetHandler1);
-        socket2.addCol(Socket.PACKET_HANDLERS, packetHandler2);
+        socket1.addToColl(Socket.PACKET_HANDLERS, packetHandler1);
+        socket2.addToColl(Socket.PACKET_HANDLERS, packetHandler2);
 
         // Send test packets
         socket1.invoke(Socket.SEND, "testdata1");

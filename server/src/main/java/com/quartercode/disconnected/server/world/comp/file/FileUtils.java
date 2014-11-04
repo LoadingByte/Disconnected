@@ -53,7 +53,7 @@ public class FileUtils {
             return false;
         } else if (checkRight(file, FileRights.OWNER, right) && file.getObj(File.OWNER).equals(user)) {
             return true;
-        } else if (checkRight(file, FileRights.GROUP, right) && user.getCol(User.GROUPS).contains(file.getObj(File.GROUP))) {
+        } else if (checkRight(file, FileRights.GROUP, right) && user.getColl(User.GROUPS).contains(file.getObj(File.GROUP))) {
             return true;
         } else if (checkRight(file, FileRights.OTHERS, right)) {
             return true;

@@ -61,7 +61,7 @@ public class WorldProcessInterruptCommandHandler implements SBPAwareEventHandler
 
         World world = ServiceRegistry.lookup(ProfileService.class).getActive().getWorld();
         // Just use first available computer as the player's one
-        Computer computer = world.getCol(World.COMPUTERS).get(0);
+        Computer computer = world.getColl(World.COMPUTERS).get(0);
 
         for (Process<?> process : computer.getObj(Computer.OS).getObj(OperatingSystem.PROC_MODULE).invoke(ProcessModule.GET_ALL)) {
             if (process.getObj(Process.PID) == pid) {

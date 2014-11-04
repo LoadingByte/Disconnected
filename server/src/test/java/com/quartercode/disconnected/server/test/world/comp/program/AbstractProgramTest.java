@@ -106,7 +106,7 @@ public abstract class AbstractProgramTest {
         world.injectBridge(bridge);
 
         computer = WorldGenerator.generateComputer(false);
-        world.addCol(World.COMPUTERS, computer);
+        world.addToColl(World.COMPUTERS, computer);
 
         os = computer.getObj(Computer.OS);
         os.invoke(OperatingSystem.SET_RUNNING, true);
@@ -114,7 +114,7 @@ public abstract class AbstractProgramTest {
         processModule = os.getObj(OperatingSystem.PROC_MODULE);
 
         FileSystemModule fsModule = os.getObj(OperatingSystem.FS_MODULE);
-        for (KnownFileSystem knownFs : fsModule.getCol(FileSystemModule.KNOWN_FS)) {
+        for (KnownFileSystem knownFs : fsModule.getColl(FileSystemModule.KNOWN_FS)) {
             if (knownFs.getObj(KnownFileSystem.MOUNTPOINT).equals(fileSystemMountpoint)) {
                 fileSystem = knownFs.getObj(KnownFileSystem.FILE_SYSTEM);
                 break;

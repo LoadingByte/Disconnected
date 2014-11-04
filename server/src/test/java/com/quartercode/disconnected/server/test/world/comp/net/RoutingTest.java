@@ -616,7 +616,7 @@ public class RoutingTest {
         }
 
         for (RouterNetInterface neighbour : neighbours) {
-            router.addCol(RouterNetInterface.NEIGHBOURS, neighbour);
+            router.addToColl(RouterNetInterface.NEIGHBOURS, neighbour);
         }
 
         return router;
@@ -719,7 +719,7 @@ public class RoutingTest {
         List<NodeNetInterface> nodes = new ArrayList<>();
         {
             List<RouterNetInterface> visited = new ArrayList<>();
-            for (RouterNetInterface child : root.getCol(Backbone.CHILDREN)) {
+            for (RouterNetInterface child : root.getColl(Backbone.CHILDREN)) {
                 if (!visited.contains(child)) {
                     nodes.addAll(getAllChildren(child, visited));
                 }
@@ -741,12 +741,12 @@ public class RoutingTest {
         visited.add(router);
 
         List<NodeNetInterface> children = new ArrayList<>();
-        for (RouterNetInterface neighbour : router.getCol(RouterNetInterface.NEIGHBOURS)) {
+        for (RouterNetInterface neighbour : router.getColl(RouterNetInterface.NEIGHBOURS)) {
             if (!visited.contains(neighbour)) {
                 children.addAll(getAllChildren(neighbour, visited));
             }
         }
-        children.addAll(router.getCol(RouterNetInterface.CHILDREN));
+        children.addAll(router.getColl(RouterNetInterface.CHILDREN));
 
         return children;
     }
