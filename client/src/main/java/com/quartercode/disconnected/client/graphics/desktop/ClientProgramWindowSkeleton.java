@@ -24,6 +24,7 @@ import com.quartercode.disconnected.shared.comp.program.ClientProcessDetails;
 import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
 import com.quartercode.disconnected.shared.event.program.SBPWorldProcessUserCommand;
 import com.quartercode.disconnected.shared.event.program.SBPWorldProcessUserCommandPredicate;
+import com.quartercode.disconnected.shared.event.program.control.WorldProcessInterruptCommand;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchAcknowledgmentEvent;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
 import com.quartercode.eventbridge.bridge.Bridge;
@@ -62,7 +63,8 @@ import com.quartercode.eventbridge.extra.predicate.TypePredicate;
  * </tr>
  * <tr>
  * <td>{@link #initializeInteractions()}</td>
- * <td>Called second on construction; logic should be added to the graphical components here. For example, a callback could be added to a button.</td>
+ * <td>Called second on construction; logic should be added to the graphical components here (e.g. a callback could be added to a button). By default, the method interrupts the world program when the
+ * window is closed.</td>
  * </tr>
  * <tr>
  * <td>{@link #registerEventHandlers()}</td>
@@ -141,10 +143,21 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
     /**
      * This method should add logic to the graphical components.
      * For example, a callback could be added to a button.
+     * By default, the method interrupts the assigned world process when the window is closed.
      * It is called second on construction.
      */
     protected void initializeInteractions() {
 
+        // Register a callback that interrupts the world process
+        addCloseListener(new Runnable() {
+
+            @Override
+            public void run() {
+
+                bridge.send(new WorldProcessInterruptCommand(worldProcessId.getPid(), false));
+            }
+
+        });
     }
 
     /**

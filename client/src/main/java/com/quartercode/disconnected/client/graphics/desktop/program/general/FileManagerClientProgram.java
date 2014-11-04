@@ -142,6 +142,8 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
         @Override
         protected void initializeInteractions() {
 
+            super.initializeInteractions();
+
             fileListTable.addCallback(new Callback() {
 
                 @Override
