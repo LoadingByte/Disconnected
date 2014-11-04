@@ -96,6 +96,17 @@ public class FileManagerProgram extends ProgramExecutor {
 
     static {
 
+        RUN.addExecutor("registerInterruptionStopper", FileManagerProgram.class, new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                ProgramUtils.registerInterruptionStopper( ((FileManagerProgram) invocation.getCHolder()).getParent());
+                return invocation.next(arguments);
+            }
+
+        });
+
         RUN.addExecutor("registerChangeDirCommandHandler", FileManagerProgram.class, new FunctionExecutor<Void>() {
 
             @Override

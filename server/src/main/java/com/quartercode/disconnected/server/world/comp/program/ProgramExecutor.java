@@ -36,7 +36,12 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
 
     /**
      * This callback is executed once when the program executor should start running.
-     * For example, this method could scheduler tasks using the scheduler.
+     * For example, this method could schedule tasks using the scheduler.<br>
+     * <br>
+     * <b>Important note:</b>
+     * If this method registers some kind of hooks apart from scheduler tasks (e.g. event handlers), they must be removed when the program stops.
+     * For doing that, {@link ProcessStateListener}s should be added to the {@link Process#STATE_LISTENERS} callback list of the parent process.
+     * Those listeners can then execute all clearance activities as soon as the process state is changed to {@link ProcessState#STOPPED}.
      */
     public static final FunctionDefinition<Void> RUN;
 

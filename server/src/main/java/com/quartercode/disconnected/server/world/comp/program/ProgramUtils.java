@@ -92,21 +92,58 @@ public class ProgramUtils {
     }
 
     /**
+     * Adds a state listener to the given {@link Process} for stopping it as soon as it is interrupted.
+     * This is a shortcut that should be used by {@link ProgramExecutor} implementations.
+     * 
+     * @param process The process the listener should be added to.
+     */
+    public static void registerInterruptionStopper(Process<?> process) {
+
+        process.addCol(Process.STATE_LISTENERS, new ProcessStateListener() {
+
+            @Override
+            public void changedState(Process<?> process, ProcessState oldState, ProcessState newState) {
+
+                process.invoke(Process.STOP, true);
+            }
+
+        });
+    }
+
+    /**
      * Registers the given {@link EventHandler} for the given {@link ProgramExecutor} and makes it listen for the given type of {@link WorldProcessCommand} events.
+     * The handler will be automatically removed once the process is stopped.
      * This is a shortcut that should be used by program executor implementations.
      * 
      * @param executor The program executor that wants to listen for events.
      * @param eventType The event type all handled events must have.
      * @param handler The event handler that should handle the incoming events.
      */
-    public static void registerEventHandler(ProgramExecutor executor, Class<? extends WorldProcessCommand> eventType, EventHandler<?> handler) {
+    public static void registerEventHandler(ProgramExecutor executor, Class<? extends WorldProcessCommand> eventType, final EventHandler<?> handler) {
 
-        executor.getBridge().getModule(StandardHandlerModule.class).addHandler(handler,
+        final StandardHandlerModule handlerModule = executor.getBridge().getModule(StandardHandlerModule.class);
+
+        // Add the handler
+        handlerModule.addHandler(handler,
                 MultiPredicates.and(new TypePredicate<>(eventType), new WorldProcessCommandPredicate<>(getProcessId(executor))));
+
+        // Register a callback that removes the listener once the process is stopped
+        executor.getParent().addCol(Process.STATE_LISTENERS, new ProcessStateListener() {
+
+            @Override
+            public void changedState(Process<?> process, ProcessState oldState, ProcessState newState) {
+
+                if (newState == ProcessState.STOPPED) {
+                    handlerModule.removeHandler(handler);
+                }
+            }
+
+        });
     }
 
     /**
      * Registers the given {@link SBPAwareEventHandler} for the given {@link ProgramExecutor} and makes it listen for the given type of {@link WorldProcessCommand} events.
+     * The handler will be automatically removed once the process is stopped.
      * It is also possible to let the handler automatically verify that the sending SBP is allowed to access the program executor.
      * This is a shortcut that should be used by program executor implementations.
      * 
@@ -117,7 +154,7 @@ public class ProgramUtils {
      */
     public static <E extends WorldProcessCommand> void registerSBPAwareEventHandler(final ProgramExecutor executor, Class<? extends E> eventType, final SBPAwareEventHandler<E> handler, boolean verifySBP) {
 
-        SBPAwareEventHandler<E> effectiveHandler;
+        final SBPAwareEventHandler<E> effectiveHandler;
         if (verifySBP) {
             effectiveHandler = new SBPAwareEventHandler<E>() {
 
@@ -135,8 +172,24 @@ public class ProgramUtils {
             effectiveHandler = handler;
         }
 
-        executor.getBridge().getModule(SBPAwareHandlerExtension.class).addHandler(effectiveHandler,
+        final SBPAwareHandlerExtension handlerExtension = executor.getBridge().getModule(SBPAwareHandlerExtension.class);
+
+        // Add the handler
+        handlerExtension.addHandler(effectiveHandler,
                 MultiPredicates.and(new TypePredicate<>(eventType), new WorldProcessCommandPredicate<>(getProcessId(executor))));
+
+        // Register a callback that removes the handler once the process is stopped
+        executor.getParent().addCol(Process.STATE_LISTENERS, new ProcessStateListener() {
+
+            @Override
+            public void changedState(Process<?> process, ProcessState oldState, ProcessState newState) {
+
+                if (newState == ProcessState.STOPPED) {
+                    handlerExtension.removeHandler(effectiveHandler);
+                }
+            }
+
+        });
     }
 
     private ProgramUtils() {
