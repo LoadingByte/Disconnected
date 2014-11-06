@@ -34,13 +34,13 @@ import com.quartercode.disconnected.client.registry.Theme;
 import com.quartercode.disconnected.client.registry.config.ConfigureClientProgramCommand;
 import com.quartercode.disconnected.client.registry.config.ConfigureThemeCommand;
 import com.quartercode.disconnected.client.util.TWLSpritesheetGenerator;
-import com.quartercode.disconnected.shared.config.ConfigService;
-import com.quartercode.disconnected.shared.config.util.RemoveNamedValueCommand;
-import com.quartercode.disconnected.shared.registry.Registries;
 import com.quartercode.disconnected.shared.util.IOFileUtils;
 import com.quartercode.disconnected.shared.util.ResourceLister;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 import com.quartercode.disconnected.shared.util.TempFileManager;
+import com.quartercode.disconnected.shared.util.config.ConfigService;
+import com.quartercode.disconnected.shared.util.config.extra.RemoveNamedValueCommand;
+import com.quartercode.disconnected.shared.util.registry.Registries;
 
 /**
  * This class contains the {@link #initialize()} method that configures everything that the server needs.

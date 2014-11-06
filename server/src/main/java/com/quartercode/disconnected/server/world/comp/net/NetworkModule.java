@@ -37,7 +37,7 @@ import com.quartercode.disconnected.server.world.comp.net.Socket.SocketState;
 import com.quartercode.disconnected.server.world.comp.net.SocketConnectionListener.ConnectionAllowance;
 import com.quartercode.disconnected.server.world.comp.os.OSModule;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.shared.comp.net.Address;
+import com.quartercode.disconnected.shared.world.comp.net.Address;
 
 /**
  * This class represents an {@link OperatingSystem} module which is used to send and receive network {@link Packet}s.

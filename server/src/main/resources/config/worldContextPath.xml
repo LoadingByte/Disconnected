@@ -6,6 +6,12 @@
     <!-- Utility -->
     <addWorldContextPathEntry>com.quartercode.disconnected.server.sim.scheduler</addWorldContextPathEntry>
 
+    <!-- Shared -->
+    <addWorldContextPathEntry>com.quartercode.disconnected.shared.world.comp</addWorldContextPathEntry>
+    <addWorldContextPathEntry>com.quartercode.disconnected.shared.world.comp.file</addWorldContextPathEntry>
+    <addWorldContextPathEntry>com.quartercode.disconnected.shared.world.comp.net</addWorldContextPathEntry>
+    <addWorldContextPathEntry>com.quartercode.disconnected.shared.world.general</addWorldContextPathEntry>
+
     <!-- World -->
     <addWorldContextPathEntry>com.quartercode.disconnected.server.world</addWorldContextPathEntry>
     <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp</addWorldContextPathEntry>
@@ -17,10 +23,4 @@
     <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp.os.config</addWorldContextPathEntry>
     <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp.os.user</addWorldContextPathEntry>
     <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp.program</addWorldContextPathEntry>
-
-    <!-- Shared -->
-    <addWorldContextPathEntry>com.quartercode.disconnected.shared.comp</addWorldContextPathEntry>
-    <addWorldContextPathEntry>com.quartercode.disconnected.shared.comp.file</addWorldContextPathEntry>
-    <addWorldContextPathEntry>com.quartercode.disconnected.shared.comp.net</addWorldContextPathEntry>
-    <addWorldContextPathEntry>com.quartercode.disconnected.shared.general</addWorldContextPathEntry>
 </config>

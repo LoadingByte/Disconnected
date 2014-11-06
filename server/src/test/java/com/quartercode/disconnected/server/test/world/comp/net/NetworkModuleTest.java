@@ -42,8 +42,8 @@ import com.quartercode.disconnected.server.world.comp.net.Socket.PacketHandler;
 import com.quartercode.disconnected.server.world.comp.net.Socket.SocketState;
 import com.quartercode.disconnected.server.world.comp.net.TCPPacket;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.shared.comp.net.Address;
-import com.quartercode.disconnected.shared.comp.net.NetID;
+import com.quartercode.disconnected.shared.world.comp.net.Address;
+import com.quartercode.disconnected.shared.world.comp.net.NetID;
 
 public class NetworkModuleTest {
 

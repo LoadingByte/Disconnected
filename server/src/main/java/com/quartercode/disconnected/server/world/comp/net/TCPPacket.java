@@ -22,7 +22,7 @@ import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.disconnected.shared.comp.net.Address;
+import com.quartercode.disconnected.shared.world.comp.net.Address;
 
 /**
  * This class represents a {@link Packet} which is sent from one network interface to another using the tcp protocol.

@@ -39,10 +39,10 @@ import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.Know
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.shared.SharedInitializer;
-import com.quartercode.disconnected.shared.comp.file.SeparatedPath;
 import com.quartercode.disconnected.shared.identity.ClientIdentity;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
-import com.quartercode.disconnected.shared.registry.Registries;
+import com.quartercode.disconnected.shared.util.registry.Registries;
+import com.quartercode.disconnected.shared.world.comp.file.SeparatedPath;
 import com.quartercode.eventbridge.EventBridgeFactory;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionRequester;

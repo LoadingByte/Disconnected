@@ -35,14 +35,14 @@ import com.quartercode.disconnected.server.world.comp.program.Process;
 import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
-import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
-import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
-import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchAcknowledgmentEvent;
-import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
+import com.quartercode.disconnected.shared.event.comp.program.control.WorldProcessLaunchAcknowledgmentEvent;
+import com.quartercode.disconnected.shared.event.comp.program.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
-import com.quartercode.disconnected.shared.registry.Registries;
-import com.quartercode.disconnected.shared.registry.extra.NamedValueUtils;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
+import com.quartercode.disconnected.shared.util.registry.Registries;
+import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
+import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
 import com.quartercode.eventbridge.bridge.Bridge;
 
 /**

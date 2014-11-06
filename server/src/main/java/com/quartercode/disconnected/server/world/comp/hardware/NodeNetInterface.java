@@ -34,7 +34,7 @@ import com.quartercode.disconnected.server.world.comp.net.NetworkModule;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.PacketProcessor;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.shared.comp.net.NetID;
+import com.quartercode.disconnected.shared.world.comp.net.NetID;
 
 /**
  * This class represents a node network interface that may be used by a normal computer.

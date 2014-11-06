@@ -49,9 +49,9 @@ import com.quartercode.disconnected.server.world.comp.os.Session;
 import com.quartercode.disconnected.server.world.comp.os.config.Configuration;
 import com.quartercode.disconnected.server.world.comp.os.config.ConfigurationEntry;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
-import com.quartercode.disconnected.shared.comp.file.CommonFiles;
-import com.quartercode.disconnected.shared.registry.Registries;
-import com.quartercode.disconnected.shared.registry.extra.NamedValueUtils;
+import com.quartercode.disconnected.shared.util.registry.Registries;
+import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
+import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
 
 /**
  * This class represents an {@link OperatingSystem} module which is used to manage the {@link RootProcess}.

@@ -47,8 +47,8 @@ import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.os.Session;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
-import com.quartercode.disconnected.shared.comp.file.FileRights;
-import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
+import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUserId;
 
 /**
  * This class represents a process which is basically a running instance of a program.

@@ -33,8 +33,8 @@ import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
 import com.quartercode.disconnected.server.world.util.SizeUtil;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
-import com.quartercode.disconnected.shared.comp.file.FileRights;
-import com.quartercode.disconnected.shared.comp.file.PathUtils;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
+import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 
 /**
  * This class represents a file on a {@link FileSystem}.

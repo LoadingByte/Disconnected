@@ -26,7 +26,7 @@ import org.junit.Test;
 import com.quartercode.disconnected.server.ServerInitializer;
 import com.quartercode.disconnected.server.sim.gen.LocationGenerator;
 import com.quartercode.disconnected.shared.SharedInitializer;
-import com.quartercode.disconnected.shared.general.Location;
+import com.quartercode.disconnected.shared.world.general.Location;
 
 public class LocationGeneratorTest {
 

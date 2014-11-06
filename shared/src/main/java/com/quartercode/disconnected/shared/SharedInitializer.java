@@ -20,12 +20,12 @@ package com.quartercode.disconnected.shared;
 
 import com.quartercode.disconnected.shared.bridge.DefaultHandleInvocationProviderExtension.DefaultHandleInvocationProviderExtensionFactory;
 import com.quartercode.disconnected.shared.bridge.HandleInvocationProviderExtension;
-import com.quartercode.disconnected.shared.config.ConfigService;
-import com.quartercode.disconnected.shared.config.DefaultConfigService;
-import com.quartercode.disconnected.shared.config.util.ClasspathConfigLoader;
-import com.quartercode.disconnected.shared.registry.DefaultRegistryService;
-import com.quartercode.disconnected.shared.registry.RegistryService;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
+import com.quartercode.disconnected.shared.util.config.ConfigService;
+import com.quartercode.disconnected.shared.util.config.DefaultConfigService;
+import com.quartercode.disconnected.shared.util.config.extra.ClasspathConfigLoader;
+import com.quartercode.disconnected.shared.util.registry.DefaultRegistryService;
+import com.quartercode.disconnected.shared.util.registry.RegistryService;
 import com.quartercode.eventbridge.EventBridgeFactory;
 import com.quartercode.eventbridge.factory.FactoryManager;
 

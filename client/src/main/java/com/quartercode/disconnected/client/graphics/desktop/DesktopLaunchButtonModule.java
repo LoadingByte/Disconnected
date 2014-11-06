@@ -24,8 +24,8 @@ import com.quartercode.disconnected.client.graphics.GraphicsState;
 import com.quartercode.disconnected.client.registry.ClientRegistries;
 import com.quartercode.disconnected.client.util.ResourceBundles;
 import com.quartercode.disconnected.client.util.ValueInjector;
-import com.quartercode.disconnected.shared.registry.Registries;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
+import com.quartercode.disconnected.shared.util.registry.Registries;
 import de.matthiasmann.twl.Button;
 import de.matthiasmann.twl.Widget;
 

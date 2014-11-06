@@ -25,7 +25,7 @@ import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
 import com.quartercode.disconnected.server.world.util.SizeUtil;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
-import com.quartercode.disconnected.shared.comp.net.Address;
+import com.quartercode.disconnected.shared.world.comp.net.Address;
 
 /**
  * This class represents a generic packet which can be sent to a network interface.

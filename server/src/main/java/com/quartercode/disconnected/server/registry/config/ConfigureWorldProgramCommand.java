@@ -22,11 +22,11 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
-import com.quartercode.disconnected.shared.comp.file.SeparatedPath;
-import com.quartercode.disconnected.shared.config.util.ConfigureNamedValueCommand;
-import com.quartercode.disconnected.shared.config.util.ParserUtils;
-import com.quartercode.disconnected.shared.registry.extra.SetRegistry;
 import com.quartercode.disconnected.shared.util.VariableReferenceResolver;
+import com.quartercode.disconnected.shared.util.config.extra.ConfigureNamedValueCommand;
+import com.quartercode.disconnected.shared.util.config.extra.ParserUtils;
+import com.quartercode.disconnected.shared.util.registry.extra.SetRegistry;
+import com.quartercode.disconnected.shared.world.comp.file.SeparatedPath;
 
 public class ConfigureWorldProgramCommand extends ConfigureNamedValueCommand<WorldProgram> {
 

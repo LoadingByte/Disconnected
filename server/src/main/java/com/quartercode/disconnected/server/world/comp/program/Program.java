@@ -32,7 +32,7 @@ import com.quartercode.disconnected.server.util.NullPreventer;
 import com.quartercode.disconnected.server.world.comp.Vulnerability;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
-import com.quartercode.disconnected.shared.comp.Version;
+import com.quartercode.disconnected.shared.world.comp.Version;
 
 /**
  * This class stores information about a program.

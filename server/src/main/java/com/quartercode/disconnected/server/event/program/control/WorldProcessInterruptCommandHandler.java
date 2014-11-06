@@ -27,10 +27,10 @@ import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.program.Process;
 import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
-import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
-import com.quartercode.disconnected.shared.event.program.control.WorldProcessInterruptCommand;
+import com.quartercode.disconnected.shared.event.comp.program.control.WorldProcessInterruptCommand;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
+import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUserId;
 
 /**
  * The world process interrupt command handler executes incoming {@link WorldProcessInterruptCommand} events.

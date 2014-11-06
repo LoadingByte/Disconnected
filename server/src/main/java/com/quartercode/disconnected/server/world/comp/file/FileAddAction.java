@@ -31,8 +31,8 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
-import com.quartercode.disconnected.shared.comp.file.FileRights;
-import com.quartercode.disconnected.shared.comp.file.PathUtils;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
+import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 
 /**
  * The file add action is a simple file action that defines the process of adding a {@link File} to a {@link FileSystem}.

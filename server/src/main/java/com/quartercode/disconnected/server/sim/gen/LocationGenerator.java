@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Random;
 import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.server.util.ResourceStore;
-import com.quartercode.disconnected.shared.general.Location;
+import com.quartercode.disconnected.shared.world.general.Location;
 
 /**
  * This utility class generates random locations on an earth map.

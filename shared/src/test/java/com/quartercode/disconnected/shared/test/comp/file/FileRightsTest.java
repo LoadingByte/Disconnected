@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.TreeSet;
 import org.junit.Test;
-import com.quartercode.disconnected.shared.comp.file.FileRights;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
 public class FileRightsTest {
 

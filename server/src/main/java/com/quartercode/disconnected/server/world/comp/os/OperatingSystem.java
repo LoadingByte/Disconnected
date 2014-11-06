@@ -42,7 +42,7 @@ import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.program.ProcessState;
 import com.quartercode.disconnected.server.world.comp.program.RootProcess;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
-import com.quartercode.disconnected.shared.comp.Version;
+import com.quartercode.disconnected.shared.world.comp.Version;
 
 /**
  * This class stores information about an operating system.

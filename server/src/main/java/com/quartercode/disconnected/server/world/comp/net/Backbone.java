@@ -34,7 +34,7 @@ import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
-import com.quartercode.disconnected.shared.comp.net.NetID;
+import com.quartercode.disconnected.shared.world.comp.net.NetID;
 
 /**
  * Backbones are <i>"magical connectors"</i> that connect different {@link RouterNetInterface}s together.

@@ -31,7 +31,7 @@ import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.server.world.World;
-import com.quartercode.disconnected.shared.registry.Registries;
+import com.quartercode.disconnected.shared.util.registry.Registries;
 
 /**
  * This class updates all {@link Scheduler}s of {@link World} {@link CFeatureHolder}s which implement the {@link SchedulerUser} interface.

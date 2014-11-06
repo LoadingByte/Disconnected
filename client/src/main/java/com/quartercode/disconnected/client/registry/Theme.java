@@ -22,7 +22,7 @@ import java.net.URL;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import com.quartercode.disconnected.shared.registry.extra.NamedValue;
+import com.quartercode.disconnected.shared.util.registry.extra.NamedValue;
 
 public class Theme implements NamedValue {
 

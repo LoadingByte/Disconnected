@@ -23,7 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
-import com.quartercode.disconnected.shared.comp.net.NetID;
+import com.quartercode.disconnected.shared.world.comp.net.NetID;
 
 public class NodeNetInterfaceTest {
 

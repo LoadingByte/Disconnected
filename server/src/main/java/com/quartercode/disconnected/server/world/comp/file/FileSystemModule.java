@@ -39,7 +39,7 @@ import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.Criterium
 import com.quartercode.disconnected.server.world.comp.os.OSModule;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
-import com.quartercode.disconnected.shared.comp.file.PathUtils;
+import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 
 /**
  * This class represents an {@link OperatingSystem} module which is used to access the available {@link FileSystem}s.

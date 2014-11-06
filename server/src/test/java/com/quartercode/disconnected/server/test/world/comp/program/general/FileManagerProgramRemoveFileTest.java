@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.server.test.world.comp.program.general;
 
-import static com.quartercode.disconnected.shared.comp.file.PathUtils.*;
+import static com.quartercode.disconnected.shared.world.comp.file.PathUtils.*;
 import static org.junit.Assert.*;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.junit.Before;
@@ -36,14 +36,14 @@ import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
 import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
-import com.quartercode.disconnected.shared.comp.file.CommonFiles;
-import com.quartercode.disconnected.shared.comp.file.FileRights;
-import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
-import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
-import com.quartercode.disconnected.shared.event.program.general.FMPWPUUpdateViewCommand;
-import com.quartercode.disconnected.shared.event.program.general.FMPWorldChangeDirCommand;
-import com.quartercode.disconnected.shared.event.program.general.FMPWorldRemoveFileCommand;
-import com.quartercode.disconnected.shared.event.program.generic.GPWPUErrorEvent;
+import com.quartercode.disconnected.shared.event.comp.program.general.FMPWPUUpdateViewCommand;
+import com.quartercode.disconnected.shared.event.comp.program.general.FMPWorldChangeDirCommand;
+import com.quartercode.disconnected.shared.event.comp.program.general.FMPWorldRemoveFileCommand;
+import com.quartercode.disconnected.shared.event.comp.program.generic.GPWPUErrorEvent;
+import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
+import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
 import com.quartercode.eventbridge.bridge.EventPredicate;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;

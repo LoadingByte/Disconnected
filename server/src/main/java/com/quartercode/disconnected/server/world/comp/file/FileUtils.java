@@ -23,10 +23,10 @@ import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
 import com.quartercode.disconnected.server.world.comp.os.user.Group;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
-import com.quartercode.disconnected.shared.comp.file.FilePlaceholder;
-import com.quartercode.disconnected.shared.comp.file.FileRights;
-import com.quartercode.disconnected.shared.comp.file.PathUtils;
-import com.quartercode.disconnected.shared.registry.Registries;
+import com.quartercode.disconnected.shared.util.registry.Registries;
+import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
+import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 
 /**
  * This file utility contains methods related to {@link File}s and {@link FileSystem}s.

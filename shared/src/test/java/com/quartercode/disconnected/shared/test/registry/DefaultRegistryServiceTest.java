@@ -23,9 +23,9 @@ import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.junit.Test;
-import com.quartercode.disconnected.shared.registry.DefaultRegistryService;
-import com.quartercode.disconnected.shared.registry.Registry;
-import com.quartercode.disconnected.shared.registry.RegistryDefinition;
+import com.quartercode.disconnected.shared.util.registry.DefaultRegistryService;
+import com.quartercode.disconnected.shared.util.registry.Registry;
+import com.quartercode.disconnected.shared.util.registry.RegistryDefinition;
 
 public class DefaultRegistryServiceTest {
 

@@ -38,8 +38,8 @@ import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.util.TreeInitializer;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.world.World;
-import com.quartercode.disconnected.shared.registry.Registries;
-import com.quartercode.disconnected.shared.registry.extra.MappedValueRegistry.Mapping;
+import com.quartercode.disconnected.shared.util.registry.Registries;
+import com.quartercode.disconnected.shared.util.registry.extra.MappedValueRegistry.Mapping;
 
 /**
  * This utility class loads a saves {@link Profile}s.

@@ -29,7 +29,7 @@ import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
-import com.quartercode.disconnected.shared.comp.ByteUnit;
+import com.quartercode.disconnected.shared.world.comp.ByteUnit;
 
 public class FileSystemModuleTest {
 

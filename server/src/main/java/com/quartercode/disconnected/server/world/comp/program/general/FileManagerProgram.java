@@ -45,17 +45,17 @@ import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.server.world.comp.program.Process;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
-import com.quartercode.disconnected.shared.comp.file.FilePlaceholder;
-import com.quartercode.disconnected.shared.comp.file.FileRights;
-import com.quartercode.disconnected.shared.comp.file.PathUtils;
-import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
-import com.quartercode.disconnected.shared.event.program.general.FMPWPUUpdateViewCommand;
-import com.quartercode.disconnected.shared.event.program.general.FMPWorldAddFileCommand;
-import com.quartercode.disconnected.shared.event.program.general.FMPWorldChangeDirCommand;
-import com.quartercode.disconnected.shared.event.program.general.FMPWorldRemoveFileCommand;
-import com.quartercode.disconnected.shared.event.program.generic.GPWPUErrorEvent;
+import com.quartercode.disconnected.shared.event.comp.program.general.FMPWPUUpdateViewCommand;
+import com.quartercode.disconnected.shared.event.comp.program.general.FMPWorldAddFileCommand;
+import com.quartercode.disconnected.shared.event.comp.program.general.FMPWorldChangeDirCommand;
+import com.quartercode.disconnected.shared.event.comp.program.general.FMPWorldRemoveFileCommand;
+import com.quartercode.disconnected.shared.event.comp.program.generic.GPWPUErrorEvent;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
-import com.quartercode.disconnected.shared.registry.Registries;
+import com.quartercode.disconnected.shared.util.registry.Registries;
+import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
+import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
+import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUserId;
 import com.quartercode.eventbridge.bridge.Bridge;
 
 /**

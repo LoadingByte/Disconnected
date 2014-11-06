@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import com.quartercode.disconnected.shared.comp.net.SpeedUnit;
+import com.quartercode.disconnected.shared.world.comp.net.SpeedUnit;
 
 @RunWith (Parameterized.class)
 public class SpeedUnitTest {

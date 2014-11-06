@@ -24,12 +24,12 @@ import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.client.graphics.desktop.ClientProgramDescriptor;
-import com.quartercode.disconnected.shared.config.util.ConfigureNamedValueCommand;
-import com.quartercode.disconnected.shared.config.util.ParserUtils;
-import com.quartercode.disconnected.shared.registry.extra.MapRegistry;
-import com.quartercode.disconnected.shared.registry.extra.MapRegistry.DefaultMapping;
-import com.quartercode.disconnected.shared.registry.extra.MappedValueRegistry.Mapping;
 import com.quartercode.disconnected.shared.util.VariableReferenceResolver;
+import com.quartercode.disconnected.shared.util.config.extra.ConfigureNamedValueCommand;
+import com.quartercode.disconnected.shared.util.config.extra.ParserUtils;
+import com.quartercode.disconnected.shared.util.registry.extra.MapRegistry;
+import com.quartercode.disconnected.shared.util.registry.extra.MapRegistry.DefaultMapping;
+import com.quartercode.disconnected.shared.util.registry.extra.MappedValueRegistry.Mapping;
 
 public class ConfigureClientProgramCommand extends ConfigureNamedValueCommand<Mapping<String, Object>> {
 

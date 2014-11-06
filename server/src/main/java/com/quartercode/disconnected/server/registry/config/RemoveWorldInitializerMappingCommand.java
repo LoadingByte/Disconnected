@@ -24,9 +24,9 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.disconnected.shared.config.ConfigCommandParser;
-import com.quartercode.disconnected.shared.registry.extra.MapRegistry;
-import com.quartercode.disconnected.shared.registry.extra.MappedValueRegistry.Mapping;
+import com.quartercode.disconnected.shared.util.config.ConfigCommandParser;
+import com.quartercode.disconnected.shared.util.registry.extra.MapRegistry;
+import com.quartercode.disconnected.shared.util.registry.extra.MappedValueRegistry.Mapping;
 
 @RequiredArgsConstructor
 public class RemoveWorldInitializerMappingCommand implements ConfigCommandParser {

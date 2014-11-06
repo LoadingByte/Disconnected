@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import com.quartercode.disconnected.shared.comp.ByteUnit;
+import com.quartercode.disconnected.shared.world.comp.ByteUnit;
 
 @RunWith (Parameterized.class)
 public class ByteUnitTest {

@@ -27,12 +27,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.disconnected.shared.config.ConfigCommandParser;
-import com.quartercode.disconnected.shared.config.util.ParserUtils;
-import com.quartercode.disconnected.shared.registry.extra.MapRegistry;
-import com.quartercode.disconnected.shared.registry.extra.MapRegistry.DefaultMapping;
-import com.quartercode.disconnected.shared.registry.extra.MappedValueRegistry.Mapping;
 import com.quartercode.disconnected.shared.util.VariableReferenceResolver;
+import com.quartercode.disconnected.shared.util.config.ConfigCommandParser;
+import com.quartercode.disconnected.shared.util.config.extra.ParserUtils;
+import com.quartercode.disconnected.shared.util.registry.extra.MapRegistry;
+import com.quartercode.disconnected.shared.util.registry.extra.MapRegistry.DefaultMapping;
+import com.quartercode.disconnected.shared.util.registry.extra.MappedValueRegistry.Mapping;
 
 @RequiredArgsConstructor
 public class AddWorldInitializerMappingCommand implements ConfigCommandParser {

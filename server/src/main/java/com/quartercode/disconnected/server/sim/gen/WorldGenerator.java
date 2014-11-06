@@ -49,15 +49,15 @@ import com.quartercode.disconnected.server.world.comp.os.config.Configuration;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.server.world.comp.program.Program;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
-import com.quartercode.disconnected.shared.comp.ByteUnit;
-import com.quartercode.disconnected.shared.comp.Version;
-import com.quartercode.disconnected.shared.comp.file.CommonFiles;
-import com.quartercode.disconnected.shared.comp.file.FileRights;
-import com.quartercode.disconnected.shared.comp.file.PathUtils;
-import com.quartercode.disconnected.shared.comp.net.NetID;
-import com.quartercode.disconnected.shared.general.Location;
-import com.quartercode.disconnected.shared.registry.Registries;
-import com.quartercode.disconnected.shared.registry.extra.NamedValueUtils;
+import com.quartercode.disconnected.shared.util.registry.Registries;
+import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
+import com.quartercode.disconnected.shared.world.comp.ByteUnit;
+import com.quartercode.disconnected.shared.world.comp.Version;
+import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
+import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
+import com.quartercode.disconnected.shared.world.comp.net.NetID;
+import com.quartercode.disconnected.shared.world.general.Location;
 
 /**
  * The world generator utility generates {@link World}s and parts of worlds.

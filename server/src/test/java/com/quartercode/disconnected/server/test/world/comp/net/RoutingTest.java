@@ -37,8 +37,8 @@ import com.quartercode.disconnected.server.world.comp.net.Backbone;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.PacketProcessor;
 import com.quartercode.disconnected.server.world.comp.net.TCPPacket;
-import com.quartercode.disconnected.shared.comp.net.Address;
-import com.quartercode.disconnected.shared.comp.net.NetID;
+import com.quartercode.disconnected.shared.world.comp.net.Address;
+import com.quartercode.disconnected.shared.world.comp.net.NetID;
 
 @RunWith (Parameterized.class)
 public class RoutingTest {

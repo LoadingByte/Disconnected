@@ -21,8 +21,8 @@ package com.quartercode.disconnected.server.registry;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import com.quartercode.disconnected.shared.comp.file.SeparatedPath;
-import com.quartercode.disconnected.shared.registry.extra.NamedValue;
+import com.quartercode.disconnected.shared.util.registry.extra.NamedValue;
+import com.quartercode.disconnected.shared.world.comp.file.SeparatedPath;
 
 /**
  * A data object that represents a world program by storing its program executor class, size, and common file location.

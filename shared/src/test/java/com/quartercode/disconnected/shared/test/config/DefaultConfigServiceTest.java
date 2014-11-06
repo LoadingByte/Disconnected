@@ -29,8 +29,8 @@ import org.jmock.Sequence;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Rule;
 import org.junit.Test;
-import com.quartercode.disconnected.shared.config.ConfigCommandParser;
-import com.quartercode.disconnected.shared.config.DefaultConfigService;
+import com.quartercode.disconnected.shared.util.config.ConfigCommandParser;
+import com.quartercode.disconnected.shared.util.config.DefaultConfigService;
 
 public class DefaultConfigServiceTest {
 

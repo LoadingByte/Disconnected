@@ -26,7 +26,7 @@ import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileUtils;
 import com.quartercode.disconnected.server.world.comp.os.user.Group;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
-import com.quartercode.disconnected.shared.comp.file.FileRights;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
 public class FileUtilsTest {
 

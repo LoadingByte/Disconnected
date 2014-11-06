@@ -40,7 +40,7 @@ import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.server.util.ObjArray;
 import com.quartercode.disconnected.server.world.util.StringRepresentable;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
-import com.quartercode.disconnected.shared.comp.net.Address;
+import com.quartercode.disconnected.shared.world.comp.net.Address;
 
 /**
  * Sockets allow the sending of {@link Packet}s between two {@link Address}es.

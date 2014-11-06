@@ -25,9 +25,9 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.quartercode.disconnected.shared.config.ConfigCommandParser;
-import com.quartercode.disconnected.shared.registry.extra.SetRegistry;
 import com.quartercode.disconnected.shared.util.VariableReferenceResolver;
+import com.quartercode.disconnected.shared.util.config.ConfigCommandParser;
+import com.quartercode.disconnected.shared.util.registry.extra.SetRegistry;
 
 @RequiredArgsConstructor
 public class AddWorldContextPathEntryCommand implements ConfigCommandParser {

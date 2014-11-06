@@ -41,7 +41,7 @@ import com.quartercode.disconnected.server.world.comp.net.Backbone;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.PacketProcessor;
 import com.quartercode.disconnected.server.world.comp.net.RoutedPacket;
-import com.quartercode.disconnected.shared.comp.net.NetID;
+import com.quartercode.disconnected.shared.world.comp.net.NetID;
 
 /**
  * This class represents a router network interface that may be used by a router computer.

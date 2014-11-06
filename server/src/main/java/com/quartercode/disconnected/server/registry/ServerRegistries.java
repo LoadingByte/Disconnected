@@ -23,10 +23,10 @@ import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.util.TreeInitializer;
-import com.quartercode.disconnected.shared.registry.Registry;
-import com.quartercode.disconnected.shared.registry.RegistryDefinition;
-import com.quartercode.disconnected.shared.registry.extra.MapRegistry;
-import com.quartercode.disconnected.shared.registry.extra.SetRegistry;
+import com.quartercode.disconnected.shared.util.registry.Registry;
+import com.quartercode.disconnected.shared.util.registry.RegistryDefinition;
+import com.quartercode.disconnected.shared.util.registry.extra.MapRegistry;
+import com.quartercode.disconnected.shared.util.registry.extra.SetRegistry;
 
 /**
  * A class that stores the default {@link RegistryDefinition}s which define the default {@link Registry}s used by the server.

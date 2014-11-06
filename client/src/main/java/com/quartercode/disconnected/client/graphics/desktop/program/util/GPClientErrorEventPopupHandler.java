@@ -21,7 +21,7 @@ package com.quartercode.disconnected.client.graphics.desktop.program.util;
 import static java.text.MessageFormat.format;
 import com.quartercode.disconnected.client.graphics.desktop.ClientProgramWindow;
 import com.quartercode.disconnected.client.graphics.desktop.popup.MessagePopup;
-import com.quartercode.disconnected.shared.event.program.generic.GPWPUErrorEvent;
+import com.quartercode.disconnected.shared.event.comp.program.generic.GPWPUErrorEvent;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 
 /**

@@ -34,14 +34,14 @@ import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.program.Program;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.RootProcess;
-import com.quartercode.disconnected.shared.comp.program.ClientProcessDetails;
-import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserDetails;
-import com.quartercode.disconnected.shared.comp.program.SBPWorldProcessUserId;
-import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
-import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchAcknowledgmentEvent;
-import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
+import com.quartercode.disconnected.shared.event.comp.program.control.WorldProcessLaunchAcknowledgmentEvent;
+import com.quartercode.disconnected.shared.event.comp.program.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.identity.ClientIdentity;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
+import com.quartercode.disconnected.shared.world.comp.program.ClientProcessDetails;
+import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUserDetails;
+import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
 import com.quartercode.eventbridge.bridge.Bridge;
 
 public class WorldProcessLaunchCommandHandlerTest {

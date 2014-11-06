@@ -26,7 +26,7 @@ import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
-import com.quartercode.disconnected.shared.comp.ByteUnit;
+import com.quartercode.disconnected.shared.world.comp.ByteUnit;
 
 public class FileSystemTest {
 

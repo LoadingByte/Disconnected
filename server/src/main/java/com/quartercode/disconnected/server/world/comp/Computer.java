@@ -29,7 +29,7 @@ import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.server.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
-import com.quartercode.disconnected.shared.general.Location;
+import com.quartercode.disconnected.shared.world.general.Location;
 
 /**
  * This class stores information about a computer, like the {@link Location} or the {@link Hardware} parts.
