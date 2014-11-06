@@ -38,8 +38,8 @@ import com.quartercode.disconnected.server.sim.scheduler.SchedulerTask;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.server.util.ObjArray;
-import com.quartercode.disconnected.server.world.WorldChildFeatureHolder;
-import com.quartercode.disconnected.server.world.general.StringRepresentable;
+import com.quartercode.disconnected.server.world.util.StringRepresentable;
+import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 import com.quartercode.disconnected.shared.comp.net.Address;
 
 /**

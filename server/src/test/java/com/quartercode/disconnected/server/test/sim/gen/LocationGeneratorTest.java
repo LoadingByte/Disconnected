@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.test.world.gen;
+package com.quartercode.disconnected.server.test.sim.gen;
 
 import static org.junit.Assert.fail;
 import java.util.List;
@@ -24,7 +24,8 @@ import java.util.Random;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import com.quartercode.disconnected.server.ServerInitializer;
-import com.quartercode.disconnected.server.world.gen.LocationGenerator;
+import com.quartercode.disconnected.server.sim.gen.LocationGenerator;
+import com.quartercode.disconnected.shared.SharedInitializer;
 import com.quartercode.disconnected.shared.general.Location;
 
 public class LocationGeneratorTest {
@@ -32,7 +33,9 @@ public class LocationGeneratorTest {
     @BeforeClass
     public static void setUpBeforeClass() {
 
+        SharedInitializer.initialize();
         ServerInitializer.initialize();
+        SharedInitializer.initializeFinal();
     }
 
     @Test

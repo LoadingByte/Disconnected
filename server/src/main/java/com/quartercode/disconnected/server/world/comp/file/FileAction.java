@@ -24,8 +24,8 @@ import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.disconnected.server.world.WorldFeatureHolder;
-import com.quartercode.disconnected.server.world.comp.os.User;
+import com.quartercode.disconnected.server.world.comp.os.user.User;
+import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 
 /**
  * File actions are predefined "plans" of activities that are related to {@link File}s, for example moving a file.

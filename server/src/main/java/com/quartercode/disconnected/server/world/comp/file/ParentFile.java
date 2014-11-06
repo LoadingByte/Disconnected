@@ -32,7 +32,7 @@ import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
-import com.quartercode.disconnected.server.world.comp.SizeUtil;
+import com.quartercode.disconnected.server.world.util.SizeUtil;
 
 /**
  * This class represents a parent file.

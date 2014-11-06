@@ -28,11 +28,11 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.ValueFactory;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.disconnected.server.world.WorldChildFeatureHolder;
-import com.quartercode.disconnected.server.world.comp.SizeUtil;
-import com.quartercode.disconnected.server.world.comp.SizeUtil.DerivableSize;
-import com.quartercode.disconnected.server.world.comp.os.Group;
-import com.quartercode.disconnected.server.world.comp.os.User;
+import com.quartercode.disconnected.server.world.comp.os.user.Group;
+import com.quartercode.disconnected.server.world.comp.os.user.User;
+import com.quartercode.disconnected.server.world.util.DerivableSize;
+import com.quartercode.disconnected.server.world.util.SizeUtil;
+import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 import com.quartercode.disconnected.shared.comp.file.FileRights;
 import com.quartercode.disconnected.shared.comp.file.PathUtils;
 

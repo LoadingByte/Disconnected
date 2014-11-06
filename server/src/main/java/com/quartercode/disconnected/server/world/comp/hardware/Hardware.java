@@ -26,9 +26,9 @@ import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
-import com.quartercode.disconnected.server.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.Vulnerability;
+import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 
 /**
  * This class stores information about a part of hardware, like a mainboard, a cpu or a ram module.

@@ -16,17 +16,14 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world.comp;
+package com.quartercode.disconnected.server.world.util;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.CollectionProperty;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Property;
@@ -129,18 +126,6 @@ public class SizeUtil {
     }
 
     private SizeUtil() {
-
-    }
-
-    /**
-     * The derivable size interface declares the {@link #GET_SIZE} function for getting the size of an object.
-     */
-    public static interface DerivableSize extends CFeatureHolder {
-
-        /**
-         * Derives the size of the implementing {@link CFeatureHolder} in bytes.
-         */
-        public static final FunctionDefinition<Long> GET_SIZE = create(new TypeLiteral<FunctionDefinition<Long>>() {}, "name", "getSize", "parameters", new Class[0]);
 
     }
 

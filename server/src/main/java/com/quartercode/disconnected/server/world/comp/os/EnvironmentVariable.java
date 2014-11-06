@@ -31,7 +31,7 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.ValueSupplierDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.server.util.NullPreventer;
-import com.quartercode.disconnected.server.world.comp.os.Configuration.ConfigurationEntry;
+import com.quartercode.disconnected.server.world.comp.os.config.ConfigurationEntry;
 
 /**
  * Environment variables are used by different programs.

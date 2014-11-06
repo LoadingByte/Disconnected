@@ -16,28 +16,21 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world;
+package com.quartercode.disconnected.server.world.util;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
+import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.CFeatureHolder;
-import com.quartercode.classmod.extra.def.DefaultCFeatureHolder;
+import com.quartercode.classmod.extra.FunctionDefinition;
 
 /**
- * The world feature holder is a special {@link WorldChildFeatureHolder} which may have any {@link CFeatureHolder} as parent.
- * It allows {@link #getWorld()} to be accessed on feature holders which do not have a defined parent.
- * Each feature holder (apart from the root one) which is not a world child feature holder should extend this class.
- * 
- * @see World
- * @see DefaultCFeatureHolder
- * @see WorldChildFeatureHolder
+ * The derivable size interface declares the {@link #GET_SIZE} function for getting the size of an object.
  */
-public class WorldFeatureHolder extends WorldChildFeatureHolder<CFeatureHolder> {
+public interface DerivableSize extends CFeatureHolder {
 
     /**
-     * Creates a new world feature holder.
+     * Derives the size of the implementing {@link CFeatureHolder} in bytes.
      */
-    public WorldFeatureHolder() {
-
-        setParentType(CFeatureHolder.class);
-    }
+    public static final FunctionDefinition<Long> GET_SIZE = create(new TypeLiteral<FunctionDefinition<Long>>() {}, "name", "getSize", "parameters", new Class[0]);
 
 }

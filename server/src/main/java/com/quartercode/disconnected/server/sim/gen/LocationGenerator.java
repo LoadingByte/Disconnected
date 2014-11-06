@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world.gen;
+package com.quartercode.disconnected.server.sim.gen;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;

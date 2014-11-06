@@ -37,9 +37,9 @@ import com.quartercode.classmod.extra.CollectionProperty;
 import com.quartercode.classmod.extra.Storage;
 import com.quartercode.classmod.extra.ValueSupplier;
 import com.quartercode.disconnected.server.ServerInitializer;
+import com.quartercode.disconnected.server.sim.gen.WorldGenerator;
 import com.quartercode.disconnected.server.sim.profile.ProfileSerializer;
 import com.quartercode.disconnected.server.world.World;
-import com.quartercode.disconnected.server.world.gen.WorldGenerator;
 import com.quartercode.disconnected.shared.SharedInitializer;
 
 public class ProfileSerializerTest {

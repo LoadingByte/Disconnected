@@ -14,6 +14,8 @@
     <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp.hardware</addWorldContextPathEntry>
     <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp.net</addWorldContextPathEntry>
     <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp.os</addWorldContextPathEntry>
+    <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp.os.config</addWorldContextPathEntry>
+    <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp.os.user</addWorldContextPathEntry>
     <addWorldContextPathEntry>com.quartercode.disconnected.server.world.comp.program</addWorldContextPathEntry>
 
     <!-- Shared -->

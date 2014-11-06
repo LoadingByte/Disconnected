@@ -31,7 +31,6 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.ValueFactory;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
-import com.quartercode.disconnected.server.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.Vulnerability;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
@@ -42,6 +41,7 @@ import com.quartercode.disconnected.server.world.comp.program.Process;
 import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.program.ProcessState;
 import com.quartercode.disconnected.server.world.comp.program.RootProcess;
+import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 import com.quartercode.disconnected.shared.comp.Version;
 
 /**
@@ -90,7 +90,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
         VERSION = create(new TypeLiteral<PropertyDefinition<Version>>() {}, "name", "version", "storage", new StandardStorage<>());
         VULNERABILITIES = create(new TypeLiteral<CollectionPropertyDefinition<Vulnerability, Set<Vulnerability>>>() {}, "name", "vulnerabilities", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new HashSet<>()));
 
-        FS_MODULE = create(new TypeLiteral<PropertyDefinition<FileSystemModule>>() {}, "name", "fileSystemModule", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<FileSystemModule>() {
+        FS_MODULE = create(new TypeLiteral<PropertyDefinition<FileSystemModule>>() {}, "name", "fsModule", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<FileSystemModule>() {
 
             @Override
             public FileSystemModule get() {
@@ -100,7 +100,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
         });
 
-        PROC_MODULE = create(new TypeLiteral<PropertyDefinition<ProcessModule>>() {}, "name", "processModule", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<ProcessModule>() {
+        PROC_MODULE = create(new TypeLiteral<PropertyDefinition<ProcessModule>>() {}, "name", "procModule", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<ProcessModule>() {
 
             @Override
             public ProcessModule get() {
@@ -110,7 +110,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
         });
 
-        NET_MODULE = create(new TypeLiteral<PropertyDefinition<NetworkModule>>() {}, "name", "networkModule", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<NetworkModule>() {
+        NET_MODULE = create(new TypeLiteral<PropertyDefinition<NetworkModule>>() {}, "name", "netModule", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<NetworkModule>() {
 
             @Override
             public NetworkModule get() {
@@ -177,7 +177,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
     static {
 
-        SET_RUNNING.addExecutor("fileSystemModule", OperatingSystem.class, new FunctionExecutor<Void>() {
+        SET_RUNNING.addExecutor("fsModule", OperatingSystem.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
@@ -187,12 +187,22 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
             }
 
         });
-        SET_RUNNING.addExecutor("processModule", OperatingSystem.class, new FunctionExecutor<Void>() {
+        SET_RUNNING.addExecutor("procModule", OperatingSystem.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 invocation.getCHolder().getObj(PROC_MODULE).invoke(OSModule.SET_RUNNING, arguments);
+                return invocation.next(arguments);
+            }
+
+        });
+        SET_RUNNING.addExecutor("netModule", OperatingSystem.class, new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                invocation.getCHolder().getObj(NET_MODULE).invoke(OSModule.SET_RUNNING, arguments);
                 return invocation.next(arguments);
             }
 

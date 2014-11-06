@@ -28,7 +28,7 @@ import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
-import com.quartercode.disconnected.server.world.comp.os.User;
+import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.shared.comp.file.FileRights;
 
 /**

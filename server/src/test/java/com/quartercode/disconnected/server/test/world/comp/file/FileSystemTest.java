@@ -22,10 +22,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.server.world.comp.SizeUtil.DerivableSize;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
+import com.quartercode.disconnected.server.world.util.DerivableSize;
 import com.quartercode.disconnected.shared.comp.ByteUnit;
 
 public class FileSystemTest {

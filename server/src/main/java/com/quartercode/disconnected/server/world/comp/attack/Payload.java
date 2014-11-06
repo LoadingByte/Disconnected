@@ -18,12 +18,11 @@
 
 package com.quartercode.disconnected.server.world.comp.attack;
 
-import com.quartercode.disconnected.server.world.WorldFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.Vulnerability;
-import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 
 /**
- * This class represents a payload which can be executed on an {@link OperatingSystem}.
+ * This class represents a payload which can be executed on an operating system.
  * In most of the cases, a payload gets executed after {@link Exploit}ing a {@link Vulnerability}.
  * 
  * @see Exploit

@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world.gen;
+package com.quartercode.disconnected.server.sim.gen;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,10 +43,10 @@ import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.hardware.RAM;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
 import com.quartercode.disconnected.server.world.comp.net.Backbone;
-import com.quartercode.disconnected.server.world.comp.os.Configuration;
 import com.quartercode.disconnected.server.world.comp.os.EnvironmentVariable;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.server.world.comp.os.User;
+import com.quartercode.disconnected.server.world.comp.os.config.Configuration;
+import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.server.world.comp.program.Program;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.shared.comp.ByteUnit;

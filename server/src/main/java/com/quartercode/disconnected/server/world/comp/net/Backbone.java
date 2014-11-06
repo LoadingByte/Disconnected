@@ -31,10 +31,9 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.storage.ReferenceCollectionStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
-import com.quartercode.disconnected.server.world.World;
-import com.quartercode.disconnected.server.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
+import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 import com.quartercode.disconnected.shared.comp.net.NetID;
 
 /**
@@ -42,7 +41,7 @@ import com.quartercode.disconnected.shared.comp.net.NetID;
  * One backbone basically represents <i>"the entire internet infrastructure"</i> in an abstract form.
  * Backbones send the {@link Packet}s, which they should process, to the router that provides the shortest route to the target subnet.
  */
-public class Backbone extends WorldChildFeatureHolder<World> implements PacketProcessor {
+public class Backbone extends WorldFeatureHolder implements PacketProcessor {
 
     // ----- Properties -----
 

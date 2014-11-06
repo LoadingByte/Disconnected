@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world.comp.os;
+package com.quartercode.disconnected.server.world.comp.os.user;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.Map;
@@ -27,7 +27,7 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.ValueSupplierDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.server.util.NullPreventer;
-import com.quartercode.disconnected.server.world.comp.os.Configuration.ConfigurationEntry;
+import com.quartercode.disconnected.server.world.comp.os.config.ConfigurationEntry;
 
 /**
  * A group represents a collection of multiple {@link User}s which have the same rights.

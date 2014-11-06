@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.test.world.comp;
+package com.quartercode.disconnected.server.test.world.util;
 
 import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
@@ -31,8 +31,8 @@ import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.def.DefaultCFeatureHolder;
 import com.quartercode.disconnected.server.util.NullPreventer;
-import com.quartercode.disconnected.server.world.comp.SizeUtil;
-import com.quartercode.disconnected.server.world.comp.SizeUtil.DerivableSize;
+import com.quartercode.disconnected.server.world.util.DerivableSize;
+import com.quartercode.disconnected.server.world.util.SizeUtil;
 
 @RunWith (Parameterized.class)
 public class SizeUtilTest {

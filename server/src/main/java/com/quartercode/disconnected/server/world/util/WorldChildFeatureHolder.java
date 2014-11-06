@@ -16,11 +16,12 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world;
+package com.quartercode.disconnected.server.world.util;
 
 import java.util.Random;
 import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.def.DefaultCChildFeatureHolder;
+import com.quartercode.disconnected.server.world.World;
 import com.quartercode.eventbridge.bridge.Bridge;
 
 /**

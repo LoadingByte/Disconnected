@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.base.Feature;
 import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
@@ -37,12 +36,9 @@ import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
-import com.quartercode.disconnected.server.world.WorldChildFeatureHolder;
-import com.quartercode.disconnected.server.world.comp.Computer;
-import com.quartercode.disconnected.server.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.server.world.comp.os.OSModule;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.server.world.comp.program.Process;
+import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 import com.quartercode.disconnected.shared.comp.file.PathUtils;
 
 /**
@@ -96,12 +92,6 @@ public class FileSystemModule extends OSModule {
     }
 
     // ----- Functions -----
-
-    /**
-     * Returns a {@link List} containing all available {@link FileSystem}s which are connected to the computer.
-     * This uses different resources to collect the {@link FileSystem}s.
-     */
-    public static final FunctionDefinition<List<FileSystem>>                                 GET_AVAILABLE;
 
     /**
      * Returns the {@link KnownFileSystem} object representing the given {@link FileSystem}.
@@ -240,32 +230,6 @@ public class FileSystemModule extends OSModule {
     public static final FunctionDefinition<FileAddAction>                                    CREATE_ADD_FILE;
 
     static {
-
-        GET_AVAILABLE = create(new TypeLiteral<FunctionDefinition<List<FileSystem>>>() {}, "name", "getAvailable", "parameters", new Class[0]);
-        GET_AVAILABLE.addExecutor("default", FileSystemModule.class, new FunctionExecutor<List<FileSystem>>() {
-
-            @Override
-            public List<FileSystem> invoke(FunctionInvocation<List<FileSystem>> invocation, Object... arguments) {
-
-                List<FileSystem> available = new ArrayList<>();
-                Computer computer = ((FileSystemModule) invocation.getCHolder()).getParent().invoke(Process.GET_OPERATING_SYSTEM).getParent();
-                for (Hardware hardware : computer.getColl(Computer.HARDWARE)) {
-                    for (Feature feature : hardware) {
-                        if (feature instanceof Iterable) {
-                            for (Object child : (Iterable<?>) feature) {
-                                if (child instanceof FileSystem) {
-                                    available.add((FileSystem) child);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                invocation.next(arguments);
-                return available;
-            }
-
-        });
 
         GET_KNOWN_BY_FILESYSTEM = create(new TypeLiteral<FunctionDefinition<KnownFileSystem>>() {}, "name", "getKnownByFilesystem", "parameters", new Class[] { FileSystem.class });
         GET_KNOWN_BY_FILESYSTEM.addExecutor("default", FileSystemModule.class, CollectionPropertyAccessorFactory.createGetSingle(KNOWN_FS, new CriteriumMatcher<KnownFileSystem>() {

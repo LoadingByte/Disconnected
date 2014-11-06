@@ -27,6 +27,8 @@ import com.quartercode.disconnected.server.bridge.DefaultSBPIdentityExtension.De
 import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
 import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension;
 import com.quartercode.disconnected.server.bridge.SBPIdentityExtension;
+import com.quartercode.disconnected.server.event.program.control.WorldProcessInterruptCommandHandler;
+import com.quartercode.disconnected.server.event.program.control.WorldProcessLaunchCommandHandler;
 import com.quartercode.disconnected.server.identity.DefaultSBPIdentityService;
 import com.quartercode.disconnected.server.identity.SBPIdentityService;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
@@ -44,8 +46,6 @@ import com.quartercode.disconnected.server.sim.TickService;
 import com.quartercode.disconnected.server.sim.profile.DefaultProfileService;
 import com.quartercode.disconnected.server.sim.profile.ProfileService;
 import com.quartercode.disconnected.server.util.ResourceStore;
-import com.quartercode.disconnected.server.world.comp.program.WorldProcessInterruptCommandHandler;
-import com.quartercode.disconnected.server.world.comp.program.WorldProcessLaunchCommandHandler;
 import com.quartercode.disconnected.shared.config.ConfigService;
 import com.quartercode.disconnected.shared.config.util.RemoveNamedValueCommand;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessInterruptCommand;

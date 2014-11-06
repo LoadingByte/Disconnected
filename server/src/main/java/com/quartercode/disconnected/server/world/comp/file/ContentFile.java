@@ -25,7 +25,7 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.disconnected.server.world.comp.SizeUtil;
+import com.quartercode.disconnected.server.world.util.SizeUtil;
 
 /**
  * This class represents a content file.

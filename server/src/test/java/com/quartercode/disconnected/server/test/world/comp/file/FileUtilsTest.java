@@ -24,8 +24,8 @@ import org.junit.Test;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileUtils;
-import com.quartercode.disconnected.server.world.comp.os.Group;
-import com.quartercode.disconnected.server.world.comp.os.User;
+import com.quartercode.disconnected.server.world.comp.os.user.Group;
+import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.shared.comp.file.FileRights;
 
 public class FileUtilsTest {

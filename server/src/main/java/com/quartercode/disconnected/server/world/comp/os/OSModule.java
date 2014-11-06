@@ -21,7 +21,7 @@ package com.quartercode.disconnected.server.world.comp.os;
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionDefinition;
-import com.quartercode.disconnected.server.world.WorldChildFeatureHolder;
+import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 
 /**
  * The base class for all {@link OperatingSystem} modules.

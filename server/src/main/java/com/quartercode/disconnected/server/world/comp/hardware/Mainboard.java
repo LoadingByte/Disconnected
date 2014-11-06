@@ -34,7 +34,7 @@ import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
-import com.quartercode.disconnected.server.world.WorldChildFeatureHolder;
+import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 
 /**
  * This class stores information about a mainboard.

@@ -22,11 +22,10 @@ import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.hardware.Mainboard.NeedsMainboardSlot;
 
 /**
- * This class represents a cpu of a {@link Computer}.
+ * This class represents a cpu of a computer.
  * A cpu has a count of possible threads running at the same time and a frequency (given in hertz).
  * 
  * @see Hardware

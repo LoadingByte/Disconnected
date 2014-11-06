@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world.comp.os;
+package com.quartercode.disconnected.server.world.comp.os.user;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ import com.quartercode.classmod.extra.storage.ReferenceCollectionStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.server.util.NullPreventer;
-import com.quartercode.disconnected.server.world.comp.os.Configuration.ConfigurationEntry;
+import com.quartercode.disconnected.server.world.comp.os.config.ConfigurationEntry;
 
 /**
  * A user represents a system user (basically someone who can use a system).

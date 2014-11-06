@@ -26,10 +26,9 @@ import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
-import com.quartercode.disconnected.server.world.World;
-import com.quartercode.disconnected.server.world.WorldChildFeatureHolder;
 import com.quartercode.disconnected.server.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 import com.quartercode.disconnected.shared.general.Location;
 
 /**
@@ -38,7 +37,7 @@ import com.quartercode.disconnected.shared.general.Location;
  * @see Location
  * @see Hardware
  */
-public class Computer extends WorldChildFeatureHolder<World> {
+public class Computer extends WorldFeatureHolder {
 
     // ----- Properties -----
 
@@ -63,14 +62,6 @@ public class Computer extends WorldChildFeatureHolder<World> {
         HARDWARE = create(new TypeLiteral<CollectionPropertyDefinition<Hardware, List<Hardware>>>() {}, "name", "hardware", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
         OS = create(new TypeLiteral<PropertyDefinition<OperatingSystem>>() {}, "name", "operatingSystem", "storage", new StandardStorage<>());
 
-    }
-
-    /**
-     * Creates a new computer.
-     */
-    public Computer() {
-
-        setParentType(World.class);
     }
 
 }
