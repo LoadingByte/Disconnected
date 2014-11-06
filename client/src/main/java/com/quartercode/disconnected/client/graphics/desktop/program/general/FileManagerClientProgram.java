@@ -64,7 +64,7 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
      */
     public FileManagerClientProgram() {
 
-        super(ResourceBundles.forProgram("file-manager"), "name");
+        super(ResourceBundles.forProgram(GeneralProgs.FILE_MANAGER), "name");
     }
 
     @Override
