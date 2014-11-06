@@ -52,6 +52,7 @@ import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
 import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
+import com.quartercode.disconnected.shared.world.comp.program.names.SystemProgs;
 
 /**
  * This class represents an {@link OperatingSystem} module which is used to manage the {@link RootProcess}.
@@ -178,7 +179,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
 
                     // Get session program
                     List<String> path = Arrays.asList(environment.get("PATH").split(":"));
-                    String sessionProgramFileName = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS).getValues(), "session").getCommonLocation().toString();
+                    String sessionProgramFileName = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS).getValues(), SystemProgs.SESSION).getCommonLocation().toString();
                     ContentFile sessionProgramFile = getProgramFileFromPaths(fsModule, path, sessionProgramFileName);
                     if (sessionProgramFile == null) {
                         throw new IllegalStateException("Cannot start process module: Session program not found");

@@ -40,6 +40,7 @@ import com.quartercode.disconnected.shared.event.comp.program.general.FMPWorldRe
 import com.quartercode.disconnected.shared.event.comp.program.generic.GPWPUErrorEvent;
 import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
+import com.quartercode.disconnected.shared.world.comp.program.names.GeneralProgs;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 import de.matthiasmann.twl.Button;
@@ -235,7 +236,7 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
         protected void doLaunchWorldProcess() {
 
             // Launch process
-            bridge.send(new WorldProcessLaunchCommand(clientProcessDetails, "fileManager"));
+            bridge.send(new WorldProcessLaunchCommand(clientProcessDetails, GeneralProgs.FILE_MANAGER));
 
             // Set initial directory in order to receive an update view command
             changeDirectory(PathUtils.SEPARATOR);
