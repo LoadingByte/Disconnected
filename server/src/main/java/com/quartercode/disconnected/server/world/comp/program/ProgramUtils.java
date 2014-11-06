@@ -54,7 +54,7 @@ public class ProgramUtils {
      * @param fileName The name of the program file that should be found.
      * @return A program file with the given name in one of the given directories.
      */
-    public static ContentFile getProgramFileFromPath(FileSystemModule fsModule, List<String> directories, String fileName) {
+    public static ContentFile getProgramFileFromPaths(FileSystemModule fsModule, List<String> directories, String fileName) {
 
         for (String directoryPath : directories) {
             String programFilePath = PathUtils.resolve(directoryPath, fileName);
