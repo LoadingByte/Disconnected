@@ -22,6 +22,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
+import com.quartercode.disconnected.shared.comp.file.SeparatedPath;
 import com.quartercode.disconnected.shared.config.util.ConfigureNamedValueCommand;
 import com.quartercode.disconnected.shared.config.util.ParserUtils;
 import com.quartercode.disconnected.shared.registry.extra.SetRegistry;
@@ -37,7 +38,7 @@ public class ConfigureWorldProgramCommand extends ConfigureNamedValueCommand<Wor
     @Override
     protected WorldProgram supplyDefaultValue(String name) {
 
-        return new WorldProgram(name, null, 0);
+        return new WorldProgram(name, null, 0, null);
     }
 
     @Override
@@ -46,6 +47,7 @@ public class ConfigureWorldProgramCommand extends ConfigureNamedValueCommand<Wor
         String name = oldValue.getName();
         Class<?> type = oldValue.getType();
         long size = oldValue.getSize();
+        SeparatedPath commonLocation = oldValue.getCommonLocation();
 
         Element typeElement = commandElement.getChild("class");
         if (typeElement != null) {
@@ -59,7 +61,13 @@ public class ConfigureWorldProgramCommand extends ConfigureNamedValueCommand<Wor
             size = ParserUtils.parsePositiveNumber(config, "world group size for '" + name + "'", sizeString, size);
         }
 
-        return new WorldProgram(name, type, size);
+        Element commonLocationElement = commandElement.getChild("commonLocation");
+        if (commonLocationElement != null) {
+            String locationString = VariableReferenceResolver.process(commonLocationElement.getText());
+            commonLocation = new SeparatedPath(locationString);
+        }
+
+        return new WorldProgram(name, type, size, commonLocation);
     }
 
 }

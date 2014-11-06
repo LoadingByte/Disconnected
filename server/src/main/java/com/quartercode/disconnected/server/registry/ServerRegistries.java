@@ -27,7 +27,6 @@ import com.quartercode.disconnected.shared.registry.Registry;
 import com.quartercode.disconnected.shared.registry.RegistryDefinition;
 import com.quartercode.disconnected.shared.registry.extra.MapRegistry;
 import com.quartercode.disconnected.shared.registry.extra.SetRegistry;
-import com.quartercode.disconnected.shared.registrydef.SharedRegistries;
 
 /**
  * A class that stores the default {@link RegistryDefinition}s which define the default {@link Registry}s used by the server.
@@ -65,8 +64,7 @@ public class ServerRegistries {
     public static final RegistryDefinition<MapRegistry<String, Class<?>>>                                     FILE_TYPES;
 
     /**
-     * The {@link WorldProgram}s that maps world program names (e.g. {@code fileManager}) to program executor classes and program sizes.
-     * Note that the common locations of programs are stored in a shared registry {@link SharedRegistries#WORLD_PROGRAM_COMLOCS}.
+     * The {@link WorldProgram}s that maps world program names (e.g. {@code fileManager}) to program executor classes, sizes, and common locations.
      */
     public static final RegistryDefinition<SetRegistry<WorldProgram>>                                         WORLD_PROGRAMS;
 

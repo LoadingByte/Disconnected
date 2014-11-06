@@ -35,6 +35,7 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
 import com.quartercode.classmod.util.FeatureDefinitionReference;
+import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.sim.TickService;
 import com.quartercode.disconnected.server.sim.scheduler.FunctionCallSchedulerTask;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
@@ -50,7 +51,7 @@ import com.quartercode.disconnected.server.world.comp.os.config.ConfigurationEnt
 import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.shared.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.registry.Registries;
-import com.quartercode.disconnected.shared.registrydef.SharedRegistries;
+import com.quartercode.disconnected.shared.registry.extra.NamedValueUtils;
 
 /**
  * This class represents an {@link OperatingSystem} module which is used to manage the {@link RootProcess}.
@@ -177,7 +178,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
 
                     // Get session program
                     List<String> path = Arrays.asList(environment.get("PATH").split(":"));
-                    String sessionProgramFileName = Registries.get(SharedRegistries.WORLD_PROGRAM_COMLOCS).getRight("session").getFile();
+                    String sessionProgramFileName = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS).getValues(), "session").getCommonLocation().toString();
                     ContentFile sessionProgramFile = getProgramFileFromPath(fsModule, path, sessionProgramFileName);
                     if (sessionProgramFile == null) {
                         throw new IllegalStateException("Cannot start process module: Session program not found");
@@ -204,6 +205,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
 
                 return invocation.next(arguments);
             }
+
         });
 
         SET_RUNNING.addExecutor("interruptRootProcess", OperatingSystem.class, new FunctionExecutor<Void>() {

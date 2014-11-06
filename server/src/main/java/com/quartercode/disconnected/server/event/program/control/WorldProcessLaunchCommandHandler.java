@@ -21,6 +21,8 @@ package com.quartercode.disconnected.server.event.program.control;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
+import com.quartercode.disconnected.server.registry.ServerRegistries;
+import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.sim.TickBridgeProvider;
 import com.quartercode.disconnected.server.sim.TickService;
 import com.quartercode.disconnected.server.sim.profile.ProfileService;
@@ -38,6 +40,8 @@ import com.quartercode.disconnected.shared.comp.program.WorldProcessId;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchAcknowledgmentEvent;
 import com.quartercode.disconnected.shared.event.program.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
+import com.quartercode.disconnected.shared.registry.Registries;
+import com.quartercode.disconnected.shared.registry.extra.NamedValueUtils;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 import com.quartercode.eventbridge.bridge.Bridge;
 
@@ -56,7 +60,7 @@ public class WorldProcessLaunchCommandHandler implements SBPAwareEventHandler<Wo
         Computer playerComputer = getSBPComputer(sender);
 
         // Get the source file
-        ContentFile source = getSourceFile(playerComputer, event.getProgramFilePath());
+        ContentFile source = getSourceFile(playerComputer, event.getProgramName());
         // Cancel if the program cannot be found
         if (source == null) {
             return;
@@ -126,10 +130,15 @@ public class WorldProcessLaunchCommandHandler implements SBPAwareEventHandler<Wo
         return getProcessModule(computer).getObj(ProcessModule.ROOT_PROCESS);
     }
 
-    protected ContentFile getSourceFile(Computer computer, String path) {
+    protected ContentFile getSourceFile(Computer computer, String programName) {
+
+        WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS).getValues(), programName);
+        if (programData == null) {
+            return null;
+        }
 
         FileSystemModule fsModule = computer.getObj(Computer.OS).getObj(OperatingSystem.FS_MODULE);
-        return (ContentFile) fsModule.invoke(FileSystemModule.GET_FILE, path);
+        return (ContentFile) fsModule.invoke(FileSystemModule.GET_FILE, programData.getCommonLocation().toString());
     }
 
     protected WorldProcessId getProcessId(ProgramExecutor executor) {

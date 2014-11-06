@@ -58,7 +58,6 @@ import com.quartercode.disconnected.shared.comp.net.NetID;
 import com.quartercode.disconnected.shared.general.Location;
 import com.quartercode.disconnected.shared.registry.Registries;
 import com.quartercode.disconnected.shared.registry.extra.NamedValueUtils;
-import com.quartercode.disconnected.shared.registrydef.SharedRegistries;
 
 /**
  * The world generator utility generates {@link World}s and parts of worlds.
@@ -308,7 +307,7 @@ public class WorldGenerator {
         program.setObj(Program.VERSION, version);
         program.setObj(Program.EXECUTOR_CLASS, executor);
 
-        String programPath = Registries.get(SharedRegistries.WORLD_PROGRAM_COMLOCS).getRight(programName).toString();
+        String programPath = programData.getCommonLocation().toString();
         addContentFile(fileSystem, PathUtils.splitAfterMountpoint(programPath)[1], superuser, "o:rx", program);
     }
 

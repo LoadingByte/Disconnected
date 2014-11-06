@@ -23,12 +23,8 @@ import com.quartercode.disconnected.shared.bridge.HandleInvocationProviderExtens
 import com.quartercode.disconnected.shared.config.ConfigService;
 import com.quartercode.disconnected.shared.config.DefaultConfigService;
 import com.quartercode.disconnected.shared.config.util.ClasspathConfigLoader;
-import com.quartercode.disconnected.shared.config.util.RemoveNamedValueCommand;
 import com.quartercode.disconnected.shared.registry.DefaultRegistryService;
-import com.quartercode.disconnected.shared.registry.Registries;
 import com.quartercode.disconnected.shared.registry.RegistryService;
-import com.quartercode.disconnected.shared.registrydef.SharedRegistries;
-import com.quartercode.disconnected.shared.registrydef.config.ConfigureCommonWorldProgramLocationCommand;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 import com.quartercode.eventbridge.EventBridgeFactory;
 import com.quartercode.eventbridge.factory.FactoryManager;
@@ -60,16 +56,6 @@ public class SharedInitializer {
         // Initialize shared services
         ServiceRegistry.register(RegistryService.class, new DefaultRegistryService());
         ServiceRegistry.register(ConfigService.class, new DefaultConfigService());
-
-        // Add shared config command parsers
-        addConfigCommandParsers(ServiceRegistry.lookup(ConfigService.class));
-    }
-
-    private static void addConfigCommandParsers(ConfigService service) {
-
-        // Common world program locations
-        service.addCommand("configureWorldProgramComloc", new ConfigureCommonWorldProgramLocationCommand(Registries.get(SharedRegistries.WORLD_PROGRAM_COMLOCS)));
-        service.addCommand("removeWorldProgramComloc", new RemoveNamedValueCommand<>("common world program location", Registries.get(SharedRegistries.WORLD_PROGRAM_COMLOCS)));
     }
 
     /**

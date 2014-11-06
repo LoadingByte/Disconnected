@@ -43,7 +43,6 @@ import com.quartercode.disconnected.shared.comp.file.SeparatedPath;
 import com.quartercode.disconnected.shared.identity.ClientIdentity;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.disconnected.shared.registry.Registries;
-import com.quartercode.disconnected.shared.registrydef.SharedRegistries;
 import com.quartercode.eventbridge.EventBridgeFactory;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionRequester;
@@ -124,14 +123,13 @@ public abstract class AbstractProgramTest {
 
     protected SeparatedPath getCommonLocation(Class<?> programExecutor) {
 
-        String programName = null;
         for (WorldProgram program : Registries.get(ServerRegistries.WORLD_PROGRAMS).getValues()) {
             if (program.getType() == programExecutor) {
-                programName = program.getName();
+                return program.getCommonLocation();
             }
         }
 
-        return Registries.get(SharedRegistries.WORLD_PROGRAM_COMLOCS).getRight(programName);
+        return null;
     }
 
 }

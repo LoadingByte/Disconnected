@@ -28,18 +28,18 @@ import com.quartercode.eventbridge.basic.EventBase;
 public class WorldProcessLaunchCommand extends EventBase {
 
     private final SBPWorldProcessUserDetails worldProcessUserDetails;
-    private final String                     programFilePath;
+    private final String                     programName;
 
     /**
      * Creates a new process launch command.
      * 
      * @param worldProcessUserDetails A {@link SBPWorldProcessUserDetails} object that is used by the SBP to identify the correct world process user.
-     * @param programFilePath The path under which the program file, which will be used for the new world process, can be found.
+     * @param programName The name of the program which should be launched for the new world process (e.g. {@code fileManager}).
      */
-    public WorldProcessLaunchCommand(SBPWorldProcessUserDetails worldProcessUserDetails, String programFilePath) {
+    public WorldProcessLaunchCommand(SBPWorldProcessUserDetails worldProcessUserDetails, String programName) {
 
         this.worldProcessUserDetails = worldProcessUserDetails;
-        this.programFilePath = programFilePath;
+        this.programName = programName;
     }
 
     /**
@@ -53,14 +53,14 @@ public class WorldProcessLaunchCommand extends EventBase {
     }
 
     /**
-     * Returns the path under which the program file, which will be used for the new world process, can be found.
-     * If the path doesn't point to a valid program file, the launched process is stopped immediately after being started.
+     * Returns the name of the program which should be launched for the new world process (e.g. {@code fileManager}).
+     * If the defined program doesn't exist, the launch command is ignored by the server.
      * 
-     * @return The source file path for the new world process.
+     * @return The program name.
      */
-    public String getProgramFilePath() {
+    public String getProgramName() {
 
-        return programFilePath;
+        return programName;
     }
 
 }

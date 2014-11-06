@@ -21,19 +21,18 @@ package com.quartercode.disconnected.server.registry;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import com.quartercode.disconnected.shared.comp.file.SeparatedPath;
 import com.quartercode.disconnected.shared.registry.extra.NamedValue;
-import com.quartercode.disconnected.shared.registrydef.SharedRegistries;
 
 /**
- * A data object that represents a world program.
- * Note that it does not contain the common location of a program since it is stored in {@link SharedRegistries#WORLD_PROGRAM_COMLOCS}.
- * See {@link ServerRegistries#WORLD_PROGRAMS} for more details.
+ * A data object that represents a world program by storing its program executor class, size, and common file location.
  */
 public class WorldProgram implements NamedValue {
 
-    private final String   name;
-    private final Class<?> type;
-    private final long     size;
+    private final String        name;
+    private final Class<?>      type;
+    private final long          size;
+    private final SeparatedPath commonLocation;
 
     /**
      * Creates a new world program data object.
@@ -41,12 +40,16 @@ public class WorldProgram implements NamedValue {
      * @param name The key (name) of the program.
      * @param type The program executor class which runs the program.
      * @param size The size of the program (in bytes).
+     * @param commonLocation The file path the program can be commonly found under.
+     *        When a new computer is generated, the default program paths are retrieved using this common location attribute.
+     *        Moreover, the file name of the common location is used to retrieve a program file through the {@code PATH} variable.
      */
-    public WorldProgram(String name, Class<?> type, long size) {
+    public WorldProgram(String name, Class<?> type, long size, SeparatedPath commonLocation) {
 
         this.name = name;
         this.type = type;
         this.size = size;
+        this.commonLocation = commonLocation;
     }
 
     /**
@@ -79,6 +82,18 @@ public class WorldProgram implements NamedValue {
     public long getSize() {
 
         return size;
+    }
+
+    /**
+     * Returns the file path the program can be commonly found under.
+     * When a new computer is generated, the default program paths are retrieved using this common location attribute.
+     * Moreover, the file name of the common location is used to retrieve a program file through the {@code PATH} variable.
+     * 
+     * @return The common program file path.
+     */
+    public SeparatedPath getCommonLocation() {
+
+        return commonLocation;
     }
 
     @Override
