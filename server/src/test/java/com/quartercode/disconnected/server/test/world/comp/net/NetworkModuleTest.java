@@ -211,7 +211,7 @@ public class NetworkModuleTest {
         packet.setObj(TCPPacket.DESTINATION, new Address(new NetID(0, 2), destinationPort));
         packet.setObj(TCPPacket.DATA, new ObjArray("testdata"));
 
-        Socket receiverSocket = netModule.invoke(NetworkModule.CREATE_SOCKET);
+        final Socket receiverSocket = netModule.invoke(NetworkModule.CREATE_SOCKET);
         receiverSocket.setObj(Socket.LOCAL_PORT, destinationPort);
         receiverSocket.setObj(Socket.DESTINATION, sourceAddress);
         receiverSocket.setObj(Socket.STATE, SocketState.CONNECTED);
@@ -222,7 +222,7 @@ public class NetworkModuleTest {
         // @formatter:off
         context.checking(new Expectations() {{
 
-            oneOf(packetHandler).handle(new ObjArray("testdata"));
+            oneOf(packetHandler).handle(receiverSocket, new ObjArray("testdata"));
 
         }});
         // @formatter:on

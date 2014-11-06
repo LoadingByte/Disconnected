@@ -179,9 +179,9 @@ public class SocketConnectionTest {
             final Sequence sequence = context.sequence("sequence");
 
             oneOf(mockNetModuleSendHook).onSend(socket1, "testdata1"); inSequence(sequence);
-            oneOf(packetHandler2).handle("testdata1"); inSequence(sequence);
+            oneOf(packetHandler2).handle(socket2, "testdata1"); inSequence(sequence);
             oneOf(mockNetModuleSendHook).onSend(socket2, "testdata2"); inSequence(sequence);
-            oneOf(packetHandler1).handle("testdata2"); inSequence(sequence);
+            oneOf(packetHandler1).handle(socket1, "testdata2"); inSequence(sequence);
 
         }});
         // @formatter:on

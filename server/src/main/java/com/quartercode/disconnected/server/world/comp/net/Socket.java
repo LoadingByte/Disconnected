@@ -531,7 +531,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                Socket holder = (Socket) invocation.getCHolder();
 
                 // Terminate the connection if a non-handshake and non-teardown packet comes through although the connection hasn't been established yet
                 if (holder.getObj(STATE) != SocketState.CONNECTED) {
@@ -542,7 +542,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                 Object data = ((Packet) arguments[0]).getObj(Packet.DATA);
 
                 for (PacketHandler packetHandler : holder.getColl(PACKET_HANDLERS)) {
-                    packetHandler.handle(data);
+                    packetHandler.handle(holder, data);
                 }
 
                 return invocation.next(arguments);
@@ -572,11 +572,13 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
     public static abstract class PacketHandler {
 
         /**
-         * This method is called when a {@link Packet} with the given data object arrives at the {@link Socket} the handler is added to.
+         * This method is called when a {@link Packet} with the given data object arrives at the given {@link Socket}.
          * 
+         * @param socket The socket which received the given packet.
+         *        Most of the times, this is the socket the packet handler was added to.
          * @param data The data object that was carried by the received packet.
          */
-        public abstract void handle(Object data);
+        public abstract void handle(Socket socket, Object data);
 
     }
 

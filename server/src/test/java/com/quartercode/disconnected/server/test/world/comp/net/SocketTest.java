@@ -43,18 +43,17 @@ public class SocketTest {
     public void testHandle() {
 
         final PacketHandler packetHandler = context.mock(PacketHandler.class);
+        final Socket socket = new Socket();
+        socket.setObj(Socket.STATE, SocketState.CONNECTED);
+        socket.addToColl(Socket.PACKET_HANDLERS, packetHandler);
 
         // @formatter:off
         context.checking(new Expectations() {{
 
-            oneOf(packetHandler).handle("testdata");
+            oneOf(packetHandler).handle(socket, "testdata");
 
         }});
         // @formatter:on
-
-        Socket socket = new Socket();
-        socket.addToColl(Socket.PACKET_HANDLERS, packetHandler);
-        socket.setObj(Socket.STATE, SocketState.CONNECTED);
 
         Packet packet = new Packet();
         packet.setObj(Packet.DATA, "testdata");
@@ -65,17 +64,16 @@ public class SocketTest {
     public void testHandleNotConnected() {
 
         final PacketHandler packetHandler = context.mock(PacketHandler.class);
+        final Socket socket = new Socket();
+        socket.addToColl(Socket.PACKET_HANDLERS, packetHandler);
 
         // @formatter:off
         context.checking(new Expectations() {{
 
-            never(packetHandler).handle("testdata");
+            never(packetHandler).handle(socket, "testdata");
 
         }});
         // @formatter:on
-
-        Socket socket = new Socket();
-        socket.addToColl(Socket.PACKET_HANDLERS, packetHandler);
 
         Packet packet = new Packet();
         packet.setObj(Packet.DATA, "testdata");
