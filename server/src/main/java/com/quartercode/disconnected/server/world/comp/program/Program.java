@@ -22,17 +22,21 @@ import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang3.reflect.TypeLiteral;
+import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
+import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.util.NullPreventer;
 import com.quartercode.disconnected.server.world.comp.Vulnerability;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
+import com.quartercode.disconnected.shared.util.registry.Registries;
+import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
 import com.quartercode.disconnected.shared.world.comp.Version;
 
 /**
@@ -81,8 +85,10 @@ public class Program extends WorldFeatureHolder implements DerivableSize {
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
-                // TODO: Make something related to the size
-                return 0 + NullPreventer.prevent(invocation.next(arguments));
+                CFeatureHolder holder = invocation.getCHolder();
+
+                long size = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS).getValues(), holder.getObj(NAME)).getSize();
+                return size + NullPreventer.prevent(invocation.next(arguments));
             }
 
         });
