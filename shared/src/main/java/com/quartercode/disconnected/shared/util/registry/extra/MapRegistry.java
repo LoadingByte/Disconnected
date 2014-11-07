@@ -21,6 +21,7 @@ package com.quartercode.disconnected.shared.util.registry.extra;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -114,6 +115,12 @@ public class MapRegistry<L, R> implements MappedValueRegistry<L, R> {
 
         removeLeft(value.getLeft());
         removeRight(value.getRight());
+    }
+
+    @Override
+    public Iterator<Mapping<L, R>> iterator() {
+
+        return getValues().iterator();
     }
 
     public static class DefaultMapping<L, R> implements Mapping<L, R> {

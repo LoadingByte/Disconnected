@@ -20,6 +20,7 @@ package com.quartercode.disconnected.shared.util.registry.extra;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import com.quartercode.disconnected.shared.util.registry.Registry;
 
@@ -68,6 +69,12 @@ public class SingleValueRegistry<V> implements Registry<V> {
         }
 
         return listCache;
+    }
+
+    @Override
+    public Iterator<V> iterator() {
+
+        return getValues().iterator();
     }
 
 }

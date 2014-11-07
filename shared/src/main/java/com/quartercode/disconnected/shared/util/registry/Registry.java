@@ -32,7 +32,7 @@ import com.quartercode.disconnected.shared.util.registry.extra.SingleValueRegist
  * @see RegistryDefinition
  * @see RegistryService
  */
-public interface Registry<V> {
+public interface Registry<V> extends Iterable<V> {
 
     /**
      * Returns a (possibly unmodifiable) view of all objects that are stored in the registry.

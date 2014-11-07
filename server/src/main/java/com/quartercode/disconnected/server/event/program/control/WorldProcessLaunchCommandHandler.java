@@ -132,7 +132,7 @@ public class WorldProcessLaunchCommandHandler implements SBPAwareEventHandler<Wo
 
     protected ContentFile getSourceFile(Computer computer, String programName) {
 
-        WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS).getValues(), programName);
+        WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS), programName);
         if (programData == null) {
             return null;
         }

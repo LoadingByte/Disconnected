@@ -179,7 +179,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
 
                     // Get session program
                     List<String> path = Arrays.asList(environment.get("PATH").split(":"));
-                    String sessionProgramFileName = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS).getValues(), SystemProgs.SESSION).getCommonLocation().toString();
+                    String sessionProgramFileName = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS), SystemProgs.SESSION).getCommonLocation().toString();
                     ContentFile sessionProgramFile = getProgramFileFromPaths(fsModule, path, sessionProgramFileName);
                     if (sessionProgramFile == null) {
                         throw new IllegalStateException("Cannot start process module: Session program not found");

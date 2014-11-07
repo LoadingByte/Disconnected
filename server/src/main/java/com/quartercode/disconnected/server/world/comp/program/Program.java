@@ -87,7 +87,7 @@ public class Program extends WorldFeatureHolder implements DerivableSize {
 
                 CFeatureHolder holder = invocation.getCHolder();
 
-                long size = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS).getValues(), holder.getObj(NAME)).getSize();
+                long size = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS), holder.getObj(NAME)).getSize();
                 return size + NullPreventer.prevent(invocation.next(arguments));
             }
 

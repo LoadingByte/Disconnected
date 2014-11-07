@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -114,8 +113,7 @@ public class ProfileSerializer {
      */
     public static JAXBContext createWorldContext() throws JAXBException {
 
-        List<String> contextPathEntries = Registries.get(ServerRegistries.WORLD_CONTEXT_PATH).getValues();
-        return JAXBContext.newInstance(StringUtils.join(contextPathEntries, ":"));
+        return JAXBContext.newInstance(StringUtils.join(Registries.get(ServerRegistries.WORLD_CONTEXT_PATH), ":"));
     }
 
     /**
@@ -146,7 +144,7 @@ public class ProfileSerializer {
         World world = (World) createWorldContext().createUnmarshaller().unmarshal(new JAXBNoCloseInputStream(inputStream));
 
         TreeInitializer worldInitializer = new TreeInitializer();
-        for (Mapping<Class<? extends FeatureHolder>, FeatureDefinition<?>> mapping : Registries.get(ServerRegistries.WORLD_INITIALIZER_MAPPINGS).getValues()) {
+        for (Mapping<Class<? extends FeatureHolder>, FeatureDefinition<?>> mapping : Registries.get(ServerRegistries.WORLD_INITIALIZER_MAPPINGS)) {
             worldInitializer.addInitializationDefinition(mapping.getLeft(), mapping.getRight());
         }
         worldInitializer.apply(world);

@@ -304,7 +304,7 @@ public class WorldGenerator {
         program.setObj(Program.NAME, programName);
         program.setObj(Program.VERSION, version);
 
-        WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS).getValues(), programName);
+        WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS), programName);
         String programPath = programData.getCommonLocation().toString();
         addContentFile(fileSystem, PathUtils.splitAfterMountpoint(programPath)[1], superuser, "o:rx", program);
     }

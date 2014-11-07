@@ -71,7 +71,7 @@ public class WorldProcessLaunchCommandHandlerTest {
     public static void tearDownAfterClass() {
 
         MultipleValueRegistry<WorldProgram> wpRegistry = Registries.get(ServerRegistries.WORLD_PROGRAMS);
-        wpRegistry.removeValue(NamedValueUtils.getByName(wpRegistry.getValues(), "_testProgram"));
+        wpRegistry.removeValue(NamedValueUtils.getByName(wpRegistry, "_testProgram"));
     }
 
     @Rule

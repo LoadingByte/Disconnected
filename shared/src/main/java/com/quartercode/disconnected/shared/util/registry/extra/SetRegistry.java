@@ -21,6 +21,7 @@ package com.quartercode.disconnected.shared.util.registry.extra;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -63,6 +64,12 @@ public class SetRegistry<V> implements MultipleValueRegistry<V> {
 
         // Invalidate the list cache
         listCache = null;
+    }
+
+    @Override
+    public Iterator<V> iterator() {
+
+        return getValues().iterator();
     }
 
 }

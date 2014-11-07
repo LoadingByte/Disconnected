@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.shared.util.registry.extra;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -48,6 +49,12 @@ public class ListRegistry<V> implements MultipleValueRegistry<V> {
     public void removeValue(V value) {
 
         values.remove(value);
+    }
+
+    @Override
+    public Iterator<V> iterator() {
+
+        return values.iterator();
     }
 
 }

@@ -20,6 +20,7 @@ package com.quartercode.disconnected.shared.test.registry;
 
 import static org.junit.Assert.*;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.junit.Test;
@@ -58,6 +59,12 @@ public class DefaultRegistryServiceTest {
         public List<String> getValues() {
 
             return Arrays.asList(value);
+        }
+
+        @Override
+        public Iterator<String> iterator() {
+
+            return getValues().iterator();
         }
 
     }

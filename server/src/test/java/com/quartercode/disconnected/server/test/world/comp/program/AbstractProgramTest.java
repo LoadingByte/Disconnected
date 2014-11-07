@@ -123,7 +123,7 @@ public abstract class AbstractProgramTest {
 
     protected SeparatedPath getCommonLocation(Class<?> programExecutor) {
 
-        for (WorldProgram program : Registries.get(ServerRegistries.WORLD_PROGRAMS).getValues()) {
+        for (WorldProgram program : Registries.get(ServerRegistries.WORLD_PROGRAMS)) {
             if (program.getType() == programExecutor) {
                 return program.getCommonLocation();
             }
