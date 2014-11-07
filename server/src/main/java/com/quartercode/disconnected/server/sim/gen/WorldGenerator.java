@@ -48,7 +48,6 @@ import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.os.config.Configuration;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.server.world.comp.program.Program;
-import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
 import com.quartercode.disconnected.shared.world.comp.ByteUnit;
@@ -301,14 +300,11 @@ public class WorldGenerator {
 
     private static void addProgramFile(FileSystem fileSystem, User superuser, String programName, Version version) {
 
-        WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS).getValues(), programName);
-        @SuppressWarnings ("unchecked")
-        Class<? extends ProgramExecutor> executor = (Class<? extends ProgramExecutor>) programData.getType();
-
         Program program = new Program();
+        program.setObj(Program.NAME, programName);
         program.setObj(Program.VERSION, version);
-        program.setObj(Program.EXECUTOR_CLASS, executor);
 
+        WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS).getValues(), programName);
         String programPath = programData.getCommonLocation().toString();
         addContentFile(fileSystem, PathUtils.splitAfterMountpoint(programPath)[1], superuser, "o:rx", program);
     }

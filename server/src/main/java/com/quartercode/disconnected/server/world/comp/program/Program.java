@@ -28,6 +28,7 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
+import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.util.NullPreventer;
 import com.quartercode.disconnected.server.world.comp.Vulnerability;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
@@ -48,6 +49,12 @@ public class Program extends WorldFeatureHolder implements DerivableSize {
     // ----- Properties -----
 
     /**
+     * The name of the program.
+     * It is used to retrieve the {@link WorldProgram} object which defines the actual {@link ProgramExecutor}.
+     */
+    public static final PropertyDefinition<String>                                      NAME;
+
+    /**
      * The {@link Version} of the program.
      */
     public static final PropertyDefinition<Version>                                     VERSION;
@@ -57,17 +64,11 @@ public class Program extends WorldFeatureHolder implements DerivableSize {
      */
     public static final CollectionPropertyDefinition<Vulnerability, Set<Vulnerability>> VULNERABILITIES;
 
-    /**
-     * The {@link Class} of the {@link ProgramExecutor} which can execute the program.
-     * The {@link Class} must have a default constructor.
-     */
-    public static final PropertyDefinition<Class<? extends ProgramExecutor>>            EXECUTOR_CLASS;
-
     static {
 
+        NAME = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "name", "storage", new StandardStorage<>());
         VERSION = create(new TypeLiteral<PropertyDefinition<Version>>() {}, "name", "version", "storage", new StandardStorage<>());
         VULNERABILITIES = create(new TypeLiteral<CollectionPropertyDefinition<Vulnerability, Set<Vulnerability>>>() {}, "name", "vulnerabilities", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new HashSet<>()));
-        EXECUTOR_CLASS = create(new TypeLiteral<PropertyDefinition<Class<? extends ProgramExecutor>>>() {}, "name", "executorClass", "storage", new StandardStorage<>());
 
     }
 

@@ -38,6 +38,8 @@ import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
+import com.quartercode.disconnected.server.registry.ServerRegistries;
+import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
@@ -47,6 +49,8 @@ import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.os.Session;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
+import com.quartercode.disconnected.shared.util.registry.Registries;
+import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUserId;
 
@@ -714,13 +718,20 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                     throw new IllegalStateException("Cannot initialize process: No read right and execute right on file");
                 }
 
+                // Class<? extends ProgramExecutor> executorClass = ((Program) source.getObj(ContentFile.CONTENT)).getObj(Program.EXECUTOR_CLASS);
+                // Retrieve the program data object
+                String programName = ((Program) source.getObj(ContentFile.CONTENT)).getObj(Program.NAME);
+                WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS).getValues(), programName);
+                if (programData == null) {
+                    throw new IllegalStateException("Cannot find world program with name '" + programName + "' for launching a process");
+                }
+
                 // Create new executor
-                Class<? extends ProgramExecutor> executorClass = ((Program) source.getObj(ContentFile.CONTENT)).getObj(Program.EXECUTOR_CLASS);
                 ProgramExecutor executor;
                 try {
-                    executor = executorClass.newInstance();
+                    executor = (ProgramExecutor) programData.getType().newInstance();
                 } catch (Exception e) {
-                    throw new RuntimeException("Unexpected exception during initialization of new program executor (class '" + executorClass.getName() + "'", e);
+                    throw new RuntimeException("Unexpected exception during initialization of new program executor (class '" + programData.getType().getName() + "'", e);
                 }
 
                 // Set new executor

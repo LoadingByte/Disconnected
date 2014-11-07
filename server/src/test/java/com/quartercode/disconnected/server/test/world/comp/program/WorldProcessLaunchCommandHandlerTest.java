@@ -23,10 +23,15 @@ import lombok.RequiredArgsConstructor;
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import com.quartercode.disconnected.server.ServerInitializer;
 import com.quartercode.disconnected.server.event.program.control.WorldProcessLaunchCommandHandler;
+import com.quartercode.disconnected.server.registry.ServerRegistries;
+import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.program.Process;
@@ -34,10 +39,14 @@ import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.program.Program;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.RootProcess;
+import com.quartercode.disconnected.shared.SharedInitializer;
 import com.quartercode.disconnected.shared.event.comp.program.control.WorldProcessLaunchAcknowledgmentEvent;
 import com.quartercode.disconnected.shared.event.comp.program.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.identity.ClientIdentity;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
+import com.quartercode.disconnected.shared.util.registry.Registries;
+import com.quartercode.disconnected.shared.util.registry.extra.MultipleValueRegistry;
+import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
 import com.quartercode.disconnected.shared.world.comp.program.ClientProcessDetails;
 import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUserDetails;
 import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUserId;
@@ -46,7 +55,24 @@ import com.quartercode.eventbridge.bridge.Bridge;
 
 public class WorldProcessLaunchCommandHandlerTest {
 
-    private static final SBPIdentity             SBP     = new ClientIdentity("client");
+    private static final SBPIdentity SBP = new ClientIdentity("client");
+
+    @BeforeClass
+    public static void setUpBeforeClass() {
+
+        SharedInitializer.initialize();
+        ServerInitializer.initialize();
+        SharedInitializer.initializeFinal();
+
+        Registries.get(ServerRegistries.WORLD_PROGRAMS).addValue(new WorldProgram("_testProgram", TestProgram.class, 0, null));
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() {
+
+        MultipleValueRegistry<WorldProgram> wpRegistry = Registries.get(ServerRegistries.WORLD_PROGRAMS);
+        wpRegistry.removeValue(NamedValueUtils.getByName(wpRegistry.getValues(), "_testProgram"));
+    }
 
     @Rule
     public JUnitRuleMockery                      context = new JUnitRuleMockery();
@@ -69,7 +95,7 @@ public class WorldProcessLaunchCommandHandlerTest {
 
         sourceFile = new ContentFile();
         Program program = new Program();
-        program.setObj(Program.EXECUTOR_CLASS, TestProgram.class);
+        program.setObj(Program.NAME, "_testProgram");
         sourceFile.setObj(ContentFile.CONTENT, program);
 
         handler = new WorldProcessLaunchCommandHandlerMock(bridge, sbpComputer, procModule, sessionProcess, sourceFile);
