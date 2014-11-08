@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <configureWorldProgram name="fileManager">
+        <class>com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram</class>
+        <size>1024</size>
+        <commonLocation>$C{com.quartercode.disconnected.shared.world.comp.file.CommonFiles.SYS_BIN_DIR}/filemanager.exe</commonLocation>
+    </configureWorldProgram>
+</config>

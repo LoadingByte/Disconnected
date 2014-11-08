@@ -56,8 +56,6 @@ import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 import com.quartercode.disconnected.shared.world.comp.net.NetID;
-import com.quartercode.disconnected.shared.world.comp.program.names.GeneralProgs;
-import com.quartercode.disconnected.shared.world.comp.program.names.SystemProgs;
 import com.quartercode.disconnected.shared.world.general.Location;
 
 /**
@@ -292,10 +290,10 @@ public class WorldGenerator {
     private static void addSystemFiles(FileSystem fileSystem, User superuser) {
 
         // Add system programs
-        addProgramFile(fileSystem, superuser, SystemProgs.SESSION, new Version(1, 0, 0));
+        addProgramFile(fileSystem, superuser, "session", new Version(1, 0, 0));
 
         // Add general programs
-        addProgramFile(fileSystem, superuser, GeneralProgs.FILE_MANAGER, new Version(1, 0, 0));
+        addProgramFile(fileSystem, superuser, "fileManager", new Version(1, 0, 0));
     }
 
     private static void addProgramFile(FileSystem fileSystem, User superuser, String programName, Version version) {
