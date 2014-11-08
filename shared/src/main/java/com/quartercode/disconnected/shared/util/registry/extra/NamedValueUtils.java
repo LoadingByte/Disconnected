@@ -18,13 +18,17 @@
 
 package com.quartercode.disconnected.shared.util.registry.extra;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /**
  * A utility class for working with {@link NamedValue} objects.
  */
 public class NamedValueUtils {
 
     /**
-     * Iterates over the given {@link Iterable} object, that contains {@link NamedValue}s, and returns the value which has the given name.
+     * Iterates over the given {@link Iterable} object, which contains {@link NamedValue}s, and returns the value which has the given name.
      * 
      * @param values The iterable object that contains the named values.
      * @param name The name the returned named value must have.
@@ -39,6 +43,26 @@ public class NamedValueUtils {
         }
 
         return null;
+    }
+
+    /**
+     * Iterates over the given {@link Iterable} object, which contains {@link NamedValue}s, and returns all the values which have the given names.
+     * 
+     * @param values The iterable object that contains the named values.
+     * @param names The names from whose each returned named value must have one of.
+     * @return All the named value with the given names.
+     */
+    public static <T extends NamedValue> List<T> getByNames(Iterable<T> values, Collection<String> names) {
+
+        List<T> selectedValues = new ArrayList<>();
+
+        for (T value : values) {
+            if (value != null && names.contains(value.getName())) {
+                selectedValues.add(value);
+            }
+        }
+
+        return selectedValues;
     }
 
     private NamedValueUtils() {
