@@ -191,7 +191,7 @@ public class Version implements Serializable {
     @Override
     public String toString() {
 
-        return new StringBuilder(major).append(".").append(minor).append(".").append(revision).toString();
+        return new StringBuilder().append(major).append(".").append(minor).append(".").append(revision).toString();
     }
 
 }

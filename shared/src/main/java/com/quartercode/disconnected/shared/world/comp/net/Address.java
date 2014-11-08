@@ -155,7 +155,7 @@ public class Address implements Serializable {
     @Override
     public String toString() {
 
-        return new StringBuilder(netId.toString()).append(":").append(port).toString();
+        return new StringBuilder().append(netId).append(":").append(port).toString();
     }
 
 }
