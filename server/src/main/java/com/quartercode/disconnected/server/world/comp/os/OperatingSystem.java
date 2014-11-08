@@ -19,20 +19,15 @@
 package com.quartercode.disconnected.server.world.comp.os;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
-import java.util.HashSet;
-import java.util.Set;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.CFeatureHolder;
-import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.ValueFactory;
 import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.server.world.comp.Computer;
-import com.quartercode.disconnected.server.world.comp.Vulnerability;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.net.NetworkModule;
@@ -57,38 +52,32 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
     /**
      * The name of the operating system.
      */
-    public static final PropertyDefinition<String>                                      NAME;
+    public static final PropertyDefinition<String>           NAME;
 
     /**
      * The {@link Version} of the operating system.
      */
-    public static final PropertyDefinition<Version>                                     VERSION;
-
-    /**
-     * The {@link Vulnerability}s the operating system has.
-     */
-    public static final CollectionPropertyDefinition<Vulnerability, Set<Vulnerability>> VULNERABILITIES;
+    public static final PropertyDefinition<Version>          VERSION;
 
     /**
      * The {@link FileSystemModule} for managing and accessing {@link FileSystem}s.
      */
-    public static final PropertyDefinition<FileSystemModule>                            FS_MODULE;
+    public static final PropertyDefinition<FileSystemModule> FS_MODULE;
 
     /**
      * The {@link ProcessModule} which manages the {@link RootProcess}.
      */
-    public static final PropertyDefinition<ProcessModule>                               PROC_MODULE;
+    public static final PropertyDefinition<ProcessModule>    PROC_MODULE;
 
     /**
      * The {@link NetworkModule} which takes care of sending and receiving {@link Packet}s.
      */
-    public static final PropertyDefinition<NetworkModule>                               NET_MODULE;
+    public static final PropertyDefinition<NetworkModule>    NET_MODULE;
 
     static {
 
         NAME = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "name", "storage", new StandardStorage<>());
         VERSION = create(new TypeLiteral<PropertyDefinition<Version>>() {}, "name", "version", "storage", new StandardStorage<>());
-        VULNERABILITIES = create(new TypeLiteral<CollectionPropertyDefinition<Vulnerability, Set<Vulnerability>>>() {}, "name", "vulnerabilities", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new HashSet<>()));
 
         FS_MODULE = create(new TypeLiteral<PropertyDefinition<FileSystemModule>>() {}, "name", "fsModule", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<FileSystemModule>() {
 
@@ -128,7 +117,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
      * Returns whether the operating system is running or not.
      * The state is determined by the running state of the {@link RootProcess}.
      */
-    public static final FunctionDefinition<Boolean>                                     IS_RUNNING;
+    public static final FunctionDefinition<Boolean>          IS_RUNNING;
 
     /**
      * Boots up (true) or shuts down (false) the operating system.
@@ -151,7 +140,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                                        SET_RUNNING;
+    public static final FunctionDefinition<Void>             SET_RUNNING;
 
     static {
 

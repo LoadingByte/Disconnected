@@ -19,15 +19,10 @@
 package com.quartercode.disconnected.server.world.comp.hardware;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
-import java.util.HashSet;
-import java.util.Set;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.server.world.comp.Computer;
-import com.quartercode.disconnected.server.world.comp.Vulnerability;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 
 /**
@@ -43,17 +38,11 @@ public class Hardware extends WorldChildFeatureHolder<Computer> {
     /**
      * The name of the hardware part.
      */
-    public static final PropertyDefinition<String>                                      NAME;
-
-    /**
-     * The {@link Vulnerability}s the hardware part has.
-     */
-    public static final CollectionPropertyDefinition<Vulnerability, Set<Vulnerability>> VULNERABILITIES;
+    public static final PropertyDefinition<String> NAME;
 
     static {
 
         NAME = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "name", "storage", new StandardStorage<>());
-        VULNERABILITIES = create(new TypeLiteral<CollectionPropertyDefinition<Vulnerability, Set<Vulnerability>>>() {}, "name", "vulnerabilities", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new HashSet<>()));
 
     }
 
