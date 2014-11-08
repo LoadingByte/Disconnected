@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.server.world.comp.program;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.extra.Priorities.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +33,6 @@ import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
@@ -138,14 +138,13 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
         SOURCE.addSetterExecutor("checkFileContent", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Validate.isInstanceOf(Program.class, ((ContentFile) arguments[0]).getObj(ContentFile.CONTENT), "Source must contain a program");
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_6);
 
         ENVIRONMENT = create(new TypeLiteral<PropertyDefinition<Map<String, String>>>() {}, "name", "environment", "storage", new StandardStorage<>(), "initialValue", new CloneValueFactory<>(new HashMap<>()));
 
@@ -153,7 +152,6 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
         STATE.addSetterExecutor("callStateListeners", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Process<?> holder = (Process<?>) invocation.getCHolder();
@@ -169,11 +167,10 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                 return null;
             }
 
-        });
+        }, LEVEL_7);
         STATE.addSetterExecutor("setExecutorSchedulerActive", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 ProgramExecutor executor = invocation.getCHolder().getObj(EXECUTOR);
@@ -186,7 +183,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_6);
 
         EXECUTOR = create(new TypeLiteral<PropertyDefinition<ProgramExecutor>>() {}, "name", "executor", "storage", new StandardStorage<>());
         CHILDREN = create(new TypeLiteral<CollectionPropertyDefinition<Process<?>, List<Process<?>>>>() {}, "name", "children", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
@@ -682,7 +679,6 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
         INITIALIZE.addExecutor("setPid", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
@@ -702,11 +698,10 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                 return invocation.next(arguments);
             }
 
-        });
+        }, DEFAULT + SUBLEVEL_7);
         INITIALIZE.addExecutor("setExecutor", Process.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.DEFAULT + Prioritized.SUBLEVEL_5)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
@@ -740,7 +735,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                 return invocation.next(arguments);
             }
 
-        });
+        }, DEFAULT + SUBLEVEL_5);
 
     }
 

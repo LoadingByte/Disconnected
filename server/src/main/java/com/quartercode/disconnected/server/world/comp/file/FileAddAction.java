@@ -19,6 +19,8 @@
 package com.quartercode.disconnected.server.world.comp.file;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.extra.Priorities.LEVEL_5;
+import static com.quartercode.classmod.extra.Priorities.LEVEL_6;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.reflect.TypeLiteral;
@@ -26,7 +28,6 @@ import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
@@ -75,7 +76,6 @@ public class FileAddAction extends FileAction {
         PATH.addSetterExecutor("normalize", FileAddAction.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 String normalizedPath = PathUtils.normalize((String) arguments[0]);
@@ -85,7 +85,7 @@ public class FileAddAction extends FileAction {
                 return invocation.next(normalizedPath);
             }
 
-        });
+        }, LEVEL_6);
 
     }
 
@@ -124,7 +124,6 @@ public class FileAddAction extends FileAction {
         EXECUTE.addExecutor("addPathDirectories", FileAddAction.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_5)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
@@ -158,7 +157,7 @@ public class FileAddAction extends FileAction {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_5);
         EXECUTE.addExecutor("addFile", FileAddAction.class, new FunctionExecutor<Void>() {
 
             @Override

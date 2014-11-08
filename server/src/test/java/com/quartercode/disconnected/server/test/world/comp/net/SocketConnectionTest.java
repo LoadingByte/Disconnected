@@ -25,14 +25,13 @@ import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.jmock.lib.concurrent.Synchroniser;
 import org.jmock.lib.legacy.ClassImposteriser;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
+import com.quartercode.classmod.extra.Priorities;
+import com.quartercode.classmod.util.test.JUnitRuleModMockery;
 import com.quartercode.disconnected.server.util.ObjArray;
 import com.quartercode.disconnected.server.world.comp.net.NetworkModule;
 import com.quartercode.disconnected.server.world.comp.net.Socket;
@@ -44,68 +43,6 @@ import com.quartercode.disconnected.shared.world.comp.net.NetID;
 
 public class SocketConnectionTest {
 
-    /*
-     * This field is changed by the test every run.
-     */
-    private static NetworkModuleSendHook netModuleSendHook;
-
-    private static interface NetworkModuleSendHook {
-
-        public void onSend(Socket socket, Object data);
-
-    }
-
-    @BeforeClass
-    public static void installHooks() {
-
-        NetworkModule.SEND_TCP.addExecutor("hook", NetworkModule.class, new FunctionExecutor<Void>() {
-
-            @Override
-            @Prioritized (Prioritized.LEVEL_9)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                if (netModuleSendHook != null) {
-                    netModuleSendHook.onSend((Socket) arguments[0], arguments[1]);
-                }
-
-                // Stop the invocation
-                return null;
-            }
-
-        });
-
-        // Change the sequence number generator of the Socket class in order to generate predictable numbers
-        // Each socket always gets a sequence number which is equal to the socket's local port
-        // Socket 1 always gets the sequence number 10 while socket 2 always gets the sequence number 20
-        Socket.CURRENT_SEQ_NUMBER.addSetterExecutor("testGenerate", Socket.class, new FunctionExecutor<Void>() {
-
-            @Override
-            @Prioritized (Prioritized.LEVEL_9)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                Socket holder = (Socket) invocation.getCHolder();
-
-                if ((int) arguments[0] < 0) {
-                    int newSequenceNumber = holder.getObj(Socket.LOCAL_PORT);
-                    holder.setObj(Socket.CURRENT_SEQ_NUMBER, newSequenceNumber);
-
-                    // Cancel the invocation chain; the next generator should not be invoked
-                    return null;
-                } else {
-                    return invocation.next(arguments);
-                }
-            }
-
-        });
-    }
-
-    @AfterClass
-    public static void uninstallHooks() {
-
-        NetworkModule.SEND_TCP.removeExecutor("hook", NetworkModule.class);
-        Socket.CURRENT_SEQ_NUMBER.removeSetterExecutor("testGenerate", Socket.class);
-    }
-
     @Rule
     // @formatter:off
     public JUnitRuleMockery context = new JUnitRuleMockery() {{
@@ -113,6 +50,9 @@ public class SocketConnectionTest {
         setThreadingPolicy(new Synchroniser());
     }};
     // @formatter:on
+
+    @Rule
+    public JUnitRuleModMockery    modmock = new JUnitRuleModMockery();
 
     private NetworkModule         netModule;
     @Mock
@@ -137,11 +77,15 @@ public class SocketConnectionTest {
         // Apply a simple routing:
         // socket1 -> socket2
         // socket2 -> socket1
-        netModuleSendHook = new NetworkModuleSendHook() {
+        modmock.addFuncExec(NetworkModule.SEND_TCP, "hook", NetworkModule.class, new FunctionExecutor<Void>() {
 
             @Override
-            public void onSend(Socket socket, Object data) {
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
+                Socket socket = (Socket) arguments[0];
+                Object data = arguments[1];
+
+                // Invoke the custom hook
                 mockNetModuleSendHook.onSend(socket, data);
 
                 TCPPacket packet = new TCPPacket();
@@ -156,10 +100,41 @@ public class SocketConnectionTest {
                     packet.setObj(TCPPacket.DESTINATION, socket1Address);
                     socket1.invoke(Socket.HANDLE, packet);
                 }
+
+                // Stop the invocation
+                return null;
             }
 
-        };
+        }, Priorities.LEVEL_9);
+    }
 
+    @Before
+    public void setUpCurrentSeqNumberGenerator() {
+
+        /*
+         * Change the sequence number generator of the Socket class in order to generate predictable numbers.
+         * Each socket always gets a sequence number which is equal to the socket's local port.
+         * Socket 1 always gets the sequence number 10 while socket 2 always gets the sequence number 20.
+         */
+        modmock.addPropSetter(Socket.CURRENT_SEQ_NUMBER, "testGenerate", Socket.class, new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                Socket holder = (Socket) invocation.getCHolder();
+
+                if ((int) arguments[0] < 0) {
+                    int newSequenceNumber = holder.getObj(Socket.LOCAL_PORT);
+                    holder.setObj(Socket.CURRENT_SEQ_NUMBER, newSequenceNumber);
+
+                    // Cancel the invocation chain; the next generator should not be invoked
+                    return null;
+                } else {
+                    return invocation.next(arguments);
+                }
+            }
+
+        }, Priorities.LEVEL_9);
     }
 
     @Test
@@ -356,6 +331,12 @@ public class SocketConnectionTest {
         socket.setObj(Socket.DESTINATION, destination);
 
         return socket;
+    }
+
+    private static interface NetworkModuleSendHook {
+
+        public void onSend(Socket socket, Object data);
+
     }
 
 }

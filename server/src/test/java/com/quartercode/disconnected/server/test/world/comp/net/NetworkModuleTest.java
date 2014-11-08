@@ -18,20 +18,20 @@
 
 package com.quartercode.disconnected.server.test.world.comp.net;
 
+import static com.quartercode.classmod.extra.Priorities.LEVEL_5;
+import static com.quartercode.classmod.extra.Priorities.LEVEL_9;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.jmock.lib.concurrent.Synchroniser;
 import org.jmock.lib.legacy.ClassImposteriser;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
+import com.quartercode.classmod.util.test.JUnitRuleModMockery;
 import com.quartercode.disconnected.server.util.ObjArray;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
@@ -45,44 +45,8 @@ import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
 import com.quartercode.disconnected.shared.world.comp.net.NetID;
 
+@SuppressWarnings ("unchecked")
 public class NetworkModuleTest {
-
-    /*
-     * This field is changed by the test at every run.
-     */
-    private static NodeNetInterfaceProcessHook nodeNetInterfaceProcessHook;
-
-    private static interface NodeNetInterfaceProcessHook {
-
-        public void onProcess(Packet packet);
-
-    }
-
-    @BeforeClass
-    public static void installHook() {
-
-        NodeNetInterface.PROCESS.addExecutor("hook", NodeNetInterface.class, new FunctionExecutor<Void>() {
-
-            @Override
-            @Prioritized (Prioritized.LEVEL_9)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                if (nodeNetInterfaceProcessHook != null) {
-                    nodeNetInterfaceProcessHook.onProcess((Packet) arguments[0]);
-                }
-
-                // Stop the invocation
-                return null;
-            }
-
-        });
-    }
-
-    @AfterClass
-    public static void uninstallHook() {
-
-        NodeNetInterface.PROCESS.removeExecutor("hook", NodeNetInterface.class);
-    }
 
     @Rule
     // @formatter:off
@@ -92,6 +56,9 @@ public class NetworkModuleTest {
     }};
     // @formatter:on
 
+    @Rule
+    public JUnitRuleModMockery     modmock         = new JUnitRuleModMockery();
+
     private final Computer         computer        = new Computer();
     private final OperatingSystem  operatingSystem = new OperatingSystem();
     private final NetworkModule    netModule       = new NetworkModule();
@@ -100,14 +67,25 @@ public class NetworkModuleTest {
     @Before
     public void setUp() {
 
-        nodeNetInterfaceProcessHook = null;
-
         netInterface.setObj(NodeNetInterface.NET_ID, new NetID());
 
         computer.setObj(Computer.OS, operatingSystem);
         operatingSystem.setObj(OperatingSystem.NET_MODULE, netModule);
 
         computer.addToColl(Computer.HARDWARE, netInterface);
+
+        // Add a function executor for stopping the normal NodeNetInterface.PROCESS method
+        final FunctionExecutor<Void> processInvocationStopper = context.mock(FunctionExecutor.class, "processInvocationStopper");
+        modmock.addFuncExec(NodeNetInterface.PROCESS, "invocationStopper", NodeNetInterface.class, processInvocationStopper, LEVEL_5);
+
+        // @formatter:off
+        context.checking(new Expectations() {{
+
+            // Invocation stopper
+            allowing(processInvocationStopper).invoke(with(any(FunctionInvocation.class)), with(any(Object[].class)));
+
+        }});
+        // @formatter:on
     }
 
     @Test
@@ -153,12 +131,13 @@ public class NetworkModuleTest {
         packet.setObj(Packet.DESTINATION, destinationAddress);
         packet.setObj(Packet.DATA, new ObjArray("testdata"));
 
-        nodeNetInterfaceProcessHook = context.mock(NodeNetInterfaceProcessHook.class);
+        final FunctionExecutor<Void> processHook = context.mock(FunctionExecutor.class, "processHook");
+        modmock.addFuncExec(NodeNetInterface.PROCESS, "processHook", NodeNetInterface.class, processHook, LEVEL_9);
 
         // @formatter:off
         context.checking(new Expectations() {{
 
-            oneOf(nodeNetInterfaceProcessHook).onProcess(packet);
+            oneOf(processHook).invoke(with(any(FunctionInvocation.class)), with(new Object[] { packet }));
 
         }});
         // @formatter:on
@@ -186,12 +165,13 @@ public class NetworkModuleTest {
         expectedPacket.setObj(TCPPacket.DESTINATION, destinationAddress);
         expectedPacket.setObj(TCPPacket.DATA, new ObjArray("testdata"));
 
-        nodeNetInterfaceProcessHook = context.mock(NodeNetInterfaceProcessHook.class);
+        final FunctionExecutor<Void> processHook = context.mock(FunctionExecutor.class, "processHook");
+        modmock.addFuncExec(NodeNetInterface.PROCESS, "processHook", NodeNetInterface.class, processHook, LEVEL_9);
 
         // @formatter:off
         context.checking(new Expectations() {{
 
-            oneOf(nodeNetInterfaceProcessHook).onProcess(expectedPacket);
+            oneOf(processHook).invoke(with(any(FunctionInvocation.class)), with(new Object[] { expectedPacket }));
 
         }});
         // @formatter:on

@@ -19,6 +19,8 @@
 package com.quartercode.disconnected.server.world.comp.program;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.extra.Priorities.LEVEL_5;
+import static com.quartercode.classmod.extra.Priorities.LEVEL_7;
 import static com.quartercode.disconnected.server.world.comp.program.ProgramUtils.getProgramFileFromPaths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +32,6 @@ import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
@@ -144,18 +145,16 @@ public class ProcessModule extends OSModule implements SchedulerUser {
         SET_RUNNING.addExecutor("resetNextPidValue", ProcessModule.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 invocation.getCHolder().setObj(NEXT_PID_VALUE, 0);
                 return invocation.next(arguments);
             }
-        });
+        }, LEVEL_7);
 
         SET_RUNNING.addExecutor("startRootProcess", ProcessModule.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_5 + Prioritized.SUBLEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
@@ -207,12 +206,11 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_5);
 
         SET_RUNNING.addExecutor("interruptRootProcess", OperatingSystem.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_5 + Prioritized.SUBLEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
@@ -228,7 +226,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_5);
 
         KILL = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "kill", "parameters", new Class[0]);
         KILL.addExecutor("default", ProcessModule.class, new FunctionExecutor<Void>() {

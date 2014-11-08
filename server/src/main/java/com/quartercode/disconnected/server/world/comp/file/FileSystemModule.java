@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.server.world.comp.file;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.extra.Priorities.LEVEL_6;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -28,7 +29,6 @@ import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
@@ -79,7 +79,6 @@ public class FileSystemModule extends OSModule {
         KNOWN_FS.addAdderExecutor("checkNotMounted", FileSystemModule.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 KnownFileSystem element = (KnownFileSystem) arguments[0];
@@ -87,7 +86,7 @@ public class FileSystemModule extends OSModule {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_6);
 
     }
 
@@ -396,7 +395,6 @@ public class FileSystemModule extends OSModule {
             MOUNTPOINT.addSetterExecutor("checkNotMounted", KnownFileSystem.class, new FunctionExecutor<Void>() {
 
                 @Override
-                @Prioritized (Prioritized.LEVEL_6)
                 public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                     CFeatureHolder holder = invocation.getCHolder();
@@ -406,13 +404,12 @@ public class FileSystemModule extends OSModule {
                     return invocation.next(arguments);
                 }
 
-            });
+            }, LEVEL_6);
 
             MOUNTED = create(new TypeLiteral<PropertyDefinition<Boolean>>() {}, "name", "mounted", "storage", new StandardStorage<>(), "initialValue", new ConstantValueFactory<>(false));
             MOUNTED.addSetterExecutor("checkMountpointNotTaken", KnownFileSystem.class, new FunctionExecutor<Void>() {
 
                 @Override
-                @Prioritized (Prioritized.LEVEL_6)
                 public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                     CFeatureHolder holder = invocation.getCHolder();
@@ -424,7 +421,7 @@ public class FileSystemModule extends OSModule {
                     return invocation.next(arguments);
                 }
 
-            });
+            }, LEVEL_6);
 
         }
 

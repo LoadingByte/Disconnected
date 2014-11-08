@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
+import static com.quartercode.classmod.extra.Priorities.LEVEL_6;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.disconnected.server.util.NullPreventer;
 
 /**
@@ -39,23 +39,21 @@ public class RootFile extends ParentFile<FileSystem> {
         NAME.addGetterExecutor("returnStatic", RootFile.class, new FunctionExecutor<String>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
                 return "root";
             }
 
-        });
+        }, LEVEL_6);
         NAME.addSetterExecutor("cancel", RootFile.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 return null;
             }
 
-        });
+        }, LEVEL_6);
 
     }
 
@@ -66,46 +64,42 @@ public class RootFile extends ParentFile<FileSystem> {
         GET_PATH.addExecutor("returnStatic", RootFile.class, new FunctionExecutor<String>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
                 return "";
             }
 
-        });
+        }, LEVEL_6);
 
         CREATE_MOVE.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileMoveAction>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public FileMoveAction invoke(FunctionInvocation<FileMoveAction> invocation, Object... arguments) {
 
                 return null;
             }
 
-        });
+        }, LEVEL_6);
 
         CREATE_MOVE_TO_OTHER_FS.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileMoveAction>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public FileMoveAction invoke(FunctionInvocation<FileMoveAction> invocation, Object... arguments) {
 
                 return null;
             }
 
-        });
+        }, LEVEL_6);
 
         CREATE_REMOVE.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileRemoveAction>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public FileRemoveAction invoke(FunctionInvocation<FileRemoveAction> invocation, Object... arguments) {
 
                 return null;
             }
 
-        });
+        }, LEVEL_6);
 
         // The root file has no name size
         GET_SIZE.addExecutor("name", RootFile.class, new FunctionExecutor<Long>() {

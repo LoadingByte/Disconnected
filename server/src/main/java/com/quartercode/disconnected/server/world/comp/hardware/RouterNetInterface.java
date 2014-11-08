@@ -19,6 +19,8 @@
 package com.quartercode.disconnected.server.world.comp.hardware;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.extra.Priorities.LEVEL_3;
+import static com.quartercode.classmod.extra.Priorities.LEVEL_5;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -30,7 +32,6 @@ import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceCollectionStorage;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
@@ -88,7 +89,6 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
         BACKBONE_CONNECTION.addSetterExecutor("addReverseConnection", RouterNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_3)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 if (arguments[0] != null) {
@@ -103,11 +103,10 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_3);
         BACKBONE_CONNECTION.addSetterExecutor("removeReverseConnection", RouterNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_5)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 if (arguments[0] == null) {
@@ -122,13 +121,12 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_5);
 
         NEIGHBOURS = create(new TypeLiteral<CollectionPropertyDefinition<RouterNetInterface, List<RouterNetInterface>>>() {}, "name", "neighbours", "storage", new ReferenceCollectionStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()), "hidden", true);
         NEIGHBOURS.addAdderExecutor("addReverseConnection", RouterNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_3)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 RouterNetInterface holder = (RouterNetInterface) invocation.getCHolder();
@@ -141,11 +139,10 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_3);
         NEIGHBOURS.addRemoverExecutor("removeReverseConnection", RouterNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_3)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 RouterNetInterface holder = (RouterNetInterface) invocation.getCHolder();
@@ -158,13 +155,12 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_3);
 
         CHILDREN = create(new TypeLiteral<CollectionPropertyDefinition<NodeNetInterface, List<NodeNetInterface>>>() {}, "name", "children", "storage", new ReferenceCollectionStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
         CHILDREN.addAdderExecutor("addReverseConnection", RouterNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_3)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 RouterNetInterface holder = (RouterNetInterface) invocation.getCHolder();
@@ -178,11 +174,10 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_3);
         CHILDREN.addRemoverExecutor("removeReverseConnection", RouterNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_3)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 RouterNetInterface holder = (RouterNetInterface) invocation.getCHolder();
@@ -196,7 +191,7 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_3);
 
     }
 

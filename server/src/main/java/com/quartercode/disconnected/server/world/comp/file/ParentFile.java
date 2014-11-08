@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.server.world.comp.file;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.extra.Priorities.LEVEL_6;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.reflect.TypeLiteral;
@@ -27,7 +28,6 @@ import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
@@ -70,7 +70,6 @@ public class ParentFile<P extends CFeatureHolder> extends File<P> {
         CHILDREN.addAdderExecutor("checkSize", ParentFile.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FileSystem fileSystem = invocation.getCHolder().invoke(GET_FILE_SYSTEM);
@@ -84,7 +83,7 @@ public class ParentFile<P extends CFeatureHolder> extends File<P> {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_6);
 
     }
 

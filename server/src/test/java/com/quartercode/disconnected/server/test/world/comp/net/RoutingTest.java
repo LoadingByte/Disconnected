@@ -18,24 +18,24 @@
 
 package com.quartercode.disconnected.server.test.world.comp.net;
 
+import static com.quartercode.classmod.extra.Priorities.LEVEL_8;
 import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
+import com.quartercode.classmod.util.test.JUnitRuleModMockery;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
 import com.quartercode.disconnected.server.world.comp.net.Backbone;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
-import com.quartercode.disconnected.server.world.comp.net.PacketProcessor;
 import com.quartercode.disconnected.server.world.comp.net.TCPPacket;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
 import com.quartercode.disconnected.shared.world.comp.net.NetID;
@@ -633,71 +633,37 @@ public class RoutingTest {
         }
     }
 
-    // ----- PacketProcessor.PROCESS Callback -----
+    // ----- NodeNetInterface.PROCESS Callback -----
 
     /*
      * This field is changed by the test on every run.
-     * The callback is called every time a packet is processed by a backbone, router or node.
+     * The callback is called every time a packet is processed NodeNetInterface.
      */
-    private static ProcessPacketCallback processPacketCallback;
+    private ProcessPacketCallback processPacketCallback;
 
     private static interface ProcessPacketCallback {
 
-        public void onProcessPacket(NetID processorID, Packet packet);
+        public void onProcessPacket(NodeNetInterface node, Packet packet);
 
     }
 
-    @BeforeClass
-    public static void installProcessCallback() {
+    @Rule
+    public JUnitRuleModMockery modmock = new JUnitRuleModMockery();
 
-        Backbone.PROCESS.addExecutor("processPacketCallbackRunner", Backbone.class, new FunctionExecutor<Void>() {
+    @Before
+    public void setUpProcessPacketCallback() {
+
+        modmock.addFuncExec(NodeNetInterface.PROCESS, "processPacketCallback", NodeNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_8)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                processPacketCallback.onProcessPacket(null, (Packet) arguments[0]);
+                processPacketCallback.onProcessPacket((NodeNetInterface) invocation.getCHolder(), (Packet) arguments[0]);
 
                 return invocation.next(arguments);
             }
 
-        });
-
-        RouterNetInterface.PROCESS.addExecutor("processPacketCallbackRunner", RouterNetInterface.class, new FunctionExecutor<Void>() {
-
-            @Override
-            @Prioritized (Prioritized.LEVEL_8)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                NetID processorID = new NetID(invocation.getCHolder().getObj(RouterNetInterface.SUBNET), 0);
-                processPacketCallback.onProcessPacket(processorID, (Packet) arguments[0]);
-
-                return invocation.next(arguments);
-            }
-
-        });
-
-        NodeNetInterface.PROCESS.addExecutor("processPacketCallbackRunner", NodeNetInterface.class, new FunctionExecutor<Void>() {
-
-            @Override
-            @Prioritized (Prioritized.LEVEL_8)
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                NetID processorID = invocation.getCHolder().getObj(NodeNetInterface.NET_ID);
-                processPacketCallback.onProcessPacket(processorID, (Packet) arguments[0]);
-
-                return invocation.next(arguments);
-            }
-
-        });
-    }
-
-    @AfterClass
-    public static void uninstallProcessCallback() {
-
-        Backbone.PROCESS.removeExecutor("processPacketCallbackRunner", Backbone.class);
-        RouterNetInterface.PROCESS.removeExecutor("processPacketCallbackRunner", RouterNetInterface.class);
-        NodeNetInterface.PROCESS.removeExecutor("processPacketCallbackRunner", NodeNetInterface.class);
+        }, LEVEL_8);
     }
 
     // ----- Actual Test -----
@@ -751,15 +717,15 @@ public class RoutingTest {
         return children;
     }
 
-    private static class TestExecutor {
+    private class TestExecutor {
 
-        private final PacketProcessor source;
-        private final NetID           sourceId;
-        private final NetID           destinationId;
+        private final NodeNetInterface source;
+        private final NetID            sourceId;
+        private final NetID            destinationId;
 
-        private boolean               receivedPacket;
+        private boolean                receivedPacket;
 
-        public TestExecutor(PacketProcessor source, NetID sourceId, NetID destinationId) {
+        public TestExecutor(NodeNetInterface source, NetID sourceId, NetID destinationId) {
 
             this.source = source;
             this.sourceId = sourceId;
@@ -768,11 +734,12 @@ public class RoutingTest {
             processPacketCallback = new ProcessPacketCallback() {
 
                 @Override
-                public void onProcessPacket(NetID processorId, Packet packet) {
+                public void onProcessPacket(NodeNetInterface node, Packet packet) {
 
-                    NetID destination = packet.getObj(Packet.DESTINATION).getNetId();
+                    NetID processorId = node.getObj(NodeNetInterface.NET_ID);
+                    NetID destinationId = packet.getObj(Packet.DESTINATION).getNetId();
 
-                    if (destination.equals(processorId) && destination.equals(TestExecutor.this.destinationId)) {
+                    if (destinationId.equals(processorId) && destinationId.equals(TestExecutor.this.destinationId)) {
                         receivedPacket = true;
                     }
                 }
@@ -787,7 +754,7 @@ public class RoutingTest {
             packet.setObj(TCPPacket.DESTINATION, new Address(destinationId, 1));
             packet.setObj(TCPPacket.DATA, "testdata");
 
-            source.invoke(PacketProcessor.PROCESS, packet);
+            source.invoke(NodeNetInterface.PROCESS, packet);
 
             String sourceString = sourceId.toString();
             String destinationString = destinationId.toString();

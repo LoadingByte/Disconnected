@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.server.world.comp.program;
 
+import static com.quartercode.classmod.extra.Priorities.LEVEL_6;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 
 /**
  * The root process is a simple {@link Process} which can be only used as root for the process tree.
@@ -36,14 +36,13 @@ public class RootProcess extends Process<ProcessModule> {
         GET_ROOT.addExecutor("returnThis", RootProcess.class, new FunctionExecutor<RootProcess>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public RootProcess invoke(FunctionInvocation<RootProcess> invocation, Object... arguments) {
 
                 invocation.next(arguments);
                 return (RootProcess) invocation.getCHolder();
             }
 
-        });
+        }, LEVEL_6);
 
     }
 

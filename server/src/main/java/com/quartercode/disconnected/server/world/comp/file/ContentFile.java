@@ -19,10 +19,10 @@
 package com.quartercode.disconnected.server.world.comp.file;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.extra.Priorities.LEVEL_6;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.server.world.util.SizeUtil;
@@ -62,7 +62,6 @@ public class ContentFile extends File<ParentFile<?>> {
         CONTENT.addSetterExecutor("checkSize", ContentFile.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 FileSystem fileSystem = invocation.getCHolder().invoke(GET_FILE_SYSTEM);
@@ -73,7 +72,7 @@ public class ContentFile extends File<ParentFile<?>> {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_6);
 
     }
 

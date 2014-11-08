@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.server.world.comp.net;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.extra.Priorities.LEVEL_3;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +29,6 @@ import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.storage.ReferenceCollectionStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
@@ -57,7 +57,6 @@ public class Backbone extends WorldFeatureHolder implements PacketProcessor {
         CHILDREN.addAdderExecutor("addReverseConnection", Backbone.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_3)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Backbone holder = (Backbone) invocation.getCHolder();
@@ -71,11 +70,10 @@ public class Backbone extends WorldFeatureHolder implements PacketProcessor {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_3);
         CHILDREN.addRemoverExecutor("removeReverseConnection", Backbone.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_3)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Backbone holder = (Backbone) invocation.getCHolder();
@@ -89,7 +87,7 @@ public class Backbone extends WorldFeatureHolder implements PacketProcessor {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_3);
 
     }
 

@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.server.world.comp.net;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.extra.Priorities.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.reflect.TypeLiteral;
@@ -27,7 +28,6 @@ import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.server.world.comp.Computer;
@@ -175,7 +175,6 @@ public class NetworkModule extends OSModule {
         Socket.CONNECT.addExecutor("generateLocalPort", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_7 + Prioritized.SUBLEVEL_5)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Socket holder = (Socket) invocation.getCHolder();
@@ -216,13 +215,12 @@ public class NetworkModule extends OSModule {
                 return true;
             }
 
-        });
+        }, LEVEL_7 + SUBLEVEL_5);
 
         // Add a listener to the Socket.CONNECT function that checks whether the connection the socket wants to establish is free
         Socket.CONNECT.addExecutor("checkFree", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Socket holder = (Socket) invocation.getCHolder();
@@ -238,13 +236,12 @@ public class NetworkModule extends OSModule {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_7);
 
         // Add a listener to the Socket.DISCONNECT function that removes the socket from the list
         Socket.DISCONNECT.addExecutor("removeFromNetModule", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_2)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Socket holder = (Socket) invocation.getCHolder();
@@ -256,13 +253,12 @@ public class NetworkModule extends OSModule {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_2);
 
         // Add a setter listener to the Socket.STATE property that notifies all connection listeners if the state of a socket changes to CONNECTED
         Socket.STATE.addSetterExecutor("notifySocketConnectionListeners", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_8)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Socket holder = (Socket) invocation.getCHolder();
@@ -279,7 +275,7 @@ public class NetworkModule extends OSModule {
                 return null;
             }
 
-        });
+        }, LEVEL_8);
 
         SEND = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "send", "parameters", new Class[] { Packet.class });
         SEND.addExecutor("default", NetworkModule.class, new FunctionExecutor<Void>() {

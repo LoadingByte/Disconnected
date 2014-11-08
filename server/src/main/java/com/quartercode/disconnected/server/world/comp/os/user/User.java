@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.server.world.comp.os.user;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.extra.Priorities.LEVEL_6;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,6 @@ import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.ValueSupplierDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceCollectionStorage;
@@ -110,7 +110,6 @@ public class User extends ConfigurationEntry {
         NAME.addSetterExecutor("checkNotSuperuser", User.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 if (invocation.getCHolder().invoke(IS_SUPERUSER)) {
@@ -121,7 +120,7 @@ public class User extends ConfigurationEntry {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_6);
 
         PASSWORD = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "password", "storage", new StandardStorage<>());
 
@@ -129,29 +128,26 @@ public class User extends ConfigurationEntry {
         GROUPS.addAdderExecutor("checkNotSuperuser", User.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Validate.isTrue(!invocation.getCHolder().invoke(IS_SUPERUSER), "The superuser can't be a member in any group");
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_6);
         GROUPS.addRemoverExecutor("checkNotSuperuser", User.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Validate.isTrue(!invocation.getCHolder().invoke(IS_SUPERUSER), "The superuser can't be a member in any group");
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_6);
         GROUPS.addRemoverExecutor("checkNotPrimaryGroup", User.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 if (invocation.getCHolder().invoke(GET_PRIMARY_GROUP).equals(arguments[0])) {
@@ -161,7 +157,7 @@ public class User extends ConfigurationEntry {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_6);
 
     }
 

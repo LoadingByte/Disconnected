@@ -19,12 +19,12 @@
 package com.quartercode.disconnected.server.world.comp.hardware;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.extra.Priorities.*;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
@@ -82,7 +82,6 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
         NET_ID.addSetterExecutor("checkSubnetAgainstConnection", NodeNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 NetID netId = (NetID) arguments[0];
@@ -98,13 +97,12 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_6);
 
         CONNECTION = create(new TypeLiteral<PropertyDefinition<RouterNetInterface>>() {}, "name", "connection", "storage", new ReferenceStorage<>(), "hidden", true);
         CONNECTION.addSetterExecutor("invalidateNetID", NodeNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_5 + Prioritized.LEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
@@ -117,11 +115,10 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_7);
         CONNECTION.addSetterExecutor("addReverseConnection", NodeNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_3)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 if (arguments[0] != null) {
@@ -136,11 +133,10 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_3);
         CONNECTION.addSetterExecutor("removeReverseConnection", NodeNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_5)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 if (arguments[0] == null) {
@@ -155,7 +151,7 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_5);
 
     }
 

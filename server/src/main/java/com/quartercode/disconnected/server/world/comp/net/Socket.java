@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.server.world.comp.net;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.extra.Priorities.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -28,7 +29,6 @@ import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Prioritized;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
@@ -151,7 +151,6 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
         LOCAL_PORT.addSetterExecutor("checkRange", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_6)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 int port = (Integer) arguments[0];
@@ -160,7 +159,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_6);
 
         DESTINATION = create(new TypeLiteral<PropertyDefinition<Address>>() {}, "name", "destination", "storage", new StandardStorage<>());
         PACKET_HANDLERS = create(new TypeLiteral<CollectionPropertyDefinition<PacketHandler, List<PacketHandler>>>() {}, "name", "packetHandlers", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
@@ -169,7 +168,6 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
         STATE.addSetterExecutor("scheduleConnectionTimeout", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
@@ -194,11 +192,10 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                 return null;
             }
 
-        });
+        }, LEVEL_7);
         STATE.addSetterExecutor("scheduleKeepalive", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
@@ -240,7 +237,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                 });
             }
 
-        });
+        }, LEVEL_7);
 
         CURRENT_SEQ_NUMBER = create(new TypeLiteral<PropertyDefinition<Integer>>() {}, "name", "currentSeqNumber", "storage", new StandardStorage<>());
         CURRENT_SEQ_NUMBER.addSetterExecutor("generate", Socket.class, new FunctionExecutor<Void>() {
@@ -328,7 +325,6 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
         CONNECT.addExecutor("validateSettings", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_8)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
@@ -338,7 +334,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_8);
         CONNECT.addExecutor("default", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -401,7 +397,6 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
         HANDLE.addExecutor("processHandshake", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
@@ -463,11 +458,10 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_7);
         HANDLE.addExecutor("processKeepalive", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
@@ -506,11 +500,10 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_7);
         HANDLE.addExecutor("processTeardown", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
-            @Prioritized (Prioritized.LEVEL_7)
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
@@ -525,7 +518,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_7);
         HANDLE.addExecutor("default", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
