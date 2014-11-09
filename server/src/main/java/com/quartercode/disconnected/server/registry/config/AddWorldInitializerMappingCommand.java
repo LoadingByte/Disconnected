@@ -66,8 +66,8 @@ public class AddWorldInitializerMappingCommand implements ConfigCommandParser {
 
             FeatureDefinition<?> featureDefinition = null;
             try {
-                String featureDefinitionString = VariableReferenceResolver.process(featureElement.getText());
-                featureDefinition = (FeatureDefinition<?>) resolveStaticFieldReference(config, featureDefinitionString);
+                String featureDefinitionString = VariableReferenceResolver.process(featureElement.getText(), null);
+                featureDefinition = (FeatureDefinition<?>) ParserUtils.parseConstant(config, "feature definition field for world initializer mapping", FeatureDefinition.class, featureDefinitionString, null);
             } catch (ClassCastException e) {
                 LOGGER.warn("Config: Static holder type field '{}' does not contain an instance of FeatureDefinition (in '{}')", featureElement.getText(), config.getBaseURI());
             }
@@ -78,20 +78,6 @@ public class AddWorldInitializerMappingCommand implements ConfigCommandParser {
         }
 
         return null;
-    }
-
-    private static Object resolveStaticFieldReference(Document config, String reference) {
-
-        String className = StringUtils.substringBeforeLast(reference, ".");;
-        String fieldName = StringUtils.substringAfterLast(reference, ".");
-
-        try {
-            Class<?> c = Class.forName(className);
-            return c.getField(fieldName).get(null);
-        } catch (ReflectiveOperationException e) {
-            LOGGER.warn("Config: Cannot find static holder type field '{}' (in '{}')", reference, config.getBaseURI(), e);
-            return null;
-        }
     }
 
 }

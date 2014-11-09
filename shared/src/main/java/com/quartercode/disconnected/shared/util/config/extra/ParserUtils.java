@@ -157,6 +157,47 @@ public class ParserUtils {
         return oldURL;
     }
 
+    /**
+     * Parses the given string, which must contain a fully qualified java {@link Class} name string and a static field name, and returns the result.
+     * The format for the string is {@code class.field} (e.g. {@code com.quartercode.disconnected.Something.CONSTANT_3}).
+     * Note that inner classes can also be accessed (e.g. {@code com.quartercode.disconnected.Outer$Inner.CONSTANT_15}).
+     * This method outputs a logger warning and returns the given old constant value class if the string does not represent a valid static field.
+     * 
+     * @param config The XML configuration {@link Document} that contains the string for parsing.
+     * @param usage A string that is used to specify the logger warning.
+     *        The context is "Cannot use ... as {}", where {} is the usage string.
+     *        An example for this might be "mapping value".
+     *        Note that additional parameters should be supplied for making finding the error easier: "mapping value for {mappingKey}".
+     * @param valueSuperclass The superclass the parsed constant value must extend somehow.
+     *        If the parsed value does not do that, a logger warning will be printed.
+     *        This parameter may be {@code null} to disable the check.
+     * @param string The fully qualified java class name string followed by a dot and the static field name that should be parsed.
+     * @param oldValue The old constant value that will be returned if there's an error during parsing.
+     * @return The parsed constant value, or {@code oldValue} if an error occurred.
+     */
+    public static Object parseConstant(Document config, String usage, Class<?> valueSuperclass, String string, Class<?> oldValue) {
+
+        String className = StringUtils.substringBeforeLast(string, ".");
+        String fieldName = StringUtils.substringAfterLast(string, ".");
+
+        try {
+            Class<?> type = Class.forName(className);
+            Object value = type.getField(fieldName).get(null);
+
+            if (valueSuperclass != null && !valueSuperclass.isInstance(value)) {
+                LOGGER.warn("Config: Cannot use constant value '{}' as {} because it does not extend '{}' (in '{}')", value, usage, valueSuperclass.getName(), config.getBaseURI());
+            } else {
+                return value;
+            }
+        } catch (ClassNotFoundException e) {
+            LOGGER.warn("Config: Cannot use constant '{}' from unknown class '{}' as {} (in '{}')", fieldName, className, usage, config.getBaseURI());
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            LOGGER.warn("Config: Cannot use unknown constant '{}' as {} (in '{}')", string, usage, config.getBaseURI());
+        }
+
+        return oldValue;
+    }
+
     private ParserUtils() {
 
     }
