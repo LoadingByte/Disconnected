@@ -73,7 +73,7 @@ public class RemoveNamedValueCommand<V extends NamedValue> implements ConfigComm
         if (StringUtils.isBlank(name)) {
             LOGGER.warn("Config: Cannot remove {} with blank name (in '{}')", valueType, config.getBaseURI());
         } else {
-            name = VariableReferenceResolver.process(name);
+            name = VariableReferenceResolver.process(name, null);
 
             V valueForRemoval = null;
             for (V existingValue : registry.getValues()) {

@@ -50,13 +50,13 @@ public class ConfigureThemeCommand extends ConfigureNamedValueCommand<Theme> {
 
         Element urlElement = commandElement.getChild("url");
         if (urlElement != null) {
-            String urlString = VariableReferenceResolver.process(urlElement.getText());
+            String urlString = VariableReferenceResolver.process(urlElement.getText(), null);
             url = ParserUtils.parseURL(config, "theme URL for '" + name + "'", urlString, url);
         }
 
         Element priorityElement = commandElement.getChild("priority");
         if (priorityElement != null) {
-            String priorityString = VariableReferenceResolver.process(priorityElement.getText());
+            String priorityString = VariableReferenceResolver.process(priorityElement.getText(), null);
             priority = (int) ParserUtils.parsePositiveNumber(config, "theme priority for '" + name + "'", priorityString, priority);
         }
 

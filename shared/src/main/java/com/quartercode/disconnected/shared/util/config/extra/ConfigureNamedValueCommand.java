@@ -86,7 +86,7 @@ public abstract class ConfigureNamedValueCommand<V extends NamedValue> implement
         if (StringUtils.isBlank(name)) {
             LOGGER.warn("Config: Cannot configure {} with blank name (in '{}')", valueType, config.getBaseURI());
         } else {
-            name = VariableReferenceResolver.process(name);
+            name = VariableReferenceResolver.process(name, null);
 
             V oldValue = null;
             for (V existingValue : registry.getValues()) {

@@ -54,7 +54,7 @@ public class ConfigureClientProgramCommand extends ConfigureNamedValueCommand<Ma
 
         Element typeElement = commandElement.getChild("class");
         if (typeElement != null) {
-            String typeString = VariableReferenceResolver.process(typeElement.getText());
+            String typeString = VariableReferenceResolver.process(typeElement.getText(), null);
             Class<?> oldType = descriptor == null ? null : descriptor.getClass();
             Class<?> type = ParserUtils.parseClass(config, "client program class for '" + name + "'", ClientProgramDescriptor.class, typeString, oldType);
 

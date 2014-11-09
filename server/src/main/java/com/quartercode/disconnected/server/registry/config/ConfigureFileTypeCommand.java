@@ -50,7 +50,7 @@ public class ConfigureFileTypeCommand extends ConfigureNamedValueCommand<Mapping
 
         Element typeElement = commandElement.getChild("class");
         if (typeElement != null) {
-            String typeString = VariableReferenceResolver.process(typeElement.getText());
+            String typeString = VariableReferenceResolver.process(typeElement.getText(), null);
             type = ParserUtils.parseClass(config, "file type class for '" + name + "'", File.class, typeString, type);
         }
 

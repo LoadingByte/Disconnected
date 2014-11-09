@@ -44,7 +44,7 @@ public class RemoveWorldContextPathEntryCommand implements ConfigCommandParser {
         if (StringUtils.isBlank(entry)) {
             LOGGER.warn("Config: Cannot remove blank world context path entry (in '{}')", config.getBaseURI());
         } else {
-            registry.removeValue(VariableReferenceResolver.process(entry));
+            registry.removeValue(VariableReferenceResolver.process(entry, null));
         }
     }
 

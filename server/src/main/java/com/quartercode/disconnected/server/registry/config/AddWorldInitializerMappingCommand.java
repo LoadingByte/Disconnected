@@ -61,7 +61,7 @@ public class AddWorldInitializerMappingCommand implements ConfigCommandParser {
         } else if (featureElement == null || StringUtils.isBlank(featureElement.getText())) {
             LOGGER.warn("Config: Cannot use blank feature for world initializer mapping (in '{}')", config.getBaseURI());
         } else {
-            String holderTypeString = VariableReferenceResolver.process(holderTypeElement.getText());
+            String holderTypeString = VariableReferenceResolver.process(holderTypeElement.getText(), null);
             Class<? extends FeatureHolder> holderType = ParserUtils.parseGenericClass(config, "holder type for world initializer mapping", FeatureHolder.class, holderTypeString, null);
 
             FeatureDefinition<?> featureDefinition = null;

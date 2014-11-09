@@ -44,7 +44,7 @@ public class AddWorldContextPathEntryCommand implements ConfigCommandParser {
         if (StringUtils.isBlank(entry)) {
             LOGGER.warn("Config: Cannot add blank world context path entry (in '{}')", config.getBaseURI());
         } else {
-            registry.addValue(VariableReferenceResolver.process(entry));
+            registry.addValue(VariableReferenceResolver.process(entry, null));
         }
     }
 

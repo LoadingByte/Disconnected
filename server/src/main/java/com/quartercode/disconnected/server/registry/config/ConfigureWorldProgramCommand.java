@@ -51,19 +51,19 @@ public class ConfigureWorldProgramCommand extends ConfigureNamedValueCommand<Wor
 
         Element typeElement = commandElement.getChild("class");
         if (typeElement != null) {
-            String typeString = VariableReferenceResolver.process(typeElement.getText());
+            String typeString = VariableReferenceResolver.process(typeElement.getText(), null);
             type = ParserUtils.parseClass(config, "program executor class for '" + name + "'", ProgramExecutor.class, typeString, type);
         }
 
         Element sizeElement = commandElement.getChild("size");
         if (sizeElement != null) {
-            String sizeString = VariableReferenceResolver.process(sizeElement.getText());
+            String sizeString = VariableReferenceResolver.process(sizeElement.getText(), null);
             size = ParserUtils.parsePositiveNumber(config, "world group size for '" + name + "'", sizeString, size);
         }
 
         Element commonLocationElement = commandElement.getChild("commonLocation");
         if (commonLocationElement != null) {
-            String locationString = VariableReferenceResolver.process(commonLocationElement.getText());
+            String locationString = VariableReferenceResolver.process(commonLocationElement.getText(), null);
             commonLocation = new SeparatedPath(locationString);
         }
 

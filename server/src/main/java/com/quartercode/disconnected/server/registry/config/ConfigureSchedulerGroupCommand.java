@@ -47,7 +47,7 @@ public class ConfigureSchedulerGroupCommand extends ConfigureNamedValueCommand<S
 
         Element priorityElement = commandElement.getChild("priority");
         if (priorityElement != null) {
-            String priorityString = VariableReferenceResolver.process(priorityElement.getText());
+            String priorityString = VariableReferenceResolver.process(priorityElement.getText(), null);
             priority = (int) ParserUtils.parsePositiveNumber(config, "scheduler group priority for '" + name + "'", priorityString, priority);
         }
 
