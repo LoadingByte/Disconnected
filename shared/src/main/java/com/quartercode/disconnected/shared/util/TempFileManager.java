@@ -80,15 +80,19 @@ public class TempFileManager {
 
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(parentDir)) {
             for (Path otherTempDir : directoryStream) {
-                if (!Files.isDirectory(otherTempDir)) {
-                    Files.delete(otherTempDir);
-                } else {
-                    String otherTempDirPid = otherTempDir.getFileName().toString();
+                try {
+                    if (!Files.isDirectory(otherTempDir)) {
+                        Files.delete(otherTempDir);
+                    } else {
+                        String otherTempDirPid = otherTempDir.getFileName().toString();
 
-                    if (!javaPids.contains(otherTempDirPid)) {
-                        LOGGER.debug("Deleting old temp dir from '{}'", otherTempDir);
-                        IOFileUtils.deleteDirectory(otherTempDir);
+                        if (!javaPids.contains(otherTempDirPid)) {
+                            LOGGER.debug("Deleting old temp dir from '{}'", otherTempDir);
+                            IOFileUtils.deleteDirectory(otherTempDir);
+                        }
                     }
+                } catch (IOException e) {
+                    LOGGER.warn("Error while trying to delete old temp dir from '{}'", otherTempDir, e);
                 }
             }
         }
