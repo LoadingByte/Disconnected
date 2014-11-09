@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.shared.util.registry.extra;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,30 +32,42 @@ import java.util.List;
  */
 public class ListRegistry<V> implements MultipleValueRegistry<V> {
 
-    private final List<V> values = new ArrayList<>();
+    private final List<V>     values = new ArrayList<>();
+    private transient List<V> unmodifiableCache;
 
     @Override
     public List<V> getValues() {
 
-        return values;
+        // Update the unmodifiable cache
+        if (unmodifiableCache == null) {
+            unmodifiableCache = Collections.unmodifiableList(values);
+        }
+
+        return unmodifiableCache;
     }
 
     @Override
     public void addValue(V value) {
 
         values.add(value);
+
+        // Invalidate the unmodifiable cache
+        unmodifiableCache = null;
     }
 
     @Override
     public void removeValue(V value) {
 
         values.remove(value);
+
+        // Invalidate the unmodifiable cache
+        unmodifiableCache = null;
     }
 
     @Override
     public Iterator<V> iterator() {
 
-        return values.iterator();
+        return getValues().iterator();
     }
 
 }

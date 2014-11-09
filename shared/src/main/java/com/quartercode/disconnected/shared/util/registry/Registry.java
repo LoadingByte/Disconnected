@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.shared.util.registry;
 
-import java.util.List;
+import java.util.Collection;
 import com.quartercode.disconnected.shared.util.registry.extra.MultipleValueRegistry;
 import com.quartercode.disconnected.shared.util.registry.extra.SingleValueRegistry;
 
@@ -36,10 +36,10 @@ public interface Registry<V> extends Iterable<V> {
 
     /**
      * Returns a (possibly unmodifiable) view of all objects that are stored in the registry.
-     * In case of a {@link SingleValueRegistry}, a list with one object is returned.
+     * In case of a {@link SingleValueRegistry}, a collection with one object is returned.
      * 
      * @return All stored objects.
      */
-    public List<V> getValues();
+    public Collection<V> getValues();
 
 }

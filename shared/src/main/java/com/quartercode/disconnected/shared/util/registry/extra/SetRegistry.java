@@ -18,11 +18,9 @@
 
 package com.quartercode.disconnected.shared.util.registry.extra;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -34,18 +32,18 @@ import java.util.Set;
  */
 public class SetRegistry<V> implements MultipleValueRegistry<V> {
 
-    private final Set<V> values = new HashSet<>();
-    private List<V>      listCache;
+    private final Set<V>     values = new HashSet<>();
+    private transient Set<V> unmodifiableCache;
 
     @Override
-    public List<V> getValues() {
+    public Set<V> getValues() {
 
-        // Update the list cache
-        if (listCache == null) {
-            listCache = Collections.unmodifiableList(new ArrayList<>(values));
+        // Update the unmodifiable cache
+        if (unmodifiableCache == null) {
+            unmodifiableCache = Collections.unmodifiableSet(values);
         }
 
-        return listCache;
+        return unmodifiableCache;
     }
 
     @Override
@@ -53,8 +51,8 @@ public class SetRegistry<V> implements MultipleValueRegistry<V> {
 
         values.add(value);
 
-        // Invalidate the list cache
-        listCache = null;
+        // Invalidate the unmodifiable cache
+        unmodifiableCache = null;
     }
 
     @Override
@@ -62,8 +60,8 @@ public class SetRegistry<V> implements MultipleValueRegistry<V> {
 
         values.remove(value);
 
-        // Invalidate the list cache
-        listCache = null;
+        // Invalidate the unmodifiable cache
+        unmodifiableCache = null;
     }
 
     @Override

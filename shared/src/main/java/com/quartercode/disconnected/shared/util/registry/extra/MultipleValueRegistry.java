@@ -19,7 +19,6 @@
 package com.quartercode.disconnected.shared.util.registry.extra;
 
 import java.util.Collection;
-import java.util.List;
 import com.quartercode.disconnected.shared.util.registry.Registry;
 
 /**
@@ -38,7 +37,7 @@ public interface MultipleValueRegistry<V> extends Registry<V> {
      * @return All stored values.
      */
     @Override
-    public List<V> getValues();
+    public Collection<V> getValues();
 
     /**
      * Adds the given value object to the multiple value registry.
