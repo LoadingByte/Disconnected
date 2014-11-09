@@ -22,8 +22,6 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlElement;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * This class stores a location using x and y relative coordinates.
@@ -132,13 +130,24 @@ public class Location implements Serializable {
     @Override
     public int hashCode() {
 
-        return HashCodeBuilder.reflectionHashCode(this);
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Float.floatToIntBits(x);
+        result = prime * result + Float.floatToIntBits(y);
+        return result;
     }
 
     @Override
     public boolean equals(Object obj) {
 
-        return EqualsBuilder.reflectionEquals(this, obj);
+        if (this == obj) {
+            return true;
+        } else if (obj == null || ! (obj instanceof Location)) {
+            return false;
+        } else {
+            Location other = (Location) obj;
+            return x == other.x && y == other.y;
+        }
     }
 
     /**

@@ -149,7 +149,7 @@ public class ParserUtils {
                 try {
                     return file.toUri().toURL();
                 } catch (MalformedURLException e) {
-                    LOGGER.error("Strange error while converting file '{}' to url", file);
+                    LOGGER.error("Strange error while converting file '{}' to url", file, e);
                 }
             }
         }

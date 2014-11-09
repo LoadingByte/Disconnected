@@ -91,7 +91,7 @@ public class VariableReferenceResolver {
         return output;
     }
 
-    public static String processVariables(String input, Map<String, Object> variables) {
+    private static String processVariables(String input, Map<String, Object> variables) {
 
         Matcher matcher = PATTERN.matcher(input);
         StringBuffer output = new StringBuffer(input.length());
