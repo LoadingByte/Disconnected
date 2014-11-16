@@ -19,12 +19,20 @@
 package com.quartercode.disconnected.server.test;
 
 import static org.junit.Assert.assertTrue;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class ExtraAssert {
+
+    public static void assertCollectionEquals(String message, Collection<?> actualCollection, Object... expectedElements) {
+
+        assertTrue(message, actualCollection.size() == expectedElements.length);
+        assertTrue(message, actualCollection.containsAll(Arrays.asList(expectedElements)));
+    }
 
     public static void assertMapEquals(String message, Map<?, ?> map, Pair<?, ?>... entries) {
 
