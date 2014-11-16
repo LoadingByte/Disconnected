@@ -60,6 +60,30 @@ public class ParserUtils {
     }
 
     /**
+     * Parses the given decimal number string and returns the result (as a double).
+     * This method outputs a logger warning and returns the given old number if the string does not represent a positive or negative decimal number.
+     * 
+     * @param config The XML configuration {@link Document} that contains the string for parsing.
+     * @param usage A string that is used to specify the logger warning.
+     *        The context is "Cannot use ... as {}", where {} is the usage string.
+     *        An example for this might be "program selection probability".
+     *        Note that additional parameters should be supplied for making finding the error easier: "program selection probability for {programName}".
+     * @param string The decimal number string that should be parsed.
+     * @param oldNumber The old decimal number that will be returned if there's an error during parsing.
+     * @return The parsed decimal number, or {@code oldNumber} if an error occurred.
+     */
+    public static double parseDecimalNumber(Document config, String usage, String string, double oldNumber) {
+
+        try {
+            return Double.parseDouble(string);
+        } catch (NumberFormatException e) {
+            LOGGER.warn("Config: Cannot use non-decimal string '{}' as {} (in '{}')", string, usage, config.getBaseURI());
+        }
+
+        return oldNumber;
+    }
+
+    /**
      * Parses the given fully qualified java {@link Class} name string and returns the result.
      * This method outputs a logger warning and returns the given old class if the string does not represent a valid class.
      * 
