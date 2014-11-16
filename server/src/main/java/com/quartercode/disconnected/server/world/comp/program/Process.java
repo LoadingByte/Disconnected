@@ -378,6 +378,12 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
     public static final FunctionDefinition<User>                                                       GET_USER;
 
     /**
+     * Returns the {@link Program} which is ran by the process.
+     * It is stored inside the {@link #SOURCE} file.
+     */
+    public static final FunctionDefinition<Program>                                                    GET_PROGRAM;
+
+    /**
      * Initializes the process using the {@link Program} that is stored in the set source {@link ContentFile}.
      * Initialization means setting the {@link #PID} and creating a {@link ProgramExecutor} instance.
      * Please note that the process needs to be launched using the {@link ProgramExecutor#RUN} method on the {@link #EXECUTOR} after intialization.
@@ -671,6 +677,21 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                     invocation.next(arguments);
                     return user;
                 }
+            }
+
+        });
+
+        GET_PROGRAM = create(new TypeLiteral<FunctionDefinition<Program>>() {}, "name", "getProgram", "parameters", new Class[0]);
+        GET_PROGRAM.addExecutor("default", Process.class, new FunctionExecutor<Program>() {
+
+            @Override
+            public Program invoke(FunctionInvocation<Program> invocation, Object... arguments) {
+
+                CFeatureHolder holder = invocation.getCHolder();
+                Program program = (Program) holder.getObj(SOURCE).getObj(ContentFile.CONTENT);
+
+                invocation.next(arguments);
+                return program;
             }
 
         });
