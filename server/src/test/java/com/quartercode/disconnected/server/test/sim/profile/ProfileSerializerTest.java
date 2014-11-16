@@ -77,6 +77,10 @@ public class ProfileSerializerTest {
      */
     private boolean equalsPersistent(DefaultFeatureHolder holder1, DefaultFeatureHolder holder2) {
 
+        if (holder1.getClass() != holder2.getClass()) {
+            return false;
+        }
+
         List<Feature> features1 = holder1.getPersistentFeatures();
         List<Feature> features2 = holder2.getPersistentFeatures();
 
