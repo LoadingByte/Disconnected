@@ -28,7 +28,7 @@ public interface NamedValue {
     /**
      * Returns the name of the value.
      * 
-     * @return The value name;
+     * @return The value name.
      */
     public String getName();
 

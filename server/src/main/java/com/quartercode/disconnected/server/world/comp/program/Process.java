@@ -447,7 +447,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             }
 
         });
-        APPLY_STATE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setState", "parameters", new Class[] { ProcessState.class, Boolean.class });
+        APPLY_STATE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "applyState", "parameters", new Class[] { ProcessState.class, Boolean.class });
         APPLY_STATE.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -734,7 +734,6 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                     throw new IllegalStateException("Cannot initialize process: No read right and execute right on file");
                 }
 
-                // Class<? extends ProgramExecutor> executorClass = ((Program) source.getObj(ContentFile.CONTENT)).getObj(Program.EXECUTOR_CLASS);
                 // Retrieve the program data object
                 String programName = ((Program) source.getObj(ContentFile.CONTENT)).getObj(Program.NAME);
                 WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS), programName);

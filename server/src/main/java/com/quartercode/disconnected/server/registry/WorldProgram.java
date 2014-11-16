@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.server.registry;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -45,6 +46,8 @@ public class WorldProgram implements NamedValue {
      *        Moreover, the file name of the common location is used to retrieve a program file through the {@code PATH} variable.
      */
     public WorldProgram(String name, Class<?> type, long size, SeparatedPath commonLocation) {
+
+        Validate.notNull(name, "World program name cannot be null");
 
         this.name = name;
         this.type = type;

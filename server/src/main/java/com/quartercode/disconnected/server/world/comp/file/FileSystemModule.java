@@ -319,7 +319,7 @@ public class FileSystemModule extends OSModule {
                 // Only invoke on bootstrap
                 if ((Boolean) arguments[0]) {
                     for (KnownFileSystem fileSystem : invocation.getCHolder().getColl(KNOWN_FS)) {
-                        // TODO: Temp: Mount every available file system until a fs table is implemented
+                        // TODO: Temp: Mount every available file system until an fs table is implemented
                         // if (fileSystem.getProp(KnownFileSystem.MOUNTPOINT).equals(CommonFiles.SYSTEM_MOUNTPOINT)) {
                         fileSystem.setObj(KnownFileSystem.MOUNTED, true);
                         // break;

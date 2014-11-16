@@ -39,7 +39,7 @@ import com.quartercode.disconnected.shared.world.comp.Version;
 
 /**
  * This class stores information about a program.
- * A program object can be stored in a file. The execution is done by a program executor. To run an executor, you need to create a new process.
+ * A program object can be stored in a file. The execution is done by a {@link ProgramExecutor}. To run an executor, you need to create a new {@link Process}.
  * This also contains a {@link VulnerabilityContainer} that manages the {@link Vulnerability}s of the program.
  * 
  * @see ProgramExecutor

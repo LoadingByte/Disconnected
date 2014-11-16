@@ -69,7 +69,7 @@ public class AddWorldInitializerMappingCommand implements ConfigCommandParser {
                 String featureDefinitionString = VariableReferenceResolver.process(featureElement.getText(), null);
                 featureDefinition = (FeatureDefinition<?>) ParserUtils.parseConstant(config, "feature definition field for world initializer mapping", FeatureDefinition.class, featureDefinitionString, null);
             } catch (ClassCastException e) {
-                LOGGER.warn("Config: Static holder type field '{}' does not contain an instance of FeatureDefinition (in '{}')", featureElement.getText(), config.getBaseURI());
+                LOGGER.warn("Config: Static feature definition field '{}' does not contain an instance of FeatureDefinition (in '{}')", featureElement.getText(), config.getBaseURI());
             }
 
             if (holderType != null && featureDefinition != null) {

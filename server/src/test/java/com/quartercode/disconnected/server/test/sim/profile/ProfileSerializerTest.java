@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import javax.xml.bind.JAXBException;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import com.quartercode.classmod.base.Feature;
@@ -52,16 +51,10 @@ public class ProfileSerializerTest {
         SharedInitializer.initializeFinal();
     }
 
-    private World world;
-
-    @Before
-    public void setUp() {
-
-        world = WorldGenerator.generateWorld(new Random(1), 2);
-    }
-
     @Test
     public void testSerializeWorld() throws IOException, JAXBException {
+
+        World world = WorldGenerator.generateWorld(new Random(1), 2);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ProfileSerializer.serializeWorld(outputStream, world);
@@ -86,23 +79,23 @@ public class ProfileSerializerTest {
 
         if (features1.size() != features2.size()) {
             return false;
-        } else {
-            for (Feature feature1 : features1) {
-                boolean contains = false;
-                for (Feature feature2 : features2) {
-                    if (equalsPersistent(feature1, feature2)) {
-                        contains = true;
-                        break;
-                    }
-                }
+        }
 
-                if (!contains) {
-                    return false;
+        for (Feature feature1 : features1) {
+            boolean contains = false;
+            for (Feature feature2 : features2) {
+                if (equalsPersistent(feature1, feature2)) {
+                    contains = true;
+                    break;
                 }
             }
 
-            return true;
+            if (!contains) {
+                return false;
+            }
         }
+
+        return true;
     }
 
     private boolean equalsPersistent(Feature feature1, Feature feature2) {

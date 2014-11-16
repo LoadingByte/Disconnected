@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.server.registry;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -39,6 +40,8 @@ public class SchedulerGroup implements NamedValue {
      * @param priority The priority of the group.
      */
     public SchedulerGroup(String name, int priority) {
+
+        Validate.notNull(name, "Scheduler group name cannot be null");
 
         this.name = name;
         this.priority = priority;
