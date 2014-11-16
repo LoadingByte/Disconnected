@@ -22,7 +22,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
+import com.quartercode.disconnected.server.registry.VulnerabilitySource;
 import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.util.ProbabilityUtil;
 import com.quartercode.disconnected.server.world.World;
@@ -48,6 +50,7 @@ import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.os.config.Configuration;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.server.world.comp.program.Program;
+import com.quartercode.disconnected.server.world.comp.vuln.VulnerabilityContainer;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
 import com.quartercode.disconnected.shared.world.comp.ByteUnit;
@@ -296,19 +299,11 @@ public class WorldGenerator {
         addProgramFile(fileSystem, superuser, "fileManager", new Version(1, 0, 0));
     }
 
-    private static void addProgramFile(FileSystem fileSystem, User superuser, String programName, Version version) {
-
-        Program program = new Program();
-        program.setObj(Program.NAME, programName);
-        program.setObj(Program.VERSION, version);
-
-        WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS), programName);
-        String programPath = programData.getCommonLocation().toString();
-        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(programPath)[1], superuser, "o:rx", program);
-    }
-
     // Temporary method for generating some unnecessary programs and personal files
     private static void addUserFiles(FileSystem fileSystem, User superuser) {
+
+        // Add service programs
+        addProgramFile(fileSystem, superuser, "webServer", new Version(1, 0, 0));
 
         // Generate basic user config
         Configuration userConfig = new Configuration();
@@ -338,6 +333,24 @@ public class WorldGenerator {
         ContentFile file = createContentFile(owner, rights, content);
         fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, path).invoke(FileAddAction.EXECUTE);
         return file;
+    }
+
+    private static void addProgramFile(FileSystem fileSystem, User superuser, String programName, Version version) {
+
+        WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS), programName);
+
+        Program program = new Program();
+        program.setObj(Program.NAME, programName);
+        program.setObj(Program.VERSION, version);
+
+        // Try to generate 3 vulnerabilities
+        Set<VulnerabilitySource> vulnSources = Registries.get(ServerRegistries.VULN_SOURCES).getValuesByUsage("worldProgram", programData.getName());
+        if (!vulnSources.isEmpty()) {
+            program.getObj(Program.VULN_CONTAINER).invoke(VulnerabilityContainer.GENERATE_VULNS, vulnSources, 3);
+        }
+
+        String programPath = programData.getCommonLocation().toString();
+        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(programPath)[1], superuser, "o:rx", program);
     }
 
     private WorldGenerator() {
