@@ -68,6 +68,13 @@ public class ServerRegistries {
      */
     public static final RegistryDefinition<SetRegistry<WorldProgram>>                                         WORLD_PROGRAMS;
 
+    /**
+     * The {@link VulnerabilitySource} definitions that are used to define the boundaries for generated vulnerabilities.
+     * One source source should address one kind of "generic" vulnerability that can be concretized by a generated vulnerability.
+     * Note that {@link VulnerabilitySourceRegistry#getValuesByUsage(String...)} can be used to retrieve the sources of a specific part (e.g. program).
+     */
+    public static final RegistryDefinition<VulnerabilitySourceRegistry>                                       VULN_SOURCES;
+
     static {
 
         WORLD_CONTEXT_PATH = new RegistryDefinition<>("worldContextPath", new TypeLiteral<SetRegistry<String>>() {});
@@ -75,6 +82,7 @@ public class ServerRegistries {
         SCHEDULER_GROUPS = new RegistryDefinition<>("schedulerGroups", new TypeLiteral<SetRegistry<SchedulerGroup>>() {});
         FILE_TYPES = new RegistryDefinition<>("fileTypes", new TypeLiteral<MapRegistry<String, Class<?>>>() {});
         WORLD_PROGRAMS = new RegistryDefinition<>("worldPrograms", new TypeLiteral<SetRegistry<WorldProgram>>() {});
+        VULN_SOURCES = new RegistryDefinition<>("vulnSources", new TypeLiteral<VulnerabilitySourceRegistry>() {});
 
     }
 

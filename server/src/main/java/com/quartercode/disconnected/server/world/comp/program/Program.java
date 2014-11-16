@@ -19,20 +19,18 @@
 package com.quartercode.disconnected.server.world.comp.program;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
-import java.util.HashSet;
-import java.util.Set;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.CFeatureHolder;
-import com.quartercode.classmod.extra.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
+import com.quartercode.classmod.extra.ValueFactory;
 import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.util.NullPreventer;
-import com.quartercode.disconnected.server.world.comp.Vulnerability;
+import com.quartercode.disconnected.server.world.comp.vuln.Vulnerability;
+import com.quartercode.disconnected.server.world.comp.vuln.VulnerabilityContainer;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 import com.quartercode.disconnected.shared.util.registry.Registries;
@@ -42,11 +40,11 @@ import com.quartercode.disconnected.shared.world.comp.Version;
 /**
  * This class stores information about a program.
  * A program object can be stored in a file. The execution is done by a program executor. To run an executor, you need to create a new process.
- * This also contains a list of all vulnerabilities this program has.
+ * This also contains a {@link VulnerabilityContainer} that manages the {@link Vulnerability}s of the program.
  * 
- * @see Vulnerability
  * @see ProgramExecutor
  * @see Process
+ * @see VulnerabilityContainer
  */
 public class Program extends WorldFeatureHolder implements DerivableSize {
 
@@ -56,23 +54,31 @@ public class Program extends WorldFeatureHolder implements DerivableSize {
      * The name of the program.
      * It is used to retrieve the {@link WorldProgram} object which defines the actual {@link ProgramExecutor}.
      */
-    public static final PropertyDefinition<String>                                      NAME;
+    public static final PropertyDefinition<String>                 NAME;
 
     /**
      * The {@link Version} of the program.
      */
-    public static final PropertyDefinition<Version>                                     VERSION;
+    public static final PropertyDefinition<Version>                VERSION;
 
     /**
-     * The {@link Vulnerability}s the program has.
+     * A {@link VulnerabilityContainer} that manages the {@link Vulnerability}s of the program.
      */
-    public static final CollectionPropertyDefinition<Vulnerability, Set<Vulnerability>> VULNERABILITIES;
+    public static final PropertyDefinition<VulnerabilityContainer> VULN_CONTAINER;
 
     static {
 
         NAME = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "name", "storage", new StandardStorage<>());
         VERSION = create(new TypeLiteral<PropertyDefinition<Version>>() {}, "name", "version", "storage", new StandardStorage<>());
-        VULNERABILITIES = create(new TypeLiteral<CollectionPropertyDefinition<Vulnerability, Set<Vulnerability>>>() {}, "name", "vulnerabilities", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new HashSet<>()));
+        VULN_CONTAINER = create(new TypeLiteral<PropertyDefinition<VulnerabilityContainer>>() {}, "name", "vulnContainer", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<VulnerabilityContainer>() {
+
+            @Override
+            public VulnerabilityContainer get() {
+
+                return new VulnerabilityContainer();
+            }
+
+        });
 
     }
 
