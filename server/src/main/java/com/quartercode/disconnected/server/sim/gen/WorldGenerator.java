@@ -302,9 +302,6 @@ public class WorldGenerator {
     // Temporary method for generating some unnecessary programs and personal files
     private static void addUserFiles(FileSystem fileSystem, User superuser) {
 
-        // Add service programs
-        addProgramFile(fileSystem, superuser, "webServer", new Version(1, 0, 0));
-
         // Generate basic user config
         Configuration userConfig = new Configuration();
         userConfig.addToColl(Configuration.ENTRIES, superuser);
