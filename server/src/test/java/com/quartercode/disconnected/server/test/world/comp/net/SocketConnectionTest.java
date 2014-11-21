@@ -34,10 +34,10 @@ import com.quartercode.classmod.extra.Priorities;
 import com.quartercode.classmod.util.test.JUnitRuleModMockery;
 import com.quartercode.disconnected.server.util.ObjArray;
 import com.quartercode.disconnected.server.world.comp.net.NetworkModule;
+import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.Socket;
 import com.quartercode.disconnected.server.world.comp.net.Socket.PacketHandler;
 import com.quartercode.disconnected.server.world.comp.net.Socket.SocketState;
-import com.quartercode.disconnected.server.world.comp.net.TCPPacket;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
 import com.quartercode.disconnected.shared.world.comp.net.NetID;
 
@@ -88,16 +88,17 @@ public class SocketConnectionTest {
                 // Invoke the custom hook
                 mockNetModuleSendHook.onSend(socket, data);
 
-                TCPPacket packet = new TCPPacket();
-                packet.setObj(TCPPacket.DATA, data);
+                Packet packet = new Packet();
+                packet.setObj(Packet.PROTOCOL, "tcp");
+                packet.setObj(Packet.DATA, data);
 
                 if (socket == socket1) {
-                    packet.setObj(TCPPacket.SOURCE, socket1Address);
-                    packet.setObj(TCPPacket.DESTINATION, socket2Address);
+                    packet.setObj(Packet.SOURCE, socket1Address);
+                    packet.setObj(Packet.DESTINATION, socket2Address);
                     socket2.invoke(Socket.HANDLE, packet);
                 } else if (socket == socket2) {
-                    packet.setObj(TCPPacket.SOURCE, socket2Address);
-                    packet.setObj(TCPPacket.DESTINATION, socket1Address);
+                    packet.setObj(Packet.SOURCE, socket2Address);
+                    packet.setObj(Packet.DESTINATION, socket1Address);
                     socket1.invoke(Socket.HANDLE, packet);
                 }
 

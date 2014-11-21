@@ -36,7 +36,6 @@ import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
 import com.quartercode.disconnected.server.world.comp.net.Backbone;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
-import com.quartercode.disconnected.server.world.comp.net.TCPPacket;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
 import com.quartercode.disconnected.shared.world.comp.net.NetID;
 
@@ -749,10 +748,10 @@ public class RoutingTest {
 
         public void run() {
 
-            TCPPacket packet = new TCPPacket();
-            packet.setObj(TCPPacket.SOURCE, new Address(sourceId, 1));
-            packet.setObj(TCPPacket.DESTINATION, new Address(destinationId, 1));
-            packet.setObj(TCPPacket.DATA, "testdata");
+            Packet packet = new Packet();
+            packet.setObj(Packet.SOURCE, new Address(sourceId, 1));
+            packet.setObj(Packet.DESTINATION, new Address(destinationId, 1));
+            packet.setObj(Packet.DATA, "testdata");
 
             source.invoke(NodeNetInterface.PROCESS, packet);
 

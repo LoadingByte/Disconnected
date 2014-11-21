@@ -28,21 +28,30 @@ import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
 
 /**
- * This class represents a generic packet which can be sent to a network interface.
- * Every packet contains a destination {@link Address} and the data payload {@link Object} which should be sent.
- * Note that no source address is stored. That means that generic packets must not be sent from a network interface.
- * Such functionality can be added by subclasses, e.g. {@link TCPPacket}.
+ * This class represents a packet which can be sent to a network interface.
+ * Every packet contains the source and destination {@link Address}es, the used protocol and the data payload {@link Object} which should be sent.
  * 
- * @see TCPPacket
+ * @see Address
  */
 public class Packet extends WorldFeatureHolder implements DerivableSize {
 
     // ----- Properties -----
 
     /**
+     * The network {@link Address} of the {@link Socket} which sent the packet.
+     */
+    public static final PropertyDefinition<Address> SOURCE;
+
+    /**
      * The network {@link Address} of the {@link Socket} the packet is sent to.
      */
     public static final PropertyDefinition<Address> DESTINATION;
+
+    /**
+     * A string that identifies the protocol the packet was sent with.
+     * By default, {@code TCP} and {@code UDP} are allowed.
+     */
+    public static final PropertyDefinition<String>  PROTOCOL;
 
     /**
      * The data payload {@link Object} which is sent.
@@ -52,7 +61,9 @@ public class Packet extends WorldFeatureHolder implements DerivableSize {
 
     static {
 
+        SOURCE = create(new TypeLiteral<PropertyDefinition<Address>>() {}, "name", "source", "storage", new StandardStorage<>());
         DESTINATION = create(new TypeLiteral<PropertyDefinition<Address>>() {}, "name", "destination", "storage", new StandardStorage<>());
+        PROTOCOL = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "protocol", "storage", new StandardStorage<>());
         DATA = create(new TypeLiteral<PropertyDefinition<Object>>() {}, "name", "data", "storage", new StandardStorage<>());
 
     }

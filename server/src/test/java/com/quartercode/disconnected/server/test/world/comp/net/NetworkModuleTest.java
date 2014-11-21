@@ -40,7 +40,6 @@ import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.Socket;
 import com.quartercode.disconnected.server.world.comp.net.Socket.PacketHandler;
 import com.quartercode.disconnected.server.world.comp.net.Socket.SocketState;
-import com.quartercode.disconnected.server.world.comp.net.TCPPacket;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
 import com.quartercode.disconnected.shared.world.comp.net.NetID;
@@ -160,10 +159,11 @@ public class NetworkModuleTest {
         socket.setObj(Socket.DESTINATION, destinationAddress);
         socket.setObj(Socket.STATE, SocketState.CONNECTED);
 
-        final TCPPacket expectedPacket = new TCPPacket();
-        expectedPacket.setObj(TCPPacket.SOURCE, sourceAddress);
-        expectedPacket.setObj(TCPPacket.DESTINATION, destinationAddress);
-        expectedPacket.setObj(TCPPacket.DATA, new ObjArray("testdata"));
+        final Packet expectedPacket = new Packet();
+        expectedPacket.setObj(Packet.SOURCE, sourceAddress);
+        expectedPacket.setObj(Packet.DESTINATION, destinationAddress);
+        expectedPacket.setObj(Packet.PROTOCOL, "tcp");
+        expectedPacket.setObj(Packet.DATA, new ObjArray("testdata"));
 
         final FunctionExecutor<Void> processHook = context.mock(FunctionExecutor.class, "processHook");
         modmock.addFuncExec(NodeNetInterface.PROCESS, "processHook", NodeNetInterface.class, processHook, LEVEL_9);
@@ -186,10 +186,11 @@ public class NetworkModuleTest {
         Address sourceAddress = new Address(new NetID(0, 1), sourcePort);
         int destinationPort = 54321;
 
-        TCPPacket packet = new TCPPacket();
-        packet.setObj(TCPPacket.SOURCE, sourceAddress);
-        packet.setObj(TCPPacket.DESTINATION, new Address(new NetID(0, 2), destinationPort));
-        packet.setObj(TCPPacket.DATA, new ObjArray("testdata"));
+        Packet packet = new Packet();
+        packet.setObj(Packet.SOURCE, sourceAddress);
+        packet.setObj(Packet.DESTINATION, new Address(new NetID(0, 2), destinationPort));
+        packet.setObj(Packet.PROTOCOL, "tcp");
+        packet.setObj(Packet.DATA, new ObjArray("testdata"));
 
         final Socket receiverSocket = netModule.invoke(NetworkModule.CREATE_SOCKET);
         receiverSocket.setObj(Socket.LOCAL_PORT, destinationPort);

@@ -41,11 +41,10 @@ import com.quartercode.disconnected.shared.world.comp.net.Address;
 
 /**
  * This class represents an {@link OperatingSystem} module which is used to send and receive network {@link Packet}s.
- * The module also abstracts the concept of {@link TCPPacket}s and introduces {@link Socket}s for easier data transfer.
- * It is an essential part of the {@link OperatingSystem} and is directly used by it.
+ * The module also abstracts the concept of TCP packets and introduces {@link Socket}s for easier data transfer.
+ * It is an essential part of the operating system and is directly used by it.
  * 
  * @see Packet
- * @see TCPPacket
  * @see Socket
  * @see OSModule
  * @see OperatingSystem
@@ -83,7 +82,7 @@ public class NetworkModule extends OSModule {
     public static final FunctionDefinition<Socket>                                                             CREATE_SOCKET;
 
     /**
-     * This is an internal function that sends a provided generic {@link Packet} over the network.
+     * This is an internal function that sends a provided {@link Packet} over the network.
      * Note that this function should be used by other functions which send a specific type of packet.
      * 
      * <table>
@@ -97,14 +96,14 @@ public class NetworkModule extends OSModule {
      * <td>0</td>
      * <td>{@link Packet}</td>
      * <td>packet</td>
-     * <td>The generic packet that should be sent by the network module.</td>
+     * <td>The packet that should be sent by the network module.</td>
      * </tr>
      * </table>
      */
     public static final FunctionDefinition<Void>                                                               SEND;
 
     /**
-     * This is an internal function that sends a new {@link TCPPacket}, which was caused by the given {@link Socket}, with the given data object over the network.
+     * This is an internal function that sends a new TCP {@link Packet}, which was caused by the given {@link Socket}, with the given data object over the network.
      * 
      * <table>
      * <tr>
@@ -117,7 +116,7 @@ public class NetworkModule extends OSModule {
      * <td>0</td>
      * <td>{@link Socket}</td>
      * <td>socket</td>
-     * <td>The socket which called the function and likes to send the tcp packet.</td>
+     * <td>The socket which called the function and likes to send the TCP packet.</td>
      * </tr>
      * <tr>
      * <td>1</td>
@@ -130,8 +129,8 @@ public class NetworkModule extends OSModule {
     public static final FunctionDefinition<Void>                                                               SEND_TCP;
 
     /**
-     * This is an internal function that delivers the given generic {@link Packet} to some sort of handler.
-     * For example, a {@link TCPPacket} is delivered to the {@link Socket} which has opened the connection.
+     * This is an internal function that delivers the given {@link Packet} to some sort of handler.
+     * For example, a TCP packet is delivered to the {@link Socket} which has opened the connection.
      * 
      * <table>
      * <tr>
@@ -144,7 +143,7 @@ public class NetworkModule extends OSModule {
      * <td>0</td>
      * <td>{@link Packet}</td>
      * <td>packet</td>
-     * <td>The generic packet which should be delivered to a handler.</td>
+     * <td>The packet which should be delivered to a handler.</td>
      * </tr>
      * </table>
      */
@@ -297,7 +296,7 @@ public class NetworkModule extends OSModule {
 
         });
 
-        SEND_TCP = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "sendTcp", "parameters", new Class[] { Socket.class, Object.class });
+        SEND_TCP = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "sendTCP", "parameters", new Class[] { Socket.class, Object.class });
         SEND_TCP.addExecutor("default", NetworkModule.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -311,11 +310,12 @@ public class NetworkModule extends OSModule {
                 NodeNetInterface netInterface = holder.getNetInterface();
                 Address sourceAddress = new Address(netInterface.getObj(NodeNetInterface.NET_ID), socket.getObj(Socket.LOCAL_PORT));
 
-                // Construct a new tcp packet
-                TCPPacket packet = new TCPPacket();
-                packet.setObj(TCPPacket.SOURCE, sourceAddress);
-                packet.setObj(TCPPacket.DESTINATION, socket.getObj(Socket.DESTINATION));
-                packet.setObj(TCPPacket.DATA, data);
+                // Construct a new TCP packet
+                Packet packet = new Packet();
+                packet.setObj(Packet.SOURCE, sourceAddress);
+                packet.setObj(Packet.DESTINATION, socket.getObj(Socket.DESTINATION));
+                packet.setObj(Packet.PROTOCOL, "tcp");
+                packet.setObj(Packet.DATA, data);
 
                 // Send the packet
                 holder.invoke(SEND, packet);
@@ -332,11 +332,12 @@ public class NetworkModule extends OSModule {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
+                Packet packet = (Packet) arguments[0];
+                String packetProtocol = packet.getObj(Packet.PROTOCOL);
 
-                if (arguments[0] instanceof TCPPacket) {
-                    TCPPacket packet = (TCPPacket) arguments[0];
-                    Address packetSource = packet.getObj(TCPPacket.SOURCE);
-                    Address packetDestination = packet.getObj(TCPPacket.DESTINATION);
+                if (packetProtocol.equals("tcp")) {
+                    Address packetSource = packet.getObj(Packet.SOURCE);
+                    Address packetDestination = packet.getObj(Packet.DESTINATION);
 
                     int packetDestinationPort = packetDestination.getPort();
 
