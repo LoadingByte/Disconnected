@@ -74,6 +74,21 @@ public class ProgramUtils {
     }
 
     /**
+     * Returns a {@link WorldProcessId} object that identifies the given {@link Process}.
+     * A process is identified using the id of the computer it is running on, as well as the actual process id (pid).
+     * 
+     * @param process The process that should be identified.
+     * @return The identification object for the given process.
+     */
+    public static WorldProcessId getProcessId(Process<?> process) {
+
+        int pid = process.getObj(Process.PID);
+        String computerId = process.invoke(Process.GET_OPERATING_SYSTEM).getParent().getId();
+
+        return new WorldProcessId(computerId, pid);
+    }
+
+    /**
      * Returns a {@link WorldProcessId} object that identifies the {@link Process} that runs the given {@link ProgramExecutor}.
      * A process is identified using the id of the computer it is running on, as well as the actual process id (pid).
      * This utility method should be used by program executor implementations.
@@ -83,12 +98,7 @@ public class ProgramUtils {
      */
     public static WorldProcessId getProcessId(ProgramExecutor executor) {
 
-        Process<?> process = executor.getParent();
-
-        int pid = process.getObj(Process.PID);
-        String computerId = process.invoke(Process.GET_OPERATING_SYSTEM).getParent().getId();
-
-        return new WorldProcessId(computerId, pid);
+        return getProcessId(executor.getParent());
     }
 
     /**
