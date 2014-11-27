@@ -18,24 +18,20 @@
 
 package com.quartercode.disconnected.server.test.world.comp.program.general;
 
-import static com.quartercode.disconnected.shared.world.comp.file.PathUtils.splitAfterMountpoint;
-import static com.quartercode.disconnected.shared.world.comp.file.PathUtils.splitBeforeName;
 import static org.junit.Assert.*;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.server.test.world.comp.program.AbstractProgramTest;
+import com.quartercode.disconnected.server.test.world.comp.AbstractComplexComputerTest;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.Directory;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
-import com.quartercode.disconnected.server.world.comp.os.Session;
+import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.server.world.comp.program.ChildProcess;
 import com.quartercode.disconnected.server.world.comp.program.Process;
-import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
-import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
 import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
 import com.quartercode.disconnected.shared.event.comp.program.general.FMPWPUUpdateViewCommand;
@@ -45,48 +41,34 @@ import com.quartercode.disconnected.shared.event.comp.program.generic.GPWPUError
 import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
-import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUserId;
 import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
 import com.quartercode.eventbridge.bridge.EventPredicate;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 import com.quartercode.eventbridge.extra.predicate.TypePredicate;
 
-public class FileManagerProgramAddFileTest extends AbstractProgramTest {
+public class FileManagerProgramAddFileTest extends AbstractComplexComputerTest {
 
-    private static final String            PARENT_PATH   = "/" + CommonFiles.SYSTEM_MOUNTPOINT + "/test1/test2";
-    private static final String            PATH_1        = PARENT_PATH + "/test.txt";
-    private static final String            PATH_2_PART_2 = "test3/test.txt";
+    private static final EventPredicate<?> UPDATE_VIEW_PREDICATE = new TypePredicate<>(FMPWPUUpdateViewCommand.class);
 
-    private static final EventPredicate<?> UW_PREDICATE  = new TypePredicate<>(FMPWPUUpdateViewCommand.class);
+    private static final String            FS_MOUNTPOINT         = CommonFiles.USER_MOUNTPOINT;
+    private static final String            DIR_PATH              = "/" + FS_MOUNTPOINT + "/test1/test2";
 
-    public FileManagerProgramAddFileTest() {
-
-        super(CommonFiles.SYSTEM_MOUNTPOINT);
-    }
-
-    private final Directory parentFile = new Directory();
-    private WorldProcessId  processId;
+    private final Directory                parentFile            = new Directory();
+    private WorldProcessId                 processId;
 
     @Before
-    public void setUp2() {
+    public void setUp() {
 
-        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, parentFile, splitAfterMountpoint(PARENT_PATH)[1]).invoke(FileAddAction.EXECUTE);
+        mainFsModule().invoke(FileSystemModule.CREATE_ADD_FILE, parentFile, DIR_PATH).invoke(FileAddAction.EXECUTE);
     }
 
     private void executeProgramAndSendChangeDirCommand(Process<?> parentProcess, String change) {
 
-        ChildProcess process = parentProcess.invoke(Process.CREATE_CHILD);
-        process.setObj(Process.SOURCE, (ContentFile) fileSystem.invoke(FileSystem.GET_FILE, splitAfterMountpoint(getCommonLocation(FileManagerProgram.class).toString())[1]));
-        process.setObj(Process.WORLD_PROCESS_USER, new SBPWorldProcessUserId(SBP, null));
-        process.invoke(Process.INITIALIZE, 10);
+        ChildProcess process = launchProgram(parentProcess, getCommonLocation(FileManagerProgram.class));
+        processId = ProgramUtils.getProcessId(process);
 
-        ProgramExecutor program = process.getObj(Process.EXECUTOR);
-        program.invoke(ProgramExecutor.RUN);
-
-        processId = ProgramUtils.getProcessId(program);
-
-        bridge.send(new FMPWorldChangeDirCommand(ProgramUtils.getProcessId(program), change));
+        bridge.send(new FMPWorldChangeDirCommand(processId, change));
     }
 
     private void sendAddFileCommand(String fileName) {
@@ -97,7 +79,7 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
     @Test
     public void testWithContentFile() {
 
-        executeProgramAndSendChangeDirCommand(processModule.getObj(ProcessModule.ROOT_PROCESS), PARENT_PATH);
+        executeProgramAndSendChangeDirCommand(mainRootProcess(), DIR_PATH);
 
         final MutableBoolean invoked = new MutableBoolean();
         bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMPWPUUpdateViewCommand>() {
@@ -105,19 +87,19 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
             @Override
             public void handle(FMPWPUUpdateViewCommand event) {
 
-                assertEquals("File path", PARENT_PATH, event.getCurrentDir());
+                assertEquals("File path", DIR_PATH, event.getCurrentDir());
 
                 FilePlaceholder[] files = event.getFiles();
                 assertTrue("The wrong amount of files (" + files.length + ") has been created", files.length == 1);
                 FilePlaceholder file = files[0];
-                assertTrue("File hasn't been created correctly", file.getPath().equals(PATH_1) && file.getType().equals("contentFile"));
+                assertTrue("File hasn't been created correctly", file.getPath().equals(DIR_PATH + "/test.txt") && file.getType().equals("contentFile"));
 
                 invoked.setTrue();
             }
 
-        }, UW_PREDICATE);
+        }, UPDATE_VIEW_PREDICATE);
 
-        sendAddFileCommand(splitBeforeName(PATH_1)[1]);
+        sendAddFileCommand("test.txt");
 
         assertTrue("Update view handler hasn't been invoked", invoked.getValue());
     }
@@ -125,9 +107,9 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
     @Test
     public void testWithFileNameWithSeparators() {
 
-        executeProgramAndSendChangeDirCommand(processModule.getObj(ProcessModule.ROOT_PROCESS), PARENT_PATH);
+        executeProgramAndSendChangeDirCommand(mainRootProcess(), DIR_PATH);
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
         bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPWPUErrorEvent>() {
@@ -136,14 +118,14 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
             public void handle(GPWPUErrorEvent event) {
 
                 assertEquals("Error type", "createFile.invalidFileName", event.getType());
-                assertArrayEquals("Error arguments (file path)", new String[] { PATH_2_PART_2 }, event.getArguments());
+                assertArrayEquals("Error arguments (file path)", new String[] { "test/test.txt" }, event.getArguments());
 
                 invoked.setTrue();
             }
 
         }, new TypePredicate<>(GPWPUErrorEvent.class));
 
-        sendAddFileCommand(PATH_2_PART_2);
+        sendAddFileCommand("test/test.txt");
 
         assertTrue("Error event handler hasn't been invoked", invoked.getValue());
     }
@@ -151,9 +133,9 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
     @Test
     public void testWithCurrentDir() {
 
-        executeProgramAndSendChangeDirCommand(processModule.getObj(ProcessModule.ROOT_PROCESS), PARENT_PATH);
+        executeProgramAndSendChangeDirCommand(mainRootProcess(), DIR_PATH);
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
         bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPWPUErrorEvent>() {
@@ -177,9 +159,9 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
     @Test (expected = IllegalStateException.class)
     public void testWithAbsoluteRoot() {
 
-        executeProgramAndSendChangeDirCommand(processModule.getObj(ProcessModule.ROOT_PROCESS), "/");
+        executeProgramAndSendChangeDirCommand(mainRootProcess(), "/");
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
 
         sendAddFileCommand(".");
     }
@@ -187,22 +169,22 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
     @Test (expected = IllegalStateException.class)
     public void testWithRootFile() {
 
-        executeProgramAndSendChangeDirCommand(processModule.getObj(ProcessModule.ROOT_PROCESS), "/");
+        executeProgramAndSendChangeDirCommand(mainRootProcess(), "/");
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
 
-        sendAddFileCommand(CommonFiles.SYSTEM_MOUNTPOINT);
+        sendAddFileCommand(FS_MOUNTPOINT);
     }
 
     @Test
     public void testOccupiedPath() {
 
         // Add content file that makes the path occupied
-        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, new ContentFile(), splitAfterMountpoint(PATH_1)[1]).invoke(FileAddAction.EXECUTE);
+        mainFsModule().invoke(FileSystemModule.CREATE_ADD_FILE, new ContentFile(), DIR_PATH + "/test.txt").invoke(FileAddAction.EXECUTE);
 
-        executeProgramAndSendChangeDirCommand(processModule.getObj(ProcessModule.ROOT_PROCESS), PARENT_PATH);
+        executeProgramAndSendChangeDirCommand(mainRootProcess(), DIR_PATH);
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
         bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPWPUErrorEvent>() {
@@ -211,14 +193,14 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
             public void handle(GPWPUErrorEvent event) {
 
                 assertEquals("Error type", "createFile.occupiedPath", event.getType());
-                assertArrayEquals("Error arguments (file path)", new String[] { PATH_1 }, event.getArguments());
+                assertArrayEquals("Error arguments (file path)", new String[] { DIR_PATH + "/test.txt" }, event.getArguments());
 
                 invoked.setTrue();
             }
 
         }, new TypePredicate<>(GPWPUErrorEvent.class));
 
-        sendAddFileCommand(splitBeforeName(PATH_1)[1]);
+        sendAddFileCommand("test.txt");
 
         assertTrue("Error event handler hasn't been invoked", invoked.getValue());
     }
@@ -227,11 +209,11 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
     public void testOutOfSpace() {
 
         // Set size of the file system to something very small
-        fileSystem.setObj(FileSystem.SIZE, 10L);
+        mainFs(FS_MOUNTPOINT).setObj(FileSystem.SIZE, 10L);
 
-        executeProgramAndSendChangeDirCommand(processModule.getObj(ProcessModule.ROOT_PROCESS), PARENT_PATH);
+        executeProgramAndSendChangeDirCommand(mainRootProcess(), DIR_PATH);
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
         bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPWPUErrorEvent>() {
@@ -240,14 +222,14 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
             public void handle(GPWPUErrorEvent event) {
 
                 assertEquals("Error type", "createFile.outOfSpace", event.getType());
-                assertArrayEquals("Error arguments (file path)", new String[] { PATH_1 }, event.getArguments());
+                assertArrayEquals("Error arguments (file path)", new String[] { DIR_PATH + "/test.txt" }, event.getArguments());
 
                 invoked.setTrue();
             }
 
         }, new TypePredicate<>(GPWPUErrorEvent.class));
 
-        sendAddFileCommand(splitBeforeName(PATH_1)[1]);
+        sendAddFileCommand("test.txt");
 
         assertTrue("Error event handler hasn't been invoked", invoked.getValue());
     }
@@ -256,21 +238,16 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
     public void testMissingWriteRight() {
 
         // Create a new user and a new session under which the process will run
-        final User testUser = new User();
+        User testUser = new User();
         testUser.setObj(User.NAME, "testUser");
-        ChildProcess sessionProcess = processModule.getObj(ProcessModule.ROOT_PROCESS).invoke(Process.CREATE_CHILD);
-        sessionProcess.setObj(Process.SOURCE, (ContentFile) fileSystem.invoke(FileSystem.GET_FILE, splitAfterMountpoint(getCommonLocation(Session.class).toString())[1]));
-        sessionProcess.invoke(Process.INITIALIZE, 1);
-        ProgramExecutor session = sessionProcess.getObj(Process.EXECUTOR);
-        session.setObj(Session.USER, testUser);
-        session.invoke(ProgramExecutor.RUN);
+        ChildProcess sessionProcess = launchSession(mainRootProcess(), testUser, null);
 
-        executeProgramAndSendChangeDirCommand(sessionProcess, PARENT_PATH);
+        executeProgramAndSendChangeDirCommand(sessionProcess, DIR_PATH);
 
         // Remove all rights from the parent file
         parentFile.setObj(File.RIGHTS, new FileRights());
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
         bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPWPUErrorEvent>() {
@@ -279,14 +256,14 @@ public class FileManagerProgramAddFileTest extends AbstractProgramTest {
             public void handle(GPWPUErrorEvent event) {
 
                 assertEquals("Error type", "createFile.missingWriteRight", event.getType());
-                assertArrayEquals("Error arguments (file path)", new String[] { PATH_1 }, event.getArguments());
+                assertArrayEquals("Error arguments (file path)", new String[] { DIR_PATH + "/test.txt" }, event.getArguments());
 
                 invoked.setTrue();
             }
 
         }, new TypePredicate<>(GPWPUErrorEvent.class));
 
-        sendAddFileCommand(splitBeforeName(PATH_1)[1]);
+        sendAddFileCommand("test.txt");
 
         assertTrue("Missing right error event handler hasn't been invoked", invoked.getValue());
     }

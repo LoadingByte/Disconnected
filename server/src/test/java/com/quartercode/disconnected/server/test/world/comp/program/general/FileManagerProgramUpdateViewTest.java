@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.server.test.world.comp.program.general;
 
-import static com.quartercode.disconnected.shared.world.comp.file.PathUtils.splitAfterMountpoint;
+import static com.quartercode.disconnected.shared.world.comp.file.PathUtils.resolve;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
@@ -27,16 +27,13 @@ import java.util.List;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.server.test.world.comp.program.AbstractProgramTest;
+import com.quartercode.disconnected.server.test.world.comp.AbstractComplexComputerTest;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.Directory;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
-import com.quartercode.disconnected.server.world.comp.file.FileSystem;
+import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.program.ChildProcess;
-import com.quartercode.disconnected.server.world.comp.program.Process;
-import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
-import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
 import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
 import com.quartercode.disconnected.shared.event.comp.program.general.FMPWPUUpdateViewCommand;
@@ -45,46 +42,33 @@ import com.quartercode.disconnected.shared.world.comp.ByteUnit;
 import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
-import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUserId;
 import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
 import com.quartercode.eventbridge.bridge.EventPredicate;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 import com.quartercode.eventbridge.extra.predicate.TypePredicate;
 
-public class FileManagerProgramUpdateViewTest extends AbstractProgramTest {
+public class FileManagerProgramUpdateViewTest extends AbstractComplexComputerTest {
 
-    private static final String            PATH               = "/" + CommonFiles.SYSTEM_MOUNTPOINT + "/test1/test2";
-    private static final EventPredicate<?> RESPONSE_PREDICATE = new TypePredicate<>(FMPWPUUpdateViewCommand.class);
+    private static final EventPredicate<?> UPDATE_VIEW_PREDICATE = new TypePredicate<>(FMPWPUUpdateViewCommand.class);
 
-    public FileManagerProgramUpdateViewTest() {
+    private static final String            FS_MOUNTPOINT         = CommonFiles.USER_MOUNTPOINT;
+    private static final String            PATH                  = "/" + FS_MOUNTPOINT + "/test1/test2";
 
-        super(CommonFiles.SYSTEM_MOUNTPOINT);
-    }
-
-    private final File<?>[] testFiles = { new ContentFile(), new Directory(), new ContentFile() };
-    private WorldProcessId  processId;
+    private final File<?>[]                testFiles             = { new ContentFile(), new Directory(), new ContentFile() };
+    private WorldProcessId                 processId;
 
     @Before
-    public void setUp2() {
-
-        String localPath = splitAfterMountpoint(PATH)[1];
+    public void setUp() {
 
         for (int index = 0; index < testFiles.length; index++) {
             File<?> file = testFiles[index];
-            fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, localPath + "/file" + index + ".txt").invoke(FileAddAction.EXECUTE);
+            mainFsModule().invoke(FileSystemModule.CREATE_ADD_FILE, file, resolve(PATH, "file" + index + ".txt")).invoke(FileAddAction.EXECUTE);
         }
 
         // Launch the program
-        ChildProcess process = processModule.getObj(ProcessModule.ROOT_PROCESS).invoke(Process.CREATE_CHILD);
-        process.setObj(Process.SOURCE, (ContentFile) fileSystem.invoke(FileSystem.GET_FILE, splitAfterMountpoint(getCommonLocation(FileManagerProgram.class).toString())[1]));
-        process.setObj(Process.WORLD_PROCESS_USER, new SBPWorldProcessUserId(SBP, null));
-        process.invoke(Process.INITIALIZE, 10);
-
-        ProgramExecutor program = process.getObj(Process.EXECUTOR);
-        program.invoke(ProgramExecutor.RUN);
-
-        processId = ProgramUtils.getProcessId(program);
+        ChildProcess process = launchProgram(mainRootProcess(), getCommonLocation(FileManagerProgram.class));
+        processId = ProgramUtils.getProcessId(process);
     }
 
     private void sendChangeDirCommand(String change) {
@@ -106,7 +90,7 @@ public class FileManagerProgramUpdateViewTest extends AbstractProgramTest {
 
                 List<FilePlaceholder> expectedFiles = new ArrayList<>();
                 for (File<?> file : testFiles) {
-                    String path = PathUtils.resolve(PathUtils.SEPARATOR + fileSystemMountpoint, file.invoke(File.GET_PATH));
+                    String path = PathUtils.resolve("/" + FS_MOUNTPOINT, file.invoke(File.GET_PATH));
                     String type = file.getClass() == Directory.class ? "directory" : "contentFile";
                     long size = file.invoke(File.GET_SIZE);
                     expectedFiles.add(new FilePlaceholder(path, type, size, File.DEFAULT_FILE_RIGHTS, null, null));
@@ -118,7 +102,7 @@ public class FileManagerProgramUpdateViewTest extends AbstractProgramTest {
                 invoked.setTrue();
             }
 
-        }, RESPONSE_PREDICATE);
+        }, UPDATE_VIEW_PREDICATE);
 
         sendChangeDirCommand(PATH);
 
@@ -139,8 +123,8 @@ public class FileManagerProgramUpdateViewTest extends AbstractProgramTest {
 
                 List<FilePlaceholder> expectedFiles = new ArrayList<>();
                 long terabyte = ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE);
-                expectedFiles.add(new FilePlaceholder(PathUtils.SEPARATOR + CommonFiles.SYSTEM_MOUNTPOINT, "rootFile", terabyte, File.DEFAULT_FILE_RIGHTS, null, null));
-                expectedFiles.add(new FilePlaceholder(PathUtils.SEPARATOR + CommonFiles.USER_MOUNTPOINT, "rootFile", terabyte, File.DEFAULT_FILE_RIGHTS, null, null));
+                expectedFiles.add(new FilePlaceholder("/" + CommonFiles.SYSTEM_MOUNTPOINT, "rootFile", terabyte, File.DEFAULT_FILE_RIGHTS, null, null));
+                expectedFiles.add(new FilePlaceholder("/" + CommonFiles.USER_MOUNTPOINT, "rootFile", terabyte, File.DEFAULT_FILE_RIGHTS, null, null));
 
                 List<FilePlaceholder> returnedFiles = new ArrayList<>(Arrays.asList(event.getFiles()));
                 assertEquals("Listed files", expectedFiles, returnedFiles);
@@ -148,7 +132,7 @@ public class FileManagerProgramUpdateViewTest extends AbstractProgramTest {
                 invoked.setTrue();
             }
 
-        }, RESPONSE_PREDICATE);
+        }, UPDATE_VIEW_PREDICATE);
 
         sendChangeDirCommand("/");
 
