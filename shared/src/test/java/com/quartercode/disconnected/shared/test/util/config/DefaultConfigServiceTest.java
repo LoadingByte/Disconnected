@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.test.config;
+package com.quartercode.disconnected.shared.test.util.config;
 
 import java.io.IOException;
 import java.io.StringReader;

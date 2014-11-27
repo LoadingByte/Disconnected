@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.test.comp.net;
+package com.quartercode.disconnected.shared.test.world.comp.net;
 
 import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
