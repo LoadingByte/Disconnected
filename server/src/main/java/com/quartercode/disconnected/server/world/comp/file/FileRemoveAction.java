@@ -112,7 +112,7 @@ public class FileRemoveAction extends FileAction {
 
             private void checkFile(User executor, File<?> file, Map<File<?>, Character[]> target) {
 
-                if (!FileUtils.hasRight(executor, file, FileRights.DELETE)) {
+                if (!file.invoke(File.HAS_RIGHT, executor, FileRights.DELETE)) {
                     target.put(file, new Character[] { FileRights.DELETE });
                 }
 

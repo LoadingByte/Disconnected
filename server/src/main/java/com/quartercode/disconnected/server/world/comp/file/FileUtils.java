@@ -37,49 +37,6 @@ import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 public class FileUtils {
 
     /**
-     * Returns if the given {@link User} has the given file right on the given {@link File}.
-     * 
-     * @param user The {@link User} who may have the given file right on the given {@link File}.
-     * @param file The {@link File} the given {@link User} may have access to.
-     * @param right The file right character the given {@link User} may have.
-     * @return True if the given {@link User} has the given file right on the given {@link File}.
-     */
-    public static boolean hasRight(User user, File<?> file, char right) {
-
-        if (user == null || user.invoke(User.IS_SUPERUSER)) {
-            return true;
-        } else if (file instanceof RootFile) {
-            // Only superusers (filtered out by the previous check) can add files to the root file
-            return false;
-        } else if (checkRight(file, FileRights.OWNER, right) && file.getObj(File.OWNER).equals(user)) {
-            return true;
-        } else if (checkRight(file, FileRights.GROUP, right) && user.getColl(User.GROUPS).contains(file.getObj(File.GROUP))) {
-            return true;
-        } else if (checkRight(file, FileRights.OTHERS, right)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    private static boolean checkRight(File<?> file, char accessor, char right) {
-
-        return file.getObj(File.RIGHTS).isRightSet(accessor, right);
-    }
-
-    /**
-     * Returns if the given {@link User} can change the {@link FileRights} attributes of the given {@link File}.
-     * 
-     * @param user The {@link User} who may can change the {@link FileRights} attributes.
-     * @param file The {@link File} the given {@link User} may have access to.
-     * @return True if the given {@link User} can change the {@link FileRights} attributes of the given {@link File}.
-     */
-    public static boolean canChangeRights(User user, File<?> file) {
-
-        return file.getObj(File.OWNER).equals(user) || user.invoke(User.IS_SUPERUSER);
-    }
-
-    /**
      * Creates a new {@link FilePlaceholder} that represents the given {@link KnownFileSystem}.
      * 
      * @param fileSystem The known file system that should be represented by the placeholder.

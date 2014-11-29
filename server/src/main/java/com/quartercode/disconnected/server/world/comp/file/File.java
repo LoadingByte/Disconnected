@@ -186,6 +186,52 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
      */
     public static final FunctionDefinition<FileSystem>       GET_FILE_SYSTEM;
 
+    /**
+     * Returns whether the given {@link User} has access to the given file right on the file.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link User}</td>
+     * <td>user</td>
+     * <td>The user whose access to the given file right should be checked.</td>
+     * </tr>
+     * <tr>
+     * <td>1</td>
+     * <td>{@link Character}</td>
+     * <td>right</td>
+     * <td>The file right character that describes the right which should be checked.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Boolean>          HAS_RIGHT;
+
+    /**
+     * Returns whether the given {@link User} is allowed to change the {@link FileRights} attributes of the file.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link User}</td>
+     * <td>user</td>
+     * <td>The user whose ability to change the file rights should be checked.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Boolean>          CAN_CHANGE_RIGHTS;
+
     static {
 
         GET_PATH = create(new TypeLiteral<FunctionDefinition<String>>() {}, "name", "getPath", "parameters", new Class[0]);
@@ -277,6 +323,60 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
 
                 invocation.next(arguments);
                 return fileSystem;
+            }
+
+        });
+
+        HAS_RIGHT = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "hasRight", "parameters", new Class[] { User.class, Character.class });
+        HAS_RIGHT.addExecutor("default", File.class, new FunctionExecutor<Boolean>() {
+
+            @Override
+            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
+
+                CFeatureHolder holder = invocation.getCHolder();
+                User user = (User) arguments[0];
+                char right = (char) arguments[1];
+
+                boolean result;
+                if (user == null || user.invoke(User.IS_SUPERUSER)) {
+                    result = true;
+                } else if (holder instanceof RootFile) {
+                    // Only superusers (filtered out by the previous check) can add files to the root file
+                    result = false;
+                } else if (checkRight(holder, FileRights.OWNER, right) && holder.getObj(File.OWNER).equals(user)) {
+                    result = true;
+                } else if (checkRight(holder, FileRights.GROUP, right) && user.getColl(User.GROUPS).contains(holder.getObj(File.GROUP))) {
+                    result = true;
+                } else if (checkRight(holder, FileRights.OTHERS, right)) {
+                    result = true;
+                } else {
+                    result = false;
+                }
+
+                invocation.next(arguments);
+                return result;
+            }
+
+            private boolean checkRight(CFeatureHolder file, char accessor, char right) {
+
+                return file.getObj(File.RIGHTS).isRightSet(accessor, right);
+            }
+
+        });
+
+        CAN_CHANGE_RIGHTS = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "canChangeRights", "parameters", new Class[] { User.class });
+        CAN_CHANGE_RIGHTS.addExecutor("default", File.class, new FunctionExecutor<Boolean>() {
+
+            @Override
+            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
+
+                CFeatureHolder holder = invocation.getCHolder();
+                User user = (User) arguments[0];
+
+                boolean result = holder.getObj(File.OWNER).equals(user) || user.invoke(User.IS_SUPERUSER);
+
+                invocation.next(arguments);
+                return result;
             }
 
         });

@@ -233,7 +233,7 @@ public class FileManagerProgram extends ProgramExecutor {
                     }
 
                     User sessionUser = process.invoke(Process.GET_USER);
-                    if (!FileUtils.hasRight(sessionUser, dir, FileRights.READ)) {
+                    if (!dir.invoke(File.HAS_RIGHT, sessionUser, FileRights.READ)) {
                         // Missing read right on directory
                         return 3;
                     }

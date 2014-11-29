@@ -200,7 +200,7 @@ public class FileAddAction extends FileAction {
                     // Check whether the current file exists
                     if (newCurrent == null) {
                         // Executor user hasn't rights to create the new file
-                        if (!FileUtils.hasRight(executor, current, FileRights.WRITE)) {
+                        if (!current.invoke(File.HAS_RIGHT, executor, FileRights.WRITE)) {
                             missingRightsFile = current;
                         }
                         break;

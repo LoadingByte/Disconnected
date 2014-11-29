@@ -43,7 +43,6 @@ import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
-import com.quartercode.disconnected.server.world.comp.file.FileUtils;
 import com.quartercode.disconnected.server.world.comp.os.EnvironmentVariable;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.os.Session;
@@ -730,7 +729,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                 // Check read and execution right on source file
                 ContentFile source = holder.getObj(SOURCE);
                 User user = holder.invoke(GET_USER);
-                if (!FileUtils.hasRight(user, source, FileRights.READ) || !FileUtils.hasRight(user, source, FileRights.EXECUTE)) {
+                if (!source.invoke(File.HAS_RIGHT, user, FileRights.READ) || !source.invoke(File.HAS_RIGHT, user, FileRights.EXECUTE)) {
                     throw new IllegalStateException("Cannot initialize process: No read right and execute right on file");
                 }
 
