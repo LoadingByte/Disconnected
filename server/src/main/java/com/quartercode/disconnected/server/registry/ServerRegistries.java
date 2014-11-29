@@ -37,10 +37,10 @@ import com.quartercode.disconnected.shared.util.registry.extra.SetRegistry;
 public class ServerRegistries {
 
     /**
-     * The jaxb context path entries for world serialization.
-     * They define the packages that contain jaxb.index files and are used for creating new {@link JAXBContext}s.
+     * The {@link PersistentClassScanDirective}s which define what should be scanned for persistent world classes.
+     * The results of such scans are fed into new {@link JAXBContext}s for making the found classes visible to the contexts.
      */
-    public static final RegistryDefinition<SetRegistry<String>>                                               WORLD_CONTEXT_PATH;
+    public static final RegistryDefinition<SetRegistry<PersistentClassScanDirective>>                         PERSISTENT_CLASS_SCAN_DIRECTIVES;
 
     /**
      * The mappings put into the {@link TreeInitializer} which is used to initialize some features when deserializing worlds.
@@ -77,7 +77,7 @@ public class ServerRegistries {
 
     static {
 
-        WORLD_CONTEXT_PATH = new RegistryDefinition<>("worldContextPath", new TypeLiteral<SetRegistry<String>>() {});
+        PERSISTENT_CLASS_SCAN_DIRECTIVES = new RegistryDefinition<>("persistentClassScanDirectives", new TypeLiteral<SetRegistry<PersistentClassScanDirective>>() {});
         WORLD_INITIALIZER_MAPPINGS = new RegistryDefinition<>("worldInitializerMappings", new TypeLiteral<MapRegistry<Class<? extends FeatureHolder>, FeatureDefinition<?>>>() {});
         SCHEDULER_GROUPS = new RegistryDefinition<>("schedulerGroups", new TypeLiteral<SetRegistry<SchedulerGroup>>() {});
         FILE_TYPES = new RegistryDefinition<>("fileTypes", new TypeLiteral<MapRegistry<String, Class<?>>>() {});

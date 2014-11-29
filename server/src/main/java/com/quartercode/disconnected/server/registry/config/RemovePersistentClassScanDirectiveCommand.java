@@ -18,6 +18,8 @@
 
 package com.quartercode.disconnected.server.registry.config;
 
+import java.util.Arrays;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Document;
@@ -25,26 +27,38 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.quartercode.disconnected.server.registry.PersistentClassScanDirective;
 import com.quartercode.disconnected.shared.util.VariableReferenceResolver;
 import com.quartercode.disconnected.shared.util.config.ConfigCommandParser;
 import com.quartercode.disconnected.shared.util.registry.extra.SetRegistry;
 
 @RequiredArgsConstructor
-public class AddWorldContextPathEntryCommand implements ConfigCommandParser {
+public class RemovePersistentClassScanDirectiveCommand implements ConfigCommandParser {
 
-    private static final Logger       LOGGER = LoggerFactory.getLogger(AddWorldContextPathEntryCommand.class);
+    private static final Logger                             LOGGER = LoggerFactory.getLogger(RemovePersistentClassScanDirectiveCommand.class);
 
-    private final SetRegistry<String> registry;
+    private final SetRegistry<PersistentClassScanDirective> registry;
 
     @Override
     public void parse(Document config, Element commandElement) throws JDOMException {
 
-        String entry = commandElement.getText();
+        String packages = commandElement.getText();
 
-        if (StringUtils.isBlank(entry)) {
-            LOGGER.warn("Config: Cannot add blank world context path entry (in '{}')", config.getBaseURI());
+        if (StringUtils.isBlank(packages)) {
+            LOGGER.warn("Config: Cannot remove persistent class scan directive(s) with blank package(s) (in '{}')", config.getBaseURI());
         } else {
-            registry.addValue(VariableReferenceResolver.process(entry, null));
+            List<String> packageList = Arrays.asList(StringUtils.split(VariableReferenceResolver.process(packages, null), ':'));
+
+            PersistentClassScanDirective directiveForRemoval = null;
+            for (PersistentClassScanDirective directive : registry.getValues()) {
+                if (packageList.contains(directive.getPackageName())) {
+                    directiveForRemoval = directive;
+                }
+            }
+
+            if (directiveForRemoval != null) {
+                registry.removeValue(directiveForRemoval);
+            }
         }
     }
 

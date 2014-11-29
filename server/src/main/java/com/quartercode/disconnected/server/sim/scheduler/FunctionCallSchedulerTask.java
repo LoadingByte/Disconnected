@@ -23,6 +23,7 @@ import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.Function;
 import com.quartercode.classmod.extra.FunctionDefinition;
 import com.quartercode.classmod.util.FeatureDefinitionReference;
+import com.quartercode.disconnected.shared.util.XmlPersistent;
 
 /**
  * A function call scheduler task is a {@link SchedulerTask} that "just" calls a {@link Function}.
@@ -32,6 +33,7 @@ import com.quartercode.classmod.util.FeatureDefinitionReference;
  * @see SchedulerTask
  * @see FeatureDefinitionReference
  */
+@XmlPersistent
 public class FunctionCallSchedulerTask extends SchedulerTaskAdapter {
 
     @XmlElement

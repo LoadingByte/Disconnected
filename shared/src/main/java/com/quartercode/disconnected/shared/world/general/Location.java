@@ -22,10 +22,12 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlElement;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import com.quartercode.disconnected.shared.util.XmlPersistent;
 
 /**
  * This class stores a location using x and y relative coordinates.
  */
+@XmlPersistent
 public class Location implements Serializable {
 
     @XmlElement

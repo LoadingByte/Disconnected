@@ -32,6 +32,7 @@ import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.net.Backbone;
+import com.quartercode.disconnected.shared.util.XmlPersistent;
 import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
@@ -39,6 +40,7 @@ import com.quartercode.eventbridge.bridge.Bridge;
  * It basically is the root of all logic objects the game uses.
  */
 @XmlRootElement (namespace = "http://quartercode.com/")
+@XmlPersistent
 public class World extends DefaultCFeatureHolder {
 
     // ----- Properties -----

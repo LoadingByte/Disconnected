@@ -22,6 +22,7 @@ import java.util.Random;
 import com.quartercode.classmod.extra.CFeatureHolder;
 import com.quartercode.classmod.extra.def.DefaultCChildFeatureHolder;
 import com.quartercode.disconnected.server.world.World;
+import com.quartercode.disconnected.shared.util.XmlPersistent;
 import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
@@ -31,6 +32,7 @@ import com.quartercode.eventbridge.bridge.Bridge;
  * @see World
  * @see DefaultCChildFeatureHolder
  */
+@XmlPersistent
 public class WorldChildFeatureHolder<P extends CFeatureHolder> extends DefaultCChildFeatureHolder<P> {
 
     /**

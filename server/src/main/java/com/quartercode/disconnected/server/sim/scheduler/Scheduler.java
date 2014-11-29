@@ -29,6 +29,7 @@ import com.quartercode.classmod.base.Feature;
 import com.quartercode.classmod.base.Persistent;
 import com.quartercode.classmod.base.def.AbstractFeature;
 import com.quartercode.classmod.extra.CFeatureHolder;
+import com.quartercode.disconnected.shared.util.XmlPersistent;
 
 /**
  * The scheduler is a {@link Feature} that allows executing actions after a delay or periodically.
@@ -43,6 +44,7 @@ import com.quartercode.classmod.extra.CFeatureHolder;
  * @see SchedulerTask
  */
 @Persistent
+@XmlPersistent
 @XmlRootElement
 public class Scheduler extends AbstractFeature {
 

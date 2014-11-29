@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -31,12 +33,17 @@ import java.util.zip.ZipOutputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.util.TreeInitializer;
+import com.quartercode.disconnected.server.registry.PersistentClassScanDirective;
+import com.quartercode.disconnected.server.registry.PersistentClassScanDirective.ScanMethod;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.world.World;
+import com.quartercode.disconnected.server.world.util.ClasspathScanningUtils;
+import com.quartercode.disconnected.shared.util.XmlPersistent;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.util.registry.extra.MappedValueRegistry.Mapping;
 
@@ -46,6 +53,10 @@ import com.quartercode.disconnected.shared.util.registry.extra.MappedValueRegist
  * @see Profile
  */
 public class ProfileSerializer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProfileSerializer.class);
+
+    private static Class<?>[]   jaxbContextClassCache;
 
     /**
      * Serializes the given {@link Profile} to the given {@link OutputStream}.
@@ -113,7 +124,54 @@ public class ProfileSerializer {
      */
     public static JAXBContext createWorldContext() throws JAXBException {
 
-        return JAXBContext.newInstance(StringUtils.join(Registries.get(ServerRegistries.WORLD_CONTEXT_PATH), ":"));
+        if (jaxbContextClassCache == null) {
+            Collection<Class<?>> classes = new HashSet<>();
+
+            for (PersistentClassScanDirective directive : Registries.get(ServerRegistries.PERSISTENT_CLASS_SCAN_DIRECTIVES)) {
+                String packageName = directive.getPackageName();
+
+                // Recursive annotation search
+                if (directive.getMethod() == ScanMethod.RECURSIVE_ANNOTATION_SEARCH) {
+                    doRecursiveAnnotationSearch(packageName, classes);
+                }
+                // JAXB index lookup
+                else if (directive.getMethod() == ScanMethod.JAXB_INDEX_LOOKUP) {
+                    try {
+                        // Add the all found classes to the list
+                        classes.addAll(ClasspathScanningUtils.getJAXBIndexedPackageClasses(directive.getPackageName(), false));
+                    } catch (IOException e) {
+                        LOGGER.error("Cannot read any classes from package '{}'", packageName, e);
+                    }
+                }
+            }
+
+            jaxbContextClassCache = classes.toArray(new Class[classes.size()]);
+        }
+
+        return JAXBContext.newInstance(jaxbContextClassCache);
+    }
+
+    private static void doRecursiveAnnotationSearch(String rootPackage, Collection<Class<?>> target) {
+
+        try {
+            // Iterate over the package and all subpackages
+            for (String packageName : ClasspathScanningUtils.getSubpackages(rootPackage, true, false)) {
+                try {
+                    // Iterate over all classes in those packages
+                    for (Class<?> c : ClasspathScanningUtils.getPackageClasses(packageName, false)) {
+                        // Check whether the class is a valid persistent class
+                        if (c.isAnnotationPresent(XmlPersistent.class) && !c.isInterface()) {
+                            // Add the found class to the list
+                            target.add(c);
+                        }
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("Cannot read any classes from package '{}'", packageName, e);
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("Cannot list subpackages of package '{}'", rootPackage, e);
+        }
     }
 
     /**

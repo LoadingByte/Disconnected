@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <!-- Classmod -->
+    <addPersistentClassScanDirective method="jaxbIndexLookup">$C{com.quartercode.classmod.Classmod.CONTEXT_PATH}</addPersistentClassScanDirective>
+
+    <!-- Game -->
+    <addPersistentClassScanDirective method="recursiveAnnotationSearch">com.quartercode.disconnected.shared.world</addPersistentClassScanDirective>
+    <addPersistentClassScanDirective method="recursiveAnnotationSearch">com.quartercode.disconnected.server.sim</addPersistentClassScanDirective>
+    <addPersistentClassScanDirective method="recursiveAnnotationSearch">com.quartercode.disconnected.server.world</addPersistentClassScanDirective>
+</config>

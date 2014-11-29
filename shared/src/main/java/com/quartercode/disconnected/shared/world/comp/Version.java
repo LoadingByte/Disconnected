@@ -24,12 +24,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import com.quartercode.disconnected.shared.util.XmlPersistent;
 
 /**
  * This class represents a simple version.
  * A version contains a major version, minor version and a revision.
  * An example version string could be {@code 2.5.1} (using the format {@code major.minor.revision}).
  */
+@XmlPersistent
 public class Version implements Serializable {
 
     @XmlElement

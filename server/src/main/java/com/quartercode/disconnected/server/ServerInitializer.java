@@ -32,13 +32,13 @@ import com.quartercode.disconnected.server.event.program.control.WorldProcessLau
 import com.quartercode.disconnected.server.identity.DefaultSBPIdentityService;
 import com.quartercode.disconnected.server.identity.SBPIdentityService;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
-import com.quartercode.disconnected.server.registry.config.AddWorldContextPathEntryCommand;
+import com.quartercode.disconnected.server.registry.config.AddPersistentClassScanDirectiveCommand;
 import com.quartercode.disconnected.server.registry.config.AddWorldInitializerMappingCommand;
 import com.quartercode.disconnected.server.registry.config.ConfigureFileTypeCommand;
 import com.quartercode.disconnected.server.registry.config.ConfigureSchedulerGroupCommand;
 import com.quartercode.disconnected.server.registry.config.ConfigureVulnerabilitySourceCommand;
 import com.quartercode.disconnected.server.registry.config.ConfigureWorldProgramCommand;
-import com.quartercode.disconnected.server.registry.config.RemoveWorldContextPathEntryCommand;
+import com.quartercode.disconnected.server.registry.config.RemovePersistentClassScanDirectiveCommand;
 import com.quartercode.disconnected.server.registry.config.RemoveWorldInitializerMappingCommand;
 import com.quartercode.disconnected.server.sim.DefaultTickService;
 import com.quartercode.disconnected.server.sim.TickBridgeProvider;
@@ -112,8 +112,8 @@ public class ServerInitializer {
     private static void addConfigCommandParsers(ConfigService service) {
 
         // World context path
-        service.addCommand("addWorldContextPathEntry", new AddWorldContextPathEntryCommand(Registries.get(ServerRegistries.WORLD_CONTEXT_PATH)));
-        service.addCommand("removeWorldContextPathEntry", new RemoveWorldContextPathEntryCommand(Registries.get(ServerRegistries.WORLD_CONTEXT_PATH)));
+        service.addCommand("addPersistentClassScanDirective", new AddPersistentClassScanDirectiveCommand(Registries.get(ServerRegistries.PERSISTENT_CLASS_SCAN_DIRECTIVES)));
+        service.addCommand("removePersistentClassScanDirective", new RemovePersistentClassScanDirectiveCommand(Registries.get(ServerRegistries.PERSISTENT_CLASS_SCAN_DIRECTIVES)));
 
         // World initializer mappings
         service.addCommand("addWorldInitializerMapping", new AddWorldInitializerMappingCommand(Registries.get(ServerRegistries.WORLD_INITIALIZER_MAPPINGS)));

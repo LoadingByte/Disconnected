@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import com.quartercode.disconnected.shared.util.XmlPersistent;
 
 /**
  * This class represents an address which locates a specific service or socket which is available through a specific network interface.
@@ -31,6 +32,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * 
  * @see NetID
  */
+@XmlPersistent
 public class Address implements Serializable {
 
     @XmlElement

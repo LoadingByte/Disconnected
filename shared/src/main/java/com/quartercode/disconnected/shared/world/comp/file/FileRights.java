@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import com.quartercode.disconnected.shared.util.XmlPersistent;
 
 /**
  * A storage object for file rights which control the access to files by users.
@@ -55,6 +56,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * <li>{@link #EXECUTE} -&gt; {@value #EXECUTE}</li>
  * </ul>
  */
+@XmlPersistent
 public class FileRights implements Serializable {
 
     // ----- Default file accessors -----

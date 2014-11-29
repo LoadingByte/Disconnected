@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.server.world.comp.net;
 
+import com.quartercode.disconnected.shared.util.XmlPersistent;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
 
 /**
@@ -28,6 +29,7 @@ import com.quartercode.disconnected.shared.world.comp.net.Address;
  * 
  * @see NetworkModule#CONNECTION_LISTENERS
  */
+@XmlPersistent
 public abstract class SocketConnectionListener {
 
     /**

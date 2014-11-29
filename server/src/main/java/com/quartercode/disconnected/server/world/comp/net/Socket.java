@@ -40,6 +40,7 @@ import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.server.util.ObjArray;
 import com.quartercode.disconnected.server.world.util.StringRepresentable;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
+import com.quartercode.disconnected.shared.util.XmlPersistent;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
 
 /**
@@ -562,6 +563,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
      * @see Socket
      * @see Packet
      */
+    @XmlPersistent
     public static abstract class PacketHandler {
 
         /**
