@@ -26,7 +26,7 @@ import java.util.Set;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.registry.VulnerabilitySource;
 import com.quartercode.disconnected.server.registry.WorldProgram;
-import com.quartercode.disconnected.server.util.ProbabilityUtil;
+import com.quartercode.disconnected.server.util.ProbabilityUtils;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
@@ -132,7 +132,7 @@ public class WorldGenerator {
                 lastRouterIndex = index;
             }
             // Randomly generate routers
-            else if (locations.size() - index > 3 && index - lastRouterIndex > 3 && ProbabilityUtil.gen(0.5F, random)) {
+            else if (locations.size() - index > 3 && index - lastRouterIndex > 3 && ProbabilityUtils.gen(0.5F, random)) {
                 router = true;
             }
 

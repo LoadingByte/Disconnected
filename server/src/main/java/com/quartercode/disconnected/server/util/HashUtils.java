@@ -26,7 +26,7 @@ import java.security.NoSuchAlgorithmException;
  * A small utility class which provides some functions for hashing strings into other strings.
  * That way, users of the functions do not need to convert the strings to byte arrays.
  */
-public class HashUtil {
+public class HashUtils {
 
     /**
      * Hashes the given string using the {@code SHA-256} algorithm and returns the result as a string.
@@ -46,7 +46,7 @@ public class HashUtil {
         }
     }
 
-    private HashUtil() {
+    private HashUtils() {
 
     }
 

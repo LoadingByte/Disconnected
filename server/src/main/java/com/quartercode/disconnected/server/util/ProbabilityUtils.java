@@ -27,7 +27,7 @@ import java.util.Random;
  * The generation generates a random boolean result which is true if the probability is hit.
  * The distribution of the results is equal to the probability.
  */
-public class ProbabilityUtil {
+public class ProbabilityUtils {
 
     /**
      * Calculates a valid probability value out of a pseudo one.
@@ -74,7 +74,7 @@ public class ProbabilityUtil {
         return gen(prepare(pseudoProbability), random);
     }
 
-    private ProbabilityUtil() {
+    private ProbabilityUtils() {
 
     }
 
