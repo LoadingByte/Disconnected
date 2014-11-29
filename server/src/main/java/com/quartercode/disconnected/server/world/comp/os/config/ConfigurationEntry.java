@@ -28,7 +28,7 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.ValueSupplierDefinition;
 import com.quartercode.disconnected.server.util.NullPreventer;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
-import com.quartercode.disconnected.server.world.util.SizeUtil;
+import com.quartercode.disconnected.server.world.util.SizeUtils;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 
 /**
@@ -67,7 +67,7 @@ public class ConfigurationEntry extends WorldChildFeatureHolder<Configuration> i
                 for (ValueSupplierDefinition<?, ?> column : holder.invoke(GET_COLUMNS).keySet()) {
                     // Cannot use the convenient method because the value supplier has generic wildcard parameters
                     Object columnValue = holder.get(column).get();
-                    size += SizeUtil.getSize(columnValue);
+                    size += SizeUtils.getSize(columnValue);
                 }
 
                 return size + NullPreventer.prevent(invocation.next(arguments));

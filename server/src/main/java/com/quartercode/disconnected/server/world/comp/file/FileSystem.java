@@ -28,7 +28,6 @@ import com.quartercode.classmod.extra.ValueFactory;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
-import com.quartercode.disconnected.server.world.util.SizeUtil;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 
@@ -201,7 +200,7 @@ public class FileSystem extends WorldFeatureHolder implements DerivableSize {
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
-                long filled = SizeUtil.getSize(invocation.getCHolder().getObj(ROOT));
+                long filled = invocation.getCHolder().getObj(ROOT).invoke(RootFile.GET_SIZE);
                 invocation.next(arguments);
                 return filled;
             }

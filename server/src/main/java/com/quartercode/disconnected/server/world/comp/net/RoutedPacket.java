@@ -27,7 +27,7 @@ import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
-import com.quartercode.disconnected.server.world.util.SizeUtil;
+import com.quartercode.disconnected.server.world.util.SizeUtils;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 
 /**
@@ -109,7 +109,7 @@ public class RoutedPacket extends WorldFeatureHolder implements DerivableSize {
 
     static {
 
-        GET_SIZE.addExecutor("data", RoutedPacket.class, SizeUtil.createGetSize(PACKET));
+        GET_SIZE.addExecutor("data", RoutedPacket.class, SizeUtils.createGetSize(PACKET));
 
     }
 

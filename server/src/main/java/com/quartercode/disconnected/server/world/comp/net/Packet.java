@@ -23,7 +23,7 @@ import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
-import com.quartercode.disconnected.server.world.util.SizeUtil;
+import com.quartercode.disconnected.server.world.util.SizeUtils;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
 
@@ -72,7 +72,7 @@ public class Packet extends WorldFeatureHolder implements DerivableSize {
 
     static {
 
-        GET_SIZE.addExecutor("data", Packet.class, SizeUtil.createGetSize(DATA));
+        GET_SIZE.addExecutor("data", Packet.class, SizeUtils.createGetSize(DATA));
 
     }
 

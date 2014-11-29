@@ -25,7 +25,7 @@ import com.quartercode.classmod.extra.FunctionExecutor;
 import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.disconnected.server.world.util.SizeUtil;
+import com.quartercode.disconnected.server.world.util.SizeUtils;
 
 /**
  * This class represents a content file.
@@ -64,9 +64,11 @@ public class ContentFile extends File<ParentFile<?>> {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
+                long size = SizeUtils.getSize(arguments[0]);
+
                 FileSystem fileSystem = invocation.getCHolder().invoke(GET_FILE_SYSTEM);
-                if (fileSystem != null && SizeUtil.getSize(arguments[0]) > fileSystem.invoke(FileSystem.GET_FREE)) {
-                    throw new OutOfSpaceException(fileSystem, SizeUtil.getSize(arguments[0]));
+                if (fileSystem != null && size > fileSystem.invoke(FileSystem.GET_FREE)) {
+                    throw new OutOfSpaceException(fileSystem, size);
                 }
 
                 return invocation.next(arguments);
@@ -80,7 +82,7 @@ public class ContentFile extends File<ParentFile<?>> {
 
     static {
 
-        GET_SIZE.addExecutor("content", ContentFile.class, SizeUtil.createGetSize(CONTENT));
+        GET_SIZE.addExecutor("content", ContentFile.class, SizeUtils.createGetSize(CONTENT));
 
     }
 

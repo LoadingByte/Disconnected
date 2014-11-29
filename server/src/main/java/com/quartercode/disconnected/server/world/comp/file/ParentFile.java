@@ -32,7 +32,7 @@ import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
-import com.quartercode.disconnected.server.world.util.SizeUtil;
+import com.quartercode.disconnected.server.world.util.SizeUtils;
 
 /**
  * This class represents a parent file.
@@ -74,7 +74,7 @@ public class ParentFile<P extends CFeatureHolder> extends File<P> {
 
                 FileSystem fileSystem = invocation.getCHolder().invoke(GET_FILE_SYSTEM);
                 if (fileSystem != null) {
-                    long fileSize = SizeUtil.getSize(arguments[0]);
+                    long fileSize = ((File<?>) arguments[0]).invoke(File.GET_SIZE);
                     if (fileSize > fileSystem.invoke(FileSystem.GET_FREE)) {
                         throw new OutOfSpaceException(fileSystem, fileSize);
                     }
@@ -122,7 +122,7 @@ public class ParentFile<P extends CFeatureHolder> extends File<P> {
 
         }));
 
-        GET_SIZE.addExecutor("children", ParentFile.class, SizeUtil.createGetSize(CHILDREN));
+        GET_SIZE.addExecutor("children", ParentFile.class, SizeUtils.createGetSize(CHILDREN));
 
     }
 

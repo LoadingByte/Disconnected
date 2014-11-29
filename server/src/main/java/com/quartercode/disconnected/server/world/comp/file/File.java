@@ -31,7 +31,7 @@ import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.server.world.comp.os.user.Group;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
-import com.quartercode.disconnected.server.world.util.SizeUtil;
+import com.quartercode.disconnected.server.world.util.SizeUtils;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
@@ -281,7 +281,7 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
 
         });
 
-        GET_SIZE.addExecutor("name", File.class, SizeUtil.createGetSize(NAME));
+        GET_SIZE.addExecutor("name", File.class, SizeUtils.createGetSize(NAME));
 
     }
 

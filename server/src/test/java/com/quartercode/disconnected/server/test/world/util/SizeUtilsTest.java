@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.server.test.world.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,10 +33,10 @@ import com.quartercode.classmod.extra.FunctionInvocation;
 import com.quartercode.classmod.extra.def.DefaultCFeatureHolder;
 import com.quartercode.disconnected.server.util.NullPreventer;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
-import com.quartercode.disconnected.server.world.util.SizeUtil;
+import com.quartercode.disconnected.server.world.util.SizeUtils;
 
 @RunWith (Parameterized.class)
-public class SizeUtilTest {
+public class SizeUtilsTest {
 
     @Parameters
     public static Collection<Object[]> data() {
@@ -88,9 +89,11 @@ public class SizeUtilTest {
         });
         data.add(new Object[] { new TestFeatureHolder(), 100 + 500 });
 
-        // Unknown objects or null (should return 0)
+        // Null (should return 0)
         data.add(new Object[] { null, 0 });
-        data.add(new Object[] { new Exception(), 0 });
+
+        // Unsupported object (-1 -> Should throw exception)
+        data.add(new Object[] { new StringBuilder(), -1 });
 
         return data;
     }
@@ -98,7 +101,7 @@ public class SizeUtilTest {
     private final Object object;
     private final long   expectedSize;
 
-    public SizeUtilTest(Object object, long expectedSize) {
+    public SizeUtilsTest(Object object, long expectedSize) {
 
         this.object = object;
         this.expectedSize = expectedSize;
@@ -107,7 +110,12 @@ public class SizeUtilTest {
     @Test
     public void testGetSize() {
 
-        assertEquals("Calculated Size", expectedSize, SizeUtil.getSize(object));
+        try {
+            assertEquals("Calculated Size", expectedSize, SizeUtils.getSize(object));
+            assertTrue("getSize() didn't throw expected exception", expectedSize != -1);
+        } catch (IllegalArgumentException e) {
+            assertTrue("getSize() threw unexpected exception", expectedSize == -1);
+        }
     }
 
     private static class TestFeatureHolder extends DefaultCFeatureHolder implements DerivableSize {
