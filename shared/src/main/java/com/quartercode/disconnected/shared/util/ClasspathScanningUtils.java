@@ -77,7 +77,7 @@ public class ClasspathScanningUtils {
         String packageDirName = convertPackageToPath(rootPackage);
 
         // Iterate over all directories which represent the package
-        try (ResourceLister resourceLister = new ResourceLister(packageDirName)) {
+        try (ResourceLister resourceLister = new ResourceLister(packageDirName, throwAll)) {
             for (final Path packageDir : resourceLister.getResourcePaths()) {
                 try {
                     Files.walkFileTree(packageDir, new SimpleFileVisitor<Path>() {
@@ -130,7 +130,7 @@ public class ClasspathScanningUtils {
         String packageDirName = convertPackageToPath(packageName);
 
         // Iterate over all directories which provide classes for the package
-        try (ResourceLister resourceLister = new ResourceLister(packageDirName)) {
+        try (ResourceLister resourceLister = new ResourceLister(packageDirName, throwAll)) {
             for (Path packageDir : resourceLister.getResourcePaths()) {
                 // Iterate over all the files in the directory
                 try (DirectoryStream<Path> packageDirStream = Files.newDirectoryStream(packageDir)) {
@@ -231,7 +231,7 @@ public class ClasspathScanningUtils {
         Collection<Class<?>> removedClasses = allowRemoval ? new HashSet<Class<?>>() : null;
 
         // Iterate over all index files provided on the classpath
-        try (ResourceLister resourceLister = new ResourceLister(indexResource)) {
+        try (ResourceLister resourceLister = new ResourceLister(indexResource, throwAll)) {
             for (Path indexFile : resourceLister.getResourcePaths()) {
                 // Resolve the directory which contains the index file
                 Path packageDir = indexFile.getParent();

@@ -75,7 +75,7 @@ public class ResourceStore {
      */
     public static void loadFromClasspath(String path) throws IOException {
 
-        try (ResourceLister resourceLister = new ResourceLister(path)) {
+        try (ResourceLister resourceLister = new ResourceLister(path, false)) {
             for (final Path resource : resourceLister.getResourcePaths()) {
                 Files.walkFileTree(resource, new SimpleFileVisitor<Path>() {
 

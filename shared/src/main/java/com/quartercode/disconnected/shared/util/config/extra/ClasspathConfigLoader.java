@@ -50,7 +50,7 @@ public class ClasspathConfigLoader {
      */
     public static void load(ConfigService configService, String path) {
 
-        try (ResourceLister resourceLister = new ResourceLister(path)) {
+        try (ResourceLister resourceLister = new ResourceLister(path, false)) {
             for (Path resource : resourceLister.getResourcePaths()) {
                 loadResource(configService, resource);
             }

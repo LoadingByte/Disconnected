@@ -105,7 +105,7 @@ public class ClientInitializer {
 
         // Generate spritesheets
         LOGGER.debug("Generating spritesheets");
-        try (ResourceLister resourceLister = new ResourceLister("/ui/sprites")) {
+        try (ResourceLister resourceLister = new ResourceLister("/ui/sprites", false)) {
             // Assume that there is only one sprites directory on the classpath
             Path spritesDir = resourceLister.getResourcePaths().get(0);
 
