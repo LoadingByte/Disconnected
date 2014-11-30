@@ -42,7 +42,7 @@ import com.quartercode.disconnected.server.registry.PersistentClassScanDirective
 import com.quartercode.disconnected.server.registry.PersistentClassScanDirective.ScanMethod;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.world.World;
-import com.quartercode.disconnected.server.world.util.ClasspathScanningUtils;
+import com.quartercode.disconnected.shared.util.ClasspathScanningUtils;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.util.registry.extra.MappedValueRegistry.Mapping;
@@ -110,7 +110,7 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
 
         try {
             // Add the all found classes to the list
-            persistentClasses.addAll(ClasspathScanningUtils.getJAXBIndexedPackageClasses(packageName, false));
+            persistentClasses.addAll(ClasspathScanningUtils.getIndexedPackageClasses(packageName, "jaxb.index", false));
         } catch (IOException e) {
             LOGGER.error("Cannot read any classes from package '{}'", packageName, e);
         }
