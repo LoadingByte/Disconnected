@@ -19,36 +19,50 @@
 package com.quartercode.disconnected.server.sim.profile;
 
 /**
- * The profile serialization exception occures if a {@link Profile} cannot be serialized or deserialized.
- * It is generally thrown by the {@link ProfileSerializer}.
+ * The profile serialization exception can occur while trying to serialize a whole {@link Profile} or a part of it.
+ * It is generally thrown by the {@link ProfileSerializationService}.
  * 
- * @see ProfileSerializer
+ * @see ProfileSerializationService
  */
 public class ProfileSerializationException extends Exception {
 
-    private final Profile profile;
-
     /**
      * Creates a new profile serialization exception.
-     * 
-     * @param cause The exception that caused the error.
-     * @param profile The {@link Profile} that cannot be serialized or deserialized.
      */
-    public ProfileSerializationException(Throwable cause, Profile profile) {
+    public ProfileSerializationException() {
 
-        super(cause);
-
-        this.profile = profile;
+        super();
     }
 
     /**
-     * Returns the {@link Profile} that cannot be serialized or deserialized.
+     * Creates a new profile serialization exception with the given message.
      * 
-     * @return The profile that caused the problem.
+     * @param message The detail message.
      */
-    public Profile getProfile() {
+    public ProfileSerializationException(String message) {
 
-        return profile;
+        super(message);
+    }
+
+    /**
+     * Creates a new profile serialization exception with the given cause.
+     * 
+     * @param cause The child cause which caused the exception to be thrown.
+     */
+    public ProfileSerializationException(Throwable cause) {
+
+        super(cause);
+    }
+
+    /**
+     * Creates a new profile serialization exception with the given message and cause.
+     * 
+     * @param message The detail message.
+     * @param cause The child cause which caused the exception to be thrown.
+     */
+    public ProfileSerializationException(String message, Throwable cause) {
+
+        super(message, cause);
     }
 
 }

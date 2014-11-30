@@ -128,14 +128,14 @@ public class DefaultProfileService implements ProfileService {
             try {
                 Files.delete(profileFile);
             } catch (IOException e) {
-                throw new ProfileSerializationException(e, profile);
+                throw new ProfileSerializationException("Cannot delete old file '" + profileFile + "' of profile '" + profile.getName() + "'", e);
             }
         }
 
         try (OutputStream outputStream = Files.newOutputStream(profileFile)) {
-            ProfileSerializer.serializeProfile(outputStream, profile);
+            ServiceRegistry.lookup(ProfileSerializationService.class).serializeProfile(outputStream, profile);
         } catch (IOException e) {
-            throw new ProfileSerializationException(e, profile);
+            throw new ProfileSerializationException("Cannot open output stream to profile file '" + profileFile + "' for serializing profile '" + profile.getName() + "'", e);
         }
     }
 
@@ -162,9 +162,9 @@ public class DefaultProfileService implements ProfileService {
 
             if (Files.exists(profileFile)) {
                 try (InputStream inputStream = Files.newInputStream(profileFile)) {
-                    ProfileSerializer.deserializeProfile(inputStream, active);
+                    ServiceRegistry.lookup(ProfileSerializationService.class).deserializeProfile(inputStream, active);
                 } catch (IOException e) {
-                    throw new ProfileSerializationException(e, profile);
+                    throw new ProfileSerializationException("Cannot open input stream to profile file '" + profileFile + "' for deserializing profile '" + profile.getName() + "'", e);
                 }
             }
         }
