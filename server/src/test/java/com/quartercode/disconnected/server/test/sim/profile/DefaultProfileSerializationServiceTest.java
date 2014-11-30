@@ -26,7 +26,6 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-import javax.xml.bind.JAXBException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import com.quartercode.classmod.base.Feature;
@@ -37,11 +36,13 @@ import com.quartercode.classmod.extra.Storage;
 import com.quartercode.classmod.extra.ValueSupplier;
 import com.quartercode.disconnected.server.ServerInitializer;
 import com.quartercode.disconnected.server.sim.gen.WorldGenerator;
-import com.quartercode.disconnected.server.sim.profile.ProfileSerializer;
+import com.quartercode.disconnected.server.sim.profile.ProfileSerializationException;
+import com.quartercode.disconnected.server.sim.profile.ProfileSerializationService;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.shared.SharedInitializer;
+import com.quartercode.disconnected.shared.util.ServiceRegistry;
 
-public class ProfileSerializerTest {
+public class DefaultProfileSerializationServiceTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -49,19 +50,23 @@ public class ProfileSerializerTest {
         SharedInitializer.initialize();
         ServerInitializer.initialize();
         SharedInitializer.initializeFinal();
+        ServerInitializer.initializeFinal();
     }
 
     @Test
-    public void testSerializeWorld() throws IOException, JAXBException {
+    public void testSerializeWorld() throws IOException, ProfileSerializationException {
+
+        // TODO: Initialize own
+        ProfileSerializationService service = ServiceRegistry.lookup(ProfileSerializationService.class);
 
         World world = WorldGenerator.generateWorld(new Random(1), 2);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ProfileSerializer.serializeWorld(outputStream, world);
+        service.serializeWorld(outputStream, world);
         outputStream.flush();
         String serialized = new String(outputStream.toByteArray(), "UTF-8");
 
-        World copy = ProfileSerializer.deserializeWorld(new ByteArrayInputStream(serialized.getBytes("UTF-8")));
+        World copy = service.deserializeWorld(new ByteArrayInputStream(serialized.getBytes("UTF-8")));
         assertTrue("Serialized-deserialized copy of world does not equal original", equalsPersistent(world, copy));
     }
 
