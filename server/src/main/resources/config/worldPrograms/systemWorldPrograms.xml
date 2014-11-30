@@ -3,6 +3,7 @@
     <configureWorldProgram name="session">
         <class>com.quartercode.disconnected.server.world.comp.os.Session</class>
         <size>1024</size>
-        <commonLocation>$C{com.quartercode.disconnected.shared.world.comp.file.CommonFiles.SYS_BIN_DIR}/session.exe</commonLocation>
+        <commonFileDir>$C{com.quartercode.disconnected.shared.world.comp.file.CommonFiles.SYS_BIN_DIR}</commonFileDir>
+        <commonFileName>session.exe</commonFileName>
     </configureWorldProgram>
 </config>

@@ -38,7 +38,7 @@ public class ConfigureWorldProgramCommand extends ConfigureNamedValueCommand<Wor
     @Override
     protected WorldProgram supplyDefaultValue(String name) {
 
-        return new WorldProgram(name, null, 0, null);
+        return new WorldProgram(name, null, 0, new SeparatedPath("", ""));
     }
 
     @Override
@@ -47,7 +47,8 @@ public class ConfigureWorldProgramCommand extends ConfigureNamedValueCommand<Wor
         String name = oldValue.getName();
         Class<?> type = oldValue.getType();
         long size = oldValue.getSize();
-        SeparatedPath commonLocation = oldValue.getCommonLocation();
+        String commonFileDir = oldValue.getCommonLocation().getDir();
+        String commonFileName = oldValue.getCommonLocation().getFile();
 
         Element typeElement = commandElement.getChild("class");
         if (typeElement != null) {
@@ -61,13 +62,17 @@ public class ConfigureWorldProgramCommand extends ConfigureNamedValueCommand<Wor
             size = ParserUtils.parsePositiveNumber(config, "world group size for '" + name + "'", sizeString, size);
         }
 
-        Element commonLocationElement = commandElement.getChild("commonLocation");
-        if (commonLocationElement != null) {
-            String locationString = VariableReferenceResolver.process(commonLocationElement.getText(), null);
-            commonLocation = new SeparatedPath(locationString);
+        Element commonFileDirElement = commandElement.getChild("commonFileDir");
+        if (commonFileDirElement != null) {
+            commonFileDir = VariableReferenceResolver.process(commonFileDirElement.getText(), null);
         }
 
-        return new WorldProgram(name, type, size, commonLocation);
+        Element fileNameElement = commandElement.getChild("commonFileName");
+        if (fileNameElement != null) {
+            commonFileName = VariableReferenceResolver.process(fileNameElement.getText(), null);
+        }
+
+        return new WorldProgram(name, type, size, new SeparatedPath(commonFileDir, commonFileName));
     }
 
 }
