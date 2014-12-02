@@ -28,7 +28,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import com.quartercode.disconnected.server.ServerInitializer;
 import com.quartercode.disconnected.server.event.program.control.WorldProcessLaunchCommandHandler;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.registry.WorldProgram;
@@ -39,7 +38,7 @@ import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.program.Program;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.RootProcess;
-import com.quartercode.disconnected.shared.SharedInitializer;
+import com.quartercode.disconnected.shared.CommonBootstrap;
 import com.quartercode.disconnected.shared.event.comp.program.control.WorldProcessLaunchAcknowledgmentEvent;
 import com.quartercode.disconnected.shared.event.comp.program.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.identity.ClientIdentity;
@@ -60,9 +59,7 @@ public class WorldProcessLaunchCommandHandlerTest {
     @BeforeClass
     public static void setUpBeforeClass() {
 
-        SharedInitializer.initialize();
-        ServerInitializer.initialize();
-        SharedInitializer.initializeFinal();
+        CommonBootstrap.bootstrap();
 
         Registries.get(ServerRegistries.WORLD_PROGRAMS).addValue(new WorldProgram("_testProgram", TestProgram.class, 0, null));
     }

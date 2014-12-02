@@ -37,10 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import ch.qos.logback.classic.Level;
-import com.quartercode.disconnected.client.ClientInitializer;
 import com.quartercode.disconnected.client.graphics.DefaultStates;
 import com.quartercode.disconnected.client.graphics.GraphicsService;
-import com.quartercode.disconnected.server.ServerInitializer;
 import com.quartercode.disconnected.server.sim.TickBridgeProvider;
 import com.quartercode.disconnected.server.sim.TickService;
 import com.quartercode.disconnected.server.sim.gen.WorldGenerator;
@@ -50,7 +48,7 @@ import com.quartercode.disconnected.server.sim.profile.ProfileService;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.shared.SharedInitializer;
+import com.quartercode.disconnected.shared.CommonBootstrap;
 import com.quartercode.disconnected.shared.util.ApplicationInfo;
 import com.quartercode.disconnected.shared.util.ExitUtil;
 import com.quartercode.disconnected.shared.util.ExitUtil.ExitProcessor;
@@ -101,8 +99,9 @@ public class Main {
         // Process the command line arguments
         processCommandLineArguments(args);
 
-        // Call module (shared, server, client) initializers
-        callModuleInitializers();
+        // Bootstrap modules (shared, server, client)
+        LOGGER.info("Executing bootstrap");
+        CommonBootstrap.bootstrap();
 
         // DEBUG: Retrieve the game services
         ProfileService profileService = ServiceRegistry.lookup(ProfileService.class);
@@ -238,25 +237,6 @@ public class Main {
         options.addOption(OptionBuilder.withLongOpt("help").withDescription("Prints a help page").create("h"));
         options.addOption(OptionBuilder.withLongOpt("locale").hasArg().withArgName("locale").withDescription("Sets the locale code to use (e.g. en or de_DE)").create("l"));
         return options;
-    }
-
-    private static void callModuleInitializers() {
-
-        // Initialize shared
-        LOGGER.info("Initializing shared module");
-        SharedInitializer.initialize();
-
-        // Initialize server
-        LOGGER.info("Initializing server module");
-        ServerInitializer.initialize();
-
-        // Initialize client
-        LOGGER.info("Initializing client module");
-        ClientInitializer.initialize();
-
-        // Initialize shared (final part)
-        LOGGER.info("Initializing shared module (final part)");
-        SharedInitializer.initializeFinal();
     }
 
     private Main() {

@@ -24,7 +24,6 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
-import com.quartercode.disconnected.server.ServerInitializer;
 import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension;
 import com.quartercode.disconnected.server.bridge.SBPIdentityExtension;
 import com.quartercode.disconnected.server.identity.SBPIdentityService;
@@ -46,7 +45,7 @@ import com.quartercode.disconnected.server.world.comp.program.Process;
 import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.program.RootProcess;
-import com.quartercode.disconnected.shared.SharedInitializer;
+import com.quartercode.disconnected.shared.CommonBootstrap;
 import com.quartercode.disconnected.shared.identity.ClientIdentity;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.disconnected.shared.util.registry.Registries;
@@ -64,9 +63,7 @@ public abstract class AbstractComplexComputerTest {
     @BeforeClass
     public static void setUpBeforeClassInternal() {
 
-        SharedInitializer.initialize();
-        ServerInitializer.initialize();
-        SharedInitializer.initializeFinal();
+        CommonBootstrap.bootstrap();
     }
 
     @Rule

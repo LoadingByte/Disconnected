@@ -34,12 +34,11 @@ import com.quartercode.classmod.base.def.DefaultFeatureHolder;
 import com.quartercode.classmod.extra.CollectionProperty;
 import com.quartercode.classmod.extra.Storage;
 import com.quartercode.classmod.extra.ValueSupplier;
-import com.quartercode.disconnected.server.ServerInitializer;
 import com.quartercode.disconnected.server.sim.gen.WorldGenerator;
 import com.quartercode.disconnected.server.sim.profile.ProfileSerializationException;
 import com.quartercode.disconnected.server.sim.profile.ProfileSerializationService;
 import com.quartercode.disconnected.server.world.World;
-import com.quartercode.disconnected.shared.SharedInitializer;
+import com.quartercode.disconnected.shared.CommonBootstrap;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 
 public class DefaultProfileSerializationServiceTest {
@@ -47,10 +46,7 @@ public class DefaultProfileSerializationServiceTest {
     @BeforeClass
     public static void setUpBeforeClass() {
 
-        SharedInitializer.initialize();
-        ServerInitializer.initialize();
-        SharedInitializer.initializeFinal();
-        ServerInitializer.initializeFinal();
+        CommonBootstrap.bootstrap();
     }
 
     @Test

@@ -23,9 +23,8 @@ import java.util.List;
 import java.util.Random;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import com.quartercode.disconnected.server.ServerInitializer;
 import com.quartercode.disconnected.server.sim.gen.LocationGenerator;
-import com.quartercode.disconnected.shared.SharedInitializer;
+import com.quartercode.disconnected.shared.CommonBootstrap;
 import com.quartercode.disconnected.shared.world.general.Location;
 
 public class LocationGeneratorTest {
@@ -33,9 +32,7 @@ public class LocationGeneratorTest {
     @BeforeClass
     public static void setUpBeforeClass() {
 
-        SharedInitializer.initialize();
-        ServerInitializer.initialize();
-        SharedInitializer.initializeFinal();
+        CommonBootstrap.bootstrap();
     }
 
     @Test
