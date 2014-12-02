@@ -108,6 +108,9 @@ public class Main {
         TickService tickService = ServiceRegistry.lookup(TickService.class);
         GraphicsService graphicsService = ServiceRegistry.lookup(GraphicsService.class);
 
+        // DEBUG: Start graphics service
+        graphicsService.setRunning(true);
+
         // DEBUG: Connect the client and server bridges
         LOGGER.info("DEBUG: Connect the client and server bridges");
         final Bridge clientBridge = graphicsService.getBridge();

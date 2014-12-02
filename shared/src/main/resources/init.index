@@ -1,0 +1,9 @@
+# Add EventBridge factory mappings
+com.quartercode.disconnected.shared.init.AddSharedEventBridgeFactoryMappings
+
+# Register services
+com.quartercode.disconnected.shared.init.RegisterRegistryService
+com.quartercode.disconnected.shared.init.RegisterConfigService
+
+# Load configs
+com.quartercode.disconnected.shared.init.LoadClasspathConfigs

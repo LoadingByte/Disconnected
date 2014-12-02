@@ -1,0 +1,9 @@
+# Register services
+com.quartercode.disconnected.client.init.RegisterGraphicsService
+
+# Initialize resources
+com.quartercode.disconnected.client.init.InitializeDefaultGraphicsStates
+com.quartercode.disconnected.client.init.GenerateSpritesheets
+
+# Add config commands
+com.quartercode.disconnected.client.init.AddClientConfigCommandParsers

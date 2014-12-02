@@ -1,0 +1,21 @@
+# Add EventBridge factory mappings
+com.quartercode.disconnected.server.init.AddServerEventBridgeFactoryMappings
+
+# Register services
+com.quartercode.disconnected.server.init.RegisterProfileService
+com.quartercode.disconnected.server.init.RegisterProfileSerializationService
+com.quartercode.disconnected.server.init.RegisterTickService
+com.quartercode.disconnected.server.init.RegisterSBPIdentityService
+
+# Initialize services
+com.quartercode.disconnected.server.init.InitializeProfileSerializationService
+com.quartercode.disconnected.server.init.InitializeTickService
+
+# Initialize resources
+com.quartercode.disconnected.server.init.LoadResourceStore
+
+# Add config commands
+com.quartercode.disconnected.server.init.AddServerConfigCommandParsers
+
+# Add event handlers
+com.quartercode.disconnected.server.init.AddServerEventHandlers
