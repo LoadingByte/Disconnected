@@ -23,10 +23,10 @@ import java.util.List;
 
 /**
  * This service manages different {@link Profile}s which store simulations and random objects.
- * For loading or saving profiles, you need to use the {@link ProfileSerializer}.
+ * It is also capable of loading and saving those profiles.
  * 
  * @see Profile
- * @see ProfileSerializer
+ * @see ProfileSerializationService
  */
 public interface ProfileService {
 

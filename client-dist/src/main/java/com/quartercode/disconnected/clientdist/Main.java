@@ -137,13 +137,12 @@ public class Main {
             // Won't ever happen (we just created a new profile)
         }
 
-        for (Computer computer : world.get(World.COMPUTERS).get()) {
-            computer.get(Computer.OS).get().get(OperatingSystem.SET_RUNNING).invoke(true);
-        }
-
         // DEBUG: Start "game" with current simulation
         LOGGER.info("DEBUG: Starting test-game with current simulation");
         tickService.setRunning(true);
+        for (Computer computer : world.get(World.COMPUTERS).get()) {
+            computer.get(Computer.OS).get().get(OperatingSystem.SET_RUNNING).invoke(true);
+        }
         graphicsService.setState(DefaultStates.DESKTOP.create());
     }
 

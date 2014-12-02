@@ -39,8 +39,8 @@ import com.quartercode.eventbridge.bridge.Bridge;
  * A world is a space which contains one "game ecosystem".
  * It basically is the root of all logic objects the game uses.
  */
-@XmlRootElement (namespace = "http://quartercode.com/")
 @XmlPersistent
+@XmlRootElement
 public class World extends DefaultCFeatureHolder {
 
     // ----- Properties -----

@@ -68,7 +68,7 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
      * 
      * @param scanDirective The scanning directive which defines the exact scanning process.
      */
-    public void addPersistentClasses(PersistentClassScanDirective scanDirective) {
+    public void scanForPersistentClasses(PersistentClassScanDirective scanDirective) {
 
         String packageName = scanDirective.getPackageName();
         ScanMethod method = scanDirective.getMethod();
@@ -87,10 +87,10 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
 
         try {
             // Iterate over the package and all subpackages
-            for (String packageName : ClasspathScanningUtils.getSubpackages(rootPackage, true, false)) {
+            for (String childPackage : ClasspathScanningUtils.getSubpackages(rootPackage, true, false)) {
                 try {
                     // Iterate over all classes in those packages
-                    for (Class<?> c : ClasspathScanningUtils.getPackageClasses(packageName, false)) {
+                    for (Class<?> c : ClasspathScanningUtils.getPackageClasses(childPackage, false)) {
                         // Check whether the class is a valid persistent class
                         if (c.isAnnotationPresent(XmlPersistent.class) && !c.isInterface()) {
                             // Add the found class to the list
@@ -98,7 +98,7 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
                         }
                     }
                 } catch (IOException e) {
-                    LOGGER.error("Cannot read any classes from package '{}'", packageName, e);
+                    LOGGER.error("Cannot read any classes from package '{}'", childPackage, e);
                 }
             }
         } catch (IOException e) {
@@ -110,7 +110,7 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
 
         try {
             // Add the all found classes to the list
-            persistentClasses.addAll(ClasspathScanningUtils.getIndexedPackageClasses(packageName, "jaxb.index", false));
+            persistentClasses.addAll(ClasspathScanningUtils.getIndexedPackageClasses(packageName, "jaxb.index", false, false));
         } catch (IOException e) {
             LOGGER.error("Cannot read any classes from package '{}'", packageName, e);
         }

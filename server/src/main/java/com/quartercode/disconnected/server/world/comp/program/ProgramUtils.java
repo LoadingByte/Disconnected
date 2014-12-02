@@ -36,7 +36,8 @@ import com.quartercode.eventbridge.extra.predicate.MultiPredicates;
 import com.quartercode.eventbridge.extra.predicate.TypePredicate;
 
 /**
- * The program utils class provides some utility methods for programs and program executors.
+ * This utility class provides some utility methods for {@link Program}s and {@link ProgramExecutor}s.
+ * A lot of the available methods should be used to executors to remove the need for boilerplate code.
  * 
  * @see Program
  * @see ProgramExecutor

@@ -120,7 +120,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
     public static final FunctionDefinition<Boolean>          IS_RUNNING;
 
     /**
-     * Boots up (true) or shuts down (false) the operating system.
+     * Boots up ({@code true}) or shuts down ({@code false}) the operating system.
      * If the operating system already is in the correct state, nothing happens.
      * This method calls the {@link OSModule#SET_RUNNING} function on every used module.
      * Because of the fact that modules are not stored in a central collection, every module has its executor which invokes the module method.
@@ -158,14 +158,8 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
             }
 
         });
+
         SET_RUNNING = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setRunning", "parameters", new Class[] { Boolean.class });
-
-    }
-
-    // ----- Foreign Content -----
-
-    static {
-
         SET_RUNNING.addExecutor("fsModule", OperatingSystem.class, new FunctionExecutor<Void>() {
 
             @Override

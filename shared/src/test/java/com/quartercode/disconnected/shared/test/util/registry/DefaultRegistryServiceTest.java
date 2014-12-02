@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.test.registry;
+package com.quartercode.disconnected.shared.test.util.registry;
 
 import static org.junit.Assert.*;
 import java.util.Arrays;
