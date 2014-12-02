@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,37 +67,35 @@ public class ResourceLister implements Closeable {
      */
     public ResourceLister(String resourcePath, boolean throwAll) throws IOException {
 
-        if (!resourcePath.startsWith("/")) {
-            throw new IllegalArgumentException("Cannot retrieve relative resources, make sure your path starts with '/'");
-        } else {
-            // Retrieve all occurrences of the given path in the classpath
-            Enumeration<URL> locations = ResourceLister.class.getClassLoader().getResources(StringUtils.stripStart(resourcePath, "/"));
+        Validate.isTrue(resourcePath.startsWith("/"), "Cannot retrieve relative resources, make sure your path starts with '/'");
 
-            // Iterate over those occurrences
-            while (locations.hasMoreElements()) {
-                URL location = locations.nextElement();
+        // Retrieve all occurrences of the given path in the classpath
+        Enumeration<URL> locations = ResourceLister.class.getClassLoader().getResources(StringUtils.stripStart(resourcePath, "/"));
 
-                // Check whether the found location is inside a jar file
-                if (location.getProtocol().equals("jar")) {
-                    try {
-                        // Resolve the path of the jar file and load the resources from there
-                        Path jarFile = Paths.get(toURI( ((JarURLConnection) location.openConnection()).getJarFileURL()));
+        // Iterate over those occurrences
+        while (locations.hasMoreElements()) {
+            URL location = locations.nextElement();
 
-                        // Load the resources from the jar file
-                        FileSystem jarFS = FileSystems.newFileSystem(jarFile, null);
-                        resourcePaths.add(jarFS.getPath(resourcePath));
-                        jarFileSystems.add(jarFS);
-                    } catch (IOException e) {
-                        if (throwAll) {
-                            throw e;
-                        } else {
-                            LOGGER.error("Cannot read resource '{}' from jar file '{}'", resourcePath, location, e);
-                        }
+            // Check whether the found location is inside a jar file
+            if (location.getProtocol().equals("jar")) {
+                try {
+                    // Resolve the path of the jar file and load the resources from there
+                    Path jarFile = Paths.get(toURI( ((JarURLConnection) location.openConnection()).getJarFileURL()));
+
+                    // Load the resources from the jar file
+                    FileSystem jarFS = FileSystems.newFileSystem(jarFile, null);
+                    resourcePaths.add(jarFS.getPath(resourcePath));
+                    jarFileSystems.add(jarFS);
+                } catch (IOException e) {
+                    if (throwAll) {
+                        throw e;
+                    } else {
+                        LOGGER.error("Cannot read resource '{}' from jar file '{}'", resourcePath, location, e);
                     }
-                } else {
-                    // Directly load the resources from the main file system
-                    resourcePaths.add(Paths.get(toURI(location)));
                 }
+            } else {
+                // Directly load the resources from the main file system
+                resourcePaths.add(Paths.get(toURI(location)));
             }
         }
     }

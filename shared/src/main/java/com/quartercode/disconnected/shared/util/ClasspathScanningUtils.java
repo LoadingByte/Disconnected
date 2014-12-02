@@ -29,6 +29,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.HashSet;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -153,6 +154,31 @@ public class ClasspathScanningUtils {
     }
 
     /**
+     * Reads the index file, which is located under the given resource, from all occurrences and returns all {@link Class}es it mentions.
+     * Each (non-empty) line from the file should reference one class from the package, which contains the index file, by its name.
+     * Note that it is also possible to reference classes from subpackages by prepending the relative subpackage path.
+     * Also note that only the classes listed in the index file are loaded.
+     * 
+     * @param indexResource The classpath resource path to the index file, which should be evaluated.
+     *        All mentioned classes must also lie in the directory of this resource.
+     * @param allowRemoval If {@code true}, lines prefixed with a {@code -} mark classes which should not be added to the resulting class list.
+     * @param throwAll Whether {@link IOException}s, which are thrown during the evaluation process and would therefore interrupt it, should be thrown.
+     *        If this is {@code false}, the regarding exceptions are logged as errors.
+     * @return The classes which are mentioned inside the given index file.
+     * @throws IOException Thrown if the available index resources directories cannot be listed.
+     *         If {@code throwAll} is {@code true}, this exception is also thrown if the contents of one index file cannot be read.
+     */
+    public static Collection<Class<?>> getIndexedPackageClasses(String indexResource, boolean allowRemoval, boolean throwAll) throws IOException {
+
+        Validate.isTrue(indexResource.startsWith("/"), "Cannot use relative class index resources, make sure your path starts with '/'");
+
+        // Translate the index resource path into into a package name
+        String packageName = StringUtils.substringBeforeLast("/" + StringUtils.strip(indexResource, "/"), "/").replace('/', '.');
+
+        return getIndexedPackageClassesInternal(indexResource, packageName, allowRemoval, throwAll);
+    }
+
+    /**
      * Reads an index file with the given name from the given package and returns all {@link Class}es it mentions.
      * Each (non-empty) line from the file should reference one class from the package by its name.
      * Note that it is also possible to reference classes from subpackages by prepending the relative subpackage path.
@@ -171,29 +197,6 @@ public class ClasspathScanningUtils {
 
         // Translate the package name into a resource path
         String indexResource = convertPackageToPath(packageName) + "/" + indexFileName;
-
-        return getIndexedPackageClassesInternal(indexResource, packageName, allowRemoval, throwAll);
-    }
-
-    /**
-     * Reads the index file, which is located under the given resource, from all occurrences and returns all {@link Class}es it mentions.
-     * Each (non-empty) line from the file should reference one class from the package, which contains the index file, by its name.
-     * Note that it is also possible to reference classes from subpackages by prepending the relative subpackage path.
-     * Also note that only the classes listed in the index file are loaded.
-     * 
-     * @param indexResource The classpath resource path to the index file, which should be evaluated.
-     *        All mentioned classes must also lie in the directory of this resource.
-     * @param allowRemoval If {@code true}, lines prefixed with a {@code -} mark classes which should not be added to the resulting class list.
-     * @param throwAll Whether {@link IOException}s, which are thrown during the evaluation process and would therefore interrupt it, should be thrown.
-     *        If this is {@code false}, the regarding exceptions are logged as errors.
-     * @return The classes which are mentioned inside the given index file.
-     * @throws IOException Thrown if the available index resources directories cannot be listed.
-     *         If {@code throwAll} is {@code true}, this exception is also thrown if the contents of one index file cannot be read.
-     */
-    public static Collection<Class<?>> getIndexedPackageClasses(String indexResource, boolean allowRemoval, boolean throwAll) throws IOException {
-
-        // Translate the index resource path into into a package name
-        String packageName = StringUtils.substringBeforeLast(StringUtils.strip(indexResource, "/"), "/").replace('/', '.');
 
         return getIndexedPackageClassesInternal(indexResource, packageName, allowRemoval, throwAll);
     }
@@ -233,9 +236,6 @@ public class ClasspathScanningUtils {
         // Iterate over all index files provided on the classpath
         try (ResourceLister resourceLister = new ResourceLister(indexResource, throwAll)) {
             for (Path indexFile : resourceLister.getResourcePaths()) {
-                // Resolve the directory which contains the index file
-                Path packageDir = indexFile.getParent();
-
                 try {
                     // Iterate over the index and try to add each class which is mentioned there
                     for (String line : Files.readAllLines(indexFile, Charset.forName("UTF-8"))) {
@@ -257,27 +257,37 @@ public class ClasspathScanningUtils {
                         // Retrieve the referenced class name by removing any leading removal character ("-") and trimming the resulting string
                         String className = StringUtils.stripStart(line, "-").trim();
 
-                        // Convert the obtained class name into a file name (or a relative path if the line references a class from a child package)
-                        String relativePath = className.replace('.', '/') + ".class";
+                        // Dispose the line if it doesn't contain any class reference
+                        if (className.isEmpty()) {
+                            continue;
+                        }
 
                         // Determine the collection the class should be put into (add or remove)
                         Collection<Class<?>> target = remove ? removedClasses : addedClasses;
 
-                        // Try to add the obtained class file to the determined collection
-                        tryAddClass(packageName, packageDir.resolve(relativePath), target);
+                        String fqClassName = packageName + (packageName.isEmpty() ? "" : ".") + className;
+
+                        try {
+                            // Retrieve the class object and add it to the determined class list
+                            target.add(Class.forName(fqClassName));
+                        } catch (ClassNotFoundException e) {
+                            LOGGER.warn("Invalid indexed class reference to '{}' (index file '{}')", fqClassName, indexFile);
+                        }
                     }
                 } catch (IOException e) {
                     if (throwAll) {
                         throw e;
                     } else {
-                        LOGGER.error("Cannot read contents from JAXB index file '{}' (package '{}')", indexFile, packageName, e);
+                        LOGGER.error("Cannot read contents from index file '{}' (package '{}')", indexFile, packageName, e);
                     }
                 }
             }
         }
 
-        // Apply the remove class orders
-        addedClasses.removeAll(removedClasses);
+        if (allowRemoval) {
+            // Apply the remove class orders
+            addedClasses.removeAll(removedClasses);
+        }
 
         return addedClasses;
     }
