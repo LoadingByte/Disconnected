@@ -150,10 +150,10 @@ public class ClientProgramWindow extends DesktopWindow {
     // ----- Utility -----
 
     /**
-     * Returns the i18n string that is associated with the given key in the {@link ResourceBundleGroup} of the descriptor.
+     * Returns the localization string that is associated with the given key in the {@link ResourceBundleGroup} of the descriptor.
      * 
      * @param key The key the returned value is associated with.
-     * @return The i18n string which is associated with the given key.
+     * @return The localization string which is associated with the given key.
      */
     public String getString(String key) {
 

@@ -52,7 +52,7 @@ public class ResourceBundleGroup {
      */
     public ResourceBundle get() {
 
-        return ResourceBundle.getBundle("i18n." + name + "." + name);
+        return ResourceBundle.getBundle("l10n." + name + "." + name);
     }
 
     /**

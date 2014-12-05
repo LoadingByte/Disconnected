@@ -40,8 +40,8 @@ public class GPClientErrorEventPopupHandler implements EventHandler<GPWPUErrorEv
      * Creates a new generic program client error event popup handler.
      * 
      * @param programWindow The {@link ClientProgramWindow} of the client program whose {@link GPWPUErrorEvent}s should be processed.
-     * @param keyPrefix A prefix that is put in front of the error type before it is used as an i18n key.
-     * @param keySuffix A suffix that is put behind the error type before it is used as an i18n key.
+     * @param keyPrefix A prefix that is put in front of the error type before it is used as a localization key.
+     * @param keySuffix A suffix that is put behind the error type before it is used as a localization key.
      * @param modal Whether the popup window should be modal.
      */
     public GPClientErrorEventPopupHandler(ClientProgramWindow programWindow, String keyPrefix, String keySuffix, boolean modal) {

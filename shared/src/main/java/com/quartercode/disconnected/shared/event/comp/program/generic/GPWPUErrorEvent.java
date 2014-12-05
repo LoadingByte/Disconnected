@@ -41,11 +41,11 @@ public class GPWPUErrorEvent extends SBPWorldProcessUserCommand {
      * @param worldProcessUserId The {@link SBPWorldProcessUserId} that should receive the event.
      *        It has launched the world process that sends the new event.
      * @param type A string that defines the type of the error.
-     *        If the WPU would be a graphical client, this could also be used as the key of an i18n string lookup.
+     *        If the WPU would be a graphical client, this could also be used as the key of a localization string lookup.
      *        That way, the client wouldn't need to worry about the different types.
      * @param arguments A string array that further defines the error.
      *        If the WPU would be a graphical client, this could be put into {@link MessageFormat#format(String, Object...)} along
-     *        with the i18n string looked up using the error type.
+     *        with the localization string looked up using the error type.
      */
     public GPWPUErrorEvent(SBPWorldProcessUserId worldProcessUserId, String type, String[] arguments) {
 
@@ -62,7 +62,7 @@ public class GPWPUErrorEvent extends SBPWorldProcessUserCommand {
 
     /**
      * Returns the string that defines the type of the error.
-     * If the WPU would be a graphical client, this could also be used as the key of an i18n string lookup.
+     * If the WPU would be a graphical client, this could also be used as the key of a localization string lookup.
      * That way, the client wouldn't need to worry about the different types.
      * 
      * @return The error type.
@@ -75,7 +75,7 @@ public class GPWPUErrorEvent extends SBPWorldProcessUserCommand {
     /**
      * Returns the string array that further defines the error.
      * If the WPU would be a graphical client, this could be put into {@link MessageFormat#format(String, Object...)} along
-     * with the i18n string looked up using the error type.
+     * with the localization string looked up using the error type.
      * 
      * @return The error details.
      */
