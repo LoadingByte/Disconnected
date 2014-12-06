@@ -21,13 +21,13 @@ package com.quartercode.disconnected.server.world.util;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
-import com.quartercode.classmod.extra.CFeatureHolder;
-import com.quartercode.classmod.extra.CollectionProperty;
-import com.quartercode.classmod.extra.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.FunctionExecutor;
-import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.Property;
-import com.quartercode.classmod.extra.PropertyDefinition;
+import com.quartercode.classmod.extra.conv.CFeatureHolder;
+import com.quartercode.classmod.extra.func.FunctionExecutor;
+import com.quartercode.classmod.extra.func.FunctionInvocation;
+import com.quartercode.classmod.extra.prop.CollectionProperty;
+import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
+import com.quartercode.classmod.extra.prop.Property;
+import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.disconnected.server.util.NullPreventer;
 
 /**

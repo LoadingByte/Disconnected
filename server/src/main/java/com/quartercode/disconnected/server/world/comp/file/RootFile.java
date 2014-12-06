@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import static com.quartercode.classmod.extra.Priorities.LEVEL_6;
-import com.quartercode.classmod.extra.FunctionExecutor;
-import com.quartercode.classmod.extra.FunctionInvocation;
+import static com.quartercode.classmod.extra.func.Priorities.LEVEL_6;
+import com.quartercode.classmod.extra.func.FunctionExecutor;
+import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.disconnected.server.util.NullPreventer;
 
 /**

@@ -29,8 +29,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import com.quartercode.classmod.extra.CFeatureHolder;
-import com.quartercode.classmod.extra.def.DefaultCFeatureHolder;
+import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
+import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
 

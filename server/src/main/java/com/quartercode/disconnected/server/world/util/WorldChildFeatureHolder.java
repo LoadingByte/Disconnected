@@ -19,8 +19,8 @@
 package com.quartercode.disconnected.server.world.util;
 
 import java.util.Random;
-import com.quartercode.classmod.extra.CFeatureHolder;
-import com.quartercode.classmod.extra.def.DefaultCChildFeatureHolder;
+import com.quartercode.classmod.def.extra.conv.DefaultCChildFeatureHolder;
+import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
 import com.quartercode.eventbridge.bridge.Bridge;

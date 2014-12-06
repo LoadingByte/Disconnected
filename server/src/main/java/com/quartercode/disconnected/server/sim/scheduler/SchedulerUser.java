@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.server.sim.scheduler;
 
-import com.quartercode.classmod.extra.CFeatureHolder;
+import com.quartercode.classmod.extra.conv.CFeatureHolder;
 
 /**
  * {@link CFeatureHolder}s which implement this interface inherit the {@link #SCHEDULER} feature which is a {@link Scheduler} that

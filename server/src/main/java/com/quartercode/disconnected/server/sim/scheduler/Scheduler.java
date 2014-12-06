@@ -26,9 +26,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.base.Feature;
-import com.quartercode.classmod.base.Persistent;
-import com.quartercode.classmod.base.def.AbstractFeature;
-import com.quartercode.classmod.extra.CFeatureHolder;
+import com.quartercode.classmod.base.Persistable;
+import com.quartercode.classmod.def.base.AbstractFeature;
+import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
 
 /**
@@ -43,10 +43,9 @@ import com.quartercode.disconnected.shared.util.XmlPersistent;
  * 
  * @see SchedulerTask
  */
-@Persistent
 @XmlPersistent
 @XmlRootElement
-public class Scheduler extends AbstractFeature {
+public class Scheduler extends AbstractFeature implements Persistable {
 
     private boolean             active;
     @XmlElement (name = "scheduledTask")
@@ -72,6 +71,12 @@ public class Scheduler extends AbstractFeature {
 
         active = true;
         scheduledTasks = new CopyOnWriteArrayList<>();
+    }
+
+    @Override
+    public boolean isPersistent() {
+
+        return true;
     }
 
     /**

@@ -18,8 +18,8 @@
 
 package com.quartercode.disconnected.server.test.world.comp.net;
 
-import static com.quartercode.classmod.extra.Priorities.LEVEL_5;
-import static com.quartercode.classmod.extra.Priorities.LEVEL_9;
+import static com.quartercode.classmod.extra.func.Priorities.LEVEL_5;
+import static com.quartercode.classmod.extra.func.Priorities.LEVEL_9;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.jmock.Expectations;
@@ -29,8 +29,8 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import com.quartercode.classmod.extra.FunctionExecutor;
-import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.func.FunctionExecutor;
+import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.util.test.JUnitRuleModMockery;
 import com.quartercode.disconnected.server.util.ObjArray;
 import com.quartercode.disconnected.server.world.comp.Computer;

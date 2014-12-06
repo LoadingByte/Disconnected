@@ -20,8 +20,8 @@ package com.quartercode.disconnected.server.world.util;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.extra.CFeatureHolder;
-import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.conv.CFeatureHolder;
+import com.quartercode.classmod.extra.func.FunctionDefinition;
 
 /**
  * The string representable interface defines methods for classes which can be converted to and created from strings.

@@ -27,8 +27,8 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.def.AbstractFeatureDefinition;
-import com.quartercode.classmod.extra.CFeatureHolder;
+import com.quartercode.classmod.def.base.AbstractFeatureDefinition;
+import com.quartercode.classmod.extra.conv.CFeatureHolder;
 
 /**
  * The {@link FeatureDefinition} that defines a {@link Scheduler}.

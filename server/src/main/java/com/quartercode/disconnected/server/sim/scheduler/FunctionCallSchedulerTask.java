@@ -19,9 +19,9 @@
 package com.quartercode.disconnected.server.sim.scheduler;
 
 import javax.xml.bind.annotation.XmlElement;
-import com.quartercode.classmod.extra.CFeatureHolder;
-import com.quartercode.classmod.extra.Function;
-import com.quartercode.classmod.extra.FunctionDefinition;
+import com.quartercode.classmod.extra.conv.CFeatureHolder;
+import com.quartercode.classmod.extra.func.Function;
+import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.util.FeatureDefinitionReference;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
 

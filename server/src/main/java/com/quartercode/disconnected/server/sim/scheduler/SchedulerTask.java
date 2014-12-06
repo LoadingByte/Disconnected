@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.server.sim.scheduler;
 
-import com.quartercode.classmod.extra.CFeatureHolder;
+import com.quartercode.classmod.extra.conv.CFeatureHolder;
 
 /**
  * A scheduler task is a unit that can be scheduled to be executed using a {@link Scheduler}.

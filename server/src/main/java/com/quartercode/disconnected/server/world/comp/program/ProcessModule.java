@@ -19,8 +19,8 @@
 package com.quartercode.disconnected.server.world.comp.program;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
-import static com.quartercode.classmod.extra.Priorities.LEVEL_5;
-import static com.quartercode.classmod.extra.Priorities.LEVEL_7;
+import static com.quartercode.classmod.extra.func.Priorities.LEVEL_5;
+import static com.quartercode.classmod.extra.func.Priorities.LEVEL_7;
 import static com.quartercode.disconnected.server.world.comp.program.ProgramUtils.getProgramFileFromPaths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,11 +28,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.extra.CFeatureHolder;
-import com.quartercode.classmod.extra.FunctionDefinition;
-import com.quartercode.classmod.extra.FunctionExecutor;
-import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.PropertyDefinition;
+import com.quartercode.classmod.extra.conv.CFeatureHolder;
+import com.quartercode.classmod.extra.func.FunctionDefinition;
+import com.quartercode.classmod.extra.func.FunctionExecutor;
+import com.quartercode.classmod.extra.func.FunctionInvocation;
+import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
 import com.quartercode.classmod.util.FeatureDefinitionReference;

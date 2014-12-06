@@ -20,12 +20,12 @@ package com.quartercode.disconnected.server.world.comp.file;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.extra.FunctionDefinition;
-import com.quartercode.classmod.extra.FunctionExecutor;
-import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.ValueFactory;
+import com.quartercode.classmod.extra.func.FunctionDefinition;
+import com.quartercode.classmod.extra.func.FunctionExecutor;
+import com.quartercode.classmod.extra.func.FunctionInvocation;
+import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.extra.valuefactory.ValueFactory;
 import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;

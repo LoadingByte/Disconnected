@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.server.world.comp.program;
 
-import static com.quartercode.classmod.extra.Priorities.LEVEL_6;
-import com.quartercode.classmod.extra.FunctionExecutor;
-import com.quartercode.classmod.extra.FunctionInvocation;
+import static com.quartercode.classmod.extra.func.Priorities.LEVEL_6;
+import com.quartercode.classmod.extra.func.FunctionExecutor;
+import com.quartercode.classmod.extra.func.FunctionInvocation;
 
 /**
  * The root process is a simple {@link Process} which can be only used as root for the process tree.

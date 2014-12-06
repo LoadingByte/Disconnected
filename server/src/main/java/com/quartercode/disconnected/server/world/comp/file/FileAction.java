@@ -21,9 +21,9 @@ package com.quartercode.disconnected.server.world.comp.file;
 import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.Map;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.extra.FunctionDefinition;
-import com.quartercode.classmod.extra.FunctionExecutor;
-import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.func.FunctionDefinition;
+import com.quartercode.classmod.extra.func.FunctionExecutor;
+import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 

@@ -19,12 +19,12 @@
 package com.quartercode.disconnected.server.world.comp.os;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
-import static com.quartercode.classmod.extra.Priorities.*;
+import static com.quartercode.classmod.extra.func.Priorities.*;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.extra.FunctionExecutor;
-import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.PropertyDefinition;
+import com.quartercode.classmod.extra.func.FunctionExecutor;
+import com.quartercode.classmod.extra.func.FunctionInvocation;
+import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.server.util.HashUtils;

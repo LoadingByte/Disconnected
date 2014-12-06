@@ -24,12 +24,12 @@ import java.util.List;
 import java.util.Random;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.extra.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.ValueFactory;
-import com.quartercode.classmod.extra.def.DefaultCFeatureHolder;
+import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
+import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
+import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
+import com.quartercode.classmod.extra.valuefactory.ValueFactory;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.net.Backbone;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
@@ -67,6 +67,7 @@ public class World extends DefaultCFeatureHolder {
             }
 
         });
+
         COMPUTERS = create(new TypeLiteral<CollectionPropertyDefinition<Computer, List<Computer>>>() {}, "name", "computers", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
 
     }

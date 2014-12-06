@@ -19,20 +19,20 @@
 package com.quartercode.disconnected.server.world.comp.hardware;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
-import static com.quartercode.classmod.extra.Priorities.LEVEL_3;
-import static com.quartercode.classmod.extra.Priorities.LEVEL_5;
+import static com.quartercode.classmod.extra.func.Priorities.LEVEL_3;
+import static com.quartercode.classmod.extra.func.Priorities.LEVEL_5;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.extra.CFeatureHolder;
-import com.quartercode.classmod.extra.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.FunctionDefinition;
-import com.quartercode.classmod.extra.FunctionExecutor;
-import com.quartercode.classmod.extra.FunctionInvocation;
-import com.quartercode.classmod.extra.PropertyDefinition;
+import com.quartercode.classmod.extra.conv.CFeatureHolder;
+import com.quartercode.classmod.extra.func.FunctionDefinition;
+import com.quartercode.classmod.extra.func.FunctionExecutor;
+import com.quartercode.classmod.extra.func.FunctionInvocation;
+import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
+import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceCollectionStorage;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;

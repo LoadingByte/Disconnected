@@ -20,9 +20,9 @@ package com.quartercode.disconnected.server.world.comp.hardware;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.reflect.TypeLiteral;
-import com.quartercode.classmod.extra.PropertyDefinition;
-import com.quartercode.classmod.extra.ValueFactory;
+import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.extra.valuefactory.ValueFactory;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.hardware.Mainboard.NeedsMainboardSlot;

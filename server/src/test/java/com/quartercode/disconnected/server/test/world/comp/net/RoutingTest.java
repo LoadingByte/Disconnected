@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.server.test.world.comp.net;
 
-import static com.quartercode.classmod.extra.Priorities.LEVEL_8;
+import static com.quartercode.classmod.extra.func.Priorities.LEVEL_8;
 import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,8 +29,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import com.quartercode.classmod.extra.FunctionExecutor;
-import com.quartercode.classmod.extra.FunctionInvocation;
+import com.quartercode.classmod.extra.func.FunctionExecutor;
+import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.util.test.JUnitRuleModMockery;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
