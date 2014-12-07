@@ -44,10 +44,12 @@ import com.quartercode.disconnected.shared.util.XmlPersistent;
 @XmlPersistent
 public class NetID implements Serializable {
 
+    private static final long serialVersionUID = 2329327720047764280L;
+
     @XmlElement
-    private final int subnet;
+    private final int         subnet;
     @XmlElement
-    private final int id;
+    private final int         id;
 
     /**
      * Creates a new empty net id object with the subnet and device id being set to 0.

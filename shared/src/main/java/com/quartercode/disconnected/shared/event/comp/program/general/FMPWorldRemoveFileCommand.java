@@ -27,6 +27,8 @@ import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
 @Getter
 public class FMPWorldRemoveFileCommand implements WorldProcessCommand {
 
+    private static final long    serialVersionUID = -3230537999479781713L;
+
     private final WorldProcessId worldProcessId;
 
     private final String         fileName;

@@ -39,7 +39,8 @@ import com.quartercode.disconnected.shared.identity.SBPIdentity;
  */
 public class SBPWorldProcessUserId implements Serializable {
 
-    private static final long                serialVersionUID = 1L;
+    private static final long                serialVersionUID = -8322027193000228322L;
+
     private final SBPIdentity                sbp;
     private final SBPWorldProcessUserDetails details;
 

@@ -30,6 +30,8 @@ import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUse
  */
 public class GPWPUErrorEvent extends SBPWorldProcessUserCommand {
 
+    private static final long           serialVersionUID = -4870522176952838987L;
+
     private final SBPWorldProcessUserId worldProcessUserId;
 
     private final String                type;

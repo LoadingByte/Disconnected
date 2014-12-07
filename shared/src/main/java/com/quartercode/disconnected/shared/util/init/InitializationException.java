@@ -25,6 +25,8 @@ package com.quartercode.disconnected.shared.util.init;
  */
 public class InitializationException extends Exception {
 
+    private static final long serialVersionUID = 175552483768930997L;
+
     /**
      * Creates a new initialization exception.
      */

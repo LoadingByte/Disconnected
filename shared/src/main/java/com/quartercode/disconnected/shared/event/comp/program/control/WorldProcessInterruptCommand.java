@@ -29,8 +29,10 @@ import com.quartercode.eventbridge.basic.EventBase;
  */
 public class WorldProcessInterruptCommand extends EventBase {
 
-    private final int     worldPid;
-    private final boolean recursive;
+    private static final long serialVersionUID = 8824084448652812667L;
+
+    private final int         worldPid;
+    private final boolean     recursive;
 
     /**
      * Creates a new world process interrupt command.

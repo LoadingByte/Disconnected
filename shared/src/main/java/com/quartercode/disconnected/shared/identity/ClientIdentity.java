@@ -31,7 +31,9 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class ClientIdentity implements SBPIdentity {
 
-    private final String name;
+    private static final long serialVersionUID = 628250503145376660L;
+
+    private final String      name;
 
     /**
      * Creates a new client identity.

@@ -35,10 +35,12 @@ import com.quartercode.disconnected.shared.util.XmlPersistent;
 @XmlPersistent
 public class Address implements Serializable {
 
+    private static final long serialVersionUID = 1589075859879897650L;
+
     @XmlElement
-    private final NetID netId;
+    private final NetID       netId;
     @XmlElement
-    private final int   port;
+    private final int         port;
 
     /**
      * Creates a new empty address object with an empty {@link NetID} and the port 1.

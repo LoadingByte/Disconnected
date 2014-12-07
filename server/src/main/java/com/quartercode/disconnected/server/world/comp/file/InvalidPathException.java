@@ -27,8 +27,10 @@ package com.quartercode.disconnected.server.world.comp.file;
  */
 public class InvalidPathException extends RuntimeException {
 
-    private final FileSystem fileSystem;
-    private final String     path;
+    private static final long serialVersionUID = 4866038832089520912L;
+
+    private final FileSystem  fileSystem;
+    private final String      path;
 
     /**
      * Creates a new invalid path exception.

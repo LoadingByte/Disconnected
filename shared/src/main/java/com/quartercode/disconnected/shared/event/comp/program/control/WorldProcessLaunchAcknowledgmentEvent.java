@@ -30,6 +30,8 @@ import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
  */
 public class WorldProcessLaunchAcknowledgmentEvent extends SBPWorldProcessUserCommand {
 
+    private static final long           serialVersionUID = 1474812214810071321L;
+
     private final SBPWorldProcessUserId worldProcessUserId;
     private final WorldProcessId        worldProcessId;
 

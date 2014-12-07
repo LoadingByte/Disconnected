@@ -26,6 +26,8 @@ package com.quartercode.disconnected.server.sim.profile;
  */
 public class ProfileSerializationException extends Exception {
 
+    private static final long serialVersionUID = 3032649287084608186L;
+
     /**
      * Creates a new profile serialization exception.
      */

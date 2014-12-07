@@ -27,8 +27,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class SeparatedPath implements Serializable {
 
-    private final String dir;
-    private final String file;
+    private static final long serialVersionUID = -6593294509606596921L;
+
+    private final String      dir;
+    private final String      file;
 
     /**
      * Creates a new separated path that represents a file with the given file name inside the given directory.

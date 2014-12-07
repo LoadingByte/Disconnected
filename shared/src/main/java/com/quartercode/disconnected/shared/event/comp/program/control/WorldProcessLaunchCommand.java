@@ -27,6 +27,8 @@ import com.quartercode.eventbridge.basic.EventBase;
  */
 public class WorldProcessLaunchCommand extends EventBase {
 
+    private static final long                serialVersionUID = 4829098722123013677L;
+
     private final SBPWorldProcessUserDetails worldProcessUserDetails;
     private final String                     programName;
 

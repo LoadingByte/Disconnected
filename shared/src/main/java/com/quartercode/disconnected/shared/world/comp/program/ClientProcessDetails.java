@@ -29,7 +29,9 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class ClientProcessDetails implements SBPWorldProcessUserDetails {
 
-    private final int clientPid;
+    private static final long serialVersionUID = -7497752447870865924L;
+
+    private final int         clientPid;
 
     /**
      * Creates a new client process details object.

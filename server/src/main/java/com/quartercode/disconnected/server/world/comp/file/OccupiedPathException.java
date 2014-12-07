@@ -27,8 +27,10 @@ package com.quartercode.disconnected.server.world.comp.file;
  */
 public class OccupiedPathException extends RuntimeException {
 
-    private final FileSystem fileSystem;
-    private final String     path;
+    private static final long serialVersionUID = -796351484036279039L;
+
+    private final FileSystem  fileSystem;
+    private final String      path;
 
     /**
      * Creates a new occupied path exception.

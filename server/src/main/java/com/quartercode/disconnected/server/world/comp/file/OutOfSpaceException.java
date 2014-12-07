@@ -25,8 +25,10 @@ package com.quartercode.disconnected.server.world.comp.file;
  */
 public class OutOfSpaceException extends RuntimeException {
 
-    private final FileSystem fileSystem;
-    private final long       size;
+    private static final long serialVersionUID = 3277220106399425382L;
+
+    private final FileSystem  fileSystem;
+    private final long        size;
 
     /**
      * Creates a new out of space exception.

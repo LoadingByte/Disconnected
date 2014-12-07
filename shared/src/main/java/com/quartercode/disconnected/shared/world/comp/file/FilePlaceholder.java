@@ -30,6 +30,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class FilePlaceholder implements Serializable {
 
+    private static final long  serialVersionUID = -6387807415977338194L;
+
     private final String       path;
     private final String       type;
     private final long         size;

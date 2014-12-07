@@ -30,10 +30,12 @@ import com.quartercode.disconnected.shared.util.XmlPersistent;
 @XmlPersistent
 public class Location implements Serializable {
 
+    private static final long serialVersionUID = 4734091462668039038L;
+
     @XmlElement
-    private final float x;
+    private final float       x;
     @XmlElement
-    private final float y;
+    private final float       y;
 
     /**
      * Creates a new empty location whose coordinates are both set to 0.

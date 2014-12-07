@@ -28,8 +28,10 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class WorldProcessId implements Serializable {
 
-    private final String computerId;
-    private final int    pid;
+    private static final long serialVersionUID = 4114453252018243232L;
+
+    private final String      computerId;
+    private final int         pid;
 
     /**
      * Creates a new world process id.

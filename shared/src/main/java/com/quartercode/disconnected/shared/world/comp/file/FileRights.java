@@ -59,6 +59,8 @@ import com.quartercode.disconnected.shared.util.XmlPersistent;
 @XmlPersistent
 public class FileRights implements Serializable {
 
+    private static final long                 serialVersionUID = -6352156428846716007L;
+
     // ----- Default file accessors -----
 
     /**
@@ -66,47 +68,47 @@ public class FileRights implements Serializable {
      * By default, this is the user who created the file.
      * Note that the owner of a file can be changed.
      */
-    public static final char                  OWNER           = 'u';
+    public static final char                  OWNER            = 'u';
 
     /**
      * A file accessor that grants rights to all members of the group of a file (letter {@code 'g'}).
      * By default, the group is the primary group of the user who created the file.
      * Note that the group of a file can be changed.
      */
-    public static final char                  GROUP           = 'g';
+    public static final char                  GROUP            = 'g';
 
     /**
      * A file accessor that grants rights to everyone (letter {@code 'o'})..
      */
-    public static final char                  OTHERS          = 'o';
+    public static final char                  OTHERS           = 'o';
 
     // ----- Default file rights -----
 
     /**
      * A file right that determines whether a user is allowed to read the content of a file or to retrieve the files inside a directory (letter {@code 'r'}).
      */
-    public static final char                  READ            = 'r';
+    public static final char                  READ             = 'r';
 
     /**
      * A file right that determines whether a user is allowed to write new content into a file or to create new files inside a directory (letter {@code 'w'}).
      */
-    public static final char                  WRITE           = 'w';
+    public static final char                  WRITE            = 'w';
 
     /**
      * A file right that determines whether a user is allowed to delete a file or a directory (letter {@code 'd'}).
      * In the case of a directory, the user also needs the delete right on each file or folder inside it.
      */
-    public static final char                  DELETE          = 'd';
+    public static final char                  DELETE           = 'd';
 
     /**
      * A file right that determines whether a user is allowed to execute a file (letter {@code 'x'}).
      * It has no effect on directories.
      */
-    public static final char                  EXECUTE         = 'x';
+    public static final char                  EXECUTE          = 'x';
 
     // ----- Object -----
 
-    private static final SortedSet<Character> EMPTY_RIGHT_SET = Collections.unmodifiableSortedSet(new TreeSet<Character>());
+    private static final SortedSet<Character> EMPTY_RIGHT_SET  = Collections.unmodifiableSortedSet(new TreeSet<Character>());
 
     private static void validateCharacter(char c) {
 

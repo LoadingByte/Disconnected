@@ -34,12 +34,14 @@ import com.quartercode.disconnected.shared.util.XmlPersistent;
 @XmlPersistent
 public class Version implements Serializable {
 
+    private static final long serialVersionUID = -1562702953794851906L;
+
     @XmlElement
-    private final int major;
+    private final int         major;
     @XmlElement
-    private final int minor;
+    private final int         minor;
     @XmlElement
-    private final int revision;
+    private final int         revision;
 
     /**
      * Creates a new empty version object with the major, minor and revision components being set to 0.

@@ -34,6 +34,8 @@ import com.quartercode.eventbridge.basic.EventPredicateBase;
 @Getter
 public class WorldProcessCommandPredicate<T extends WorldProcessCommand> extends EventPredicateBase<T> {
 
+    private static final long    serialVersionUID = 7884175850606958107L;
+
     /**
      * The {@link WorldProcessId} each {@link WorldProcessCommand} must have to be accepted by the predicate.
      * That means that the accepted commands are sent to this server-side world process.

@@ -27,6 +27,8 @@ import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
 @Getter
 public class FMPWorldAddFileCommand implements WorldProcessCommand {
 
+    private static final long    serialVersionUID = -5137403851325813134L;
+
     private final WorldProcessId worldProcessId;
 
     private final String         fileName;

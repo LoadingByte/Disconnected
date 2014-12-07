@@ -28,6 +28,8 @@ import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUse
 @Getter
 public class FMPWPUUpdateViewCommand extends SBPWorldProcessUserCommand {
 
+    private static final long           serialVersionUID = -2227588084391195646L;
+
     private final SBPWorldProcessUserId worldProcessUserId;
 
     private final String                currentDir;

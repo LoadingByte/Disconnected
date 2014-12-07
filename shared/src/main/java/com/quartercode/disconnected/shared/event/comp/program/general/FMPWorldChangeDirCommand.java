@@ -27,6 +27,8 @@ import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
 @Getter
 public class FMPWorldChangeDirCommand implements WorldProcessCommand {
 
+    private static final long    serialVersionUID = 7326382596752988011L;
+
     private final WorldProcessId worldProcessId;
 
     private final String         change;

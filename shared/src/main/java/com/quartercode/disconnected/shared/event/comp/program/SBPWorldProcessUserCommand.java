@@ -29,6 +29,8 @@ import com.quartercode.eventbridge.basic.EventBase;
  */
 public abstract class SBPWorldProcessUserCommand extends EventBase implements LimitedSBPEvent {
 
+    private static final long serialVersionUID = 5578483002721162314L;
+
     @Override
     public SBPIdentity[] getSBPs() {
 
