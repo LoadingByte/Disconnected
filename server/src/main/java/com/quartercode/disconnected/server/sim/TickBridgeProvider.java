@@ -18,13 +18,23 @@
 
 package com.quartercode.disconnected.server.sim;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
+import com.quartercode.disconnected.server.bridge.SBPAwareEventHandlerExceptionCatcher;
 import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension;
 import com.quartercode.disconnected.server.bridge.SBPIdentityExtension;
 import com.quartercode.disconnected.server.identity.SBPIdentityService;
 import com.quartercode.disconnected.shared.bridge.HandleInvocationProviderExtension;
+import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 import com.quartercode.eventbridge.EventBridgeFactory;
 import com.quartercode.eventbridge.bridge.Bridge;
+import com.quartercode.eventbridge.bridge.BridgeConnector;
+import com.quartercode.eventbridge.bridge.Event;
+import com.quartercode.eventbridge.bridge.module.EventHandler;
+import com.quartercode.eventbridge.bridge.module.EventHandlerExceptionCatcher;
+import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionRequester;
 import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
 
@@ -36,7 +46,9 @@ import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
  */
 public class TickBridgeProvider extends TickRunnableInvoker {
 
-    private final Bridge bridge = EventBridgeFactory.create(Bridge.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TickBridgeProvider.class);
+
+    private final Bridge        bridge = EventBridgeFactory.create(Bridge.class);
 
     /**
      * Creates a new tick bridge provider.
@@ -54,6 +66,32 @@ public class TickBridgeProvider extends TickRunnableInvoker {
         SBPIdentityService sbpIdentityService = ServiceRegistry.lookup(SBPIdentityService.class);
         bridge.getModule(SBPIdentityExtension.class).setIdentityService(sbpIdentityService);
         bridge.getModule(SBPAwareHandlerExtension.class).setIdentityService(sbpIdentityService);
+
+        // Add exception catchers
+        bridge.getModule(StandardHandlerModule.class).addExceptionCatcher(new EventHandlerExceptionCatcher() {
+
+            @Override
+            public void handle(RuntimeException exception, EventHandler<?> handler, Event event, BridgeConnector source) {
+
+                logEventHandlingException(exception, handler.getClass(), event, source);
+            }
+
+        });
+        bridge.getModule(SBPAwareHandlerExtension.class).addExceptionCatcher(new SBPAwareEventHandlerExceptionCatcher() {
+
+            @Override
+            public void handle(RuntimeException exception, SBPAwareEventHandler<?> handler, Event event, BridgeConnector source) {
+
+                logEventHandlingException(exception, handler.getClass(), event, source);
+            }
+
+        });
+    }
+
+    private void logEventHandlingException(RuntimeException exception, Class<?> handlerType, Event event, BridgeConnector source) {
+
+        SBPIdentity sender = ServiceRegistry.lookup(SBPIdentityService.class).getIdentity(source);
+        LOGGER.warn("SBP '{}' sent event '{}' which caused an exception in handler '{}'", sender, event, handlerType.getName(), exception);
     }
 
     /**
