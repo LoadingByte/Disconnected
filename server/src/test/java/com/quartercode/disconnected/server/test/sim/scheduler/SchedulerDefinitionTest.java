@@ -22,8 +22,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
@@ -39,8 +37,6 @@ public class SchedulerDefinitionTest {
 
     @Before
     public void setUp() {
-
-        ToStringBuilder.setDefaultStyle(ToStringStyle.SHORT_PREFIX_STYLE);
 
         schedulerDefinition = new SchedulerDefinition("testSchedulerDefinition");
     }

@@ -24,6 +24,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * This annotation marks classes which should be added to the JAXB context for serializing worlds.
+ * It is mostly used to mark classes for a scanner which scans a certain part of the classpath.
+ * Note that the annotation is inherited to subclasses of the annotated class.
+ */
 @Target (ElementType.TYPE)
 @Retention (RetentionPolicy.RUNTIME)
 @Inherited

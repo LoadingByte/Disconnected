@@ -255,9 +255,7 @@ public class FileManagerProgram extends ProgramExecutor {
         @Override
         public void handle(FMPWorldAddFileCommand event, SBPIdentity sender) {
 
-            if (holder.getObj(CURRENT_DIR).equals(PathUtils.SEPARATOR)) {
-                throw new IllegalStateException("Cannot create a file when the current path is set to the absolute root");
-            }
+            Validate.validState(!holder.getObj(CURRENT_DIR).equals(PathUtils.SEPARATOR), "Cannot create a file when the current path is set to the absolute root");
 
             String fileName = event.getFileName();
             Validate.notBlank(fileName, "File name cannot be blank");
@@ -324,9 +322,7 @@ public class FileManagerProgram extends ProgramExecutor {
         @Override
         public void handle(FMPWorldRemoveFileCommand event, SBPIdentity sender) {
 
-            if (holder.getObj(CURRENT_DIR).equals(PathUtils.SEPARATOR)) {
-                throw new IllegalStateException("Cannot delete a file when the current path is set to the absolute root");
-            }
+            Validate.validState(!holder.getObj(CURRENT_DIR).equals(PathUtils.SEPARATOR), "Cannot delete a file when the current path is set to the absolute root");
 
             String fileName = event.getFileName();
             Validate.notBlank(fileName, "File name cannot be blank");

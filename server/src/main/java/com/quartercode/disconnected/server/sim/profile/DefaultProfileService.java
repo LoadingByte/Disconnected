@@ -169,10 +169,13 @@ public class DefaultProfileService implements ProfileService {
             }
         }
 
-        LOGGER.debug("Injecting profile '{}' into tick service", profile.getName());
-
         TickService tickService = ServiceRegistry.lookup(TickService.class);
-        if (tickService != null) {
+
+        if (tickService == null) {
+            LOGGER.error("No tick service found for injecting profile '{}'", profile.getName());
+        } else {
+            LOGGER.debug("Injecting profile '{}' into tick service", profile.getName());
+
             active.getWorld().injectBridge(tickService.getAction(TickBridgeProvider.class).getBridge());
 
             TickSchedulerUpdater schedulerUpdater = tickService.getAction(TickSchedulerUpdater.class);

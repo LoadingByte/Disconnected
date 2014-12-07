@@ -63,9 +63,7 @@ public class DefaultTickService implements TickService {
     public void addAction(TickAction action) {
 
         for (TickAction testAction : actions) {
-            if (testAction.getClass().equals(action.getClass())) {
-                throw new IllegalStateException("There is already a tick action using the class " + testAction.getClass().getName());
-            }
+            Validate.validState(testAction.getClass() != action.getClass(), "Tick action '%s' is already present; remove it before adding a replacement", testAction.getClass().getName());
         }
 
         actions.add(action);

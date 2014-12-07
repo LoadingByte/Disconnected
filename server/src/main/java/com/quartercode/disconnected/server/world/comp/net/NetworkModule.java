@@ -22,6 +22,7 @@ import static com.quartercode.classmod.extra.func.Priorities.*;
 import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -228,9 +229,8 @@ public class NetworkModule extends OSModule {
                 Address destination = holder.getObj(Socket.DESTINATION);
 
                 for (Socket socket : holder.getParent().getColl(SOCKETS)) {
-                    if (socket.getObj(Socket.LOCAL_PORT) == localPort && socket.getObj(Socket.DESTINATION).equals(destination)) {
-                        throw new IllegalStateException("Socket with local port '" + localPort + "' and destination '" + destination + "' is already bound");
-                    }
+                    boolean bound = socket.getObj(Socket.LOCAL_PORT) == localPort && socket.getObj(Socket.DESTINATION).equals(destination);
+                    Validate.validState(!bound, "Socket with local port '%d' and destination '%s' is already bound", localPort, destination);
                 }
 
                 return invocation.next(arguments);

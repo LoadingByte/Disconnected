@@ -400,24 +400,26 @@ public class FileSystemModule extends OSModule {
                 public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                     CFeatureHolder holder = invocation.getCHolder();
-                    if (holder.getObj(MOUNTED)) {
-                        throw new IllegalStateException("Can't change mountpoint of known file system '" + holder.getObj(MOUNTPOINT) + "' while mounted");
-                    }
+
+                    Validate.validState(!holder.getObj(MOUNTED), "Can't change mountpoint of known file system '%s' while mounted", holder.getObj(MOUNTPOINT));
+
                     return invocation.next(arguments);
                 }
 
             }, LEVEL_6);
 
             MOUNTED = factory(PropertyDefinitionFactory.class).create("mounted", new StandardStorage<>(), new ConstantValueFactory<>(false));
-            MOUNTED.addSetterExecutor("checkMountpointNotTaken", KnownFileSystem.class, new FunctionExecutor<Void>() {
+            MOUNTED.addSetterExecutor("checkMountpointFree", KnownFileSystem.class, new FunctionExecutor<Void>() {
 
                 @Override
                 public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                     CFeatureHolder holder = invocation.getCHolder();
                     FileSystemModule parent = ((KnownFileSystem) holder).getParent();
-                    if ((Boolean) arguments[0] && parent.invoke(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT, holder.getObj(MOUNTPOINT)) != null) {
-                        throw new IllegalStateException("Other known file system with same mountpoint already mounted");
+
+                    if ((Boolean) arguments[0]) {
+                        boolean mountpointFree = parent.invoke(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT, holder.getObj(MOUNTPOINT)) == null;
+                        Validate.validState(mountpointFree, "Other known file system with same mountpoint ('%s') already mounted", holder.getObj(MOUNTPOINT));
                     }
 
                     return invocation.next(arguments);

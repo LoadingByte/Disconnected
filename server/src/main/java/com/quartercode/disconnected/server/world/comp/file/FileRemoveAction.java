@@ -21,6 +21,7 @@ package com.quartercode.disconnected.server.world.comp.file;
 import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -84,11 +85,9 @@ public class FileRemoveAction extends FileAction {
                 CFeatureHolder holder = invocation.getCHolder();
                 File<ParentFile<?>> removeFile = holder.getObj(FILE);
 
-                if (removeFile.getParent() != null) {
-                    removeFile.getParent().removeFromColl(ParentFile.CHILDREN, removeFile);
-                } else {
-                    throw new IllegalStateException("File for removal is not stored on any file system (parent file == null)");
-                }
+                Validate.validState(removeFile.getParent() != null, "File for removal is not stored on any file system (parent file == null)");
+
+                removeFile.getParent().removeFromColl(ParentFile.CHILDREN, removeFile);
 
                 return invocation.next(arguments);
             }

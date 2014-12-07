@@ -152,10 +152,7 @@ public class User extends ConfigurationEntry {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                if (invocation.getCHolder().invoke(GET_PRIMARY_GROUP).equals(arguments[0])) {
-                    throw new IllegalStateException("Can't remove user from its primary group");
-                }
-
+                Validate.validState(!invocation.getCHolder().invoke(GET_PRIMARY_GROUP).equals(arguments[0]), "Can't remove user from its primary group");
                 return invocation.next(arguments);
             }
 

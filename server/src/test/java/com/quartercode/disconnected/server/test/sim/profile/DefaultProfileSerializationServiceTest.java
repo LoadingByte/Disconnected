@@ -52,7 +52,6 @@ public class DefaultProfileSerializationServiceTest {
     @Test
     public void testSerializeWorld() throws IOException, ProfileSerializationException {
 
-        // TODO: Initialize own
         ProfileSerializationService service = ServiceRegistry.lookup(ProfileSerializationService.class);
 
         World world = WorldGenerator.generateWorld(new Random(1), 2);

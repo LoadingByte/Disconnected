@@ -22,12 +22,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import com.quartercode.disconnected.shared.event.comp.program.WorldProcessCommand;
 import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
+import com.quartercode.eventbridge.basic.EventBase;
 
 @RequiredArgsConstructor
 @Getter
-public class FMPWorldRemoveFileCommand implements WorldProcessCommand {
+public class FMPWorldRemoveFileCommand extends EventBase implements WorldProcessCommand {
 
-    private static final long    serialVersionUID = -3230537999479781713L;
+    private static final long    serialVersionUID = -11610305620764156L;
 
     private final WorldProcessId worldProcessId;
 

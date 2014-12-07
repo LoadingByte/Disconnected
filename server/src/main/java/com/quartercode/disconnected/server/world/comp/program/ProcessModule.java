@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -180,9 +181,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
                     List<String> path = Arrays.asList(environment.get("PATH").split(":"));
                     String sessionProgramFileName = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS), "session").getCommonLocation().toString();
                     ContentFile sessionProgramFile = getProgramFileFromPaths(fsModule, path, sessionProgramFileName);
-                    if (sessionProgramFile == null) {
-                        throw new IllegalStateException("Cannot start process module: Session program not found");
-                    }
+                    Validate.validState(sessionProgramFile != null, "Cannot start process module: Session program not found");
                     root.setObj(Process.SOURCE, sessionProgramFile);
 
                     // Get superuser

@@ -344,9 +344,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
 
                 Socket holder = (Socket) invocation.getCHolder();
 
-                if (holder.getObj(STATE) != SocketState.INACTIVE) {
-                    throw new IllegalStateException("Cannot connect socket because it is not in state INACTIVE (current state is '" + holder.getObj(STATE) + "')");
-                }
+                Validate.validState(holder.getObj(STATE) == SocketState.INACTIVE, "Cannot connect socket because it is not in state INACTIVE (current state is '%s')", holder.getObj(STATE));
 
                 holder.setObj(STATE, SocketState.HANDSHAKE_SYN);
                 // Generate a new sequence number

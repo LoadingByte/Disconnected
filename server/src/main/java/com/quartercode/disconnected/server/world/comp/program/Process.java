@@ -738,9 +738,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                 // Retrieve the program data object
                 String programName = ((Program) source.getObj(ContentFile.CONTENT)).getObj(Program.NAME);
                 WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS), programName);
-                if (programData == null) {
-                    throw new IllegalStateException("Cannot find world program with name '" + programName + "' for launching a process");
-                }
+                Validate.validState(programData != null, "Cannot find world program with name '%s' for launching a process", programName);
 
                 // Create new executor
                 ProgramExecutor executor;
