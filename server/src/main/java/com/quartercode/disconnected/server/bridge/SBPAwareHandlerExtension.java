@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.server.bridge;
 
+import java.util.List;
 import java.util.Map;
 import com.quartercode.disconnected.server.identity.SBPIdentityService;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
@@ -82,6 +83,30 @@ public interface SBPAwareHandlerExtension extends BridgeModule {
     public void removeHandler(SBPAwareEventHandler<?> handler);
 
     /**
+     * Returns all {@link SBPAwareEventHandlerExceptionCatcher}s which are listening for {@link RuntimeException}s that occur during the handling of an {@link Event}.
+     * When a registered {@link SBPAwareEventHandler} throws such an exception, all of these exception catchers are called.
+     * 
+     * @return The exception catchers that are listening on the SBP-aware handler extension.
+     */
+    public List<SBPAwareEventHandlerExceptionCatcher> getExceptionCatchers();
+
+    /**
+     * Adds the given {@link SBPAwareEventHandlerExceptionCatcher}s to the SBP-aware handler extension.
+     * It'll start listening for {@link RuntimeException}s that occur during the handling of an {@link Event}.
+     * 
+     * @param catcher The new exception catcher that should start listening on the SBP-aware handler extension.
+     */
+    public void addExceptionCatcher(SBPAwareEventHandlerExceptionCatcher catcher);
+
+    /**
+     * Removes the given {@link SBPAwareEventHandlerExceptionCatcher}s from the SBP-aware handler extension.
+     * It'll stop listening for {@link RuntimeException}s that occur during the handling of an {@link Event}.
+     * 
+     * @param catcher The exception catcher that should stop listening on the SBP-aware handler extension.
+     */
+    public void removeExceptionCatcher(SBPAwareEventHandlerExceptionCatcher catcher);
+
+    /**
      * Adds the given {@link ModifySBPAwareHandlerListListener} that is called when an {@link SBPAwareEventHandler} is added or removed.
      * 
      * @param listener The listener that should be added.
@@ -100,11 +125,36 @@ public interface SBPAwareHandlerExtension extends BridgeModule {
     public void removeModifyHandlerListListener(ModifySBPAwareHandlerListListener listener);
 
     /**
+     * Adds the given {@link ModifySBPAwareExceptionCatcherListListener} that is called when an {@link SBPAwareEventHandlerExceptionCatcher} is added or removed.
+     * 
+     * @param listener The listener that should be added.
+     * @see #addExceptionCatcher(SBPAwareEventHandlerExceptionCatcher)
+     * @see #removeExceptionCatcher(SBPAwareEventHandlerExceptionCatcher)
+     */
+    public void addModifyExceptionCatcherListListener(ModifySBPAwareExceptionCatcherListListener listener);
+
+    /**
+     * Removes the given {@link ModifySBPAwareExceptionCatcherListListener} that is called when an {@link SBPAwareEventHandlerExceptionCatcher} is added or removed.
+     * 
+     * @param listener The listener that should be removed.
+     * @see #addExceptionCatcher(SBPAwareEventHandlerExceptionCatcher)
+     * @see #removeExceptionCatcher(SBPAwareEventHandlerExceptionCatcher)
+     */
+    public void removeModifyExceptionCatcherListListener(ModifySBPAwareExceptionCatcherListListener listener);
+
+    /**
      * Returns the {@link Channel} which delivers {@link Event}s to a specific {@link SBPAwareEventHandler}s.
      * 
      * @return The channel which delivers events to a specific SBP-aware event handler.
      */
-    public Channel<SBPAwareHandleInterceptor> getChannel();
+    public Channel<SBPAwareHandleInterceptor> getHandleChannel();
+
+    /**
+     * Returns the {@link Channel} which delivers {@link RuntimeException}s that occurred during the hanlding of events to all {@link SBPAwareEventHandlerExceptionCatcher}s.
+     * 
+     * @return The channel which delivers runtime exceptions to all exception catchers.
+     */
+    public Channel<SBPAwareHandleExceptionInterceptor> getExceptionChannel();
 
     /**
      * A modify SBP-aware handler list listener is called when an {@link SBPAwareEventHandler} is added to or removed from an {@link SBPAwareHandlerExtension}.
@@ -134,9 +184,34 @@ public interface SBPAwareHandlerExtension extends BridgeModule {
     }
 
     /**
+     * A modify SBP-aware exception catcher list listener is called when an {@link SBPAwareEventHandlerExceptionCatcher} is added to or removed from an {@link SBPAwareHandlerExtension}.
+     */
+    public static interface ModifySBPAwareExceptionCatcherListListener {
+
+        /**
+         * This method is invoked when the given {@link SBPAwareEventHandlerExceptionCatcher} is being added to the given {@link SBPAwareHandlerExtension}.
+         * It is called after the catcher was added.
+         * 
+         * @param catcher The exception catcher that is added to the standard handler extension.
+         * @param extension The SBP-aware handler extension the given catcher is added to.
+         */
+        public void onAddCatcher(SBPAwareEventHandlerExceptionCatcher catcher, SBPAwareHandlerExtension extension);
+
+        /**
+         * This method is invoked when the given {@link SBPAwareEventHandlerExceptionCatcher} is being removed from the given {@link SBPAwareHandlerExtension}.
+         * It is called before the catcher is removed.
+         * 
+         * @param catcher The exception catcher that is removed from the SBP-aware handler extension.
+         * @param extension The SBP-aware handler extension the given catcher is removed from.
+         */
+        public void onRemoveCatcher(SBPAwareEventHandlerExceptionCatcher catcher, SBPAwareHandlerExtension extension);
+
+    }
+
+    /**
      * The interceptor which is used in the SBP-aware handle channel of an {@link SBPAwareHandlerExtension}.
      * 
-     * @see SBPAwareHandlerExtension#getChannel()
+     * @see SBPAwareHandlerExtension#getHandleChannel()
      */
     public static interface SBPAwareHandleInterceptor {
 
@@ -153,6 +228,28 @@ public interface SBPAwareHandlerExtension extends BridgeModule {
          * @param handler The SBP-aware event handler the given event is delivered to.
          */
         public void handle(ChannelInvocation<SBPAwareHandleInterceptor> invocation, Event event, BridgeConnector source, SBPIdentity sender, SBPAwareEventHandler<?> handler);
+
+    }
+
+    /**
+     * The interceptor which is used in the SBP-aware exception handle channel of an {@link SBPAwareHandlerExtension}.
+     * 
+     * @see SBPAwareHandlerExtension#getExceptionChannel()
+     */
+    public static interface SBPAwareHandleExceptionInterceptor {
+
+        /**
+         * Intercepts the delivery process of the given {@link RuntimeException} to all {@link SBPAwareEventHandlerExceptionCatcher}s of the {@link SBPAwareHandlerExtension}.
+         * 
+         * @param invocation The {@link ChannelInvocation} object for the current invocation chain.
+         * @param exception The runtime exception which is transported through the channel.
+         *        It should be delivered all exception catchers of the extension.
+         * @param handler The {@link SBPAwareEventHandler} which threw the exception.
+         * @param event The {@link Event} which caused the given event handler to throw the given exception on handling.
+         * @param source The {@link BridgeConnector} which received the given event.
+         *        May be {@code null} if the handled event was sent from the same bridge as the one which is handling it.
+         */
+        public void handle(ChannelInvocation<SBPAwareHandleExceptionInterceptor> invocation, RuntimeException exception, SBPAwareEventHandler<?> handler, Event event, BridgeConnector source);
 
     }
 

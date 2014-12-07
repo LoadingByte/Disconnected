@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import com.quartercode.disconnected.server.identity.SBPIdentityService;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.eventbridge.basic.AbstractBridgeModule;
@@ -43,20 +44,25 @@ import com.quartercode.eventbridge.factory.Factory;
  */
 public class DefaultSBPAwareHandlerExtension extends AbstractBridgeModule implements SBPAwareHandlerExtension {
 
-    private final Channel<SBPAwareHandleInterceptor>              channel                    = new DefaultChannel<>(SBPAwareHandleInterceptor.class);
+    private final Channel<SBPAwareHandleInterceptor>               handleChannel                       = new DefaultChannel<>(SBPAwareHandleInterceptor.class);
+    private final Channel<SBPAwareHandleExceptionInterceptor>      exceptionChannel                    = new DefaultChannel<>(SBPAwareHandleExceptionInterceptor.class);
 
-    private SBPIdentityService                                    identityService;
-    private final Map<SBPAwareEventHandler<?>, EventPredicate<?>> handlers                   = new ConcurrentHashMap<>();
-    private final Map<SBPAwareEventHandler<?>, LowLevelHandler>   lowLevelHandlers           = new ConcurrentHashMap<>();
-    private final List<ModifySBPAwareHandlerListListener>         modifyHandlerListListeners = new ArrayList<>();
-    private Map<SBPAwareEventHandler<?>, EventPredicate<?>>       handlersUnmodifiableCache;
+    private SBPIdentityService                                     identityService;
+    private final Map<SBPAwareEventHandler<?>, EventPredicate<?>>  handlers                            = new ConcurrentHashMap<>();
+    private final Map<SBPAwareEventHandler<?>, LowLevelHandler>    lowLevelHandlers                    = new ConcurrentHashMap<>();
+    private final List<ModifySBPAwareHandlerListListener>          modifyHandlerListListeners          = new ArrayList<>();
+    private Map<SBPAwareEventHandler<?>, EventPredicate<?>>        handlersUnmodifiableCache;
+
+    private final List<SBPAwareEventHandlerExceptionCatcher>       exceptionCatchers                   = new CopyOnWriteArrayList<>();
+    private final List<ModifySBPAwareExceptionCatcherListListener> modifyExceptionCatcherListListeners = new ArrayList<>();
 
     /**
      * Creates a new default SBP-aware handler extension.
      */
     public DefaultSBPAwareHandlerExtension() {
 
-        channel.addInterceptor(new LastSBPAwareHandleInterceptor(), 0);
+        handleChannel.addInterceptor(new LastSBPAwareHandleInterceptor(), 0);
+        exceptionChannel.addInterceptor(new LastSBPAwareHandleExceptionInterceptor(), 0);
     }
 
     @Override
@@ -127,6 +133,32 @@ public class DefaultSBPAwareHandlerExtension extends AbstractBridgeModule implem
     }
 
     @Override
+    public List<SBPAwareEventHandlerExceptionCatcher> getExceptionCatchers() {
+
+        return Collections.unmodifiableList(exceptionCatchers);
+    }
+
+    @Override
+    public void addExceptionCatcher(SBPAwareEventHandlerExceptionCatcher catcher) {
+
+        exceptionCatchers.add(catcher);
+
+        for (ModifySBPAwareExceptionCatcherListListener listener : modifyExceptionCatcherListListeners) {
+            listener.onAddCatcher(catcher, this);
+        }
+    }
+
+    @Override
+    public void removeExceptionCatcher(SBPAwareEventHandlerExceptionCatcher catcher) {
+
+        for (ModifySBPAwareExceptionCatcherListListener listener : modifyExceptionCatcherListListeners) {
+            listener.onRemoveCatcher(catcher, this);
+        }
+
+        exceptionCatchers.remove(catcher);
+    }
+
+    @Override
     public void addModifyHandlerListListener(ModifySBPAwareHandlerListListener listener) {
 
         modifyHandlerListListeners.add(listener);
@@ -139,16 +171,34 @@ public class DefaultSBPAwareHandlerExtension extends AbstractBridgeModule implem
     }
 
     @Override
-    public Channel<SBPAwareHandleInterceptor> getChannel() {
+    public void addModifyExceptionCatcherListListener(ModifySBPAwareExceptionCatcherListListener listener) {
 
-        return channel;
+        modifyExceptionCatcherListListeners.add(listener);
+    }
+
+    @Override
+    public void removeModifyExceptionCatcherListListener(ModifySBPAwareExceptionCatcherListListener listener) {
+
+        modifyExceptionCatcherListListeners.remove(listener);
+    }
+
+    @Override
+    public Channel<SBPAwareHandleInterceptor> getHandleChannel() {
+
+        return handleChannel;
+    }
+
+    @Override
+    public Channel<SBPAwareHandleExceptionInterceptor> getExceptionChannel() {
+
+        return exceptionChannel;
     }
 
     private void handle(Event event, BridgeConnector source, SBPAwareEventHandler<?> handler) {
 
         SBPIdentity sender = identityService.getIdentity(source);
 
-        ChannelInvocation<SBPAwareHandleInterceptor> invocation = channel.invoke();
+        ChannelInvocation<SBPAwareHandleInterceptor> invocation = handleChannel.invoke();
         invocation.next().handle(invocation, event, source, sender, handler);
     }
 
@@ -182,7 +232,11 @@ public class DefaultSBPAwareHandlerExtension extends AbstractBridgeModule implem
         @Override
         public void handle(ChannelInvocation<SBPAwareHandleInterceptor> invocation, Event event, BridgeConnector source, SBPIdentity sender, SBPAwareEventHandler<?> handler) {
 
-            tryHandle(handler, event, sender);
+            try {
+                tryHandle(handler, event, sender);
+            } catch (RuntimeException e) {
+                invokeExceptionChannel(e, handler, event, source);
+            }
 
             invocation.next().handle(invocation, event, source, sender, handler);
         }
@@ -196,6 +250,26 @@ public class DefaultSBPAwareHandlerExtension extends AbstractBridgeModule implem
             } catch (ClassCastException e) {
                 // Do nothing
             }
+        }
+
+        private void invokeExceptionChannel(RuntimeException exception, SBPAwareEventHandler<?> handler, Event event, BridgeConnector source) {
+
+            ChannelInvocation<SBPAwareHandleExceptionInterceptor> invocation = exceptionChannel.invoke();
+            invocation.next().handle(invocation, exception, handler, event, source);
+        }
+
+    }
+
+    private class LastSBPAwareHandleExceptionInterceptor implements SBPAwareHandleExceptionInterceptor {
+
+        @Override
+        public void handle(ChannelInvocation<SBPAwareHandleExceptionInterceptor> invocation, RuntimeException exception, SBPAwareEventHandler<?> handler, Event event, BridgeConnector source) {
+
+            for (SBPAwareEventHandlerExceptionCatcher catcher : exceptionCatchers) {
+                catcher.handle(exception, handler, event, source);
+            }
+
+            invocation.next().handle(invocation, exception, handler, event, source);
         }
 
     }

@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.server.test.bridge;
 
 import static com.quartercode.disconnected.server.test.ExtraActions.storeArgument;
+import static com.quartercode.disconnected.server.test.ExtraAssert.assertListEquals;
 import static com.quartercode.disconnected.server.test.ExtraAssert.assertMapEquals;
 import static com.quartercode.disconnected.server.test.ExtraMatchers.aLowLevelHandlerWithThePredicate;
 import static org.junit.Assert.assertTrue;
@@ -34,7 +35,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import com.quartercode.disconnected.server.bridge.DefaultSBPAwareHandlerExtension;
 import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
+import com.quartercode.disconnected.server.bridge.SBPAwareEventHandlerExceptionCatcher;
+import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension.ModifySBPAwareExceptionCatcherListListener;
 import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension.ModifySBPAwareHandlerListListener;
+import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension.SBPAwareHandleExceptionInterceptor;
 import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension.SBPAwareHandleInterceptor;
 import com.quartercode.disconnected.server.identity.SBPIdentityService;
 import com.quartercode.disconnected.server.test.bridge.DummyEvents.CallableEvent;
@@ -221,7 +225,7 @@ public class DefaultSBPAwareHandlerExtensionTest {
         final EventPredicate<Event> dummyPredicate = context.mock(EventPredicate.class, "dummyPredicate");
 
         final SBPAwareHandleInterceptor interceptor = context.mock(SBPAwareHandleInterceptor.class);
-        extension.getChannel().addInterceptor(new DummySBPAwareHandleInterceptor(interceptor), 1);
+        extension.getHandleChannel().addInterceptor(new DummySBPAwareHandleInterceptor(interceptor), 1);
 
         final Mutable<LowLevelHandler> lowLevelHandler = new MutableObject<>();
 
@@ -260,7 +264,7 @@ public class DefaultSBPAwareHandlerExtensionTest {
         final EventPredicate<Event> predicate = context.mock(EventPredicate.class, "predicate");
 
         final SBPAwareHandleInterceptor interceptor = context.mock(SBPAwareHandleInterceptor.class);
-        extension.getChannel().addInterceptor(new DummySBPAwareHandleInterceptor(interceptor), 1);
+        extension.getHandleChannel().addInterceptor(new DummySBPAwareHandleInterceptor(interceptor), 1);
 
         final Mutable<LowLevelHandler> lowLevelHandler = new MutableObject<>();
 
@@ -327,6 +331,117 @@ public class DefaultSBPAwareHandlerExtensionTest {
         lowLevelHandler.getValue().handle(new Event1(), source1);
     }
 
+    @Test
+    public void testExceptionCatcherStorage() {
+
+        final SBPAwareEventHandlerExceptionCatcher catcher1 = context.mock(SBPAwareEventHandlerExceptionCatcher.class, "catcher1");
+        final SBPAwareEventHandlerExceptionCatcher catcher2 = context.mock(SBPAwareEventHandlerExceptionCatcher.class, "catcher2");
+        final SBPAwareEventHandlerExceptionCatcher catcher3 = context.mock(SBPAwareEventHandlerExceptionCatcher.class, "catcher3");
+
+        assertExceptionCatcherListEmpty();
+
+        extension.removeExceptionCatcher(catcher1);
+        assertExceptionCatcherListEmpty();
+
+        extension.addExceptionCatcher(catcher1);
+        assertListEquals("Exception catchers that are stored inside the extension are not correct", extension.getExceptionCatchers(), catcher1);
+        assertListEquals("Exception catchers that are stored inside the extension changed on the second retrieval", extension.getExceptionCatchers(), catcher1);
+
+        extension.addExceptionCatcher(catcher2);
+        assertListEquals("Exception catchers that are stored inside the extension are not correct", extension.getExceptionCatchers(), catcher1, catcher2);
+        assertListEquals("Exception catchers that are stored inside the extension changed on the second retrieval", extension.getExceptionCatchers(), catcher1, catcher2);
+
+        extension.addExceptionCatcher(catcher3);
+        assertListEquals("Exception catchers that are stored inside the extension are not correct", extension.getExceptionCatchers(), catcher1, catcher2, catcher3);
+        assertListEquals("Exception catchers that are stored inside the extension changed on the second retrieval", extension.getExceptionCatchers(), catcher1, catcher2, catcher3);
+
+        extension.removeExceptionCatcher(catcher2);
+        assertListEquals("Exception catchers that are stored inside the extension are not correct", extension.getExceptionCatchers(), catcher1, catcher3);
+        assertListEquals("Exception catchers that are stored inside the extension changed on the second retrieval", extension.getExceptionCatchers(), catcher1, catcher3);
+    }
+
+    private void assertExceptionCatcherListEmpty() {
+
+        assertTrue("There are exception catchers stored inside the extension although none were added", extension.getExceptionCatchers().isEmpty());
+        assertTrue("Exception catchers that are stored inside the extension changed on the second retrieval", extension.getExceptionCatchers().isEmpty());
+    }
+
+    @Test
+    public void testExceptionCatcherStorageListeners() {
+
+        final SBPAwareEventHandlerExceptionCatcher catcher = context.mock(SBPAwareEventHandlerExceptionCatcher.class, "catcher");
+        final ModifySBPAwareExceptionCatcherListListener listener = context.mock(ModifySBPAwareExceptionCatcherListListener.class);
+
+        // @formatter:off
+        context.checking(new Expectations() {{
+
+            final Sequence listenerCalls = context.sequence("listenerCalls");
+            oneOf(listener).onAddCatcher(catcher, extension); inSequence(listenerCalls);
+            oneOf(listener).onRemoveCatcher(catcher, extension); inSequence(listenerCalls);
+
+        }});
+        // @formatter:on
+
+        // Calls with listener
+        extension.addModifyExceptionCatcherListListener(listener);
+        extension.addExceptionCatcher(catcher);
+        extension.removeExceptionCatcher(catcher);
+
+        // Calls without listener
+        extension.removeModifyExceptionCatcherListListener(listener);
+        extension.addExceptionCatcher(catcher);
+        extension.removeExceptionCatcher(catcher);
+    }
+
+    @SuppressWarnings ("unchecked")
+    @Test
+    public void testExceptionInHandler() {
+
+        final Event1 regularEvent = new Event1();
+        final Event2 exceptionEvent = new Event2();
+
+        final SBPAwareEventHandler<Event> handler = context.mock(SBPAwareEventHandler.class, "handler");
+        final EventPredicate<Event> predicate = context.mock(EventPredicate.class, "predicate");
+
+        final SBPAwareEventHandlerExceptionCatcher catcher1 = context.mock(SBPAwareEventHandlerExceptionCatcher.class, "exceptionCatcher1");
+        final SBPAwareEventHandlerExceptionCatcher catcher2 = context.mock(SBPAwareEventHandlerExceptionCatcher.class, "exceptionCatcher2");
+        extension.addExceptionCatcher(catcher1);
+        extension.addExceptionCatcher(catcher2);
+
+        final SBPAwareHandleExceptionInterceptor interceptor = context.mock(SBPAwareHandleExceptionInterceptor.class);
+        extension.getExceptionChannel().addInterceptor(new DummySBPAwareHandleExceptionInterceptor(interceptor), 1);
+
+        final Mutable<LowLevelHandler> lowLevelHandler = new MutableObject<>();
+
+        // @formatter:off
+        context.checking(new Expectations() {{
+
+            allowing(predicate).test(with(any(Event.class)));
+                will(returnValue(true));
+
+            oneOf(lowLevelHandlerModule).addHandler(with(aLowLevelHandlerWithThePredicate(predicate)));
+                will(storeArgument(0).in(lowLevelHandler));
+
+            final Sequence handleChain = context.sequence("handleChain");
+            // Regular event
+            oneOf(handler).handle(regularEvent, SBP_1); inSequence(handleChain);
+            // Exception event
+            final RuntimeException exception = new RuntimeException();
+            oneOf(handler).handle(exceptionEvent, SBP_1); inSequence(handleChain);
+                will(throwException(exception));
+            oneOf(interceptor).handle(with(any(ChannelInvocation.class)), with(exception), with(handler), with(exceptionEvent), with(source1)); inSequence(handleChain);
+            oneOf(catcher1).handle(exception, handler, exceptionEvent, source1); inSequence(handleChain);
+            oneOf(catcher2).handle(exception, handler, exceptionEvent, source1); inSequence(handleChain);
+
+        }});
+        // @formatter:on
+
+        extension.addHandler(handler, predicate);
+
+        lowLevelHandler.getValue().handle(regularEvent, source1);
+        lowLevelHandler.getValue().handle(exceptionEvent, source1);
+    }
+
     private static class DummySBPAwareHandleInterceptor implements SBPAwareHandleInterceptor {
 
         private final SBPAwareHandleInterceptor dummy;
@@ -341,6 +456,24 @@ public class DefaultSBPAwareHandlerExtensionTest {
 
             dummy.handle(invocation, event, source, sender, handler);
             invocation.next().handle(invocation, event, source, sender, handler);
+        }
+
+    }
+
+    private static class DummySBPAwareHandleExceptionInterceptor implements SBPAwareHandleExceptionInterceptor {
+
+        private final SBPAwareHandleExceptionInterceptor dummy;
+
+        private DummySBPAwareHandleExceptionInterceptor(SBPAwareHandleExceptionInterceptor dummy) {
+
+            this.dummy = dummy;
+        }
+
+        @Override
+        public void handle(ChannelInvocation<SBPAwareHandleExceptionInterceptor> invocation, RuntimeException exception, SBPAwareEventHandler<?> handler, Event event, BridgeConnector source) {
+
+            dummy.handle(invocation, exception, handler, event, source);
+            invocation.next().handle(invocation, exception, handler, event, source);
         }
 
     }

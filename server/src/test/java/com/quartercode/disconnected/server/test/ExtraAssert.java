@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.tuple.Pair;
@@ -32,6 +33,15 @@ public class ExtraAssert {
 
         assertTrue(message, actualCollection.size() == expectedElements.length);
         assertTrue(message, actualCollection.containsAll(Arrays.asList(expectedElements)));
+    }
+
+    public static void assertListEquals(String message, List<?> actualList, Object... expectedElements) {
+
+        assertTrue(message, actualList.size() == expectedElements.length);
+
+        for (int index = 0; index < actualList.size(); index++) {
+            assertTrue(message, Objects.equals(expectedElements[index], actualList.get(index)));
+        }
     }
 
     public static void assertMapEquals(String message, Map<?, ?> map, Pair<?, ?>... entries) {
