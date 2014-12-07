@@ -29,7 +29,7 @@
         <commons-lang3.version>3.3.2</commons-lang3.version>
         <slf4j.version>1.7.7</slf4j.version>
         <lombok.version>1.14.8</lombok.version>
-        <eventbridge.version>0.1.0</eventbridge.version>
+        <eventbridge.version>0.2.0-SNAPSHOT</eventbridge.version>
         <jdom2.version>2.0.5</jdom2.version>
         <junit.version>4.11</junit.version>
         <jmock.version>2.6.0</jmock.version>
