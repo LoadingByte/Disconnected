@@ -79,8 +79,13 @@ import com.quartercode.eventbridge.extra.predicate.TypePredicate;
  * <td>Called by {@link #launchWorldProcess()}; a {@link WorldProcessLaunchCommand} with the stored {@link #clientProcessDetails} to launch the actual world process should be sent here.</td>
  * </tr>
  * <tr>
- * <td>{@link #registerEventHandlersAfterLaunch()}</td>
+ * <td>{@link #registerEventHandlersRequiringWorldProcessId()}</td>
  * <td>Called by {@link #launchWorldProcess()} once {@link #worldProcessId} is set; any {@link EventHandler}s that <b>do</b> require the {@link #worldProcessId} field should be registered here.</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #executeActionsRequiringWorldProcessId()}</td>
+ * <td>Called by {@link #launchWorldProcess()} once {@link #worldProcessId} is set and {@link #registerEventHandlersRequiringWorldProcessId()} has been called; any other actions that <b>do</b> require
+ * the {@link #worldProcessId} field should be executed here.</td>
  * </tr>
  * </table>
  * 
@@ -122,6 +127,7 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
         context.injectValues(this);
 
         // Use a dummy client process id
+        // TODO: Use propert client process ids; this system will eventually run into collisions
         clientProcessDetails = new ClientProcessDetails((int) (Math.random() * 10000D));
 
         initializeGraphics();
@@ -170,7 +176,8 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
 
     /**
      * By default, this method calls {@link #doLaunchWorldProcess()} and does some other things required for the program to work.
-     * It is called fourth on construction and should not be overridden if {@link #doLaunchWorldProcess()} or {@link #registerEventHandlersAfterLaunch()} is used.
+     * It is called fourth on construction and should not be overridden if {@link #doLaunchWorldProcess()}, {@link #registerEventHandlersRequiringWorldProcessId()} or
+     * {@link #executeActionsRequiringWorldProcessId()} is used.
      */
     protected void launchWorldProcess() {
 
@@ -182,7 +189,8 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
 
                 worldProcessId = event.getWorldProcessId();
 
-                registerEventHandlersAfterLaunch();
+                registerEventHandlersRequiringWorldProcessId();
+                executeActionsRequiringWorldProcessId();
 
                 // Remove the handler after the acknowledgment arrived
                 bridge.getModule(StandardHandlerModule.class).removeHandler(this);
@@ -205,7 +213,15 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
      * This method should register any {@link EventHandler}s that <b>do</b> require the {@link #worldProcessId} field.
      * It is called by {@link #launchWorldProcess()} immediately after {@link #worldProcessId} has been set.
      */
-    protected void registerEventHandlersAfterLaunch() {
+    protected void registerEventHandlersRequiringWorldProcessId() {
+
+    }
+
+    /**
+     * This method should execute any actions that <b>do</b> require the {@link #worldProcessId} field (apart from registering {@link EventHandler}s).
+     * It is called by {@link #launchWorldProcess()} immediately after {@link #worldProcessId} has been set and {@link #registerEventHandlersRequiringWorldProcessId()} has been called.
+     */
+    protected void executeActionsRequiringWorldProcessId() {
 
     }
 
