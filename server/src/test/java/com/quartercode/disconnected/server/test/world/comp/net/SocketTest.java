@@ -20,37 +20,40 @@ package com.quartercode.disconnected.server.test.world.comp.net;
 
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
-import org.jmock.lib.concurrent.Synchroniser;
-import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Rule;
 import org.junit.Test;
+import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
+import com.quartercode.classmod.extra.func.FunctionExecutor;
+import com.quartercode.classmod.extra.func.FunctionInvocation;
+import com.quartercode.classmod.util.test.JUnitRuleModMockery;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
+import com.quartercode.disconnected.server.world.comp.net.PacketHandler;
 import com.quartercode.disconnected.server.world.comp.net.Socket;
-import com.quartercode.disconnected.server.world.comp.net.Socket.PacketHandler;
 import com.quartercode.disconnected.server.world.comp.net.Socket.SocketState;
 
+@SuppressWarnings ("unchecked")
 public class SocketTest {
 
     @Rule
-    // @formatter:off
-    public JUnitRuleMockery context = new JUnitRuleMockery() {{
-        setImposteriser(ClassImposteriser.INSTANCE);
-        setThreadingPolicy(new Synchroniser());
-    }};
-    // @formatter:on
+    public JUnitRuleMockery    context = new JUnitRuleMockery();
+    @Rule
+    public JUnitRuleModMockery modmock = new JUnitRuleModMockery();
 
     @Test
     public void testHandle() {
 
-        final PacketHandler packetHandler = context.mock(PacketHandler.class);
         final Socket socket = new Socket();
         socket.setObj(Socket.STATE, SocketState.CONNECTED);
-        socket.addToColl(Socket.PACKET_HANDLERS, packetHandler);
+
+        // Add a packet handler
+        final FunctionExecutor<Void> packetHandlerHook = context.mock(FunctionExecutor.class, "packetHandlerHook");
+        modmock.addFuncExec(PacketHandler.HANDLE, "packetHandlerHook", HookedPacketHandler.class, packetHandlerHook);
+        socket.addToColl(Socket.PACKET_HANDLERS, new HookedPacketHandler());
 
         // @formatter:off
         context.checking(new Expectations() {{
 
-            oneOf(packetHandler).handle(socket, "testdata");
+            oneOf(packetHandlerHook).invoke(with(any(FunctionInvocation.class)), with(new Object[] { socket, "testdata" }));
 
         }});
         // @formatter:on
@@ -63,14 +66,17 @@ public class SocketTest {
     @Test
     public void testHandleNotConnected() {
 
-        final PacketHandler packetHandler = context.mock(PacketHandler.class);
         final Socket socket = new Socket();
-        socket.addToColl(Socket.PACKET_HANDLERS, packetHandler);
+
+        // Add a packet handler
+        final FunctionExecutor<Void> packetHandlerHook = context.mock(FunctionExecutor.class, "packetHandlerHook");
+        modmock.addFuncExec(PacketHandler.HANDLE, "packetHandlerHook", HookedPacketHandler.class, packetHandlerHook);
+        socket.addToColl(Socket.PACKET_HANDLERS, new HookedPacketHandler());
 
         // @formatter:off
         context.checking(new Expectations() {{
 
-            never(packetHandler).handle(socket, "testdata");
+            never(packetHandlerHook).invoke(with(any(FunctionInvocation.class)), with(new Object[] { socket, "testdata" }));
 
         }});
         // @formatter:on
@@ -78,6 +84,10 @@ public class SocketTest {
         Packet packet = new Packet();
         packet.setObj(Packet.DATA, "testdata");
         socket.invoke(Socket.HANDLE, packet);
+    }
+
+    private static class HookedPacketHandler extends DefaultCFeatureHolder implements PacketHandler {
+
     }
 
 }

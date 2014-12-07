@@ -18,18 +18,27 @@
 
 package com.quartercode.disconnected.server.world.comp.program;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
 import java.util.List;
+import org.apache.commons.lang3.reflect.TypeLiteral;
+import com.quartercode.classmod.extra.func.FunctionExecutor;
+import com.quartercode.classmod.extra.func.FunctionInvocation;
+import com.quartercode.classmod.extra.prop.NonPersistent;
+import com.quartercode.classmod.extra.prop.PropertyDefinition;
+import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
 import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.UnknownMountpointException;
+import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 import com.quartercode.disconnected.shared.event.comp.program.WorldProcessCommand;
 import com.quartercode.disconnected.shared.event.comp.program.WorldProcessCommandPredicate;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
+import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 import com.quartercode.eventbridge.extra.predicate.MultiPredicates;
@@ -110,15 +119,7 @@ public class ProgramUtils {
      */
     public static void registerInterruptionStopper(Process<?> process) {
 
-        process.addToColl(Process.STATE_LISTENERS, new ProcessStateListener() {
-
-            @Override
-            public void changedState(Process<?> process, ProcessState oldState, ProcessState newState) {
-
-                process.invoke(Process.STOP, true);
-            }
-
-        });
+        process.addToColl(Process.STATE_LISTENERS, new StopOnInterruptPSListener());
     }
 
     /**
@@ -130,26 +131,18 @@ public class ProgramUtils {
      * @param eventType The event type all handled events must have.
      * @param handler The event handler that should handle the incoming events.
      */
-    public static void registerEventHandler(ProgramExecutor executor, Class<? extends WorldProcessCommand> eventType, final EventHandler<?> handler) {
+    public static void registerEventHandler(ProgramExecutor executor, Class<? extends WorldProcessCommand> eventType, EventHandler<?> handler) {
 
-        final StandardHandlerModule handlerModule = executor.getBridge().getModule(StandardHandlerModule.class);
+        StandardHandlerModule handlerModule = executor.getBridge().getModule(StandardHandlerModule.class);
 
         // Add the handler
         handlerModule.addHandler(handler,
                 MultiPredicates.and(new TypePredicate<>(eventType), new WorldProcessCommandPredicate<>(getProcessId(executor))));
 
         // Register a callback that removes the listener once the process is stopped
-        executor.getParent().addToColl(Process.STATE_LISTENERS, new ProcessStateListener() {
-
-            @Override
-            public void changedState(Process<?> process, ProcessState oldState, ProcessState newState) {
-
-                if (newState == ProcessState.STOPPED) {
-                    handlerModule.removeHandler(handler);
-                }
-            }
-
-        });
+        RemoveEventHandlerOnStopPSListener removalListener = new RemoveEventHandlerOnStopPSListener();
+        removalListener.setObj(RemoveEventHandlerOnStopPSListener.EVENT_HANDLER, handler);
+        executor.getParent().addToColl(Process.STATE_LISTENERS, removalListener);
     }
 
     /**
@@ -190,17 +183,86 @@ public class ProgramUtils {
                 MultiPredicates.and(new TypePredicate<>(eventType), new WorldProcessCommandPredicate<>(getProcessId(executor))));
 
         // Register a callback that removes the handler once the process is stopped
-        executor.getParent().addToColl(Process.STATE_LISTENERS, new ProcessStateListener() {
+        RemoveEventHandlerOnStopPSListener removalListener = new RemoveEventHandlerOnStopPSListener();
+        removalListener.setObj(RemoveEventHandlerOnStopPSListener.EVENT_HANDLER, handler);
+        executor.getParent().addToColl(Process.STATE_LISTENERS, removalListener);
+    }
 
-            @Override
-            public void changedState(Process<?> process, ProcessState oldState, ProcessState newState) {
+    /*
+     * This class must be public for making it persistent.
+     */
+    public static class StopOnInterruptPSListener extends WorldFeatureHolder implements ProcessStateListener {
 
-                if (newState == ProcessState.STOPPED) {
-                    handlerExtension.removeHandler(effectiveHandler);
+        static {
+
+            ON_STATE_CHANGE.addExecutor("stopOnInterrupt", StopOnInterruptPSListener.class, new FunctionExecutor<Void>() {
+
+                @Override
+                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                    Object newState = arguments[2];
+
+                    if (newState == ProcessState.INTERRUPTED) {
+                        ((Process<?>) arguments[0]).invoke(Process.STOP, true);
+                    }
+
+                    return invocation.next(arguments);
                 }
-            }
 
-        });
+            });
+
+        }
+
+    }
+
+    /*
+     * This listener removes a given EventHandler or SBPAwareEventHandler once the program is stopped.
+     * It doesn't need to be persistent because all event handlers are removed anyway when the server stops.
+     * That would make it useless junk.
+     */
+    @NonPersistent
+    private static class RemoveEventHandlerOnStopPSListener extends WorldFeatureHolder implements ProcessStateListener {
+
+        // ----- Properties -----
+
+        // Must store an object because both EventHandler and SBPAwareEventHandler are allowed
+        private static final PropertyDefinition<Object> EVENT_HANDLER;
+
+        static {
+
+            EVENT_HANDLER = create(new TypeLiteral<PropertyDefinition<Object>>() {}, "name", "eventHandler", "storage", new StandardStorage<>());
+
+        }
+
+        // ----- Functions -----
+
+        static {
+
+            ON_STATE_CHANGE.addExecutor("removeEventHandlerOnStop", RemoveEventHandlerOnStopPSListener.class, new FunctionExecutor<Void>() {
+
+                @Override
+                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                    Object newState = arguments[2];
+
+                    if (newState == ProcessState.STOPPED) {
+                        Object handler = invocation.getCHolder().getObj(EVENT_HANDLER);
+                        Bridge bridge = ((Process<?>) arguments[0]).getBridge();
+
+                        if (handler instanceof EventHandler) {
+                            bridge.getModule(StandardHandlerModule.class).removeHandler((EventHandler<?>) handler);
+                        } else if (handler instanceof SBPAwareEventHandler) {
+                            bridge.getModule(SBPAwareHandlerExtension.class).removeHandler((SBPAwareEventHandler<?>) handler);
+                        }
+                    }
+
+                    return invocation.next(arguments);
+                }
+
+            });
+
+        }
+
     }
 
     private ProgramUtils() {

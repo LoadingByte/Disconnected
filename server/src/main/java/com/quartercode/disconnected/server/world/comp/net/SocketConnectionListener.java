@@ -18,6 +18,10 @@
 
 package com.quartercode.disconnected.server.world.comp.net;
 
+import static com.quartercode.classmod.ClassmodFactory.create;
+import org.apache.commons.lang3.reflect.TypeLiteral;
+import com.quartercode.classmod.extra.conv.CFeatureHolder;
+import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
 
@@ -30,10 +34,10 @@ import com.quartercode.disconnected.shared.world.comp.net.Address;
  * @see NetworkModule#CONNECTION_LISTENERS
  */
 @XmlPersistent
-public abstract class SocketConnectionListener {
+public interface SocketConnectionListener extends CFeatureHolder {
 
     /**
-     * This enumeration defines the different results the {@link SocketConnectionListener#allow(Address, int)} method can return.
+     * This enumeration defines the different results the {@link SocketConnectionListener#ON_ESTABLISH} method can return.
      * The combination of all allowance results of all connection listeners defines whether a {@link Socket} connection is allowed or not.<br>
      * <br>
      * Here're some examples for a connection request passing through some listeners:
@@ -75,24 +79,52 @@ public abstract class SocketConnectionListener {
     }
 
     /**
-     * Returns the position of the listener on whether the socket under the given {@link Address} is allowed to build a {@link Socket} connection.
-     * See {@link ConnectionAllowance} for more information on the different positions the listener can take.
-     * If the connection request is allowed, the {@link #established(Socket)} will be called with the created socket after some time.
+     * Returns the opinion of the listener on whether the socket under the given {@link Address} is allowed to build a {@link Socket} connection.
+     * See {@link ConnectionAllowance} for more information on the different opinions the listener can take.
+     * If the connection request is allowed, {@link #ON_ESTABLISH} will be called with the created socket after some time.
      * 
-     * @param requestor The address of the socket/service which wants to build a connection.
-     * @param localPort The local port the request is sent to.
-     *        If the connection request is allowed, it is used for the new socket.
-     * @return A connection allowance entry that controls the whether the building of the connection is allowed.
-     *         See {@link ConnectionAllowance} for more information on the usage.
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Address}</td>
+     * <td>requester</td>
+     * <td>The address of the socket/service which wants to build a connection.</td>
+     * </tr>
+     * <tr>
+     * <td>1</td>
+     * <td>{@link Integer}</td>
+     * <td>localPort</td>
+     * <td>The local port the request is sent to. If the connection request is allowed, it is used for the new socket.</td>
+     * </tr>
+     * </table>
      */
-    public abstract ConnectionAllowance allow(Address requestor, int localPort);
+    public static final FunctionDefinition<ConnectionAllowance> ON_REQUEST   = create(new TypeLiteral<FunctionDefinition<ConnectionAllowance>>() {}, "name", "onRequest", "parameters", new Class[] { Address.class, Integer.class });
 
     /**
      * This method is called when a new {@link Socket} connection was successfully established.
-     * Note that {@link #allow(Address, int)} has been called before this method.
+     * Note that {@link #ON_REQUEST} must have been called before this method.
      * 
-     * @param socket The stream socket which was built in order to represent the established connection.
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link Socket}</td>
+     * <td>socket</td>
+     * <td>The stream socket which was built in order to represent the established connection.</td>
+     * </tr>
+     * </table>
      */
-    public abstract void established(Socket socket);
+    public static final FunctionDefinition<Void>                ON_ESTABLISH = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "onEstablish", "parameters", new Class[] { Socket.class });
 
 }

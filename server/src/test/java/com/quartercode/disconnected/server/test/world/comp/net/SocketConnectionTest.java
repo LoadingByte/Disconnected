@@ -23,11 +23,10 @@ import org.jmock.Expectations;
 import org.jmock.Sequence;
 import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
-import org.jmock.lib.concurrent.Synchroniser;
-import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
 import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.extra.func.Priorities;
@@ -35,22 +34,17 @@ import com.quartercode.classmod.util.test.JUnitRuleModMockery;
 import com.quartercode.disconnected.server.util.ObjArray;
 import com.quartercode.disconnected.server.world.comp.net.NetworkModule;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
+import com.quartercode.disconnected.server.world.comp.net.PacketHandler;
 import com.quartercode.disconnected.server.world.comp.net.Socket;
-import com.quartercode.disconnected.server.world.comp.net.Socket.PacketHandler;
 import com.quartercode.disconnected.server.world.comp.net.Socket.SocketState;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
 import com.quartercode.disconnected.shared.world.comp.net.NetID;
 
+@SuppressWarnings ("unchecked")
 public class SocketConnectionTest {
 
     @Rule
-    // @formatter:off
-    public JUnitRuleMockery context = new JUnitRuleMockery() {{
-        setImposteriser(ClassImposteriser.INSTANCE);
-        setThreadingPolicy(new Synchroniser());
-    }};
-    // @formatter:on
-
+    public JUnitRuleMockery       context = new JUnitRuleMockery();
     @Rule
     public JUnitRuleModMockery    modmock = new JUnitRuleModMockery();
 
@@ -146,8 +140,10 @@ public class SocketConnectionTest {
         socket2.setObj(Socket.STATE, SocketState.CONNECTED);
 
         // Add some packet handlers for checking that the correct packets arrive
-        final PacketHandler packetHandler1 = context.mock(PacketHandler.class, "packetHandler1");
-        final PacketHandler packetHandler2 = context.mock(PacketHandler.class, "packetHandler2");
+        final FunctionExecutor<Void> packetHandler1Hook = context.mock(FunctionExecutor.class, "packetHandler1Hook");
+        final FunctionExecutor<Void> packetHandler2Hook = context.mock(FunctionExecutor.class, "packetHandler2Hook");
+        modmock.addFuncExec(PacketHandler.HANDLE, "packetHandler1Hook", HookedPacketHandler1.class, packetHandler1Hook);
+        modmock.addFuncExec(PacketHandler.HANDLE, "packetHandler2Hook", HookedPacketHandler2.class, packetHandler2Hook);
 
         // @formatter:off
         context.checking(new Expectations() {{
@@ -155,15 +151,15 @@ public class SocketConnectionTest {
             final Sequence sequence = context.sequence("sequence");
 
             oneOf(mockNetModuleSendHook).onSend(socket1, "testdata1"); inSequence(sequence);
-            oneOf(packetHandler2).handle(socket2, "testdata1"); inSequence(sequence);
+            oneOf(packetHandler2Hook).invoke(with(any(FunctionInvocation.class)), with(new Object[] { socket2, "testdata1" })); inSequence(sequence);
             oneOf(mockNetModuleSendHook).onSend(socket2, "testdata2"); inSequence(sequence);
-            oneOf(packetHandler1).handle(socket1, "testdata2"); inSequence(sequence);
+            oneOf(packetHandler1Hook).invoke(with(any(FunctionInvocation.class)), with(new Object[] { socket1, "testdata2" })); inSequence(sequence);
 
         }});
         // @formatter:on
 
-        socket1.addToColl(Socket.PACKET_HANDLERS, packetHandler1);
-        socket2.addToColl(Socket.PACKET_HANDLERS, packetHandler2);
+        socket1.addToColl(Socket.PACKET_HANDLERS, new HookedPacketHandler1());
+        socket2.addToColl(Socket.PACKET_HANDLERS, new HookedPacketHandler2());
 
         // Send test packets
         socket1.invoke(Socket.SEND, "testdata1");
@@ -337,6 +333,14 @@ public class SocketConnectionTest {
     private static interface NetworkModuleSendHook {
 
         public void onSend(Socket socket, Object data);
+
+    }
+
+    private static class HookedPacketHandler1 extends DefaultCFeatureHolder implements PacketHandler {
+
+    }
+
+    private static class HookedPacketHandler2 extends DefaultCFeatureHolder implements PacketHandler {
 
     }
 

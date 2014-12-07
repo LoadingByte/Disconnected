@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world.comp.program;
+package com.quartercode.disconnected.server.world.comp.net;
 
 import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.reflect.TypeLiteral;
@@ -25,14 +25,19 @@ import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
 
 /**
- * A process state listener is notified after the {@link ProcessState} of a {@link Process} has changed.
- * Such listeners can be activated by adding them to {@link Process#STATE_LISTENERS}.
+ * A packet handle is a simple functional class which is called when a {@link Packet} arrives at a {@link Socket}.
+ * However, the handler only receives the carried data object and no further metadata.<br>
+ * <br>
+ * Sadly, this class must be abstract since JAXB can't handle interfaces.
+ * 
+ * @see Socket
+ * @see Packet
  */
 @XmlPersistent
-public interface ProcessStateListener extends CFeatureHolder {
+public interface PacketHandler extends CFeatureHolder {
 
     /**
-     * Called after the {@link ProcessState} of the given {@link Process} has changed.
+     * This method is called when a {@link Packet} with the given data object arrives at the given {@link Socket}.
      * 
      * <table>
      * <tr>
@@ -43,24 +48,18 @@ public interface ProcessStateListener extends CFeatureHolder {
      * </tr>
      * <tr>
      * <td>0</td>
-     * <td>{@link Process}&lt;?&gt;</td>
-     * <td>process</td>
-     * <td>The process whose state has changed.</td>
+     * <td>{@link Socket}</td>
+     * <td>socket</td>
+     * <td>The socket which received the given packet. Most of the times, this is the socket the packet handler was added to.</td>
      * </tr>
      * <tr>
      * <td>1</td>
-     * <td>{@link ProcessState}</td>
-     * <td>oldState</td>
-     * <td>The old state of the process.</td>
-     * </tr>
-     * <tr>
-     * <td>2</td>
-     * <td>{@link ProcessState}</td>
-     * <td>newState</td>
-     * <td>The new state of the process.</td>
+     * <td>{@link Object}</td>
+     * <td>data</td>
+     * <td>The data object that was carried by the received packet.</td>
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void> ON_STATE_CHANGE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "onStateChange", "parameters", new Class[] { Process.class, ProcessState.class, ProcessState.class });
+    public static final FunctionDefinition<Void> HANDLE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "handle", "parameters", new Class[] { Socket.class, Object.class });
 
 }

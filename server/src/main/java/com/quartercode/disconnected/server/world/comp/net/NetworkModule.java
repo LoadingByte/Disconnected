@@ -260,14 +260,14 @@ public class NetworkModule extends OSModule {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Socket holder = (Socket) invocation.getCHolder();
+                CFeatureHolder holder = invocation.getCHolder();
                 boolean stateChangesToConnected = arguments[0] == SocketState.CONNECTED && holder.getObj(Socket.STATE) != SocketState.CONNECTED;
 
                 invocation.next(arguments);
 
                 if (stateChangesToConnected) {
                     for (SocketConnectionListener connectionListener : holder.getColl(CONNECTION_LISTENERS)) {
-                        connectionListener.established(holder);
+                        connectionListener.invoke(SocketConnectionListener.ON_ESTABLISH, holder);
                     }
                 }
 
@@ -365,12 +365,12 @@ public class NetworkModule extends OSModule {
                 return invocation.next(arguments);
             }
 
-            private Socket tryCreateSocket(CFeatureHolder holder, Address requestor, int localPort) {
+            private Socket tryCreateSocket(CFeatureHolder holder, Address requester, int localPort) {
 
                 // Iterate over the opinions of all connection listeners and
                 boolean allowAfterAll = false;
                 for (SocketConnectionListener connectionListener : holder.getColl(CONNECTION_LISTENERS)) {
-                    ConnectionAllowance allowance = connectionListener.allow(requestor, localPort);
+                    ConnectionAllowance allowance = connectionListener.invoke(SocketConnectionListener.ON_REQUEST, requester, localPort);
                     if (allowance == ConnectionAllowance.ALLOW_AFTER_ALL) {
                         allowAfterAll = true;
                     } else if (allowance == ConnectionAllowance.REJECT_IMMEDIATELY) {
@@ -384,7 +384,7 @@ public class NetworkModule extends OSModule {
                 // If the socket creation is allowed, create the socket
                 Socket socket = new Socket();
                 socket.setObj(Socket.LOCAL_PORT, localPort);
-                socket.setObj(Socket.DESTINATION, requestor);
+                socket.setObj(Socket.DESTINATION, requester);
                 holder.addToColl(SOCKETS, socket);
                 return socket;
             }
@@ -398,7 +398,8 @@ public class NetworkModule extends OSModule {
 
                 // Only invoke on shutdown
                 if (!(Boolean) arguments[0]) {
-                    for (Socket socket : invocation.getCHolder().getColl(SOCKETS)) {
+                    // Need to use a new list instance because the old one is modified when a socket is disconnected
+                    for (Socket socket : new ArrayList<>(invocation.getCHolder().getColl(SOCKETS))) {
                         socket.invoke(Socket.DISCONNECT);
                     }
                 }

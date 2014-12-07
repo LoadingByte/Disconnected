@@ -40,7 +40,6 @@ import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.server.util.ObjArray;
 import com.quartercode.disconnected.server.world.util.StringRepresentable;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
-import com.quartercode.disconnected.shared.util.XmlPersistent;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
 
 /**
@@ -525,7 +524,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Socket holder = (Socket) invocation.getCHolder();
+                CFeatureHolder holder = invocation.getCHolder();
 
                 // Terminate the connection if a non-handshake and non-teardown packet comes through although the connection hasn't been established yet
                 if (holder.getObj(STATE) != SocketState.CONNECTED) {
@@ -536,7 +535,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                 Object data = ((Packet) arguments[0]).getObj(Packet.DATA);
 
                 for (PacketHandler packetHandler : holder.getColl(PACKET_HANDLERS)) {
-                    packetHandler.handle(holder, data);
+                    packetHandler.invoke(PacketHandler.HANDLE, holder, data);
                 }
 
                 return invocation.next(arguments);
@@ -552,29 +551,6 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
     public Socket() {
 
         setParentType(NetworkModule.class);
-    }
-
-    /**
-     * A packet handle is a simple functional class which is called when a {@link Packet} arrives at a {@link Socket}.
-     * However, the handler only receives the carried data object and no further metadata.<br>
-     * <br>
-     * Sadly, this class must be abstract since JAXB can't handle interfaces.
-     * 
-     * @see Socket
-     * @see Packet
-     */
-    @XmlPersistent
-    public static abstract class PacketHandler {
-
-        /**
-         * This method is called when a {@link Packet} with the given data object arrives at the given {@link Socket}.
-         * 
-         * @param socket The socket which received the given packet.
-         *        Most of the times, this is the socket the packet handler was added to.
-         * @param data The data object that was carried by the received packet.
-         */
-        public abstract void handle(Socket socket, Object data);
-
     }
 
 }

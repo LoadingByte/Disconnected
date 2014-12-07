@@ -24,21 +24,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
-import org.jmock.lib.concurrent.Synchroniser;
-import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
 import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.util.test.JUnitRuleModMockery;
-import com.quartercode.disconnected.server.util.ObjArray;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.net.NetworkModule;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
+import com.quartercode.disconnected.server.world.comp.net.PacketHandler;
 import com.quartercode.disconnected.server.world.comp.net.Socket;
-import com.quartercode.disconnected.server.world.comp.net.Socket.PacketHandler;
 import com.quartercode.disconnected.server.world.comp.net.Socket.SocketState;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
@@ -48,13 +46,7 @@ import com.quartercode.disconnected.shared.world.comp.net.NetID;
 public class NetworkModuleTest {
 
     @Rule
-    // @formatter:off
-    public JUnitRuleMockery context = new JUnitRuleMockery() {{
-        setImposteriser(ClassImposteriser.INSTANCE);
-        setThreadingPolicy(new Synchroniser());
-    }};
-    // @formatter:on
-
+    public JUnitRuleMockery        context         = new JUnitRuleMockery();
     @Rule
     public JUnitRuleModMockery     modmock         = new JUnitRuleModMockery();
 
@@ -128,7 +120,7 @@ public class NetworkModuleTest {
 
         final Packet packet = new Packet();
         packet.setObj(Packet.DESTINATION, destinationAddress);
-        packet.setObj(Packet.DATA, new ObjArray("testdata"));
+        packet.setObj(Packet.DATA, "testdata");
 
         final FunctionExecutor<Void> processHook = context.mock(FunctionExecutor.class, "processHook");
         modmock.addFuncExec(NodeNetInterface.PROCESS, "processHook", NodeNetInterface.class, processHook, LEVEL_9);
@@ -163,7 +155,7 @@ public class NetworkModuleTest {
         expectedPacket.setObj(Packet.SOURCE, sourceAddress);
         expectedPacket.setObj(Packet.DESTINATION, destinationAddress);
         expectedPacket.setObj(Packet.PROTOCOL, "tcp");
-        expectedPacket.setObj(Packet.DATA, new ObjArray("testdata"));
+        expectedPacket.setObj(Packet.DATA, "testdata");
 
         final FunctionExecutor<Void> processHook = context.mock(FunctionExecutor.class, "processHook");
         modmock.addFuncExec(NodeNetInterface.PROCESS, "processHook", NodeNetInterface.class, processHook, LEVEL_9);
@@ -176,7 +168,7 @@ public class NetworkModuleTest {
         }});
         // @formatter:on
 
-        netModule.invoke(NetworkModule.SEND_TCP, socket, new ObjArray("testdata"));
+        netModule.invoke(NetworkModule.SEND_TCP, socket, "testdata");
     }
 
     @Test
@@ -190,25 +182,31 @@ public class NetworkModuleTest {
         packet.setObj(Packet.SOURCE, sourceAddress);
         packet.setObj(Packet.DESTINATION, new Address(new NetID(0, 2), destinationPort));
         packet.setObj(Packet.PROTOCOL, "tcp");
-        packet.setObj(Packet.DATA, new ObjArray("testdata"));
+        packet.setObj(Packet.DATA, "testdata");
 
         final Socket receiverSocket = netModule.invoke(NetworkModule.CREATE_SOCKET);
         receiverSocket.setObj(Socket.LOCAL_PORT, destinationPort);
         receiverSocket.setObj(Socket.DESTINATION, sourceAddress);
         receiverSocket.setObj(Socket.STATE, SocketState.CONNECTED);
 
-        final PacketHandler packetHandler = context.mock(PacketHandler.class);
-        receiverSocket.addToColl(Socket.PACKET_HANDLERS, packetHandler);
+        // Add a packet handler
+        final FunctionExecutor<Void> packetHandlerHook = context.mock(FunctionExecutor.class, "packetHandlerHook");
+        modmock.addFuncExec(PacketHandler.HANDLE, "packetHandlerHook", HookedPacketHandler.class, packetHandlerHook);
+        receiverSocket.addToColl(Socket.PACKET_HANDLERS, new HookedPacketHandler());
 
         // @formatter:off
         context.checking(new Expectations() {{
 
-            oneOf(packetHandler).handle(receiverSocket, new ObjArray("testdata"));
+            oneOf(packetHandlerHook).invoke(with(any(FunctionInvocation.class)), with(new Object[] { receiverSocket, "testdata" }));
 
         }});
         // @formatter:on
 
         netModule.invoke(NetworkModule.HANDLE, packet);
+    }
+
+    private static class HookedPacketHandler extends DefaultCFeatureHolder implements PacketHandler {
+
     }
 
 }

@@ -22,6 +22,7 @@ import static com.quartercode.classmod.ClassmodFactory.create;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
+import com.quartercode.disconnected.shared.util.XmlPersistent;
 
 /**
  * This class represents a "thing" that can take {@link Packet}s and do something with them.
@@ -29,6 +30,7 @@ import com.quartercode.classmod.extra.func.FunctionDefinition;
  * 
  * @see Packet
  */
+@XmlPersistent
 public interface PacketProcessor extends CFeatureHolder {
 
     /**

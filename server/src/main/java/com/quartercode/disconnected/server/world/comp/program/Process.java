@@ -153,14 +153,14 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Process<?> holder = (Process<?>) invocation.getCHolder();
+                CFeatureHolder holder = invocation.getCHolder();
                 ProcessState oldState = holder.getObj(STATE);
 
                 invocation.next(arguments);
 
                 ProcessState newState = (ProcessState) arguments[0];
                 for (ProcessStateListener stateListener : holder.getColl(STATE_LISTENERS)) {
-                    stateListener.changedState(holder, oldState, newState);
+                    stateListener.invoke(ProcessStateListener.ON_STATE_CHANGE, holder, oldState, newState);
                 }
 
                 return null;
