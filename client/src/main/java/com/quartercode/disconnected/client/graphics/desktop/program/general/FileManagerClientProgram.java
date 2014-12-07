@@ -236,6 +236,10 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
 
             // Launch process
             bridge.send(new WorldProcessLaunchCommand(clientProcessDetails, "fileManager"));
+        }
+
+        @Override
+        protected void executeActionsRequiringWorldProcessId() {
 
             // Set initial directory in order to receive an update view command
             changeDirectory(PathUtils.SEPARATOR);

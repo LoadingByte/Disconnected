@@ -78,7 +78,7 @@ public class DefaultHandleInvocationProviderExtensionTest {
                 will(returnValue(handlerModuleChannel));
 
             // The module should add a hook to the handler module's channel
-            allowing(handlerModuleChannel).addInterceptor(with(any(HandleInterceptor.class)), with(40));
+            allowing(handlerModuleChannel).addInterceptor(with(any(HandleInterceptor.class)), with(1000));
                 will(storeArgument(0).in(hookInterceptor));
 
         }});

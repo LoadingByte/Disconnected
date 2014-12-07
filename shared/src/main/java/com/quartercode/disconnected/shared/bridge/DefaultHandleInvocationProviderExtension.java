@@ -44,7 +44,7 @@ public class DefaultHandleInvocationProviderExtension extends AbstractBridgeModu
 
         super.add(bridge);
 
-        bridge.getModule(HandlerModule.class).getChannel().addInterceptor(handleInterceptor, 40);
+        bridge.getModule(HandlerModule.class).getChannel().addInterceptor(handleInterceptor, 1000);
     }
 
     @Override
