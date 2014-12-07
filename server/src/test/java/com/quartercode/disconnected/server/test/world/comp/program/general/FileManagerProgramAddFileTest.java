@@ -18,10 +18,15 @@
 
 package com.quartercode.disconnected.server.test.world.comp.program.general;
 
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.*;
 import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
+import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
+import com.quartercode.disconnected.server.bridge.SBPAwareEventHandlerExceptionCatcher;
+import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension;
 import com.quartercode.disconnected.server.test.world.comp.AbstractComplexComputerTest;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.Directory;
@@ -42,6 +47,8 @@ import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
+import com.quartercode.eventbridge.bridge.BridgeConnector;
+import com.quartercode.eventbridge.bridge.Event;
 import com.quartercode.eventbridge.bridge.EventPredicate;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
@@ -71,9 +78,14 @@ public class FileManagerProgramAddFileTest extends AbstractComplexComputerTest {
         bridge.send(new FMPWorldChangeDirCommand(processId, change));
     }
 
+    private Event createAddFileCommand(String fileName) {
+
+        return new FMPWorldAddFileCommand(processId, fileName, "contentFile");
+    }
+
     private void sendAddFileCommand(String fileName) {
 
-        bridge.send(new FMPWorldAddFileCommand(processId, fileName, "contentFile"));
+        bridge.send(createAddFileCommand(fileName));
     }
 
     @Test
@@ -133,7 +145,12 @@ public class FileManagerProgramAddFileTest extends AbstractComplexComputerTest {
     @Test
     public void testWithCurrentDir() {
 
-        executeProgramAndSendChangeDirCommand(mainRootProcess(), DIR_PATH);
+        internalTestWithCurrentDir(DIR_PATH);
+    }
+
+    private void internalTestWithCurrentDir(String dir) {
+
+        executeProgramAndSendChangeDirCommand(mainRootProcess(), dir);
 
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
 
@@ -156,24 +173,34 @@ public class FileManagerProgramAddFileTest extends AbstractComplexComputerTest {
         assertTrue("Error event handler hasn't been invoked", invoked.getValue());
     }
 
-    @Test (expected = IllegalStateException.class)
+    @Test
     public void testWithAbsoluteRoot() {
 
         executeProgramAndSendChangeDirCommand(mainRootProcess(), "/");
 
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
 
-        sendAddFileCommand(".");
+        final Event event = createAddFileCommand(".");
+
+        final SBPAwareEventHandlerExceptionCatcher exceptionCatcher = context.mock(SBPAwareEventHandlerExceptionCatcher.class);
+        bridge.getModule(SBPAwareHandlerExtension.class).addExceptionCatcher(exceptionCatcher);
+
+        // @formatter:off
+        context.checking(new Expectations() {{
+
+            // Expect one IllegalStateException
+            oneOf(exceptionCatcher).handle(with(any(IllegalStateException.class)), with(any(SBPAwareEventHandler.class)), with(event), with(nullValue(BridgeConnector.class)));
+
+        }});
+        // @formatter:on
+
+        bridge.send(event);
     }
 
-    @Test (expected = IllegalStateException.class)
+    @Test
     public void testWithRootFile() {
 
-        executeProgramAndSendChangeDirCommand(mainRootProcess(), "/");
-
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
-
-        sendAddFileCommand(FS_MOUNTPOINT);
+        internalTestWithCurrentDir("/" + FS_MOUNTPOINT);
     }
 
     @Test

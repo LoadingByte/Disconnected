@@ -20,10 +20,15 @@ package com.quartercode.disconnected.server.test.world.comp.program.general;
 
 import static com.quartercode.disconnected.shared.world.comp.file.PathUtils.resolve;
 import static com.quartercode.disconnected.shared.world.comp.file.PathUtils.splitBeforeName;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.*;
 import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
+import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
+import com.quartercode.disconnected.server.bridge.SBPAwareEventHandlerExceptionCatcher;
+import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension;
 import com.quartercode.disconnected.server.test.world.comp.AbstractComplexComputerTest;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
@@ -41,6 +46,8 @@ import com.quartercode.disconnected.shared.event.comp.program.generic.GPWPUError
 import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
+import com.quartercode.eventbridge.bridge.BridgeConnector;
+import com.quartercode.eventbridge.bridge.Event;
 import com.quartercode.eventbridge.bridge.EventPredicate;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
@@ -71,9 +78,14 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
         bridge.send(new FMPWorldChangeDirCommand(processId, change));
     }
 
+    private Event createRemoveFileCommand(String fileName) {
+
+        return new FMPWorldRemoveFileCommand(processId, fileName);
+    }
+
     private void sendRemoveFileCommand(String fileName) {
 
-        bridge.send(new FMPWorldRemoveFileCommand(processId, fileName));
+        bridge.send(createRemoveFileCommand(fileName));
     }
 
     @Test
@@ -129,7 +141,12 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
     @Test
     public void testWithCurrentDir() {
 
-        executeProgramAndSendChangeDirCommand(mainRootProcess(), splitBeforeName(TEST_PATH)[0]);
+        internalTestWithCurrentDir(splitBeforeName(TEST_PATH)[0]);
+    }
+
+    private void internalTestWithCurrentDir(String dir) {
+
+        executeProgramAndSendChangeDirCommand(mainRootProcess(), dir);
 
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
 
@@ -152,24 +169,34 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
         assertTrue("Error event handler hasn't been invoked", invoked.getValue());
     }
 
-    @Test (expected = IllegalStateException.class)
+    @Test
     public void testWithAbsoluteRoot() {
 
         executeProgramAndSendChangeDirCommand(mainRootProcess(), "/");
 
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
 
-        sendRemoveFileCommand(".");
+        final Event event = createRemoveFileCommand(".");
+
+        final SBPAwareEventHandlerExceptionCatcher exceptionCatcher = context.mock(SBPAwareEventHandlerExceptionCatcher.class);
+        bridge.getModule(SBPAwareHandlerExtension.class).addExceptionCatcher(exceptionCatcher);
+
+        // @formatter:off
+        context.checking(new Expectations() {{
+
+            // Expect one IllegalStateException
+            oneOf(exceptionCatcher).handle(with(any(IllegalStateException.class)), with(any(SBPAwareEventHandler.class)), with(event), with(nullValue(BridgeConnector.class)));
+
+        }});
+        // @formatter:on
+
+        bridge.send(event);
     }
 
-    @Test (expected = IllegalStateException.class)
+    @Test
     public void testWithRootFile() {
 
-        executeProgramAndSendChangeDirCommand(mainRootProcess(), "/");
-
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
-
-        sendRemoveFileCommand(CommonFiles.SYSTEM_MOUNTPOINT);
+        internalTestWithCurrentDir("/" + FS_MOUNTPOINT);
     }
 
     @Test
