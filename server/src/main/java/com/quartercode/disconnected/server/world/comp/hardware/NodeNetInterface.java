@@ -18,16 +18,16 @@
 
 package com.quartercode.disconnected.server.world.comp.hardware;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
 import static com.quartercode.classmod.extra.func.Priorities.*;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
 import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.hardware.Mainboard.NeedsMainboardSlot;
 import com.quartercode.disconnected.server.world.comp.net.NetworkModule;
@@ -78,7 +78,7 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
 
     static {
 
-        NET_ID = create(new TypeLiteral<PropertyDefinition<NetID>>() {}, "name", "netId", "storage", new StandardStorage<>());
+        NET_ID = factory(PropertyDefinitionFactory.class).create("netId", new StandardStorage<>());
         NET_ID.addSetterExecutor("checkSubnetAgainstConnection", NodeNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -99,7 +99,7 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
 
         }, LEVEL_6);
 
-        CONNECTION = create(new TypeLiteral<PropertyDefinition<RouterNetInterface>>() {}, "name", "connection", "storage", new ReferenceStorage<>(), "hidden", true);
+        CONNECTION = factory(PropertyDefinitionFactory.class).create("connection", new ReferenceStorage<>(), true, true);
         CONNECTION.addSetterExecutor("invalidateNetID", NodeNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override

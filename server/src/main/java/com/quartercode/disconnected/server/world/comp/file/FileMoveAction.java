@@ -18,11 +18,10 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
 import static com.quartercode.classmod.extra.func.Priorities.LEVEL_6;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -30,6 +29,7 @@ import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 
@@ -72,9 +72,9 @@ public class FileMoveAction extends FileAction {
 
     static {
 
-        FILE_SYSTEM = create(new TypeLiteral<PropertyDefinition<FileSystem>>() {}, "name", "fileSystem", "storage", new ReferenceStorage<>());
+        FILE_SYSTEM = factory(PropertyDefinitionFactory.class).create("fileSystem", new ReferenceStorage<>());
 
-        FILE = create(new TypeLiteral<PropertyDefinition<File<ParentFile<?>>>>() {}, "name", "file", "storage", new ReferenceStorage<>());
+        FILE = factory(PropertyDefinitionFactory.class).create("file", new ReferenceStorage<>());
         FILE.addSetterExecutor("adjustFileSystem", FileMoveAction.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -92,7 +92,7 @@ public class FileMoveAction extends FileAction {
 
         }, LEVEL_6);
 
-        PATH = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "path", "storage", new StandardStorage<>());
+        PATH = factory(PropertyDefinitionFactory.class).create("path", new StandardStorage<>());
         PATH.addSetterExecutor("normalize", FileMoveAction.class, new FunctionExecutor<Void>() {
 
             @Override

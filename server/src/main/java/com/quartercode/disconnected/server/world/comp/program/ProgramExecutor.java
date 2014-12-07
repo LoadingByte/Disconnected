@@ -18,9 +18,9 @@
 
 package com.quartercode.disconnected.server.world.comp.program;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
-import org.apache.commons.lang3.reflect.TypeLiteral;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 
 /**
@@ -47,7 +47,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
 
     static {
 
-        RUN = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "run", "parameters", new Class[0]);
+        RUN = factory(FunctionDefinitionFactory.class).create("run", new Class[0]);
 
     }
 

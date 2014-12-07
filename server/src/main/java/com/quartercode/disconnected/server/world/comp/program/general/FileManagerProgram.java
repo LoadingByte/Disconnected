@@ -18,16 +18,16 @@
 
 package com.quartercode.disconnected.server.world.comp.program.general;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
 import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.world.comp.file.File;
@@ -88,7 +88,7 @@ public class FileManagerProgram extends ProgramExecutor {
 
     static {
 
-        CURRENT_DIR = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "currentPath", "storage", new StandardStorage<>(), "initialValue", new ConstantValueFactory<>(PathUtils.SEPARATOR));
+        CURRENT_DIR = factory(PropertyDefinitionFactory.class).create("currentPath", new StandardStorage<>(), new ConstantValueFactory<>(PathUtils.SEPARATOR));
 
     }
 

@@ -18,10 +18,10 @@
 
 package com.quartercode.disconnected.server.world.util;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
-import org.apache.commons.lang3.reflect.TypeLiteral;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 
 /**
  * The derivable size interface declares the {@link #GET_SIZE} function for getting the size of an object.
@@ -31,6 +31,6 @@ public interface DerivableSize extends CFeatureHolder {
     /**
      * Derives the size of the implementing {@link CFeatureHolder} in bytes.
      */
-    public static final FunctionDefinition<Long> GET_SIZE = create(new TypeLiteral<FunctionDefinition<Long>>() {}, "name", "getSize", "parameters", new Class[0]);
+    public static final FunctionDefinition<Long> GET_SIZE = factory(FunctionDefinitionFactory.class).create("getSize", new Class[0]);
 
 }

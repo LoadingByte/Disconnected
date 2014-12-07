@@ -18,10 +18,10 @@
 
 package com.quartercode.disconnected.server.world.comp.net;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
-import org.apache.commons.lang3.reflect.TypeLiteral;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
 
@@ -104,7 +104,7 @@ public interface SocketConnectionListener extends CFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<ConnectionAllowance> ON_REQUEST   = create(new TypeLiteral<FunctionDefinition<ConnectionAllowance>>() {}, "name", "onRequest", "parameters", new Class[] { Address.class, Integer.class });
+    public static final FunctionDefinition<ConnectionAllowance> ON_REQUEST   = factory(FunctionDefinitionFactory.class).create("onRequest", new Class[] { Address.class, Integer.class });
 
     /**
      * This method is called when a new {@link Socket} connection was successfully established.
@@ -125,6 +125,6 @@ public interface SocketConnectionListener extends CFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void>                ON_ESTABLISH = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "onEstablish", "parameters", new Class[] { Socket.class });
+    public static final FunctionDefinition<Void>                ON_ESTABLISH = factory(FunctionDefinitionFactory.class).create("onEstablish", new Class[] { Socket.class });
 
 }

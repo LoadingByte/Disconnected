@@ -18,14 +18,14 @@
 
 package com.quartercode.disconnected.server.world.comp.program;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
-import org.apache.commons.lang3.reflect.TypeLiteral;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
 import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.ValueFactory;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.util.NullPreventer;
@@ -68,9 +68,9 @@ public class Program extends WorldFeatureHolder implements DerivableSize {
 
     static {
 
-        NAME = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "name", "storage", new StandardStorage<>());
-        VERSION = create(new TypeLiteral<PropertyDefinition<Version>>() {}, "name", "version", "storage", new StandardStorage<>());
-        VULN_CONTAINER = create(new TypeLiteral<PropertyDefinition<VulnerabilityContainer>>() {}, "name", "vulnContainer", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<VulnerabilityContainer>() {
+        NAME = factory(PropertyDefinitionFactory.class).create("name", new StandardStorage<>());
+        VERSION = factory(PropertyDefinitionFactory.class).create("version", new StandardStorage<>());
+        VULN_CONTAINER = factory(PropertyDefinitionFactory.class).create("vulnContainer", new StandardStorage<>(), new ValueFactory<VulnerabilityContainer>() {
 
             @Override
             public VulnerabilityContainer get() {

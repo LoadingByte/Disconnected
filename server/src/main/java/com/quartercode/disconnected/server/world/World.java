@@ -18,18 +18,19 @@
 
 package com.quartercode.disconnected.server.world;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
 import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.classmod.extra.valuefactory.ValueFactory;
+import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.net.Backbone;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
@@ -58,7 +59,7 @@ public class World extends DefaultCFeatureHolder {
 
     static {
 
-        BACKBONE = create(new TypeLiteral<PropertyDefinition<Backbone>>() {}, "name", "backbone", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<Backbone>() {
+        BACKBONE = factory(PropertyDefinitionFactory.class).create("backbone", new StandardStorage<>(), new ValueFactory<Backbone>() {
 
             @Override
             public Backbone get() {
@@ -68,7 +69,7 @@ public class World extends DefaultCFeatureHolder {
 
         });
 
-        COMPUTERS = create(new TypeLiteral<CollectionPropertyDefinition<Computer, List<Computer>>>() {}, "name", "computers", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
+        COMPUTERS = factory(CollectionPropertyDefinitionFactory.class).create("computers", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
 
     }
 

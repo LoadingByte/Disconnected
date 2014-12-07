@@ -18,10 +18,10 @@
 
 package com.quartercode.disconnected.server.world.comp.net;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
-import org.apache.commons.lang3.reflect.TypeLiteral;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
 import com.quartercode.disconnected.server.world.util.SizeUtils;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
@@ -61,10 +61,10 @@ public class Packet extends WorldFeatureHolder implements DerivableSize {
 
     static {
 
-        SOURCE = create(new TypeLiteral<PropertyDefinition<Address>>() {}, "name", "source", "storage", new StandardStorage<>());
-        DESTINATION = create(new TypeLiteral<PropertyDefinition<Address>>() {}, "name", "destination", "storage", new StandardStorage<>());
-        PROTOCOL = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "protocol", "storage", new StandardStorage<>());
-        DATA = create(new TypeLiteral<PropertyDefinition<Object>>() {}, "name", "data", "storage", new StandardStorage<>());
+        SOURCE = factory(PropertyDefinitionFactory.class).create("source", new StandardStorage<>());
+        DESTINATION = factory(PropertyDefinitionFactory.class).create("destination", new StandardStorage<>());
+        PROTOCOL = factory(PropertyDefinitionFactory.class).create("protocol", new StandardStorage<>());
+        DATA = factory(PropertyDefinitionFactory.class).create("data", new StandardStorage<>());
 
     }
 

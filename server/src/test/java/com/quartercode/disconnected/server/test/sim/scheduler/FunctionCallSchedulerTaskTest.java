@@ -18,14 +18,13 @@
 
 package com.quartercode.disconnected.server.test.sim.scheduler;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import static org.junit.Assert.assertTrue;
 import java.io.StringReader;
 import java.io.StringWriter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.classmod.base.FeatureDefinition;
@@ -33,6 +32,7 @@ import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
 import com.quartercode.classmod.extra.func.FunctionInvocation;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.classmod.util.FeatureDefinitionReference;
 import com.quartercode.disconnected.server.sim.scheduler.FunctionCallSchedulerTask;
 import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
@@ -85,7 +85,7 @@ public class FunctionCallSchedulerTaskTest {
 
         static {
 
-            TEST_FUNCTION = create(new TypeLiteral<FunctionDefinition<String>>() {}, "name", "testFunction", "parameters", new Class[0]);
+            TEST_FUNCTION = factory(FunctionDefinitionFactory.class).create("testFunction", new Class[0]);
             TEST_FUNCTION.addExecutor("default", TestFeatureHolder.class, new FunctionExecutor<String>() {
 
                 @Override

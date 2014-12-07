@@ -18,8 +18,7 @@
 
 package com.quartercode.disconnected.server.world.comp.os;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
-import org.apache.commons.lang3.reflect.TypeLiteral;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -27,6 +26,8 @@ import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.ValueFactory;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
@@ -76,10 +77,10 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
     static {
 
-        NAME = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "name", "storage", new StandardStorage<>());
-        VERSION = create(new TypeLiteral<PropertyDefinition<Version>>() {}, "name", "version", "storage", new StandardStorage<>());
+        NAME = factory(PropertyDefinitionFactory.class).create("name", new StandardStorage<>());
+        VERSION = factory(PropertyDefinitionFactory.class).create("version", new StandardStorage<>());
 
-        FS_MODULE = create(new TypeLiteral<PropertyDefinition<FileSystemModule>>() {}, "name", "fsModule", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<FileSystemModule>() {
+        FS_MODULE = factory(PropertyDefinitionFactory.class).create("fsModule", new StandardStorage<>(), new ValueFactory<FileSystemModule>() {
 
             @Override
             public FileSystemModule get() {
@@ -89,7 +90,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
         });
 
-        PROC_MODULE = create(new TypeLiteral<PropertyDefinition<ProcessModule>>() {}, "name", "procModule", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<ProcessModule>() {
+        PROC_MODULE = factory(PropertyDefinitionFactory.class).create("procModule", new StandardStorage<>(), new ValueFactory<ProcessModule>() {
 
             @Override
             public ProcessModule get() {
@@ -99,7 +100,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
         });
 
-        NET_MODULE = create(new TypeLiteral<PropertyDefinition<NetworkModule>>() {}, "name", "netModule", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<NetworkModule>() {
+        NET_MODULE = factory(PropertyDefinitionFactory.class).create("netModule", new StandardStorage<>(), new ValueFactory<NetworkModule>() {
 
             @Override
             public NetworkModule get() {
@@ -144,7 +145,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
     static {
 
-        IS_RUNNING = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "isRunning", "parameters", new Class[0]);
+        IS_RUNNING = factory(FunctionDefinitionFactory.class).create("isRunning", new Class[0]);
         IS_RUNNING.addExecutor("default", OperatingSystem.class, new FunctionExecutor<Boolean>() {
 
             @Override
@@ -159,7 +160,7 @@ public class OperatingSystem extends WorldChildFeatureHolder<Computer> {
 
         });
 
-        SET_RUNNING = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setRunning", "parameters", new Class[] { Boolean.class });
+        SET_RUNNING = factory(FunctionDefinitionFactory.class).create("setRunning", new Class[] { Boolean.class });
         SET_RUNNING.addExecutor("fsModule", OperatingSystem.class, new FunctionExecutor<Void>() {
 
             @Override

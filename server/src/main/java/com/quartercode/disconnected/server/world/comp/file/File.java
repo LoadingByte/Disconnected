@@ -18,8 +18,7 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
-import org.apache.commons.lang3.reflect.TypeLiteral;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -28,6 +27,8 @@ import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.ValueFactory;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.comp.os.user.Group;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
@@ -83,9 +84,9 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
 
     static {
 
-        NAME = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "name", "storage", new StandardStorage<>());
+        NAME = factory(PropertyDefinitionFactory.class).create("name", new StandardStorage<>());
 
-        RIGHTS = create(new TypeLiteral<PropertyDefinition<FileRights>>() {}, "name", "rights", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<FileRights>() {
+        RIGHTS = factory(PropertyDefinitionFactory.class).create("rights", new StandardStorage<>(), new ValueFactory<FileRights>() {
 
             @Override
             public FileRights get() {
@@ -95,8 +96,8 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
 
         });
 
-        OWNER = create(new TypeLiteral<PropertyDefinition<User>>() {}, "name", "owner", "storage", new ReferenceStorage<>());
-        GROUP = create(new TypeLiteral<PropertyDefinition<Group>>() {}, "name", "group", "storage", new ReferenceStorage<>());
+        OWNER = factory(PropertyDefinitionFactory.class).create("owner", new ReferenceStorage<>());
+        GROUP = factory(PropertyDefinitionFactory.class).create("group", new ReferenceStorage<>());
 
     }
 
@@ -234,7 +235,7 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
 
     static {
 
-        GET_PATH = create(new TypeLiteral<FunctionDefinition<String>>() {}, "name", "getPath", "parameters", new Class[0]);
+        GET_PATH = factory(FunctionDefinitionFactory.class).create("getPath", new Class[0]);
         GET_PATH.addExecutor("default", File.class, new FunctionExecutor<String>() {
 
             @Override
@@ -254,7 +255,7 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
 
         });
 
-        CREATE_MOVE = create(new TypeLiteral<FunctionDefinition<FileMoveAction>>() {}, "name", "createMove", "parameters", new Class[] { String.class });
+        CREATE_MOVE = factory(FunctionDefinitionFactory.class).create("createMove", new Class[] { String.class });
         CREATE_MOVE.addExecutor("default", File.class, new FunctionExecutor<FileMoveAction>() {
 
             @Override
@@ -272,7 +273,7 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
 
         });
 
-        CREATE_MOVE_TO_OTHER_FS = create(new TypeLiteral<FunctionDefinition<FileMoveAction>>() {}, "name", "createMoveToOtherFs", "parameters", new Class[] { String.class, FileSystem.class });
+        CREATE_MOVE_TO_OTHER_FS = factory(FunctionDefinitionFactory.class).create("createMoveToOtherFs", new Class[] { String.class, FileSystem.class });
         CREATE_MOVE_TO_OTHER_FS.addExecutor("default", File.class, new FunctionExecutor<FileMoveAction>() {
 
             @SuppressWarnings ("unchecked")
@@ -290,7 +291,7 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
 
         });
 
-        CREATE_REMOVE = create(new TypeLiteral<FunctionDefinition<FileRemoveAction>>() {}, "name", "createRemove", "parameters", new Class[0]);
+        CREATE_REMOVE = factory(FunctionDefinitionFactory.class).create("createRemove", new Class[0]);
         CREATE_REMOVE.addExecutor("default", File.class, new FunctionExecutor<FileRemoveAction>() {
 
             @Override
@@ -306,7 +307,7 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
 
         });
 
-        GET_FILE_SYSTEM = create(new TypeLiteral<FunctionDefinition<FileSystem>>() {}, "name", "getFileSystem", "parameters", new Class[0]);
+        GET_FILE_SYSTEM = factory(FunctionDefinitionFactory.class).create("getFileSystem", new Class[0]);
         GET_FILE_SYSTEM.addExecutor("default", File.class, new FunctionExecutor<FileSystem>() {
 
             @Override
@@ -327,7 +328,7 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
 
         });
 
-        HAS_RIGHT = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "hasRight", "parameters", new Class[] { User.class, Character.class });
+        HAS_RIGHT = factory(FunctionDefinitionFactory.class).create("hasRight", new Class[] { User.class, Character.class });
         HAS_RIGHT.addExecutor("default", File.class, new FunctionExecutor<Boolean>() {
 
             @Override
@@ -364,7 +365,7 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
 
         });
 
-        CAN_CHANGE_RIGHTS = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "canChangeRights", "parameters", new Class[] { User.class });
+        CAN_CHANGE_RIGHTS = factory(FunctionDefinitionFactory.class).create("canChangeRights", new Class[] { User.class });
         CAN_CHANGE_RIGHTS.addExecutor("default", File.class, new FunctionExecutor<Boolean>() {
 
             @Override

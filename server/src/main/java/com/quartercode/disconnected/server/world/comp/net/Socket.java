@@ -18,12 +18,11 @@
 
 package com.quartercode.disconnected.server.world.comp.net;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
 import static com.quartercode.classmod.extra.func.Priorities.*;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -33,6 +32,9 @@ import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
+import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.sim.TickService;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTask;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
@@ -147,7 +149,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
 
     static {
 
-        LOCAL_PORT = create(new TypeLiteral<PropertyDefinition<Integer>>() {}, "name", "localPort", "storage", new StandardStorage<>());
+        LOCAL_PORT = factory(PropertyDefinitionFactory.class).create("localPort", new StandardStorage<>());
         LOCAL_PORT.addSetterExecutor("checkRange", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -161,10 +163,10 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
 
         }, LEVEL_6);
 
-        DESTINATION = create(new TypeLiteral<PropertyDefinition<Address>>() {}, "name", "destination", "storage", new StandardStorage<>());
-        PACKET_HANDLERS = create(new TypeLiteral<CollectionPropertyDefinition<PacketHandler, List<PacketHandler>>>() {}, "name", "packetHandlers", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
+        DESTINATION = factory(PropertyDefinitionFactory.class).create("destination", new StandardStorage<>());
+        PACKET_HANDLERS = factory(CollectionPropertyDefinitionFactory.class).create("packetHandlers", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
 
-        STATE = create(new TypeLiteral<PropertyDefinition<SocketState>>() {}, "name", "state", "storage", new StandardStorage<>(), "initialValue", new ConstantValueFactory<>(SocketState.INACTIVE));
+        STATE = factory(PropertyDefinitionFactory.class).create("state", new StandardStorage<>(), new ConstantValueFactory<>(SocketState.INACTIVE));
         STATE.addSetterExecutor("scheduleConnectionTimeout", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -239,7 +241,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
 
         }, LEVEL_7);
 
-        CURRENT_SEQ_NUMBER = create(new TypeLiteral<PropertyDefinition<Integer>>() {}, "name", "currentSeqNumber", "storage", new StandardStorage<>());
+        CURRENT_SEQ_NUMBER = factory(PropertyDefinitionFactory.class).create("currentSeqNumber", new StandardStorage<>());
         CURRENT_SEQ_NUMBER.addSetterExecutor("generate", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -321,7 +323,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
 
     static {
 
-        CONNECT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "connect", "parameters", new Class[0]);
+        CONNECT = factory(FunctionDefinitionFactory.class).create("connect", new Class[0]);
         CONNECT.addExecutor("validateSettings", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -357,7 +359,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
 
         });
 
-        DISCONNECT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "disconnect", "parameters", new Class[0]);
+        DISCONNECT = factory(FunctionDefinitionFactory.class).create("disconnect", new Class[0]);
         DISCONNECT.addExecutor("default", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -376,7 +378,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
 
         });
 
-        SEND = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "send", "parameters", new Class[] { Object.class });
+        SEND = factory(FunctionDefinitionFactory.class).create("send", new Class[] { Object.class });
         SEND.addExecutor("default", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -393,7 +395,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
 
         });
 
-        HANDLE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "handle", "parameters", new Class[] { Packet.class });
+        HANDLE = factory(FunctionDefinitionFactory.class).create("handle", new Class[] { Packet.class });
         HANDLE.addExecutor("processHandshake", Socket.class, new FunctionExecutor<Void>() {
 
             @Override

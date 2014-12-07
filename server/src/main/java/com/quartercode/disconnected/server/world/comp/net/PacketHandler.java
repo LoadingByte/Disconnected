@@ -18,10 +18,10 @@
 
 package com.quartercode.disconnected.server.world.comp.net;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
-import org.apache.commons.lang3.reflect.TypeLiteral;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
 
 /**
@@ -60,6 +60,6 @@ public interface PacketHandler extends CFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void> HANDLE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "handle", "parameters", new Class[] { Socket.class, Object.class });
+    public static final FunctionDefinition<Void> HANDLE = factory(FunctionDefinitionFactory.class).create("handle", new Class[] { Socket.class, Object.class });
 
 }

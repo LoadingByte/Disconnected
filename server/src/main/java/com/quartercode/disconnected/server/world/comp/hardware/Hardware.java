@@ -18,10 +18,10 @@
 
 package com.quartercode.disconnected.server.world.comp.hardware;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
-import org.apache.commons.lang3.reflect.TypeLiteral;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 
@@ -42,7 +42,7 @@ public class Hardware extends WorldChildFeatureHolder<Computer> {
 
     static {
 
-        NAME = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "name", "storage", new StandardStorage<>());
+        NAME = factory(PropertyDefinitionFactory.class).create("name", new StandardStorage<>());
 
     }
 

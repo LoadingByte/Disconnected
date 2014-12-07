@@ -18,20 +18,22 @@
 
 package com.quartercode.disconnected.server.world.comp.hardware;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
+import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
@@ -54,7 +56,7 @@ public class Mainboard extends Hardware {
 
     static {
 
-        SLOTS = create(new TypeLiteral<CollectionPropertyDefinition<MainboardSlot, List<MainboardSlot>>>() {}, "name", "slots", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
+        SLOTS = factory(CollectionPropertyDefinitionFactory.class).create("slots", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
 
     }
 
@@ -82,7 +84,7 @@ public class Mainboard extends Hardware {
 
     static {
 
-        GET_SLOTS_BY_CONTENT_TYPE = create(new TypeLiteral<FunctionDefinition<List<MainboardSlot>>>() {}, "name", "getSlotsByContentType", "parameters", new Class[] { Class.class });
+        GET_SLOTS_BY_CONTENT_TYPE = factory(FunctionDefinitionFactory.class).create("getSlotsByContentType", new Class[] { Class.class });
         GET_SLOTS_BY_CONTENT_TYPE.addExecutor("default", Mainboard.class, CollectionPropertyAccessorFactory.createGet(SLOTS, new CriteriumMatcher<MainboardSlot>() {
 
             @Override
@@ -119,8 +121,8 @@ public class Mainboard extends Hardware {
 
         static {
 
-            TYPE = create(new TypeLiteral<PropertyDefinition<Class<? extends Hardware>>>() {}, "name", "name", "storage", new StandardStorage<>());
-            CONTENT = create(new TypeLiteral<PropertyDefinition<Hardware>>() {}, "name", "content", "storage", new ReferenceStorage<>());
+            TYPE = factory(PropertyDefinitionFactory.class).create("name", new StandardStorage<>());
+            CONTENT = factory(PropertyDefinitionFactory.class).create("content", new ReferenceStorage<>());
 
         }
 

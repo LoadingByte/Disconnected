@@ -18,13 +18,13 @@
 
 package com.quartercode.disconnected.server.world.comp.os.config;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
+import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
 import com.quartercode.disconnected.server.world.util.SizeUtils;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
@@ -57,7 +57,7 @@ public class Configuration extends WorldFeatureHolder implements DerivableSize {
 
     static {
 
-        ENTRIES = create(new TypeLiteral<CollectionPropertyDefinition<ConfigurationEntry, List<ConfigurationEntry>>>() {}, "name", "entries", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
+        ENTRIES = factory(CollectionPropertyDefinitionFactory.class).create("entries", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
 
     }
 

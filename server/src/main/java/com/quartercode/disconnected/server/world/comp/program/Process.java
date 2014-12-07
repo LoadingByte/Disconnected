@@ -18,8 +18,8 @@
 
 package com.quartercode.disconnected.server.world.comp.program;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
 import static com.quartercode.classmod.extra.func.Priorities.*;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -38,6 +37,9 @@ import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
+import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
@@ -131,9 +133,9 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
     static {
 
-        PID = create(new TypeLiteral<PropertyDefinition<Integer>>() {}, "name", "pid", "storage", new StandardStorage<>());
+        PID = factory(PropertyDefinitionFactory.class).create("pid", new StandardStorage<>());
 
-        SOURCE = create(new TypeLiteral<PropertyDefinition<ContentFile>>() {}, "name", "source", "storage", new ReferenceStorage<>());
+        SOURCE = factory(PropertyDefinitionFactory.class).create("source", new ReferenceStorage<>());
         SOURCE.addSetterExecutor("checkFileContent", Process.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -145,9 +147,9 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
         }, LEVEL_6);
 
-        ENVIRONMENT = create(new TypeLiteral<PropertyDefinition<Map<String, String>>>() {}, "name", "environment", "storage", new StandardStorage<>(), "initialValue", new CloneValueFactory<>(new HashMap<>()));
+        ENVIRONMENT = factory(PropertyDefinitionFactory.class).create("environment", new StandardStorage<>(), new CloneValueFactory<>(new HashMap<>()));
 
-        STATE = create(new TypeLiteral<PropertyDefinition<ProcessState>>() {}, "name", "state", "storage", new StandardStorage<>(), "initialValue", new ConstantValueFactory<>(ProcessState.RUNNING));
+        STATE = factory(PropertyDefinitionFactory.class).create("state", new StandardStorage<>(), new ConstantValueFactory<>(ProcessState.RUNNING));
         STATE.addSetterExecutor("callStateListeners", Process.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -184,10 +186,10 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
         }, LEVEL_6);
 
-        EXECUTOR = create(new TypeLiteral<PropertyDefinition<ProgramExecutor>>() {}, "name", "executor", "storage", new StandardStorage<>());
-        CHILDREN = create(new TypeLiteral<CollectionPropertyDefinition<Process<?>, List<Process<?>>>>() {}, "name", "children", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
-        STATE_LISTENERS = create(new TypeLiteral<CollectionPropertyDefinition<ProcessStateListener, List<ProcessStateListener>>>() {}, "name", "stateListeners", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
-        WORLD_PROCESS_USER = create(new TypeLiteral<PropertyDefinition<SBPWorldProcessUserId>>() {}, "name", "worldProcessParnter", "storage", new StandardStorage<>());
+        EXECUTOR = factory(PropertyDefinitionFactory.class).create("executor", new StandardStorage<>());
+        CHILDREN = factory(CollectionPropertyDefinitionFactory.class).create("children", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
+        STATE_LISTENERS = factory(CollectionPropertyDefinitionFactory.class).create("stateListeners", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
+        WORLD_PROCESS_USER = factory(PropertyDefinitionFactory.class).create("worldProcessParnter", new StandardStorage<>());
 
     }
 
@@ -421,7 +423,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
     static {
 
-        IS_STATE_APPLIED = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "isStateApplied", "parameters", new Class[] { ProcessState.class });
+        IS_STATE_APPLIED = factory(FunctionDefinitionFactory.class).create("isStateApplied", new Class[] { ProcessState.class });
         IS_STATE_APPLIED.addExecutor("default", Process.class, new FunctionExecutor<Boolean>() {
 
             @Override
@@ -446,7 +448,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             }
 
         });
-        APPLY_STATE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "applyState", "parameters", new Class[] { ProcessState.class, Boolean.class });
+        APPLY_STATE = factory(FunctionDefinitionFactory.class).create("applyState", new Class[] { ProcessState.class, Boolean.class });
         APPLY_STATE.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -465,7 +467,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             }
 
         });
-        SUSPEND = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "suspend", "parameters", new Class[] { Boolean.class });
+        SUSPEND = factory(FunctionDefinitionFactory.class).create("suspend", new Class[] { Boolean.class });
         SUSPEND.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -481,7 +483,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             }
 
         });
-        RESUME = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "resume", "parameters", new Class[] { Boolean.class });
+        RESUME = factory(FunctionDefinitionFactory.class).create("resume", new Class[] { Boolean.class });
         RESUME.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -497,7 +499,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             }
 
         });
-        INTERRUPT = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "interrupt", "parameters", new Class[] { Boolean.class });
+        INTERRUPT = factory(FunctionDefinitionFactory.class).create("interrupt", new Class[] { Boolean.class });
         INTERRUPT.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -513,7 +515,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             }
 
         });
-        STOP = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "stop", "parameters", new Class[] { Boolean.class });
+        STOP = factory(FunctionDefinitionFactory.class).create("stop", new Class[] { Boolean.class });
         STOP.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -542,7 +544,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
         });
 
-        GET_ALL_CHILDREN = create(new TypeLiteral<FunctionDefinition<List<Process<?>>>>() {}, "name", "getAllChildren", "parameters", new Class[0]);
+        GET_ALL_CHILDREN = factory(FunctionDefinitionFactory.class).create("getAllChildren", new Class[0]);
         GET_ALL_CHILDREN.addExecutor("default", Process.class, new FunctionExecutor<List<Process<?>>>() {
 
             @Override
@@ -566,7 +568,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
         });
 
-        CREATE_CHILD = create(new TypeLiteral<FunctionDefinition<ChildProcess>>() {}, "name", "createChild", "parameters", new Class[0]);
+        CREATE_CHILD = factory(FunctionDefinitionFactory.class).create("createChild", new Class[0]);
         CREATE_CHILD.addExecutor("default", Process.class, new FunctionExecutor<ChildProcess>() {
 
             @Override
@@ -585,7 +587,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
         });
 
-        GET_ROOT = create(new TypeLiteral<FunctionDefinition<RootProcess>>() {}, "name", "getRoot", "parameters", new Class[0]);
+        GET_ROOT = factory(FunctionDefinitionFactory.class).create("getRoot", new Class[0]);
         GET_ROOT.addExecutor("default", Process.class, new FunctionExecutor<RootProcess>() {
 
             @Override
@@ -606,7 +608,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
         });
 
-        GET_OPERATING_SYSTEM = create(new TypeLiteral<FunctionDefinition<OperatingSystem>>() {}, "name", "getOperatingSystem", "parameters", new Class[0]);
+        GET_OPERATING_SYSTEM = factory(FunctionDefinitionFactory.class).create("getOperatingSystem", new Class[0]);
         GET_OPERATING_SYSTEM.addExecutor("default", Process.class, new FunctionExecutor<OperatingSystem>() {
 
             @Override
@@ -619,7 +621,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
         });
 
-        GET_SESSION_PROCESS = create(new TypeLiteral<FunctionDefinition<Process<?>>>() {}, "name", "getSessionProcess", "parameters", new Class[0]);
+        GET_SESSION_PROCESS = factory(FunctionDefinitionFactory.class).create("getSessionProcess", new Class[0]);
         GET_SESSION_PROCESS.addExecutor("default", Process.class, new FunctionExecutor<Process<?>>() {
 
             @Override
@@ -644,7 +646,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
         });
 
-        GET_SESSION = create(new TypeLiteral<FunctionDefinition<Session>>() {}, "name", "getSession", "parameters", new Class[0]);
+        GET_SESSION = factory(FunctionDefinitionFactory.class).create("getSession", new Class[0]);
         GET_SESSION.addExecutor("default", Process.class, new FunctionExecutor<Session>() {
 
             @Override
@@ -662,7 +664,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
         });
 
-        GET_USER = create(new TypeLiteral<FunctionDefinition<User>>() {}, "name", "getUser", "parameters", new Class[0]);
+        GET_USER = factory(FunctionDefinitionFactory.class).create("getUser", new Class[0]);
         GET_USER.addExecutor("default", Process.class, new FunctionExecutor<User>() {
 
             @Override
@@ -680,7 +682,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
         });
 
-        GET_PROGRAM = create(new TypeLiteral<FunctionDefinition<Program>>() {}, "name", "getProgram", "parameters", new Class[0]);
+        GET_PROGRAM = factory(FunctionDefinitionFactory.class).create("getProgram", new Class[0]);
         GET_PROGRAM.addExecutor("default", Process.class, new FunctionExecutor<Program>() {
 
             @Override
@@ -695,7 +697,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
         });
 
-        INITIALIZE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "initialize", "parameters", new Class[] { Integer.class });
+        INITIALIZE = factory(FunctionDefinitionFactory.class).create("initialize", new Class[] { Integer.class });
         INITIALIZE.addExecutor("setPid", Process.class, new FunctionExecutor<Void>() {
 
             @Override

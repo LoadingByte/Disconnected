@@ -18,10 +18,10 @@
 
 package com.quartercode.disconnected.server.world.comp.program;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
-import org.apache.commons.lang3.reflect.TypeLiteral;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
 
 /**
@@ -61,6 +61,6 @@ public interface ProcessStateListener extends CFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void> ON_STATE_CHANGE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "onStateChange", "parameters", new Class[] { Process.class, ProcessState.class, ProcessState.class });
+    public static final FunctionDefinition<Void> ON_STATE_CHANGE = factory(FunctionDefinitionFactory.class).create("onStateChange", new Class[] { Process.class, ProcessState.class, ProcessState.class });
 
 }

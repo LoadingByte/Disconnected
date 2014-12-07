@@ -18,13 +18,12 @@
 
 package com.quartercode.disconnected.server.world.comp.os.user;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
 import static com.quartercode.classmod.extra.func.Priorities.LEVEL_6;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -35,6 +34,9 @@ import com.quartercode.classmod.extra.prop.ValueSupplierDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceCollectionStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
+import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.util.NullPreventer;
 import com.quartercode.disconnected.server.world.comp.os.config.ConfigurationEntry;
 
@@ -106,7 +108,7 @@ public class User extends ConfigurationEntry {
 
     static {
 
-        NAME = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "name", "storage", new StandardStorage<>());
+        NAME = factory(PropertyDefinitionFactory.class).create("name", new StandardStorage<>());
         NAME.addSetterExecutor("checkNotSuperuser", User.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -122,9 +124,9 @@ public class User extends ConfigurationEntry {
 
         }, LEVEL_6);
 
-        PASSWORD = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "password", "storage", new StandardStorage<>());
+        PASSWORD = factory(PropertyDefinitionFactory.class).create("password", new StandardStorage<>());
 
-        GROUPS = create(new TypeLiteral<CollectionPropertyDefinition<Group, List<Group>>>() {}, "name", "groups", "storage", new ReferenceCollectionStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
+        GROUPS = factory(CollectionPropertyDefinitionFactory.class).create("groups", new ReferenceCollectionStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
         GROUPS.addAdderExecutor("checkNotSuperuser", User.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -199,7 +201,7 @@ public class User extends ConfigurationEntry {
 
     static {
 
-        GET_PRIMARY_GROUP = create(new TypeLiteral<FunctionDefinition<Group>>() {}, "name", "getPrimaryGroup", "parameters", new Class[0]);
+        GET_PRIMARY_GROUP = factory(FunctionDefinitionFactory.class).create("getPrimaryGroup", new Class[0]);
         GET_PRIMARY_GROUP.addExecutor("default", User.class, new FunctionExecutor<Group>() {
 
             @Override
@@ -216,7 +218,7 @@ public class User extends ConfigurationEntry {
             }
 
         });
-        SET_PRIMARY_GROUP = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "setPrimaryGroup", "parameters", new Class[] { Group.class });
+        SET_PRIMARY_GROUP = factory(FunctionDefinitionFactory.class).create("setPrimaryGroup", new Class[] { Group.class });
         SET_PRIMARY_GROUP.addExecutor("default", User.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -243,7 +245,7 @@ public class User extends ConfigurationEntry {
 
         });
 
-        IS_SUPERUSER = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "isSuperuser", "parameters", new Class[0]);
+        IS_SUPERUSER = factory(FunctionDefinitionFactory.class).create("isSuperuser", new Class[0]);
         IS_SUPERUSER.addExecutor("default", User.class, new FunctionExecutor<Boolean>() {
 
             @Override

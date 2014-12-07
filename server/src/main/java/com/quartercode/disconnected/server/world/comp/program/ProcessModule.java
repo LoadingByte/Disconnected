@@ -18,16 +18,15 @@
 
 package com.quartercode.disconnected.server.world.comp.program;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
 import static com.quartercode.classmod.extra.func.Priorities.LEVEL_5;
 import static com.quartercode.classmod.extra.func.Priorities.LEVEL_7;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import static com.quartercode.disconnected.server.world.comp.program.ProgramUtils.getProgramFileFromPaths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -35,6 +34,8 @@ import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.classmod.util.FeatureDefinitionReference;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.sim.TickService;
@@ -82,8 +83,8 @@ public class ProcessModule extends OSModule implements SchedulerUser {
 
     static {
 
-        ROOT_PROCESS = create(new TypeLiteral<PropertyDefinition<RootProcess>>() {}, "name", "rootProcess", "storage", new StandardStorage<>());
-        NEXT_PID_VALUE = create(new TypeLiteral<PropertyDefinition<Integer>>() {}, "name", "nextPidValue", "storage", new StandardStorage<>(), "initialValue", new ConstantValueFactory<>(0));
+        ROOT_PROCESS = factory(PropertyDefinitionFactory.class).create("rootProcess", new StandardStorage<>());
+        NEXT_PID_VALUE = factory(PropertyDefinitionFactory.class).create("nextPidValue", new StandardStorage<>(), new ConstantValueFactory<>(0));
 
     }
 
@@ -108,7 +109,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
 
     static {
 
-        GET_ALL = create(new TypeLiteral<FunctionDefinition<List<Process<?>>>>() {}, "name", "getAll", "parameters", new Class[0]);
+        GET_ALL = factory(FunctionDefinitionFactory.class).create("getAll", new Class[0]);
         GET_ALL.addExecutor("default", ProcessModule.class, new FunctionExecutor<List<Process<?>>>() {
 
             @Override
@@ -125,7 +126,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
 
         });
 
-        NEXT_PID = create(new TypeLiteral<FunctionDefinition<Integer>>() {}, "name", "nextPid", "parameters", new Class[0]);
+        NEXT_PID = factory(FunctionDefinitionFactory.class).create("nextPid", new Class[0]);
         NEXT_PID.addExecutor("default", ProcessModule.class, new FunctionExecutor<Integer>() {
 
             @Override
@@ -227,7 +228,7 @@ public class ProcessModule extends OSModule implements SchedulerUser {
 
         }, LEVEL_5);
 
-        KILL = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "kill", "parameters", new Class[0]);
+        KILL = factory(FunctionDefinitionFactory.class).create("kill", new Class[0]);
         KILL.addExecutor("default", ProcessModule.class, new FunctionExecutor<Void>() {
 
             @Override

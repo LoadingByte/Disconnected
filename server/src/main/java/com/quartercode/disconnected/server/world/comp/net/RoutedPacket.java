@@ -18,14 +18,15 @@
 
 package com.quartercode.disconnected.server.world.comp.net;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
+import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
 import com.quartercode.disconnected.server.world.util.SizeUtils;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
@@ -100,8 +101,8 @@ public class RoutedPacket extends WorldFeatureHolder implements DerivableSize {
 
     static {
 
-        PACKET = create(new TypeLiteral<PropertyDefinition<Packet>>() {}, "name", "packet", "storage", new StandardStorage<>());
-        PATH = create(new TypeLiteral<CollectionPropertyDefinition<Integer, List<Integer>>>() {}, "name", "path", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
+        PACKET = factory(PropertyDefinitionFactory.class).create("packet", new StandardStorage<>());
+        PATH = factory(CollectionPropertyDefinitionFactory.class).create("path", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
 
     }
 

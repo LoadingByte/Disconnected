@@ -18,12 +18,12 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.Map;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
 import com.quartercode.classmod.extra.func.FunctionInvocation;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 
@@ -49,7 +49,7 @@ public abstract class FileAction extends WorldFeatureHolder {
      * Actually executes the defined action without doing anything else.
      * For example, a file movement action would simply do the file movement here.
      */
-    public static final FunctionDefinition<Void>                      EXECUTE            = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "execute", "parameters", new Class[0]);
+    public static final FunctionDefinition<Void>                      EXECUTE            = factory(FunctionDefinitionFactory.class).create("execute", new Class[0]);
 
     /**
      * Takes a {@link User} and checks whether the user is allowed to execute the action under the current circumstances.<br>
@@ -71,7 +71,7 @@ public abstract class FileAction extends WorldFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Boolean>                   IS_EXECUTABLE_BY   = create(new TypeLiteral<FunctionDefinition<Boolean>>() {}, "name", "isExecutableBy", "parameters", new Class[] { User.class });
+    public static final FunctionDefinition<Boolean>                   IS_EXECUTABLE_BY   = factory(FunctionDefinitionFactory.class).create("isExecutableBy", new Class[] { User.class });
 
     /**
      * If {@link #IS_EXECUTABLE_BY} is {@code false}, this method returns the files the user has insufficient access to.
@@ -92,7 +92,7 @@ public abstract class FileAction extends WorldFeatureHolder {
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Map<File<?>, Character[]>> GET_MISSING_RIGHTS = create(new TypeLiteral<FunctionDefinition<Map<File<?>, Character[]>>>() {}, "name", "getMissingRights", "parameters", new Class[] { User.class });
+    public static final FunctionDefinition<Map<File<?>, Character[]>> GET_MISSING_RIGHTS = factory(FunctionDefinitionFactory.class).create("getMissingRights", new Class[] { User.class });
 
     static {
 

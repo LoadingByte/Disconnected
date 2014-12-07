@@ -18,11 +18,11 @@
 
 package com.quartercode.disconnected.server.world.comp.hardware;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
-import org.apache.commons.lang3.reflect.TypeLiteral;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.ValueFactory;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.hardware.Mainboard.NeedsMainboardSlot;
@@ -48,7 +48,7 @@ public class HardDrive extends Hardware {
 
     static {
 
-        FILE_SYSTEM = create(new TypeLiteral<PropertyDefinition<FileSystem>>() {}, "name", "fileSystem", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<FileSystem>() {
+        FILE_SYSTEM = factory(PropertyDefinitionFactory.class).create("fileSystem", new StandardStorage<>(), new ValueFactory<FileSystem>() {
 
             @Override
             public FileSystem get() {

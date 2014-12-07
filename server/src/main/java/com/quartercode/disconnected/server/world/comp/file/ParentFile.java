@@ -18,11 +18,10 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
 import static com.quartercode.classmod.extra.func.Priorities.LEVEL_6;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -30,6 +29,8 @@ import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
+import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
 import com.quartercode.disconnected.server.world.util.SizeUtils;
@@ -66,7 +67,7 @@ public class ParentFile<P extends CFeatureHolder> extends File<P> {
 
     static {
 
-        CHILDREN = create(new TypeLiteral<CollectionPropertyDefinition<File<ParentFile<?>>, List<File<ParentFile<?>>>>>() {}, "name", "children", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
+        CHILDREN = factory(CollectionPropertyDefinitionFactory.class).create("children", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
         CHILDREN.addAdderExecutor("checkSize", ParentFile.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -111,7 +112,7 @@ public class ParentFile<P extends CFeatureHolder> extends File<P> {
 
     static {
 
-        GET_CHILD_BY_NAME = create(new TypeLiteral<FunctionDefinition<File<ParentFile<?>>>>() {}, "name", "getChildByName", "parameters", new Class[] { String.class });
+        GET_CHILD_BY_NAME = factory(FunctionDefinitionFactory.class).create("getChildByName", new Class[] { String.class });
         GET_CHILD_BY_NAME.addExecutor("default", ParentFile.class, CollectionPropertyAccessorFactory.createGetSingle(CHILDREN, new CriteriumMatcher<File<ParentFile<?>>>() {
 
             @Override

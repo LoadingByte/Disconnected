@@ -18,14 +18,15 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
-import org.apache.commons.lang3.reflect.TypeLiteral;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
 import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.ValueFactory;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
@@ -54,9 +55,9 @@ public class FileSystem extends WorldFeatureHolder implements DerivableSize {
 
     static {
 
-        SIZE = create(new TypeLiteral<PropertyDefinition<Long>>() {}, "name", "size", "storage", new StandardStorage<>());
+        SIZE = factory(PropertyDefinitionFactory.class).create("size", new StandardStorage<>());
 
-        ROOT = create(new TypeLiteral<PropertyDefinition<RootFile>>() {}, "name", "root", "storage", new StandardStorage<>(), "initialValue", new ValueFactory<RootFile>() {
+        ROOT = factory(PropertyDefinitionFactory.class).create("root", new StandardStorage<>(), new ValueFactory<RootFile>() {
 
             @Override
             public RootFile get() {
@@ -140,7 +141,7 @@ public class FileSystem extends WorldFeatureHolder implements DerivableSize {
 
     static {
 
-        GET_FILE = create(new TypeLiteral<FunctionDefinition<File<?>>>() {}, "name", "getFile", "parameters", new Class[] { String.class });
+        GET_FILE = factory(FunctionDefinitionFactory.class).create("getFile", new Class[] { String.class });
         GET_FILE.addExecutor("default", FileSystem.class, new FunctionExecutor<File<?>>() {
 
             @Override
@@ -176,7 +177,7 @@ public class FileSystem extends WorldFeatureHolder implements DerivableSize {
 
         });
 
-        CREATE_ADD_FILE = create(new TypeLiteral<FunctionDefinition<FileAddAction>>() {}, "name", "createAddFile", "parameters", new Class[] { File.class, String.class });
+        CREATE_ADD_FILE = factory(FunctionDefinitionFactory.class).create("createAddFile", new Class[] { File.class, String.class });
         CREATE_ADD_FILE.addExecutor("default", FileSystem.class, new FunctionExecutor<FileAddAction>() {
 
             @Override
@@ -194,7 +195,7 @@ public class FileSystem extends WorldFeatureHolder implements DerivableSize {
 
         });
 
-        GET_FILLED = create(new TypeLiteral<FunctionDefinition<Long>>() {}, "name", "getFilled", "parameters", new Class[0]);
+        GET_FILLED = factory(FunctionDefinitionFactory.class).create("getFilled", new Class[0]);
         GET_FILLED.addExecutor("default", FileSystem.class, new FunctionExecutor<Long>() {
 
             @Override
@@ -207,7 +208,7 @@ public class FileSystem extends WorldFeatureHolder implements DerivableSize {
 
         });
 
-        GET_FREE = create(new TypeLiteral<FunctionDefinition<Long>>() {}, "name", "getFree", "parameters", new Class[0]);
+        GET_FREE = factory(FunctionDefinitionFactory.class).create("getFree", new Class[0]);
         GET_FREE.addExecutor("default", FileSystem.class, new FunctionExecutor<Long>() {
 
             @Override

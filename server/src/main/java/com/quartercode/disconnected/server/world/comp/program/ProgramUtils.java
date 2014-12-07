@@ -18,14 +18,14 @@
 
 package com.quartercode.disconnected.server.world.comp.program;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.List;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
 import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.extra.prop.NonPersistent;
 import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
 import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
@@ -230,7 +230,7 @@ public class ProgramUtils {
 
         static {
 
-            EVENT_HANDLER = create(new TypeLiteral<PropertyDefinition<Object>>() {}, "name", "eventHandler", "storage", new StandardStorage<>());
+            EVENT_HANDLER = factory(PropertyDefinitionFactory.class).create("eventHandler", new StandardStorage<>());
 
         }
 

@@ -18,11 +18,11 @@
 
 package com.quartercode.disconnected.server.world.comp.vuln;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
-import org.apache.commons.lang3.reflect.TypeLiteral;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.prop.PropertyDefinition;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 
 /**
@@ -57,8 +57,8 @@ public class Attack extends WorldFeatureHolder {
 
     static {
 
-        VULNERABILITY = create(new TypeLiteral<PropertyDefinition<Vulnerability>>() {}, "name", "vulnerability", "storage", new ReferenceStorage<>());
-        PREFERRED_ACTION = create(new TypeLiteral<PropertyDefinition<String>>() {}, "name", "preferredAction", "storage", new StandardStorage<>());
+        VULNERABILITY = factory(PropertyDefinitionFactory.class).create("vulnerability", new ReferenceStorage<>());
+        PREFERRED_ACTION = factory(PropertyDefinitionFactory.class).create("preferredAction", new StandardStorage<>());
 
     }
 

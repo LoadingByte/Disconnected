@@ -18,15 +18,14 @@
 
 package com.quartercode.disconnected.server.world.comp.hardware;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
 import static com.quartercode.classmod.extra.func.Priorities.LEVEL_3;
 import static com.quartercode.classmod.extra.func.Priorities.LEVEL_5;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -37,6 +36,9 @@ import com.quartercode.classmod.extra.storage.ReferenceCollectionStorage;
 import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
+import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.comp.hardware.Mainboard.NeedsMainboardSlot;
 import com.quartercode.disconnected.server.world.comp.net.Backbone;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
@@ -83,9 +85,9 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
 
     static {
 
-        SUBNET = create(new TypeLiteral<PropertyDefinition<Integer>>() {}, "name", "subnet", "storage", new StandardStorage<>());
+        SUBNET = factory(PropertyDefinitionFactory.class).create("subnet", new StandardStorage<>());
 
-        BACKBONE_CONNECTION = create(new TypeLiteral<PropertyDefinition<Backbone>>() {}, "name", "backboneConnection", "storage", new ReferenceStorage<>(), "hidden", true);
+        BACKBONE_CONNECTION = factory(PropertyDefinitionFactory.class).create("backboneConnection", new ReferenceStorage<>(), true, true);
         BACKBONE_CONNECTION.addSetterExecutor("addReverseConnection", RouterNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -123,7 +125,7 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
 
         }, LEVEL_5);
 
-        NEIGHBOURS = create(new TypeLiteral<CollectionPropertyDefinition<RouterNetInterface, List<RouterNetInterface>>>() {}, "name", "neighbours", "storage", new ReferenceCollectionStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()), "hidden", true);
+        NEIGHBOURS = factory(CollectionPropertyDefinitionFactory.class).create("neighbours", new ReferenceCollectionStorage<>(), new CloneValueFactory<>(new ArrayList<>()), true, true);
         NEIGHBOURS.addAdderExecutor("addReverseConnection", RouterNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -157,7 +159,7 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
 
         }, LEVEL_3);
 
-        CHILDREN = create(new TypeLiteral<CollectionPropertyDefinition<NodeNetInterface, List<NodeNetInterface>>>() {}, "name", "children", "storage", new ReferenceCollectionStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
+        CHILDREN = factory(CollectionPropertyDefinitionFactory.class).create("children", new ReferenceCollectionStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
         CHILDREN.addAdderExecutor("addReverseConnection", RouterNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -232,7 +234,7 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
 
         });
 
-        PROCESS_ROUTED = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "processRouted", "parameters", new Class[] { RoutedPacket.class });
+        PROCESS_ROUTED = factory(FunctionDefinitionFactory.class).create("processRouted", new Class[] { RoutedPacket.class });
         PROCESS_ROUTED.addExecutor("default", RouterNetInterface.class, new FunctionExecutor<Void>() {
 
             @Override

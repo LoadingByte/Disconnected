@@ -18,11 +18,10 @@
 
 package com.quartercode.disconnected.server.world.comp.net;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
 import static com.quartercode.classmod.extra.func.Priorities.*;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -30,6 +29,8 @@ import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
+import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
@@ -68,8 +69,8 @@ public class NetworkModule extends OSModule {
 
     static {
 
-        SOCKETS = create(new TypeLiteral<CollectionPropertyDefinition<Socket, List<Socket>>>() {}, "name", "sockets", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
-        CONNECTION_LISTENERS = create(new TypeLiteral<CollectionPropertyDefinition<SocketConnectionListener, List<SocketConnectionListener>>>() {}, "name", "connectionListeners", "storage", new StandardStorage<>(), "collection", new CloneValueFactory<>(new ArrayList<>()));
+        SOCKETS = factory(CollectionPropertyDefinitionFactory.class).create("sockets", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
+        CONNECTION_LISTENERS = factory(CollectionPropertyDefinitionFactory.class).create("connectionListeners", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
 
     }
 
@@ -151,7 +152,7 @@ public class NetworkModule extends OSModule {
 
     static {
 
-        CREATE_SOCKET = create(new TypeLiteral<FunctionDefinition<Socket>>() {}, "name", "createSocket", "parameters", new Class[0]);
+        CREATE_SOCKET = factory(FunctionDefinitionFactory.class).create("createSocket", new Class[0]);
         CREATE_SOCKET.addExecutor("default", NetworkModule.class, new FunctionExecutor<Socket>() {
 
             @Override
@@ -276,7 +277,7 @@ public class NetworkModule extends OSModule {
 
         }, LEVEL_8);
 
-        SEND = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "send", "parameters", new Class[] { Packet.class });
+        SEND = factory(FunctionDefinitionFactory.class).create("send", new Class[] { Packet.class });
         SEND.addExecutor("default", NetworkModule.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -296,7 +297,7 @@ public class NetworkModule extends OSModule {
 
         });
 
-        SEND_TCP = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "sendTCP", "parameters", new Class[] { Socket.class, Object.class });
+        SEND_TCP = factory(FunctionDefinitionFactory.class).create("sendTCP", new Class[] { Socket.class, Object.class });
         SEND_TCP.addExecutor("default", NetworkModule.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -325,7 +326,7 @@ public class NetworkModule extends OSModule {
 
         });
 
-        HANDLE = create(new TypeLiteral<FunctionDefinition<Void>>() {}, "name", "handle", "parameters", new Class[] { Packet.class });
+        HANDLE = factory(FunctionDefinitionFactory.class).create("handle", new Class[] { Packet.class });
         HANDLE.addExecutor("tcpSockets", NetworkModule.class, new FunctionExecutor<Void>() {
 
             @Override

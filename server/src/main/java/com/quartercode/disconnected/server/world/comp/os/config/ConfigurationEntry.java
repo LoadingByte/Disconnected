@@ -18,14 +18,14 @@
 
 package com.quartercode.disconnected.server.world.comp.os.config;
 
-import static com.quartercode.classmod.ClassmodFactory.create;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.Map;
-import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
 import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.extra.prop.ValueSupplierDefinition;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.disconnected.server.util.NullPreventer;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
 import com.quartercode.disconnected.server.world.util.SizeUtils;
@@ -54,7 +54,7 @@ public class ConfigurationEntry extends WorldChildFeatureHolder<Configuration> i
 
     static {
 
-        GET_COLUMNS = create(new TypeLiteral<FunctionDefinition<Map<ValueSupplierDefinition<?, ?>, Class<?>>>>() {}, "name", "getColumns", "parameters", new Class[0]);
+        GET_COLUMNS = factory(FunctionDefinitionFactory.class).create("getColumns", new Class[0]);
 
         GET_SIZE.addExecutor("columns", ConfigurationEntry.class, new FunctionExecutor<Long>() {
 
