@@ -38,15 +38,15 @@ import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
 import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.util.NullPreventer;
-import com.quartercode.disconnected.server.world.comp.os.config.ConfigurationEntry;
+import com.quartercode.disconnected.server.world.comp.os.config.ConfigEntry;
 
 /**
  * A user represents a system user (basically someone who can use a system).
- * The user object represents a user and all its properties. It can be used as {@link ConfigurationEntry}.
+ * The user object represents a user and all its properties. It can be used as {@link ConfigEntry}.
  * 
  * @see Group
  */
-public class User extends ConfigurationEntry {
+public class User extends ConfigEntry {
 
     /**
      * This is the name of the superuser on a system.

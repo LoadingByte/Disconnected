@@ -24,19 +24,19 @@ import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 
 /**
- * The base class for all {@link OperatingSystem} modules.
- * Such {@link OperatingSystem} modules are an essential part of the {@link OperatingSystem}.
- * They define methods which are required by the {@link OperatingSystem} to interact with these modules.
+ * The base class for all {@link OS operating system} modules.
+ * Such OS modules are an essential part of the operating system.
+ * They define methods which are required by the operating system to interact with these modules.
  * 
  * @see OSModule#SET_RUNNING
- * @see OperatingSystem
+ * @see OS
  */
-public abstract class OSModule extends WorldChildFeatureHolder<OperatingSystem> {
+public abstract class OSModule extends WorldChildFeatureHolder<OS> {
 
     // ----- Functions -----
 
     /**
-     * Called on the bootstrap (true) or shutdown (false) of the {@link OperatingSystem} which uses the module.
+     * Called on the bootstrap (true) or shutdown (false) of the {@link OS operating system} which uses the module.
      * 
      * <table>
      * <tr>
@@ -49,18 +49,18 @@ public abstract class OSModule extends WorldChildFeatureHolder<OperatingSystem> 
      * <td>0</td>
      * <td>{@link Boolean}</td>
      * <td>running</td>
-     * <td>True if the {@link OperatingSystem} is booting up, false if it's shutting down.</td>
+     * <td>{@code True} if the operating system is booting up, {@code false} if it's shutting down.</td>
      * </tr>
      * </table>
      */
     public static final FunctionDefinition<Void> SET_RUNNING = factory(FunctionDefinitionFactory.class).create("setRunning", new Class[] { Boolean.class });
 
     /**
-     * Creates a new generic {@link OperatingSystem} module.
+     * Creates a new generic {@link OS operating system} module.
      */
     public OSModule() {
 
-        setParentType(OperatingSystem.class);
+        setParentType(OS.class);
     }
 
 }

@@ -28,28 +28,28 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import com.quartercode.disconnected.server.event.program.control.WorldProcessLaunchCommandHandler;
+import com.quartercode.disconnected.server.event.prog.control.WorldProcessLaunchCommandHandler;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
-import com.quartercode.disconnected.server.world.comp.program.Process;
-import com.quartercode.disconnected.server.world.comp.program.ProcessModule;
-import com.quartercode.disconnected.server.world.comp.program.Program;
-import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
-import com.quartercode.disconnected.server.world.comp.program.RootProcess;
+import com.quartercode.disconnected.server.world.comp.prog.ProcModule;
+import com.quartercode.disconnected.server.world.comp.prog.Process;
+import com.quartercode.disconnected.server.world.comp.prog.Program;
+import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
+import com.quartercode.disconnected.server.world.comp.prog.RootProcess;
 import com.quartercode.disconnected.shared.CommonBootstrap;
-import com.quartercode.disconnected.shared.event.comp.program.control.WorldProcessLaunchAcknowledgmentEvent;
-import com.quartercode.disconnected.shared.event.comp.program.control.WorldProcessLaunchCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchAcknowledgmentEvent;
+import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.identity.ClientIdentity;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.util.registry.extra.MultipleValueRegistry;
 import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
-import com.quartercode.disconnected.shared.world.comp.program.ClientProcessDetails;
-import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUserDetails;
-import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUserId;
-import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
+import com.quartercode.disconnected.shared.world.comp.prog.ClientProcessDetails;
+import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserDetails;
+import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
 import com.quartercode.eventbridge.bridge.Bridge;
 
 public class WorldProcessLaunchCommandHandlerTest {
@@ -79,7 +79,7 @@ public class WorldProcessLaunchCommandHandlerTest {
     @Mock
     private Bridge                               bridge;
     private Computer                             sbpComputer;
-    private ProcessModule                        procModule;
+    private ProcModule                           procModule;
     private Process<?>                           sessionProcess;
     private ContentFile                          sourceFile;
 
@@ -87,7 +87,7 @@ public class WorldProcessLaunchCommandHandlerTest {
     public void setUp() {
 
         sbpComputer = new Computer();
-        procModule = new ProcessModule();
+        procModule = new ProcModule();
         sessionProcess = new RootProcess();
 
         sourceFile = new ContentFile();
@@ -107,7 +107,7 @@ public class WorldProcessLaunchCommandHandlerTest {
         launchAndAssert(4, 3);
         launchAndAssert(5, 4);
 
-        procModule.setObj(ProcessModule.NEXT_PID_VALUE, 10);
+        procModule.setObj(ProcModule.NEXT_PID_VALUE, 10);
         launchAndAssert(6, 10);
         launchAndAssert(7, 11);
         launchAndAssert(8, 12);
@@ -145,13 +145,13 @@ public class WorldProcessLaunchCommandHandlerTest {
     @RequiredArgsConstructor
     private static class WorldProcessLaunchCommandHandlerMock extends WorldProcessLaunchCommandHandler {
 
-        private final Bridge        bridge;
-        private final Computer      sbpComputer;
-        private final ProcessModule procModule;
-        private final Process<?>    sessionProcess;
-        private final ContentFile   sourceFile;
+        private final Bridge      bridge;
+        private final Computer    sbpComputer;
+        private final ProcModule  procModule;
+        private final Process<?>  sessionProcess;
+        private final ContentFile sourceFile;
 
-        private int                 currentLaunchedProcessId;
+        private int               currentLaunchedProcessId;
 
         @Override
         protected Bridge getBridge() {
@@ -166,7 +166,7 @@ public class WorldProcessLaunchCommandHandlerTest {
         }
 
         @Override
-        protected ProcessModule getProcessModule(Computer computer) {
+        protected ProcModule getProcModule(Computer computer) {
 
             return procModule;
         }

@@ -27,15 +27,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import com.quartercode.disconnected.server.event.program.control.WorldProcessInterruptCommandHandler;
-import com.quartercode.disconnected.server.world.comp.program.ChildProcess;
-import com.quartercode.disconnected.server.world.comp.program.Process;
-import com.quartercode.disconnected.server.world.comp.program.ProcessState;
-import com.quartercode.disconnected.server.world.comp.program.RootProcess;
-import com.quartercode.disconnected.shared.event.comp.program.control.WorldProcessInterruptCommand;
+import com.quartercode.disconnected.server.event.prog.control.WorldProcessInterruptCommandHandler;
+import com.quartercode.disconnected.server.world.comp.prog.ChildProcess;
+import com.quartercode.disconnected.server.world.comp.prog.ProcState;
+import com.quartercode.disconnected.server.world.comp.prog.Process;
+import com.quartercode.disconnected.server.world.comp.prog.RootProcess;
+import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessInterruptCommand;
 import com.quartercode.disconnected.shared.identity.ClientIdentity;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
-import com.quartercode.disconnected.shared.world.comp.program.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId;
 
 @RunWith (Parameterized.class)
 public class WorldProcessInterruptCommandHandlerTest {
@@ -79,7 +79,7 @@ public class WorldProcessInterruptCommandHandlerTest {
 
         interruptAndAssert(process1, recursive);
 
-        assertEquals("State of not-interrupted process", ProcessState.RUNNING, process2.getObj(Process.STATE));
+        assertEquals("State of not-interrupted process", ProcState.RUNNING, process2.getObj(Process.STATE));
     }
 
     @Test
@@ -110,7 +110,7 @@ public class WorldProcessInterruptCommandHandlerTest {
 
         ChildProcess process = parent.invoke(Process.CREATE_CHILD);
         process.setObj(Process.PID, pid);
-        process.setObj(Process.STATE, ProcessState.RUNNING);
+        process.setObj(Process.STATE, ProcState.RUNNING);
         process.setObj(Process.WORLD_PROCESS_USER, new SBPWorldProcessUserId(SBP, null));
         return process;
     }
@@ -122,13 +122,13 @@ public class WorldProcessInterruptCommandHandlerTest {
         WorldProcessInterruptCommand event = new WorldProcessInterruptCommand(process.getObj(Process.PID), recursive);
         handler.handle(event, SBP);
 
-        assertEquals("State of interrupted process", ProcessState.INTERRUPTED, process.getObj(Process.STATE));
+        assertEquals("State of interrupted process", ProcState.INTERRUPTED, process.getObj(Process.STATE));
 
         for (Process<?> child : process.invoke(Process.GET_ALL_CHILDREN)) {
             if (recursive) {
-                assertEquals("State of interrupted child process", ProcessState.INTERRUPTED, child.getObj(Process.STATE));
+                assertEquals("State of interrupted child process", ProcState.INTERRUPTED, child.getObj(Process.STATE));
             } else {
-                assertEquals("State of non-interrupted child process", ProcessState.RUNNING, child.getObj(Process.STATE));
+                assertEquals("State of non-interrupted child process", ProcState.RUNNING, child.getObj(Process.STATE));
             }
         }
     }

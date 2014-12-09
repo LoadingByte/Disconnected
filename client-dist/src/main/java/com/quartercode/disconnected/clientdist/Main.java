@@ -47,7 +47,7 @@ import com.quartercode.disconnected.server.sim.profile.ProfileSerializationExcep
 import com.quartercode.disconnected.server.sim.profile.ProfileService;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
-import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.server.world.comp.os.OS;
 import com.quartercode.disconnected.shared.CommonBootstrap;
 import com.quartercode.disconnected.shared.util.ApplicationInfo;
 import com.quartercode.disconnected.shared.util.ExitUtil;
@@ -141,7 +141,7 @@ public class Main {
         LOGGER.info("DEBUG: Starting test-game with current simulation");
         tickService.setRunning(true);
         for (Computer computer : world.get(World.COMPUTERS).get()) {
-            computer.get(Computer.OS).get().get(OperatingSystem.SET_RUNNING).invoke(true);
+            computer.get(Computer.OS).get().get(OS.SET_RUNNING).invoke(true);
         }
         graphicsService.setState(DefaultStates.DESKTOP.create());
     }

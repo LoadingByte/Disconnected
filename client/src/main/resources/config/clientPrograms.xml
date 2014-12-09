@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <configureClientProgram name="fileManager">
-        <class>com.quartercode.disconnected.client.graphics.desktop.program.general.FileManagerClientProgram</class>
+        <class>com.quartercode.disconnected.client.graphics.desktop.prog.general.FileManagerClientProgram</class>
     </configureClientProgram>
 </config>

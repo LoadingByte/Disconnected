@@ -21,22 +21,22 @@ package com.quartercode.disconnected.server.world.comp.file;
 /**
  * This runtime exception occures if no file system is mounted under a certain mountpoint that the user input.
  * 
- * @see FileSystemModule
+ * @see FSModule
  */
 public class UnknownMountpointException extends RuntimeException {
 
-    private static final long      serialVersionUID = 6564332145013501014L;
+    private static final long serialVersionUID = 6564332145013501014L;
 
-    private final FileSystemModule fsModule;
-    private final String           mountpoint;
+    private final FSModule    fsModule;
+    private final String      mountpoint;
 
     /**
      * Creates a new unknown mountpoint exception.
      * 
-     * @param fsModule The {@link FileSystemModule} that doesn't contain a mounted file system under the given mountpoint.
+     * @param fsModule The {@link FSModule file system module} that doesn't contain a mounted file system under the given mountpoint.
      * @param mountpoint The mountpoint no file system is mounted under.
      */
-    public UnknownMountpointException(FileSystemModule fsModule, String mountpoint) {
+    public UnknownMountpointException(FSModule fsModule, String mountpoint) {
 
         super("Unknown mountpoint: " + mountpoint);
 
@@ -45,11 +45,11 @@ public class UnknownMountpointException extends RuntimeException {
     }
 
     /**
-     * Returns the {@link FileSystemModule} that doesn't contain a mounted file system under the set mountpoint ({@link #getMountpoint()}).
+     * Returns the {@link FSModule file system module} that doesn't contain a mounted file system under the set mountpoint ({@link #getMountpoint()}).
      * 
      * @return The file system module on which the required mountpoint cannot be found.
      */
-    public FileSystemModule getFsModule() {
+    public FSModule getFsModule() {
 
         return fsModule;
     }

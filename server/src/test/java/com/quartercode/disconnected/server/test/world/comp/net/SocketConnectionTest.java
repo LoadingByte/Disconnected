@@ -32,7 +32,7 @@ import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.extra.func.Priorities;
 import com.quartercode.classmod.util.test.JUnitRuleModMockery;
 import com.quartercode.disconnected.server.util.ObjArray;
-import com.quartercode.disconnected.server.world.comp.net.NetworkModule;
+import com.quartercode.disconnected.server.world.comp.net.NetModule;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.PacketHandler;
 import com.quartercode.disconnected.server.world.comp.net.Socket;
@@ -44,23 +44,23 @@ import com.quartercode.disconnected.shared.world.comp.net.NetID;
 public class SocketConnectionTest {
 
     @Rule
-    public JUnitRuleMockery       context = new JUnitRuleMockery();
+    public JUnitRuleMockery    context = new JUnitRuleMockery();
     @Rule
-    public JUnitRuleModMockery    modmock = new JUnitRuleModMockery();
+    public JUnitRuleModMockery modmock = new JUnitRuleModMockery();
 
-    private NetworkModule         netModule;
+    private NetModule          netModule;
     @Mock
-    private NetworkModuleSendHook mockNetModuleSendHook;
+    private NetModuleSendHook  mockNetModuleSendHook;
 
-    private Address               socket1Address;
-    private Address               socket2Address;
-    private Socket                socket1;
-    private Socket                socket2;
+    private Address            socket1Address;
+    private Address            socket2Address;
+    private Socket             socket1;
+    private Socket             socket2;
 
     @Before
     public void setUp() {
 
-        netModule = new NetworkModule();
+        netModule = new NetModule();
 
         // Create the test sockets
         socket1Address = new Address(new NetID(0, 1), 10);
@@ -71,7 +71,7 @@ public class SocketConnectionTest {
         // Apply a simple routing:
         // socket1 -> socket2
         // socket2 -> socket1
-        modmock.addFuncExec(NetworkModule.SEND_TCP, "hook", NetworkModule.class, new FunctionExecutor<Void>() {
+        modmock.addFuncExec(NetModule.SEND_TCP, "hook", NetModule.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
@@ -320,7 +320,7 @@ public class SocketConnectionTest {
         assertEquals("State of socket 2 after the handshake", SocketState.DISCONNECTED, socket2.getObj(Socket.STATE));
     }
 
-    private Socket createSocket(NetworkModule netModule, int localPort, Address destination) {
+    private Socket createSocket(NetModule netModule, int localPort, Address destination) {
 
         Socket socket = new Socket();
         socket.setParent(netModule);
@@ -330,7 +330,7 @@ public class SocketConnectionTest {
         return socket;
     }
 
-    private static interface NetworkModuleSendHook {
+    private static interface NetModuleSendHook {
 
         public void onSend(Socket socket, Object data);
 

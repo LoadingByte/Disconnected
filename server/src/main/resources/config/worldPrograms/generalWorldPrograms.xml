@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <configureWorldProgram name="fileManager">
-        <class>com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram</class>
+        <class>com.quartercode.disconnected.server.world.comp.prog.general.FileManagerProgram</class>
         <size>1024</size>
         <commonFileDir>$C{com.quartercode.disconnected.shared.world.comp.file.CommonFiles.SYS_BIN_DIR}</commonFileDir>
         <commonFileName>filemanager.exe</commonFileName>

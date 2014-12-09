@@ -30,10 +30,10 @@ import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.hardware.Mainboard.NeedsMainboardSlot;
-import com.quartercode.disconnected.server.world.comp.net.NetworkModule;
+import com.quartercode.disconnected.server.world.comp.net.NetModule;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.PacketProcessor;
-import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.server.world.comp.os.OS;
 import com.quartercode.disconnected.shared.world.comp.net.NetID;
 
 /**
@@ -189,8 +189,8 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
 
                 // Only deliver the packet if the net interface is connected to a computer
                 if (netInterface.getParent() != null) {
-                    NetworkModule netModule = netInterface.getParent().getObj(Computer.OS).getObj(OperatingSystem.NET_MODULE);
-                    netModule.invoke(NetworkModule.HANDLE, packet);
+                    NetModule netModule = netInterface.getParent().getObj(Computer.OS).getObj(OS.NET_MODULE);
+                    netModule.invoke(NetModule.HANDLE, packet);
                 }
 
                 return true;

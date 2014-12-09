@@ -20,12 +20,12 @@ package com.quartercode.disconnected.server.init;
 
 import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
 import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension;
-import com.quartercode.disconnected.server.event.program.control.WorldProcessInterruptCommandHandler;
-import com.quartercode.disconnected.server.event.program.control.WorldProcessLaunchCommandHandler;
+import com.quartercode.disconnected.server.event.prog.control.WorldProcessInterruptCommandHandler;
+import com.quartercode.disconnected.server.event.prog.control.WorldProcessLaunchCommandHandler;
 import com.quartercode.disconnected.server.sim.TickBridgeProvider;
 import com.quartercode.disconnected.server.sim.TickService;
-import com.quartercode.disconnected.shared.event.comp.program.control.WorldProcessInterruptCommand;
-import com.quartercode.disconnected.shared.event.comp.program.control.WorldProcessLaunchCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessInterruptCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 import com.quartercode.disconnected.shared.util.init.Initializer;
 import com.quartercode.disconnected.shared.util.init.InitializerSettings;

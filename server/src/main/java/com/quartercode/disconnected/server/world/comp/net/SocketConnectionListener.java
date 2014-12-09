@@ -31,7 +31,7 @@ import com.quartercode.disconnected.shared.world.comp.net.Address;
  * <br>
  * Sadly, this class must be abstract since JAXB can't handle interfaces.
  * 
- * @see NetworkModule#CONNECTION_LISTENERS
+ * @see NetModule#CONNECTION_LISTENERS
  */
 @XmlPersistent
 public interface SocketConnectionListener extends CFeatureHolder {

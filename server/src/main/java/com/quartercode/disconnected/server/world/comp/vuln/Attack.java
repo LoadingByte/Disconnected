@@ -26,7 +26,7 @@ import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 
 /**
- * An attack is targeted at a specific {@link Vulnerability} of a computer part (e.g. a program).
+ * An attack is targeted at a specific {@link Vuln vulnerability} of a computer part (e.g. a program).
  * It tries to execute a defined {@link #PREFERRED_ACTION}.
  * That action describes what the attacked computer part should do when the attack arrives.
  * For example, there could be {@code "crash"} and {@code "executePayload"} actions for a buffer overflow vulnerability.<br>
@@ -35,29 +35,29 @@ import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
  * Depending on the environment, something else might happen.
  * For example, the action might be unsafe and sometimes causes the attacked program to crash instead of executing the payload.
  * 
- * @see Vulnerability
- * @see VulnerabilityAction
- * @see VulnerabilityAction#ATTACK_WEIGHT
+ * @see Vuln
+ * @see VulnAction
+ * @see VulnAction#ATTACK_WEIGHT
  */
 public class Attack extends WorldFeatureHolder {
 
     // ----- Properties -----
 
     /**
-     * The {@link Vulnerability} the attack is using to attack a computer part.
+     * The {@link Vuln vulnerability} the attack is using to attack a computer part.
      * This is only used to check that the attacked computer part actually has the assumed vulnerability.
      */
-    public static final PropertyDefinition<Vulnerability> VULNERABILITY;
+    public static final PropertyDefinition<Vuln>   VULN;
 
     /**
      * Returns the action which should be executed once the attack arrives at the target.
      * See {@link Attack} for more information on the purpose of actions and why the field starts with "preferred".
      */
-    public static final PropertyDefinition<String>        PREFERRED_ACTION;
+    public static final PropertyDefinition<String> PREFERRED_ACTION;
 
     static {
 
-        VULNERABILITY = factory(PropertyDefinitionFactory.class).create("vulnerability", new ReferenceStorage<>());
+        VULN = factory(PropertyDefinitionFactory.class).create("vuln", new ReferenceStorage<>());
         PREFERRED_ACTION = factory(PropertyDefinitionFactory.class).create("preferredAction", new StandardStorage<>());
 
     }

@@ -23,7 +23,7 @@ import com.quartercode.disconnected.server.registry.config.AddPersistentClassSca
 import com.quartercode.disconnected.server.registry.config.AddWorldInitializerMappingCommand;
 import com.quartercode.disconnected.server.registry.config.ConfigureFileTypeCommand;
 import com.quartercode.disconnected.server.registry.config.ConfigureSchedulerGroupCommand;
-import com.quartercode.disconnected.server.registry.config.ConfigureVulnerabilitySourceCommand;
+import com.quartercode.disconnected.server.registry.config.ConfigureVulnSourceCommand;
 import com.quartercode.disconnected.server.registry.config.ConfigureWorldProgramCommand;
 import com.quartercode.disconnected.server.registry.config.RemovePersistentClassScanDirectiveCommand;
 import com.quartercode.disconnected.server.registry.config.RemoveWorldInitializerMappingCommand;
@@ -62,8 +62,8 @@ public class AddServerConfigCommandParsers implements Initializer {
         service.addCommand("configureWorldProgram", new ConfigureWorldProgramCommand(Registries.get(ServerRegistries.WORLD_PROGRAMS)));
         service.addCommand("removeWorldProgram", new RemoveNamedValueCommand<>("world program", Registries.get(ServerRegistries.WORLD_PROGRAMS)));
 
-        // Vulnerability sources
-        service.addCommand("configureVulnSource", new ConfigureVulnerabilitySourceCommand(Registries.get(ServerRegistries.VULN_SOURCES)));
+        // Vuln sources
+        service.addCommand("configureVulnSource", new ConfigureVulnSourceCommand(Registries.get(ServerRegistries.VULN_SOURCES)));
         service.addCommand("removeVulnSource", new RemoveNamedValueCommand<>("vulnerability source", Registries.get(ServerRegistries.VULN_SOURCES)));
     }
 

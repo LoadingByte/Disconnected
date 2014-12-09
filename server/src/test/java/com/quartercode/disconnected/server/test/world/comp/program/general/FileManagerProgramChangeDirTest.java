@@ -25,18 +25,18 @@ import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.server.test.world.comp.AbstractComplexComputerTest;
 import com.quartercode.disconnected.server.world.comp.file.Directory;
+import com.quartercode.disconnected.server.world.comp.file.FSModule;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileRemoveAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
-import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
-import com.quartercode.disconnected.server.world.comp.program.ChildProcess;
-import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
-import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
-import com.quartercode.disconnected.shared.event.comp.program.general.FMPWPUUpdateViewCommand;
-import com.quartercode.disconnected.shared.event.comp.program.general.FMPWorldChangeDirCommand;
+import com.quartercode.disconnected.server.world.comp.prog.ChildProcess;
+import com.quartercode.disconnected.server.world.comp.prog.ProgramUtils;
+import com.quartercode.disconnected.server.world.comp.prog.general.FileManagerProgram;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWPUUpdateViewCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWorldChangeDirCommand;
 import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
-import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
 import com.quartercode.eventbridge.bridge.EventPredicate;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
@@ -161,7 +161,7 @@ public class FileManagerProgramChangeDirTest extends AbstractComplexComputerTest
         sendChangeDirCommand(resolve(ROOT, "test1/test2/test5"));
 
         // Delete /test1/test2
-        mainFsModule().invoke(FileSystemModule.GET_FILE, resolve(ROOT, "test1/test2")).invoke(File.CREATE_REMOVE).invoke(FileRemoveAction.EXECUTE);
+        mainFsModule().invoke(FSModule.GET_FILE, resolve(ROOT, "test1/test2")).invoke(File.CREATE_REMOVE).invoke(FileRemoveAction.EXECUTE);
 
         // /test1/test2/test6 (should result in /test1 because /test1/test2 does no longer exist)
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMPWPUUpdateViewCommandTestHandler(resolve(ROOT, "test1"), invoked2), UPDATE_VIEW_PREDICATE);

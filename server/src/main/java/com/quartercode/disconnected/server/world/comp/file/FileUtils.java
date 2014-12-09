@@ -20,7 +20,7 @@ package com.quartercode.disconnected.server.world.comp.file;
 
 import org.apache.commons.lang3.tuple.Triple;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
-import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
+import com.quartercode.disconnected.server.world.comp.file.FSModule.KnownFS;
 import com.quartercode.disconnected.server.world.comp.os.user.Group;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.shared.util.registry.Registries;
@@ -29,7 +29,7 @@ import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 
 /**
- * This file utility contains methods related to {@link File}s and {@link FileSystem}s.
+ * This file utility contains methods related to {@link File}s and {@link FileSystem file systems}.
  * 
  * @see File
  * @see FileSystem
@@ -37,17 +37,17 @@ import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 public class FileUtils {
 
     /**
-     * Creates a new {@link FilePlaceholder} that represents the given {@link KnownFileSystem}.
+     * Creates a new {@link FilePlaceholder} that represents the given {@link KnownFS known file system}.
      * 
      * @param fileSystem The known file system that should be represented by the placeholder.
      * @return The new file placeholder.
      */
-    public static FilePlaceholder createFilePlaceholder(KnownFileSystem fileSystem) {
+    public static FilePlaceholder createFilePlaceholder(KnownFS fileSystem) {
 
-        FileSystem actualFs = fileSystem.getObj(KnownFileSystem.FILE_SYSTEM);
+        FileSystem actualFs = fileSystem.getObj(KnownFS.FILE_SYSTEM);
         RootFile root = actualFs.getObj(FileSystem.ROOT);
 
-        String path = PathUtils.SEPARATOR + fileSystem.getObj(KnownFileSystem.MOUNTPOINT);
+        String path = PathUtils.SEPARATOR + fileSystem.getObj(KnownFS.MOUNTPOINT);
         String type = Registries.get(ServerRegistries.FILE_TYPES).getLeft(RootFile.class);
         long size = actualFs.invoke(FileSystem.GET_SIZE);
         Triple<FileRights, String, String> commonData = getCommonFilePlaceholderData(root);

@@ -49,7 +49,7 @@ import com.quartercode.disconnected.shared.world.comp.net.Address;
  * For doing that, they must establish a connection between the addresses before any packets can be sent/received.
  * Note that a random free port is chosen by the os if a client, which does not have any open ports, connects to some other computer.
  */
-public class Socket extends WorldChildFeatureHolder<NetworkModule> implements SchedulerUser, StringRepresentable {
+public class Socket extends WorldChildFeatureHolder<NetModule> implements SchedulerUser, StringRepresentable {
 
     /**
      * The amount of ticks after which a socket whose {@link #CONNECT} method had been called is terminated if no connection was established.
@@ -385,7 +385,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
                 Socket holder = (Socket) invocation.getCHolder();
 
                 if (holder.getParent() != null) {
-                    holder.getParent().invoke(NetworkModule.SEND_TCP, holder, arguments[0]);
+                    holder.getParent().invoke(NetModule.SEND_TCP, holder, arguments[0]);
                 }
 
                 return invocation.next(arguments);
@@ -550,7 +550,7 @@ public class Socket extends WorldChildFeatureHolder<NetworkModule> implements Sc
      */
     public Socket() {
 
-        setParentType(NetworkModule.class);
+        setParentType(NetModule.class);
     }
 
 }

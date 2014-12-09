@@ -29,9 +29,9 @@ import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.util.HashUtils;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
-import com.quartercode.disconnected.server.world.comp.program.ChildProcess;
-import com.quartercode.disconnected.server.world.comp.program.Process;
-import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
+import com.quartercode.disconnected.server.world.comp.prog.ChildProcess;
+import com.quartercode.disconnected.server.world.comp.prog.Process;
+import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
 
 /**
  * This class represents a program which opens a session.

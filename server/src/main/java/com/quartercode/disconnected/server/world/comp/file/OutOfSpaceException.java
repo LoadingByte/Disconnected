@@ -33,7 +33,7 @@ public class OutOfSpaceException extends RuntimeException {
     /**
      * Creates a new out of space exception.
      * 
-     * @param fileSystem The file system which should have stored the new bytes.
+     * @param fileSystem The {@link FileSystem} which should have stored the new bytes.
      * @param size The amount of new bytes.
      */
     public OutOfSpaceException(FileSystem fileSystem, long size) {
@@ -45,7 +45,7 @@ public class OutOfSpaceException extends RuntimeException {
     }
 
     /**
-     * Returns the file system which should have stored the new bytes.
+     * Returns the {@link FileSystem} which should have stored the new bytes.
      * 
      * @return The file system which should have stored the new bytes.
      */

@@ -24,20 +24,20 @@ import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.server.test.world.comp.AbstractComplexComputerTest;
 import com.quartercode.disconnected.server.world.comp.file.Directory;
+import com.quartercode.disconnected.server.world.comp.file.FSModule;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
-import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
-import com.quartercode.disconnected.server.world.comp.program.ChildProcess;
-import com.quartercode.disconnected.server.world.comp.program.Process;
-import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
-import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
-import com.quartercode.disconnected.shared.event.comp.program.general.FMPWPUUpdateViewCommand;
-import com.quartercode.disconnected.shared.event.comp.program.general.FMPWorldChangeDirCommand;
-import com.quartercode.disconnected.shared.event.comp.program.generic.GPWPUErrorEvent;
+import com.quartercode.disconnected.server.world.comp.prog.ChildProcess;
+import com.quartercode.disconnected.server.world.comp.prog.Process;
+import com.quartercode.disconnected.server.world.comp.prog.ProgramUtils;
+import com.quartercode.disconnected.server.world.comp.prog.general.FileManagerProgram;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWPUUpdateViewCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWorldChangeDirCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.generic.GPWPUErrorEvent;
 import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
-import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 import com.quartercode.eventbridge.extra.predicate.TypePredicate;
@@ -53,7 +53,7 @@ public class FileManagerProgramMissingReadRightTest extends AbstractComplexCompu
     public void setUp() {
 
         // Create the test directory
-        mainFsModule().invoke(FileSystemModule.CREATE_ADD_FILE, dir, PATH).invoke(FileAddAction.EXECUTE);
+        mainFsModule().invoke(FSModule.CREATE_ADD_FILE, dir, PATH).invoke(FileAddAction.EXECUTE);
     }
 
     private void executeProgramAndSendChangeDirCommand(Process<?> parentProcess, String change) {

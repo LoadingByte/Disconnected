@@ -28,7 +28,7 @@ import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
 import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.comp.hardware.Hardware;
-import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.server.world.comp.os.OS;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 import com.quartercode.disconnected.shared.world.general.Location;
 
@@ -53,15 +53,15 @@ public class Computer extends WorldFeatureHolder {
     public static final CollectionPropertyDefinition<Hardware, List<Hardware>> HARDWARE;
 
     /**
-     * The active {@link OperatingSystem} instance which is currently running the computer.
+     * The active {@link OS operating system} instance which is currently running the computer.
      */
-    public static final PropertyDefinition<OperatingSystem>                    OS;
+    public static final PropertyDefinition<OS>                                 OS;
 
     static {
 
         LOCATION = factory(PropertyDefinitionFactory.class).create("location", new StandardStorage<>());
         HARDWARE = factory(CollectionPropertyDefinitionFactory.class).create("hardware", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
-        OS = factory(PropertyDefinitionFactory.class).create("operatingSystem", new StandardStorage<>());
+        OS = factory(PropertyDefinitionFactory.class).create("os", new StandardStorage<>());
 
     }
 

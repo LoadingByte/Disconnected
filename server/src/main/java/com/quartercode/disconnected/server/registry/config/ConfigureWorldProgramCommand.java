@@ -21,7 +21,7 @@ package com.quartercode.disconnected.server.registry.config;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import com.quartercode.disconnected.server.registry.WorldProgram;
-import com.quartercode.disconnected.server.world.comp.program.ProgramExecutor;
+import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
 import com.quartercode.disconnected.shared.util.VariableReferenceResolver;
 import com.quartercode.disconnected.shared.util.config.extra.ConfigureNamedValueCommand;
 import com.quartercode.disconnected.shared.util.config.extra.ParserUtils;

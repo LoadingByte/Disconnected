@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.server.test.world.comp.program.general;
 
 import static org.junit.Assert.fail;
-import com.quartercode.disconnected.shared.event.comp.program.general.FMPWPUUpdateViewCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWPUUpdateViewCommand;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 
 public class FMPUpdateViewFailHandler implements EventHandler<FMPWPUUpdateViewCommand> {

@@ -30,19 +30,19 @@ import org.junit.Test;
 import com.quartercode.disconnected.server.test.world.comp.AbstractComplexComputerTest;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.Directory;
+import com.quartercode.disconnected.server.world.comp.file.FSModule;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
-import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
-import com.quartercode.disconnected.server.world.comp.program.ChildProcess;
-import com.quartercode.disconnected.server.world.comp.program.ProgramUtils;
-import com.quartercode.disconnected.server.world.comp.program.general.FileManagerProgram;
-import com.quartercode.disconnected.shared.event.comp.program.general.FMPWPUUpdateViewCommand;
-import com.quartercode.disconnected.shared.event.comp.program.general.FMPWorldChangeDirCommand;
+import com.quartercode.disconnected.server.world.comp.prog.ChildProcess;
+import com.quartercode.disconnected.server.world.comp.prog.ProgramUtils;
+import com.quartercode.disconnected.server.world.comp.prog.general.FileManagerProgram;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWPUUpdateViewCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWorldChangeDirCommand;
 import com.quartercode.disconnected.shared.world.comp.ByteUnit;
 import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
-import com.quartercode.disconnected.shared.world.comp.program.WorldProcessId;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
 import com.quartercode.eventbridge.bridge.EventPredicate;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
@@ -63,7 +63,7 @@ public class FileManagerProgramUpdateViewTest extends AbstractComplexComputerTes
 
         for (int index = 0; index < testFiles.length; index++) {
             File<?> file = testFiles[index];
-            mainFsModule().invoke(FileSystemModule.CREATE_ADD_FILE, file, resolve(PATH, "file" + index + ".txt")).invoke(FileAddAction.EXECUTE);
+            mainFsModule().invoke(FSModule.CREATE_ADD_FILE, file, resolve(PATH, "file" + index + ".txt")).invoke(FileAddAction.EXECUTE);
         }
 
         // Launch the program

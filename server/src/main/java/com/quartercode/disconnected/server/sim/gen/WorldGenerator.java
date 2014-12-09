@@ -24,17 +24,17 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
-import com.quartercode.disconnected.server.registry.VulnerabilitySource;
+import com.quartercode.disconnected.server.registry.VulnSource;
 import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.util.ProbabilityUtils;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
+import com.quartercode.disconnected.server.world.comp.file.FSModule;
+import com.quartercode.disconnected.server.world.comp.file.FSModule.KnownFS;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
-import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
-import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
 import com.quartercode.disconnected.server.world.comp.hardware.CPU;
 import com.quartercode.disconnected.server.world.comp.hardware.HardDrive;
 import com.quartercode.disconnected.server.world.comp.hardware.Hardware;
@@ -45,12 +45,12 @@ import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.hardware.RAM;
 import com.quartercode.disconnected.server.world.comp.hardware.RouterNetInterface;
 import com.quartercode.disconnected.server.world.comp.net.Backbone;
-import com.quartercode.disconnected.server.world.comp.os.EnvironmentVariable;
-import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.server.world.comp.os.config.Configuration;
+import com.quartercode.disconnected.server.world.comp.os.EnvVariable;
+import com.quartercode.disconnected.server.world.comp.os.OS;
+import com.quartercode.disconnected.server.world.comp.os.config.Config;
 import com.quartercode.disconnected.server.world.comp.os.user.User;
-import com.quartercode.disconnected.server.world.comp.program.Program;
-import com.quartercode.disconnected.server.world.comp.vuln.VulnerabilityContainer;
+import com.quartercode.disconnected.server.world.comp.prog.Program;
+import com.quartercode.disconnected.server.world.comp.vuln.VulnContainer;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
 import com.quartercode.disconnected.shared.world.comp.ByteUnit;
@@ -239,17 +239,17 @@ public class WorldGenerator {
             }
         }
 
-        OperatingSystem operatingSystem = new OperatingSystem();
-        operatingSystem.setObj(OperatingSystem.NAME, "Frames");
-        operatingSystem.setObj(OperatingSystem.VERSION, new Version(3, 7, 65));
-        computer.setObj(Computer.OS, operatingSystem);
+        OS os = new OS();
+        os.setObj(OS.NAME, "Frames");
+        os.setObj(OS.VERSION, new Version(3, 7, 65));
+        computer.setObj(Computer.OS, os);
 
         // Generate superuser object
         User superuser = new User();
         superuser.setObj(User.NAME, User.SUPERUSER_NAME);
 
         // Generate debug file systems
-        FileSystemModule fsModule = operatingSystem.getObj(OperatingSystem.FS_MODULE);
+        FSModule fsModule = os.getObj(OS.FS_MODULE);
         addKnownFs(fsModule, systemMedium.getObj(HardDrive.FILE_SYSTEM), CommonFiles.SYSTEM_MOUNTPOINT);
         addKnownFs(fsModule, userMedium.getObj(HardDrive.FILE_SYSTEM), CommonFiles.USER_MOUNTPOINT);
 
@@ -279,12 +279,12 @@ public class WorldGenerator {
         return slot;
     }
 
-    private static KnownFileSystem addKnownFs(FileSystemModule fsModule, FileSystem fileSystem, String mountpoint) {
+    private static KnownFS addKnownFs(FSModule fsModule, FileSystem fileSystem, String mountpoint) {
 
-        KnownFileSystem known = new KnownFileSystem();
-        known.setObj(KnownFileSystem.FILE_SYSTEM, fileSystem);
-        known.setObj(KnownFileSystem.MOUNTPOINT, mountpoint);
-        fsModule.addToColl(FileSystemModule.KNOWN_FS, known);
+        KnownFS known = new KnownFS();
+        known.setObj(KnownFS.FILE_SYSTEM, fileSystem);
+        known.setObj(KnownFS.MOUNTPOINT, mountpoint);
+        fsModule.addToColl(FSModule.KNOWN_FS, known);
 
         return known;
     }
@@ -303,16 +303,16 @@ public class WorldGenerator {
     private static void addUserFiles(FileSystem fileSystem, User superuser) {
 
         // Generate basic user config
-        Configuration userConfig = new Configuration();
-        userConfig.addToColl(Configuration.ENTRIES, superuser);
+        Config userConfig = new Config();
+        userConfig.addToColl(Config.ENTRIES, superuser);
         addContentFile(fileSystem, PathUtils.splitAfterMountpoint(CommonFiles.USER_CONFIG)[1], superuser, "o:r", userConfig);
 
         // Generate basic environment config
-        Configuration envConfig = new Configuration();
-        EnvironmentVariable pathVariable = new EnvironmentVariable();
-        pathVariable.setObj(EnvironmentVariable.NAME, "PATH");
-        pathVariable.invoke(EnvironmentVariable.SET_VALUE_LIST, Arrays.asList(CommonFiles.SYS_BIN_DIR, CommonFiles.USER_BIN_DIR));
-        envConfig.addToColl(Configuration.ENTRIES, pathVariable);
+        Config envConfig = new Config();
+        EnvVariable pathVariable = new EnvVariable();
+        pathVariable.setObj(EnvVariable.NAME, "PATH");
+        pathVariable.invoke(EnvVariable.SET_VALUE_LIST, Arrays.asList(CommonFiles.SYS_BIN_DIR, CommonFiles.USER_BIN_DIR));
+        envConfig.addToColl(Config.ENTRIES, pathVariable);
         addContentFile(fileSystem, PathUtils.splitAfterMountpoint(CommonFiles.ENVIRONMENT_CONFIG)[1], superuser, "o:r", envConfig);
     }
 
@@ -341,9 +341,9 @@ public class WorldGenerator {
         program.setObj(Program.VERSION, version);
 
         // Try to generate 3 vulnerabilities
-        Set<VulnerabilitySource> vulnSources = Registries.get(ServerRegistries.VULN_SOURCES).getValuesByUsage("worldProgram", programData.getName());
+        Set<VulnSource> vulnSources = Registries.get(ServerRegistries.VULN_SOURCES).getValuesByUsage("worldProgram", programData.getName());
         if (!vulnSources.isEmpty()) {
-            program.getObj(Program.VULN_CONTAINER).invoke(VulnerabilityContainer.GENERATE_VULNS, vulnSources, 3);
+            program.getObj(Program.VULN_CONTAINER).invoke(VulnContainer.GENERATE_VULNS, vulnSources, 3);
         }
 
         String programPath = programData.getCommonLocation().toString();
