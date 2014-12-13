@@ -84,7 +84,7 @@ public class NetModule extends OSModule {
     public static final FunctionDefinition<Socket>                                                             CREATE_SOCKET;
 
     /**
-     * This is an internal function that sends a provided {@link Packet} over the network.
+     * This is an internal function that <b>immediately</b> sends a provided {@link Packet} over the network.
      * Note that this function should be used by other functions which send a specific type of packet.
      * 
      * <table>
@@ -105,7 +105,7 @@ public class NetModule extends OSModule {
     public static final FunctionDefinition<Void>                                                               SEND;
 
     /**
-     * This is an internal function that sends a new TCP {@link Packet}, which was caused by the given {@link Socket}, with the given data object over the network.
+     * This is an internal function that <b>immediately</b> sends a new TCP {@link Packet}, which was caused by the given {@link Socket}, with the given data object over the network.
      * 
      * <table>
      * <tr>
@@ -131,7 +131,7 @@ public class NetModule extends OSModule {
     public static final FunctionDefinition<Void>                                                               SEND_TCP;
 
     /**
-     * This is an internal function that delivers the given {@link Packet} to some sort of handler.
+     * This is an internal function that <b>immediately</b> delivers the given {@link Packet} to some sort of handler.
      * For example, a TCP packet is delivered to the {@link Socket} which has opened the connection.
      * 
      * <table>
@@ -368,7 +368,7 @@ public class NetModule extends OSModule {
 
             private Socket tryCreateSocket(CFeatureHolder holder, Address requester, int localPort) {
 
-                // Iterate over the opinions of all connection listeners and
+                // Iterate over the opinions of all connection listeners and cancel the connection attempt if it is disallowed
                 boolean allowAfterAll = false;
                 for (SocketConnectionListener connectionListener : holder.getColl(CONNECTION_LISTENERS)) {
                     ConnectionAllowance allowance = connectionListener.invoke(SocketConnectionListener.ON_REQUEST, requester, localPort);

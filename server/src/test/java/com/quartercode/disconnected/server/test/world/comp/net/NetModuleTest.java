@@ -203,6 +203,7 @@ public class NetModuleTest {
         // @formatter:on
 
         netModule.invoke(NetModule.HANDLE, packet);
+        receiverSocket.get(Socket.SCHEDULER).update("computerProgramUpdate");
     }
 
     private static class HookedPacketHandler extends DefaultCFeatureHolder implements PacketHandler {

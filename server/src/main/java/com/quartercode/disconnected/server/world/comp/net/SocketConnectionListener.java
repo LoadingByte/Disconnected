@@ -27,9 +27,7 @@ import com.quartercode.disconnected.shared.world.comp.net.Address;
 
 /**
  * A stream socket connection listener is called when another computer would like to set up a {@link Socket} connection.
- * It can prevent the creation of the connection as well as be notified when the connection was established successfully.<br>
- * <br>
- * Sadly, this class must be abstract since JAXB can't handle interfaces.
+ * It can prevent the creation of the connection as well as be notified when the connection was successfully established.
  * 
  * @see NetModule#CONNECTION_LISTENERS
  */

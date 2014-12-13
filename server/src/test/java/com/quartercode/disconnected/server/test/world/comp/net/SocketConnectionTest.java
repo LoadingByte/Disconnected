@@ -162,8 +162,14 @@ public class SocketConnectionTest {
         socket2.addToColl(Socket.PACKET_HANDLERS, new HookedPacketHandler2());
 
         // Send test packets
+
         socket1.invoke(Socket.SEND, "testdata1");
+        socket1.get(Socket.SCHEDULER).update("computerNetworkUpdate"); // Send
+        socket2.get(Socket.SCHEDULER).update("computerProgramUpdate"); // Handle
+
         socket2.invoke(Socket.SEND, "testdata2");
+        socket2.get(Socket.SCHEDULER).update("computerNetworkUpdate"); // Send
+        socket1.get(Socket.SCHEDULER).update("computerProgramUpdate"); // Handle
     }
 
     @Test
@@ -206,7 +212,12 @@ public class SocketConnectionTest {
         // @formatter:on
 
         socket1.invoke(Socket.SEND, "testdata1");
+        socket1.get(Socket.SCHEDULER).update("computerNetworkUpdate"); // Send
+        socket2.get(Socket.SCHEDULER).update("computerProgramUpdate"); // Handle
+
         socket2.invoke(Socket.SEND, "testdata2");
+        socket2.get(Socket.SCHEDULER).update("computerNetworkUpdate"); // Send
+        socket1.get(Socket.SCHEDULER).update("computerProgramUpdate"); // Handle
     }
 
     @Test

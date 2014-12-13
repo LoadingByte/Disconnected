@@ -28,7 +28,8 @@ import com.quartercode.disconnected.shared.util.XmlPersistent;
  * A packet handle is a simple functional class which is called when a {@link Packet} arrives at a {@link Socket}.
  * However, the handler only receives the carried data object and no further metadata.<br>
  * <br>
- * Sadly, this class must be abstract since JAXB can't handle interfaces.
+ * Actually, the {@link Socket#PACKET_HANDLERS packet handlers of a socket} are called when scheduler invokes the group {@code computerProgramUpdate}.
+ * When that happens, all queued packets are polled from the {@link Socket#INCOMING_PACKET_QUEUE} and handed over to the handlers.
  * 
  * @see Socket
  * @see Packet

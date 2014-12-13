@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <configureSchedulerGroup name="computerNetworkUpdate">
-        <priority>700</priority>
-    </configureSchedulerGroup>
     <configureSchedulerGroup name="computerProgramUpdate">
-        <priority>500</priority>
+        <priority>1000</priority>
+    </configureSchedulerGroup>
+    <configureSchedulerGroup name="computerNetworkUpdate">
+        <priority>750</priority>
     </configureSchedulerGroup>
 </config>
