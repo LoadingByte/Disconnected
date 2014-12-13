@@ -22,12 +22,14 @@ import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import static org.junit.Assert.assertTrue;
 import java.io.StringReader;
 import java.io.StringWriter;
-import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -35,53 +37,43 @@ import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.classmod.util.FeatureDefinitionReference;
 import com.quartercode.disconnected.server.sim.scheduler.FunctionCallSchedulerTask;
-import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
-import com.quartercode.disconnected.server.sim.scheduler.SchedulerDefinition;
 
 public class FunctionCallSchedulerTaskTest {
 
-    private static boolean    executedTestFunction;
+    private static boolean            executedTestFunction;
 
-    private TestFeatureHolder schedulerHolder;
-    private Scheduler         scheduler;
+    private FunctionCallSchedulerTask task;
 
     @Before
     public void setUp() {
 
         executedTestFunction = false;
 
-        schedulerHolder = new TestFeatureHolder();
-        scheduler = schedulerHolder.get(TestFeatureHolder.SCHEDULER);
-
-        scheduler.schedule(new FunctionCallSchedulerTask(null, "testGroup", 1, new FeatureDefinitionReference<FunctionDefinition<?>>(TestFeatureHolder.class, "TEST_FUNCTION")));
+        task = new FunctionCallSchedulerTask(new FeatureDefinitionReference<FunctionDefinition<?>>(TestFeatureHolder.class, "TEST_FUNCTION"));
     }
 
     @Test
     public void testSchedule() {
 
-        scheduler.update("testGroup");
+        task.execute(new TestFeatureHolder());
         assertTrue("Function call scheduler task didn't call test function", executedTestFunction);
     }
 
     @Test
     public void testScheduleWithPersistence() throws JAXBException {
 
-        JAXBContext context = JAXBContext.newInstance(Scheduler.class, FunctionCallSchedulerTask.class, TestFeatureHolder.class);
         StringWriter serialized = new StringWriter();
-        context.createMarshaller().marshal(schedulerHolder, serialized);
-        TestFeatureHolder schedulerHolderCopy = (TestFeatureHolder) context.createUnmarshaller().unmarshal(new StringReader(serialized.toString()));
-        Scheduler copy = schedulerHolderCopy.get(TestFeatureHolder.SCHEDULER);
+        JAXB.marshal(new FunctionCallSchedulerTaskContainer(task), serialized);
+        FunctionCallSchedulerTask taskCopy = JAXB.unmarshal(new StringReader(serialized.toString()), FunctionCallSchedulerTaskContainer.class).getTask();
 
-        copy.update("testGroup");
-        assertTrue("Function call scheduler task didn't call test function", executedTestFunction);
+        taskCopy.execute(new TestFeatureHolder());
+        assertTrue("Function call scheduler task didn't call test function after persistence roundtrip", executedTestFunction);
     }
 
     @XmlRootElement
     private static class TestFeatureHolder extends DefaultCFeatureHolder {
 
-        public static final FeatureDefinition<Scheduler> SCHEDULER = new SchedulerDefinition("scheduler");
-
-        public static final FunctionDefinition<String>   TEST_FUNCTION;
+        public static final FunctionDefinition<String> TEST_FUNCTION;
 
         static {
 
@@ -96,6 +88,21 @@ public class FunctionCallSchedulerTaskTest {
                 }
 
             });
+
+        }
+
+    }
+
+    @AllArgsConstructor
+    @Getter
+    @XmlRootElement
+    protected static class FunctionCallSchedulerTaskContainer {
+
+        @XmlElement
+        private FunctionCallSchedulerTask task;
+
+        // JAXB constructor
+        protected FunctionCallSchedulerTaskContainer() {
 
         }
 

@@ -23,7 +23,7 @@ import com.quartercode.classmod.extra.conv.CFeatureHolder;
 /**
  * {@link CFeatureHolder}s which implement this interface inherit the {@link #SCHEDULER} feature which is a {@link Scheduler} that
  * is automatically updated by the tick simulator.
- * The simulator visits all {@link CFeatureHolder}s of a world and updates all automatic schedulers with all groups in the correct order.
+ * The simulator visits all feature holders of a world and updates all automatic schedulers with all groups in the correct order.
  * 
  * @see Scheduler
  */

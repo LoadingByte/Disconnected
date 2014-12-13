@@ -37,7 +37,7 @@ public class SchedulerPersistenceTest {
     public void testScheduleWithPersistence() throws JAXBException {
 
         Scheduler scheduler = new Scheduler("scheduler", new DefaultCFeatureHolder());
-        scheduler.schedule(new TestSchedulerTask(5, 2));
+        scheduler.schedule("testName", "testGroup", 5, 2, new TestSchedulerTask());
 
         JAXBContext context = JAXBContext.newInstance(Scheduler.class, TestSchedulerTask.class);
         StringWriter serialized = new StringWriter();
@@ -52,17 +52,6 @@ public class SchedulerPersistenceTest {
     }
 
     private static class TestSchedulerTask extends SchedulerTaskAdapter {
-
-        // JAXB constructor
-        @SuppressWarnings ("unused")
-        protected TestSchedulerTask() {
-
-        }
-
-        private TestSchedulerTask(int initialDelay, int periodicDelay) {
-
-            super("testName", "testGroup", initialDelay, periodicDelay);
-        }
 
         @Override
         public void execute(CFeatureHolder holder) {

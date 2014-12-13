@@ -23,17 +23,15 @@ import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.Function;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.util.FeatureDefinitionReference;
-import com.quartercode.disconnected.shared.util.XmlPersistent;
 
 /**
- * A function call scheduler task is a {@link SchedulerTask} that "just" calls a {@link Function}.
+ * A function call scheduler task is a {@link SchedulerTask} that "just" calls a {@link Function} on execution.
  * It supports persistence and can restore scheduled function calls that were serialized before.
  * For achieving that, it uses the {@link FeatureDefinitionReference} utility.
  * 
  * @see SchedulerTask
  * @see FeatureDefinitionReference
  */
-@XmlPersistent
 public class FunctionCallSchedulerTask extends SchedulerTaskAdapter {
 
     @XmlElement
@@ -48,47 +46,13 @@ public class FunctionCallSchedulerTask extends SchedulerTaskAdapter {
     }
 
     /**
-     * Creates a new function call scheduler task with the given {@link FeatureDefinitionReference} which is executed <b>once</b> after the given initial delay.
+     * Creates a new function call scheduler task with the given {@link FeatureDefinitionReference}.
      * Note that the given reference must point to a {@link FunctionDefinition}.
-     * See the provided methods of the {@link SchedulerTask} class for more information on the other parameters.
      * 
-     * @param name The name that can be used to identify the task inside a {@link Scheduler}.
-     *        This field may be {@code null}, in which case the task is anonymous.
-     * @param group The group which defines at which point inside a tick the task should be executed.
-     * @param initialDelay The amount of ticks that must elapse before the task is executed.
      * @param functionDefinition A feature definition reference that references the function definition which defines
      *        the {@link Function} that should be called by the task.
-     * 
-     * @see SchedulerTask#getInitialDelay()
-     * @see SchedulerTask#getGroup()
      */
-    public FunctionCallSchedulerTask(String name, String group, int initialDelay, FeatureDefinitionReference<FunctionDefinition<?>> functionDefinition) {
-
-        super(name, group, initialDelay);
-
-        this.functionDefinition = functionDefinition;
-    }
-
-    /**
-     * Creates a new function call scheduler task with the given {@link FeatureDefinitionReference} whose execution starts after the given initial delay
-     * and then continues with gaps of the given periodic delay.
-     * See the provided methods of the {@link SchedulerTask} class for more information on the other parameters.
-     * 
-     * @param name The name that can be used to identify the task inside a {@link Scheduler}.
-     *        This field may be {@code null}, in which case the task is anonymous.
-     * @param group The group which defines at which point inside a tick the task should be executed.
-     * @param initialDelay The amount of ticks that must elapse before the task is executed for the first time.
-     * @param periodicDelay The amount of ticks that must elapse before the task is executed for any subsequent time.
-     * @param functionDefinition A feature definition reference that references the function definition which defines
-     *        the {@link Function} that should be called by the task.
-     * 
-     * @see SchedulerTask#getInitialDelay()
-     * @see SchedulerTask#getPeriodicDelay()
-     * @see SchedulerTask#getGroup()
-     */
-    public FunctionCallSchedulerTask(String name, String group, int initialDelay, int periodicDelay, FeatureDefinitionReference<FunctionDefinition<?>> functionDefinition) {
-
-        super(name, group, initialDelay, periodicDelay);
+    public FunctionCallSchedulerTask(FeatureDefinitionReference<FunctionDefinition<?>> functionDefinition) {
 
         this.functionDefinition = functionDefinition;
     }

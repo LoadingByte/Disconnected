@@ -19,21 +19,26 @@
 package com.quartercode.disconnected.server.test.sim.scheduler;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerDefinition;
-import com.quartercode.disconnected.server.sim.scheduler.SchedulerTask;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
 
 public class SchedulerDefinitionTest {
 
-    private SchedulerDefinition schedulerDefinition;
+    private SchedulerDefinition     schedulerDefinition;
+
+    private final TestSchedulerTask task1 = new TestSchedulerTask(1);
+    private final TestSchedulerTask task2 = new TestSchedulerTask(2);
+    private final TestSchedulerTask task3 = new TestSchedulerTask(3);
 
     @Before
     public void setUp() {
@@ -42,104 +47,136 @@ public class SchedulerDefinitionTest {
     }
 
     @Test
-    public void testScheduleAndGet() {
+    public void testScheduleAndGetGlobalTasks() {
 
-        SchedulerTask testTask1 = new TestSchedulerTask("testTask1", 1);
-        SchedulerTask testTask2 = new TestSchedulerTask("testTask2", 1);
-        SchedulerTask testTask3 = new TestSchedulerTask("testTask3", 1);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask1", "testGroup", 1, 1, task1);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask2", "testGroup", 1, 1, task2);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask3", "testGroup", 1, 1, task3);
 
-        schedulerDefinition.schedule(testTask1, FeatureHolder1.class);
-        schedulerDefinition.schedule(testTask2, FeatureHolder1.class);
-        schedulerDefinition.schedule(testTask3, FeatureHolder1.class);
+        assertEquals("Scheduled tasks", new ArrayList<>(Arrays.asList(Pair.of(task1, FeatureHolder1.class), Pair.of(task2, FeatureHolder1.class), Pair.of(task3, FeatureHolder1.class))), new ArrayList<>(schedulerDefinition.getGlobalTasks()));
+    }
 
-        assertEquals("Scheduled task with name 'testTask2'", testTask2, schedulerDefinition.getGlobalTask("testTask2", FeatureHolder1.class));
+    @Test
+    public void testScheduleAndGetGlobalTask() {
+
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask1", "testGroup", 1, 1, task1);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask2", "testGroup", 1, 1, task2);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask3", "testGroup", 1, 1, task3);
+
+        assertEquals("Scheduled task with name 'testTask1'", task1, schedulerDefinition.getGlobalTask("testTask1", FeatureHolder1.class));
+        assertEquals("Scheduled task with name 'testTask2'", task2, schedulerDefinition.getGlobalTask("testTask2", FeatureHolder1.class));
+        assertEquals("Scheduled task with name 'testTask3'", task3, schedulerDefinition.getGlobalTask("testTask3", FeatureHolder1.class));
+    }
+
+    @Test
+    public void testRemoveByTask() {
+
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask1", "testGroup", 1, 1, task1);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask2", "testGroup", 1, 1, task2);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask3", "testGroup", 1, 1, task3);
+
+        schedulerDefinition.remove(FeatureHolder1.class, task2);
+
+        assertEquals("Scheduled tasks", new ArrayList<>(Arrays.asList(Pair.of(task1, FeatureHolder1.class), Pair.of(task3, FeatureHolder1.class))), new ArrayList<>(schedulerDefinition.getGlobalTasks()));
+    }
+
+    @Test
+    public void testRemoveByName() {
+
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask1", "testGroup", 1, 1, task1);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask2", "testGroup", 1, 1, task2);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask3", "testGroup", 1, 1, task3);
+
+        schedulerDefinition.remove(FeatureHolder1.class, "testTask2");
+
+        assertEquals("Scheduled tasks", new ArrayList<>(Arrays.asList(Pair.of(task1, FeatureHolder1.class), Pair.of(task3, FeatureHolder1.class))), new ArrayList<>(schedulerDefinition.getGlobalTasks()));
     }
 
     @Test
     public void testScheduleAndCreate() {
 
-        SchedulerTask testTask = new TestSchedulerTask("testTask", 1);
-
-        schedulerDefinition.schedule(testTask, FeatureHolder1.class);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask1", "testGroup", 1, 1, task1);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask2", "testGroup", 1, 1, task2);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask3", "testGroup", 1, 1, task3);
 
         Scheduler scheduler = new FeatureHolder1().get(schedulerDefinition);
-        assertEquals("Scheduler object's tasks", new ArrayList<>(Arrays.asList(testTask)), new ArrayList<>(scheduler.getTasks()));
+        assertEquals("Scheduler object's tasks", new ArrayList<>(Arrays.asList(task1, task2, task3)), new ArrayList<>(scheduler.getTasks()));
     }
 
     @Test
-    public void testScheduleAndRemoveAndCreate() {
+    public void testScheduleAndRemoveByTaskAndCreate() {
 
-        SchedulerTask testTask = new TestSchedulerTask("testTask", 1);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask1", "testGroup", 1, 1, task1);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask2", "testGroup", 1, 1, task2);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask3", "testGroup", 1, 1, task3);
 
-        schedulerDefinition.schedule(testTask, FeatureHolder1.class);
-        schedulerDefinition.remove(testTask, FeatureHolder1.class);
+        schedulerDefinition.remove(FeatureHolder1.class, task2);
 
         Scheduler scheduler = new FeatureHolder1().get(schedulerDefinition);
-        assertTrue("Scheduler object's tasks are not empty", scheduler.getTasks().isEmpty());
+        assertEquals("Scheduler object's tasks", new ArrayList<>(Arrays.asList(task1, task3)), new ArrayList<>(scheduler.getTasks()));
     }
 
     @Test
-    public void testScheduleAndRemoveWithNameAndCreate() {
+    public void testScheduleAndRemoveByNameAndCreate() {
 
-        SchedulerTask testTask = new TestSchedulerTask("testTask", 1);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask1", "testGroup", 1, 1, task1);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask2", "testGroup", 1, 1, task2);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask3", "testGroup", 1, 1, task3);
 
-        schedulerDefinition.schedule(testTask, FeatureHolder1.class);
-        schedulerDefinition.remove("testTask", FeatureHolder1.class);
+        schedulerDefinition.remove(FeatureHolder1.class, "testTask2");
 
         Scheduler scheduler = new FeatureHolder1().get(schedulerDefinition);
-        assertTrue("Scheduler object's tasks are not empty", scheduler.getTasks().isEmpty());
+        assertEquals("Scheduler object's tasks", new ArrayList<>(Arrays.asList(task1, task3)), new ArrayList<>(scheduler.getTasks()));
     }
 
     @Test
     public void testScheduleAndCreateWithDifferentHolderClasses() {
 
-        SchedulerTask testTask1 = new TestSchedulerTask("testTask1", 1);
-        SchedulerTask testTask2 = new TestSchedulerTask("testTask2", 1);
-        SchedulerTask testTask3 = new TestSchedulerTask("testTask3", 1);
-
-        schedulerDefinition.schedule(testTask1, FeatureHolder1.class);
-        schedulerDefinition.schedule(testTask2, FeatureHolder2.class);
-        schedulerDefinition.schedule(testTask3, FeatureHolder3Extends2.class);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask1", "testGroup", 1, 1, task1);
+        schedulerDefinition.schedule(FeatureHolder2.class, "testTask2", "testGroup", 1, 1, task2);
+        schedulerDefinition.schedule(FeatureHolder3Extends2.class, "testTask3", "testGroup", 1, 1, task3);
 
         Scheduler scheduler1 = new FeatureHolder1().get(schedulerDefinition);
-        assertEquals("Scheduler object's tasks with FeatureHolder1", new ArrayList<>(Arrays.asList(testTask1)), new ArrayList<>(scheduler1.getTasks()));
+        assertEquals("Scheduler object's tasks with FeatureHolder1", new ArrayList<>(Arrays.asList(task1)), new ArrayList<>(scheduler1.getTasks()));
 
         Scheduler scheduler2 = new FeatureHolder2().get(schedulerDefinition);
-        assertEquals("Scheduler object's tasks with FeatureHolder1", new ArrayList<>(Arrays.asList(testTask2)), new ArrayList<>(scheduler2.getTasks()));
+        assertEquals("Scheduler object's tasks with FeatureHolder2", new ArrayList<>(Arrays.asList(task2)), new ArrayList<>(scheduler2.getTasks()));
 
         Scheduler scheduler3 = new FeatureHolder3Extends2().get(schedulerDefinition);
-        assertEquals("Scheduler object's tasks with FeatureHolder3Extands2", new ArrayList<>(Arrays.asList(testTask2, testTask3)), new ArrayList<>(scheduler3.getTasks()));
+        assertEquals("Scheduler object's tasks with FeatureHolder3Extands2", new ArrayList<>(Arrays.asList(task2, task3)), new ArrayList<>(scheduler3.getTasks()));
     }
 
     @Test
     public void testScheduleTwice() {
 
-        SchedulerTask testTask = new TestSchedulerTask("testTask", 1);
-
-        schedulerDefinition.schedule(testTask, FeatureHolder1.class);
-        schedulerDefinition.schedule(testTask, FeatureHolder1.class);
+        // No error
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask1", "testGroup", 1, 1, task1);
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask1", "testGroup", 1, 1, task1);
     }
 
     @Test
     public void testScheduleTwiceDifferentHolderClass() {
 
-        SchedulerTask testTask = new TestSchedulerTask("testTask", 1);
-
-        schedulerDefinition.schedule(testTask, FeatureHolder1.class);
-        schedulerDefinition.schedule(testTask, FeatureHolder2.class);
+        // No error
+        schedulerDefinition.schedule(FeatureHolder1.class, "testTask1", "testGroup", 1, 1, task1);
+        schedulerDefinition.schedule(FeatureHolder2.class, "testTask1", "testGroup", 1, 1, task1);
     }
 
+    @RequiredArgsConstructor
+    @Getter
     private static class TestSchedulerTask extends SchedulerTaskAdapter {
 
-        private TestSchedulerTask(String name, int id) {
-
-            super(name, "testGroup" + id, id, id);
-        }
+        private final int id;
 
         @Override
         public void execute(CFeatureHolder holder) {
 
-            // Empty
+        }
+
+        @Override
+        public String toString() {
+
+            return Integer.toHexString(System.identityHashCode(this));
         }
 
     }
