@@ -42,27 +42,24 @@ import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.sim.TickService;
 import com.quartercode.disconnected.server.sim.scheduler.FunctionCallSchedulerTask;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
+import com.quartercode.disconnected.server.world.comp.config.Config;
+import com.quartercode.disconnected.server.world.comp.config.ConfigEntry;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.FSModule;
 import com.quartercode.disconnected.server.world.comp.file.File;
-import com.quartercode.disconnected.server.world.comp.os.EnvVariable;
 import com.quartercode.disconnected.server.world.comp.os.OS;
-import com.quartercode.disconnected.server.world.comp.os.OSModule;
-import com.quartercode.disconnected.server.world.comp.os.Session;
-import com.quartercode.disconnected.server.world.comp.os.config.Config;
-import com.quartercode.disconnected.server.world.comp.os.config.ConfigEntry;
-import com.quartercode.disconnected.server.world.comp.os.user.User;
+import com.quartercode.disconnected.server.world.comp.os.mod.OSModule;
+import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
 import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
 
 /**
- * This class represents an {@link OS operating system} module which is used to manage the {@link RootProcess}.
+ * This class represents an {@link OSModule operating system module} which is used to manage the {@link RootProcess}.
  * It is an essential part of the operating system and is directly used by it.
  * 
  * @see RootProcess
  * @see OSModule
- * @see OS
  */
 public class ProcModule extends OSModule implements SchedulerUser {
 
@@ -207,7 +204,7 @@ public class ProcModule extends OSModule implements SchedulerUser {
 
         }, LEVEL_5);
 
-        SET_RUNNING.addExecutor("interruptRootProcess", OS.class, new FunctionExecutor<Void>() {
+        SET_RUNNING.addExecutor("interruptRootProcess", ProcModule.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {

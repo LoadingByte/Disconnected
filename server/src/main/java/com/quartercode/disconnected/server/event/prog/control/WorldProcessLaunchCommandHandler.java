@@ -34,7 +34,6 @@ import com.quartercode.disconnected.server.world.comp.os.OS;
 import com.quartercode.disconnected.server.world.comp.prog.ProcModule;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
-import com.quartercode.disconnected.server.world.comp.prog.ProgramUtils;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchAcknowledgmentEvent;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
@@ -143,7 +142,7 @@ public class WorldProcessLaunchCommandHandler implements SBPAwareEventHandler<Wo
 
     protected WorldProcessId getProcessId(ProgramExecutor executor) {
 
-        return ProgramUtils.getProcessId(executor);
+        return executor.getParent().invoke(Process.GET_WORLD_PROCESS_ID);
     }
 
 }

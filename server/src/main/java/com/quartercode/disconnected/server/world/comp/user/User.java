@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world.comp.os.user;
+package com.quartercode.disconnected.server.world.comp.user;
 
 import static com.quartercode.classmod.extra.func.Priorities.LEVEL_6;
 import static com.quartercode.classmod.factory.ClassmodFactory.factory;
@@ -38,7 +38,7 @@ import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
 import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.util.NullPreventer;
-import com.quartercode.disconnected.server.world.comp.os.config.ConfigEntry;
+import com.quartercode.disconnected.server.world.comp.config.ConfigEntry;
 
 /**
  * A user represents a system user (basically someone who can use a system).

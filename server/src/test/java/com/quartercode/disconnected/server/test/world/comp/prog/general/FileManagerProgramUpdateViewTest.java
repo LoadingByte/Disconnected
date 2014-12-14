@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.test.world.comp.program.general;
+package com.quartercode.disconnected.server.test.world.comp.prog.general;
 
 import static com.quartercode.disconnected.shared.world.comp.file.PathUtils.resolve;
 import static org.junit.Assert.assertEquals;
@@ -34,7 +34,7 @@ import com.quartercode.disconnected.server.world.comp.file.FSModule;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.prog.ChildProcess;
-import com.quartercode.disconnected.server.world.comp.prog.ProgramUtils;
+import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.general.FileManagerProgram;
 import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWPUUpdateViewCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWorldChangeDirCommand;
@@ -68,7 +68,7 @@ public class FileManagerProgramUpdateViewTest extends AbstractComplexComputerTes
 
         // Launch the program
         ChildProcess process = launchProgram(mainRootProcess(), getCommonLocation(FileManagerProgram.class));
-        processId = ProgramUtils.getProcessId(process);
+        processId = process.invoke(Process.GET_WORLD_PROCESS_ID);
     }
 
     private void sendChangeDirCommand(String change) {

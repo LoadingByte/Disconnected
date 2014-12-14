@@ -24,7 +24,7 @@ import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
 import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.factory.FunctionDefinitionFactory;
-import com.quartercode.disconnected.server.world.comp.os.user.User;
+import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 
 /**

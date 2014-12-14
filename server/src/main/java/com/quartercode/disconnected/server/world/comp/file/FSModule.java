@@ -38,19 +38,17 @@ import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
 import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
-import com.quartercode.disconnected.server.world.comp.os.OS;
-import com.quartercode.disconnected.server.world.comp.os.OSModule;
+import com.quartercode.disconnected.server.world.comp.os.mod.OSModule;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 
 /**
- * This class represents an {@link OS operating system} module which is used to access the available {@link FileSystem file systems}.
+ * This class represents an {@link OSModule operating system module} which is used to access the available {@link FileSystem file systems}.
  * It is an essential part of the operating system and is directly used by it.
  * 
  * @see FileSystem
  * @see File
  * @see OSModule
- * @see OS
  */
 public class FSModule extends OSModule {
 

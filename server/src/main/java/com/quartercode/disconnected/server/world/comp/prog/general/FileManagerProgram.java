@@ -19,6 +19,8 @@
 package com.quartercode.disconnected.server.world.comp.prog.general;
 
 import static com.quartercode.classmod.factory.ClassmodFactory.factory;
+import static com.quartercode.disconnected.server.world.comp.prog.util.ProgEventUtils.registerSBPAwareEventHandler;
+import static com.quartercode.disconnected.server.world.comp.prog.util.ProgStateUtils.registerInterruptionStopper;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -41,10 +43,9 @@ import com.quartercode.disconnected.server.world.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.server.world.comp.file.ParentFile;
 import com.quartercode.disconnected.server.world.comp.file.UnknownMountpointException;
 import com.quartercode.disconnected.server.world.comp.os.OS;
-import com.quartercode.disconnected.server.world.comp.os.user.User;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
-import com.quartercode.disconnected.server.world.comp.prog.ProgramUtils;
+import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWPUUpdateViewCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWorldAddFileCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWorldChangeDirCommand;
@@ -101,7 +102,7 @@ public class FileManagerProgram extends ProgramExecutor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                ProgramUtils.registerInterruptionStopper( ((FileManagerProgram) invocation.getCHolder()).getParent());
+                registerInterruptionStopper( ((FileManagerProgram) invocation.getCHolder()).getParent());
                 return invocation.next(arguments);
             }
 
@@ -115,7 +116,7 @@ public class FileManagerProgram extends ProgramExecutor {
                 FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
                 ChangeDirCommandHandler handler = new ChangeDirCommandHandler();
                 handler.holder = holder;
-                ProgramUtils.registerSBPAwareEventHandler(holder, FMPWorldChangeDirCommand.class, handler, true);
+                registerSBPAwareEventHandler(holder, FMPWorldChangeDirCommand.class, handler, true);
 
                 return invocation.next(arguments);
             }
@@ -129,7 +130,7 @@ public class FileManagerProgram extends ProgramExecutor {
                 FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
                 AddFileCommandHandler handler = new AddFileCommandHandler();
                 handler.holder = holder;
-                ProgramUtils.registerSBPAwareEventHandler(holder, FMPWorldAddFileCommand.class, handler, true);
+                registerSBPAwareEventHandler(holder, FMPWorldAddFileCommand.class, handler, true);
 
                 return invocation.next(arguments);
             }
@@ -143,7 +144,7 @@ public class FileManagerProgram extends ProgramExecutor {
                 FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
                 RemoveFileCommandHandler handler = new RemoveFileCommandHandler();
                 handler.holder = holder;
-                ProgramUtils.registerSBPAwareEventHandler(holder, FMPWorldRemoveFileCommand.class, handler, true);
+                registerSBPAwareEventHandler(holder, FMPWorldRemoveFileCommand.class, handler, true);
 
                 return invocation.next(arguments);
             }

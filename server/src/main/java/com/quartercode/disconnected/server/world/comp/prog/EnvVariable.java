@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world.comp.os;
+package com.quartercode.disconnected.server.world.comp.prog;
 
 import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.util.NullPreventer;
-import com.quartercode.disconnected.server.world.comp.os.config.ConfigEntry;
+import com.quartercode.disconnected.server.world.comp.config.ConfigEntry;
 
 /**
  * Environment variables are used by different programs.

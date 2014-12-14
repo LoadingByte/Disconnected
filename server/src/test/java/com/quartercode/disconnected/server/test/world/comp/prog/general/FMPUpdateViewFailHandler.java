@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.test.world.comp.program.general;
+package com.quartercode.disconnected.server.test.world.comp.prog.general;
 
 import static org.junit.Assert.fail;
 import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWPUUpdateViewCommand;

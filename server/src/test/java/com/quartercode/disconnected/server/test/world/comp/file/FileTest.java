@@ -25,8 +25,8 @@ import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
-import com.quartercode.disconnected.server.world.comp.os.user.Group;
-import com.quartercode.disconnected.server.world.comp.os.user.User;
+import com.quartercode.disconnected.server.world.comp.user.Group;
+import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.shared.world.comp.ByteUnit;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 

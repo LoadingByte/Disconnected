@@ -16,11 +16,12 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world.comp.os;
+package com.quartercode.disconnected.server.world.comp.os.mod;
 
 import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.factory.FunctionDefinitionFactory;
+import com.quartercode.disconnected.server.world.comp.os.OS;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 
 /**
@@ -36,7 +37,7 @@ public abstract class OSModule extends WorldChildFeatureHolder<OS> {
     // ----- Functions -----
 
     /**
-     * Called on the bootstrap (true) or shutdown (false) of the {@link OS operating system} which uses the module.
+     * Called on the bootstrap ({@code true}) or shutdown ({@code false}) of the {@link OS operating system} which uses the module.
      * 
      * <table>
      * <tr>

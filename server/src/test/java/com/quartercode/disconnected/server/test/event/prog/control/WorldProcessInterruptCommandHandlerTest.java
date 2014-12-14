@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.test.world.comp.program;
+package com.quartercode.disconnected.server.test.event.prog.control;
 
 import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;

@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world.comp.os;
+package com.quartercode.disconnected.server.world.comp.prog;
 
 import static com.quartercode.classmod.extra.func.Priorities.*;
 import static com.quartercode.classmod.factory.ClassmodFactory.factory;
@@ -28,10 +28,7 @@ import com.quartercode.classmod.extra.storage.ReferenceStorage;
 import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.util.HashUtils;
-import com.quartercode.disconnected.server.world.comp.os.user.User;
-import com.quartercode.disconnected.server.world.comp.prog.ChildProcess;
-import com.quartercode.disconnected.server.world.comp.prog.Process;
-import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
+import com.quartercode.disconnected.server.world.comp.user.User;
 
 /**
  * This class represents a program which opens a session.

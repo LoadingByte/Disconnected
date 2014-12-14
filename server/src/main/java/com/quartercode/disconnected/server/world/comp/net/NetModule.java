@@ -37,19 +37,17 @@ import com.quartercode.disconnected.server.world.comp.hardware.Hardware;
 import com.quartercode.disconnected.server.world.comp.hardware.NodeNetInterface;
 import com.quartercode.disconnected.server.world.comp.net.Socket.SocketState;
 import com.quartercode.disconnected.server.world.comp.net.SocketConnectionListener.ConnectionAllowance;
-import com.quartercode.disconnected.server.world.comp.os.OS;
-import com.quartercode.disconnected.server.world.comp.os.OSModule;
+import com.quartercode.disconnected.server.world.comp.os.mod.OSModule;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
 
 /**
- * This class represents an {@link OS operating system} module which is used to send and receive network {@link Packet}s.
+ * This class represents an {@link OSModule operating system module} which is used to send and receive network {@link Packet}s.
  * The module also abstracts the concept of TCP packets and introduces {@link Socket}s for easier data transfer.
  * It is an essential part of the operating system and is directly used by it.
  * 
  * @see Packet
  * @see Socket
  * @see OSModule
- * @see OS
  */
 public class NetModule extends OSModule {
 

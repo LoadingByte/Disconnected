@@ -45,15 +45,14 @@ import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
-import com.quartercode.disconnected.server.world.comp.os.EnvVariable;
 import com.quartercode.disconnected.server.world.comp.os.OS;
-import com.quartercode.disconnected.server.world.comp.os.Session;
-import com.quartercode.disconnected.server.world.comp.os.user.User;
+import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
 
 /**
  * This class represents a process which is basically a running instance of a program.
@@ -386,6 +385,12 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
     public static final FunctionDefinition<Program>                                              GET_PROGRAM;
 
     /**
+     * Returns a {@link WorldProcessId} object that identifies this process.
+     * The process is identified using the id of the computer it is running on, as well as the actual {@link #PID process id (pid)}.
+     */
+    public static final FunctionDefinition<WorldProcessId>                                       GET_WORLD_PROCESS_ID;
+
+    /**
      * Initializes the process using the {@link Program} that is stored in the set source {@link ContentFile}.
      * Initialization means setting the {@link #PID} and creating a {@link ProgramExecutor} instance.
      * Please note that the process needs to be launched using the {@link ProgramExecutor#RUN} method on the {@link #EXECUTOR} after intialization.
@@ -694,6 +699,24 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
                 invocation.next(arguments);
                 return program;
+            }
+
+        });
+
+        GET_WORLD_PROCESS_ID = factory(FunctionDefinitionFactory.class).create("getWorldProcessId", new Class[0]);
+        GET_WORLD_PROCESS_ID.addExecutor("default", Process.class, new FunctionExecutor<WorldProcessId>() {
+
+            @Override
+            public WorldProcessId invoke(FunctionInvocation<WorldProcessId> invocation, Object... arguments) {
+
+                CFeatureHolder holder = invocation.getCHolder();
+
+                int pid = holder.getObj(Process.PID);
+                String computerId = holder.invoke(Process.GET_OS).getParent().getId();
+                WorldProcessId worldProcessId = new WorldProcessId(computerId, pid);
+
+                invocation.next(arguments);
+                return worldProcessId;
             }
 
         });

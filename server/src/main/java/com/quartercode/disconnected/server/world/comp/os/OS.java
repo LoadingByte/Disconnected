@@ -44,8 +44,6 @@ import com.quartercode.disconnected.shared.world.comp.Version;
 /**
  * This class stores information about an operating system.
  * It is the core part of a running computer and manages all required modules (e.g. the {@link FSModule file system module}).
- * 
- * @see FSModule
  */
 public class OS extends WorldChildFeatureHolder<Computer> {
 
@@ -125,7 +123,7 @@ public class OS extends WorldChildFeatureHolder<Computer> {
     /**
      * Boots up ({@code true}) or shuts down ({@code false}) the operating system.
      * If the operating system already is in the correct state, nothing happens.
-     * This method calls the {@link OSModule#SET_RUNNING} function on every used module.
+     * This method calls a similar {@code SET_RUNNING} function on every used module.
      * Because of the fact that modules are not stored in a central collection, every module has its executor which invokes the module method.
      * 
      * <table>
@@ -139,7 +137,7 @@ public class OS extends WorldChildFeatureHolder<Computer> {
      * <td>0</td>
      * <td>{@link Boolean}</td>
      * <td>running</td>
-     * <td>True to boot up the operating system, false to shut it down.</td>
+     * <td>{@code True} to boot up the operating system, {@code false} to shut it down.</td>
      * </tr>
      * </table>
      */
@@ -168,7 +166,7 @@ public class OS extends WorldChildFeatureHolder<Computer> {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                invocation.getCHolder().getObj(FS_MODULE).invoke(OSModule.SET_RUNNING, arguments);
+                invocation.getCHolder().getObj(FS_MODULE).invoke(FSModule.SET_RUNNING, arguments);
                 return invocation.next(arguments);
             }
 
@@ -178,7 +176,7 @@ public class OS extends WorldChildFeatureHolder<Computer> {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                invocation.getCHolder().getObj(PROC_MODULE).invoke(OSModule.SET_RUNNING, arguments);
+                invocation.getCHolder().getObj(PROC_MODULE).invoke(ProcModule.SET_RUNNING, arguments);
                 return invocation.next(arguments);
             }
 
@@ -188,7 +186,7 @@ public class OS extends WorldChildFeatureHolder<Computer> {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                invocation.getCHolder().getObj(NET_MODULE).invoke(OSModule.SET_RUNNING, arguments);
+                invocation.getCHolder().getObj(NET_MODULE).invoke(NetModule.SET_RUNNING, arguments);
                 return invocation.next(arguments);
             }
 
