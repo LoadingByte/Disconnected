@@ -19,6 +19,8 @@
 package com.quartercode.disconnected.clientdist;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
@@ -71,8 +73,21 @@ public class Main {
 
     static {
 
-        String jarName = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getFileName().toString();
-        JAR_NAME = jarName.endsWith(".jar") ? jarName : null;
+        URL jarLocation = Main.class.getProtectionDomain().getCodeSource().getLocation();
+        String jarName = "<unknown>";
+
+        try {
+            String tempJarName = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getFileName().toString();
+            if (tempJarName.endsWith(".jar")) {
+                tempJarName = jarName;
+            } else {
+                LOGGER.warn("Cannot read application jar name (location '{}') because it doesn't end with '.jar'", jarLocation);
+            }
+        } catch (URISyntaxException e) {
+            LOGGER.warn("Cannot read application jar name (location '{}') due to and unexpected exception", jarLocation, e);
+        }
+
+        JAR_NAME = jarName;
 
     }
 

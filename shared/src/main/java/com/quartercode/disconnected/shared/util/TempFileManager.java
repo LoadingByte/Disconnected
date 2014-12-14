@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,13 +101,31 @@ public class TempFileManager {
 
     private static List<String> getJavaPids() throws IOException {
 
+        if (!SystemUtils.IS_OS_UNIX && !SystemUtils.IS_OS_WINDOWS) {
+            throw new IllegalStateException("TempFileManager does only support Unix and Windows");
+        }
+
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        if (SystemUtils.IS_OS_UNIX) {
+            processBuilder.command("ps", "-C", "java", "-o", "pid=");
+        } else {
+            processBuilder.command("tasklist.exe", "/fo", "csv", "/nh");
+        }
+
         List<String> javaPids = new ArrayList<>();
 
-        Process process = new ProcessBuilder("jps", "-q").start();
+        Process process = processBuilder.start();
         try (Scanner scanner = new Scanner(process.getInputStream())) {
             scanner.useDelimiter("\\n");
             while (scanner.hasNext()) {
-                javaPids.add(scanner.next());
+                if (SystemUtils.IS_OS_UNIX) {
+                    javaPids.add(scanner.next().trim());
+                } else {
+                    String[] tokens = scanner.next().split(",");
+                    if (tokens.length == 5 && tokens[0].equals("java.exe")) {
+                        javaPids.add(StringUtils.strip(tokens[1], "\""));
+                    }
+                }
             }
         }
 

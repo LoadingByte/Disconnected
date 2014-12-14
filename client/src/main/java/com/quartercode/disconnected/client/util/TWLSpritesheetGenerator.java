@@ -20,6 +20,7 @@ package com.quartercode.disconnected.client.util;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -340,7 +341,7 @@ public class TWLSpritesheetGenerator {
         // Write all pages
         for (Entry<Path, List<Sprite>> page : smallSprites.entrySet()) {
             // Write images start element
-            output.write("<images file=\"" + page.getKey().toAbsolutePath() + "\">");
+            output.write("<images file=\"" + page.getKey().toUri().toURL() + "\">");
 
             // Write all regions
             for (Sprite sprite : page.getValue()) {
@@ -353,7 +354,7 @@ public class TWLSpritesheetGenerator {
 
         // Write all large sprites
         for (Entry<Path, Sprite> largeSprite : largeSprites.entrySet()) {
-            output.write(" <images file=\"" + largeSprite.getKey().toAbsolutePath() + "\">");
+            output.write(" <images file=\"" + largeSprite.getKey().toUri().toURL() + "\">");
             getSpriteWriter(writers, largeSprite.getValue().name).write(largeSprite.getValue(), true, output);
             output.write("</images>");
         }
@@ -440,6 +441,11 @@ public class TWLSpritesheetGenerator {
 
     }
 
+    private static String prepareSpriteName(String name) {
+
+        return name.replace('/', '_').replace(File.separatorChar, '_');
+    }
+
     @RequiredArgsConstructor
     private static class SingleSpriteWriter implements SpriteWriter {
 
@@ -450,7 +456,7 @@ public class TWLSpritesheetGenerator {
         @Override
         public void write(Sprite sprite, boolean large, Writer output) throws IOException {
 
-            output.write("<area name=\"" + spriteName.replace("/", "_") + "\"");
+            output.write("<area name=\"" + prepareSpriteName(spriteName) + "\"");
             output.write(" xywh=\"" + (large ? "*" : toXYWH(sprite.bounds)) + "\"");
             writeAttributes(attributes, output);
             output.write(" />");
@@ -472,7 +478,7 @@ public class TWLSpritesheetGenerator {
         @Override
         public void write(Sprite sprite, boolean large, Writer output) throws IOException {
 
-            String baseName = spriteName.replace("/", "_");
+            String baseName = prepareSpriteName(spriteName);
             Rectangle bounds = sprite.bounds;
             maxIndex = (int) Math.floor((double) bounds.width / (double) itemLength);
 
@@ -502,7 +508,7 @@ public class TWLSpritesheetGenerator {
         public void write(List<TWLWriter> otherWriters, Writer output) throws IOException {
 
             // Write the start of the base animation element
-            output.write("<animation name=\"" + animationName.replace("/", "_") + "\"");
+            output.write("<animation name=\"" + prepareSpriteName(animationName) + "\"");
             writeAttributes(createXMLAttributeMap(root.getAttributes(), "name"), output);
             output.write(">");
 
@@ -544,7 +550,7 @@ public class TWLSpritesheetGenerator {
                 } else {
                     Map<String, String> attributes = createXMLAttributeMap(element.getAttributes(), "sprite", "reps");
                     // Write the single frame
-                    writeSingleFrame(resolveGlobalSpriteName(spriteName).replace("/", "_"), attributes, output);
+                    writeSingleFrame(prepareSpriteName(resolveGlobalSpriteName(spriteName)), attributes, output);
                 }
             }
             // Frame array using a sprite array
@@ -582,7 +588,7 @@ public class TWLSpritesheetGenerator {
                         Map<String, String> attributes = createXMLAttributeMap(element.getAttributes(), "spriteArray", "start", "end", "reps");
                         // Write all defined frames, one after another
                         for (int index = start; index <= end; index++) {
-                            writeSingleFrame(spriteArrayName.replace("/", "_") + "$" + index, attributes, output);
+                            writeSingleFrame(prepareSpriteName(spriteArrayName) + "$" + index, attributes, output);
                         }
                     }
                 }

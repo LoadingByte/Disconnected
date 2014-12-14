@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.server.world.comp.os;
 
+import static com.quartercode.classmod.extra.func.Priorities.*;
 import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
@@ -170,17 +171,7 @@ public class OS extends WorldChildFeatureHolder<Computer> {
                 return invocation.next(arguments);
             }
 
-        });
-        SET_RUNNING.addExecutor("procModule", OS.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                invocation.getCHolder().getObj(PROC_MODULE).invoke(ProcModule.SET_RUNNING, arguments);
-                return invocation.next(arguments);
-            }
-
-        });
+        }, LEVEL_8);
         SET_RUNNING.addExecutor("netModule", OS.class, new FunctionExecutor<Void>() {
 
             @Override
@@ -190,7 +181,17 @@ public class OS extends WorldChildFeatureHolder<Computer> {
                 return invocation.next(arguments);
             }
 
-        });
+        }, LEVEL_7);
+        SET_RUNNING.addExecutor("procModule", OS.class, new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                invocation.getCHolder().getObj(PROC_MODULE).invoke(ProcModule.SET_RUNNING, arguments);
+                return invocation.next(arguments);
+            }
+
+        }, LEVEL_4);
 
     }
 
