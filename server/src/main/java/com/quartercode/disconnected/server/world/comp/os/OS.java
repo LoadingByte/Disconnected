@@ -36,11 +36,11 @@ import com.quartercode.disconnected.server.world.comp.net.NetModule;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.Socket;
 import com.quartercode.disconnected.server.world.comp.prog.ProcModule;
-import com.quartercode.disconnected.server.world.comp.prog.ProcState;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.RootProcess;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 import com.quartercode.disconnected.shared.world.comp.Version;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
 
 /**
  * This class stores information about an operating system.
@@ -153,7 +153,7 @@ public class OS extends WorldChildFeatureHolder<Computer> {
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
-                boolean running = holder.getObj(PROC_MODULE).getObj(ProcModule.ROOT_PROCESS).getObj(Process.STATE) != ProcState.STOPPED;
+                boolean running = holder.getObj(PROC_MODULE).getObj(ProcModule.ROOT_PROCESS).getObj(Process.STATE) != WorldProcessState.STOPPED;
 
                 invocation.next(arguments);
                 return running;

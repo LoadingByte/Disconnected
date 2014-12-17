@@ -25,9 +25,10 @@ import com.quartercode.disconnected.server.world.comp.prog.ProcStateListener;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
 
 /**
- * This utility class provides some utility methods and classes regarding {@link ProcState process states} for {@link ProgramExecutor} implementations.
+ * This utility class provides some utility methods and classes regarding {@link WorldProcessState}s for {@link ProgramExecutor} implementations.
  * They should be used to remove the need for boilerplate code.
  * 
  * @see ProgramExecutor
@@ -60,7 +61,7 @@ public class ProgStateUtils {
 
                     Object newState = arguments[2];
 
-                    if (newState == ProcState.INTERRUPTED) {
+                    if (newState == WorldProcessState.INTERRUPTED) {
                         ((Process<?>) arguments[0]).invoke(Process.STOP, true);
                     }
 

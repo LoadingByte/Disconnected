@@ -29,12 +29,12 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.disconnected.server.event.prog.control.WorldProcessInterruptCommandHandler;
 import com.quartercode.disconnected.server.world.comp.prog.ChildProcess;
-import com.quartercode.disconnected.server.world.comp.prog.ProcState;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.RootProcess;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessInterruptCommand;
 import com.quartercode.disconnected.shared.identity.ClientIdentity;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
 import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId;
 
 @RunWith (Parameterized.class)
@@ -79,7 +79,7 @@ public class WorldProcessInterruptCommandHandlerTest {
 
         interruptAndAssert(process1, recursive);
 
-        assertEquals("State of not-interrupted process", ProcState.RUNNING, process2.getObj(Process.STATE));
+        assertEquals("State of not-interrupted process", WorldProcessState.RUNNING, process2.getObj(Process.STATE));
     }
 
     @Test
@@ -110,7 +110,7 @@ public class WorldProcessInterruptCommandHandlerTest {
 
         ChildProcess process = parent.invoke(Process.CREATE_CHILD);
         process.setObj(Process.PID, pid);
-        process.setObj(Process.STATE, ProcState.RUNNING);
+        process.setObj(Process.STATE, WorldProcessState.RUNNING);
         process.setObj(Process.WORLD_PROCESS_USER, new SBPWorldProcessUserId(SBP, null));
         return process;
     }
@@ -122,13 +122,13 @@ public class WorldProcessInterruptCommandHandlerTest {
         WorldProcessInterruptCommand event = new WorldProcessInterruptCommand(process.getObj(Process.PID), recursive);
         handler.handle(event, SBP);
 
-        assertEquals("State of interrupted process", ProcState.INTERRUPTED, process.getObj(Process.STATE));
+        assertEquals("State of interrupted process", WorldProcessState.INTERRUPTED, process.getObj(Process.STATE));
 
         for (Process<?> child : process.invoke(Process.GET_ALL_CHILDREN)) {
             if (recursive) {
-                assertEquals("State of interrupted child process", ProcState.INTERRUPTED, child.getObj(Process.STATE));
+                assertEquals("State of interrupted child process", WorldProcessState.INTERRUPTED, child.getObj(Process.STATE));
             } else {
-                assertEquals("State of non-interrupted child process", ProcState.RUNNING, child.getObj(Process.STATE));
+                assertEquals("State of non-interrupted child process", WorldProcessState.RUNNING, child.getObj(Process.STATE));
             }
         }
     }

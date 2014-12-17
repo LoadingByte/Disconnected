@@ -23,16 +23,17 @@ import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
 
 /**
- * A process state listener is notified after the {@link ProcState process state} of a {@link Process} has changed.
+ * A process state listener is notified after the {@link WorldProcessState} of a {@link Process} has changed.
  * Such listeners can be activated by adding them to {@link Process#STATE_LISTENERS}.
  */
 @XmlPersistent
 public interface ProcStateListener extends CFeatureHolder {
 
     /**
-     * Called after the {@link ProcState process state} of the given {@link Process} has changed.
+     * Called after the {@link WorldProcessState} of the given {@link Process} has changed.
      * 
      * <table>
      * <tr>
@@ -49,18 +50,18 @@ public interface ProcStateListener extends CFeatureHolder {
      * </tr>
      * <tr>
      * <td>1</td>
-     * <td>{@link ProcState}</td>
+     * <td>{@link WorldProcessState}</td>
      * <td>oldState</td>
      * <td>The old state of the process.</td>
      * </tr>
      * <tr>
      * <td>2</td>
-     * <td>{@link ProcState}</td>
+     * <td>{@link WorldProcessState}</td>
      * <td>newState</td>
      * <td>The new state of the process.</td>
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Void> ON_STATE_CHANGE = factory(FunctionDefinitionFactory.class).create("onStateChange", new Class[] { Process.class, ProcState.class, ProcState.class });
+    public static final FunctionDefinition<Void> ON_STATE_CHANGE = factory(FunctionDefinitionFactory.class).create("onStateChange", new Class[] { Process.class, WorldProcessState.class, WorldProcessState.class });
 
 }

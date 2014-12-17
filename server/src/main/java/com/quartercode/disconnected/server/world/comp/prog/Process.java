@@ -53,6 +53,7 @@ import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId;
 import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
 
 /**
  * This class represents a process which is basically a running instance of a program.
@@ -97,12 +98,12 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
     public static final PropertyDefinition<Map<String, String>>                                  ENVIRONMENT;
 
     /**
-     * The {@link ProcState process state} which defines the global state of the process the os can see.
+     * The {@link WorldProcessState} which defines the global state of the process as seen by the OS.
      * It stores whether the process is running, interrupted etc.<br>
      * Note that using the {@link #APPLY_STATE} or {@link #SUSPEND}/{@link #RESUME}/{@link #INTERRUPT}/{@link #STOP} methods
      * is preferred over directly accessing the property.
      */
-    public static final PropertyDefinition<ProcState>                                            STATE;
+    public static final PropertyDefinition<WorldProcessState>                                    STATE;
 
     /**
      * The {@link ProgramExecutor} which contains the logic of the process.
@@ -148,18 +149,18 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
         ENVIRONMENT = factory(PropertyDefinitionFactory.class).create("environment", new StandardStorage<>(), new CloneValueFactory<>(new HashMap<>()));
 
-        STATE = factory(PropertyDefinitionFactory.class).create("state", new StandardStorage<>(), new ConstantValueFactory<>(ProcState.RUNNING));
+        STATE = factory(PropertyDefinitionFactory.class).create("state", new StandardStorage<>(), new ConstantValueFactory<>(WorldProcessState.RUNNING));
         STATE.addSetterExecutor("callStateListeners", Process.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
-                ProcState oldState = holder.getObj(STATE);
+                WorldProcessState oldState = holder.getObj(STATE);
 
                 invocation.next(arguments);
 
-                ProcState newState = (ProcState) arguments[0];
+                WorldProcessState newState = (WorldProcessState) arguments[0];
                 for (ProcStateListener stateListener : holder.getColl(STATE_LISTENERS)) {
                     stateListener.invoke(ProcStateListener.ON_STATE_CHANGE, holder, oldState, newState);
                 }
@@ -176,7 +177,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                 ProgramExecutor executor = invocation.getCHolder().getObj(EXECUTOR);
 
                 if (executor instanceof SchedulerUser) {
-                    boolean active = ((ProcState) arguments[0]).isTickState();
+                    boolean active = ((WorldProcessState) arguments[0]).isTickState();
                     executor.get(SchedulerUser.SCHEDULER).setActive(active);
                 }
 
@@ -195,7 +196,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
     // ----- Functions -----
 
     /**
-     * Returns true if the given {@link ProcState process state} is applied to this process and all child processes (recursively).
+     * Returns true if the given {@link WorldProcessState} is applied to this process and all child processes (recursively).
      * It stores if the process is running, interrupted etc.
      * 
      * <table>
@@ -207,7 +208,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
      * </tr>
      * <tr>
      * <td>0</td>
-     * <td>{@link ProcState}</td>
+     * <td>{@link WorldProcessState}</td>
      * <td>state</td>
      * <td>The process state to check all children for recursively.</td>
      * </tr>
@@ -429,7 +430,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
     static {
 
-        IS_STATE_APPLIED = factory(FunctionDefinitionFactory.class).create("isStateApplied", new Class[] { ProcState.class });
+        IS_STATE_APPLIED = factory(FunctionDefinitionFactory.class).create("isStateApplied", new Class[] { WorldProcessState.class });
         IS_STATE_APPLIED.addExecutor("default", Process.class, new FunctionExecutor<Boolean>() {
 
             @Override

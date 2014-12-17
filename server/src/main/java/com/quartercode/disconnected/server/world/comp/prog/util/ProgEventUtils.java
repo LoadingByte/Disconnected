@@ -29,7 +29,6 @@ import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
 import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension;
-import com.quartercode.disconnected.server.world.comp.prog.ProcState;
 import com.quartercode.disconnected.server.world.comp.prog.ProcStateListener;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
@@ -37,6 +36,7 @@ import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 import com.quartercode.disconnected.shared.event.comp.prog.WorldProcessCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.WorldProcessCommandPredicate;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
 import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
@@ -166,7 +166,7 @@ public class ProgEventUtils {
 
                     Object newState = arguments[2];
 
-                    if (newState == ProcState.STOPPED) {
+                    if (newState == WorldProcessState.STOPPED) {
                         Object handler = invocation.getCHolder().getObj(EVENT_HANDLER);
                         Bridge bridge = ((Process<?>) arguments[0]).getBridge();
 

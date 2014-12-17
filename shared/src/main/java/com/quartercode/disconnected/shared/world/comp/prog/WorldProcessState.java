@@ -16,16 +16,16 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world.comp.prog;
+package com.quartercode.disconnected.shared.world.comp.prog;
 
 /**
- * The process state defines the management state of a running {@link Process}.
+ * The process state defines the management state of a running process.
  * It stores whether the process is running, interrupted etc.
  */
-public enum ProcState {
+public enum WorldProcessState {
 
     /**
-     * The {@link Process} is running and the update executes every tick.
+     * The process is running and the update executes every tick.
      * This is the default state of a process.
      */
     RUNNING (true),
@@ -46,13 +46,13 @@ public enum ProcState {
 
     private final boolean tickState;
 
-    private ProcState(boolean tickState) {
+    private WorldProcessState(boolean tickState) {
 
         this.tickState = tickState;
     }
 
     /**
-     * Returns true if the process state should allow execution of the {@link Process} it is applied on.
+     * Returns true if the process state should allow execution of the process it is applied on.
      * 
      * @return Whether the state should allow the active process execution.
      */

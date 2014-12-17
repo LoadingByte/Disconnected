@@ -22,6 +22,7 @@ import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
 
 /**
  * This abstract class defines a program executor which takes care of actually running a program.
@@ -41,7 +42,7 @@ public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>
      * <b>Important note:</b>
      * If this method registers some kind of hooks apart from scheduler tasks (e.g. event handlers), they must be removed when the program stops.
      * For doing that, {@link ProcStateListener process state listeners} should be added to the {@link Process#STATE_LISTENERS} callback list of the parent process.
-     * Those listeners can then execute all clearance activities as soon as the process state is changed to {@link ProcState#STOPPED}.
+     * Those listeners can then execute all clearance activities as soon as the process state is changed to {@link WorldProcessState#STOPPED}.
      */
     public static final FunctionDefinition<Void> RUN;
 
