@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -65,6 +67,8 @@ import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
  */
 public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatureHolder<P> {
 
+    private static final Logger                                                                  LOGGER = LoggerFactory.getLogger(Process.class);
+
     // ----- Properties -----
 
     /**
@@ -100,8 +104,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
     /**
      * The {@link WorldProcessState} which defines the global state of the process as seen by the OS.
      * It stores whether the process is running, interrupted etc.<br>
-     * Note that using the {@link #APPLY_STATE} or {@link #SUSPEND}/{@link #RESUME}/{@link #INTERRUPT}/{@link #STOP} methods
-     * is preferred over directly accessing the property.
+     * Note that using the {@link #SUSPEND}/{@link #RESUME}/{@link #INTERRUPT}/{@link #STOP} methods is preferred over directly accessing the property.
      */
     public static final PropertyDefinition<WorldProcessState>                                    STATE;
 
@@ -214,40 +217,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
      * </tr>
      * </table>
      */
-    public static final FunctionDefinition<Boolean>                                              IS_STATE_APPLIED;
-
-    /**
-     * Changes the {@link ProcState process state} which defines the global state of the process the os can see.
-     * The state change can also apply to every child process using the recursive parameter.<br>
-     * Note that using the specific state-changing methods like {@link #SUSPEND} is preferred over using this plain function.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link ProcState}</td>
-     * <td>state</td>
-     * <td>The new process state.</td>
-     * </tr>
-     * <tr>
-     * <td>1</td>
-     * <td>{@link Boolean}</td>
-     * <td>recursive</td>
-     * <td>True if the state change should affect all child processes.</td>
-     * </tr>
-     * </table>
-     * 
-     * @see #SUSPEND
-     * @see #RESUME
-     * @see #INTERRUPT
-     * @see #STOP
-     */
-    public static final FunctionDefinition<Void>                                                 APPLY_STATE;
+    public static final FunctionDefinition<Boolean>                                              IS_STATE_APPLIED_RECURSIVELY;
 
     /**
      * Suspends the execution temporarily, tick updates will be ignored.
@@ -320,6 +290,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
      * Forces the process to stop the execution.
      * This will act like {@link #SUSPEND}, apart from the fact that a stopped process won't ever be able to resume/restart.
      * The forced stopping action should only be used if the further execution of the process must be stopped or when the interruption finished.
+     * Calling this method on an uninterrupted process might cause internal conflicts and is therefore disallowed.
      * 
      * <table>
      * <tr>
@@ -430,8 +401,8 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
     static {
 
-        IS_STATE_APPLIED = factory(FunctionDefinitionFactory.class).create("isStateApplied", new Class[] { WorldProcessState.class });
-        IS_STATE_APPLIED.addExecutor("default", Process.class, new FunctionExecutor<Boolean>() {
+        IS_STATE_APPLIED_RECURSIVELY = factory(FunctionDefinitionFactory.class).create("isStateApplied", new Class[] { WorldProcessState.class });
+        IS_STATE_APPLIED_RECURSIVELY.addExecutor("default", Process.class, new FunctionExecutor<Boolean>() {
 
             @Override
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
@@ -443,7 +414,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                     stateApplied = false;
                 } else {
                     for (Process<?> child : holder.getColl(CHILDREN)) {
-                        if (!child.invoke(IS_STATE_APPLIED)) {
+                        if (!child.invoke(IS_STATE_APPLIED_RECURSIVELY)) {
                             stateApplied = false;
                             break;
                         }
@@ -455,25 +426,6 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             }
 
         });
-        APPLY_STATE = factory(FunctionDefinitionFactory.class).create("applyState", new Class[] { ProcState.class, Boolean.class });
-        APPLY_STATE.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                CFeatureHolder holder = invocation.getCHolder();
-
-                holder.setObj(STATE, (ProcState) arguments[0]);
-                if ((Boolean) arguments[1]) {
-                    for (Process<?> child : holder.getColl(CHILDREN)) {
-                        child.invoke(APPLY_STATE, arguments[0], arguments[1]);
-                    }
-                }
-
-                return invocation.next(arguments);
-            }
-
-        });
         SUSPEND = factory(FunctionDefinitionFactory.class).create("suspend", new Class[] { Boolean.class });
         SUSPEND.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
 
@@ -482,8 +434,16 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
                 CFeatureHolder holder = invocation.getCHolder();
 
-                if (holder.getObj(STATE) == ProcState.RUNNING) {
-                    holder.invoke(APPLY_STATE, ProcState.SUSPENDED, arguments[0]);
+                if (holder.getObj(STATE) != WorldProcessState.RUNNING) {
+                    LOGGER.warn("Cannot suspend non-running process '{}' (current state '{}, program executor '{}')", holder.invoke(GET_WORLD_PROCESS_ID), holder.getObj(STATE), holder.getObj(EXECUTOR).getClass());
+                } else {
+                    holder.setObj(STATE, WorldProcessState.SUSPENDED);
+
+                    if ((Boolean) arguments[0]) {
+                        for (Process<?> child : holder.getColl(CHILDREN)) {
+                            child.invoke(SUSPEND, true);
+                        }
+                    }
                 }
 
                 return invocation.next(arguments);
@@ -498,8 +458,16 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
                 CFeatureHolder holder = invocation.getCHolder();
 
-                if (holder.getObj(STATE) == ProcState.SUSPENDED) {
-                    holder.invoke(APPLY_STATE, ProcState.RUNNING, arguments[0]);
+                if (holder.getObj(STATE) != WorldProcessState.SUSPENDED) {
+                    LOGGER.warn("Cannot resume non-suspended process '{}' (current state '{}, program executor '{}')", holder.invoke(GET_WORLD_PROCESS_ID), holder.getObj(STATE), holder.getObj(EXECUTOR).getClass());
+                } else {
+                    holder.setObj(STATE, WorldProcessState.RUNNING);
+
+                    if ((Boolean) arguments[0]) {
+                        for (Process<?> child : holder.getColl(CHILDREN)) {
+                            child.invoke(RESUME, true);
+                        }
+                    }
                 }
 
                 return invocation.next(arguments);
@@ -514,8 +482,16 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
                 CFeatureHolder holder = invocation.getCHolder();
 
-                if (holder.getObj(STATE) == ProcState.RUNNING) {
-                    holder.invoke(APPLY_STATE, ProcState.INTERRUPTED, arguments[0]);
+                if (holder.getObj(STATE) != WorldProcessState.RUNNING) {
+                    LOGGER.warn("Cannot interrupt non-running process '{}' (current state '{}, program executor '{}')", holder.invoke(GET_WORLD_PROCESS_ID), holder.getObj(STATE), holder.getObj(EXECUTOR).getClass());
+                } else {
+                    holder.setObj(STATE, WorldProcessState.INTERRUPTED);
+
+                    if ((Boolean) arguments[0]) {
+                        for (Process<?> child : holder.getColl(CHILDREN)) {
+                            child.invoke(INTERRUPT, true);
+                        }
+                    }
                 }
 
                 return invocation.next(arguments);
@@ -529,10 +505,13 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Process<?> holder = (Process<?>) invocation.getCHolder();
-                boolean recursive = (boolean) arguments[0];
 
-                if (holder.getObj(STATE) != ProcState.STOPPED) {
-                    holder.invoke(APPLY_STATE, ProcState.STOPPED, recursive);
+                if (holder.getObj(STATE) != WorldProcessState.INTERRUPTED) {
+                    LOGGER.warn("Cannot suspend non-interrupted process '{}' (current state '{}, program executor '{}')", holder.invoke(GET_WORLD_PROCESS_ID), holder.getObj(STATE), holder.getObj(EXECUTOR).getClass());
+                } else if (holder.getObj(STATE) == WorldProcessState.STOPPED) {
+                    LOGGER.warn("Cannot stop already stopped process '{}' again (current state '{}, program executor '{}')", holder.invoke(GET_WORLD_PROCESS_ID), holder.getObj(STATE), holder.getObj(EXECUTOR).getClass());
+                } else {
+                    holder.setObj(STATE, WorldProcessState.STOPPED);
 
                     // Unregister stopped process from parent
                     if (holder.getParent() != null) {
@@ -543,6 +522,12 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                     for (Process<?> child : new ArrayList<>(holder.getColl(CHILDREN))) {
                         holder.removeFromColl(CHILDREN, child);
                         holder.getParent().addToColl(CHILDREN, child);
+                    }
+
+                    if ((Boolean) arguments[0]) {
+                        for (Process<?> child : holder.getColl(CHILDREN)) {
+                            child.invoke(SUSPEND, true);
+                        }
                     }
                 }
 
