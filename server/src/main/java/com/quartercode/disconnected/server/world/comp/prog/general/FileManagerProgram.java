@@ -20,7 +20,7 @@ package com.quartercode.disconnected.server.world.comp.prog.general;
 
 import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import static com.quartercode.disconnected.server.world.comp.prog.util.ProgEventUtils.registerSBPAwareEventHandler;
-import static com.quartercode.disconnected.server.world.comp.prog.util.ProgStateUtils.registerInterruptionStopper;
+import static com.quartercode.disconnected.server.world.comp.prog.util.ProgStateUtils.addInterruptionStopperRegisteringExecutor;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -97,16 +97,7 @@ public class FileManagerProgram extends ProgramExecutor {
 
     static {
 
-        RUN.addExecutor("registerInterruptionStopper", FileManagerProgram.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                registerInterruptionStopper( ((FileManagerProgram) invocation.getCHolder()).getParent());
-                return invocation.next(arguments);
-            }
-
-        });
+        addInterruptionStopperRegisteringExecutor(FileManagerProgram.class);
 
         RUN.addExecutor("registerChangeDirCommandHandler", FileManagerProgram.class, new FunctionExecutor<Void>() {
 

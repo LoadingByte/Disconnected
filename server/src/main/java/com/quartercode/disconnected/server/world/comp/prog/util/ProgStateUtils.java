@@ -18,9 +18,10 @@
 
 package com.quartercode.disconnected.server.world.comp.prog.util;
 
+import static com.quartercode.classmod.extra.func.Priorities.LEVEL_3;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
 import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.disconnected.server.world.comp.prog.ProcState;
+import com.quartercode.classmod.extra.func.Priorities;
 import com.quartercode.disconnected.server.world.comp.prog.ProcStateListener;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
@@ -36,19 +37,32 @@ import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
 public class ProgStateUtils {
 
     /**
-     * Adds the {@link StopOnInterruptPSListener} to the given {@link Process} for stopping it as soon as that process is interrupted.
+     * Adds a function executor for registering the {@link StopOnInterruptPSListener} to the given {@link ProgramExecutor} type.
+     * It stops each instance of the program it as soon as its process is interrupted.
+     * Note that the executor is added to the priority {@link Priorities#LEVEL_3}.
      * 
-     * @param process The process the listener should be added to.
+     * @param executorType The program executor class the listener should be added to.
      */
-    public static void registerInterruptionStopper(Process<?> process) {
+    public static void addInterruptionStopperRegisteringExecutor(Class<? extends ProgramExecutor> executorType) {
 
-        process.addToColl(Process.STATE_LISTENERS, new StopOnInterruptPSListener());
+        ProgramExecutor.RUN.addExecutor("registerInterruptionStopper", executorType, new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                Process<?> process = ((ProgramExecutor) invocation.getCHolder()).getParent();
+                process.addToColl(Process.STATE_LISTENERS, new StopOnInterruptPSListener());
+
+                return invocation.next(arguments);
+            }
+
+        }, LEVEL_3);
     }
 
     /**
-     * A {@link ProcStateListener} that stops the the {@link Process} it is attached to as soon as that process is interrupted.
+     * A {@link ProcStateListener} that stops the {@link Process} it is attached to as soon as that process is interrupted.
      * 
-     * @see ProgStateUtils#registerInterruptionStopper(Process)
+     * @see ProgStateUtils#addInterruptionStopperRegisteringExecutor(Class)
      */
     public static class StopOnInterruptPSListener extends WorldFeatureHolder implements ProcStateListener {
 
