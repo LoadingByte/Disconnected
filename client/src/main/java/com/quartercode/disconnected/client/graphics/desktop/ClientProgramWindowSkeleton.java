@@ -229,14 +229,25 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
 
     /**
      * Registers the given {@link EventHandler} for the client program and makes it listen for the given type of {@link SBPWorldProcessUserCommand} events that are sent to it.
+     * The handler will be automatically removed once the client program is stopped.
      * 
      * @param eventType The event type all handled events must have.
      * @param handler The event handler that should handle the incoming events.
      */
-    protected void registerEventHandler(Class<? extends SBPWorldProcessUserCommand> eventType, EventHandler<?> handler) {
+    protected void registerEventHandler(Class<? extends SBPWorldProcessUserCommand> eventType, final EventHandler<?> handler) {
 
         bridge.getModule(StandardHandlerModule.class).addHandler(handler,
                 MultiPredicates.and(new TypePredicate<>(eventType), new SBPWorldProcessUserCommandPredicate<>(clientProcessDetails)));
+
+        addCloseListener(new Runnable() {
+
+            @Override
+            public void run() {
+
+                bridge.getModule(StandardHandlerModule.class).removeHandler(handler);
+            }
+
+        });
     }
 
 }

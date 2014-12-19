@@ -41,7 +41,6 @@ import com.quartercode.disconnected.shared.event.comp.prog.generic.GPWPUErrorEve
 import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
-import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 import de.matthiasmann.twl.Button;
 import de.matthiasmann.twl.DialogLayout;
 import de.matthiasmann.twl.DialogLayout.Group;
@@ -212,23 +211,8 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
         @Override
         protected void registerEventHandlers() {
 
-            final UpdateViewCommandHandler updateViewCommandHandler = new UpdateViewCommandHandler();
-            final GPClientErrorEventPopupHandler genericErrorEventHandler = new GPClientErrorEventPopupHandler(this, "", "Popup.message", true);
-
-            registerEventHandler(FMPWPUUpdateViewCommand.class, updateViewCommandHandler);
-            registerEventHandler(GPWPUErrorEvent.class, genericErrorEventHandler);
-
-            addCloseListener(new Runnable() {
-
-                @Override
-                public void run() {
-
-                    StandardHandlerModule handlerModule = bridge.getModule(StandardHandlerModule.class);
-                    handlerModule.removeHandler(updateViewCommandHandler);
-                    handlerModule.removeHandler(genericErrorEventHandler);
-                }
-
-            });
+            registerEventHandler(FMPWPUUpdateViewCommand.class, new UpdateViewCommandHandler());
+            registerEventHandler(GPWPUErrorEvent.class, new GPClientErrorEventPopupHandler(this, "", "Popup.message", true));
         }
 
         @Override
