@@ -22,6 +22,7 @@ import com.quartercode.disconnected.client.graphics.GraphicsState;
 import com.quartercode.disconnected.client.util.ValueInjector.InjectValue;
 import com.quartercode.disconnected.shared.event.comp.prog.SBPWorldProcessUserCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.SBPWorldProcessUserCommandPredicate;
+import com.quartercode.disconnected.shared.event.comp.prog.control.SBPWorldProcessUserInterruptCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessInterruptCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchAcknowledgmentEvent;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchCommand;
@@ -168,10 +169,20 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
 
     /**
      * This method should register any {@link EventHandler}s that <b>do not</b> require the {@link #worldProcessId} field.
+     * By default, the method closes the program window when a {@link SBPWorldProcessUserInterruptCommand} is received.
      * It is called third on construction.
      */
     protected void registerEventHandlers() {
 
+        registerEventHandler(SBPWorldProcessUserInterruptCommand.class, new EventHandler<SBPWorldProcessUserInterruptCommand>() {
+
+            @Override
+            public void handle(SBPWorldProcessUserInterruptCommand event) {
+
+                close();
+            }
+
+        });
     }
 
     /**

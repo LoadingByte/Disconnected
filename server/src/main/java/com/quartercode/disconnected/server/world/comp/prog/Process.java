@@ -50,12 +50,15 @@ import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.os.OS;
 import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
+import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
+import com.quartercode.disconnected.shared.event.comp.prog.control.SBPWorldProcessUserInterruptCommand;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId;
 import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
 import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
+import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
  * This class represents a process which is basically a running instance of a program.
@@ -765,6 +768,51 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             }
 
         }, DEFAULT + SUBLEVEL_5);
+        INITIALIZE.addExecutor("registerInterruptionCPICommandSender", Process.class, new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                invocation.getCHolder().addToColl(STATE_LISTENERS, new SendClientProcessInterruptCommandOnInterruptPSListener());
+
+                return invocation.next(arguments);
+            }
+
+        }, DEFAULT + SUBLEVEL_2);
+
+    }
+
+    /**
+     * A {@link ProcStateListener} that sends a {@link SBPWorldProcessUserInterruptCommand} when the {@link Process} it is attached to is interrupted.
+     * Note that the event is only sent if the {@link Process#WORLD_PROCESS_USER} property is not {@code null}.
+     * Also note that the listener is added to each new process by default.
+     */
+    public static class SendClientProcessInterruptCommandOnInterruptPSListener extends WorldFeatureHolder implements ProcStateListener {
+
+        static {
+
+            ON_STATE_CHANGE.addExecutor("sendClientProcessInterruptCommandOnInterrupt", SendClientProcessInterruptCommandOnInterruptPSListener.class, new FunctionExecutor<Void>() {
+
+                @Override
+                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                    Object newState = arguments[2];
+
+                    if (newState == WorldProcessState.INTERRUPTED) {
+                        SBPWorldProcessUserId wpuId = ((Process<?>) arguments[0]).getObj(WORLD_PROCESS_USER);
+
+                        if (wpuId != null) {
+                            Bridge bridge = ((SendClientProcessInterruptCommandOnInterruptPSListener) invocation.getCHolder()).getBridge();
+                            bridge.send(new SBPWorldProcessUserInterruptCommand(wpuId));
+                        }
+                    }
+
+                    return invocation.next(arguments);
+                }
+
+            });
+
+        }
 
     }
 
