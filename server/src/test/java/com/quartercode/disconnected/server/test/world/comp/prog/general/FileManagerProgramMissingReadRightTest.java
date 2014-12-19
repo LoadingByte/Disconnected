@@ -31,9 +31,9 @@ import com.quartercode.disconnected.server.world.comp.prog.ChildProcess;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.general.FileManagerProgram;
 import com.quartercode.disconnected.server.world.comp.user.User;
-import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWPUUpdateViewCommand;
-import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWorldChangeDirCommand;
-import com.quartercode.disconnected.shared.event.comp.prog.generic.GPWPUErrorEvent;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_SBPWPU_UpdateViewCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_WP_ChangeDirCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.generic.GP_SBPWPU_ErrorEvent;
 import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
@@ -60,7 +60,7 @@ public class FileManagerProgramMissingReadRightTest extends AbstractComplexCompu
         ChildProcess process = launchProgram(parentProcess, getCommonLocation(FileManagerProgram.class));
         WorldProcessId processId = process.invoke(Process.GET_WORLD_PROCESS_ID);
 
-        bridge.send(new FMPWorldChangeDirCommand(processId, change));
+        bridge.send(new FMP_WP_ChangeDirCommand(processId, change));
     }
 
     @Test
@@ -74,13 +74,13 @@ public class FileManagerProgramMissingReadRightTest extends AbstractComplexCompu
         testUser.setObj(User.NAME, "testUser");
         ChildProcess sessionProcess = launchSession(mainRootProcess(), testUser, null);
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), new TypePredicate<>(FMPWPUUpdateViewCommand.class));
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_WPUSBP_UpdateViewCommandFailHandler(), new TypePredicate<>(FMP_SBPWPU_UpdateViewCommand.class));
 
         final MutableBoolean invoked = new MutableBoolean();
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPWPUErrorEvent>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GP_SBPWPU_ErrorEvent>() {
 
             @Override
-            public void handle(GPWPUErrorEvent event) {
+            public void handle(GP_SBPWPU_ErrorEvent event) {
 
                 assertEquals("Error type", "fileList.missingReadRight", event.getType());
                 assertArrayEquals("Error arguments (file path)", new String[] { PATH }, event.getArguments());
@@ -88,7 +88,7 @@ public class FileManagerProgramMissingReadRightTest extends AbstractComplexCompu
                 invoked.setTrue();
             }
 
-        }, new TypePredicate<>(GPWPUErrorEvent.class));
+        }, new TypePredicate<>(GP_SBPWPU_ErrorEvent.class));
 
         executeProgramAndSendChangeDirCommand(sessionProcess, PATH);
 

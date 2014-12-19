@@ -38,10 +38,10 @@ import com.quartercode.disconnected.server.world.comp.prog.ChildProcess;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.general.FileManagerProgram;
 import com.quartercode.disconnected.server.world.comp.user.User;
-import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWPUUpdateViewCommand;
-import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWorldChangeDirCommand;
-import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWorldRemoveFileCommand;
-import com.quartercode.disconnected.shared.event.comp.prog.generic.GPWPUErrorEvent;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_SBPWPU_UpdateViewCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_WP_ChangeDirCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_WP_RemoveFileCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.generic.GP_SBPWPU_ErrorEvent;
 import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
@@ -58,7 +58,7 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
     private static final String            ROOT                  = "/" + FS_MOUNTPOINT;
     private static final String            TEST_PATH             = ROOT + "/test1/test2/test.txt";
 
-    private static final EventPredicate<?> UPDATE_VIEW_PREDICATE = new TypePredicate<>(FMPWPUUpdateViewCommand.class);
+    private static final EventPredicate<?> UPDATE_VIEW_PREDICATE = new TypePredicate<>(FMP_SBPWPU_UpdateViewCommand.class);
 
     private final ContentFile              path1File             = new ContentFile();
     private WorldProcessId                 processId;
@@ -74,12 +74,12 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
         ChildProcess process = launchProgram(parentProcess, getCommonLocation(FileManagerProgram.class));
         processId = process.invoke(Process.GET_WORLD_PROCESS_ID);
 
-        bridge.send(new FMPWorldChangeDirCommand(processId, change));
+        bridge.send(new FMP_WP_ChangeDirCommand(processId, change));
     }
 
     private Event createRemoveFileCommand(String fileName) {
 
-        return new FMPWorldRemoveFileCommand(processId, fileName);
+        return new FMP_WP_RemoveFileCommand(processId, fileName);
     }
 
     private void sendRemoveFileCommand(String fileName) {
@@ -93,10 +93,10 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
         executeProgramAndSendChangeDirCommand(mainRootProcess(), splitBeforeName(TEST_PATH)[0]);
 
         final MutableBoolean invoked = new MutableBoolean();
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMPWPUUpdateViewCommand>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMP_SBPWPU_UpdateViewCommand>() {
 
             @Override
-            public void handle(FMPWPUUpdateViewCommand event) {
+            public void handle(FMP_SBPWPU_UpdateViewCommand event) {
 
                 assertEquals("File path", splitBeforeName(TEST_PATH)[0], event.getCurrentDir());
                 assertTrue("File hasn't been removed", event.getFiles().length == 0);
@@ -116,13 +116,13 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
 
         executeProgramAndSendChangeDirCommand(mainRootProcess(), resolve(ROOT, "test1/test2"));
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_WPUSBP_UpdateViewCommandFailHandler(), UPDATE_VIEW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPWPUErrorEvent>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GP_SBPWPU_ErrorEvent>() {
 
             @Override
-            public void handle(GPWPUErrorEvent event) {
+            public void handle(GP_SBPWPU_ErrorEvent event) {
 
                 assertEquals("Error type", "removeFile.invalidFileName", event.getType());
                 assertArrayEquals("Error arguments (file path)", new String[] { "test4/test.txt" }, event.getArguments());
@@ -130,7 +130,7 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
                 invoked.setTrue();
             }
 
-        }, new TypePredicate<>(GPWPUErrorEvent.class));
+        }, new TypePredicate<>(GP_SBPWPU_ErrorEvent.class));
 
         sendRemoveFileCommand("test4/test.txt");
 
@@ -147,13 +147,13 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
 
         executeProgramAndSendChangeDirCommand(mainRootProcess(), dir);
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_WPUSBP_UpdateViewCommandFailHandler(), UPDATE_VIEW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPWPUErrorEvent>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GP_SBPWPU_ErrorEvent>() {
 
             @Override
-            public void handle(GPWPUErrorEvent event) {
+            public void handle(GP_SBPWPU_ErrorEvent event) {
 
                 assertEquals("Error type", "removeFile.invalidFileName", event.getType());
                 assertArrayEquals("Error arguments (file path)", new String[] { "." }, event.getArguments());
@@ -161,7 +161,7 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
                 invoked.setTrue();
             }
 
-        }, new TypePredicate<>(GPWPUErrorEvent.class));
+        }, new TypePredicate<>(GP_SBPWPU_ErrorEvent.class));
 
         sendRemoveFileCommand(".");
 
@@ -173,7 +173,7 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
 
         executeProgramAndSendChangeDirCommand(mainRootProcess(), "/");
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_WPUSBP_UpdateViewCommandFailHandler(), UPDATE_VIEW_PREDICATE);
 
         final Event event = createRemoveFileCommand(".");
 
@@ -211,13 +211,13 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
         // Remove all rights from the file
         path1File.setObj(File.RIGHTS, new FileRights());
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPUpdateViewFailHandler(), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_WPUSBP_UpdateViewCommandFailHandler(), UPDATE_VIEW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GPWPUErrorEvent>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GP_SBPWPU_ErrorEvent>() {
 
             @Override
-            public void handle(GPWPUErrorEvent event) {
+            public void handle(GP_SBPWPU_ErrorEvent event) {
 
                 assertEquals("Error type", "removeFile.missingDeleteRight", event.getType());
                 assertArrayEquals("Error arguments (file path)", new String[] { TEST_PATH }, event.getArguments());
@@ -225,7 +225,7 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
                 invoked.setTrue();
             }
 
-        }, new TypePredicate<>(GPWPUErrorEvent.class));
+        }, new TypePredicate<>(GP_SBPWPU_ErrorEvent.class));
 
         sendRemoveFileCommand(splitBeforeName(TEST_PATH)[1]);
 

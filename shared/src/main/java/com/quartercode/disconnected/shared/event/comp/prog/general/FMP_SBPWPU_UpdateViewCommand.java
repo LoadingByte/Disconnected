@@ -20,19 +20,19 @@ package com.quartercode.disconnected.shared.event.comp.prog.general;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import com.quartercode.disconnected.shared.event.comp.prog.WorldProcessCommand;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
-import com.quartercode.eventbridge.basic.EventBase;
+import com.quartercode.disconnected.shared.event.comp.prog.SBPWorldProcessUserCommand;
+import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
+import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId;
 
 @RequiredArgsConstructor
 @Getter
-public class FMPWorldAddFileCommand extends EventBase implements WorldProcessCommand {
+public class FMP_SBPWPU_UpdateViewCommand extends SBPWorldProcessUserCommand {
 
-    private static final long    serialVersionUID = 2588649236700607903L;
+    private static final long           serialVersionUID = -1549966651003635232L;
 
-    private final WorldProcessId worldProcessId;
+    private final SBPWorldProcessUserId worldProcessUserId;
 
-    private final String         fileName;
-    private final String         fileType;
+    private final String                currentDir;
+    private final FilePlaceholder[]     files;
 
 }

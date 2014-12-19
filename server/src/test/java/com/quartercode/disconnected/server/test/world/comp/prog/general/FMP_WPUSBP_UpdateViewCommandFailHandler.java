@@ -16,22 +16,18 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.shared.event.comp.prog.general;
+package com.quartercode.disconnected.server.test.world.comp.prog.general;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import com.quartercode.disconnected.shared.event.comp.prog.WorldProcessCommand;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
-import com.quartercode.eventbridge.basic.EventBase;
+import static org.junit.Assert.fail;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_SBPWPU_UpdateViewCommand;
+import com.quartercode.eventbridge.bridge.module.EventHandler;
 
-@RequiredArgsConstructor
-@Getter
-public class FMPWorldChangeDirCommand extends EventBase implements WorldProcessCommand {
+public class FMP_WPUSBP_UpdateViewCommandFailHandler implements EventHandler<FMP_SBPWPU_UpdateViewCommand> {
 
-    private static final long    serialVersionUID = 2499473893413425044L;
+    @Override
+    public void handle(FMP_SBPWPU_UpdateViewCommand event) {
 
-    private final WorldProcessId worldProcessId;
-
-    private final String         change;
+        fail("View was updated although nothing should have happened");
+    }
 
 }

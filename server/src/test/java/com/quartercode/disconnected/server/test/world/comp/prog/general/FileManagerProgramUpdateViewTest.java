@@ -36,8 +36,8 @@ import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.prog.ChildProcess;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.general.FileManagerProgram;
-import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWPUUpdateViewCommand;
-import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWorldChangeDirCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_SBPWPU_UpdateViewCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_WP_ChangeDirCommand;
 import com.quartercode.disconnected.shared.world.comp.ByteUnit;
 import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
@@ -50,7 +50,7 @@ import com.quartercode.eventbridge.extra.predicate.TypePredicate;
 
 public class FileManagerProgramUpdateViewTest extends AbstractComplexComputerTest {
 
-    private static final EventPredicate<?> UPDATE_VIEW_PREDICATE = new TypePredicate<>(FMPWPUUpdateViewCommand.class);
+    private static final EventPredicate<?> UPDATE_VIEW_PREDICATE = new TypePredicate<>(FMP_SBPWPU_UpdateViewCommand.class);
 
     private static final String            FS_MOUNTPOINT         = CommonFiles.USER_MOUNTPOINT;
     private static final String            PATH                  = "/" + FS_MOUNTPOINT + "/test1/test2";
@@ -73,7 +73,7 @@ public class FileManagerProgramUpdateViewTest extends AbstractComplexComputerTes
 
     private void sendChangeDirCommand(String change) {
 
-        bridge.send(new FMPWorldChangeDirCommand(processId, change));
+        bridge.send(new FMP_WP_ChangeDirCommand(processId, change));
     }
 
     @Test
@@ -81,10 +81,10 @@ public class FileManagerProgramUpdateViewTest extends AbstractComplexComputerTes
 
         final MutableBoolean invoked = new MutableBoolean();
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMPWPUUpdateViewCommand>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMP_SBPWPU_UpdateViewCommand>() {
 
             @Override
-            public void handle(FMPWPUUpdateViewCommand event) {
+            public void handle(FMP_SBPWPU_UpdateViewCommand event) {
 
                 assertEquals("File path", PATH, event.getCurrentDir());
 
@@ -114,10 +114,10 @@ public class FileManagerProgramUpdateViewTest extends AbstractComplexComputerTes
 
         final MutableBoolean invoked = new MutableBoolean();
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMPWPUUpdateViewCommand>() {
+        bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<FMP_SBPWPU_UpdateViewCommand>() {
 
             @Override
-            public void handle(FMPWPUUpdateViewCommand event) {
+            public void handle(FMP_SBPWPU_UpdateViewCommand event) {
 
                 assertEquals("File path", "/", event.getCurrentDir());
 

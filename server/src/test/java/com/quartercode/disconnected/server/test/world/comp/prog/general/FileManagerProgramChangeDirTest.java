@@ -33,8 +33,8 @@ import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.prog.ChildProcess;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.general.FileManagerProgram;
-import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWPUUpdateViewCommand;
-import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWorldChangeDirCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_SBPWPU_UpdateViewCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_WP_ChangeDirCommand;
 import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
 import com.quartercode.eventbridge.bridge.EventPredicate;
@@ -44,7 +44,7 @@ import com.quartercode.eventbridge.extra.predicate.TypePredicate;
 
 public class FileManagerProgramChangeDirTest extends AbstractComplexComputerTest {
 
-    private static final EventPredicate<?> UPDATE_VIEW_PREDICATE = new TypePredicate<>(FMPWPUUpdateViewCommand.class);
+    private static final EventPredicate<?> UPDATE_VIEW_PREDICATE = new TypePredicate<>(FMP_SBPWPU_UpdateViewCommand.class);
 
     private static final String            FS_MOUNTPOINT         = CommonFiles.USER_MOUNTPOINT;
     private static final String            ROOT                  = "/" + FS_MOUNTPOINT;
@@ -69,7 +69,7 @@ public class FileManagerProgramChangeDirTest extends AbstractComplexComputerTest
 
     private void sendChangeDirCommand(String change) {
 
-        bridge.send(new FMPWorldChangeDirCommand(processId, change));
+        bridge.send(new FMP_WP_ChangeDirCommand(processId, change));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class FileManagerProgramChangeDirTest extends AbstractComplexComputerTest
         MutableBoolean invoked = new MutableBoolean();
 
         // /test1/test2
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPWPUUpdateViewCommandTestHandler(resolve(ROOT, "test1/test2"), invoked), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_SBPWPU_UpdateViewCommandTestHandler(resolve(ROOT, "test1/test2"), invoked), UPDATE_VIEW_PREDICATE);
         sendChangeDirCommand(resolve(ROOT, "test1/test2"));
 
         assertTrue("Handler hasn't been invoked", invoked.getValue());
@@ -93,19 +93,19 @@ public class FileManagerProgramChangeDirTest extends AbstractComplexComputerTest
         MutableBoolean invoked4 = new MutableBoolean();
 
         // /test1
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPWPUUpdateViewCommandTestHandler(resolve(ROOT, "test1"), invoked1), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_SBPWPU_UpdateViewCommandTestHandler(resolve(ROOT, "test1"), invoked1), UPDATE_VIEW_PREDICATE);
         sendChangeDirCommand(resolve(ROOT, "test1"));
 
         // /test1/test2
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPWPUUpdateViewCommandTestHandler(resolve(ROOT, "test1/test2"), invoked2), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_SBPWPU_UpdateViewCommandTestHandler(resolve(ROOT, "test1/test2"), invoked2), UPDATE_VIEW_PREDICATE);
         sendChangeDirCommand("test2");
 
         // /test1/test3
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPWPUUpdateViewCommandTestHandler(resolve(ROOT, "test1/test3"), invoked3), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_SBPWPU_UpdateViewCommandTestHandler(resolve(ROOT, "test1/test3"), invoked3), UPDATE_VIEW_PREDICATE);
         sendChangeDirCommand("../test3");
 
         // /test4
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPWPUUpdateViewCommandTestHandler(resolve(ROOT, "test4"), invoked4), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_SBPWPU_UpdateViewCommandTestHandler(resolve(ROOT, "test4"), invoked4), UPDATE_VIEW_PREDICATE);
         sendChangeDirCommand(resolve(ROOT, "test4"));
 
         assertTrue("Handler 1 hasn't been invoked", invoked1.getValue());
@@ -120,7 +120,7 @@ public class FileManagerProgramChangeDirTest extends AbstractComplexComputerTest
         MutableBoolean invoked = new MutableBoolean();
 
         // /
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPWPUUpdateViewCommandTestHandler("/", invoked), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_SBPWPU_UpdateViewCommandTestHandler("/", invoked), UPDATE_VIEW_PREDICATE);
         sendChangeDirCommand("/");
 
         assertTrue("Handler hasn't been invoked", invoked.getValue());
@@ -132,7 +132,7 @@ public class FileManagerProgramChangeDirTest extends AbstractComplexComputerTest
         MutableBoolean invoked = new MutableBoolean();
 
         // /system
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPWPUUpdateViewCommandTestHandler("/" + CommonFiles.SYSTEM_MOUNTPOINT, invoked), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_SBPWPU_UpdateViewCommandTestHandler("/" + CommonFiles.SYSTEM_MOUNTPOINT, invoked), UPDATE_VIEW_PREDICATE);
         sendChangeDirCommand(CommonFiles.SYSTEM_MOUNTPOINT);
 
         assertTrue("Handler hasn't been invoked", invoked.getValue());
@@ -144,7 +144,7 @@ public class FileManagerProgramChangeDirTest extends AbstractComplexComputerTest
         MutableBoolean invoked = new MutableBoolean();
 
         // /test1/test2/test7 (invalid)
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPWPUUpdateViewCommandTestHandler(null, invoked), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_SBPWPU_UpdateViewCommandTestHandler(null, invoked), UPDATE_VIEW_PREDICATE);
         sendChangeDirCommand(resolve(ROOT, "test1/test2/test7"));
 
         assertFalse("Handler has been invoked", invoked.getValue());
@@ -157,33 +157,33 @@ public class FileManagerProgramChangeDirTest extends AbstractComplexComputerTest
         MutableBoolean invoked2 = new MutableBoolean();
 
         // /test1/test2/test5
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPWPUUpdateViewCommandTestHandler(resolve(ROOT, "test1/test2/test5"), invoked1), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_SBPWPU_UpdateViewCommandTestHandler(resolve(ROOT, "test1/test2/test5"), invoked1), UPDATE_VIEW_PREDICATE);
         sendChangeDirCommand(resolve(ROOT, "test1/test2/test5"));
 
         // Delete /test1/test2
         mainFsModule().invoke(FSModule.GET_FILE, resolve(ROOT, "test1/test2")).invoke(File.CREATE_REMOVE).invoke(FileRemoveAction.EXECUTE);
 
         // /test1/test2/test6 (should result in /test1 because /test1/test2 does no longer exist)
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMPWPUUpdateViewCommandTestHandler(resolve(ROOT, "test1"), invoked2), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_SBPWPU_UpdateViewCommandTestHandler(resolve(ROOT, "test1"), invoked2), UPDATE_VIEW_PREDICATE);
         sendChangeDirCommand(resolve(ROOT, "/test1/test2/test6"));
 
         assertTrue("Handler 1 hasn't been invoked", invoked1.getValue());
         assertTrue("Handler 2 hasn't been invoked", invoked2.getValue());
     }
 
-    private class FMPWPUUpdateViewCommandTestHandler implements EventHandler<FMPWPUUpdateViewCommand> {
+    private class FMP_SBPWPU_UpdateViewCommandTestHandler implements EventHandler<FMP_SBPWPU_UpdateViewCommand> {
 
         private final String         expectedCurrentDir;
         private final MutableBoolean invoked;
 
-        private FMPWPUUpdateViewCommandTestHandler(String expectedCurrentDir, MutableBoolean invoked) {
+        private FMP_SBPWPU_UpdateViewCommandTestHandler(String expectedCurrentDir, MutableBoolean invoked) {
 
             this.expectedCurrentDir = expectedCurrentDir;
             this.invoked = invoked;
         }
 
         @Override
-        public void handle(FMPWPUUpdateViewCommand event) {
+        public void handle(FMP_SBPWPU_UpdateViewCommand event) {
 
             if (expectedCurrentDir != null) {
                 assertEquals("New current dir", expectedCurrentDir, event.getCurrentDir());

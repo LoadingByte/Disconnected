@@ -30,14 +30,14 @@ import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowSizeLim
 import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup;
 import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup.Option;
 import com.quartercode.disconnected.client.graphics.desktop.popup.TextInputPopup;
-import com.quartercode.disconnected.client.graphics.desktop.prog.util.GPClientErrorEventPopupHandler;
+import com.quartercode.disconnected.client.graphics.desktop.prog.util.GP_SBPWPU_ErrorEventPopupHandler;
 import com.quartercode.disconnected.client.util.ResourceBundles;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchCommand;
-import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWPUUpdateViewCommand;
-import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWorldAddFileCommand;
-import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWorldChangeDirCommand;
-import com.quartercode.disconnected.shared.event.comp.prog.general.FMPWorldRemoveFileCommand;
-import com.quartercode.disconnected.shared.event.comp.prog.generic.GPWPUErrorEvent;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_SBPWPU_UpdateViewCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_WP_AddFileCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_WP_ChangeDirCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_WP_RemoveFileCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.generic.GP_SBPWPU_ErrorEvent;
 import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
@@ -54,6 +54,8 @@ import de.matthiasmann.twl.model.SimpleTableModel;
 
 /**
  * The file manager client program allows the user to view and manipulate the files on all mounted file systems.
+ * 
+ * @see FileManagerClientProgramWindow
  */
 public class FileManagerClientProgram extends ClientProgramDescriptor {
 
@@ -71,7 +73,10 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
         return new FileManagerClientProgramWindow(state, this, context);
     }
 
-    private static class FileManagerClientProgramWindow extends ClientProgramWindowSkeleton {
+    /**
+     * The internal {@link ClientProgramWindow} used by the {@link FileManagerClientProgram}.
+     */
+    public static class FileManagerClientProgramWindow extends ClientProgramWindowSkeleton {
 
         private Label            currentDirectoryLabel;
         private Button           createFileButton;
@@ -195,7 +200,7 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
 
                                     if (selected == Option.YES) {
                                         // Remove the file
-                                        bridge.send(new FMPWorldRemoveFileCommand(worldProcessId, fileName));
+                                        bridge.send(new FMP_WP_RemoveFileCommand(worldProcessId, fileName));
                                     }
                                 }
 
@@ -211,8 +216,8 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
         @Override
         protected void registerEventHandlers() {
 
-            registerEventHandler(FMPWPUUpdateViewCommand.class, new UpdateViewCommandHandler());
-            registerEventHandler(GPWPUErrorEvent.class, new GPClientErrorEventPopupHandler(this, "", "Popup.message", true));
+            registerEventHandler(FMP_SBPWPU_UpdateViewCommand.class, new UpdateViewCommandHandler());
+            registerEventHandler(GP_SBPWPU_ErrorEvent.class, new GP_SBPWPU_ErrorEventPopupHandler(this, "", "Popup.message", true));
         }
 
         @Override
@@ -232,7 +237,7 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
         private void changeDirectory(final String change) {
 
             // Send a request to set the new path
-            bridge.send(new FMPWorldChangeDirCommand(worldProcessId, change));
+            bridge.send(new FMP_WP_ChangeDirCommand(worldProcessId, change));
         }
 
         private void updateView(String currentDir, FilePlaceholder[] files) {
@@ -282,7 +287,7 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
 
                         if (!cancelled && text != null) {
                             // Add the new file
-                            bridge.send(new FMPWorldAddFileCommand(worldProcessId, text, fileType));
+                            bridge.send(new FMP_WP_AddFileCommand(worldProcessId, text, fileType));
                         }
                     }
 
@@ -291,10 +296,10 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
 
         }
 
-        private class UpdateViewCommandHandler implements EventHandler<FMPWPUUpdateViewCommand> {
+        private class UpdateViewCommandHandler implements EventHandler<FMP_SBPWPU_UpdateViewCommand> {
 
             @Override
-            public void handle(FMPWPUUpdateViewCommand event) {
+            public void handle(FMP_SBPWPU_UpdateViewCommand event) {
 
                 updateView(event.getCurrentDir(), event.getFiles());
             }

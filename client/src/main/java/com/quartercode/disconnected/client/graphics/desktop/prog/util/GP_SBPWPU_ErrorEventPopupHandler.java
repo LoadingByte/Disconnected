@@ -21,15 +21,15 @@ package com.quartercode.disconnected.client.graphics.desktop.prog.util;
 import static java.text.MessageFormat.format;
 import com.quartercode.disconnected.client.graphics.desktop.ClientProgramWindow;
 import com.quartercode.disconnected.client.graphics.desktop.popup.MessagePopup;
-import com.quartercode.disconnected.shared.event.comp.prog.generic.GPWPUErrorEvent;
+import com.quartercode.disconnected.shared.event.comp.prog.generic.GP_SBPWPU_ErrorEvent;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 
 /**
- * A simple {@link EventHandler} for {@link GPWPUErrorEvent}s that just opens a {@link MessagePopup} window when an error event arrives.
+ * A simple {@link EventHandler} for {@link GP_SBPWPU_ErrorEvent}s that just opens a {@link MessagePopup} window when an error event arrives.
  * 
- * @see GPWPUErrorEvent
+ * @see GP_SBPWPU_ErrorEvent
  */
-public class GPClientErrorEventPopupHandler implements EventHandler<GPWPUErrorEvent> {
+public class GP_SBPWPU_ErrorEventPopupHandler implements EventHandler<GP_SBPWPU_ErrorEvent> {
 
     private final ClientProgramWindow programWindow;
     private final String              keyPrefix;
@@ -37,14 +37,14 @@ public class GPClientErrorEventPopupHandler implements EventHandler<GPWPUErrorEv
     private final boolean             modal;
 
     /**
-     * Creates a new generic program client error event popup handler.
+     * Creates a new {@link GP_SBPWPU_ErrorEvent} popup handler.
      * 
-     * @param programWindow The {@link ClientProgramWindow} of the client program whose {@link GPWPUErrorEvent}s should be processed.
+     * @param programWindow The {@link ClientProgramWindow} of the client program whose {@link GP_SBPWPU_ErrorEvent}s should be processed.
      * @param keyPrefix A prefix that is put in front of the error type before it is used as a localization key.
      * @param keySuffix A suffix that is put behind the error type before it is used as a localization key.
      * @param modal Whether the popup window should be modal.
      */
-    public GPClientErrorEventPopupHandler(ClientProgramWindow programWindow, String keyPrefix, String keySuffix, boolean modal) {
+    public GP_SBPWPU_ErrorEventPopupHandler(ClientProgramWindow programWindow, String keyPrefix, String keySuffix, boolean modal) {
 
         this.programWindow = programWindow;
         this.keyPrefix = keyPrefix;
@@ -53,7 +53,7 @@ public class GPClientErrorEventPopupHandler implements EventHandler<GPWPUErrorEv
     }
 
     @Override
-    public void handle(GPWPUErrorEvent event) {
+    public void handle(GP_SBPWPU_ErrorEvent event) {
 
         String key = keyPrefix + event.getType() + keySuffix;
         String message = format(programWindow.getString(key), (Object[]) event.getArguments());

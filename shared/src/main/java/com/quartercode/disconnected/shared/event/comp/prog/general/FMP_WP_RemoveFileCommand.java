@@ -26,9 +26,9 @@ import com.quartercode.eventbridge.basic.EventBase;
 
 @RequiredArgsConstructor
 @Getter
-public class FMPWorldRemoveFileCommand extends EventBase implements WorldProcessCommand {
+public class FMP_WP_RemoveFileCommand extends EventBase implements WorldProcessCommand {
 
-    private static final long    serialVersionUID = 2638879441023261279L;
+    private static final long    serialVersionUID = 3492802814526000779L;
 
     private final WorldProcessId worldProcessId;
 
