@@ -42,6 +42,7 @@ import ch.qos.logback.classic.Level;
 import com.quartercode.disconnected.client.graphics.DefaultStates;
 import com.quartercode.disconnected.client.graphics.GraphicsService;
 import com.quartercode.disconnected.server.sim.TickBridgeProvider;
+import com.quartercode.disconnected.server.sim.TickRunnableInvoker;
 import com.quartercode.disconnected.server.sim.TickService;
 import com.quartercode.disconnected.server.sim.gen.WorldGenerator;
 import com.quartercode.disconnected.server.sim.profile.Profile;
@@ -140,7 +141,7 @@ public class Main {
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG: Generating new simulation");
         Random random = new Random(1);
-        World world = WorldGenerator.generateWorld(random, 10);
+        final World world = WorldGenerator.generateWorld(random, 100);
 
         Profile profile = new Profile("test");
         profile.setWorld(world);
@@ -155,9 +156,17 @@ public class Main {
         // DEBUG: Start "game" with current simulation
         LOGGER.info("DEBUG: Starting test-game with current simulation");
         tickService.setRunning(true);
-        for (Computer computer : world.get(World.COMPUTERS).get()) {
-            computer.get(Computer.OS).get().get(OS.SET_RUNNING).invoke(true);
-        }
+        tickService.getAction(TickRunnableInvoker.class).invoke(new Runnable() {
+
+            @Override
+            public void run() {
+
+                for (Computer computer : world.get(World.COMPUTERS).get()) {
+                    computer.get(Computer.OS).get().invoke(OS.SET_RUNNING, true);
+                }
+            }
+
+        });
         graphicsService.setState(DefaultStates.DESKTOP.create());
     }
 
