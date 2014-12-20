@@ -29,17 +29,47 @@ import de.matthiasmann.twl.model.TreeTableNode;
 public interface TreeNode extends TreeTableNode {
 
     /**
-     * Returns all child nodes this node holds.
+     * Returns the data object which is stored inside the given table column of the node (row).
      * 
-     * @return All child nodes this node holds.
+     * @param column The index of the column whose data object should be returned.
+     *        Note that the column indices start at {@code 0}. For example, the third column has the index {@code 2}.
+     * @return The data object which is stored inside the given column.
+     * @throws IllegalArgumentException Thrown if the given column doesn't exist.
+     */
+    @Override
+    public Object getData(int column);
+
+    /**
+     * Changes the data object which is stored inside the given table column of the node (row).
+     * 
+     * @param column The index of the column whose data object should be returned.
+     *        Note that the column indices start at {@code 0}. For example, the third column has the index {@code 2}.
+     * @param data The new data object which should be stored inside the given column.
+     * @throws IllegalArgumentException Thrown if the given column doesn't exist.
+     */
+    public void setData(int column, Object data);
+
+    /**
+     * Returns all direct child nodes this node holds.
+     * 
+     * @return All direct child nodes.
      */
     public TreeNode[] getChildren();
 
     /**
-     * Returns if the given node is a child of this node.
+     * Returns the direct child node this node holds at the given index.
+     * A call to this method is equivalent to calling <code>{@link #getChildren()}[index]</code>.
+     * 
+     * @param index The index of the direct child node for retrieval.
+     */
+    @Override
+    public TreeNode getChild(int index);
+
+    /**
+     * Returns if the given node is a direct child of this node.
      * 
      * @param child The node to check.
-     * @return True if the given node is a child of this node.
+     * @return True if the given node is a direct child node.
      */
     public boolean hasChild(TreeNode child);
 
@@ -48,19 +78,20 @@ public interface TreeNode extends TreeTableNode {
      * 
      * @param data The data to use for the columns of the table.
      * @return The created child node object.
+     * @throws IllegalArgumentException Thrown if the amount of data objects does not match the amount of available columns.
      */
     public TreeNode addChild(Object... data);
 
     /**
      * Removes a given child node from this node.
      * 
-     * @param child The child node to remove from this node.
+     * @param child The child node for removal.
      */
     public void removeChild(TreeNode child);
 
     /**
      * Removes all child nodes from this node.
      */
-    public void removeAllChildren();
+    public void clear();
 
 }

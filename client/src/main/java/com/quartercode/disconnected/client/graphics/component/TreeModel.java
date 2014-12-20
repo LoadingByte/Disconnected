@@ -18,6 +18,8 @@
 
 package com.quartercode.disconnected.client.graphics.component;
 
+import java.util.Arrays;
+import org.apache.commons.lang3.Validate;
 import de.matthiasmann.twl.model.AbstractTreeTableModel;
 import de.matthiasmann.twl.model.AbstractTreeTableNode;
 import de.matthiasmann.twl.model.TreeTableNode;
@@ -25,6 +27,8 @@ import de.matthiasmann.twl.model.TreeTableNode;
 /**
  * This tree model is an implementation of twl's abstract tree table model using the {@link TreeNode}-interface.
  * The tree allows adding and removing child nodes.
+ * Although the tree model class implements the {@link TreeNode} interface, it isn't able to store data since it is only a 'virtual' root node.
+ * The visible root nodes are added to this 'virtual' one.
  * 
  * @see TreeNode
  * @see TreeNodeImpl
@@ -66,13 +70,31 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
     }
 
     @Override
+    public Object getData(int column) {
+
+        throw new UnsupportedOperationException("Cannot retrieve data from tree model root node (it is a 'virtual' root node)");
+    }
+
+    @Override
+    public void setData(int column, Object data) {
+
+        throw new UnsupportedOperationException("Cannot write data into tree model root node (it is a 'virtual' root node)");
+    }
+
+    @Override
     public TreeNode[] getChildren() {
 
-        TreeNodeImpl[] children = new TreeNodeImpl[getNumChildren()];
+        TreeNode[] children = new TreeNode[getNumChildren()];
         for (int index = 0; index < getNumChildren(); index++) {
-            children[index] = (TreeNodeImpl) getChild(index);
+            children[index] = getChild(index);
         }
         return children;
+    }
+
+    @Override
+    public TreeNode getChild(int index) {
+
+        return (TreeNode) super.getChild(index);
     }
 
     @Override
@@ -84,7 +106,7 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
     @Override
     public TreeNode addChild(Object... data) {
 
-        TreeNodeImpl child = new TreeNodeImpl(this, data);
+        TreeNode child = new TreeNodeImpl(this, data);
         insertChild(child, getNumChildren());
         return child;
     }
@@ -96,9 +118,9 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
     }
 
     @Override
-    public void removeAllChildren() {
+    public void clear() {
 
-        super.removeAllChildren();
+        removeAllChildren();
     }
 
     /**
@@ -122,24 +144,46 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
 
             super(parent);
 
-            this.data = data;
+            int columns = getTreeTableModel().getNumColumns();
+            Validate.inclusiveBetween(0, columns, data.length, "Cannot create tree node with %d entries while the table has %d columns", data.length, columns);
+
+            this.data = Arrays.copyOf(data, columns);
             setLeaf(true);
         }
 
         @Override
         public Object getData(int column) {
 
-            return data[column];
+            int columns = getTreeTableModel().getNumColumns();
+            Validate.inclusiveBetween(0, columns - 1, column, "Cannot retrieve data from unknown column %d (table has %d columns)", column, columns);
+
+            Object result = data[column];
+            return result == null ? "" : result;
+        }
+
+        @Override
+        public void setData(int column, Object data) {
+
+            int columns = getTreeTableModel().getNumColumns();
+            Validate.inclusiveBetween(0, columns - 1, column, "Cannot write data into unknown column %d (table has %d columns)", column, columns);
+
+            this.data[column] = data;
         }
 
         @Override
         public TreeNode[] getChildren() {
 
-            TreeNodeImpl[] children = new TreeNodeImpl[getNumChildren()];
+            TreeNode[] children = new TreeNode[getNumChildren()];
             for (int index = 0; index < getNumChildren(); index++) {
-                children[index] = (TreeNodeImpl) getChild(index);
+                children[index] = getChild(index);
             }
             return children;
+        }
+
+        @Override
+        public TreeNode getChild(int index) {
+
+            return (TreeNode) super.getChild(index);
         }
 
         @Override
@@ -151,7 +195,7 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
         @Override
         public TreeNode addChild(Object... data) {
 
-            TreeNodeImpl child = new TreeNodeImpl(this, data);
+            TreeNode child = new TreeNodeImpl(this, data);
             insertChild(child, getNumChildren());
             setLeaf(false);
             return child;
@@ -162,6 +206,7 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
 
             if (hasChild(child)) {
                 removeChild(getChildIndex(child));
+
                 if (getNumChildren() == 0) {
                     setLeaf(true);
                 }
@@ -169,9 +214,9 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
         }
 
         @Override
-        public void removeAllChildren() {
+        public void clear() {
 
-            super.removeAllChildren();
+            removeAllChildren();
         }
 
     }
