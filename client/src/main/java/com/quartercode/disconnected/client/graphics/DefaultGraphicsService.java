@@ -23,6 +23,11 @@ import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.shared.bridge.HandleInvocationProviderExtension;
 import com.quartercode.eventbridge.EventBridgeFactory;
 import com.quartercode.eventbridge.bridge.Bridge;
+import com.quartercode.eventbridge.bridge.BridgeConnector;
+import com.quartercode.eventbridge.bridge.Event;
+import com.quartercode.eventbridge.bridge.module.EventHandler;
+import com.quartercode.eventbridge.bridge.module.EventHandlerExceptionCatcher;
+import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionRequester;
 import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
 
@@ -49,6 +54,17 @@ public class DefaultGraphicsService implements GraphicsService {
         bridge.addModule(EventBridgeFactory.create(HandleInvocationProviderExtension.class));
 
         bridge.getModule(HandleInvocationProviderExtension.class).setInvocationProvider(this);
+
+        // Add exception catcher
+        bridge.getModule(StandardHandlerModule.class).addExceptionCatcher(new EventHandlerExceptionCatcher() {
+
+            @Override
+            public void handle(RuntimeException exception, EventHandler<?> handler, Event event, BridgeConnector source) {
+
+                LOGGER.warn("Server sent event '{}' which caused an exception in handler '{}'", event, handler.getClass().getName(), exception);
+            }
+
+        });
     }
 
     @Override
