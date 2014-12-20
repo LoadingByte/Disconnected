@@ -48,8 +48,8 @@ import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_SBPWPU_UpdateViewCommand;
-import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_WP_ChangeDirCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_WP_AddFileCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_WP_ChangeDirCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_WP_RemoveFileCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.generic.GP_SBPWPU_ErrorEvent;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
@@ -169,10 +169,10 @@ public class FileManagerProgram extends ProgramExecutor {
                 int validationResult = verifyDir(newDirPath);
 
                 if (validationResult == 0) {
-                    // New dir is valid -> update current dir and send change to sbp later on
+                    // New dir is valid -> update current dir and send change to SBP later on
                     holder.setObj(CURRENT_DIR, newDirPath);
                 } else if (validationResult == 3) {
-                    // Missing read right on new dir -> do not update current dir and send error message to sbp
+                    // Missing read right on new dir -> do not update current dir and send error message to SBP
                     SBPWorldProcessUserId wpuId = holder.getParent().getObj(Process.WORLD_PROCESS_USER);
                     holder.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "fileList.missingReadRight", new String[] { newDirPath }));
                     return;
@@ -184,8 +184,8 @@ public class FileManagerProgram extends ProgramExecutor {
                 holder.setObj(CURRENT_DIR, newDirPath);
             }
 
-            // Send the updated dir to the sbp
-            sendUpdateView(holder.getParent(), holder.getBridge(), holder.getObj(CURRENT_DIR));
+            // Send the updated dir to the SBP
+            sendUpdateView(holder.getParent(), holder.getObj(CURRENT_DIR));
         }
 
         /*
@@ -301,7 +301,7 @@ public class FileManagerProgram extends ProgramExecutor {
             if (addAction.invoke(FileAddAction.IS_EXECUTABLE_BY, sessionUser)) {
                 try {
                     addAction.invoke(FileAddAction.EXECUTE);
-                    sendUpdateView(process, holder.getBridge(), holder.getObj(CURRENT_DIR));
+                    sendUpdateView(process, holder.getObj(CURRENT_DIR));
                 } catch (OccupiedPathException e) {
                     holder.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "createFile.occupiedPath", new String[] { filePath }));
                 } catch (OutOfSpaceException e) {
@@ -367,7 +367,7 @@ public class FileManagerProgram extends ProgramExecutor {
 
             if (removeAction.invoke(FileRemoveAction.IS_EXECUTABLE_BY, sessionUser)) {
                 removeAction.invoke(FileRemoveAction.EXECUTE);
-                sendUpdateView(process, holder.getBridge(), holder.getObj(CURRENT_DIR));
+                sendUpdateView(process, holder.getObj(CURRENT_DIR));
             } else {
                 holder.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "removeFile.missingDeleteRight", new String[] { filePath }));
             }
@@ -375,8 +375,16 @@ public class FileManagerProgram extends ProgramExecutor {
 
     }
 
-    private static void sendUpdateView(Process<?> process, Bridge bridge, String currentDir) {
+    /**
+     * Sends an {@link FMP_SBPWPU_UpdateViewCommand} from the given {@link FileManagerProgram} {@link Process}.
+     * Note that this method is completely independent from any state (it's a utility method).
+     * 
+     * @param process The file manager program process which sends the command.
+     * @param currentDir The directory whose contents should be sent inside the command.
+     */
+    public static void sendUpdateView(Process<?> process, String currentDir) {
 
+        Bridge bridge = process.getBridge();
         SBPWorldProcessUserId wpuId = process.getObj(Process.WORLD_PROCESS_USER);
         FSModule fsModule = process.invoke(Process.GET_OS).getObj(OS.FS_MODULE);
 

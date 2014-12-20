@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.server.test.world.comp.net;
 
+import static com.quartercode.classmod.extra.func.Priorities.LEVEL_9;
 import static org.junit.Assert.assertEquals;
 import org.jmock.Expectations;
 import org.jmock.Sequence;
@@ -29,7 +30,6 @@ import org.junit.Test;
 import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
 import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.classmod.extra.func.Priorities;
 import com.quartercode.classmod.util.test.JUnitRuleModMockery;
 import com.quartercode.disconnected.server.util.ObjArray;
 import com.quartercode.disconnected.server.world.comp.net.NetModule;
@@ -100,7 +100,7 @@ public class SocketConnectionTest {
                 return null;
             }
 
-        }, Priorities.LEVEL_9);
+        }, LEVEL_9);
     }
 
     @Before
@@ -129,7 +129,7 @@ public class SocketConnectionTest {
                 }
             }
 
-        }, Priorities.LEVEL_9);
+        }, LEVEL_9);
     }
 
     @Test

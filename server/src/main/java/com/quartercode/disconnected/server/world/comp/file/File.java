@@ -119,7 +119,7 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
     /**
      * Returns the local the path of the file.
      * The local path can be used to look up the file a on its {@link FileSystem}.<br>
-     * A path is a collection of files seperated by a separator.
+     * A path is a collection of files separated by a separator.
      */
     public static final FunctionDefinition<String>           GET_PATH;
 

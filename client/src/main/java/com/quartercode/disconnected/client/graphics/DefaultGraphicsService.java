@@ -113,7 +113,9 @@ public class DefaultGraphicsService implements GraphicsService {
     @Override
     public void invoke(Runnable runnable) {
 
-        thread.invoke(runnable);
+        if (thread != null) {
+            thread.invoke(runnable);
+        }
     }
 
 }

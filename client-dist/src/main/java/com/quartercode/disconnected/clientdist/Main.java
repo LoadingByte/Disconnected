@@ -141,7 +141,7 @@ public class Main {
         // DEBUG: Generate and set new simulation
         LOGGER.info("DEBUG: Generating new simulation");
         Random random = new Random(1);
-        final World world = WorldGenerator.generateWorld(random, 100);
+        final World world = WorldGenerator.generateWorld(random, 10);
 
         Profile profile = new Profile("test");
         profile.setWorld(world);

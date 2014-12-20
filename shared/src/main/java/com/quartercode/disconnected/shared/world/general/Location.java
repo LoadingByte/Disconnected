@@ -55,30 +55,35 @@ public class Location implements Serializable {
      */
     public Location(float x, float y) {
 
+        this.x = round(x);
+        this.y = round(y);
+
         Validate.isTrue(x >= 0 && x <= 1, "X coordinate (%d) must be >= 0 and <= 1", x);
         Validate.isTrue(y >= 0 && y <= 1, "Y coordinate (%d) must be >= 0 and <= 1", y);
-
-        this.x = x;
-        this.y = y;
     }
 
     /**
      * Creates a new location using the two coordinates that are stored in the given location string.
-     * The string must be using the format {@code x;y} (e.g. {@code 0.32;0.57}).
+     * The string must be using the format {@code x,y} (e.g. {@code 0.32,0.57}).
      * Both coordinates must be located between 0 and 1 (inclusive).
      * 
      * @param string The location string to parse.
      */
     public Location(String string) {
 
-        String[] stringParts = StringUtils.split(string, ';');
-        Validate.isTrue(stringParts.length == 2, "The location string (%s) must be provided in the format x;y", string);
+        String[] stringParts = StringUtils.split(string, ',');
+        Validate.isTrue(stringParts.length == 2, "The location string (%s) must be provided in the format x,y", string);
 
-        x = Float.parseFloat(stringParts[0]);
-        y = Float.parseFloat(stringParts[1]);
+        x = round(Float.parseFloat(stringParts[0]));
+        y = round(Float.parseFloat(stringParts[1]));
 
         Validate.isTrue(x >= 0 && x <= 1, "X coordinate (%d) must be >= 0 and <= 1", x);
         Validate.isTrue(y >= 0 && y <= 1, "Y coordinate (%d) must be >= 0 and <= 1", y);
+    }
+
+    private float round(float number) {
+
+        return Math.round(number * 100) / 100F;
     }
 
     /**
@@ -156,14 +161,14 @@ public class Location implements Serializable {
 
     /**
      * Returns the stored location as a string.
-     * The returned string is using the format {@code x;y} (e.g. {@code 0.32;0.57}).
+     * The returned string is using the format {@code x,y} (e.g. {@code 0.32,0.57}).
      * 
      * @return A string representation of the location.
      */
     @Override
     public String toString() {
 
-        return new StringBuilder().append(x).append(";").append(y).toString();
+        return new StringBuilder().append(x).append(",").append(y).toString();
     }
 
 }

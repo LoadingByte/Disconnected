@@ -20,7 +20,6 @@ package com.quartercode.disconnected.shared.identity;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * An {@link SBPIdentity} that represents an identified client which is connected to a server.
@@ -70,7 +69,7 @@ public class ClientIdentity implements SBPIdentity {
     @Override
     public String toString() {
 
-        return ToStringBuilder.reflectionToString(this);
+        return new StringBuilder().append("Client[").append(name).append("]").toString();
     }
 
 }

@@ -62,6 +62,7 @@ public class WorldProcessLaunchCommandHandler implements SBPAwareEventHandler<Wo
         ContentFile source = getSourceFile(playerComputer, event.getProgramName());
         // Cancel if the program cannot be found
         if (source == null) {
+            LOGGER.warn("Cannot find program '{}' for launching it (commanded by SBP '{}')", event.getProgramName(), sender);
             return;
         }
 
@@ -83,7 +84,7 @@ public class WorldProcessLaunchCommandHandler implements SBPAwareEventHandler<Wo
         try {
             process.invoke(Process.INITIALIZE, pid);
         } catch (Exception e) {
-            LOGGER.warn("Error while initializing process with pid {}; sbp failure?", pid, e);
+            LOGGER.warn("Error while initializing process with pid {} (commanded by SBP '{}')", pid, sender, e);
             abort(sessionProcess, process);
             return;
         }
@@ -93,7 +94,7 @@ public class WorldProcessLaunchCommandHandler implements SBPAwareEventHandler<Wo
         try {
             executor.invoke(ProgramExecutor.RUN);
         } catch (Exception e) {
-            LOGGER.warn("Program executor '{}' threw unexpected exception on start", executor, e);
+            LOGGER.warn("Program executor '{}' threw unexpected exception on start (commanded by SBP '{}')", executor, sender, e);
             abort(sessionProcess, process);
         }
 

@@ -53,7 +53,7 @@ import de.matthiasmann.twl.TableBase.Callback;
 import de.matthiasmann.twl.model.SimpleTableModel;
 
 /**
- * The file manager client program allows the user to view and manipulate the files on all mounted file systems.
+ * The file manager client program is used to list, create, and remove files.
  * 
  * @see FileManagerClientProgramWindow
  */
@@ -124,7 +124,7 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
             DialogLayout layout = new DialogLayout();
             layout.setTheme("");
             layout.setDefaultGap(new Dimension(5, 5));
-            Group hButtons = layout.createSequentialGroup(createFileButton, createDirectoryButton, removeFileButton);
+            Group hButtons = layout.createSequentialGroup(createFileButton, createDirectoryButton, removeFileButton).addGap();
             Group vButtons = layout.createParallelGroup(createFileButton, createDirectoryButton, removeFileButton);
             layout.setHorizontalGroup(layout.createParallelGroup(currentDirectoryLabel).addGroup(hButtons).addWidget(scrollPane));
             layout.setVerticalGroup(layout.createSequentialGroup(currentDirectoryLabel).addGroup(vButtons).addWidget(scrollPane));

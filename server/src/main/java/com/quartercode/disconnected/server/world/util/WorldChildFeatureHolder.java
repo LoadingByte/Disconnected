@@ -60,7 +60,8 @@ public class WorldChildFeatureHolder<P extends CFeatureHolder> extends DefaultCC
      */
     public Bridge getBridge() {
 
-        return getWorld().getBridge();
+        World world = getWorld();
+        return world != null ? world.getBridge() : null;
     }
 
     /**
@@ -72,7 +73,8 @@ public class WorldChildFeatureHolder<P extends CFeatureHolder> extends DefaultCC
      */
     public Random getRandom() {
 
-        return getWorld().getRandom();
+        World world = getWorld();
+        return world != null ? world.getRandom() : null;
     }
 
 }

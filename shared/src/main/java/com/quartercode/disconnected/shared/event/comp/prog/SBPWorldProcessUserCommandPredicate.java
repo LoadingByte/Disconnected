@@ -40,6 +40,7 @@ import com.quartercode.eventbridge.basic.EventPredicateBase;
 public class SBPWorldProcessUserCommandPredicate<T extends SBPWorldProcessUserCommand> extends EventPredicateBase<T> {
 
     private static final long                serialVersionUID = -890729154221302611L;
+
     /**
      * The {@link SBPWorldProcessUserDetails} each {@link SBPWorldProcessUserCommand} must carry in its {@link SBPWorldProcessUserId} in
      * order to be accepted by the predicate.

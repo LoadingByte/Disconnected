@@ -50,7 +50,7 @@ public class DefaultProfileSerializationServiceTest {
     }
 
     @Test
-    public void testSerializeWorld() throws IOException, ProfileSerializationException {
+    public void testRoundtripWorld() throws IOException, ProfileSerializationException {
 
         ProfileSerializationService service = ServiceRegistry.lookup(ProfileSerializationService.class);
 

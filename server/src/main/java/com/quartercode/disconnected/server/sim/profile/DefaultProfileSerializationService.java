@@ -73,6 +73,8 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
         String packageName = scanDirective.getPackageName();
         ScanMethod method = scanDirective.getMethod();
 
+        LOGGER.debug("Scanning package '{}' using method '{}'", packageName, method.getName());
+
         // Recursive annotation search
         if (method == ScanMethod.RECURSIVE_ANNOTATION_SEARCH) {
             recursiveAnnotationSearch(packageName);

@@ -51,6 +51,7 @@ import com.quartercode.disconnected.server.world.comp.os.OS;
 import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 import com.quartercode.disconnected.shared.event.comp.prog.control.SBPWorldProcessUserInterruptCommand;
+import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
@@ -132,7 +133,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
     /**
      * If the process was launched by an SBP, this property stores the {@link SBPWorldProcessUserId} that identifies the SBP and the world process user.
-     * Such a remote launch is done using a command event.
+     * Such a remote launch is done using the {@link WorldProcessLaunchCommand} event.
      */
     public static final PropertyDefinition<SBPWorldProcessUserId>                                WORLD_PROCESS_USER;
 
@@ -270,6 +271,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
      * If the process notes the interruption, it should try to execute last activities and then the stop the execution.
      * Interruption only works if the execution is running.
      * The state change can also apply to every child process using the recursive parameter.
+     * Note that an {@link SBPWorldProcessUserInterruptCommand} is sent if the {@link Process#WORLD_PROCESS_USER} property is not {@code null}.
      * 
      * <table>
      * <tr>
@@ -348,7 +350,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
     /**
      * Resolves the {@link User} this process is running under.
-     * This uses the {@link #GET_SESSION} function for resolving the Session} object.
+     * This uses the {@link #GET_SESSION} function for resolving the {@link Session} object.
      */
     public static final FunctionDefinition<User>                                                 GET_USER;
 
@@ -751,7 +753,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                 ContentFile source = holder.getObj(SOURCE);
                 User user = holder.invoke(GET_USER);
                 if (!source.invoke(File.HAS_RIGHT, user, FileRights.READ) || !source.invoke(File.HAS_RIGHT, user, FileRights.EXECUTE)) {
-                    throw new IllegalStateException("Cannot initialize process: No read right and execute right on file");
+                    throw new IllegalStateException("Cannot initialize process: No read right and execute right on source file");
                 }
 
                 // Retrieve the program data object
