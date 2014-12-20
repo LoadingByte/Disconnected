@@ -18,17 +18,29 @@
 
 package com.quartercode.disconnected.server.world.comp.prog;
 
+import java.util.ArrayList;
 import java.util.List;
+import com.quartercode.disconnected.server.registry.ServerRegistries;
+import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.FSModule;
+import com.quartercode.disconnected.server.world.comp.file.FSModule.KnownFS;
 import com.quartercode.disconnected.server.world.comp.file.File;
+import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.UnknownMountpointException;
+import com.quartercode.disconnected.server.world.comp.os.OS;
+import com.quartercode.disconnected.server.world.comp.user.User;
+import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessPlaceholder;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
 
 /**
- * This utility class provides some utility methods for {@link Program}s.
+ * This utility class provides some utility methods for {@link Program}s and {@link Process}es.
  * 
  * @see Program
+ * @see Process
  */
 public class ProgramUtils {
 
@@ -56,6 +68,57 @@ public class ProgramUtils {
                 }
             } catch (IllegalArgumentException | UnknownMountpointException e) {
                 // Continue
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Creates a new {@link WorldProcessPlaceholder} that represents the given world {@link Process}.
+     * The method assumes that the {@link Process#SOURCE} file has been retrieved from a {@link FileSystem} that is known to the computer.
+     * See {@link FSModule#KNOWN_FS} for more information on such known file systems.
+     * 
+     * @param process The world process that should be represented by the placeholder.
+     * @param addChildren Whether the {@link WorldProcessPlaceholder#getChildren() child processes} should be added to the placeholder.
+     *        If this argument is {@code true}, a tree with all child processes and their child processes and so on emerges.
+     *        Therefore, the object becomes much bigger.
+     * @return The new world process placeholder.
+     */
+    public static WorldProcessPlaceholder createProcessPlaceholder(Process<?> process, boolean addChildren) {
+
+        WorldProcessId id = process.invoke(Process.GET_WORLD_PROCESS_ID);
+        WorldProcessState state = process.getObj(Process.STATE);
+        String user = process.invoke(Process.GET_USER).getObj(User.NAME);
+
+        WorldProcessPlaceholder[] children = null;
+
+        if (addChildren) {
+            List<WorldProcessPlaceholder> childrenList = new ArrayList<>();
+
+            for (Process<?> child : process.getColl(Process.CHILDREN)) {
+                childrenList.add(createProcessPlaceholder(child, true));
+            }
+
+            children = childrenList.toArray(new WorldProcessPlaceholder[childrenList.size()]);
+        }
+
+        ContentFile sourceFile = process.getObj(Process.SOURCE);
+        FSModule fsModule = process.invoke(Process.GET_OS).getObj(OS.FS_MODULE);
+        String localSourcePath = sourceFile.invoke(File.GET_PATH);
+        String mountpoint = fsModule.invoke(FSModule.GET_KNOWN_BY_FS, sourceFile.invoke(File.GET_FILE_SYSTEM)).getObj(KnownFS.MOUNTPOINT);
+        String sourcePath = PathUtils.resolve(PathUtils.SEPARATOR + mountpoint, localSourcePath);
+
+        String programName = getProgramName(process.getObj(Process.EXECUTOR).getClass());
+
+        return new WorldProcessPlaceholder(id, state, user, children, sourcePath, programName);
+    }
+
+    private static String getProgramName(Class<?> programExecutor) {
+
+        for (WorldProgram worldProgram : Registries.get(ServerRegistries.WORLD_PROGRAMS)) {
+            if (worldProgram.getType() == programExecutor) {
+                return worldProgram.getName();
             }
         }
 
