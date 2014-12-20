@@ -23,9 +23,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import com.quartercode.classmod.base.Feature;
+import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.classmod.extra.prop.ValueSupplier;
+import com.quartercode.classmod.util.FeatureHolderVisitorAdapter;
+import com.quartercode.classmod.util.TreeWalker;
 import com.quartercode.disconnected.server.registry.SchedulerGroup;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
@@ -72,8 +73,7 @@ public class TickSchedulerUpdater implements TickAction {
 
         if (getWorld() != null) {
             // Collect all schedulers which are present inside the world
-            List<Scheduler> schedulers = new ArrayList<>();
-            collectSchedulers(world, schedulers);
+            List<Scheduler> schedulers = collectSchedulers(getWorld());
 
             // Update each scheduler with each group in the correct order
             for (String group : getSortedGroups()) {
@@ -84,19 +84,26 @@ public class TickSchedulerUpdater implements TickAction {
         }
     }
 
-    private void collectSchedulers(Object object, List<Scheduler> list) {
+    private List<Scheduler> collectSchedulers(World world) {
 
-        if (object instanceof SchedulerUser) {
-            list.add( ((SchedulerUser) object).get(SchedulerUser.SCHEDULER));
-        }
+        final List<Scheduler> schedulers = new ArrayList<>();
 
-        if (object instanceof CFeatureHolder) {
-            for (Feature feature : (CFeatureHolder) object) {
-                collectSchedulers(feature, list);
+        TreeWalker.walk(world, new FeatureHolderVisitorAdapter() {
+
+            @Override
+            public VisitResult preVisit(FeatureHolder holder) {
+
+                // If the current feature holder is a SchedulerUser, add its scheduler to the output list
+                if (holder instanceof SchedulerUser) {
+                    schedulers.add(holder.get(SchedulerUser.SCHEDULER));
+                }
+
+                return VisitResult.CONTINUE;
             }
-        } else if (object instanceof ValueSupplier) {
-            collectSchedulers( ((ValueSupplier<?>) object).get(), list);
-        }
+
+        });
+
+        return schedulers;
     }
 
     private List<String> getSortedGroups() {
