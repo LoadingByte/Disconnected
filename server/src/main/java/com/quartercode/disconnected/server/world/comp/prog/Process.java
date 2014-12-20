@@ -625,13 +625,13 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                 CFeatureHolder holder = invocation.getCHolder();
                 Process<?> sessionProcess = null;
 
-                // Error check
-                if ( ((Process<?>) holder).getParent() != null) {
-                    if ( ((Process<?>) holder).getParent().getObj(EXECUTOR) instanceof Session) {
-                        sessionProcess = (Process<?>) ((Process<?>) holder).getParent();
-                    } else {
-                        // Ask parent process
-                        sessionProcess = ((Process<?>) holder).getParent().invoke(GET_SESSION_PROCESS);
+                if (holder.getObj(EXECUTOR) instanceof Session) {
+                    sessionProcess = (Process<?>) holder;
+                } else {
+                    // Check parent process
+                    CFeatureHolder parentProcess = ((Process<?>) holder).getParent();
+                    if (parentProcess != null) {
+                        sessionProcess = parentProcess.invoke(GET_SESSION_PROCESS);
                     }
                 }
 
