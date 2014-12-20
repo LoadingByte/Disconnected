@@ -258,12 +258,12 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
 
             // Add reference to parent file
             if (!absoluteRoot) {
-                fileListModel.addRow("..", getString("fileList.file.type.parentFile"));
+                fileListModel.addRow("..", getString("fileList.fileType.parentFile"));
             }
 
             // Add new entries to file list
             for (FilePlaceholder file : files) {
-                String type = getString("fileList.file.type." + file.getType());
+                String type = getString("fileList.fileType." + file.getType());
 
                 String size = file.getSize() + " B";
                 fileListModel.addRow(file.getName(), type, size);
