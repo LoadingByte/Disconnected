@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
+import static com.quartercode.classmod.extra.func.Priorities.LEVEL_7;
 import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
@@ -85,6 +86,18 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
     static {
 
         NAME = factory(PropertyDefinitionFactory.class).create("name", new StandardStorage<>());
+        NAME.addSetterExecutor("trim", File.class, new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                String name = (String) arguments[0];
+                name = name.trim();
+
+                return invocation.next(name);
+            }
+
+        }, LEVEL_7);
 
         RIGHTS = factory(PropertyDefinitionFactory.class).create("rights", new StandardStorage<>(), new ValueFactory<FileRights>() {
 
