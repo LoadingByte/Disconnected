@@ -36,6 +36,7 @@
         <theme name="spanrenderer" ref="-defaults"/>
         <theme name="treeButton" ref="-defaults">
             <param name="background"><image>treetable.treebutton.background</image></param>
+            <param name="mouseCursor"><cursor>cursor.finger</cursor></param>
         </theme>
         <theme name="columnHeader" ref="label">
             <param name="background"><image>table.columnHeader.background</image></param>
