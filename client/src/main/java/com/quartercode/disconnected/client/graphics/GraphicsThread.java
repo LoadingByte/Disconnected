@@ -31,9 +31,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -69,7 +69,7 @@ public class GraphicsThread extends Thread {
     private Container             root;
 
     private GraphicsState         newState;
-    private final Queue<Runnable> toInvoke = new LinkedList<>();
+    private final Queue<Runnable> toInvoke = new ConcurrentLinkedQueue<>();
     private boolean               exit;
 
     /**

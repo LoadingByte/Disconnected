@@ -18,8 +18,8 @@
 
 package com.quartercode.disconnected.server.sim;
 
-import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import com.quartercode.disconnected.shared.util.RunnableInvocationProvider;
 
 /**
@@ -27,7 +27,7 @@ import com.quartercode.disconnected.shared.util.RunnableInvocationProvider;
  */
 public class TickRunnableInvoker implements TickAction, RunnableInvocationProvider {
 
-    private final Queue<Runnable> toInvoke = new LinkedList<>();
+    private final Queue<Runnable> toInvoke = new ConcurrentLinkedQueue<>();
 
     /**
      * Invokes the given {@link Runnable} in the tick update thread.
