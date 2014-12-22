@@ -101,7 +101,7 @@ public class TickSchedulerUpdater implements TickAction {
                 return VisitResult.CONTINUE;
             }
 
-        });
+        }, false);
 
         return schedulers;
     }

@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.shared.world.comp.prog;
 
 import java.io.Serializable;
+import java.util.UUID;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -28,31 +29,31 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class WorldProcessId implements Serializable {
 
-    private static final long serialVersionUID = -2077285645140149846L;
+    private static final long serialVersionUID = -6220241091232315812L;
 
-    private final String      computerId;
+    private final UUID        computerUUID;
     private final int         pid;
 
     /**
      * Creates a new world process id.
      * 
-     * @param computerId The id of the computer which runs the identifiable process.
+     * @param computerUUID The {@link UUID} of the computer which runs the identifiable process.
      * @param pid The process id of the identifiable process.
      */
-    public WorldProcessId(String computerId, int pid) {
+    public WorldProcessId(UUID computerUUID, int pid) {
 
-        this.computerId = computerId;
+        this.computerUUID = computerUUID;
         this.pid = pid;
     }
 
     /**
-     * Returns the id of the computer which runs the identifiable process.
+     * Returns the {@link UUID} of the computer which runs the identifiable process.
      * 
-     * @return The computer id.
+     * @return The computer UUID.
      */
-    public String getComputerId() {
+    public UUID getComputerUUID() {
 
-        return computerId;
+        return computerUUID;
     }
 
     /**

@@ -124,7 +124,7 @@ public class WorldProcessLaunchCommandHandlerTest {
         // @formatter:off
         context.checking(new Expectations() {{
 
-            oneOf(bridge).send(new WorldProcessLaunchAcknowledgmentEvent(new SBPWorldProcessUserId(SBP, wpuDetails), new WorldProcessId(sbpComputer.getId(), expectedPid)));
+            oneOf(bridge).send(new WorldProcessLaunchAcknowledgmentEvent(new SBPWorldProcessUserId(SBP, wpuDetails), new WorldProcessId(sbpComputer.getUUID(), expectedPid)));
 
         }});
         // @formatter:on
@@ -190,7 +190,7 @@ public class WorldProcessLaunchCommandHandlerTest {
         @Override
         protected WorldProcessId getProcessId(ProgramExecutor executor) {
 
-            return new WorldProcessId(sbpComputer.getId(), currentLaunchedProcessId);
+            return new WorldProcessId(sbpComputer.getUUID(), currentLaunchedProcessId);
         }
 
     }

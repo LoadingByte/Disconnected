@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -709,7 +710,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                 CFeatureHolder holder = invocation.getCHolder();
 
                 int pid = holder.getObj(Process.PID);
-                String computerId = holder.invoke(Process.GET_OS).getParent().getId();
+                UUID computerId = holder.invoke(Process.GET_OS).getParent().getUUID();
                 WorldProcessId worldProcessId = new WorldProcessId(computerId, pid);
 
                 invocation.next(arguments);
