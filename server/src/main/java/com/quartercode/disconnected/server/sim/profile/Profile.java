@@ -86,7 +86,7 @@ public class Profile {
 
         // Clear the random object from the old world
         if (this.world != null) {
-            this.world.injectRandom(null);
+            this.world.setRandom(null);
         }
 
         this.world = world;
@@ -123,7 +123,7 @@ public class Profile {
     private void injectRandomIntoWorld() {
 
         if (world != null) {
-            world.injectRandom(random);
+            world.setRandom(random);
         }
     }
 

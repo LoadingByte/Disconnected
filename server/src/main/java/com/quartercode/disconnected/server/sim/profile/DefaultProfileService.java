@@ -149,7 +149,7 @@ public class DefaultProfileService implements ProfileService {
     public void setActive(Profile profile) throws ProfileSerializationException {
 
         if (active != null) {
-            active.getWorld().injectBridge(null);
+            active.getWorld().setBridge(null);
             active.setWorld(null);
             active.setRandom(null);
         }
@@ -176,7 +176,7 @@ public class DefaultProfileService implements ProfileService {
         } else {
             LOGGER.debug("Injecting profile '{}' into tick service", profile.getName());
 
-            active.getWorld().injectBridge(tickService.getAction(TickBridgeProvider.class).getBridge());
+            active.getWorld().setBridge(tickService.getAction(TickBridgeProvider.class).getBridge());
 
             TickSchedulerUpdater schedulerUpdater = tickService.getAction(TickSchedulerUpdater.class);
             if (schedulerUpdater != null) {

@@ -78,7 +78,7 @@ public class World extends DefaultCFeatureHolder {
 
     /**
      * Returns the {@link Bridge} that should be used for sending events by any object in the world tree.
-     * It is must be injected using {@link #injectBridge(Bridge)}.
+     * It is must be injected using {@link #setBridge(Bridge)}.
      * 
      * @return The world's bridge.
      */
@@ -88,8 +88,19 @@ public class World extends DefaultCFeatureHolder {
     }
 
     /**
+     * Injects a {@link Bridge} that can be used by the world.
+     * It can be retrieved with {@link #getBridge()}.
+     * 
+     * @param bridge The bridge the world can use.
+     */
+    public void setBridge(Bridge bridge) {
+
+        this.bridge = bridge;
+    }
+
+    /**
      * Returns the {@link Random} object that can be used by the world.
-     * It is must be injected using {@link #injectRandom(Random)}.
+     * It is must be injected using {@link #setRandom(Random)}.
      * 
      * @return The random object the world can use.
      */
@@ -99,23 +110,12 @@ public class World extends DefaultCFeatureHolder {
     }
 
     /**
-     * Injects a {@link Bridge} that can be used by the world.
-     * It can be retrieved with {@link #getBridge()}.
-     * 
-     * @param bridge The bridge the world can use.
-     */
-    public void injectBridge(Bridge bridge) {
-
-        this.bridge = bridge;
-    }
-
-    /**
      * Injects a {@link Random} object that can be used by the world.
      * It can be retrieved with {@link #getRandom()}.
      * 
      * @param random The random object the world can use.
      */
-    public void injectRandom(Random random) {
+    public void setRandom(Random random) {
 
         this.random = random;
     }

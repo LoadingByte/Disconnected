@@ -99,7 +99,7 @@ public abstract class AbstractComplexComputerTest {
         bridge.getModule(SBPAwareHandlerExtension.class).setIdentityService(sbpIdentityService);
 
         world = new World();
-        world.injectBridge(bridge);
+        world.setBridge(bridge);
 
         mainComputer = newComputer(true);
     }

@@ -18,7 +18,6 @@
 
 package com.quartercode.disconnected.server.sim;
 
-import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,11 +58,12 @@ public class TickThread extends Thread {
     @Override
     public void run() {
 
-        long delay = service.getDelay();
+        final long delay = service.getDelay();
         long next = System.currentTimeMillis();
 
         while (!isInterrupted()) {
-            for (TickAction action : new ArrayList<>(service.getActions())) {
+            // Execute all tick actions
+            for (TickAction action : service.getActions()) {
                 try {
                     action.update();
                 } catch (RuntimeException e) {
@@ -71,8 +71,13 @@ public class TickThread extends Thread {
                 }
             }
 
+            // Calculate the time at which the next tick should be executed
             next += delay;
+
+            // Calculate the time this thread has to sleep until the next tick is executed
             long sleep = next - System.currentTimeMillis();
+
+            // Sleep if the next tick time is in the future
             if (sleep > 0) {
                 try {
                     Thread.sleep(sleep);
@@ -80,6 +85,10 @@ public class TickThread extends Thread {
                     // Interruption -> Exit thread
                     break;
                 }
+            }
+            // Adjust/reset the next tick time if it is quite a bit in the past
+            else if (sleep <= -100) {
+                next = System.currentTimeMillis();
             }
         }
     }
