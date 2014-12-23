@@ -9,6 +9,7 @@ com.quartercode.disconnected.server.init.RegisterSBPIdentityService
 
 # Initialize services
 com.quartercode.disconnected.server.init.InitializeProfileSerializationService
+com.quartercode.disconnected.server.init.InitializeProfileService
 com.quartercode.disconnected.server.init.InitializeTickService
 
 # Initialize resources

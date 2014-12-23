@@ -21,13 +21,12 @@ package com.quartercode.disconnected.server.sim.profile;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Random;
-import javax.xml.bind.JAXBContext;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.world.World;
 
 /**
- * This service implements mechanisms for serializing and deserializing entire {@link Profile}s.
- * The persistent profiles are stored in some kind of (archive) files, which contain the different components of the profiles.
+ * This service implements mechanisms for serializing and deserializing {@link ProfileData profile data}.
+ * That persistent data is stored in some kind of (archive) files, which contain the different profile data components.
  * 
  * @see Profile
  */
@@ -36,59 +35,53 @@ public interface ProfileSerializationService {
     // ----- Profile -----
 
     /**
-     * Serializes the given {@link Profile} to the given {@link OutputStream}.
-     * This methods writes an (archive) file to the stream, which contain the different components of the profile.
+     * Serializes the given persistent {@link ProfileData profile data} (e.g. the profile's world) to the given {@link OutputStream}.
+     * This methods writes an (archive) file, which contain the different profile data components, to the stream.
      * 
-     * @param outputStream The output stream to write the result to.
-     * @param profile The profile to serialize to the given output stream.
-     * @throws ProfileSerializationException Thrown if something goes wrong while serializing the profile.
+     * @param outputStream The output stream to write the profile data to.
+     * @param data The profile data to serialize to the given output stream.
+     * @throws ProfileSerializationException Thrown if something goes wrong while serializing the profile data.
      */
-    public void serializeProfile(OutputStream outputStream, Profile profile) throws ProfileSerializationException;
+    public void serializeProfile(OutputStream outputStream, ProfileData data) throws ProfileSerializationException;
 
     /**
-     * Deserializes the profile data from the given {@link InputStream} and puts the results into the given {@link Profile} object.
-     * This method reads an (archive) file from the stream, which contains the different components of the profile for deserialization.
+     * Deserializes the {@link ProfileData profile data} from the given {@link InputStream} and returns the result.
+     * This method reads an (archive) file, which contains the different profile data components for deserialization, from the stream.
+     * Note that the deserialized {@link World} is automatically initialized.
      * 
-     * @param inputStream The input stream to read the data from.
-     * @param target The profile where the deserialized profile data should be put into.
+     * @param inputStream The input stream to read the profile data from.
+     * @return The deserialized profile data as a {@link ProfileData} object.
      * @throws ProfileSerializationException Thrown if something goes wrong while deserializing the profile data.
      */
-    public void deserializeProfile(InputStream inputStream, Profile target) throws ProfileSerializationException;
+    public ProfileData deserializeProfile(InputStream inputStream) throws ProfileSerializationException;
 
     // ----- World -----
 
     /**
-     * Creates a new {@link JAXBContext} which can be used for the {@link World} XML model.
-     * The new context uses the classes whose retrieval is defined by the {@link ServerRegistries#PERSISTENT_CLASS_SCAN_DIRECTIVES persistent class scan directives}.
+     * Serializes the given {@link World} to the given {@link OutputStream} without closing the stream.
      * 
-     * @return A JAXB context for the world XML model.
-     * @throws ProfileSerializationException Thrown if the world JAXB context cannot be created for some reason.
-     */
-    public JAXBContext createWorldContext() throws ProfileSerializationException;
-
-    /**
-     * Serializes the given {@link World} to the given {@link OutputStream} as textual XML.
-     * 
-     * @param outputStream The output stream to write the world XML to.
+     * @param outputStream The output stream to write the world to.
      * @param world The world object to serialize.
      * @throws ProfileSerializationException Thrown if an exception occurs while serializing the world to the given output stream.
      */
     public void serializeWorld(OutputStream outputStream, World world) throws ProfileSerializationException;
 
     /**
-     * Deserializes the {@link World} which is provided as textual XML by the given {@link InputStream}.
-     * Also tries to initialize the read world with the defined {@link ServerRegistries#WORLD_INITIALIZER_MAPPINGS world initializer mappings}.
+     * Deserializes the {@link World}, which is provided by the given {@link InputStream}, without closing the stream.
+     * The method is also able to initialize the read world with the defined {@link ServerRegistries#WORLD_INITIALIZER_MAPPINGS world initializer mappings}.
+     * That is required for avoiding some endless cycles when using {@code hashCode()} or {@code equals()}.
      * 
-     * @param inputStream The input stream to read the world XML from.
+     * @param inputStream The input stream to read the world from.
+     * @param initialize Whether the deserialized world should be initialized.
      * @return The deserialized world object.
-     * @throws ProfileSerializationException Thrown if an exception occurs while deserializing the world's XML document provided by the given input stream.
+     * @throws ProfileSerializationException Thrown if an exception occurs while deserializing the world from the given input stream.
      */
-    public World deserializeWorld(InputStream inputStream) throws ProfileSerializationException;
+    public World deserializeWorld(InputStream inputStream, boolean initialize) throws ProfileSerializationException;
 
     // ----- Random -----
 
     /**
-     * Serializes the given {@link Random} object to the given {@link OutputStream}.
+     * Serializes the given {@link Random} object to the given {@link OutputStream} without closing the stream.
      * 
      * @param outputStream The output stream to write the random object to.
      * @param random The random object to serialize to the given output stream.
@@ -97,7 +90,7 @@ public interface ProfileSerializationService {
     public void serializeRandom(OutputStream outputStream, Random random) throws ProfileSerializationException;
 
     /**
-     * Deserializes a {@link Random} object from the given {@link InputStream}.
+     * Deserializes a {@link Random} object from the given {@link InputStream} without closing the stream.
      * 
      * @param inputStream The input stream to read the random object from.
      * @return The deserialized random object.

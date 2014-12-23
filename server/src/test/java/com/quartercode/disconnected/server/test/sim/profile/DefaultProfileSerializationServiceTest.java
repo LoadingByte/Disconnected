@@ -61,7 +61,7 @@ public class DefaultProfileSerializationServiceTest {
         outputStream.flush();
         String serialized = new String(outputStream.toByteArray(), "UTF-8");
 
-        World copy = service.deserializeWorld(new ByteArrayInputStream(serialized.getBytes("UTF-8")));
+        World copy = service.deserializeWorld(new ByteArrayInputStream(serialized.getBytes("UTF-8")), true);
         assertTrue("Serialized-deserialized copy of world does not equal original", equalsPersistent(world, copy));
     }
 

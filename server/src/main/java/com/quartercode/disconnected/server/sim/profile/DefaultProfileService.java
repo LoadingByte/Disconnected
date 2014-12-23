@@ -24,14 +24,16 @@ import java.io.OutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.quartercode.disconnected.server.sim.TickBridgeProvider;
-import com.quartercode.disconnected.server.sim.TickSchedulerUpdater;
-import com.quartercode.disconnected.server.sim.TickService;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 
 /**
@@ -44,38 +46,22 @@ public class DefaultProfileService implements ProfileService {
     private static final Logger LOGGER   = LoggerFactory.getLogger(DefaultProfileService.class);
 
     private final Path          directory;
+    // This list must be concurrent because the watcher thread is accessing it
+    private final List<String>  profiles = new CopyOnWriteArrayList<>();
 
-    private final List<Profile> profiles = new ArrayList<>();
-    private Profile             active;
+    private Thread              watcherThread;
 
     /**
      * Creates a new default profile service which stores its profiles in the given directory.
-     * The constructor also loads all profile as trunks which are present in the given directory.
+     * If the profile directory doesn't exist yet, it is created.
      * 
      * @param directory The directory the new service will store its profiles in.
      */
     public DefaultProfileService(Path directory) {
 
+        Validate.notNull(directory, "Cannot use null profile directory");
+
         this.directory = directory;
-
-        if (Files.exists(directory)) {
-            try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directory)) {
-                for (Path profileFile : directoryStream) {
-                    LOGGER.debug("Indexing profile under '{}'", profileFile);
-
-                    String profileFileName = profileFile.getFileName().toString();
-                    profiles.add(new Profile(profileFileName.substring(0, profileFileName.lastIndexOf("."))));
-                }
-            } catch (IOException e) {
-                LOGGER.error("Cannot index existing profiles in directory '{}'", directory, e);
-            }
-        } else {
-            try {
-                Files.createDirectories(directory);
-            } catch (IOException e) {
-                LOGGER.error("Cannot create profile directory '{}'", directory, e);
-            }
-        }
     }
 
     @Override
@@ -85,104 +71,185 @@ public class DefaultProfileService implements ProfileService {
     }
 
     @Override
-    public List<Profile> getProfiles() {
+    public List<String> getProfiles() {
 
         return Collections.unmodifiableList(profiles);
     }
 
-    @Override
-    public void addProfile(Profile profile) {
+    private Path getProfileFile(String profile) {
 
-        removeProfile(profile);
-        profiles.add(profile);
+        return directory.resolve(profile + ".zip");
     }
 
     @Override
-    public void removeProfile(Profile profile) {
+    public void deleteProfile(String profile) {
 
-        for (Profile existingProfile : new ArrayList<>(profiles)) {
-            if (existingProfile.getName().equalsIgnoreCase(profile.getName())) {
-                Path profileFile = directory.resolve(profile.getName() + ".zip");
-                LOGGER.debug("Removing profile '{}' from '{}'", profile.getName(), profileFile);
+        Validate.notBlank(profile, "Cannot delete profile with blank name");
+        Validate.isTrue(getProfiles().contains(profile), "Cannot delete unknown profile '{}'", profile);
 
-                profiles.remove(profile);
+        Path profileFile = getProfileFile(profile);
+        LOGGER.debug("Removing profile '{}' from '{}'", profile, profileFile);
 
-                try {
-                    Files.delete(profileFile);
-                } catch (IOException e) {
-                    LOGGER.error("Cannot delete profile file '{}'", profileFile, e);
-                }
-
-                break;
-            }
+        try {
+            // This call also updates the "profiles" list because the profile directory is watched
+            Files.delete(profileFile);
+        } catch (IOException e) {
+            LOGGER.error("Cannot delete profile file '{}'", profileFile, e);
         }
     }
 
     @Override
-    public void serializeProfile(Profile profile) throws ProfileSerializationException {
+    public void serializeProfile(String profile, ProfileData data) throws ProfileSerializationException {
 
-        Path profileFile = directory.resolve(profile.getName() + ".zip");
-        LOGGER.debug("Serializing (saving) profile '{}' to '{}'", profile.getName(), profileFile);
+        Validate.notBlank(profile, "Cannot serialize profile with blank name");
 
+        Path profileFile = getProfileFile(profile);
+        LOGGER.debug("Serializing profile '{}' to '{}'", profile, profileFile);
+
+        // Delete old file
         if (Files.exists(profileFile)) {
             try {
                 Files.delete(profileFile);
             } catch (IOException e) {
-                throw new ProfileSerializationException("Cannot delete old file '" + profileFile + "' of profile '" + profile.getName() + "'", e);
+                throw new ProfileSerializationException("Cannot delete old file '" + profileFile + "' of profile '" + profile + "'", e);
             }
         }
 
+        // Create new file; this call also updates the "profiles" list because the profile directory is watched
         try (OutputStream outputStream = Files.newOutputStream(profileFile)) {
-            ServiceRegistry.lookup(ProfileSerializationService.class).serializeProfile(outputStream, profile);
+            ServiceRegistry.lookup(ProfileSerializationService.class).serializeProfile(outputStream, data);
         } catch (IOException e) {
-            throw new ProfileSerializationException("Cannot open output stream to profile file '" + profileFile + "' for serializing profile '" + profile.getName() + "'", e);
+            throw new ProfileSerializationException("Cannot open output stream to profile file '" + profileFile + "' for serializing profile '" + profile + "'", e);
+        } catch (ProfileSerializationException e) {
+            throw new ProfileSerializationException("Error while serializing profile '" + profile + "' to '" + profileFile + "'", e);
         }
     }
 
     @Override
-    public Profile getActive() {
+    public ProfileData deserializeProfile(String profile) throws ProfileSerializationException {
 
-        return active;
+        Validate.notBlank(profile, "Cannot deserialize profile with blank name");
+        Validate.isTrue(getProfiles().contains(profile), "Cannot deserialize unknown profile '{}'", profile);
+
+        Path profileFile = getProfileFile(profile);
+        LOGGER.debug("Deserializing profile '{}' from '{}'", profile, profileFile);
+
+        // Deserialize the profile
+        try (InputStream inputStream = Files.newInputStream(profileFile)) {
+            return ServiceRegistry.lookup(ProfileSerializationService.class).deserializeProfile(inputStream);
+        } catch (IOException e) {
+            throw new ProfileSerializationException("Cannot open input stream to profile file '" + profileFile + "' for deserializing profile '" + profile + "'", e);
+        } catch (ProfileSerializationException e) {
+            throw new ProfileSerializationException("Error while deserializing profile '" + profile + "' from '" + profileFile + "'", e);
+        }
     }
 
     @Override
-    public void setActive(Profile profile) throws ProfileSerializationException {
+    public boolean isWatching() {
 
-        if (active != null) {
-            active.getWorld().setBridge(null);
-            active.setWorld(null);
-            active.setRandom(null);
+        return watcherThread != null && watcherThread.isAlive();
+    }
+
+    @Override
+    public void setWatching(boolean watching) {
+
+        if (watching && !isWatching()) {
+            LOGGER.debug("Starting up profile dir watcher daemon thread");
+            watcherThread = new Thread(new DirectoryWatcher(), "profile-dir-watcher");
+            // Use a daemon in order to avoid having to stop the thread explicitly
+            watcherThread.setDaemon(true);
+            watcherThread.start();
+        } else if (!watching && isWatching()) {
+            LOGGER.debug("Shutting down profile dir watcher daemon thread");
+            watcherThread.interrupt();
+            watcherThread = null;
         }
+    }
 
-        active = profile;
+    /*
+     * A simple thread runnable that watches the profile service's directory for changes and updates the "profiles" list accordingly.
+     */
+    private class DirectoryWatcher implements Runnable {
 
-        if (active != null && (active.getWorld() == null || active.getRandom() == null)) {
-            Path profileFile = directory.resolve(active.getName() + ".zip");
-            LOGGER.debug("Loading profile '{}' from '{}'", profile.getName(), profileFile);
+        @Override
+        public void run() {
 
-            if (Files.exists(profileFile)) {
-                try (InputStream inputStream = Files.newInputStream(profileFile)) {
-                    ServiceRegistry.lookup(ProfileSerializationService.class).deserializeProfile(inputStream, active);
+            LOGGER.debug("The profile directory is '{}'", directory.toAbsolutePath());
+
+            // Create the profile directory if it doesn't exist yet
+            if (!Files.exists(directory)) {
+                try {
+                    Files.createDirectories(directory);
                 } catch (IOException e) {
-                    throw new ProfileSerializationException("Cannot open input stream to profile file '" + profileFile + "' for deserializing profile '" + profile.getName() + "'", e);
+                    LOGGER.error("Cannot create profile directory '{}'", directory, e);
+                    return;
+                }
+            }
+
+            // Start the directory watcher
+            try (WatchService watcher = directory.getFileSystem().newWatchService()) {
+                directory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE);
+
+                while (true) {
+                    WatchKey watckKey = watcher.take();
+
+                    // Process all events
+                    for (WatchEvent<?> event : watckKey.pollEvents()) {
+                        processEvent(event);
+                    }
+
+                    watckKey.reset();
+                }
+            } catch (IOException e) {
+                LOGGER.error("Cannot register watch service for watching profile directory '{}'", directory, e);
+            } catch (InterruptedException e) {
+                // Should never happen
+                LOGGER.error("Profile directory watching thread interrupted while watching directory '{}'", directory, e);
+            }
+        }
+
+        private void processEvent(WatchEvent<?> event) {
+
+            if (event.kind() == StandardWatchEventKinds.OVERFLOW) {
+                reindexProfiles();
+            } else {
+                String profile = getProfile( ((Path) event.context()).toString());
+
+                if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
+                    LOGGER.debug("Indexing new profile '{}'", profile);
+                    profiles.add(profile);
+                } else if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
+                    LOGGER.debug("Removing profile '{}'", profile);
+                    profiles.remove(profile);
                 }
             }
         }
 
-        TickService tickService = ServiceRegistry.lookup(TickService.class);
+        private String getProfile(String fileName) {
 
-        if (tickService == null) {
-            LOGGER.error("No tick service found for injecting profile '{}'", profile.getName());
-        } else {
-            LOGGER.debug("Injecting profile '{}' into tick service", profile.getName());
+            return fileName.substring(0, fileName.lastIndexOf("."));
+        }
 
-            active.getWorld().setBridge(tickService.getAction(TickBridgeProvider.class).getBridge());
+        private void reindexProfiles() {
 
-            TickSchedulerUpdater schedulerUpdater = tickService.getAction(TickSchedulerUpdater.class);
-            if (schedulerUpdater != null) {
-                schedulerUpdater.setWorld(active == null ? null : active.getWorld());
+            LOGGER.debug("Re-indexing all profiles in directory '{}'", directory);
+
+            // Clear the old profile list
+            profiles.clear();
+
+            // Iterate over all profile files and index them
+            try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directory)) {
+                for (Path profileFile : directoryStream) {
+                    String profile = getProfile(profileFile.getFileName().toString());
+
+                    LOGGER.debug("Re-indexing profile '{}'", profile);
+                    profiles.add(profile);
+                }
+            } catch (IOException e) {
+                LOGGER.error("Cannot re-index existing profiles in directory '{}'", directory, e);
             }
         }
+
     }
 
 }

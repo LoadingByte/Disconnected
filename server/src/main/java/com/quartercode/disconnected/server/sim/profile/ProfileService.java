@@ -20,6 +20,7 @@ package com.quartercode.disconnected.server.sim.profile;
 
 import java.nio.file.Path;
 import java.util.List;
+import com.quartercode.disconnected.shared.util.ServiceRegistry;
 
 /**
  * This service manages different {@link Profile}s which store simulations and random objects.
@@ -31,61 +32,64 @@ import java.util.List;
 public interface ProfileService {
 
     /**
-     * Returns The directory the profile service stores its {@link Profile}s in.
+     * Returns the directory the profile service stores its profiles in.
      * 
-     * @return The directory the service uses as storage.
+     * @return The directory used as storage.
      */
     public Path getDirectory();
 
     /**
-     * Returns a list of all loaded {@link Profile}s.
+     * Returns the names of all available profiles that are located in the {@link #getDirectory() set profile directory}.
+     * If something changes in that directory, the list returned by this method changes as well.
+     * In order to add new profiles programmatically, {@link #serializeProfile(String, ProfileData)} must be called.
      * 
-     * @return All loaded profiles.
+     * @return All available profiles.
      */
-    public List<Profile> getProfiles();
+    public List<String> getProfiles();
 
     /**
-     * Adds a new {@link Profile} object to the storage.
-     * If there's already a profile with the same name (ignoring case), the old one will be deleted.
+     * Deletes the available profile with the given name and the associated profile file.
+     * Note that the given profile name must be present in the {@link #getProfiles() profile list}.
      * 
-     * @param profile The new profile to add.
+     * @param profile The name of the indexed profile to delete.
      */
-    public void addProfile(Profile profile);
+    public void deleteProfile(String profile);
 
     /**
-     * Removes the given {@link Profile} object from the storage.
-     * This actually removes any profile with the same name as the given one (ignoring case).
+     * Serializes (or "saves") the profile with the given name and {@link ProfileData} into the correct ZIP file in the {@link #getDirectory() set profile directory}.
+     * If the profile with the given name doesn't exist yet in the {@link #getProfiles() profile list}, it is added to the list.
      * 
-     * @param profile The loaded profile to remove.
-     */
-    public void removeProfile(Profile profile);
-
-    /**
-     * Serializes (or "saves") the given {@link Profile} into the correct zip file in the set directory.
-     * 
-     * @param profile The profile to serialize.
+     * @param profile The name of the profile to serialize.
+     * @param data A {@link ProfileData} object that contains the persistent data of the profile.
+     *        It can be created using a simple constructor.
      * @throws ProfileSerializationException Something goes wrong while serializing the profile.
+     * @see ProfileSerializationService
      */
-    public void serializeProfile(Profile profile) throws ProfileSerializationException;
+    public void serializeProfile(String profile, ProfileData data) throws ProfileSerializationException;
 
     /**
-     * Returns the current active {@link Profile} which is simulated at the time.
+     * Deserializes (or "loads") the {@link ProfileData} of the profile with the given name from the correct ZIP file in the {@link #getDirectory() set profile directory}.
      * 
-     * @return The current active profile.
+     * @param profile The name of the profile to serialize.
+     * @return A {@link ProfileData} object that contains the persistent data of the loaded profile.
+     * @throws ProfileSerializationException Something goes wrong while deserializing the profile.
+     * @see ProfileSerializationService
      */
-    public Profile getActive();
+    public ProfileData deserializeProfile(String profile) throws ProfileSerializationException;
 
     /**
-     * Changes the currently active {@link Profile}.
-     * By setting a profile active, it will deserialize the data of it.
-     * By setting a profile inactive, it will unlink the data of it from the memory.<br>
-     * <br>
-     * If you want to deactivate the current profile without activating a new one, you can use {@code null}.
-     * The change will take place in the next tick.
+     * Returns whether the service is currently watching the {@link #getDirectory() set profile directory} and updating the {@link #getProfiles() profile list} accordingly.
+     * This should always return {@code true} for the profile service that is retrievable through the {@link ServiceRegistry}.
      * 
-     * @param profile The new active profile which will be simulated.
-     * @throws ProfileSerializationException Something goes wrong while deserializing the profile data.
+     * @return Whether the profile directory is watched for changes.
      */
-    public void setActive(Profile profile) throws ProfileSerializationException;
+    public boolean isWatching();
+
+    /**
+     * Sets whether the service should be watching the {@link #getDirectory() set profile directory} and updating the {@link #getProfiles() profile list} accordingly.
+     * 
+     * @param watching Whether the profile directory should be watched for changes.
+     */
+    public void setWatching(boolean watching);
 
 }

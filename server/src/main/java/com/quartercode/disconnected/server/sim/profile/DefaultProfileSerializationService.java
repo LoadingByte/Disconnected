@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.server.sim.profile;
 
 import java.io.FilterInputStream;
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -121,23 +122,23 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
     // ----- Profile -----
 
     @Override
-    public void serializeProfile(OutputStream outputStream, Profile profile) throws ProfileSerializationException {
+    public void serializeProfile(OutputStream outputStream, ProfileData data) throws ProfileSerializationException {
 
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
             zipOutputStream.putNextEntry(new ZipEntry("world.xml"));
-            serializeWorld(zipOutputStream, profile.getWorld());
+            serializeWorld(zipOutputStream, data.getWorld());
             zipOutputStream.closeEntry();
 
             zipOutputStream.putNextEntry(new ZipEntry("random.ser"));
-            serializeRandom(zipOutputStream, profile.getRandom());
+            serializeRandom(zipOutputStream, data.getRandom());
             zipOutputStream.closeEntry();
         } catch (IOException e) {
-            throw new ProfileSerializationException("Cannot serialize profile '" + profile.getName() + "' to output stream", e);
+            throw new ProfileSerializationException("I/O exception while serializing profile to output stream", e);
         }
     }
 
     @Override
-    public void deserializeProfile(InputStream inputStream, Profile target) throws ProfileSerializationException {
+    public ProfileData deserializeProfile(InputStream inputStream) throws ProfileSerializationException {
 
         World world = null;
         Random random = null;
@@ -146,28 +147,33 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
             ZipEntry zipEntry = null;
             while ( (zipEntry = zipInputStream.getNextEntry()) != null) {
                 if (zipEntry.getName().equals("world.xml")) {
-                    world = deserializeWorld(zipInputStream);
+                    world = deserializeWorld(zipInputStream, true);
                 } else if (zipEntry.getName().equals("random.ser")) {
                     random = deserializeRandom(zipInputStream);
                 }
             }
         } catch (IOException e) {
-            throw new ProfileSerializationException("Cannot deserialize profile '" + target.getName() + "' from input stream", e);
+            throw new ProfileSerializationException("I/O exception while deserializing profile from input stream", e);
         }
 
         if (world == null) {
-            throw new ProfileSerializationException("No valid world object found while deserializing profile '" + target.getName() + "'");
+            throw new ProfileSerializationException("No valid world object found after deserializing profile");
         } else if (random == null) {
-            throw new ProfileSerializationException("No valid Random object found while deserializing profile '" + target.getName() + "'");
+            throw new ProfileSerializationException("No valid Random object found after deserializing profile");
         }
 
-        target.setWorld(world);
-        target.setRandom(random);
+        return new ProfileData(world, random);
     }
 
     // ----- World -----
 
-    @Override
+    /**
+     * Creates a new {@link JAXBContext} which can be used for the {@link World} XML model.
+     * The new context uses the classes whose retrieval is defined by the {@link ServerRegistries#PERSISTENT_CLASS_SCAN_DIRECTIVES persistent class scan directives}.
+     * 
+     * @return A JAXB context for the world XML model.
+     * @throws ProfileSerializationException Thrown if the world JAXB context cannot be created for some reason.
+     */
     public JAXBContext createWorldContext() throws ProfileSerializationException {
 
         try {
@@ -185,14 +191,14 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
             Marshaller marshaller = createWorldContext().createMarshaller();
             // Turn this option on for debugging:
             // marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            marshaller.marshal(world, outputStream);
+            marshaller.marshal(world, new NoCloseOutputStream(outputStream));
         } catch (JAXBException e) {
             throw new ProfileSerializationException("Cannot marshal input world object as XML", e);
         }
     }
 
     @Override
-    public World deserializeWorld(InputStream inputStream) throws ProfileSerializationException {
+    public World deserializeWorld(InputStream inputStream, boolean initialize) throws ProfileSerializationException {
 
         // Unmarshal world
         World world;
@@ -202,12 +208,14 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
             throw new ProfileSerializationException("Cannot unmarshal world object from input XML", e);
         }
 
-        // Initialize world
-        TreeInitializer worldInitializer = new TreeInitializer();
-        for (Mapping<Class<? extends FeatureHolder>, FeatureDefinition<?>> mapping : Registries.get(ServerRegistries.WORLD_INITIALIZER_MAPPINGS)) {
-            worldInitializer.addInitializationDefinition(mapping.getLeft(), mapping.getRight());
+        if (initialize) {
+            // Initialize world
+            TreeInitializer worldInitializer = new TreeInitializer();
+            for (Mapping<Class<? extends FeatureHolder>, FeatureDefinition<?>> mapping : Registries.get(ServerRegistries.WORLD_INITIALIZER_MAPPINGS)) {
+                worldInitializer.addInitializationDefinition(mapping.getLeft(), mapping.getRight());
+            }
+            worldInitializer.apply(world);
         }
-        worldInitializer.apply(world);
 
         return world;
     }
@@ -217,8 +225,7 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
     @Override
     public void serializeRandom(OutputStream outputStream, Random random) throws ProfileSerializationException {
 
-        try {
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new NoCloseOutputStream(outputStream))) {
             objectOutputStream.writeObject(random);
             objectOutputStream.flush();
         } catch (IOException e) {
@@ -229,14 +236,28 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
     @Override
     public Random deserializeRandom(InputStream inputStream) throws ProfileSerializationException {
 
-        try {
-            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(new NoCloseInputStream(inputStream))) {
             return (Random) objectInputStream.readObject();
         } catch (IOException e) {
             throw new ProfileSerializationException("Cannot deserialize Random object from input stream", e);
         } catch (ClassNotFoundException e) {
             throw new ProfileSerializationException("Cannot find a certain class which is used by the serialized Random object", e);
         }
+    }
+
+    private static class NoCloseOutputStream extends FilterOutputStream {
+
+        private NoCloseOutputStream(OutputStream outputStream) {
+
+            super(outputStream);
+        }
+
+        @Override
+        public void close() {
+
+            // Do nothing
+        }
+
     }
 
     private static class NoCloseInputStream extends FilterInputStream {
