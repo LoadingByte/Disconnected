@@ -18,24 +18,50 @@
 
 package com.quartercode.disconnected.server.sim.scheduler;
 
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
+import com.quartercode.classmod.extra.func.FunctionDefinition;
+import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
 
 /**
- * A scheduler task is a unit that can be scheduled to be executed using a {@link Scheduler}.
- * It contains a method to execute it the right time has come ({@link #execute(CFeatureHolder)}).<br>
- * <br>
- * Setting the {@link #isCancelled()} flag to {@code true} cancels the task and removes it from its scheduler.
- * That means that the task will no longer be executed.
- * Note that the {@link #cloneStateless()} method is used to create clones of the task without the cancelled flag.
- * That way, the same task object can be scheduled multiple times (if the task itself has no other state or overrides the clone stateless method).<br>
+ * A scheduler task is an action that can be scheduled to be executed using a {@link Scheduler}.
+ * It contains the {@link #EXECUTE} function to call it when the right time has come.
+ * Setting the {@link #isCancelled() cancellation} flag to {@code true} cancels the task and removes it from its scheduler.
+ * That means that the task will no longer be executed.<br>
  * <br>
  * Please note that the state of a scheduler task must be serializable using JAXB persistence.
  * 
  * @see Scheduler
+ * @see SchedulerTaskAdapter
  */
 @XmlPersistent
-public interface SchedulerTask {
+public interface SchedulerTask extends CFeatureHolder {
+
+    // ----- Functions -----
+
+    /**
+     * Executes the scheduler task.
+     * This function should only be used by a {@link Scheduler} in order to execute a task.
+     * 
+     * <table>
+     * <tr>
+     * <th>Index</th>
+     * <th>Type</th>
+     * <th>Parameter</th>
+     * <th>Description</th>
+     * </tr>
+     * <tr>
+     * <td>0</td>
+     * <td>{@link CFeatureHolder}</td>
+     * <td>schedulerHolder</td>
+     * <td>The feature holder that contains the scheduler which called the method.</td>
+     * </tr>
+     * </table>
+     */
+    public static final FunctionDefinition<Void> EXECUTE = factory(FunctionDefinitionFactory.class).create("execute", new Class[] { CFeatureHolder.class });
+
+    // ----- Regular Methods -----
 
     /**
      * Returns whether the task has been cancelled and should no longer be executed.
@@ -49,20 +75,5 @@ public interface SchedulerTask {
      * This method should set the {@link #isCancelled()} flag to {@code true}.
      */
     public void cancel();
-
-    /**
-     * Executes the scheduler task.
-     * This method should only be used by the {@link Scheduler} in order to execute a task.
-     * 
-     * @param holder The {@link CFeatureHolder} that contains the scheduler which called the method.
-     */
-    public void execute(CFeatureHolder holder);
-
-    /**
-     * Creates a copy of the scheduler task without copying the {@link #isCancelled() cancellation} attribute.
-     * 
-     * @return A stateless copy of the task.
-     */
-    public SchedulerTask cloneStateless();
 
 }

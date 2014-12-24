@@ -16,22 +16,21 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.sim.scheduler;
+package com.quartercode.disconnected.server.init;
 
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
+import com.quartercode.classmod.factory.ClassmodFactory;
+import com.quartercode.disconnected.server.sim.scheduler.DefaultSchedulerDefinitionFactory;
+import com.quartercode.disconnected.server.sim.scheduler.SchedulerDefinitionFactory;
+import com.quartercode.disconnected.shared.util.init.Initializer;
+import com.quartercode.disconnected.shared.util.init.InitializerSettings;
 
-/**
- * {@link CFeatureHolder}s which implement this interface inherit the {@link #SCHEDULER} feature which is a {@link Scheduler} that
- * is automatically updated by the tick simulator.
- * The simulator visits all feature holders of a world and updates all automatic schedulers with all groups in the correct order.
- * 
- * @see Scheduler
- */
-public interface SchedulerUser extends CFeatureHolder {
+@InitializerSettings (groups = "addClassmodFactoryProviders")
+public class AddServerClassmodFactoryProviders implements Initializer {
 
-    /**
-     * The {@link Scheduler} which is automatically updated by the tick simulator on every tick.
-     */
-    public static final SchedulerDefinition SCHEDULER = new SchedulerDefinition("scheduler");
+    @Override
+    public void initialize() {
+
+        ClassmodFactory.registerFactoryProvider(SchedulerDefinitionFactory.class, new DefaultSchedulerDefinitionFactory());
+    }
 
 }

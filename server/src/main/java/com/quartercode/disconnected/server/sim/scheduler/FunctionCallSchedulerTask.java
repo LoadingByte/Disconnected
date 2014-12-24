@@ -18,10 +18,15 @@
 
 package com.quartercode.disconnected.server.sim.scheduler;
 
-import javax.xml.bind.annotation.XmlElement;
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.Function;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
+import com.quartercode.classmod.extra.func.FunctionExecutor;
+import com.quartercode.classmod.extra.func.FunctionInvocation;
+import com.quartercode.classmod.extra.prop.PropertyDefinition;
+import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.classmod.util.FeatureDefinitionReference;
 
 /**
@@ -34,33 +39,38 @@ import com.quartercode.classmod.util.FeatureDefinitionReference;
  */
 public class FunctionCallSchedulerTask extends SchedulerTaskAdapter {
 
-    @XmlElement
-    private FeatureDefinitionReference<FunctionDefinition<?>> functionDefinition;
+    // ----- Properties -----
 
     /**
-     * Creates a new empty function call scheduler task.
-     * This is only recommended for direct field access (e.g. for serialization).
+     * A {@link FeatureDefinitionReference} that references the {@link FunctionDefinition} which defines the {@link Function} that should be called by the task.
      */
-    protected FunctionCallSchedulerTask() {
+    public static final PropertyDefinition<FeatureDefinitionReference<FunctionDefinition<?>>> FUNCTION_DEFINITION;
+
+    static {
+
+        FUNCTION_DEFINITION = factory(PropertyDefinitionFactory.class).create("functionDefinition", new StandardStorage<>());
 
     }
 
-    /**
-     * Creates a new function call scheduler task with the given {@link FeatureDefinitionReference}.
-     * Note that the given reference must point to a {@link FunctionDefinition}.
-     * 
-     * @param functionDefinition A feature definition reference that references the function definition which defines
-     *        the {@link Function} that should be called by the task.
-     */
-    public FunctionCallSchedulerTask(FeatureDefinitionReference<FunctionDefinition<?>> functionDefinition) {
+    // ----- Functions -----
 
-        this.functionDefinition = functionDefinition;
-    }
+    static {
 
-    @Override
-    public void execute(CFeatureHolder holder) {
+        EXECUTE.addExecutor("default", FunctionCallSchedulerTask.class, new FunctionExecutor<Void>() {
 
-        holder.invoke(functionDefinition.getDefinition());
+            @Override
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                CFeatureHolder schedulerHolder = (CFeatureHolder) arguments[0];
+                FunctionDefinition<?> functionDefinition = invocation.getCHolder().getObj(FUNCTION_DEFINITION).getDefinition();
+
+                schedulerHolder.invoke(functionDefinition);
+
+                return invocation.next(arguments);
+            }
+
+        });
+
     }
 
 }

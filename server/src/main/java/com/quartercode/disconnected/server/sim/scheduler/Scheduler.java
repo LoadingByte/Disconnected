@@ -18,65 +18,28 @@
 
 package com.quartercode.disconnected.server.sim.scheduler;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import org.apache.commons.lang3.Validate;
 import com.quartercode.classmod.base.Feature;
+import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.classmod.base.Persistable;
-import com.quartercode.classmod.def.base.AbstractFeature;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.disconnected.shared.util.XmlPersistent;
+import com.quartercode.disconnected.server.sim.scheduler.DefaultScheduler.ScheduledTask;
 
 /**
- * The scheduler is a {@link Feature} that allows executing actions after a delay or periodically.
- * These delayed actions are called {@link SchedulerTask}s.
- * Such tasks are registered and started through the two scheduler methods
+ * A scheduler is a {@link Feature} that allows executing actions (in the form of {@link ScheduledTask}s) after a set delay and/or periodically.
+ * Such tasks are registered and started through the two {@code schedule()} methods
  * ({@link #schedule(String, String, int, SchedulerTask)} and {@link #schedule(String, String, int, int, SchedulerTask)}).
  * For actually counting down any delay and finally executing the tasks, the {@link #update(String)} method needs to be called
  * once per tick for each group.
- * Note that the update method can be temporarily disabled using the {@link #setActive(boolean)} method.
+ * Note that the update method can be temporarily disabled using the {@link #setActive(boolean)} method.<br>
+ * <br>
+ * It is important to note that a scheduler expects its {@link FeatureHolder holder} to implement the {@link SchedulerRegistryProvider} interface.
+ * The scheduler needs such a {@link SchedulerRegistry} in order to register itself for updating if it has any tasks.
+ * If its holder doesn't implement the interface, no exception is thrown; however, the scheduler also isn't able to register itself.
+ * Therefore, such a holder should only be used for testing (when a scheduler index isn't needed for updating all schedulers).
  * 
  * @see SchedulerTask
  */
-@XmlPersistent
-@XmlRootElement
-public class Scheduler extends AbstractFeature implements Persistable {
-
-    private boolean                   active;
-    @XmlElement (name = "scheduledTask")
-    private List<ActiveScheduledTask> scheduledTasks;
-
-    /**
-     * Creates a new empty scheduler.
-     * This is only recommended for direct field access (e.g. for serialization).
-     */
-    protected Scheduler() {
-
-    }
-
-    /**
-     * Creates a new scheduler with the given name and {@link CFeatureHolder}.
-     * 
-     * @param name The name of the scheduler.
-     * @param holder The feature holder which has and uses the new scheduler.
-     */
-    public Scheduler(String name, CFeatureHolder holder) {
-
-        super(name, holder);
-
-        active = true;
-        scheduledTasks = new CopyOnWriteArrayList<>();
-    }
-
-    @Override
-    public boolean isPersistent() {
-
-        return true;
-    }
+public interface Scheduler extends Feature, Persistable {
 
     /**
      * Returns whether the scheduler is active and processes {@link #update(String)} invocations.
@@ -84,10 +47,7 @@ public class Scheduler extends AbstractFeature implements Persistable {
      * 
      * @return Whether the scheduler is active.
      */
-    public boolean isActive() {
-
-        return active;
-    }
+    public boolean isActive();
 
     /**
      * Sets whether the scheduler is active and processes {@link #update(String)} invocations.
@@ -95,27 +55,16 @@ public class Scheduler extends AbstractFeature implements Persistable {
      * 
      * @param active Whether the scheduler should be active.
      */
-    public void setActive(boolean active) {
-
-        this.active = active;
-    }
+    public void setActive(boolean active);
 
     /**
      * Returns all {@link SchedulerTask}s that are currently scheduled.
      * Such tasks must have been added using {@link #schedule(String, String, int, SchedulerTask)} or {@link #schedule(String, String, int, int, SchedulerTask)} before.
+     * The order of the returned tasks matches the order in which they were scheduled.
      * 
      * @return All currently scheduled tasks.
      */
-    public List<SchedulerTask> getTasks() {
-
-        List<SchedulerTask> tasks = new ArrayList<>();
-
-        for (ActiveScheduledTask scheduledTask : scheduledTasks) {
-            tasks.add(scheduledTask.getTask());
-        }
-
-        return tasks;
-    }
+    public List<SchedulerTask> getTasks();
 
     /**
      * Retrieves the scheduled {@link SchedulerTask} that has the given name.
@@ -123,25 +72,22 @@ public class Scheduler extends AbstractFeature implements Persistable {
      * For example, this method could be used to {@link SchedulerTask#cancel() cancel} the retrieved task.
      * 
      * @param name The name of the task that should be returned.
-     * @return The first task with the given name.
+     * @return The first task with the given name, or {@code null} if no one exists.
      */
-    public SchedulerTask getTask(String name) {
-
-        Validate.notNull(name, "Can't search for scheduler task with null name");
-
-        for (ActiveScheduledTask task : scheduledTasks) {
-            String taskName = task.getName();
-
-            if (taskName != null && taskName.equals(name)) {
-                return task.getTask();
-            }
-        }
-
-        return null;
-    }
+    public SchedulerTask getTaskByName(String name);
 
     /**
-     * Schedules a {@link SchedulerTask#cloneStateless() stateless copy} of the given {@link SchedulerTask}.
+     * Retrieves the {@link SchedulerTask}s that are scheduled for the given group.
+     * If no tasks are assigned to the given group, an empty list is returned.
+     * The order of the returned tasks matches the order in which they were scheduled.
+     * 
+     * @param group The group of the tasks that should be returned.
+     * @return The tasks with the given group.
+     */
+    public List<SchedulerTask> getTasksByGroup(String group);
+
+    /**
+     * Schedules the given non-repeating {@link SchedulerTask}.
      * Note that the task can be can be {@link SchedulerTask#cancel() cancelled}.
      * Also note that calling this method is equivalent to calling {@link #schedule(String, String, int, int, SchedulerTask)} with a {@code periodicDelay} of {@code -1}.<br>
      * <br>
@@ -164,16 +110,11 @@ public class Scheduler extends AbstractFeature implements Persistable {
      * @param group The group which defines at which point during a tick the task should be executed.
      * @param initialDelay The amount of ticks that must elapse before the task is executed once.
      * @param task The scheduler task that should be scheduled for execution.
-     *        The same task object can be used multiple times because a stateless copy is created each time it is scheduled.
-     *        However, that is only possible if the task itself has no other state or overrides the {@link SchedulerTask#cloneStateless()} method.
      */
-    public void schedule(String name, String group, int initialDelay, SchedulerTask task) {
-
-        schedule(name, group, initialDelay, -1, task);
-    }
+    public void schedule(String name, String group, int initialDelay, SchedulerTask task);
 
     /**
-     * Schedules a {@link SchedulerTask#cloneStateless() stateless copy} of the given {@link SchedulerTask}.
+     * Schedules the given repeating {@link SchedulerTask}.
      * Note that the task can be can be {@link SchedulerTask#cancel() cancelled}.<br>
      * <br>
      * The {@code name} can be used to retrieve the task from the scheduler using {@link #getTask(String)}.
@@ -198,13 +139,8 @@ public class Scheduler extends AbstractFeature implements Persistable {
      * @param initialDelay The amount of ticks that must elapse before the task is executed for the first time.
      * @param periodicDelay The amount of ticks that must elapse before the task is executed for any subsequent time.
      * @param task The scheduler task that should be scheduled for execution.
-     *        The same task object can be used multiple times because a stateless copy is created each time it is scheduled.
-     *        However, that is only possible if the task itself has no other state or overrides the {@link SchedulerTask#cloneStateless()} method.
      */
-    public void schedule(String name, String group, int initialDelay, int periodicDelay, SchedulerTask task) {
-
-        scheduledTasks.add(new ActiveScheduledTask(name, group, initialDelay, periodicDelay, task));
-    }
+    public void schedule(String name, String group, int initialDelay, int periodicDelay, SchedulerTask task);
 
     /**
      * Lets <b>one</b> tick pass and executes all scheduled {@link SchedulerTask}s which are assigned to the given group
@@ -218,70 +154,6 @@ public class Scheduler extends AbstractFeature implements Persistable {
      * @param group The group whose scheduler tasks should be updated.
      *        Note that this method should be invoked once per tick for <b>each</b> group.
      */
-    public void update(String group) {
-
-        if (!active) {
-            return;
-        }
-
-        for (ActiveScheduledTask scheduledTask : scheduledTasks) {
-            if (scheduledTask.getGroup().equals(group)) {
-                if (scheduledTask.getTask().isCancelled()) {
-                    scheduledTasks.remove(scheduledTask);
-                } else {
-                    // Only the usage of CFeatureHolder is allowed
-                    scheduledTask.update((CFeatureHolder) getHolder());
-                }
-            }
-        }
-    }
-
-    private static class ActiveScheduledTask extends ScheduledTask {
-
-        @XmlAttribute
-        private boolean executedInitially;
-        @XmlAttribute
-        private int     ticksSinceLastExecution;
-
-        // JAXB constructor
-        @SuppressWarnings ("unused")
-        protected ActiveScheduledTask() {
-
-        }
-
-        private ActiveScheduledTask(String name, String group, int initialDelay, int periodicDelay, SchedulerTask task) {
-
-            super(name, group, initialDelay, periodicDelay, task);
-        }
-
-        private void update(CFeatureHolder schedulerHolder) {
-
-            ticksSinceLastExecution++;
-
-            if (!executedInitially && reachedDelay(getInitialDelay())) {
-                if (isPeriodic()) {
-                    executedInitially = true;
-                } else {
-                    getTask().cancel();
-                }
-
-                execute(schedulerHolder);
-            } else if (executedInitially && reachedDelay(getPeriodicDelay())) {
-                execute(schedulerHolder);
-            }
-        }
-
-        private boolean reachedDelay(int delay) {
-
-            return ticksSinceLastExecution >= delay;
-        }
-
-        private void execute(CFeatureHolder schedulerHolder) {
-
-            ticksSinceLastExecution = 0;
-            getTask().execute(schedulerHolder);
-        }
-
-    }
+    public void update(String group);
 
 }

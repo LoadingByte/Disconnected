@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.server.test.sim.scheduler;
 
+import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import static org.junit.Assert.assertEquals;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -25,8 +26,13 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import org.junit.Test;
 import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
+import com.quartercode.classmod.def.extra.prop.DefaultProperty;
+import com.quartercode.classmod.extra.func.FunctionExecutor;
+import com.quartercode.classmod.extra.func.FunctionInvocation;
+import com.quartercode.classmod.extra.prop.PropertyDefinition;
+import com.quartercode.classmod.extra.storage.StandardStorage;
+import com.quartercode.classmod.factory.PropertyDefinitionFactory;
+import com.quartercode.disconnected.server.sim.scheduler.DefaultScheduler;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
 
 public class SchedulerPersistenceTest {
@@ -36,27 +42,52 @@ public class SchedulerPersistenceTest {
     @Test
     public void testScheduleWithPersistence() throws JAXBException {
 
-        Scheduler scheduler = new Scheduler("scheduler", new DefaultCFeatureHolder());
-        scheduler.schedule("testName", "testGroup", 5, 2, new TestSchedulerTask());
+        DefaultScheduler scheduler = new DefaultScheduler("scheduler", new DefaultCFeatureHolder());
 
-        JAXBContext context = JAXBContext.newInstance(Scheduler.class, TestSchedulerTask.class);
+        TestSchedulerTask task = new TestSchedulerTask();
+        task.setObj(TestSchedulerTask.PROP, 5);
+        scheduler.schedule("testName", "testGroup", 5, 2, task);
+
+        JAXBContext context = JAXBContext.newInstance(TestSchedulerTask.class, DefaultScheduler.class, DefaultProperty.class, StandardStorage.class);
         StringWriter serialized = new StringWriter();
         context.createMarshaller().marshal(scheduler, serialized);
-        Scheduler copy = (Scheduler) context.createUnmarshaller().unmarshal(new StringReader(serialized.toString()));
+        DefaultScheduler copy = (DefaultScheduler) context.createUnmarshaller().unmarshal(new StringReader(serialized.toString()));
 
         for (int update = 0; update < 11; update++) {
             copy.update("testGroup");
         }
 
-        assertEquals("Scheduler task executions after 11 updates", 4, schedulerTaskExecutions);
+        assertEquals("Scheduler task executions after 11 updates", 4 * 5, schedulerTaskExecutions);
     }
 
     private static class TestSchedulerTask extends SchedulerTaskAdapter {
 
-        @Override
-        public void execute(CFeatureHolder holder) {
+        // ----- Properties -----
 
-            schedulerTaskExecutions++;
+        public static final PropertyDefinition<Integer> PROP;
+
+        static {
+
+            PROP = factory(PropertyDefinitionFactory.class).create("prop", new StandardStorage<>());
+
+        }
+
+        // ----- Functions -----
+
+        static {
+
+            EXECUTE.addExecutor("default", TestSchedulerTask.class, new FunctionExecutor<Void>() {
+
+                @Override
+                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                    schedulerTaskExecutions += invocation.getCHolder().getObj(PROP);
+
+                    return invocation.next(arguments);
+                }
+
+            });
+
         }
 
     }

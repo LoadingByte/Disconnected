@@ -1,3 +1,6 @@
+# Add Classmod factory providers
+com.quartercode.disconnected.server.init.AddServerClassmodFactoryProviders
+
 # Add EventBridge factory mappings
 com.quartercode.disconnected.server.init.AddServerEventBridgeFactoryMappings
 

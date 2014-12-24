@@ -19,17 +19,15 @@
 package com.quartercode.disconnected.server.sim.scheduler;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
 
 /**
- * An adapter class for {@link SchedulerTask} which implements common behavior.
+ * An adapter class for {@link SchedulerTask} which implements the cancellation flag.
+ * It extends {@link DefaultCFeatureHolder} for implementing the feature holder functionality.
  * 
  * @see SchedulerTask
  */
-public abstract class SchedulerTaskAdapter implements SchedulerTask, Cloneable {
+public abstract class SchedulerTaskAdapter extends DefaultCFeatureHolder implements SchedulerTask {
 
     @XmlAttribute
     private boolean cancelled;
@@ -47,36 +45,27 @@ public abstract class SchedulerTaskAdapter implements SchedulerTask, Cloneable {
     }
 
     @Override
-    public SchedulerTaskAdapter clone() throws CloneNotSupportedException {
-
-        return (SchedulerTaskAdapter) super.clone();
-    }
-
-    @Override
-    public SchedulerTask cloneStateless() {
-
-        SchedulerTaskAdapter clone = ObjectUtils.clone(this);
-        clone.cancelled = false;
-
-        return clone;
-    }
-
-    @Override
     public int hashCode() {
 
-        return HashCodeBuilder.reflectionHashCode(this);
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + (cancelled ? 1231 : 1237);
+        return result;
     }
 
     @Override
     public boolean equals(Object obj) {
 
-        return EqualsBuilder.reflectionEquals(this, obj);
+        if (this == obj) {
+            return true;
+        } else if (obj == null || ! (obj instanceof SchedulerTaskAdapter) || !super.equals(obj)) {
+            return false;
+        } else {
+            SchedulerTaskAdapter other = (SchedulerTaskAdapter) obj;
+            return cancelled == other.cancelled;
+        }
     }
 
-    @Override
-    public String toString() {
-
-        return ToStringBuilder.reflectionToString(this);
-    }
+    // Do not override toString()
 
 }

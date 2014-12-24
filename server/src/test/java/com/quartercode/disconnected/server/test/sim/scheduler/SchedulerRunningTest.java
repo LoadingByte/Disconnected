@@ -23,14 +23,16 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
+import com.quartercode.classmod.extra.func.FunctionExecutor;
+import com.quartercode.classmod.extra.func.FunctionInvocation;
+import com.quartercode.disconnected.server.sim.scheduler.DefaultScheduler;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
 
 @RunWith (Parameterized.class)
@@ -54,12 +56,12 @@ public class SchedulerRunningTest {
         return data;
     }
 
-    private final int     initialDelay;
-    private final int     periodicDelay;
+    private final int        initialDelay;
+    private final int        periodicDelay;
 
-    private final boolean periodic;
+    private final boolean    periodic;
 
-    private Scheduler     scheduler;
+    private DefaultScheduler scheduler;
 
     public SchedulerRunningTest(int initialDelay, int periodicDelay) {
 
@@ -74,7 +76,7 @@ public class SchedulerRunningTest {
 
         schedulerTaskExecutions = new int[2];
 
-        scheduler = new Scheduler("scheduler", new DefaultCFeatureHolder());
+        scheduler = new DefaultScheduler("scheduler", new DefaultCFeatureHolder());
     }
 
     @Test
@@ -134,20 +136,27 @@ public class SchedulerRunningTest {
         assertEquals("Scheduler task was executed although scheduler was deactivated", 1, actualExecutions);
     }
 
+    @RequiredArgsConstructor
     private static class TestSchedulerTask extends SchedulerTaskAdapter {
 
+        static {
+
+            EXECUTE.addExecutor("default", TestSchedulerTask.class, new FunctionExecutor<Void>() {
+
+                @Override
+                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                    int trackingIndex = ((TestSchedulerTask) invocation.getCHolder()).trackingIndex;
+                    schedulerTaskExecutions[trackingIndex]++;
+
+                    return invocation.next(arguments);
+                }
+
+            });
+
+        }
+
         private final int trackingIndex;
-
-        private TestSchedulerTask(int trackingIndex) {
-
-            this.trackingIndex = trackingIndex;
-        }
-
-        @Override
-        public void execute(CFeatureHolder holder) {
-
-            schedulerTaskExecutions[trackingIndex]++;
-        }
 
     }
 

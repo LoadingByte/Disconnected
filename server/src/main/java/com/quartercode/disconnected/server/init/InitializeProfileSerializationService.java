@@ -27,7 +27,10 @@ import com.quartercode.disconnected.shared.util.init.Initializer;
 import com.quartercode.disconnected.shared.util.init.InitializerSettings;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 
-@InitializerSettings (groups = "initializeServices", dependencies = { "registerServices", "loadConfigs" })
+/*
+ * Depends on "addClassmodFactoryProviders" because world classes are loaded during the initialization.
+ */
+@InitializerSettings (groups = "initializeServices", dependencies = { "registerServices", "loadConfigs", "addClassmodFactoryProviders" })
 public class InitializeProfileSerializationService implements Initializer {
 
     @Override
