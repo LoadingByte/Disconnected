@@ -44,10 +44,9 @@ import com.quartercode.disconnected.client.graphics.GraphicsService;
 import com.quartercode.disconnected.server.sim.TickBridgeProvider;
 import com.quartercode.disconnected.server.sim.TickRunnableInvoker;
 import com.quartercode.disconnected.server.sim.TickService;
+import com.quartercode.disconnected.server.sim.TickWorldUpdater;
 import com.quartercode.disconnected.server.sim.gen.WorldGenerator;
-import com.quartercode.disconnected.server.sim.profile.Profile;
-import com.quartercode.disconnected.server.sim.profile.ProfileSerializationException;
-import com.quartercode.disconnected.server.sim.profile.ProfileService;
+import com.quartercode.disconnected.server.sim.scheduler.SchedulerRegistry;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.os.OS;
@@ -120,7 +119,6 @@ public class Main {
         CommonBootstrap.bootstrap();
 
         // DEBUG: Retrieve the game services
-        ProfileService profileService = ServiceRegistry.lookup(ProfileService.class);
         TickService tickService = ServiceRegistry.lookup(TickService.class);
         GraphicsService graphicsService = ServiceRegistry.lookup(GraphicsService.class);
 
@@ -143,18 +141,14 @@ public class Main {
         Random random = new Random(1);
         final World world = WorldGenerator.generateWorld(random, 10);
 
-        Profile profile = new Profile("test");
-        profile.setWorld(world);
-        profile.setRandom(random);
-        profileService.addProfile(profile);
-        try {
-            profileService.setActive(profile);
-        } catch (ProfileSerializationException e) {
-            // Won't ever happen (we just created a new profile)
-        }
+        // DEBUG: Create and inject the world dependency provider
+        SchedulerRegistry schedulerRegistry = new SchedulerRegistry();
+        schedulerRegistry.addSchedulersFromTree(world);
+        world.setDependencyProvider(new DefaultWorldDependencyProvider(random, serverBridge, schedulerRegistry));
 
         // DEBUG: Start "game" with current simulation
         LOGGER.info("DEBUG: Starting test-game with current simulation");
+        tickService.getAction(TickWorldUpdater.class).setWorld(world);
         tickService.setRunning(true);
         tickService.getAction(TickRunnableInvoker.class).invoke(new Runnable() {
 
