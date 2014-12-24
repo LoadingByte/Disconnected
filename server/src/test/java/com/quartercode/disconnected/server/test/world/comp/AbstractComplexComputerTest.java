@@ -31,6 +31,7 @@ import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.sim.gen.WorldGenerator;
 import com.quartercode.disconnected.server.world.World;
+import com.quartercode.disconnected.server.world.WorldDependencyProvider;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.FSModule;
@@ -99,7 +100,18 @@ public abstract class AbstractComplexComputerTest {
         bridge.getModule(SBPAwareHandlerExtension.class).setIdentityService(sbpIdentityService);
 
         world = new World();
-        world.setBridge(bridge);
+        final WorldDependencyProvider dependencyProvider = context.mock(WorldDependencyProvider.class);
+        world.setDependencyProvider(dependencyProvider);
+
+        // @formatter:off
+        context.checking(new Expectations() {{
+
+            // Use null BridgeConnector because no bridge connector is used for the test
+            allowing(dependencyProvider).getBridge();
+                will(returnValue(bridge));
+
+        }});
+        // @formatter:on
 
         mainComputer = newComputer(true);
     }

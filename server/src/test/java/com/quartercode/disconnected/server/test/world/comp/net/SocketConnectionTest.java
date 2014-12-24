@@ -25,6 +25,7 @@ import org.jmock.Sequence;
 import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
@@ -37,11 +38,18 @@ import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.PacketHandler;
 import com.quartercode.disconnected.server.world.comp.net.Socket;
 import com.quartercode.disconnected.server.world.comp.net.Socket.SocketState;
+import com.quartercode.disconnected.shared.CommonBootstrap;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
 import com.quartercode.disconnected.shared.world.comp.net.NetID;
 
 @SuppressWarnings ("unchecked")
 public class SocketConnectionTest {
+
+    @BeforeClass
+    public static void setUpBeforeClass() {
+
+        CommonBootstrap.bootstrap();
+    }
 
     @Rule
     public JUnitRuleMockery    context = new JUnitRuleMockery();

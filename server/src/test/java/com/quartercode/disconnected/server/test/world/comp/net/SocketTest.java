@@ -24,6 +24,7 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jmock.Expectations;
 import org.jmock.Sequence;
 import org.jmock.integration.junit4.JUnitRuleMockery;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
@@ -34,9 +35,16 @@ import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.PacketHandler;
 import com.quartercode.disconnected.server.world.comp.net.Socket;
 import com.quartercode.disconnected.server.world.comp.net.Socket.SocketState;
+import com.quartercode.disconnected.shared.CommonBootstrap;
 
 @SuppressWarnings ("unchecked")
 public class SocketTest {
+
+    @BeforeClass
+    public static void setUpBeforeClass() {
+
+        CommonBootstrap.bootstrap();
+    }
 
     @Rule
     public JUnitRuleMockery    context = new JUnitRuleMockery();

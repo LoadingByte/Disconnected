@@ -18,92 +18,79 @@
 
 package com.quartercode.disconnected.server.sim;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.classmod.util.FeatureHolderVisitorAdapter;
-import com.quartercode.classmod.util.TreeWalker;
 import com.quartercode.disconnected.server.registry.SchedulerGroup;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
-import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
+import com.quartercode.disconnected.server.sim.scheduler.SchedulerRegistry;
 import com.quartercode.disconnected.server.world.World;
+import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 
 /**
- * This class updates all {@link Scheduler}s of {@link World} {@link CFeatureHolder}s which implement the {@link SchedulerUser} interface.
+ * This class updates the {@link World} it stores.
+ * It does that by updating all available {@link Scheduler}s which are registered inside the world's {@link SchedulerRegistry}.
  * 
- * @see SchedulerUser
+ * @see Scheduler
  */
-public class TickSchedulerUpdater implements TickAction {
+public class TickWorldUpdater implements TickAction {
 
-    private List<String>                  sortedGroups;
-    private volatile WeakReference<World> world;
+    private List<String>   sortedGroups;
+    private volatile World world;
 
     /**
-     * Returns the {@link World} that is currently updated by the tick scheduler updater.
+     * Returns the {@link World} that is currently updated by the tick world updater.
      * 
      * @return The currently updated world.
      */
     public World getWorld() {
 
-        return world == null ? null : world.get();
+        return world;
     }
 
     /**
-     * Changes the {@link World} that is currently updated by the tick scheduler updater.
+     * Changes the {@link World} that is currently updated by the tick world updater.
      * The change will take place in the next tick.
      * 
      * @param world The new world to updated.
      */
     public void setWorld(World world) {
 
-        this.world = world == null ? null : new WeakReference<>(world);
+        this.world = world;
     }
 
     /**
-     * Executes the tick update on all {@link SchedulerUser}s of the set {@link World}.
+     * Executes the tick update on the set {@link World}.
+     * That is done by updating all available {@link Scheduler}s which are registered inside the world's {@link SchedulerRegistry}.
      */
     @Override
     public void update() {
 
-        if (getWorld() != null) {
-            // Collect all schedulers which are present inside the world
-            List<Scheduler> schedulers = collectSchedulers(getWorld());
+        if (world != null) {
+            // Remove the schedulers that are no longer part of the world tree
+            // That is determined by checking whether they are able to retrieve the world root object
+            Iterator<Scheduler> schedulerIterator = world.getSchedulerRegistry().getNewModifiableSchedulersIterator();
+            while (schedulerIterator.hasNext()) {
+                FeatureHolder schedulerHolder = schedulerIterator.next().getHolder();
+                if (schedulerHolder instanceof WorldChildFeatureHolder && ((WorldChildFeatureHolder<?>) schedulerHolder).getWorld() == null) {
+                    schedulerIterator.remove();
+                }
+            }
 
             // Update each scheduler with each group in the correct order
+            Collection<Scheduler> schedulers = world.getSchedulerRegistry().getSchedulers();
             for (String group : getSortedGroups()) {
                 for (Scheduler scheduler : schedulers) {
                     scheduler.update(group);
                 }
             }
         }
-    }
-
-    private List<Scheduler> collectSchedulers(World world) {
-
-        final List<Scheduler> schedulers = new ArrayList<>();
-
-        TreeWalker.walk(world, new FeatureHolderVisitorAdapter() {
-
-            @Override
-            public VisitResult preVisit(FeatureHolder holder) {
-
-                // If the current feature holder is a SchedulerUser, add its scheduler to the output list
-                if (holder instanceof SchedulerUser) {
-                    schedulers.add(holder.get(SchedulerUser.SCHEDULER));
-                }
-
-                return VisitResult.CONTINUE;
-            }
-
-        }, false);
-
-        return schedulers;
     }
 
     private List<String> getSortedGroups() {

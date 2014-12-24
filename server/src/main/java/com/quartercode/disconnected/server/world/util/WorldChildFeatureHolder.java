@@ -21,6 +21,9 @@ package com.quartercode.disconnected.server.world.util;
 import java.util.Random;
 import com.quartercode.classmod.def.extra.conv.DefaultCChildFeatureHolder;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
+import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
+import com.quartercode.disconnected.server.sim.scheduler.SchedulerRegistry;
+import com.quartercode.disconnected.server.sim.scheduler.SchedulerRegistryProvider;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
 import com.quartercode.eventbridge.bridge.Bridge;
@@ -33,7 +36,7 @@ import com.quartercode.eventbridge.bridge.Bridge;
  * @see DefaultCChildFeatureHolder
  */
 @XmlPersistent
-public class WorldChildFeatureHolder<P extends CFeatureHolder> extends DefaultCChildFeatureHolder<P> {
+public class WorldChildFeatureHolder<P extends CFeatureHolder> extends DefaultCChildFeatureHolder<P> implements SchedulerRegistryProvider {
 
     /**
      * Resolves the {@link World} this world child feature holder is in.
@@ -75,6 +78,20 @@ public class WorldChildFeatureHolder<P extends CFeatureHolder> extends DefaultCC
 
         World world = getWorld();
         return world != null ? world.getRandom() : null;
+    }
+
+    /**
+     * Returns the {@link SchedulerRegistry} that can be used by all {@link Scheduler}s of the world child feature holder.
+     * Actually, this returns the scheduler registry of the {@link World} the feature holder is in.
+     * 
+     * @return The scheduler registry the feature holder can use.
+     * @see World#getSchedulerRegistry()
+     */
+    @Override
+    public SchedulerRegistry getSchedulerRegistry() {
+
+        World world = getWorld();
+        return world != null ? world.getSchedulerRegistry() : null;
     }
 
 }

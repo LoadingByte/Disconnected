@@ -25,7 +25,7 @@ import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.sim.TickBridgeProvider;
 import com.quartercode.disconnected.server.sim.TickService;
-import com.quartercode.disconnected.server.sim.profile.ProfileService;
+import com.quartercode.disconnected.server.sim.TickWorldUpdater;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
@@ -114,7 +114,7 @@ public class WorldProcessLaunchCommandHandler implements SBPAwareEventHandler<Wo
 
     protected Computer getSBPComputer(SBPIdentity sbp) {
 
-        World world = ServiceRegistry.lookup(ProfileService.class).getActive().getWorld();
+        World world = ServiceRegistry.lookup(TickService.class).getAction(TickWorldUpdater.class).getWorld();
         // Just use first available computer as the player's one
         return world.getColl(World.COMPUTERS).get(0);
     }

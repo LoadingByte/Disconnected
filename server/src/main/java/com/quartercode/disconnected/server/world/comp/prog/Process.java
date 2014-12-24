@@ -45,7 +45,6 @@ import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.registry.WorldProgram;
-import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.os.OS;
@@ -183,9 +182,9 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
 
                 ProgramExecutor executor = invocation.getCHolder().getObj(EXECUTOR);
 
-                if (executor instanceof SchedulerUser) {
+                if (executor instanceof SchedulerUsing) {
                     boolean active = ((WorldProcessState) arguments[0]).isTickState();
-                    executor.get(SchedulerUser.SCHEDULER).setActive(active);
+                    executor.get(SchedulerUsing.SCHEDULER).setActive(active);
                 }
 
                 return invocation.next(arguments);

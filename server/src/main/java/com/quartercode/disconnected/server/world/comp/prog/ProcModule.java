@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
+import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -41,7 +42,8 @@ import com.quartercode.classmod.util.FeatureDefinitionReference;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.sim.TickService;
 import com.quartercode.disconnected.server.sim.scheduler.FunctionCallSchedulerTask;
-import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
+import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
+import com.quartercode.disconnected.server.sim.scheduler.SchedulerDefinitionFactory;
 import com.quartercode.disconnected.server.world.comp.config.Config;
 import com.quartercode.disconnected.server.world.comp.config.ConfigEntry;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
@@ -61,7 +63,20 @@ import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
  * @see RootProcess
  * @see OSModule
  */
-public class ProcModule extends OSModule implements SchedulerUser {
+public class ProcModule extends OSModule {
+
+    // ----- Schedulers -----
+
+    /**
+     * The {@link Scheduler} which is used by the process module for scheduling different actions.
+     */
+    public static final FeatureDefinition<Scheduler>         SCHEDULER;
+
+    static {
+
+        SCHEDULER = factory(SchedulerDefinitionFactory.class).create("scheduler");
+
+    }
 
     // ----- Properties -----
 
@@ -215,8 +230,9 @@ public class ProcModule extends OSModule implements SchedulerUser {
                 if (! ((Boolean) arguments[0])) {
                     holder.getObj(ROOT_PROCESS).invoke(Process.INTERRUPT);
                     // Kill the process tree after 5 seconds
-                    FeatureDefinitionReference<FunctionDefinition<?>> killFunction = new FeatureDefinitionReference<FunctionDefinition<?>>(ProcModule.class, KILL);
-                    holder.get(SCHEDULER).schedule("killRootProcess", "computerProgramUpdate", TickService.DEFAULT_TICKS_PER_SECOND * 5, new FunctionCallSchedulerTask(killFunction));
+                    FunctionCallSchedulerTask killTask = new FunctionCallSchedulerTask();
+                    killTask.setObj(FunctionCallSchedulerTask.FUNCTION_DEFINITION, new FeatureDefinitionReference<FunctionDefinition<?>>(ProcModule.class, KILL));
+                    holder.get(SCHEDULER).schedule("kill", "computerProgramUpdate", TickService.DEFAULT_TICKS_PER_SECOND * 5, killTask);
                 }
 
                 return invocation.next(arguments);

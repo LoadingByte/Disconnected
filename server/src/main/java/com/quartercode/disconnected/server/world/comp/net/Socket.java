@@ -23,6 +23,7 @@ import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
+import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.classmod.extra.conv.CFeatureHolder;
 import com.quartercode.classmod.extra.func.FunctionDefinition;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
@@ -35,10 +36,13 @@ import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
 import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
 import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.classmod.factory.PropertyDefinitionFactory;
+import com.quartercode.classmod.util.FeatureDefinitionReference;
 import com.quartercode.disconnected.server.sim.TickService;
+import com.quartercode.disconnected.server.sim.scheduler.FunctionCallSchedulerTask;
+import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
+import com.quartercode.disconnected.server.sim.scheduler.SchedulerDefinitionFactory;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTask;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
-import com.quartercode.disconnected.server.sim.scheduler.SchedulerUser;
 import com.quartercode.disconnected.server.util.ObjArray;
 import com.quartercode.disconnected.server.world.util.StringRepresentable;
 import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
@@ -49,7 +53,7 @@ import com.quartercode.disconnected.shared.world.comp.net.Address;
  * For doing that, they must establish a connection between the addresses before any packets can be sent/received.
  * Note that a random free port is chosen by the os if a client, which does not have any open ports, connects to some other computer.
  */
-public class Socket extends WorldChildFeatureHolder<NetModule> implements SchedulerUser, StringRepresentable {
+public class Socket extends WorldChildFeatureHolder<NetModule> implements StringRepresentable {
 
     /**
      * The amount of ticks after which a socket whose {@link #CONNECT} method had been called is terminated if no connection was established.
@@ -97,6 +101,19 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements Schedu
          * The socket is fully disconnected and can no longer be used for anything.
          */
         DISCONNECTED;
+
+    }
+
+    // ----- Schedulers -----
+
+    /**
+     * The {@link Scheduler} which is used by the socket for scheduling different timeouts etc.
+     */
+    public static final FeatureDefinition<Scheduler>                                     SCHEDULER;
+
+    static {
+
+        SCHEDULER = factory(SchedulerDefinitionFactory.class).create("scheduler");
 
     }
 
@@ -150,7 +167,14 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements Schedu
     public static final PropertyDefinition<Integer>                                      CURRENT_SEQ_NUMBER;
 
     /**
-     * A queue of the data {@link Object}s of all {@link Packet}s that needs to be processed by the user of the socket.
+     * A queue of the data {@link Object}s that should be sent as TCP {@link Packet}s at the end of the tick (scheduler group {@code computerNetworkUpdate}).
+     * All {@link #SEND sent} data objects are added to the end of this list.
+     * When the scheduler calls the group {@code computerNetworkUpdate}, all these data objects are polled and handed over to the {@link NetModule#SEND_TCP} method.
+     */
+    public static final CollectionPropertyDefinition<Object, List<Object>>               OUTGOING_PACKET_QUEUE;
+
+    /**
+     * A queue of the data {@link Object}s of all {@link Packet}s that need to be processed by the user of the socket.
      * All incoming packets are added to the end of this list.
      * When the scheduler calls the group {@code computerProgramUpdate}, all these packets are polled and handed over to the {@link #PACKET_HANDLERS}.
      */
@@ -182,15 +206,13 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements Schedu
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
-                boolean stateChangesToHandshakeSyn = arguments[0] == SocketState.HANDSHAKE_SYN && holder.getObj(Socket.STATE) != SocketState.HANDSHAKE_SYN;
 
-                invocation.next(arguments);
-
-                if (stateChangesToHandshakeSyn) {
+                // If the state is changed to "HANDSHAKE_SYN"
+                if (arguments[0] == SocketState.HANDSHAKE_SYN && holder.getObj(Socket.STATE) != SocketState.HANDSHAKE_SYN) {
                     holder.get(SCHEDULER).schedule("connectionTimeout", "computerNetworkUpdate", CONNECTION_TIMEOUT, new ConnectionTimeoutTask());
                 }
 
-                return null;
+                return invocation.next(arguments);
             }
 
         }, LEVEL_7);
@@ -200,15 +222,32 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements Schedu
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder holder = invocation.getCHolder();
-                boolean stateChangesToConnected = arguments[0] == SocketState.CONNECTED && holder.getObj(Socket.STATE) != SocketState.CONNECTED;
 
-                invocation.next(arguments);
-
-                if (stateChangesToConnected) {
+                // If the state is changed to "CONNECTED"
+                if (arguments[0] == SocketState.CONNECTED && holder.getObj(Socket.STATE) != SocketState.CONNECTED) {
+                    // Note that this task does not need to be cancelled explicitly since the garbage collector automatically removes them if the socket is disconnected
                     holder.get(SCHEDULER).schedule("scheduleKeepalive", "computerNetworkUpdate", KEEPALIVE_PERIOD, KEEPALIVE_PERIOD, new ScheduleKeepaliveTask());
                 }
 
-                return null;
+                return invocation.next(arguments);
+            }
+
+        }, LEVEL_7);
+        STATE.addSetterExecutor("schedulePacketQueueProcessing", Socket.class, new FunctionExecutor<Void>() {
+
+            @Override
+            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                CFeatureHolder holder = invocation.getCHolder();
+
+                // If the state is changed to "CONNECTED"
+                if (arguments[0] == SocketState.CONNECTED && holder.getObj(Socket.STATE) != SocketState.CONNECTED) {
+                    // Note that these tasks do not need to be cancelled explicitly since the garbage collector automatically removes them if the socket is disconnected
+                    holder.get(SCHEDULER).schedule("sendQueuedPackets", "computerNetworkUpdate", 1, 1, new SendQueuedPacketsTask());
+                    holder.get(SCHEDULER).schedule("handleQueuedPackets", "computerProgramUpdate", 1, 1, new HandleQueuedPacketsTask());
+                }
+
+                return invocation.next(arguments);
             }
 
         }, LEVEL_7);
@@ -231,6 +270,7 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements Schedu
 
         });
 
+        OUTGOING_PACKET_QUEUE = factory(CollectionPropertyDefinitionFactory.class).create("outgoingPacketQueue", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
         INCOMING_PACKET_QUEUE = factory(CollectionPropertyDefinitionFactory.class).create("incomingPacketQueue", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
 
     }
@@ -301,7 +341,7 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements Schedu
     static {
 
         CONNECT = factory(FunctionDefinitionFactory.class).create("connect", new Class[0]);
-        CONNECT.addExecutor("validateSettings", Socket.class, new FunctionExecutor<Void>() {
+        CONNECT.addExecutor("validateSettingsAndState", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
@@ -309,19 +349,18 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements Schedu
                 CFeatureHolder holder = invocation.getCHolder();
 
                 Validate.notNull(holder.getObj(DESTINATION), "Socket destination cannot be null");
+                Validate.validState(holder.getObj(STATE) == SocketState.INACTIVE, "Cannot connect socket because it is not in state INACTIVE (current state is '%s')", holder.getObj(STATE));
 
                 return invocation.next(arguments);
             }
 
         }, LEVEL_8);
-        CONNECT.addExecutor("default", Socket.class, new FunctionExecutor<Void>() {
+        CONNECT.addExecutor("startHandshake", Socket.class, new FunctionExecutor<Void>() {
 
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Socket holder = (Socket) invocation.getCHolder();
-
-                Validate.validState(holder.getObj(STATE) == SocketState.INACTIVE, "Cannot connect socket because it is not in state INACTIVE (current state is '%s')", holder.getObj(STATE));
+                CFeatureHolder holder = invocation.getCHolder();
 
                 holder.setObj(STATE, SocketState.HANDSHAKE_SYN);
                 // Generate a new sequence number
@@ -360,10 +399,10 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements Schedu
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 Socket holder = (Socket) invocation.getCHolder();
-                final NetModule netModule = holder.getParent();
+                NetModule netModule = holder.getParent();
 
                 if (netModule != null) {
-                    final Object data = arguments[0];
+                    Object data = arguments[0];
                     boolean internal = false;
                     if (isInternalString(data) || data instanceof ObjArray && isInternalString( ((ObjArray) data).getArray()[0])) {
                         internal = true;
@@ -372,18 +411,8 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements Schedu
                     if (internal) {
                         netModule.invoke(NetModule.SEND_TCP, holder, data);
                     } else {
-                        // This task can be anonymous because it doesn't need to be serialized.
-                        // It should be executed at the end of the tick it was scheduled.
-                        // Note, however, that anyone who calls SEND after the "computerNetworkUpdate" group might cause an error.
-                        holder.get(SCHEDULER).schedule("sendPacket", "computerNetworkUpdate", 1, new SchedulerTaskAdapter() {
-
-                            @Override
-                            public void execute(CFeatureHolder holder) {
-
-                                netModule.invoke(NetModule.SEND_TCP, holder, data);
-                            }
-
-                        });
+                        // The state checking (whether the socket is connected) is done in the scheduler task that sends the packet queue
+                        holder.addToColl(OUTGOING_PACKET_QUEUE, data);
                     }
                 }
 
@@ -485,7 +514,7 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements Schedu
                             // If a response packet was received
                             else if (dataArray[1].equals("rsp")) {
                                 // Cancel the current keepalive timeout scheduler task if one exists
-                                SchedulerTask keepaliveTimeoutTask = holder.get(SCHEDULER).getTask("keepaliveTimeout");
+                                SchedulerTask keepaliveTimeoutTask = holder.get(SCHEDULER).getTaskByName("keepaliveTimeout");
                                 if (keepaliveTimeoutTask != null) {
                                     keepaliveTimeoutTask.cancel();
                                 }
@@ -546,14 +575,6 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements Schedu
 
     }
 
-    // ----- Scheduler -----
-
-    static {
-
-        SCHEDULER.schedule(Socket.class, "callPacketHandlersWithQueuedPackets", "computerProgramUpdate", 1, 1, new CallPacketHandlersWithQueuedPacketsTask());
-
-    }
-
     /**
      * Creates a new socket.
      */
@@ -570,82 +591,138 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements Schedu
      */
     public static class ConnectionTimeoutTask extends SchedulerTaskAdapter {
 
-        @Override
-        public void execute(CFeatureHolder holder) {
+        static {
 
-            if (holder.getObj(STATE) != SocketState.CONNECTED) {
-                holder.invoke(DISCONNECT);
-            }
+            EXECUTE.addExecutor("default", ConnectionTimeoutTask.class, new FunctionExecutor<Void>() {
+
+                @Override
+                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                    Socket socket = (Socket) arguments[0];
+
+                    if (socket.getObj(STATE) != SocketState.CONNECTED) {
+                        socket.invoke(DISCONNECT);
+                    }
+
+                    return invocation.next(arguments);
+                }
+
+            });
+
         }
 
     }
 
     /**
      * This {@link SchedulerTask} is called on a regular basis to verify the availability of the connection.
-     * It schedules a new {@link KeepaliveTimeoutTask} and sends a {@code keepalive} request packet to the remote {@link Socket}.
+     * It schedules a new task for calling {@link Socket#DISCONNECT} (name {@code keepaliveTimeout}) and sends a {@code keepalive} request packet to the remote {@link Socket}.
+     * Once the keepalive response packet arrives, the timeout task is cancelled.
      * 
      * @see Socket
      */
     public static class ScheduleKeepaliveTask extends SchedulerTaskAdapter {
 
-        @Override
-        public void execute(CFeatureHolder holder) {
+        static {
 
-            scheduleKeepaliveResponseCheck(holder);
+            EXECUTE.addExecutor("default", ScheduleKeepaliveTask.class, new FunctionExecutor<Void>() {
 
-            holder.invoke(SEND, new ObjArray("$_keepalive", "req"));
-        }
+                @Override
+                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-        /*
-         * This method schedules a task that disconnects the connection after some time.
-         * It is cancelled when a keepalive response packet arrives.
-         */
-        private void scheduleKeepaliveResponseCheck(CFeatureHolder holder) {
+                    Socket socket = (Socket) arguments[0];
 
-            holder.get(SCHEDULER).schedule("keepaliveTimeout", "computerNetworkUpdate", KEEPALIVE_REPONSE_TIMEOUT, new KeepaliveTimeoutTask());
+                    // Schedule a new task that disconnects the connection after some time
+                    // That new task is cancelled once a keepalive response packet arrives
+                    FunctionCallSchedulerTask timeoutTask = new FunctionCallSchedulerTask();
+                    timeoutTask.setObj(FunctionCallSchedulerTask.FUNCTION_DEFINITION, new FeatureDefinitionReference<FunctionDefinition<?>>(Socket.class, DISCONNECT));
+                    socket.get(SCHEDULER).schedule("keepaliveTimeout", "computerNetworkUpdate", KEEPALIVE_REPONSE_TIMEOUT, timeoutTask);
+
+                    // Send the keepalive request
+                    socket.invoke(SEND, new ObjArray("$_keepalive", "req"));
+
+                    return invocation.next(arguments);
+                }
+
+            });
+
         }
 
     }
 
     /**
-     * This {@link SchedulerTask} waits for the {@code keepalive} packet, which was sent by a {@link ScheduleKeepaliveTask}, to not be answered.
-     * If that is the case, it just disconnects the connection.
+     * This {@link SchedulerTask} sends all packets from the {@link Socket#OUTGOING_PACKET_QUEUE} using the {@link NetModule#SEND_TCP} method.
+     * Afterwards, it clears the outgoing packet queue.
      * 
      * @see Socket
      */
-    public static class KeepaliveTimeoutTask extends SchedulerTaskAdapter {
+    public static class SendQueuedPacketsTask extends SchedulerTaskAdapter {
 
-        @Override
-        public void execute(CFeatureHolder holder) {
+        static {
 
-            holder.invoke(DISCONNECT);
+            EXECUTE.addExecutor("default", SendQueuedPacketsTask.class, new FunctionExecutor<Void>() {
+
+                @Override
+                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                    Socket socket = (Socket) arguments[0];
+                    NetModule netModule = socket.getParent();
+
+                    for (Object packetData : socket.getColl(OUTGOING_PACKET_QUEUE)) {
+                        // While the socket is marked as connected
+                        if (socket.getObj(STATE) != SocketState.CONNECTED) {
+                            break;
+                        }
+
+                        netModule.invoke(NetModule.SEND_TCP, socket, packetData);
+                    }
+
+                    socket.get(OUTGOING_PACKET_QUEUE).clear();
+
+                    return invocation.next(arguments);
+                }
+
+            });
+
         }
+
     }
 
     /**
      * This {@link SchedulerTask} delivers all packets from the {@link Socket#INCOMING_PACKET_QUEUE} to all {@link Socket#PACKET_HANDLERS}.
-     * Afterwards, it clears the packet queue.
+     * Afterwards, it clears the incoming packet queue.
      * 
      * @see Socket
      */
-    public static class CallPacketHandlersWithQueuedPacketsTask extends SchedulerTaskAdapter {
+    public static class HandleQueuedPacketsTask extends SchedulerTaskAdapter {
 
-        @Override
-        public void execute(CFeatureHolder holder) {
+        static {
 
-            outerLoop:
-            for (Object packetData : holder.getColl(INCOMING_PACKET_QUEUE)) {
-                for (PacketHandler packetHandler : holder.getColl(PACKET_HANDLERS)) {
-                    // While the socket is marked as connected
-                    if (holder.getObj(STATE) != SocketState.CONNECTED) {
-                        break outerLoop;
+            EXECUTE.addExecutor("default", HandleQueuedPacketsTask.class, new FunctionExecutor<Void>() {
+
+                @Override
+                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+
+                    Socket socket = (Socket) arguments[0];
+
+                    outerLoop:
+                    for (Object packetData : socket.getColl(INCOMING_PACKET_QUEUE)) {
+                        for (PacketHandler packetHandler : socket.getColl(PACKET_HANDLERS)) {
+                            // While the socket is marked as connected
+                            if (socket.getObj(STATE) != SocketState.CONNECTED) {
+                                break outerLoop;
+                            }
+
+                            packetHandler.invoke(PacketHandler.HANDLE, socket, packetData);
+                        }
                     }
 
-                    packetHandler.invoke(PacketHandler.HANDLE, holder, packetData);
-                }
-            }
+                    socket.get(INCOMING_PACKET_QUEUE).clear();
 
-            holder.get(INCOMING_PACKET_QUEUE).clear();
+                    return invocation.next(arguments);
+                }
+
+            });
+
         }
 
     }

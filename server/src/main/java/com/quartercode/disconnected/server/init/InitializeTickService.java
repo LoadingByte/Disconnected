@@ -19,8 +19,8 @@
 package com.quartercode.disconnected.server.init;
 
 import com.quartercode.disconnected.server.sim.TickBridgeProvider;
-import com.quartercode.disconnected.server.sim.TickSchedulerUpdater;
 import com.quartercode.disconnected.server.sim.TickService;
+import com.quartercode.disconnected.server.sim.TickWorldUpdater;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 import com.quartercode.disconnected.shared.util.init.Initializer;
 import com.quartercode.disconnected.shared.util.init.InitializerSettings;
@@ -34,7 +34,7 @@ public class InitializeTickService implements Initializer {
         TickService service = ServiceRegistry.lookup(TickService.class);
 
         service.addAction(new TickBridgeProvider());
-        service.addAction(new TickSchedulerUpdater());
+        service.addAction(new TickWorldUpdater());
     }
 
 }

@@ -31,6 +31,9 @@ import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
 import com.quartercode.classmod.extra.valuefactory.ValueFactory;
 import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
 import com.quartercode.classmod.factory.PropertyDefinitionFactory;
+import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
+import com.quartercode.disconnected.server.sim.scheduler.SchedulerRegistry;
+import com.quartercode.disconnected.server.sim.scheduler.SchedulerRegistryProvider;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.net.Backbone;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
@@ -42,7 +45,7 @@ import com.quartercode.eventbridge.bridge.Bridge;
  */
 @XmlPersistent
 @XmlRootElement
-public class World extends DefaultCFeatureHolder {
+public class World extends DefaultCFeatureHolder implements SchedulerRegistryProvider {
 
     // ----- Properties -----
 
@@ -73,51 +76,53 @@ public class World extends DefaultCFeatureHolder {
 
     }
 
-    private Bridge                                                             bridge;
-    private Random                                                             random;
+    private WorldDependencyProvider                                            dependencyProvider;
 
     /**
-     * Returns the {@link Bridge} that should be used for sending events by any object in the world tree.
-     * It is must be injected using {@link #setBridge(Bridge)}.
+     * Uses the given {@link WorldDependencyProvider} for retrieving the {@link #getRandom() random object}, {@link #getBridge() bridge}, and {@link #getSchedulerRegistry() scheduler registry}.
      * 
-     * @return The world's bridge.
+     * @param dependencyProvider The world dependency to use.
      */
-    public Bridge getBridge() {
+    public void setDependencyProvider(WorldDependencyProvider dependencyProvider) {
 
-        return bridge;
-    }
-
-    /**
-     * Injects a {@link Bridge} that can be used by the world.
-     * It can be retrieved with {@link #getBridge()}.
-     * 
-     * @param bridge The bridge the world can use.
-     */
-    public void setBridge(Bridge bridge) {
-
-        this.bridge = bridge;
+        this.dependencyProvider = dependencyProvider;
     }
 
     /**
      * Returns the {@link Random} object that can be used by the world.
-     * It is must be injected using {@link #setRandom(Random)}.
+     * It is is supplied by the {@link WorldDependencyProvider} (see {@link #setDependencyProvider(WorldDependencyProvider)}).
      * 
      * @return The random object the world can use.
+     * @see WorldDependencyProvider#getRandom()
      */
     public Random getRandom() {
 
-        return random;
+        return dependencyProvider.getRandom();
     }
 
     /**
-     * Injects a {@link Random} object that can be used by the world.
-     * It can be retrieved with {@link #getRandom()}.
+     * Returns the {@link Bridge} that should be used for sending events by any object in the world tree.
+     * It is is supplied by the {@link WorldDependencyProvider} (see {@link #setDependencyProvider(WorldDependencyProvider)}).
      * 
-     * @param random The random object the world can use.
+     * @return The bridge the world can use.
+     * @see WorldDependencyProvider#getBridge()
      */
-    public void setRandom(Random random) {
+    public Bridge getBridge() {
 
-        this.random = random;
+        return dependencyProvider.getBridge();
+    }
+
+    /**
+     * Returns the {@link SchedulerRegistry} that can be used by all {@link Scheduler} features in the world tree.
+     * It is is supplied by the {@link WorldDependencyProvider} (see {@link #setDependencyProvider(WorldDependencyProvider)}).
+     * 
+     * @return The scheduler registry the world can use.
+     * @see WorldDependencyProvider#getSchedulerRegistry()
+     */
+    @Override
+    public SchedulerRegistry getSchedulerRegistry() {
+
+        return dependencyProvider.getSchedulerRegistry();
     }
 
 }

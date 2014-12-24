@@ -21,7 +21,8 @@ package com.quartercode.disconnected.server.event.prog.control;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
-import com.quartercode.disconnected.server.sim.profile.ProfileService;
+import com.quartercode.disconnected.server.sim.TickService;
+import com.quartercode.disconnected.server.sim.TickWorldUpdater;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.os.OS;
@@ -61,7 +62,7 @@ public class WorldProcessInterruptCommandHandler implements SBPAwareEventHandler
 
     protected Process<?> getSBPProcess(SBPIdentity sbp, int pid) {
 
-        World world = ServiceRegistry.lookup(ProfileService.class).getActive().getWorld();
+        World world = ServiceRegistry.lookup(TickService.class).getAction(TickWorldUpdater.class).getWorld();
         // Just use first available computer as the player's one
         Computer computer = world.getColl(World.COMPUTERS).get(0);
 
