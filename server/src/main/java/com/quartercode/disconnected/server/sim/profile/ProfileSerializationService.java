@@ -28,7 +28,7 @@ import com.quartercode.disconnected.server.world.World;
  * This service implements mechanisms for serializing and deserializing {@link ProfileData profile data}.
  * That persistent data is stored in some kind of (archive) files, which contain the different profile data components.
  * 
- * @see Profile
+ * @see ProfileData
  */
 public interface ProfileSerializationService {
 

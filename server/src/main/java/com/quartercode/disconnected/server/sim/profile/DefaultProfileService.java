@@ -186,6 +186,9 @@ public class DefaultProfileService implements ProfileService {
                 }
             }
 
+            // Index all existing profiles
+            reindexProfiles();
+
             // Start the directory watcher
             try (WatchService watcher = directory.getFileSystem().newWatchService()) {
                 directory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE);
@@ -225,11 +228,6 @@ public class DefaultProfileService implements ProfileService {
             }
         }
 
-        private String getProfile(String fileName) {
-
-            return fileName.substring(0, fileName.lastIndexOf("."));
-        }
-
         private void reindexProfiles() {
 
             LOGGER.debug("Re-indexing all profiles in directory '{}'", directory);
@@ -248,6 +246,11 @@ public class DefaultProfileService implements ProfileService {
             } catch (IOException e) {
                 LOGGER.error("Cannot re-index existing profiles in directory '{}'", directory, e);
             }
+        }
+
+        private String getProfile(String fileName) {
+
+            return fileName.substring(0, fileName.lastIndexOf("."));
         }
 
     }

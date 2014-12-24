@@ -23,10 +23,10 @@ import java.util.List;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 
 /**
- * This service manages different {@link Profile}s which store simulations and random objects.
- * It is also capable of loading and saving those profiles.
+ * This service manages different profiles which store simulations and random objects.
+ * It is also capable of loading and saving those profiles in the form of {@link ProfileData object}.
  * 
- * @see Profile
+ * @see ProfileData
  * @see ProfileSerializationService
  */
 public interface ProfileService {

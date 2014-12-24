@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.server.sim.profile;
 
 /**
- * The profile serialization exception can occur while trying to serialize a whole {@link Profile} or a part of it.
+ * The profile serialization exception can occur while trying to serialize a whole {@link ProfileData} object or a part of it.
  * It is generally thrown by the {@link ProfileSerializationService}.
  * 
  * @see ProfileSerializationService

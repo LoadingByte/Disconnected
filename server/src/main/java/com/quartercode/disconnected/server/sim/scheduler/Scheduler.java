@@ -91,7 +91,7 @@ public interface Scheduler extends Feature, Persistable {
      * Note that the task can be can be {@link SchedulerTask#cancel() cancelled}.
      * Also note that calling this method is equivalent to calling {@link #schedule(String, String, int, int, SchedulerTask)} with a {@code periodicDelay} of {@code -1}.<br>
      * <br>
-     * The {@code name} can be used to retrieve the task from the scheduler using {@link #getTask(String)}.
+     * The {@code name} can be used to retrieve the task from the scheduler using {@link #getTaskByName(String)}.
      * Afterwards, the {@link SchedulerTask#cancel()} method could then be used to remove it, for example.
      * Note that this field may be {@code null}, in which case the scheduler task is anonymous.<br>
      * <br>
@@ -117,7 +117,7 @@ public interface Scheduler extends Feature, Persistable {
      * Schedules the given repeating {@link SchedulerTask}.
      * Note that the task can be can be {@link SchedulerTask#cancel() cancelled}.<br>
      * <br>
-     * The {@code name} can be used to retrieve the task from the scheduler using {@link #getTask(String)}.
+     * The {@code name} can be used to retrieve the task from the scheduler using {@link #getTaskByName(String)}.
      * Afterwards, the {@link SchedulerTask#cancel()} method could then be used to remove it, for example.
      * Note that this field may be {@code null}, in which case the scheduler task is anonymous.<br>
      * <br>
