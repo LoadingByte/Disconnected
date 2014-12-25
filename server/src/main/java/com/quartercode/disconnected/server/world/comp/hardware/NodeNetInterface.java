@@ -105,11 +105,11 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder nodeNetInterface = invocation.getCHolder();
 
-                RouterNetInterface oldConnection = holder.getObj(CONNECTION);
+                RouterNetInterface oldConnection = nodeNetInterface.getObj(CONNECTION);
                 if (oldConnection == null || !oldConnection.equals(arguments[0])) {
-                    holder.setObj(NET_ID, null);
+                    nodeNetInterface.setObj(NET_ID, null);
                 }
 
                 return invocation.next(arguments);
@@ -122,11 +122,11 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 if (arguments[0] != null) {
-                    NodeNetInterface holder = (NodeNetInterface) invocation.getCHolder();
+                    NodeNetInterface nodeNetInterface = (NodeNetInterface) invocation.getCHolder();
                     RouterNetInterface connection = (RouterNetInterface) arguments[0];
 
-                    if (!connection.getColl(RouterNetInterface.CHILDREN).contains(holder)) {
-                        connection.addToColl(RouterNetInterface.CHILDREN, holder);
+                    if (!connection.getColl(RouterNetInterface.CHILDREN).contains(nodeNetInterface)) {
+                        connection.addToColl(RouterNetInterface.CHILDREN, nodeNetInterface);
                     }
                 }
 
@@ -140,11 +140,11 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 if (arguments[0] == null) {
-                    NodeNetInterface holder = (NodeNetInterface) invocation.getCHolder();
-                    RouterNetInterface oldConnection = holder.getObj(CONNECTION);
+                    NodeNetInterface nodeNetInterface = (NodeNetInterface) invocation.getCHolder();
+                    RouterNetInterface oldConnection = nodeNetInterface.getObj(CONNECTION);
 
-                    if (oldConnection != null && oldConnection.getColl(RouterNetInterface.CHILDREN).contains(holder)) {
-                        oldConnection.removeFromColl(RouterNetInterface.CHILDREN, holder);
+                    if (oldConnection != null && oldConnection.getColl(RouterNetInterface.CHILDREN).contains(nodeNetInterface)) {
+                        oldConnection.removeFromColl(RouterNetInterface.CHILDREN, nodeNetInterface);
                     }
                 }
 
@@ -164,12 +164,12 @@ public class NodeNetInterface extends Hardware implements PacketProcessor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                NodeNetInterface holder = (NodeNetInterface) invocation.getCHolder();
+                NodeNetInterface nodeNetInterface = (NodeNetInterface) invocation.getCHolder();
                 Packet packet = (Packet) arguments[0];
 
                 // Routing cascade
-                if (!tryRouteToOs(holder, packet)) {
-                    tryRouteToRouter(holder, packet);
+                if (!tryRouteToOs(nodeNetInterface, packet)) {
+                    tryRouteToRouter(nodeNetInterface, packet);
                 }
 
                 return invocation.next(arguments);

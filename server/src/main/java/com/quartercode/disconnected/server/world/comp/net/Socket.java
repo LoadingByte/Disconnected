@@ -205,11 +205,11 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements String
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder socket = invocation.getCHolder();
 
                 // If the state is changed to "HANDSHAKE_SYN"
-                if (arguments[0] == SocketState.HANDSHAKE_SYN && holder.getObj(Socket.STATE) != SocketState.HANDSHAKE_SYN) {
-                    holder.get(SCHEDULER).schedule("connectionTimeout", "computerNetworkUpdate", CONNECTION_TIMEOUT, new ConnectionTimeoutTask());
+                if (arguments[0] == SocketState.HANDSHAKE_SYN && socket.getObj(Socket.STATE) != SocketState.HANDSHAKE_SYN) {
+                    socket.get(SCHEDULER).schedule("connectionTimeout", "computerNetworkUpdate", CONNECTION_TIMEOUT, new ConnectionTimeoutTask());
                 }
 
                 return invocation.next(arguments);
@@ -221,12 +221,12 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements String
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder socket = invocation.getCHolder();
 
                 // If the state is changed to "CONNECTED"
-                if (arguments[0] == SocketState.CONNECTED && holder.getObj(Socket.STATE) != SocketState.CONNECTED) {
+                if (arguments[0] == SocketState.CONNECTED && socket.getObj(Socket.STATE) != SocketState.CONNECTED) {
                     // Note that this task does not need to be cancelled explicitly since the garbage collector automatically removes them if the socket is disconnected
-                    holder.get(SCHEDULER).schedule("scheduleKeepalive", "computerNetworkUpdate", KEEPALIVE_PERIOD, KEEPALIVE_PERIOD, new ScheduleKeepaliveTask());
+                    socket.get(SCHEDULER).schedule("scheduleKeepalive", "computerNetworkUpdate", KEEPALIVE_PERIOD, KEEPALIVE_PERIOD, new ScheduleKeepaliveTask());
                 }
 
                 return invocation.next(arguments);
@@ -238,13 +238,13 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements String
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder socket = invocation.getCHolder();
 
                 // If the state is changed to "CONNECTED"
-                if (arguments[0] == SocketState.CONNECTED && holder.getObj(Socket.STATE) != SocketState.CONNECTED) {
+                if (arguments[0] == SocketState.CONNECTED && socket.getObj(Socket.STATE) != SocketState.CONNECTED) {
                     // Note that these tasks do not need to be cancelled explicitly since the garbage collector automatically removes them if the socket is disconnected
-                    holder.get(SCHEDULER).schedule("sendQueuedPackets", "computerNetworkUpdate", 1, 1, new SendQueuedPacketsTask());
-                    holder.get(SCHEDULER).schedule("handleQueuedPackets", "computerProgramUpdate", 1, 1, new HandleQueuedPacketsTask());
+                    socket.get(SCHEDULER).schedule("sendQueuedPackets", "computerNetworkUpdate", 1, 1, new SendQueuedPacketsTask());
+                    socket.get(SCHEDULER).schedule("handleQueuedPackets", "computerProgramUpdate", 1, 1, new HandleQueuedPacketsTask());
                 }
 
                 return invocation.next(arguments);
@@ -258,11 +258,11 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements String
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Socket holder = (Socket) invocation.getCHolder();
+                Socket socket = (Socket) invocation.getCHolder();
 
                 if ((int) arguments[0] < 0) {
                     // Generate a new sequence number
-                    holder.setObj(CURRENT_SEQ_NUMBER, holder.getRandom().nextInt());
+                    socket.setObj(CURRENT_SEQ_NUMBER, socket.getRandom().nextInt());
                 }
 
                 return invocation.next(arguments);
@@ -346,10 +346,10 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements String
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder socket = invocation.getCHolder();
 
-                Validate.notNull(holder.getObj(DESTINATION), "Socket destination cannot be null");
-                Validate.validState(holder.getObj(STATE) == SocketState.INACTIVE, "Cannot connect socket because it is not in state INACTIVE (current state is '%s')", holder.getObj(STATE));
+                Validate.notNull(socket.getObj(DESTINATION), "Socket destination cannot be null");
+                Validate.validState(socket.getObj(STATE) == SocketState.INACTIVE, "Cannot connect socket because it is not in state INACTIVE (current state is '%s')", socket.getObj(STATE));
 
                 return invocation.next(arguments);
             }
@@ -360,13 +360,13 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements String
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder socket = invocation.getCHolder();
 
-                holder.setObj(STATE, SocketState.HANDSHAKE_SYN);
+                socket.setObj(STATE, SocketState.HANDSHAKE_SYN);
                 // Generate a new sequence number
-                holder.setObj(CURRENT_SEQ_NUMBER, -1);
+                socket.setObj(CURRENT_SEQ_NUMBER, -1);
                 // Send the first handshake packet (syn) with the local sequence number
-                holder.invoke(SEND, new ObjArray("$_handshake", "syn", holder.getObj(CURRENT_SEQ_NUMBER)));
+                socket.invoke(SEND, new ObjArray("$_handshake", "syn", socket.getObj(CURRENT_SEQ_NUMBER)));
 
                 return invocation.next(arguments);
             }
@@ -379,13 +379,13 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements String
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Socket holder = (Socket) invocation.getCHolder();
+                Socket socket = (Socket) invocation.getCHolder();
 
-                if (holder.getObj(STATE) != SocketState.RECEIVED_TEARDOWN && holder.getObj(STATE) != SocketState.DISCONNECTED) {
-                    holder.invoke(SEND, "$_teardown");
+                if (socket.getObj(STATE) != SocketState.RECEIVED_TEARDOWN && socket.getObj(STATE) != SocketState.DISCONNECTED) {
+                    socket.invoke(SEND, "$_teardown");
                 }
 
-                holder.setObj(STATE, SocketState.DISCONNECTED);
+                socket.setObj(STATE, SocketState.DISCONNECTED);
 
                 return invocation.next(arguments);
             }
@@ -398,8 +398,8 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements String
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Socket holder = (Socket) invocation.getCHolder();
-                NetModule netModule = holder.getParent();
+                Socket socket = (Socket) invocation.getCHolder();
+                NetModule netModule = socket.getParent();
 
                 if (netModule != null) {
                     Object data = arguments[0];
@@ -409,10 +409,10 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements String
                     }
 
                     if (internal) {
-                        netModule.invoke(NetModule.SEND_TCP, holder, data);
+                        netModule.invoke(NetModule.SEND_TCP, socket, data);
                     } else {
                         // The state checking (whether the socket is connected) is done in the scheduler task that sends the packet queue
-                        holder.addToColl(OUTGOING_PACKET_QUEUE, data);
+                        socket.addToColl(OUTGOING_PACKET_QUEUE, data);
                     }
                 }
 
@@ -432,7 +432,7 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements String
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder socket = invocation.getCHolder();
                 Object data = ((Packet) arguments[0]).getObj(Packet.DATA);
 
                 if (data instanceof ObjArray) {
@@ -440,48 +440,48 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements String
 
                     if (dataArray.length >= 1 && dataArray[0].equals("$_handshake")) {
                         // If a syn packet was received
-                        if (holder.getObj(STATE) == SocketState.INACTIVE && dataArray.length == 3 && dataArray[1].equals("syn") && dataArray[2] instanceof Integer) {
+                        if (socket.getObj(STATE) == SocketState.INACTIVE && dataArray.length == 3 && dataArray[1].equals("syn") && dataArray[2] instanceof Integer) {
                             int destinationSeqNumber = (int) dataArray[2];
 
-                            holder.setObj(STATE, SocketState.HANDSHAKE_SYN);
+                            socket.setObj(STATE, SocketState.HANDSHAKE_SYN);
                             // Generate a new sequence number
-                            holder.setObj(CURRENT_SEQ_NUMBER, -1);
+                            socket.setObj(CURRENT_SEQ_NUMBER, -1);
                             // Send the second handshake packet (syn-ack) with the local sequence number and the ack sequence number
-                            holder.invoke(SEND, new ObjArray("$_handshake", "syn-ack", holder.getObj(CURRENT_SEQ_NUMBER), destinationSeqNumber + 1));
+                            socket.invoke(SEND, new ObjArray("$_handshake", "syn-ack", socket.getObj(CURRENT_SEQ_NUMBER), destinationSeqNumber + 1));
                         }
                         // If a syn-ack packet was received
-                        else if (holder.getObj(STATE) == SocketState.HANDSHAKE_SYN && dataArray.length == 4 && dataArray[1].equals("syn-ack") && dataArray[2] instanceof Integer && dataArray[3] instanceof Integer) {
+                        else if (socket.getObj(STATE) == SocketState.HANDSHAKE_SYN && dataArray.length == 4 && dataArray[1].equals("syn-ack") && dataArray[2] instanceof Integer && dataArray[3] instanceof Integer) {
                             int destinationSeqNumber = (int) dataArray[2];
                             int ackSeqNumber = (int) dataArray[3];
 
                             // Check whether the ack sequence number is correct
-                            if (ackSeqNumber == holder.getObj(CURRENT_SEQ_NUMBER) + 1) {
+                            if (ackSeqNumber == socket.getObj(CURRENT_SEQ_NUMBER) + 1) {
                                 // Mark the connection as established
-                                holder.setObj(STATE, SocketState.CONNECTED);
+                                socket.setObj(STATE, SocketState.CONNECTED);
                                 // Send the final handshake packet (ack) with the destination sequence number increased by 1
-                                holder.invoke(SEND, new ObjArray("$_handshake", "ack", destinationSeqNumber + 1));
+                                socket.invoke(SEND, new ObjArray("$_handshake", "ack", destinationSeqNumber + 1));
                             } else {
                                 // Terminate the connection
-                                holder.invoke(DISCONNECT);
+                                socket.invoke(DISCONNECT);
                             }
                         }
                         // If an ack packet was received
-                        else if (holder.getObj(STATE) == SocketState.HANDSHAKE_SYN && dataArray.length == 3 && dataArray[1].equals("ack") && dataArray[2] instanceof Integer) {
+                        else if (socket.getObj(STATE) == SocketState.HANDSHAKE_SYN && dataArray.length == 3 && dataArray[1].equals("ack") && dataArray[2] instanceof Integer) {
                             int ackId = (int) dataArray[2];
 
                             // Check whether the ack sequence number is correct
-                            if (ackId == holder.getObj(CURRENT_SEQ_NUMBER) + 1) {
+                            if (ackId == socket.getObj(CURRENT_SEQ_NUMBER) + 1) {
                                 // Mark the connection as established
-                                holder.setObj(STATE, SocketState.CONNECTED);
+                                socket.setObj(STATE, SocketState.CONNECTED);
                             } else {
                                 // Terminate the connection
-                                holder.invoke(DISCONNECT);
+                                socket.invoke(DISCONNECT);
                             }
                         }
                         // If an invalid handshake packet was received
                         else {
                             // Terminate the connection
-                            holder.invoke(DISCONNECT);
+                            socket.invoke(DISCONNECT);
                         }
 
                         return null;
@@ -497,9 +497,9 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements String
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder socket = invocation.getCHolder();
 
-                if (holder.getObj(STATE) == SocketState.CONNECTED) {
+                if (socket.getObj(STATE) == SocketState.CONNECTED) {
                     Object data = ((Packet) arguments[0]).getObj(Packet.DATA);
 
                     if (data instanceof ObjArray) {
@@ -509,12 +509,12 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements String
                             // If a request packet was received
                             if (dataArray[1].equals("req")) {
                                 // Answer with a response packet
-                                holder.invoke(SEND, new ObjArray("$_keepalive", "rsp"));
+                                socket.invoke(SEND, new ObjArray("$_keepalive", "rsp"));
                             }
                             // If a response packet was received
                             else if (dataArray[1].equals("rsp")) {
                                 // Cancel the current keepalive timeout scheduler task if one exists
-                                SchedulerTask keepaliveTimeoutTask = holder.get(SCHEDULER).getTaskByName("keepaliveTimeout");
+                                SchedulerTask keepaliveTimeoutTask = socket.get(SCHEDULER).getTaskByName("keepaliveTimeout");
                                 if (keepaliveTimeoutTask != null) {
                                     keepaliveTimeoutTask.cancel();
                                 }
@@ -522,7 +522,7 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements String
                             // If an invalid keepalive packet was received
                             else {
                                 // Terminate the connection
-                                holder.invoke(DISCONNECT);
+                                socket.invoke(DISCONNECT);
                             }
 
                             return null;
@@ -539,12 +539,12 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements String
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder socket = invocation.getCHolder();
                 Object data = ((Packet) arguments[0]).getObj(Packet.DATA);
 
                 if (data instanceof String && data.equals("$_teardown")) {
-                    holder.setObj(STATE, SocketState.RECEIVED_TEARDOWN);
-                    holder.invoke(DISCONNECT);
+                    socket.setObj(STATE, SocketState.RECEIVED_TEARDOWN);
+                    socket.invoke(DISCONNECT);
                     return null;
                 }
 
@@ -557,16 +557,16 @@ public class Socket extends WorldChildFeatureHolder<NetModule> implements String
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder socket = invocation.getCHolder();
 
                 // Terminate the connection if a non-handshake and non-teardown packet comes through although the connection hasn't been established yet
-                if (holder.getObj(STATE) != SocketState.CONNECTED) {
-                    holder.invoke(DISCONNECT);
+                if (socket.getObj(STATE) != SocketState.CONNECTED) {
+                    socket.invoke(DISCONNECT);
                     return null;
                 }
 
                 Object data = ((Packet) arguments[0]).getObj(Packet.DATA);
-                holder.addToColl(INCOMING_PACKET_QUEUE, data);
+                socket.addToColl(INCOMING_PACKET_QUEUE, data);
 
                 return invocation.next(arguments);
             }

@@ -61,12 +61,12 @@ public class ConfigEntry extends WorldChildFeatureHolder<Config> implements Deri
             @Override
             public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder configEntry = invocation.getCHolder();
 
                 long size = 0;
-                for (ValueSupplierDefinition<?, ?> column : holder.invoke(GET_COLUMNS).keySet()) {
+                for (ValueSupplierDefinition<?, ?> column : configEntry.invoke(GET_COLUMNS).keySet()) {
                     // Cannot use the convenient method because the value supplier has generic wildcard parameters
-                    Object columnValue = holder.get(column).get();
+                    Object columnValue = configEntry.get(column).get();
                     size += SizeUtils.getSize(columnValue);
                 }
 

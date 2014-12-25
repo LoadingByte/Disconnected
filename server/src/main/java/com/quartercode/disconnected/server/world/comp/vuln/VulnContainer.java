@@ -144,12 +144,12 @@ public class VulnContainer extends WorldFeatureHolder {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                VulnContainer holder = (VulnContainer) invocation.getCHolder();
+                VulnContainer vulnContainer = (VulnContainer) invocation.getCHolder();
                 VulnSource vulnSource = (VulnSource) arguments[0];
 
                 Vuln vuln = new Vuln();
-                selectActions(holder, vulnSource, vuln);
-                holder.addToColl(VULNS, vuln);
+                selectActions(vulnContainer, vulnSource, vuln);
+                vulnContainer.addToColl(VULNS, vuln);
 
                 return invocation.next(arguments);
             }
@@ -182,14 +182,14 @@ public class VulnContainer extends WorldFeatureHolder {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                VulnContainer holder = (VulnContainer) invocation.getCHolder();
+                VulnContainer vulnContainer = (VulnContainer) invocation.getCHolder();
                 // Trust the user of the method
                 @SuppressWarnings ("unchecked")
                 Collection<VulnSource> vulnSources = (Collection<VulnSource>) arguments[0];
                 int amount = (int) arguments[1];
 
                 for (int counter = 0; counter < amount; counter++) {
-                    holder.invoke(GENERATE_VULN, selectVulnSource(holder, vulnSources));
+                    vulnContainer.invoke(GENERATE_VULN, selectVulnSource(vulnContainer, vulnSources));
                 }
 
                 return invocation.next(arguments);
@@ -228,12 +228,12 @@ public class VulnContainer extends WorldFeatureHolder {
             @Override
             public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder vulnContainer = invocation.getCHolder();
                 Attack attack = (Attack) arguments[0];
                 Vuln vuln = attack.getObj(Attack.VULN);
 
                 String action;
-                if (holder.getColl(VULNS).contains(vuln)) {
+                if (vulnContainer.getColl(VULNS).contains(vuln)) {
                     action = attack.getObj(Attack.PREFERRED_ACTION);
                 } else {
                     action = "null";

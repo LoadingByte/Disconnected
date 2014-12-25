@@ -397,9 +397,9 @@ public class FSModule extends OSModule {
                 @Override
                 public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                    CFeatureHolder holder = invocation.getCHolder();
+                    CFeatureHolder knownFs = invocation.getCHolder();
 
-                    Validate.validState(!holder.getObj(MOUNTED), "Can't change mountpoint of known file system '%s' while mounted", holder.getObj(MOUNTPOINT));
+                    Validate.validState(!knownFs.getObj(MOUNTED), "Can't change mountpoint of known file system '%s' while mounted", knownFs.getObj(MOUNTPOINT));
 
                     return invocation.next(arguments);
                 }
@@ -412,12 +412,12 @@ public class FSModule extends OSModule {
                 @Override
                 public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                    CFeatureHolder holder = invocation.getCHolder();
-                    FSModule parent = ((KnownFS) holder).getParent();
+                    CFeatureHolder knownFs = invocation.getCHolder();
+                    FSModule parent = ((KnownFS) knownFs).getParent();
 
                     if ((Boolean) arguments[0]) {
-                        boolean mountpointFree = parent.invoke(FSModule.GET_MOUNTED_BY_MOUNTPOINT, holder.getObj(MOUNTPOINT)) == null;
-                        Validate.validState(mountpointFree, "Other known file system with same mountpoint ('%s') already mounted", holder.getObj(MOUNTPOINT));
+                        boolean mountpointFree = parent.invoke(FSModule.GET_MOUNTED_BY_MOUNTPOINT, knownFs.getObj(MOUNTPOINT)) == null;
+                        Validate.validState(mountpointFree, "Other known file system with same mountpoint ('%s') already mounted", knownFs.getObj(MOUNTPOINT));
                     }
 
                     return invocation.next(arguments);

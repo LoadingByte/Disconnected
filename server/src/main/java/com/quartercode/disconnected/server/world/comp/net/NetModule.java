@@ -157,12 +157,12 @@ public class NetModule extends OSModule {
             @Override
             public Socket invoke(FunctionInvocation<Socket> invocation, Object... arguments) {
 
-                NetModule holder = (NetModule) invocation.getCHolder();
+                NetModule netModule = (NetModule) invocation.getCHolder();
 
                 Socket socket = new Socket();
                 // Set the local port to 0 (random) so applications don't have to do that
                 socket.setObj(Socket.LOCAL_PORT, 0);
-                holder.addToColl(SOCKETS, socket);
+                netModule.addToColl(SOCKETS, socket);
 
                 invocation.next(arguments);
                 return socket;
@@ -176,10 +176,10 @@ public class NetModule extends OSModule {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Socket holder = (Socket) invocation.getCHolder();
+                Socket socket = (Socket) invocation.getCHolder();
 
-                if (holder.getObj(Socket.LOCAL_PORT) == 0) {
-                    holder.setObj(Socket.LOCAL_PORT, getFreePort(holder));
+                if (socket.getObj(Socket.LOCAL_PORT) == 0) {
+                    socket.setObj(Socket.LOCAL_PORT, getFreePort(socket));
                 }
 
                 return invocation.next(arguments);
@@ -222,12 +222,12 @@ public class NetModule extends OSModule {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Socket holder = (Socket) invocation.getCHolder();
-                int localPort = holder.getObj(Socket.LOCAL_PORT);
-                Address destination = holder.getObj(Socket.DESTINATION);
+                Socket socket = (Socket) invocation.getCHolder();
+                int localPort = socket.getObj(Socket.LOCAL_PORT);
+                Address destination = socket.getObj(Socket.DESTINATION);
 
-                for (Socket socket : holder.getParent().getColl(SOCKETS)) {
-                    boolean bound = socket.getObj(Socket.LOCAL_PORT) == localPort && socket.getObj(Socket.DESTINATION).equals(destination);
+                for (Socket otherSocket : socket.getParent().getColl(SOCKETS)) {
+                    boolean bound = otherSocket.getObj(Socket.LOCAL_PORT) == localPort && otherSocket.getObj(Socket.DESTINATION).equals(destination);
                     Validate.validState(!bound, "Socket with local port '%d' and destination '%s' is already bound", localPort, destination);
                 }
 
@@ -242,10 +242,10 @@ public class NetModule extends OSModule {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Socket holder = (Socket) invocation.getCHolder();
+                Socket socket = (Socket) invocation.getCHolder();
 
-                if (holder.getParent() != null) {
-                    holder.getParent().removeFromColl(SOCKETS, holder);
+                if (socket.getParent() != null) {
+                    socket.getParent().removeFromColl(SOCKETS, socket);
                 }
 
                 return invocation.next(arguments);
@@ -259,14 +259,14 @@ public class NetModule extends OSModule {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
-                boolean stateChangesToConnected = arguments[0] == SocketState.CONNECTED && holder.getObj(Socket.STATE) != SocketState.CONNECTED;
+                CFeatureHolder socket = invocation.getCHolder();
+                boolean stateChangesToConnected = arguments[0] == SocketState.CONNECTED && socket.getObj(Socket.STATE) != SocketState.CONNECTED;
 
                 invocation.next(arguments);
 
                 if (stateChangesToConnected) {
-                    for (SocketConnectionListener connectionListener : holder.getColl(CONNECTION_LISTENERS)) {
-                        connectionListener.invoke(SocketConnectionListener.ON_ESTABLISH, holder);
+                    for (SocketConnectionListener connectionListener : socket.getColl(CONNECTION_LISTENERS)) {
+                        connectionListener.invoke(SocketConnectionListener.ON_ESTABLISH, socket);
                     }
                 }
 
@@ -281,11 +281,11 @@ public class NetModule extends OSModule {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                NetModule holder = (NetModule) invocation.getCHolder();
+                NetModule netModule = (NetModule) invocation.getCHolder();
                 Packet packet = (Packet) arguments[0];
 
                 // Retrieve the network interface the packet will be sent by
-                NodeNetInterface netInterface = holder.getNetInterface();
+                NodeNetInterface netInterface = netModule.getNetInterface();
 
                 // Send the packet
                 netInterface.invoke(NodeNetInterface.PROCESS, packet);
@@ -301,12 +301,12 @@ public class NetModule extends OSModule {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                NetModule holder = (NetModule) invocation.getCHolder();
+                NetModule netModule = (NetModule) invocation.getCHolder();
                 Socket socket = (Socket) arguments[0];
                 Object data = arguments[1];
 
                 // Construct the address of the sending socket
-                NodeNetInterface netInterface = holder.getNetInterface();
+                NodeNetInterface netInterface = netModule.getNetInterface();
                 Address sourceAddress = new Address(netInterface.getObj(NodeNetInterface.NET_ID), socket.getObj(Socket.LOCAL_PORT));
 
                 // Construct a new TCP packet
@@ -317,7 +317,7 @@ public class NetModule extends OSModule {
                 packet.setObj(Packet.DATA, data);
 
                 // Send the packet
-                holder.invoke(SEND, packet);
+                netModule.invoke(SEND, packet);
 
                 return invocation.next(arguments);
             }
@@ -330,7 +330,7 @@ public class NetModule extends OSModule {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder netModule = invocation.getCHolder();
                 Packet packet = (Packet) arguments[0];
                 String packetProtocol = packet.getObj(Packet.PROTOCOL);
 
@@ -342,7 +342,7 @@ public class NetModule extends OSModule {
 
                     // Find the socket the packet was sent to
                     Socket responsibleSocket = null;
-                    for (Socket socket : holder.getColl(SOCKETS)) {
+                    for (Socket socket : netModule.getColl(SOCKETS)) {
                         if (socket.getObj(Socket.LOCAL_PORT) == packetDestinationPort && socket.getObj(Socket.DESTINATION).equals(packetSource)) {
                             responsibleSocket = socket;
                             break;
@@ -352,7 +352,7 @@ public class NetModule extends OSModule {
                     // Create a new socket if the destination of the packet is not yet bound
                     // Note that this creation must be allowed by the connection listeners
                     if (responsibleSocket == null) {
-                        responsibleSocket = tryCreateSocket(holder, packetSource, packetDestinationPort);
+                        responsibleSocket = tryCreateSocket(netModule, packetSource, packetDestinationPort);
                     }
 
                     // Hand the packet over to the socket so it can handle it

@@ -84,21 +84,21 @@ public class Session extends ProgramExecutor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Session holder = (Session) invocation.getCHolder();
+                Session session = (Session) invocation.getCHolder();
 
                 // Determine whether a check is required (parent session != null or parent session user != root)
-                Session parentSession = holder.getParent().invoke(Process.GET_SESSION);
+                Session parentSession = session.getParent().invoke(Process.GET_SESSION);
                 boolean checkRequired = parentSession != null && !parentSession.getObj(USER).invoke(User.IS_SUPERUSER);
 
-                if (checkRequired && holder.getObj(USER).getObj(User.PASSWORD) != null) {
-                    String password = holder.getObj(PASSWORD);
+                if (checkRequired && session.getObj(USER).getObj(User.PASSWORD) != null) {
+                    String password = session.getObj(PASSWORD);
                     if (password == null) {
                         // Wrong password
                         return null;
                     }
                     String hashedPassword = HashUtils.sha256(password);
 
-                    String correctPassword = holder.getObj(USER).getObj(User.PASSWORD);
+                    String correctPassword = session.getObj(USER).getObj(User.PASSWORD);
                     if (!correctPassword.equals(hashedPassword)) {
                         // Wrong password
                         return null;

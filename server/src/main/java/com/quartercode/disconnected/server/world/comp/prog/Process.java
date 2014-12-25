@@ -161,14 +161,14 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
-                WorldProcessState oldState = holder.getObj(STATE);
+                CFeatureHolder process = invocation.getCHolder();
+                WorldProcessState oldState = process.getObj(STATE);
 
                 invocation.next(arguments);
 
                 WorldProcessState newState = (WorldProcessState) arguments[0];
-                for (ProcStateListener stateListener : holder.getColl(STATE_LISTENERS)) {
-                    stateListener.invoke(ProcStateListener.ON_STATE_CHANGE, holder, oldState, newState);
+                for (ProcStateListener stateListener : process.getColl(STATE_LISTENERS)) {
+                    stateListener.invoke(ProcStateListener.ON_STATE_CHANGE, process, oldState, newState);
                 }
 
                 return null;
@@ -411,13 +411,13 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             @Override
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder process = invocation.getCHolder();
                 boolean stateApplied = true;
 
-                if (holder.getObj(STATE) != arguments[0]) {
+                if (process.getObj(STATE) != arguments[0]) {
                     stateApplied = false;
                 } else {
-                    for (Process<?> child : holder.getColl(CHILDREN)) {
+                    for (Process<?> child : process.getColl(CHILDREN)) {
                         if (!child.invoke(IS_STATE_APPLIED_RECURSIVELY)) {
                             stateApplied = false;
                             break;
@@ -436,15 +436,15 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder process = invocation.getCHolder();
 
-                if (holder.getObj(STATE) != WorldProcessState.RUNNING) {
-                    LOGGER.warn("Cannot suspend non-running process '{}' (current state '{}, program executor '{}')", holder.invoke(GET_WORLD_PROCESS_ID), holder.getObj(STATE), holder.getObj(EXECUTOR).getClass());
+                if (process.getObj(STATE) != WorldProcessState.RUNNING) {
+                    LOGGER.warn("Cannot suspend non-running process '{}' (current state '{}, program executor '{}')", process.invoke(GET_WORLD_PROCESS_ID), process.getObj(STATE), process.getObj(EXECUTOR).getClass());
                 } else {
-                    holder.setObj(STATE, WorldProcessState.SUSPENDED);
+                    process.setObj(STATE, WorldProcessState.SUSPENDED);
 
                     if ((Boolean) arguments[0]) {
-                        for (Process<?> child : holder.getColl(CHILDREN)) {
+                        for (Process<?> child : process.getColl(CHILDREN)) {
                             child.invoke(SUSPEND, true);
                         }
                     }
@@ -460,15 +460,15 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder process = invocation.getCHolder();
 
-                if (holder.getObj(STATE) != WorldProcessState.SUSPENDED) {
-                    LOGGER.warn("Cannot resume non-suspended process '{}' (current state '{}, program executor '{}')", holder.invoke(GET_WORLD_PROCESS_ID), holder.getObj(STATE), holder.getObj(EXECUTOR).getClass());
+                if (process.getObj(STATE) != WorldProcessState.SUSPENDED) {
+                    LOGGER.warn("Cannot resume non-suspended process '{}' (current state '{}, program executor '{}')", process.invoke(GET_WORLD_PROCESS_ID), process.getObj(STATE), process.getObj(EXECUTOR).getClass());
                 } else {
-                    holder.setObj(STATE, WorldProcessState.RUNNING);
+                    process.setObj(STATE, WorldProcessState.RUNNING);
 
                     if ((Boolean) arguments[0]) {
-                        for (Process<?> child : holder.getColl(CHILDREN)) {
+                        for (Process<?> child : process.getColl(CHILDREN)) {
                             child.invoke(RESUME, true);
                         }
                     }
@@ -484,22 +484,22 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Process<?> holder = (Process<?>) invocation.getCHolder();
+                Process<?> process = (Process<?>) invocation.getCHolder();
 
-                if (holder.getObj(STATE) != WorldProcessState.RUNNING) {
-                    LOGGER.warn("Cannot interrupt non-running process '{}' (current state '{}, program executor '{}')", holder.invoke(GET_WORLD_PROCESS_ID), holder.getObj(STATE), holder.getObj(EXECUTOR).getClass());
+                if (process.getObj(STATE) != WorldProcessState.RUNNING) {
+                    LOGGER.warn("Cannot interrupt non-running process '{}' (current state '{}, program executor '{}')", process.invoke(GET_WORLD_PROCESS_ID), process.getObj(STATE), process.getObj(EXECUTOR).getClass());
                 } else {
-                    holder.setObj(STATE, WorldProcessState.INTERRUPTED);
+                    process.setObj(STATE, WorldProcessState.INTERRUPTED);
 
                     // Send SBPWorldProcessUserInterruptCommand
-                    SBPWorldProcessUserId wpuId = holder.getObj(WORLD_PROCESS_USER);
-                    Bridge bridge = holder.getBridge();
+                    SBPWorldProcessUserId wpuId = process.getObj(WORLD_PROCESS_USER);
+                    Bridge bridge = process.getBridge();
                     if (wpuId != null && bridge != null) {
                         bridge.send(new SBPWorldProcessUserInterruptCommand(wpuId));
                     }
 
                     if ((Boolean) arguments[0]) {
-                        for (Process<?> child : holder.getColl(CHILDREN)) {
+                        for (Process<?> child : process.getColl(CHILDREN)) {
                             child.invoke(INTERRUPT, true);
                         }
                     }
@@ -515,28 +515,28 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Process<?> holder = (Process<?>) invocation.getCHolder();
+                Process<?> process = (Process<?>) invocation.getCHolder();
 
-                if (holder.getObj(STATE) != WorldProcessState.INTERRUPTED) {
-                    LOGGER.warn("Cannot suspend non-interrupted process '{}' (current state '{}, program executor '{}')", holder.invoke(GET_WORLD_PROCESS_ID), holder.getObj(STATE), holder.getObj(EXECUTOR).getClass());
-                } else if (holder.getObj(STATE) == WorldProcessState.STOPPED) {
-                    LOGGER.warn("Cannot stop already stopped process '{}' again (current state '{}, program executor '{}')", holder.invoke(GET_WORLD_PROCESS_ID), holder.getObj(STATE), holder.getObj(EXECUTOR).getClass());
+                if (process.getObj(STATE) != WorldProcessState.INTERRUPTED) {
+                    LOGGER.warn("Cannot suspend non-interrupted process '{}' (current state '{}, program executor '{}')", process.invoke(GET_WORLD_PROCESS_ID), process.getObj(STATE), process.getObj(EXECUTOR).getClass());
+                } else if (process.getObj(STATE) == WorldProcessState.STOPPED) {
+                    LOGGER.warn("Cannot stop already stopped process '{}' again (current state '{}, program executor '{}')", process.invoke(GET_WORLD_PROCESS_ID), process.getObj(STATE), process.getObj(EXECUTOR).getClass());
                 } else {
-                    holder.setObj(STATE, WorldProcessState.STOPPED);
+                    process.setObj(STATE, WorldProcessState.STOPPED);
 
                     // Unregister stopped process from parent
-                    if (holder.getParent() != null) {
-                        holder.getParent().removeFromColl(CHILDREN, holder);
+                    if (process.getParent() != null) {
+                        process.getParent().removeFromColl(CHILDREN, process);
                     }
 
                     // Promote the old child processes of this process to child processes of the parent process
-                    for (Process<?> child : new ArrayList<>(holder.getColl(CHILDREN))) {
-                        holder.removeFromColl(CHILDREN, child);
-                        holder.getParent().addToColl(CHILDREN, child);
+                    for (Process<?> child : new ArrayList<>(process.getColl(CHILDREN))) {
+                        process.removeFromColl(CHILDREN, child);
+                        process.getParent().addToColl(CHILDREN, child);
                     }
 
                     if ((Boolean) arguments[0]) {
-                        for (Process<?> child : holder.getColl(CHILDREN)) {
+                        for (Process<?> child : process.getColl(CHILDREN)) {
                             child.invoke(SUSPEND, true);
                         }
                     }
@@ -577,15 +577,15 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             @Override
             public ChildProcess invoke(FunctionInvocation<ChildProcess> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder process = invocation.getCHolder();
 
-                ChildProcess process = new ChildProcess();
-                process.setParent((Process<?>) holder);
-                process.setObj(ENVIRONMENT, new HashMap<>(holder.getObj(ENVIRONMENT)));
-                holder.addToColl(CHILDREN, process);
+                ChildProcess newChildProcess = new ChildProcess();
+                newChildProcess.setParent((Process<?>) process);
+                newChildProcess.setObj(ENVIRONMENT, new HashMap<>(process.getObj(ENVIRONMENT)));
+                process.addToColl(CHILDREN, newChildProcess);
 
                 invocation.next(arguments);
-                return process;
+                return newChildProcess;
             }
 
         });
@@ -596,13 +596,13 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             @Override
             public RootProcess invoke(FunctionInvocation<RootProcess> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder process = invocation.getCHolder();
                 RootProcess root = null;
 
-                if (holder instanceof RootProcess) {
-                    root = (RootProcess) holder;
+                if (process instanceof RootProcess) {
+                    root = (RootProcess) process;
                 } else {
-                    root = ((Process<?>) holder).getParent().invoke(GET_ROOT);
+                    root = ((Process<?>) process).getParent().invoke(GET_ROOT);
                 }
 
                 invocation.next(arguments);
@@ -630,14 +630,14 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             @Override
             public Process<?> invoke(FunctionInvocation<Process<?>> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder process = invocation.getCHolder();
                 Process<?> sessionProcess = null;
 
-                if (holder.getObj(EXECUTOR) instanceof Session) {
-                    sessionProcess = (Process<?>) holder;
+                if (process.getObj(EXECUTOR) instanceof Session) {
+                    sessionProcess = (Process<?>) process;
                 } else {
                     // Check parent process
-                    CFeatureHolder parentProcess = ((Process<?>) holder).getParent();
+                    CFeatureHolder parentProcess = ((Process<?>) process).getParent();
                     if (parentProcess != null) {
                         sessionProcess = parentProcess.invoke(GET_SESSION_PROCESS);
                     }
@@ -691,8 +691,8 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             @Override
             public Program invoke(FunctionInvocation<Program> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
-                Program program = (Program) holder.getObj(SOURCE).getObj(ContentFile.CONTENT);
+                CFeatureHolder process = invocation.getCHolder();
+                Program program = (Program) process.getObj(SOURCE).getObj(ContentFile.CONTENT);
 
                 invocation.next(arguments);
                 return program;
@@ -706,10 +706,10 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             @Override
             public WorldProcessId invoke(FunctionInvocation<WorldProcessId> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder process = invocation.getCHolder();
 
-                int pid = holder.getObj(Process.PID);
-                UUID computerId = holder.invoke(Process.GET_OS).getParent().getUUID();
+                int pid = process.getObj(Process.PID);
+                UUID computerId = process.invoke(Process.GET_OS).getParent().getUUID();
                 WorldProcessId worldProcessId = new WorldProcessId(computerId, pid);
 
                 invocation.next(arguments);
@@ -724,20 +724,20 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder process = invocation.getCHolder();
 
                 int pid = (int) arguments[0];
 
                 // Check given pid
                 Set<Integer> existingPids = new HashSet<>();
-                Process<?> root = holder.invoke(GET_ROOT);
+                Process<?> root = process.invoke(GET_ROOT);
                 existingPids.add(root.getObj(PID));
-                for (Process<?> process : root.invoke(GET_ALL_CHILDREN)) {
-                    existingPids.add(process.getObj(PID));
+                for (Process<?> otherProcess : root.invoke(GET_ALL_CHILDREN)) {
+                    existingPids.add(otherProcess.getObj(PID));
                 }
                 Validate.isTrue(!existingPids.contains(pid), "Pid {} is already used by another process", pid);
 
-                holder.setObj(PID, pid);
+                process.setObj(PID, pid);
                 return invocation.next(arguments);
             }
 
@@ -747,11 +747,11 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder process = invocation.getCHolder();
 
                 // Check read and execution right on source file
-                ContentFile source = holder.getObj(SOURCE);
-                User user = holder.invoke(GET_USER);
+                ContentFile source = process.getObj(SOURCE);
+                User user = process.invoke(GET_USER);
                 if (!source.invoke(File.HAS_RIGHT, user, FileRights.READ) || !source.invoke(File.HAS_RIGHT, user, FileRights.EXECUTE)) {
                     throw new IllegalStateException("Cannot initialize process: No read right and execute right on source file");
                 }
@@ -770,7 +770,7 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                 }
 
                 // Set new executor
-                holder.setObj(EXECUTOR, executor);
+                process.setObj(EXECUTOR, executor);
 
                 return invocation.next(arguments);
             }

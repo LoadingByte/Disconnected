@@ -105,8 +105,8 @@ public class FileManagerProgram extends ProgramExecutor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
-                registerSBPAwareEventHandler(holder, FMP_WP_ChangeDirCommand.class, new ChangeDirCommandHandler(holder), true);
+                FileManagerProgram program = (FileManagerProgram) invocation.getCHolder();
+                registerSBPAwareEventHandler(program, FMP_WP_ChangeDirCommand.class, new ChangeDirCommandHandler(program), true);
 
                 return invocation.next(arguments);
             }
@@ -117,8 +117,8 @@ public class FileManagerProgram extends ProgramExecutor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
-                registerSBPAwareEventHandler(holder, FMP_WP_AddFileCommand.class, new AddFileCommandHandler(holder), true);
+                FileManagerProgram program = (FileManagerProgram) invocation.getCHolder();
+                registerSBPAwareEventHandler(program, FMP_WP_AddFileCommand.class, new AddFileCommandHandler(program), true);
 
                 return invocation.next(arguments);
             }
@@ -129,8 +129,8 @@ public class FileManagerProgram extends ProgramExecutor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FileManagerProgram holder = (FileManagerProgram) invocation.getCHolder();
-                registerSBPAwareEventHandler(holder, FMP_WP_RemoveFileCommand.class, new RemoveFileCommandHandler(holder), true);
+                FileManagerProgram program = (FileManagerProgram) invocation.getCHolder();
+                registerSBPAwareEventHandler(program, FMP_WP_RemoveFileCommand.class, new RemoveFileCommandHandler(program), true);
 
                 return invocation.next(arguments);
             }

@@ -204,10 +204,10 @@ public class User extends ConfigEntry {
             @Override
             public Group invoke(FunctionInvocation<Group> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder user = invocation.getCHolder();
                 Group primaryGroup = null;
-                if (holder.getColl(GROUPS).size() > 0) {
-                    primaryGroup = holder.getColl(GROUPS).get(0);
+                if (user.getColl(GROUPS).size() > 0) {
+                    primaryGroup = user.getColl(GROUPS).get(0);
                 }
 
                 invocation.next(arguments);
@@ -221,19 +221,19 @@ public class User extends ConfigEntry {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder user = invocation.getCHolder();
                 Group primaryGroup = (Group) arguments[0];
 
-                if (holder.getColl(GROUPS).contains(primaryGroup)) {
+                if (user.getColl(GROUPS).contains(primaryGroup)) {
                     // Put the new primary group at the front of the list
-                    List<Group> groups = holder.getColl(GROUPS);
+                    List<Group> groups = user.getColl(GROUPS);
                     groups.remove(primaryGroup);
 
                     for (Group group : groups) {
-                        holder.removeFromColl(GROUPS, group);
+                        user.removeFromColl(GROUPS, group);
                     }
                     for (Group group : groups) {
-                        holder.addToColl(GROUPS, group);
+                        user.addToColl(GROUPS, group);
                     }
                 }
 

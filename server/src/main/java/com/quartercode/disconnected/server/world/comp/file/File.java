@@ -254,12 +254,12 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
             @Override
             public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
 
-                File<?> holder = (File<?>) invocation.getCHolder();
+                File<?> file = (File<?>) invocation.getCHolder();
                 String path = null;
                 // Check for removed files
-                if (holder.getParent() != null) {
-                    String parentPath = holder.getParent().invoke(GET_PATH);
-                    path = parentPath + (parentPath.isEmpty() ? "" : PathUtils.SEPARATOR) + holder.getObj(NAME);
+                if (file.getParent() != null) {
+                    String parentPath = file.getParent().invoke(GET_PATH);
+                    path = parentPath + (parentPath.isEmpty() ? "" : PathUtils.SEPARATOR) + file.getObj(NAME);
                 }
 
                 invocation.next(arguments);
@@ -274,11 +274,11 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
             @Override
             public FileMoveAction invoke(FunctionInvocation<FileMoveAction> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder file = invocation.getCHolder();
 
                 String path = (String) arguments[0];
-                FileSystem fileSystem = holder.invoke(GET_FILE_SYSTEM);
-                FileMoveAction action = holder.invoke(CREATE_MOVE_TO_OTHER_FS, path, fileSystem);
+                FileSystem fileSystem = file.invoke(GET_FILE_SYSTEM);
+                FileMoveAction action = file.invoke(CREATE_MOVE_TO_OTHER_FS, path, fileSystem);
 
                 invocation.next(arguments);
                 return action;
@@ -326,13 +326,13 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
             @Override
             public FileSystem invoke(FunctionInvocation<FileSystem> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder file = invocation.getCHolder();
 
                 FileSystem fileSystem = null;
-                if (holder instanceof RootFile) {
-                    fileSystem = ((RootFile) holder).getParent();
-                } else if (holder instanceof File && ((File<?>) holder).getParent() != null) {
-                    fileSystem = ((File<?>) holder).getParent().invoke(GET_FILE_SYSTEM);
+                if (file instanceof RootFile) {
+                    fileSystem = ((RootFile) file).getParent();
+                } else if (file instanceof File && ((File<?>) file).getParent() != null) {
+                    fileSystem = ((File<?>) file).getParent().invoke(GET_FILE_SYSTEM);
                 }
 
                 invocation.next(arguments);
@@ -347,21 +347,21 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
             @Override
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder file = invocation.getCHolder();
                 User user = (User) arguments[0];
                 char right = (char) arguments[1];
 
                 boolean result;
                 if (user == null || user.invoke(User.IS_SUPERUSER)) {
                     result = true;
-                } else if (holder instanceof RootFile) {
+                } else if (file instanceof RootFile) {
                     // Only superusers (filtered out by the previous check) can add files to the root file
                     result = false;
-                } else if (checkRight(holder, FileRights.OWNER, right) && holder.getObj(File.OWNER).equals(user)) {
+                } else if (checkRight(file, FileRights.OWNER, right) && file.getObj(File.OWNER).equals(user)) {
                     result = true;
-                } else if (checkRight(holder, FileRights.GROUP, right) && user.getColl(User.GROUPS).contains(holder.getObj(File.GROUP))) {
+                } else if (checkRight(file, FileRights.GROUP, right) && user.getColl(User.GROUPS).contains(file.getObj(File.GROUP))) {
                     result = true;
-                } else if (checkRight(holder, FileRights.OTHERS, right)) {
+                } else if (checkRight(file, FileRights.OTHERS, right)) {
                     result = true;
                 } else {
                     result = false;
@@ -384,10 +384,10 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
             @Override
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder file = invocation.getCHolder();
                 User user = (User) arguments[0];
 
-                boolean result = holder.getObj(File.OWNER).equals(user) || user.invoke(User.IS_SUPERUSER);
+                boolean result = file.getObj(File.OWNER).equals(user) || user.invoke(User.IS_SUPERUSER);
 
                 invocation.next(arguments);
                 return result;

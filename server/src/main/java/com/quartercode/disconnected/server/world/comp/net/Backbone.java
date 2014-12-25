@@ -59,12 +59,12 @@ public class Backbone extends WorldFeatureHolder implements PacketProcessor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Backbone holder = (Backbone) invocation.getCHolder();
+                Backbone backbone = (Backbone) invocation.getCHolder();
                 RouterNetInterface child = (RouterNetInterface) arguments[0];
 
                 Backbone currentChildConnection = child.getObj(RouterNetInterface.BACKBONE_CONNECTION);
-                if (currentChildConnection == null || !currentChildConnection.equals(holder)) {
-                    child.setObj(RouterNetInterface.BACKBONE_CONNECTION, holder);
+                if (currentChildConnection == null || !currentChildConnection.equals(backbone)) {
+                    child.setObj(RouterNetInterface.BACKBONE_CONNECTION, backbone);
                 }
 
                 return invocation.next(arguments);
@@ -76,11 +76,11 @@ public class Backbone extends WorldFeatureHolder implements PacketProcessor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Backbone holder = (Backbone) invocation.getCHolder();
+                Backbone backbone = (Backbone) invocation.getCHolder();
                 RouterNetInterface child = (RouterNetInterface) arguments[0];
 
                 Backbone currentChildConnection = child.getObj(RouterNetInterface.BACKBONE_CONNECTION);
-                if (currentChildConnection != null && currentChildConnection.equals(holder)) {
+                if (currentChildConnection != null && currentChildConnection.equals(backbone)) {
                     child.setObj(RouterNetInterface.BACKBONE_CONNECTION, null);
                 }
 

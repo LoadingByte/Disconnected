@@ -80,11 +80,11 @@ public class FileMoveAction extends FileAction {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder fileMoveAction = invocation.getCHolder();
 
-                if (holder.getObj(FILE_SYSTEM) == null) {
+                if (fileMoveAction.getObj(FILE_SYSTEM) == null) {
                     File<?> file = (File<?>) arguments[0];
-                    holder.setObj(FILE_SYSTEM, file.invoke(File.GET_FILE_SYSTEM));
+                    fileMoveAction.setObj(FILE_SYSTEM, file.invoke(File.GET_FILE_SYSTEM));
                 }
 
                 return invocation.next(arguments);
@@ -139,10 +139,10 @@ public class FileMoveAction extends FileAction {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
-                FileSystem targetFileSystem = holder.getObj(FILE_SYSTEM);
-                File<ParentFile<?>> moveFile = holder.getObj(FILE);
-                String targetPath = holder.getObj(PATH);
+                CFeatureHolder fileMoveAction = invocation.getCHolder();
+                FileSystem targetFileSystem = fileMoveAction.getObj(FILE_SYSTEM);
+                File<ParentFile<?>> moveFile = fileMoveAction.getObj(FILE);
+                String targetPath = fileMoveAction.getObj(PATH);
 
                 // Retrieve the old parent file before the movement
                 ParentFile<?> oldParent = moveFile.getParent();
@@ -168,18 +168,18 @@ public class FileMoveAction extends FileAction {
             public Map<File<?>, Character[]> invoke(FunctionInvocation<Map<File<?>, Character[]>> invocation, Object... arguments) {
 
                 User executor = (User) arguments[0];
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder fileMoveAction = invocation.getCHolder();
 
                 Map<File<?>, Character[]> missingRights = new HashMap<>();
 
                 FileRemoveAction action1 = new FileRemoveAction();
-                action1.setObj(FileRemoveAction.FILE, holder.getObj(FILE));
+                action1.setObj(FileRemoveAction.FILE, fileMoveAction.getObj(FILE));
                 missingRights.putAll(action1.invoke(GET_MISSING_RIGHTS, executor));
 
                 FileAddAction action2 = new FileAddAction();
-                action2.setObj(FileAddAction.FILE_SYSTEM, holder.getObj(FILE_SYSTEM));
-                action2.setObj(FileAddAction.FILE, holder.getObj(FILE));
-                action2.setObj(FileAddAction.PATH, holder.getObj(PATH));
+                action2.setObj(FileAddAction.FILE_SYSTEM, fileMoveAction.getObj(FILE_SYSTEM));
+                action2.setObj(FileAddAction.FILE, fileMoveAction.getObj(FILE));
+                action2.setObj(FileAddAction.PATH, fileMoveAction.getObj(PATH));
                 missingRights.putAll(action2.invoke(GET_MISSING_RIGHTS, executor));
 
                 invocation.next(arguments);

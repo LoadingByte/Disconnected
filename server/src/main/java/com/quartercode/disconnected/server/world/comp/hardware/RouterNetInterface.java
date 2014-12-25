@@ -94,11 +94,11 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 if (arguments[0] != null) {
-                    RouterNetInterface holder = (RouterNetInterface) invocation.getCHolder();
+                    RouterNetInterface routerNetInterface = (RouterNetInterface) invocation.getCHolder();
                     Backbone connection = (Backbone) arguments[0];
 
-                    if (!connection.getColl(Backbone.CHILDREN).contains(holder)) {
-                        connection.addToColl(Backbone.CHILDREN, holder);
+                    if (!connection.getColl(Backbone.CHILDREN).contains(routerNetInterface)) {
+                        connection.addToColl(Backbone.CHILDREN, routerNetInterface);
                     }
                 }
 
@@ -112,11 +112,11 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 if (arguments[0] == null) {
-                    RouterNetInterface holder = (RouterNetInterface) invocation.getCHolder();
-                    Backbone oldConnection = holder.getObj(BACKBONE_CONNECTION);
+                    RouterNetInterface routerNetInterface = (RouterNetInterface) invocation.getCHolder();
+                    Backbone oldConnection = routerNetInterface.getObj(BACKBONE_CONNECTION);
 
-                    if (oldConnection != null && oldConnection.getColl(Backbone.CHILDREN).contains(holder)) {
-                        oldConnection.removeFromColl(Backbone.CHILDREN, holder);
+                    if (oldConnection != null && oldConnection.getColl(Backbone.CHILDREN).contains(routerNetInterface)) {
+                        oldConnection.removeFromColl(Backbone.CHILDREN, routerNetInterface);
                     }
                 }
 
@@ -131,11 +131,11 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                RouterNetInterface holder = (RouterNetInterface) invocation.getCHolder();
+                RouterNetInterface routerNetInterface = (RouterNetInterface) invocation.getCHolder();
                 RouterNetInterface neighbour = (RouterNetInterface) arguments[0];
 
-                if (!neighbour.getColl(NEIGHBOURS).contains(holder)) {
-                    neighbour.addToColl(NEIGHBOURS, holder);
+                if (!neighbour.getColl(NEIGHBOURS).contains(routerNetInterface)) {
+                    neighbour.addToColl(NEIGHBOURS, routerNetInterface);
                 }
 
                 return invocation.next(arguments);
@@ -147,11 +147,11 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                RouterNetInterface holder = (RouterNetInterface) invocation.getCHolder();
+                RouterNetInterface routerNetInterface = (RouterNetInterface) invocation.getCHolder();
                 RouterNetInterface neighbour = (RouterNetInterface) arguments[0];
 
-                if (neighbour.getColl(NEIGHBOURS).contains(holder)) {
-                    neighbour.removeFromColl(NEIGHBOURS, holder);
+                if (neighbour.getColl(NEIGHBOURS).contains(routerNetInterface)) {
+                    neighbour.removeFromColl(NEIGHBOURS, routerNetInterface);
                 }
 
                 return invocation.next(arguments);
@@ -165,12 +165,12 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                RouterNetInterface holder = (RouterNetInterface) invocation.getCHolder();
+                RouterNetInterface routerNetInterface = (RouterNetInterface) invocation.getCHolder();
                 NodeNetInterface child = (NodeNetInterface) arguments[0];
 
                 RouterNetInterface currentChildConnection = child.getObj(NodeNetInterface.CONNECTION);
-                if (currentChildConnection == null || !currentChildConnection.equals(holder)) {
-                    child.setObj(NodeNetInterface.CONNECTION, holder);
+                if (currentChildConnection == null || !currentChildConnection.equals(routerNetInterface)) {
+                    child.setObj(NodeNetInterface.CONNECTION, routerNetInterface);
                 }
 
                 return invocation.next(arguments);
@@ -182,11 +182,11 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                RouterNetInterface holder = (RouterNetInterface) invocation.getCHolder();
+                RouterNetInterface routerNetInterface = (RouterNetInterface) invocation.getCHolder();
                 NodeNetInterface child = (NodeNetInterface) arguments[0];
 
                 RouterNetInterface currentChildConnection = child.getObj(NodeNetInterface.CONNECTION);
-                if (currentChildConnection != null && currentChildConnection.equals(holder)) {
+                if (currentChildConnection != null && currentChildConnection.equals(routerNetInterface)) {
                     child.setObj(NodeNetInterface.CONNECTION, null);
                 }
 
@@ -240,13 +240,13 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder routerNetInterface = invocation.getCHolder();
                 RoutedPacket routedPacket = (RoutedPacket) arguments[0];
                 Packet packet = routedPacket.getObj(RoutedPacket.PACKET);
 
                 if (routedPacket.getColl(RoutedPacket.PATH).isEmpty()) {
-                    if (!tryHandOverToChild(holder, packet)) {
-                        routePacket(holder, packet);
+                    if (!tryHandOverToChild(routerNetInterface, packet)) {
+                        routePacket(routerNetInterface, packet);
                     }
                 } else {
                     // Poll the next subnet from the path pseudo-queue
@@ -254,11 +254,11 @@ public class RouterNetInterface extends Hardware implements PacketProcessor {
                     routedPacket.removeFromColl(RoutedPacket.PATH, nextSubnet);
 
                     if (nextSubnet < 0) {
-                        if (!tryHandOverToBackbone(holder, packet)) {
-                            routePacket(holder, packet);
+                        if (!tryHandOverToBackbone(routerNetInterface, packet)) {
+                            routePacket(routerNetInterface, packet);
                         }
-                    } else if (!tryHandOverToNeighbour(holder, routedPacket, packet, nextSubnet)) {
-                        routePacket(holder, packet);
+                    } else if (!tryHandOverToNeighbour(routerNetInterface, routedPacket, packet, nextSubnet)) {
+                        routePacket(routerNetInterface, packet);
                     }
                 }
 

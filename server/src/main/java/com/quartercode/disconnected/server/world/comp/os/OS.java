@@ -152,8 +152,8 @@ public class OS extends WorldChildFeatureHolder<Computer> {
             @Override
             public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
-                boolean running = holder.getObj(PROC_MODULE).getObj(ProcModule.ROOT_PROCESS).getObj(Process.STATE) != WorldProcessState.STOPPED;
+                CFeatureHolder os = invocation.getCHolder();
+                boolean running = os.getObj(PROC_MODULE).getObj(ProcModule.ROOT_PROCESS).getObj(Process.STATE) != WorldProcessState.STOPPED;
 
                 invocation.next(arguments);
                 return running;

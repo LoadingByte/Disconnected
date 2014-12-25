@@ -82,8 +82,8 @@ public class FileRemoveAction extends FileAction {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
-                File<ParentFile<?>> removeFile = holder.getObj(FILE);
+                CFeatureHolder fileRemoveAction = invocation.getCHolder();
+                File<ParentFile<?>> removeFile = fileRemoveAction.getObj(FILE);
 
                 Validate.validState(removeFile.getParent() != null, "File for removal is not stored on any file system (parent file == null)");
 

@@ -126,14 +126,14 @@ public class FileAddAction extends FileAction {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
-                File<ParentFile<?>> addFile = holder.getObj(FILE);
+                CFeatureHolder fileAddAction = invocation.getCHolder();
+                File<ParentFile<?>> addFile = fileAddAction.getObj(FILE);
 
-                String path = holder.getObj(PATH);
+                String path = fileAddAction.getObj(PATH);
                 String pathToParent = path.contains(PathUtils.SEPARATOR) ? path.substring(0, path.lastIndexOf(PathUtils.SEPARATOR)) : "";
                 String[] pathParts = pathToParent.split(PathUtils.SEPARATOR);
 
-                File<?> current = holder.getObj(FILE_SYSTEM).getObj(FileSystem.ROOT);
+                File<?> current = fileAddAction.getObj(FILE_SYSTEM).getObj(FileSystem.ROOT);
                 for (String pathPart : pathParts) {
                     if (!pathPart.isEmpty()) {
                         File<?> nextCurrent = current.invoke(ParentFile.GET_CHILD_BY_NAME, pathPart);
@@ -147,7 +147,7 @@ public class FileAddAction extends FileAction {
                             current.addToColl(ParentFile.CHILDREN, directory);
                             nextCurrent = directory;
                         } else if (! (nextCurrent instanceof ParentFile)) {
-                            throw new InvalidPathException(holder.getObj(FILE_SYSTEM), path);
+                            throw new InvalidPathException(fileAddAction.getObj(FILE_SYSTEM), path);
                         }
 
                         current = nextCurrent;
@@ -163,18 +163,18 @@ public class FileAddAction extends FileAction {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder fileAddAction = invocation.getCHolder();
 
-                String path = holder.getObj(PATH);
+                String path = fileAddAction.getObj(PATH);
                 String pathToParent = path.contains(PathUtils.SEPARATOR) ? path.substring(0, path.lastIndexOf(PathUtils.SEPARATOR)) : "";
-                File<?> parent = holder.getObj(FILE_SYSTEM).invoke(FileSystem.GET_FILE, pathToParent);
+                File<?> parent = fileAddAction.getObj(FILE_SYSTEM).invoke(FileSystem.GET_FILE, pathToParent);
 
                 String addFileName = path.substring(path.lastIndexOf(PathUtils.SEPARATOR) + 1);
                 if (parent.invoke(ParentFile.GET_CHILD_BY_NAME, addFileName) != null) {
-                    throw new OccupiedPathException(holder.getObj(FILE_SYSTEM), path);
+                    throw new OccupiedPathException(fileAddAction.getObj(FILE_SYSTEM), path);
                 }
 
-                File<ParentFile<?>> addFile = holder.getObj(FILE);
+                File<ParentFile<?>> addFile = fileAddAction.getObj(FILE);
                 addFile.setObj(File.NAME, addFileName);
                 parent.addToColl(ParentFile.CHILDREN, addFile);
 
@@ -191,9 +191,9 @@ public class FileAddAction extends FileAction {
                 User executor = (User) arguments[0];
                 File<?> missingRightsFile = null;
 
-                CFeatureHolder holder = invocation.getCHolder();
-                String[] parts = holder.getObj(PATH).split(PathUtils.SEPARATOR);
-                File<?> current = holder.getObj(FILE_SYSTEM).getObj(FileSystem.ROOT);
+                CFeatureHolder fileAddAction = invocation.getCHolder();
+                String[] parts = fileAddAction.getObj(PATH).split(PathUtils.SEPARATOR);
+                File<?> current = fileAddAction.getObj(FILE_SYSTEM).getObj(FileSystem.ROOT);
                 for (String part : parts) {
                     File<?> newCurrent = current.invoke(ParentFile.GET_CHILD_BY_NAME, part);
 

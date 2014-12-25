@@ -124,11 +124,11 @@ public class SocketConnectionTest {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                Socket holder = (Socket) invocation.getCHolder();
+                Socket socket = (Socket) invocation.getCHolder();
 
                 if ((int) arguments[0] < 0) {
-                    int newSequenceNumber = holder.getObj(Socket.LOCAL_PORT);
-                    holder.setObj(Socket.CURRENT_SEQ_NUMBER, newSequenceNumber);
+                    int newSequenceNumber = socket.getObj(Socket.LOCAL_PORT);
+                    socket.setObj(Socket.CURRENT_SEQ_NUMBER, newSequenceNumber);
 
                     // Cancel the invocation chain; the next generator should not be invoked
                     return null;

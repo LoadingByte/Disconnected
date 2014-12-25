@@ -145,9 +145,9 @@ public class ProcModule extends OSModule {
             @Override
             public Integer invoke(FunctionInvocation<Integer> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
-                int value = holder.getObj(NEXT_PID_VALUE);
-                holder.setObj(NEXT_PID_VALUE, value + 1);
+                CFeatureHolder procModule = invocation.getCHolder();
+                int value = procModule.getObj(NEXT_PID_VALUE);
+                procModule.setObj(NEXT_PID_VALUE, value + 1);
 
                 invocation.next(arguments);
                 return value;
@@ -170,13 +170,13 @@ public class ProcModule extends OSModule {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder procModule = invocation.getCHolder();
 
                 // Only invoke on bootstrap
                 if ((Boolean) arguments[0]) {
                     RootProcess root = new RootProcess();
 
-                    FSModule fsModule = ((ProcModule) holder).getParent().getObj(OS.FS_MODULE);
+                    FSModule fsModule = ((ProcModule) procModule).getParent().getObj(OS.FS_MODULE);
 
                     // Get environment
                     Map<String, String> environment = new HashMap<>();
@@ -207,8 +207,8 @@ public class ProcModule extends OSModule {
                     }
 
                     // Start root process
-                    holder.setObj(ROOT_PROCESS, root);
-                    root.invoke(Process.INITIALIZE, holder.invoke(NEXT_PID));
+                    procModule.setObj(ROOT_PROCESS, root);
+                    root.invoke(Process.INITIALIZE, procModule.invoke(NEXT_PID));
                     ProgramExecutor rootProgram = root.getObj(Process.EXECUTOR);
                     rootProgram.setObj(Session.USER, superuser);
                     rootProgram.invoke(ProgramExecutor.RUN);
@@ -224,15 +224,15 @@ public class ProcModule extends OSModule {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
+                CFeatureHolder procModule = invocation.getCHolder();
 
                 // Only invoke on shutdown
                 if (! ((Boolean) arguments[0])) {
-                    holder.getObj(ROOT_PROCESS).invoke(Process.INTERRUPT);
+                    procModule.getObj(ROOT_PROCESS).invoke(Process.INTERRUPT);
                     // Kill the process tree after 5 seconds
                     FunctionCallSchedulerTask killTask = new FunctionCallSchedulerTask();
                     killTask.setObj(FunctionCallSchedulerTask.FUNCTION_DEFINITION, new FeatureDefinitionReference<FunctionDefinition<?>>(ProcModule.class, KILL));
-                    holder.get(SCHEDULER).schedule("kill", "computerProgramUpdate", TickService.DEFAULT_TICKS_PER_SECOND * 5, killTask);
+                    procModule.get(SCHEDULER).schedule("kill", "computerProgramUpdate", TickService.DEFAULT_TICKS_PER_SECOND * 5, killTask);
                 }
 
                 return invocation.next(arguments);
@@ -246,9 +246,9 @@ public class ProcModule extends OSModule {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                CFeatureHolder holder = invocation.getCHolder();
-                holder.getObj(ROOT_PROCESS).invoke(Process.STOP);
-                holder.setObj(ROOT_PROCESS, null);
+                CFeatureHolder procModule = invocation.getCHolder();
+                procModule.getObj(ROOT_PROCESS).invoke(Process.STOP);
+                procModule.setObj(ROOT_PROCESS, null);
 
                 return invocation.next(arguments);
             }
