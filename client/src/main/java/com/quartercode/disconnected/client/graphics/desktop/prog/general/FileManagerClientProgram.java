@@ -216,6 +216,8 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
         @Override
         protected void registerEventHandlers() {
 
+            super.registerEventHandlers();
+
             registerEventHandler(FMP_SBPWPU_UpdateViewCommand.class, new UpdateViewCommandHandler());
             registerEventHandler(GP_SBPWPU_ErrorEvent.class, new GP_SBPWPU_ErrorEventPopupHandler(this, "", "Popup.message", true));
         }

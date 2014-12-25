@@ -489,14 +489,15 @@ public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatur
                 if (process.getObj(STATE) != WorldProcessState.RUNNING) {
                     LOGGER.warn("Cannot interrupt non-running process '{}' (current state '{}, program executor '{}')", process.invoke(GET_WORLD_PROCESS_ID), process.getObj(STATE), process.getObj(EXECUTOR).getClass());
                 } else {
-                    process.setObj(STATE, WorldProcessState.INTERRUPTED);
-
                     // Send SBPWorldProcessUserInterruptCommand
                     SBPWorldProcessUserId wpuId = process.getObj(WORLD_PROCESS_USER);
                     Bridge bridge = process.getBridge();
                     if (wpuId != null && bridge != null) {
                         bridge.send(new SBPWorldProcessUserInterruptCommand(wpuId));
                     }
+
+                    // Actually interrupt the process
+                    process.setObj(STATE, WorldProcessState.INTERRUPTED);
 
                     if ((Boolean) arguments[0]) {
                         for (Process<?> child : process.getColl(CHILDREN)) {

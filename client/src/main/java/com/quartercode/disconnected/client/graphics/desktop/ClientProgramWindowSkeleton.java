@@ -109,7 +109,11 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
 
     /**
      * A {@link WorldProcessId} that identifies the running process on the server.
-     * It should be used for sending server events
+     * It should be used for sending server events.<br>
+     * <br>
+     * Note that this variable might be {@code null} if the world process is no longer running.
+     * However, that is only the case if the window was closed due to an {@link SBPWorldProcessUserInterruptCommand} that has been caught by a default event listener.
+     * Therefore, checks only need to be added to {@link #addCloseListener(Runnable) closing listeners}.
      */
     protected WorldProcessId       worldProcessId;
 
@@ -161,7 +165,9 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
             @Override
             public void run() {
 
-                bridge.send(new WorldProcessInterruptCommand(worldProcessId.getPid(), false));
+                if (worldProcessId != null) {
+                    bridge.send(new WorldProcessInterruptCommand(worldProcessId.getPid(), false));
+                }
             }
 
         });
@@ -178,6 +184,9 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
 
             @Override
             public void handle(SBPWorldProcessUserInterruptCommand event) {
+
+                // The world process is no longer running
+                worldProcessId = null;
 
                 close();
             }
