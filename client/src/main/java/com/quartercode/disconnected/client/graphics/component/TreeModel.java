@@ -18,7 +18,9 @@
 
 package com.quartercode.disconnected.client.graphics.component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.lang3.Validate;
 import de.matthiasmann.twl.model.AbstractTreeTableModel;
 import de.matthiasmann.twl.model.AbstractTreeTableNode;
@@ -82,11 +84,11 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
     }
 
     @Override
-    public TreeNode[] getChildren() {
+    public List<TreeNode> getChildren() {
 
-        TreeNode[] children = new TreeNode[getNumChildren()];
+        List<TreeNode> children = new ArrayList<>(getNumChildren());
         for (int index = 0; index < getNumChildren(); index++) {
-            children[index] = getChild(index);
+            children.add(getChild(index));
         }
         return children;
     }
@@ -171,11 +173,11 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
         }
 
         @Override
-        public TreeNode[] getChildren() {
+        public List<TreeNode> getChildren() {
 
-            TreeNode[] children = new TreeNode[getNumChildren()];
+            List<TreeNode> children = new ArrayList<>(getNumChildren());
             for (int index = 0; index < getNumChildren(); index++) {
-                children[index] = getChild(index);
+                children.add(getChild(index));
             }
             return children;
         }

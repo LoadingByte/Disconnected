@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.client.graphics.component;
 
+import java.util.List;
 import de.matthiasmann.twl.model.TreeTableNode;
 
 /**
@@ -54,7 +55,7 @@ public interface TreeNode extends TreeTableNode {
      * 
      * @return All direct child nodes.
      */
-    public TreeNode[] getChildren();
+    public List<TreeNode> getChildren();
 
     /**
      * Returns the direct child node this node holds at the given index.
