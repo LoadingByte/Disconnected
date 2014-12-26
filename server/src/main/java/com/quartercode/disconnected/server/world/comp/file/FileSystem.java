@@ -29,7 +29,7 @@ import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.classmod.util.PropertyAccessorFactory;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
-import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
+import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 
 /**
@@ -39,7 +39,7 @@ import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
  * 
  * @see File
  */
-public class FileSystem extends WorldFeatureHolder implements DerivableSize {
+public class FileSystem extends WorldChildFeatureHolder<FileSystemHolder> implements DerivableSize {
 
     // ----- Properties -----
 
@@ -223,6 +223,14 @@ public class FileSystem extends WorldFeatureHolder implements DerivableSize {
 
         GET_SIZE.addExecutor("fileSystemSize", FileSystem.class, PropertyAccessorFactory.createGet(SIZE));
 
+    }
+
+    /**
+     * Creates a new file system.
+     */
+    public FileSystem() {
+
+        setParentType(FileSystemHolder.class);
     }
 
 }

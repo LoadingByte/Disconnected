@@ -25,6 +25,7 @@ import com.quartercode.classmod.extra.valuefactory.ValueFactory;
 import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
+import com.quartercode.disconnected.server.world.comp.file.FileSystemHolder;
 import com.quartercode.disconnected.server.world.comp.hardware.Mainboard.NeedsMainboardSlot;
 
 /**
@@ -36,7 +37,7 @@ import com.quartercode.disconnected.server.world.comp.hardware.Mainboard.NeedsMa
  * @see FileSystem
  */
 @NeedsMainboardSlot
-public class HardDrive extends Hardware {
+public class HardDrive extends Hardware implements FileSystemHolder {
 
     // ----- Properties -----
 
