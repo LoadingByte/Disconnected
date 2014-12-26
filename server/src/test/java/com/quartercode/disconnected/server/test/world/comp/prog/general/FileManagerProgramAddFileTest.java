@@ -120,7 +120,7 @@ public class FileManagerProgramAddFileTest extends AbstractComplexComputerTest {
 
         executeProgramAndSendChangeDirCommand(mainRootProcess(), DIR_PATH);
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_WPUSBP_UpdateViewCommandFailHandler(), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FailEventHandler(), UPDATE_VIEW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
         bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GP_SBPWPU_ErrorEvent>() {
@@ -151,7 +151,7 @@ public class FileManagerProgramAddFileTest extends AbstractComplexComputerTest {
 
         executeProgramAndSendChangeDirCommand(mainRootProcess(), dir);
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_WPUSBP_UpdateViewCommandFailHandler(), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FailEventHandler(), UPDATE_VIEW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
         bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GP_SBPWPU_ErrorEvent>() {
@@ -177,7 +177,7 @@ public class FileManagerProgramAddFileTest extends AbstractComplexComputerTest {
 
         executeProgramAndSendChangeDirCommand(mainRootProcess(), "/");
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_WPUSBP_UpdateViewCommandFailHandler(), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FailEventHandler(), UPDATE_VIEW_PREDICATE);
 
         final Event event = createAddFileCommand(".");
 
@@ -210,7 +210,7 @@ public class FileManagerProgramAddFileTest extends AbstractComplexComputerTest {
 
         executeProgramAndSendChangeDirCommand(mainRootProcess(), DIR_PATH);
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_WPUSBP_UpdateViewCommandFailHandler(), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FailEventHandler(), UPDATE_VIEW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
         bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GP_SBPWPU_ErrorEvent>() {
@@ -239,7 +239,7 @@ public class FileManagerProgramAddFileTest extends AbstractComplexComputerTest {
 
         executeProgramAndSendChangeDirCommand(mainRootProcess(), DIR_PATH);
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_WPUSBP_UpdateViewCommandFailHandler(), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FailEventHandler(), UPDATE_VIEW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
         bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GP_SBPWPU_ErrorEvent>() {
@@ -273,7 +273,7 @@ public class FileManagerProgramAddFileTest extends AbstractComplexComputerTest {
         // Remove all rights from the parent file
         parentFile.setObj(File.RIGHTS, new FileRights());
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_WPUSBP_UpdateViewCommandFailHandler(), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FailEventHandler(), UPDATE_VIEW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
         bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GP_SBPWPU_ErrorEvent>() {

@@ -109,7 +109,7 @@ public class FileAddAction extends FileAction {
      * </tr>
      * <tr>
      * <td>{@link OccupiedPathException}</td>
-     * <td>The file path, under which the new file should be added, is already used by annother file.</td>
+     * <td>The file path, under which the new file should be added, is already used by another file.</td>
      * </tr>
      * <tr>
      * <td>{@link OutOfSpaceException}</td>

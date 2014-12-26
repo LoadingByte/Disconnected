@@ -54,11 +54,11 @@ import com.quartercode.eventbridge.extra.predicate.TypePredicate;
 
 public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTest {
 
+    private static final EventPredicate<?> UPDATE_VIEW_PREDICATE = new TypePredicate<>(FMP_SBPWPU_UpdateViewCommand.class);
+
     private static final String            FS_MOUNTPOINT         = CommonFiles.USER_MOUNTPOINT;
     private static final String            ROOT                  = "/" + FS_MOUNTPOINT;
     private static final String            TEST_PATH             = ROOT + "/test1/test2/test.txt";
-
-    private static final EventPredicate<?> UPDATE_VIEW_PREDICATE = new TypePredicate<>(FMP_SBPWPU_UpdateViewCommand.class);
 
     private final ContentFile              path1File             = new ContentFile();
     private WorldProcessId                 processId;
@@ -116,7 +116,7 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
 
         executeProgramAndSendChangeDirCommand(mainRootProcess(), resolve(ROOT, "test1/test2"));
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_WPUSBP_UpdateViewCommandFailHandler(), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FailEventHandler(), UPDATE_VIEW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
         bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GP_SBPWPU_ErrorEvent>() {
@@ -147,7 +147,7 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
 
         executeProgramAndSendChangeDirCommand(mainRootProcess(), dir);
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_WPUSBP_UpdateViewCommandFailHandler(), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FailEventHandler(), UPDATE_VIEW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
         bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GP_SBPWPU_ErrorEvent>() {
@@ -173,7 +173,7 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
 
         executeProgramAndSendChangeDirCommand(mainRootProcess(), "/");
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_WPUSBP_UpdateViewCommandFailHandler(), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FailEventHandler(), UPDATE_VIEW_PREDICATE);
 
         final Event event = createRemoveFileCommand(".");
 
@@ -211,7 +211,7 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
         // Remove all rights from the file
         path1File.setObj(File.RIGHTS, new FileRights());
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_WPUSBP_UpdateViewCommandFailHandler(), UPDATE_VIEW_PREDICATE);
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FailEventHandler(), UPDATE_VIEW_PREDICATE);
 
         final MutableBoolean invoked = new MutableBoolean();
         bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GP_SBPWPU_ErrorEvent>() {

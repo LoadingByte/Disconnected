@@ -248,14 +248,14 @@ public class WorldGenerator {
         User superuser = new User();
         superuser.setObj(User.NAME, User.SUPERUSER_NAME);
 
-        // Generate debug file systems
-        FSModule fsModule = os.getObj(OS.FS_MODULE);
-        addKnownFs(fsModule, systemMedium.getObj(HardDrive.FILE_SYSTEM), CommonFiles.SYSTEM_MOUNTPOINT);
-        addKnownFs(fsModule, userMedium.getObj(HardDrive.FILE_SYSTEM), CommonFiles.USER_MOUNTPOINT);
-
         // Fill debug file systems
         addSystemFiles(systemFs, superuser);
         addUserFiles(userFs, superuser);
+
+        // Add debug known file systems
+        FSModule fsModule = os.getObj(OS.FS_MODULE);
+        addKnownFs(fsModule, systemFs, CommonFiles.SYSTEM_MOUNTPOINT);
+        addKnownFs(fsModule, userFs, CommonFiles.USER_MOUNTPOINT);
 
         return computer;
     }

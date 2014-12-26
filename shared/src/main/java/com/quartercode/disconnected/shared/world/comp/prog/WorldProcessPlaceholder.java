@@ -29,15 +29,17 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class WorldProcessPlaceholder implements Serializable {
 
-    private static final long               serialVersionUID = 166313506712944198L;
+    private static final long                      serialVersionUID = 8959524350542547614L;
 
-    private final WorldProcessId            id;
-    private final WorldProcessState         state;
-    private final String                    user;
-    private final WorldProcessPlaceholder[] children;                              // Optional
+    private static final WorldProcessPlaceholder[] EMPTY_ARRAY      = new WorldProcessPlaceholder[0];
 
-    private final String                    sourcePath;
-    private final String                    programName;
+    private final WorldProcessId                   id;
+    private final WorldProcessState                state;
+    private final String                           user;
+    private final WorldProcessPlaceholder[]        children;                                         // Optional
+
+    private final String                           sourcePath;
+    private final String                           programName;
 
     /**
      * Creates a new process placeholder <b>without</b> the child processes of the represented process using the provided data.
@@ -74,7 +76,7 @@ public class WorldProcessPlaceholder implements Serializable {
         this.id = id;
         this.state = state;
         this.user = user;
-        this.children = children == null ? null : children.clone();
+        this.children = children == null || children.length == 0 ? null : children.clone();
         this.sourcePath = sourcePath;
         this.programName = programName;
     }
@@ -120,11 +122,11 @@ public class WorldProcessPlaceholder implements Serializable {
      * That might be the case if the information is not needed and would result in useless data being sent over the network.
      * 
      * @return The child processes of the represented process.
-     *         May be {@code null} if the creator of the placeholder didn't want to add this information.
+     *         May be empty if the creator of the placeholder didn't want to add this information (e.g. by supplying {@code null}).
      */
     public WorldProcessPlaceholder[] getChildren() {
 
-        return children == null ? null : children.clone();
+        return children == null ? EMPTY_ARRAY : children.clone();
     }
 
     /**

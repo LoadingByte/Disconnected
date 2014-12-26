@@ -49,7 +49,7 @@ public class GP_SBPWPU_ErrorEvent extends SBPWorldProcessUserCommand {
      *        If the WPU would be a graphical client, this could be put into {@link MessageFormat#format(String, Object...)} along
      *        with the localization string looked up using the error type.
      */
-    public GP_SBPWPU_ErrorEvent(SBPWorldProcessUserId worldProcessUserId, String type, String[] arguments) {
+    public GP_SBPWPU_ErrorEvent(SBPWorldProcessUserId worldProcessUserId, String type, String... arguments) {
 
         this.worldProcessUserId = worldProcessUserId;
         this.type = type;

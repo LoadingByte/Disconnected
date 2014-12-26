@@ -70,6 +70,7 @@ public class Program extends WorldFeatureHolder implements DerivableSize {
 
         NAME = factory(PropertyDefinitionFactory.class).create("name", new StandardStorage<>());
         VERSION = factory(PropertyDefinitionFactory.class).create("version", new StandardStorage<>());
+
         VULN_CONTAINER = factory(PropertyDefinitionFactory.class).create("vulnContainer", new StandardStorage<>(), new ValueFactory<VulnContainer>() {
 
             @Override

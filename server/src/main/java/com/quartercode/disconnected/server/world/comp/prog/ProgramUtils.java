@@ -106,7 +106,7 @@ public class ProgramUtils {
         ContentFile sourceFile = process.getObj(Process.SOURCE);
         FSModule fsModule = process.invoke(Process.GET_OS).getObj(OS.FS_MODULE);
         String localSourcePath = sourceFile.invoke(File.GET_PATH);
-        String mountpoint = fsModule.invoke(FSModule.GET_KNOWN_BY_FS, sourceFile.invoke(File.GET_FILE_SYSTEM)).getObj(KnownFS.MOUNTPOINT);
+        String mountpoint = fsModule.invoke(FSModule.GET_KNOWN_BY_FS, sourceFile.invoke(File.GET_FS)).getObj(KnownFS.MOUNTPOINT);
         String sourcePath = PathUtils.resolve(PathUtils.SEPARATOR + mountpoint, localSourcePath);
 
         String programName = getProgramName(process.getObj(Process.EXECUTOR).getClass());

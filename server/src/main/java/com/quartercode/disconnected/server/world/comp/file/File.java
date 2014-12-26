@@ -55,7 +55,7 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
      * Note that this object is not allowed to be modified.
      * If you wish to obtain an instance of the default file rights, please use the {@link FileRights#FileRights(FileRights)} copy constructor.
      */
-    // TODO: Make the default {@link FileRights} dynamic
+    // TODO: Make the default FileRights dynamic
     public static final FileRights                           DEFAULT_FILE_RIGHTS = new FileRights("o:r,u:dw");
 
     // ----- Properties -----
@@ -198,7 +198,7 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
     /**
      * Returns the {@link FileSystem} which is hosting the file.
      */
-    public static final FunctionDefinition<FileSystem>       GET_FILE_SYSTEM;
+    public static final FunctionDefinition<FileSystem>       GET_FS;
 
     /**
      * Returns whether the given {@link User} has access to the given file right on the file.
@@ -256,7 +256,8 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
 
                 File<?> file = (File<?>) invocation.getCHolder();
                 String path = null;
-                // Check for removed files
+                // Check to avoid errors when this method is called on removed/unlinked files
+                // Normally, the root file terminates the recursion by returning an empty string
                 if (file.getParent() != null) {
                     String parentPath = file.getParent().invoke(GET_PATH);
                     path = parentPath + (parentPath.isEmpty() ? "" : PathUtils.SEPARATOR) + file.getObj(NAME);
@@ -277,7 +278,7 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
                 CFeatureHolder file = invocation.getCHolder();
 
                 String path = (String) arguments[0];
-                FileSystem fileSystem = file.invoke(GET_FILE_SYSTEM);
+                FileSystem fileSystem = file.invoke(GET_FS);
                 FileMoveAction action = file.invoke(CREATE_MOVE_TO_OTHER_FS, path, fileSystem);
 
                 invocation.next(arguments);
@@ -320,8 +321,8 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
 
         });
 
-        GET_FILE_SYSTEM = factory(FunctionDefinitionFactory.class).create("getFileSystem", new Class[0]);
-        GET_FILE_SYSTEM.addExecutor("default", File.class, new FunctionExecutor<FileSystem>() {
+        GET_FS = factory(FunctionDefinitionFactory.class).create("getFs", new Class[0]);
+        GET_FS.addExecutor("default", File.class, new FunctionExecutor<FileSystem>() {
 
             @Override
             public FileSystem invoke(FunctionInvocation<FileSystem> invocation, Object... arguments) {
@@ -332,7 +333,7 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
                 if (file instanceof RootFile) {
                     fileSystem = ((RootFile) file).getParent();
                 } else if (file instanceof File && ((File<?>) file).getParent() != null) {
-                    fileSystem = ((File<?>) file).getParent().invoke(GET_FILE_SYSTEM);
+                    fileSystem = ((File<?>) file).getParent().invoke(GET_FS);
                 }
 
                 invocation.next(arguments);

@@ -147,7 +147,7 @@ public class FileManagerProgram extends ProgramExecutor {
     @RequiredArgsConstructor
     public static class ChangeDirCommandHandler implements SBPAwareEventHandler<FMP_WP_ChangeDirCommand> {
 
-        private final FileManagerProgram holder;
+        private final FileManagerProgram program;
 
         @Override
         public void handle(FMP_WP_ChangeDirCommand event, SBPIdentity sender) {
@@ -163,29 +163,29 @@ public class FileManagerProgram extends ProgramExecutor {
             // Verify that the currently set dir is still valid before updating.
             // If it is, the change update is applied to the valid current dir.
             // If it isn't, the current is set to the next valid dir and the requested change is ignored.
-            if (verifyAndUpdateCurrentDir(holder.getObj(CURRENT_DIR))) {
-                String newDirPath = PathUtils.resolve(holder.getObj(CURRENT_DIR), change);
+            if (verifyAndUpdateCurrentDir(program.getObj(CURRENT_DIR))) {
+                String newDirPath = PathUtils.resolve(program.getObj(CURRENT_DIR), change);
 
                 int validationResult = verifyDir(newDirPath);
 
                 if (validationResult == 0) {
                     // New dir is valid -> update current dir and send change to SBP later on
-                    holder.setObj(CURRENT_DIR, newDirPath);
+                    program.setObj(CURRENT_DIR, newDirPath);
                 } else if (validationResult == 3) {
                     // Missing read right on new dir -> do not update current dir and send error message to SBP
-                    SBPWorldProcessUserId wpuId = holder.getParent().getObj(Process.WORLD_PROCESS_USER);
-                    holder.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "fileList.missingReadRight", new String[] { newDirPath }));
+                    SBPWorldProcessUserId wpuId = program.getParent().getObj(Process.WORLD_PROCESS_USER);
+                    program.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "fileList.missingReadRight", newDirPath));
                     return;
                 } else {
                     // New dir does not exist or is not a directory -> do not update current dir
                     return;
                 }
 
-                holder.setObj(CURRENT_DIR, newDirPath);
+                program.setObj(CURRENT_DIR, newDirPath);
             }
 
             // Send the updated dir to the SBP
-            sendUpdateView(holder.getParent(), holder.getObj(CURRENT_DIR));
+            sendUpdateView(program.getParent(), program.getObj(CURRENT_DIR));
         }
 
         /*
@@ -200,7 +200,7 @@ public class FileManagerProgram extends ProgramExecutor {
                 verifyAndUpdateCurrentDir(PathUtils.resolve(currentDir, ".."));
                 return false;
             } else {
-                holder.setObj(CURRENT_DIR, currentDir);
+                program.setObj(CURRENT_DIR, currentDir);
                 return true;
             }
         }
@@ -216,7 +216,7 @@ public class FileManagerProgram extends ProgramExecutor {
 
             if (!path.equals(PathUtils.SEPARATOR)) {
                 try {
-                    Process<?> process = holder.getParent();
+                    Process<?> process = program.getParent();
                     FSModule fsModule = process.invoke(Process.GET_OS).getObj(OS.FS_MODULE);
                     File<?> dir = fsModule.invoke(FSModule.GET_FILE, path);
 
@@ -249,19 +249,19 @@ public class FileManagerProgram extends ProgramExecutor {
     @RequiredArgsConstructor
     public static class AddFileCommandHandler implements SBPAwareEventHandler<FMP_WP_AddFileCommand> {
 
-        private final FileManagerProgram holder;
+        private final FileManagerProgram program;
 
         @Override
         public void handle(FMP_WP_AddFileCommand event, SBPIdentity sender) {
 
-            Validate.validState(!holder.getObj(CURRENT_DIR).equals(PathUtils.SEPARATOR), "Cannot create a file when the current path is set to the absolute root");
+            Validate.validState(!program.getObj(CURRENT_DIR).equals(PathUtils.SEPARATOR), "Cannot create a file when the current path is set to the absolute root");
 
             String fileName = event.getFileName();
             Validate.notBlank(fileName, "File name cannot be blank");
 
             if (PathUtils.split(fileName).length != 1) {
-                SBPWorldProcessUserId wpuId = holder.getParent().getObj(Process.WORLD_PROCESS_USER);
-                holder.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "createFile.invalidFileName", new String[] { fileName }));
+                SBPWorldProcessUserId wpuId = program.getParent().getObj(Process.WORLD_PROCESS_USER);
+                program.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "createFile.invalidFileName", fileName));
                 return;
             }
 
@@ -274,15 +274,15 @@ public class FileManagerProgram extends ProgramExecutor {
 
         private void addFile(String fileName, String fileType) {
 
-            SBPWorldProcessUserId wpuId = holder.getParent().getObj(Process.WORLD_PROCESS_USER);
-            Process<?> process = holder.getParent();
+            SBPWorldProcessUserId wpuId = program.getParent().getObj(Process.WORLD_PROCESS_USER);
+            Process<?> process = program.getParent();
             FSModule fsModule = process.invoke(Process.GET_OS).getObj(OS.FS_MODULE);
 
-            String currentDir = holder.getObj(CURRENT_DIR);
+            String currentDir = program.getObj(CURRENT_DIR);
             String filePath = PathUtils.resolve(currentDir, fileName);
 
             if (filePath.equals(currentDir)) {
-                holder.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "createFile.invalidFileName", new String[] { fileName }));
+                program.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "createFile.invalidFileName", fileName));
                 return;
             }
 
@@ -301,14 +301,14 @@ public class FileManagerProgram extends ProgramExecutor {
             if (addAction.invoke(FileAddAction.IS_EXECUTABLE_BY, sessionUser)) {
                 try {
                     addAction.invoke(FileAddAction.EXECUTE);
-                    sendUpdateView(process, holder.getObj(CURRENT_DIR));
+                    sendUpdateView(process, program.getObj(CURRENT_DIR));
                 } catch (OccupiedPathException e) {
-                    holder.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "createFile.occupiedPath", new String[] { filePath }));
+                    program.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "createFile.occupiedPath", filePath));
                 } catch (OutOfSpaceException e) {
-                    holder.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "createFile.outOfSpace", new String[] { filePath }));
+                    program.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "createFile.outOfSpace", filePath));
                 }
             } else {
-                holder.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "createFile.missingWriteRight", new String[] { filePath }));
+                program.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "createFile.missingWriteRight", filePath));
             }
         }
 
@@ -322,19 +322,19 @@ public class FileManagerProgram extends ProgramExecutor {
     @RequiredArgsConstructor
     public static class RemoveFileCommandHandler implements SBPAwareEventHandler<FMP_WP_RemoveFileCommand> {
 
-        private final FileManagerProgram holder;
+        private final FileManagerProgram program;
 
         @Override
         public void handle(FMP_WP_RemoveFileCommand event, SBPIdentity sender) {
 
-            Validate.validState(!holder.getObj(CURRENT_DIR).equals(PathUtils.SEPARATOR), "Cannot delete a file when the current path is set to the absolute root");
+            Validate.validState(!program.getObj(CURRENT_DIR).equals(PathUtils.SEPARATOR), "Cannot delete a file when the current path is set to the absolute root");
 
             String fileName = event.getFileName();
             Validate.notBlank(fileName, "File name cannot be blank");
 
             if (PathUtils.split(fileName).length != 1) {
-                SBPWorldProcessUserId wpuId = holder.getParent().getObj(Process.WORLD_PROCESS_USER);
-                holder.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "removeFile.invalidFileName", new String[] { fileName }));
+                SBPWorldProcessUserId wpuId = program.getParent().getObj(Process.WORLD_PROCESS_USER);
+                program.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "removeFile.invalidFileName", fileName));
                 return;
             }
 
@@ -343,15 +343,15 @@ public class FileManagerProgram extends ProgramExecutor {
 
         private void removeFile(String fileName) {
 
-            SBPWorldProcessUserId wpuId = holder.getParent().getObj(Process.WORLD_PROCESS_USER);
-            Process<?> process = holder.getParent();
+            SBPWorldProcessUserId wpuId = program.getParent().getObj(Process.WORLD_PROCESS_USER);
+            Process<?> process = program.getParent();
             FSModule fsModule = process.invoke(Process.GET_OS).getObj(OS.FS_MODULE);
 
-            String currentDir = holder.getObj(CURRENT_DIR);
+            String currentDir = program.getObj(CURRENT_DIR);
             String filePath = PathUtils.resolve(currentDir, fileName);
 
             if (filePath.equals(currentDir)) {
-                holder.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "removeFile.invalidFileName", new String[] { fileName }));
+                program.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "removeFile.invalidFileName", fileName));
                 return;
             }
 
@@ -367,9 +367,9 @@ public class FileManagerProgram extends ProgramExecutor {
 
             if (removeAction.invoke(FileRemoveAction.IS_EXECUTABLE_BY, sessionUser)) {
                 removeAction.invoke(FileRemoveAction.EXECUTE);
-                sendUpdateView(process, holder.getObj(CURRENT_DIR));
+                sendUpdateView(process, program.getObj(CURRENT_DIR));
             } else {
-                holder.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "removeFile.missingDeleteRight", new String[] { filePath }));
+                program.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "removeFile.missingDeleteRight", filePath));
             }
         }
 
@@ -379,21 +379,21 @@ public class FileManagerProgram extends ProgramExecutor {
      * Sends an {@link FMP_SBPWPU_UpdateViewCommand} from the given {@link FileManagerProgram} {@link Process}.
      * Note that this method is completely independent from any state (it's a utility method).
      * 
-     * @param process The file manager program process which sends the command.
+     * @param programProcess The file manager program process which sends the command.
      * @param currentDir The directory whose contents should be sent inside the command.
      */
-    public static void sendUpdateView(Process<?> process, String currentDir) {
+    public static void sendUpdateView(Process<?> programProcess, String currentDir) {
 
-        Bridge bridge = process.getBridge();
-        SBPWorldProcessUserId wpuId = process.getObj(Process.WORLD_PROCESS_USER);
-        FSModule fsModule = process.invoke(Process.GET_OS).getObj(OS.FS_MODULE);
+        Bridge bridge = programProcess.getBridge();
+        SBPWorldProcessUserId wpuId = programProcess.getObj(Process.WORLD_PROCESS_USER);
+        FSModule fsModule = programProcess.invoke(Process.GET_OS).getObj(OS.FS_MODULE);
 
         // Current dir is absolute root
         if (currentDir.equals(PathUtils.SEPARATOR)) {
             List<FilePlaceholder> files = new ArrayList<>();
 
-            for (KnownFS fileSystem : fsModule.invoke(FSModule.GET_MOUNTED)) {
-                files.add(FileUtils.createFilePlaceholder(fileSystem));
+            for (KnownFS knownFs : fsModule.invoke(FSModule.GET_MOUNTED)) {
+                files.add(FileUtils.createFilePlaceholder(knownFs));
             }
 
             FilePlaceholder[] fileArray = files.toArray(new FilePlaceholder[files.size()]);

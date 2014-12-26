@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.server.test.world.comp;
 
+import java.util.Random;
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -30,6 +31,7 @@ import com.quartercode.disconnected.server.identity.SBPIdentityService;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.sim.gen.WorldGenerator;
+import com.quartercode.disconnected.server.sim.scheduler.SchedulerRegistry;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.WorldDependencyProvider;
 import com.quartercode.disconnected.server.world.comp.Computer;
@@ -72,7 +74,9 @@ public abstract class AbstractComplexComputerTest {
 
     @Mock
     protected SBPIdentityService sbpIdentityService;
+    protected Random             random;
     protected Bridge             bridge;
+    protected SchedulerRegistry  schedulerRegistry;
     protected World              world;
 
     protected Computer           mainComputer;
@@ -99,6 +103,8 @@ public abstract class AbstractComplexComputerTest {
         bridge.getModule(SBPIdentityExtension.class).setIdentityService(sbpIdentityService);
         bridge.getModule(SBPAwareHandlerExtension.class).setIdentityService(sbpIdentityService);
 
+        schedulerRegistry = new SchedulerRegistry();
+
         world = new World();
         final WorldDependencyProvider dependencyProvider = context.mock(WorldDependencyProvider.class);
         world.setDependencyProvider(dependencyProvider);
@@ -106,9 +112,12 @@ public abstract class AbstractComplexComputerTest {
         // @formatter:off
         context.checking(new Expectations() {{
 
-            // Use null BridgeConnector because no bridge connector is used for the test
+            allowing(dependencyProvider).getRandom();
+                will(returnValue(random));
             allowing(dependencyProvider).getBridge();
                 will(returnValue(bridge));
+            allowing(dependencyProvider).getSchedulerRegistry();
+                will(returnValue(schedulerRegistry));
 
         }});
         // @formatter:on

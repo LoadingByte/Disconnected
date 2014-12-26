@@ -154,9 +154,9 @@ public class VulnContainer extends WorldFeatureHolder {
                 return invocation.next(arguments);
             }
 
-            private void selectActions(VulnContainer holder, VulnSource vulnSource, Vuln target) {
+            private void selectActions(VulnContainer vulnContainer, VulnSource vulnSource, Vuln target) {
 
-                Random random = holder.getWorld() != null ? holder.getRandom() : new Random();
+                Random random = vulnContainer.getWorld() != null ? vulnContainer.getRandom() : new Random();
 
                 boolean selectedOneAction = false;
                 while (!selectedOneAction) {
@@ -195,14 +195,14 @@ public class VulnContainer extends WorldFeatureHolder {
                 return invocation.next(arguments);
             }
 
-            private VulnSource selectVulnSource(VulnContainer holder, Collection<VulnSource> vulnSources) {
+            private VulnSource selectVulnSource(VulnContainer vulnContainer, Collection<VulnSource> vulnSources) {
 
                 int totalWeights = 0;
                 for (VulnSource vulnSource : vulnSources) {
                     totalWeights += vulnSource.getWeight();
                 }
 
-                Random random = holder.getWorld() != null ? holder.getRandom() : new Random();
+                Random random = vulnContainer.getWorld() != null ? vulnContainer.getRandom() : new Random();
                 int randomPosition = random.nextInt(totalWeights);
 
                 int currentPosition = 0;

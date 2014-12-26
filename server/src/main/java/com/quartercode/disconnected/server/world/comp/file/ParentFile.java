@@ -73,7 +73,7 @@ public class ParentFile<P extends CFeatureHolder> extends File<P> {
             @Override
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
-                FileSystem fileSystem = invocation.getCHolder().invoke(GET_FILE_SYSTEM);
+                FileSystem fileSystem = invocation.getCHolder().invoke(GET_FS);
                 if (fileSystem != null) {
                     long fileSize = ((File<?>) arguments[0]).invoke(File.GET_SIZE);
                     if (fileSize > fileSystem.invoke(FileSystem.GET_FREE)) {

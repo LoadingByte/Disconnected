@@ -19,15 +19,15 @@
 package com.quartercode.disconnected.server.test.world.comp.prog.general;
 
 import static org.junit.Assert.fail;
-import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_SBPWPU_UpdateViewCommand;
+import com.quartercode.eventbridge.bridge.Event;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 
-public class FMP_WPUSBP_UpdateViewCommandFailHandler implements EventHandler<FMP_SBPWPU_UpdateViewCommand> {
+public class FailEventHandler implements EventHandler<Event> {
 
     @Override
-    public void handle(FMP_SBPWPU_UpdateViewCommand event) {
+    public void handle(Event event) {
 
-        fail("View was updated although nothing should have happened");
+        fail("Received unexpected event: '" + event + "'");
     }
 
 }

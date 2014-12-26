@@ -74,7 +74,7 @@ public class FileManagerProgramMissingReadRightTest extends AbstractComplexCompu
         testUser.setObj(User.NAME, "testUser");
         ChildProcess sessionProcess = launchSession(mainRootProcess(), testUser, null);
 
-        bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_WPUSBP_UpdateViewCommandFailHandler(), new TypePredicate<>(FMP_SBPWPU_UpdateViewCommand.class));
+        bridge.getModule(StandardHandlerModule.class).addHandler(new FailEventHandler(), new TypePredicate<>(FMP_SBPWPU_UpdateViewCommand.class));
 
         final MutableBoolean invoked = new MutableBoolean();
         bridge.getModule(StandardHandlerModule.class).addHandler(new EventHandler<GP_SBPWPU_ErrorEvent>() {

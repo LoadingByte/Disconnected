@@ -84,7 +84,7 @@ public class FileMoveAction extends FileAction {
 
                 if (fileMoveAction.getObj(FILE_SYSTEM) == null) {
                     File<?> file = (File<?>) arguments[0];
-                    fileMoveAction.setObj(FILE_SYSTEM, file.invoke(File.GET_FILE_SYSTEM));
+                    fileMoveAction.setObj(FILE_SYSTEM, file.invoke(File.GET_FS));
                 }
 
                 return invocation.next(arguments);
