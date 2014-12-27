@@ -31,6 +31,7 @@ import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup;
 import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup.Option;
 import com.quartercode.disconnected.client.graphics.desktop.popup.TextInputPopup;
 import com.quartercode.disconnected.client.graphics.desktop.prog.util.GP_SBPWPU_ErrorEventPopupHandler;
+import com.quartercode.disconnected.client.util.ByteCountFormatter;
 import com.quartercode.disconnected.client.util.ResourceBundles;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_SBPWPU_UpdateViewCommand;
@@ -110,8 +111,11 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
 
             String headerName = getString("fileList.header.name");
             String headerType = getString("fileList.header.type");
+            String headerOwner = getString("fileList.header.owner");
+            String headerGroup = getString("fileList.header.group");
+            String headerRights = getString("fileList.header.rights");
             String headerSize = getString("fileList.header.size");
-            fileListModel = new SimpleTableModel(new String[] { headerName, headerType, headerSize });
+            fileListModel = new SimpleTableModel(new String[] { headerName, headerType, headerOwner, headerGroup, headerRights, headerSize });
 
             fileListTable = new Table(fileListModel);
             fileListTable.setTheme("/table");
@@ -131,9 +135,12 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
             add(layout);
 
             fileListTable.adjustSize();
-            adjustColumnWidth(fileListTable, 0, 0.4F);
-            adjustColumnWidth(fileListTable, 1, 0.3F);
-            adjustColumnWidth(fileListTable, 2, 0.3F);
+            adjustColumnWidth(fileListTable, 0, 0.23F);
+            adjustColumnWidth(fileListTable, 1, 0.15F);
+            adjustColumnWidth(fileListTable, 2, 0.15F);
+            adjustColumnWidth(fileListTable, 3, 0.15F);
+            adjustColumnWidth(fileListTable, 4, 0.17F);
+            adjustColumnWidth(fileListTable, 5, 0.15F);
         }
 
         private void adjustColumnWidth(Table table, int column, float width) {
@@ -266,8 +273,9 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
             for (FilePlaceholder file : files) {
                 String type = getString("fileList.fileType." + file.getType());
 
-                String size = file.getSize() + " B";
-                fileListModel.addRow(file.getName(), type, size);
+                String size = ByteCountFormatter.format(file.getSize());
+                String rights = file.getRights().toString();
+                fileListModel.addRow(file.getName(), type, file.getOwner(), file.getGroup(), rights, size);
             }
         }
 
