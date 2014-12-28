@@ -31,6 +31,7 @@ public interface SchedulerRegistryProvider {
 
     /**
      * Returns the {@link SchedulerRegistry} that is provided by the scheduler registry provider.
+     * Note that it may be {@code null}.
      * 
      * @return The provided scheduler registry.
      */

@@ -58,6 +58,7 @@ import com.quartercode.disconnected.shared.util.LogExceptionHandler;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 import com.quartercode.disconnected.shared.util.Settings;
 import com.quartercode.disconnected.shared.util.TempFileManager;
+import com.quartercode.disconnected.shared.util.ValueInjector;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.BridgeConnectorException;
 import com.quartercode.eventbridge.extra.connector.LocalBridgeConnector;
@@ -141,10 +142,16 @@ public class Main {
         Random random = new Random(1);
         final World world = WorldGenerator.generateWorld(random, 10);
 
-        // DEBUG: Create and inject the world dependency provider
+        // DEBUG: Create and fill a new scheduler registry
         SchedulerRegistry schedulerRegistry = new SchedulerRegistry();
         schedulerRegistry.addSchedulersFromTree(world);
-        world.setDependencyProvider(new DefaultWorldDependencyProvider(random, serverBridge, schedulerRegistry));
+
+        // DEBUG: Inject the correct values into the world
+        ValueInjector worldValueInjector = new ValueInjector();
+        worldValueInjector.put("random", random);
+        worldValueInjector.put("bridge", serverBridge);
+        worldValueInjector.put("schedulerRegistry", schedulerRegistry);
+        worldValueInjector.inject(world);
 
         // DEBUG: Start "game" with current simulation
         LOGGER.info("DEBUG: Starting test-game with current simulation");

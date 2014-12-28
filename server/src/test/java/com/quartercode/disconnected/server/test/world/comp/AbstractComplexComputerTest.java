@@ -18,7 +18,6 @@
 
 package com.quartercode.disconnected.server.test.world.comp;
 
-import java.util.Random;
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -33,7 +32,6 @@ import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.sim.gen.WorldGenerator;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerRegistry;
 import com.quartercode.disconnected.server.world.World;
-import com.quartercode.disconnected.server.world.WorldDependencyProvider;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.FSModule;
@@ -51,6 +49,7 @@ import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.shared.CommonBootstrap;
 import com.quartercode.disconnected.shared.identity.ClientIdentity;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
+import com.quartercode.disconnected.shared.util.ValueInjector;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.world.comp.file.SeparatedPath;
 import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId;
@@ -74,7 +73,6 @@ public abstract class AbstractComplexComputerTest {
 
     @Mock
     protected SBPIdentityService sbpIdentityService;
-    protected Random             random;
     protected Bridge             bridge;
     protected SchedulerRegistry  schedulerRegistry;
     protected World              world;
@@ -106,21 +104,11 @@ public abstract class AbstractComplexComputerTest {
         schedulerRegistry = new SchedulerRegistry();
 
         world = new World();
-        final WorldDependencyProvider dependencyProvider = context.mock(WorldDependencyProvider.class);
-        world.setDependencyProvider(dependencyProvider);
 
-        // @formatter:off
-        context.checking(new Expectations() {{
-
-            allowing(dependencyProvider).getRandom();
-                will(returnValue(random));
-            allowing(dependencyProvider).getBridge();
-                will(returnValue(bridge));
-            allowing(dependencyProvider).getSchedulerRegistry();
-                will(returnValue(schedulerRegistry));
-
-        }});
-        // @formatter:on
+        ValueInjector worldValueInjector = new ValueInjector();
+        worldValueInjector.put("bridge", bridge);
+        worldValueInjector.put("schedulerRegistry", schedulerRegistry);
+        worldValueInjector.inject(world);
 
         mainComputer = newComputer(true);
     }

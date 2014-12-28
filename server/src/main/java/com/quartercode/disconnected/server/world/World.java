@@ -36,6 +36,7 @@ import com.quartercode.disconnected.server.sim.scheduler.SchedulerRegistry;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerRegistryProvider;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.net.Backbone;
+import com.quartercode.disconnected.shared.util.ValueInjector.InjectValue;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
 import com.quartercode.eventbridge.bridge.Bridge;
 
@@ -76,53 +77,45 @@ public class World extends DefaultCFeatureHolder implements SchedulerRegistryPro
 
     }
 
-    private WorldDependencyProvider                                            dependencyProvider;
-
-    /**
-     * Uses the given {@link WorldDependencyProvider} for retrieving the {@link #getRandom() random object}, {@link #getBridge() bridge}, and {@link #getSchedulerRegistry() scheduler registry}.
-     * 
-     * @param dependencyProvider The world dependency to use.
-     */
-    public void setDependencyProvider(WorldDependencyProvider dependencyProvider) {
-
-        this.dependencyProvider = dependencyProvider;
-    }
+    @InjectValue (value = "random", allowNull = true)
+    private Random                                                             random;
+    @InjectValue ("bridge")
+    private Bridge                                                             bridge;
+    @InjectValue (value = "schedulerRegistry", allowNull = true)
+    private SchedulerRegistry                                                  schedulerRegistry;
 
     /**
      * Returns the {@link Random} object that can be used by the world.
-     * It is is supplied by the {@link WorldDependencyProvider} (see {@link #setDependencyProvider(WorldDependencyProvider)}).
+     * Note that it may be {@code null}.
      * 
      * @return The random object the world can use.
-     * @see WorldDependencyProvider#getRandom()
      */
     public Random getRandom() {
 
-        return dependencyProvider.getRandom();
+        return random;
     }
 
     /**
      * Returns the {@link Bridge} that should be used for sending events by any object in the world tree.
-     * It is is supplied by the {@link WorldDependencyProvider} (see {@link #setDependencyProvider(WorldDependencyProvider)}).
+     * Note that it may not be {@code null}.
      * 
      * @return The bridge the world can use.
-     * @see WorldDependencyProvider#getBridge()
      */
     public Bridge getBridge() {
 
-        return dependencyProvider.getBridge();
+        return bridge;
     }
 
     /**
      * Returns the {@link SchedulerRegistry} that can be used by all {@link Scheduler} features in the world tree.
-     * It is is supplied by the {@link WorldDependencyProvider} (see {@link #setDependencyProvider(WorldDependencyProvider)}).
+     * Note that it may be {@code null}.
      * 
      * @return The scheduler registry the world can use.
-     * @see WorldDependencyProvider#getSchedulerRegistry()
      */
     @Override
     public SchedulerRegistry getSchedulerRegistry() {
 
-        return dependencyProvider.getSchedulerRegistry();
+        return schedulerRegistry;
     }
 
 }

@@ -55,21 +55,9 @@ public class WorldChildFeatureHolder<P extends CFeatureHolder> extends DefaultCC
     }
 
     /**
-     * Returns the {@link Bridge} that should be used for sending events by the world child feature holder.
-     * Actually, this returns the bridge of the {@link World} the feature holder is in.
-     * 
-     * @return The bridge for the feature holder.
-     * @see World#getBridge()
-     */
-    public Bridge getBridge() {
-
-        World world = getWorld();
-        return world != null ? world.getBridge() : null;
-    }
-
-    /**
      * Returns the {@link Random} object that can be used by the world child feature holder.
      * Actually, this returns the random object of the {@link World} the feature holder is in.
+     * Note that it may be {@code null}.
      * 
      * @return The random object the feature holder can use.
      * @see World#getRandom()
@@ -81,8 +69,23 @@ public class WorldChildFeatureHolder<P extends CFeatureHolder> extends DefaultCC
     }
 
     /**
+     * Returns the {@link Bridge} that should be used for sending events by the world child feature holder.
+     * Actually, this returns the bridge of the {@link World} the feature holder is in.
+     * Note that it may not be {@code null}.
+     * 
+     * @return The bridge for the feature holder.
+     * @see World#getBridge()
+     */
+    public Bridge getBridge() {
+
+        World world = getWorld();
+        return world != null ? world.getBridge() : null;
+    }
+
+    /**
      * Returns the {@link SchedulerRegistry} that can be used by all {@link Scheduler}s of the world child feature holder.
      * Actually, this returns the scheduler registry of the {@link World} the feature holder is in.
+     * Note that it may be {@code null}.
      * 
      * @return The scheduler registry the feature holder can use.
      * @see World#getSchedulerRegistry()
