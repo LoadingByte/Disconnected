@@ -2,4 +2,5 @@
 <sprites>
     <sprite name="area1" splitx="L1,R1" splity="T1,B1" />
     <sprite name="area2" splitx="L1,R1" splity="T1,B1" />
+    <sprite name="area3" splitx="L1,R1" splity="T1,B1" />
 </sprites>

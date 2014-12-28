@@ -2,7 +2,7 @@
 <!DOCTYPE themes PUBLIC "-//www.matthiasmann.de//TWL-Theme//EN" "http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd">
 <themes>
     <images>
-        <alias name="tooltip.background" ref="default_area2" tint="#008AEE"/>
+        <alias name="tooltip.background" ref="default_area3" tint="#008AEE"/>
     </images>
 
     <theme name="tooltipwindow" ref="-defaults">

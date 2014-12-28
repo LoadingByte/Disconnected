@@ -4,7 +4,7 @@
     <images>
         <!-- Background -->
         <composed name="desktop.frame.background" border="30,5,5,5">
-            <alias ref="default_area1" tint="#0000D5"/>
+            <alias ref="default_area2" tint="#0000D5"/>
             <grid weightsX="0,1,0" weightsY="0,1" inset="4">
                 <alias ref="none"/>
                 <alias ref="default_white" tint="#0063FF" sizeOverwriteV="20"/>

@@ -3,7 +3,7 @@
 <themes>
     <images>
         <!-- Header -->
-        <alias name="table.columnHeader.background" ref="default_area2" inset="-3,0" tint="#005EFF"/>
+        <alias name="table.columnHeader.background" ref="default_area3" inset="-3,0" tint="#005EFF"/>
 
         <!-- Rows -->
         <alias name="table.row.background" ref="none"/>

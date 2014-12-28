@@ -7,10 +7,10 @@
 
         <!-- Up/down/left/right buttons -->
         <select name="-scrollbar.button.background">
-            <alias ref="default_area2" if="disabled" tint="#0076C9"/>
-            <alias ref="default_area2" if="pressed" tint="#008B00"/>
-            <alias ref="default_area2" if="hover" tint="#00C800"/>
-            <alias ref="default_area2" tint="#0196FF"/>
+            <alias ref="default_area3" if="disabled" tint="#0076C9"/>
+            <alias ref="default_area3" if="pressed" tint="#008B00"/>
+            <alias ref="default_area3" if="hover" tint="#00C800"/>
+            <alias ref="default_area3" tint="#0196FF"/>
         </select>
         <composed name="scrollbar.button.up.background">
             <alias ref="-scrollbar.button.background"/>

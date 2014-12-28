@@ -4,8 +4,8 @@
     <images>
         <!-- Background -->
         <select name="editfield.background">
-            <alias ref="default_area2" tint="#0099FA" if="keyboardFocus"/>
-            <alias ref="default_area2" tint="#2525FF"/>
+            <alias ref="default_area3" tint="#0099FA" if="keyboardFocus"/>
+            <alias ref="default_area3" tint="#2525FF"/>
         </select>
 
         <!-- Cursor animation -->
