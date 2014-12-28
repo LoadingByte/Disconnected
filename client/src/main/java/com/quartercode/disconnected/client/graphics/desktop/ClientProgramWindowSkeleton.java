@@ -18,14 +18,15 @@
 
 package com.quartercode.disconnected.client.graphics.desktop;
 
+import java.util.UUID;
 import com.quartercode.disconnected.client.graphics.GraphicsState;
-import com.quartercode.disconnected.client.util.ValueInjector.InjectValue;
 import com.quartercode.disconnected.shared.event.comp.prog.SBPWorldProcessUserCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.SBPWorldProcessUserCommandPredicate;
 import com.quartercode.disconnected.shared.event.comp.prog.control.SBPWorldProcessUserInterruptCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessInterruptCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchAcknowledgmentEvent;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchCommand;
+import com.quartercode.disconnected.shared.util.ValueInjector.InjectValue;
 import com.quartercode.disconnected.shared.world.comp.prog.ClientProcessDetails;
 import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
 import com.quartercode.eventbridge.bridge.Bridge;
@@ -131,9 +132,8 @@ public class ClientProgramWindowSkeleton extends ClientProgramWindow {
 
         context.injectValues(this);
 
-        // Use a dummy client process id
-        // TODO: Use propert client process ids; this system will eventually run into collisions
-        clientProcessDetails = new ClientProcessDetails((int) (Math.random() * 10000D));
+        // Create a new client process identifier
+        clientProcessDetails = new ClientProcessDetails(UUID.randomUUID());
 
         initializeGraphics();
         initializeInteractions();

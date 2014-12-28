@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.shared.world.comp.prog;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * A marker interface for data objects which identify certain SBP modules/parts which use world processes.
@@ -26,8 +27,7 @@ import java.io.Serializable;
  * All events sent by a world process carry that details object.
  * Using that object, the SBP can decide which module/part should receive the incoming event.<br>
  * <br>
- * For example, if an SBP would identify local world-process-using routines with sequential numbers, an implementation of this interface
- * would contain that sequential number in order to identify the routines.
+ * For example, if an SBP would identify local world-process-using routines with {@link UUID}s, an implementation of this interface would contain that UUID in order to identify the routines.
  * Using that, the SBP can then pass incoming world process events to the correct routine.
  * 
  * @see SBPWorldProcessUserId

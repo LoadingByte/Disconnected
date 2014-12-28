@@ -18,40 +18,41 @@
 
 package com.quartercode.disconnected.shared.world.comp.prog;
 
+import java.util.UUID;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * A data object that identifies a client-side client process which runs a graphical client program.
+ * It does that by storing a {@link UUID}.
  * 
  * @see SBPWorldProcessUserDetails
  */
 public class ClientProcessDetails implements SBPWorldProcessUserDetails {
 
-    private static final long serialVersionUID = 1834465265098422024L;
+    private static final long serialVersionUID = 2108217135239748254L;
 
-    private final int         clientPid;
+    private final UUID        uuid;
 
     /**
      * Creates a new client process details object.
      * 
-     * @param clientPid The unique id of the identifiable client process.
+     * @param uuid The {@link UUID} that uniquely identifies the client process.
      */
-    public ClientProcessDetails(int clientPid) {
+    public ClientProcessDetails(UUID uuid) {
 
-        this.clientPid = clientPid;
+        this.uuid = uuid;
     }
 
     /**
-     * Returns the unique id of the identifiable client process.
-     * Most likely it is just a sequential number.
+     * Returns the {@link UUID} that uniquely identifies the client process.
      * 
-     * @return The client process id.
+     * @return The unique client process id.
      */
-    public int getClientPid() {
+    public UUID getUUID() {
 
-        return clientPid;
+        return uuid;
     }
 
     @Override

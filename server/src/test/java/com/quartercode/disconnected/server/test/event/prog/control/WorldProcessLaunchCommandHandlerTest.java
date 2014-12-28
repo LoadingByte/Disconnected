@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.server.test.event.prog.control;
 
 import static org.junit.Assert.*;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
@@ -119,7 +120,7 @@ public class WorldProcessLaunchCommandHandlerTest {
 
         handler.currentLaunchedProcessId = expectedPid;
 
-        final SBPWorldProcessUserDetails wpuDetails = new ClientProcessDetails(20);
+        final SBPWorldProcessUserDetails wpuDetails = new ClientProcessDetails(UUID.randomUUID());
 
         // @formatter:off
         context.checking(new Expectations() {{
