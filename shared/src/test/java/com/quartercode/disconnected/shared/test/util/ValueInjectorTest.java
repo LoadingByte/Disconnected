@@ -16,13 +16,13 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.client.test.util;
+package com.quartercode.disconnected.shared.test.util;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.disconnected.client.util.ValueInjector;
-import com.quartercode.disconnected.client.util.ValueInjector.InjectValue;
+import com.quartercode.disconnected.shared.util.ValueInjector;
+import com.quartercode.disconnected.shared.util.ValueInjector.InjectValue;
 
 public class ValueInjectorTest {
 
@@ -40,7 +40,7 @@ public class ValueInjectorTest {
     public void testRunOn() {
 
         TestClass1 object = new TestClass1();
-        valueInjector.runOn(object);
+        valueInjector.inject(object);
 
         assertEquals("Injected value for 'test1'", 10, object.test1);
         assertEquals("Injected value for 'test2'", "something", object.test2);
@@ -50,14 +50,14 @@ public class ValueInjectorTest {
     public void testRunOnMissingValue() {
 
         TestClass2 object = new TestClass2();
-        valueInjector.runOn(object);
+        valueInjector.inject(object);
     }
 
     @Test
     public void testRunOnMissingValueAllowNull() {
 
         TestClass3 object = new TestClass3();
-        valueInjector.runOn(object);
+        valueInjector.inject(object);
 
         assertEquals("Injected value for 'test1' (unavailable)", 0, object.test);
     }
@@ -66,14 +66,14 @@ public class ValueInjectorTest {
     public void testRunOnWrongType() {
 
         TestClass4 object = new TestClass4();
-        valueInjector.runOn(object);
+        valueInjector.inject(object);
     }
 
     @Test
     public void testRunOnWrongAllowNull() {
 
         TestClass5 object = new TestClass5();
-        valueInjector.runOn(object);
+        valueInjector.inject(object);
 
         assertEquals("Injected value for 'test1' (wrong type)", null, object.test);
     }

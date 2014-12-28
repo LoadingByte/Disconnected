@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.client.graphics.desktop;
 
-import com.quartercode.disconnected.client.util.ValueInjector;
+import com.quartercode.disconnected.shared.util.ValueInjector;
 
 /**
  * A client program context stores information about the environment of a running client program.
@@ -47,13 +47,13 @@ public class ClientProgramContext {
 
     /**
      * Injects the stored values into the given object.
-     * See {@link ValueInjector#runOn(Object)} for more details.
+     * See {@link ValueInjector#inject(Object)} for more details.
      * 
      * @param object The object to inject values into.
      */
     public void injectValues(Object object) {
 
-        valueInjector.runOn(object);
+        valueInjector.inject(object);
     }
 
 }

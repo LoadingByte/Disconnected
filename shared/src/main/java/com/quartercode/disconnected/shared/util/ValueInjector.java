@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.client.util;
+package com.quartercode.disconnected.shared.util;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A value injector takes an object and injects some previously set values into its fields.
  * Such fields must be annotated with the {@link InjectValue} annotation.
- * Every object that has such fields must call the {@link #runOn(Object)} method on itself in order to get its required values injected.
+ * Every object that has such fields must call the {@link #inject(Object)} method on itself in order to get its required values injected.
  */
 public class ValueInjector {
 
@@ -66,7 +66,7 @@ public class ValueInjector {
      * 
      * @param object The object whose injectable fields should be filled with values.
      */
-    public void runOn(Object object) {
+    public void inject(Object object) {
 
         Class<?> type = object.getClass();
 
