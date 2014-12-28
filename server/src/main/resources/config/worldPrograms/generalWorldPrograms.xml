@@ -6,4 +6,11 @@
         <commonFileDir>$C{com.quartercode.disconnected.shared.world.comp.file.CommonFiles.SYS_BIN_DIR}</commonFileDir>
         <commonFileName>filemanager.exe</commonFileName>
     </configureWorldProgram>
+
+    <configureWorldProgram name="processManager">
+        <class>com.quartercode.disconnected.server.world.comp.prog.general.ProcessManagerProgram</class>
+        <size>1024</size>
+        <commonFileDir>$C{com.quartercode.disconnected.shared.world.comp.file.CommonFiles.SYS_BIN_DIR}</commonFileDir>
+        <commonFileName>processmanager.exe</commonFileName>
+    </configureWorldProgram>
 </config>

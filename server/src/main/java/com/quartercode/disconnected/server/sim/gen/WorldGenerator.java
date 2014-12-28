@@ -297,6 +297,7 @@ public class WorldGenerator {
 
         // Add general programs
         addProgramFile(fileSystem, superuser, "fileManager", new Version(1, 0, 0));
+        addProgramFile(fileSystem, superuser, "processManager", new Version(1, 0, 0));
     }
 
     // Temporary method for generating some unnecessary programs and personal files
