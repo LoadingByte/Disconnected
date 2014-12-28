@@ -72,6 +72,10 @@
         <url>/ui/themes/desktop/launchButton.xml</url>
         <priority>8000</priority>
     </configureTheme>
+    <configureTheme name="launchMenuButton">
+        <url>/ui/themes/desktop/launchMenuButton.xml</url>
+        <priority>8000</priority>
+    </configureTheme>
     <configureTheme name="taskbarButton">
         <url>/ui/themes/desktop/taskbarButton.xml</url>
         <priority>8000</priority>

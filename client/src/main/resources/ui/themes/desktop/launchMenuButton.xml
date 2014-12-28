@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE themes PUBLIC "-//www.matthiasmann.de//TWL-Theme//EN" "http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd">
+<themes>
+    <images>
+        <select name="desktop.launchMenuButton.background">
+            <alias ref="default_area1" if="disabled" tint="#0093BD"/>
+            <alias ref="default_area1" if="pressed" tint="#00A600"/>
+            <alias ref="default_area1" if="hover" tint="#00BD00"/>
+            <alias ref="default_area1" tint="#09D3ED"/>
+        </select>
+    </images>
+
+    <theme name="desktop-launchMenuButton" ref="button">
+        <param name="background"><image>desktop.launchMenuButton.background</image></param>
+        <param name="font"><font>button.black</font></param>
+        <param name="border"><border>12,7</border></param>
+    </theme>
+</themes>
