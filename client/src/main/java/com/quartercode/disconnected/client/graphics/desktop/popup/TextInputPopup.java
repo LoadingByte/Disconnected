@@ -62,7 +62,7 @@ public class TextInputPopup extends DesktopWindow {
             inputField.setText(defaultText);
         }
 
-        Button confirmButton = new Button(ResourceBundles.DESKTOP.getString("general.confirm"));
+        Button confirmButton = new Button(ResourceBundles.DESKTOP.get("general.confirm"));
         confirmButton.setTheme("/button");
         confirmButton.addCallback(new Runnable() {
 
@@ -81,7 +81,7 @@ public class TextInputPopup extends DesktopWindow {
 
         Button cancelButton = null;
         if (showCancelButton) {
-            cancelButton = new Button(ResourceBundles.DESKTOP.getString("general.cancel"));
+            cancelButton = new Button(ResourceBundles.DESKTOP.get("general.cancel"));
             cancelButton.setTheme("/button");
             cancelButton.addCallback(new Runnable() {
 

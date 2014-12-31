@@ -24,12 +24,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A resource bundle group is a simple class that stores the bundle name and creates new {@link ResourceBundle}s on every request.
+ * A resource bundle group is a simple {@link LocalizationSupplier} that stores the bundle name and creates new {@link ResourceBundle}s on every request.
  * That way resource bundles don't need to be cached.
  * 
  * @see ResourceBundle
+ * @see LocalizationSupplier
  */
-public class ResourceBundleGroup {
+public class ResourceBundleGroup implements LocalizationSupplier {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceBundleGroup.class);
 
@@ -56,13 +57,11 @@ public class ResourceBundleGroup {
     }
 
     /**
-     * Returns the string that is associated with the given key in the {@link ResourceBundle} retrieved with {@link #get()}.
+     * {@inheritDoc}<br>
      * The method actually invokes the {@link ResourceBundle#getString(String)} method on the {@link #get()} bundle and returns the result.
-     * 
-     * @param key The key the returned value is associated with.
-     * @return The value in the {@link #get()} resource bundle which is associated with the given key.
      */
-    public String getString(String key) {
+    @Override
+    public String get(String key) {
 
         try {
             return get().getString(key);

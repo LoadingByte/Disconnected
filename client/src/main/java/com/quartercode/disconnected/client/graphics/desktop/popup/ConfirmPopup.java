@@ -105,7 +105,7 @@ public class ConfirmPopup extends DesktopWindow {
 
         List<Button> optionButtons = new ArrayList<>();
         for (final Option option : options) {
-            Button optionButton = new Button(ResourceBundles.DESKTOP.getString(option.getKey()));
+            Button optionButton = new Button(ResourceBundles.DESKTOP.get(option.getKey()));
             optionButton.setTheme("/button");
             optionButton.addCallback(new Runnable() {
 

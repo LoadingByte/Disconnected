@@ -64,7 +64,7 @@ public class MessagePopup extends DesktopWindow {
         Label messageLabel = new Label(message);
         messageLabel.setTheme("/label");
 
-        Button closeButton = new Button(ResourceBundles.DESKTOP.getString("general.close"));
+        Button closeButton = new Button(ResourceBundles.DESKTOP.get("general.close"));
         closeButton.setTheme("/button");
         closeButton.addCallback(new Runnable() {
 
