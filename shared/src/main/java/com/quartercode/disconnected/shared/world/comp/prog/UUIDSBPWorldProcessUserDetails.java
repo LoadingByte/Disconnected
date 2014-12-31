@@ -24,31 +24,31 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
- * A data object that identifies a client-side client process which runs a graphical client program.
- * It does that by storing a {@link UUID}.
+ * A generic {@link SBPWorldProcessUserDetails} implementation that identifies a world process user using a set {@link UUID}.
+ * That UUID might be {@link UUID#randomUUID() randomly generated}.
  * 
  * @see SBPWorldProcessUserDetails
  */
-public class ClientProcessDetails implements SBPWorldProcessUserDetails {
+public class UUIDSBPWorldProcessUserDetails implements SBPWorldProcessUserDetails {
 
-    private static final long serialVersionUID = 2108217135239748254L;
+    private static final long serialVersionUID = -8825526709133357773L;
 
     private final UUID        uuid;
 
     /**
-     * Creates a new client process details object.
+     * Creates a new UUID SBP world process user details object.
      * 
-     * @param uuid The {@link UUID} that uniquely identifies the client process.
+     * @param uuid The {@link UUID} that uniquely identifies the world process user.
      */
-    public ClientProcessDetails(UUID uuid) {
+    public UUIDSBPWorldProcessUserDetails(UUID uuid) {
 
         this.uuid = uuid;
     }
 
     /**
-     * Returns the {@link UUID} that uniquely identifies the client process.
+     * Returns the {@link UUID} that uniquely identifies the world process user.
      * 
-     * @return The unique client process id.
+     * @return The unique id.
      */
     public UUID getUUID() {
 

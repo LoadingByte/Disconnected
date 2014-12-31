@@ -19,8 +19,9 @@
 package com.quartercode.disconnected.client.graphics.desktop.prog.util;
 
 import static java.text.MessageFormat.format;
-import com.quartercode.disconnected.client.graphics.desktop.ClientProgramWindow;
 import com.quartercode.disconnected.client.graphics.desktop.popup.MessagePopup;
+import com.quartercode.disconnected.client.graphics.desktop.prog.ClientProgramWindow;
+import com.quartercode.disconnected.client.util.LocalizationSupplier;
 import com.quartercode.disconnected.shared.event.comp.prog.generic.GP_SBPWPU_ErrorEvent;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 
@@ -31,22 +32,25 @@ import com.quartercode.eventbridge.bridge.module.EventHandler;
  */
 public class GP_SBPWPU_ErrorEventPopupHandler implements EventHandler<GP_SBPWPU_ErrorEvent> {
 
-    private final ClientProgramWindow programWindow;
-    private final String              keyPrefix;
-    private final String              keySuffix;
-    private final boolean             modal;
+    private final ClientProgramWindow  programWindow;
+    private final LocalizationSupplier l10nContext;
+    private final String               keyPrefix;
+    private final String               keySuffix;
+    private final boolean              modal;
 
     /**
      * Creates a new {@link GP_SBPWPU_ErrorEvent} popup handler.
      * 
      * @param programWindow The {@link ClientProgramWindow} of the client program whose {@link GP_SBPWPU_ErrorEvent}s should be processed.
+     * @param l10nContext The {@link LocalizationSupplier} which should be used to resolve the error messages.
      * @param keyPrefix A prefix that is put in front of the error type before it is used as a localization key.
      * @param keySuffix A suffix that is put behind the error type before it is used as a localization key.
      * @param modal Whether the popup window should be modal.
      */
-    public GP_SBPWPU_ErrorEventPopupHandler(ClientProgramWindow programWindow, String keyPrefix, String keySuffix, boolean modal) {
+    public GP_SBPWPU_ErrorEventPopupHandler(ClientProgramWindow programWindow, LocalizationSupplier l10nContext, String keyPrefix, String keySuffix, boolean modal) {
 
         this.programWindow = programWindow;
+        this.l10nContext = l10nContext;
         this.keyPrefix = keyPrefix;
         this.keySuffix = keySuffix;
         this.modal = modal;
@@ -56,7 +60,7 @@ public class GP_SBPWPU_ErrorEventPopupHandler implements EventHandler<GP_SBPWPU_
     public void handle(GP_SBPWPU_ErrorEvent event) {
 
         String key = keyPrefix + event.getType() + keySuffix;
-        String message = format(programWindow.getString(key), (Object[]) event.getArguments());
+        String message = format(l10nContext.get(key), (Object[]) event.getArguments());
 
         programWindow.openPopup(new MessagePopup(programWindow.getState(), message), modal);
     }

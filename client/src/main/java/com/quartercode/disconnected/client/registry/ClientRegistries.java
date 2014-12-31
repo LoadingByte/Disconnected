@@ -21,7 +21,6 @@ package com.quartercode.disconnected.client.registry;
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import com.quartercode.disconnected.shared.util.registry.Registry;
 import com.quartercode.disconnected.shared.util.registry.RegistryDefinition;
-import com.quartercode.disconnected.shared.util.registry.extra.MapRegistry;
 import com.quartercode.disconnected.shared.util.registry.extra.SetRegistry;
 
 /**
@@ -36,22 +35,22 @@ public class ClientRegistries {
      * A map that maps client program names (e.g. {@code fileManager}) to client program descriptors.
      * All descriptors that should be available in the launch menu must be registered here.<br>
      * <br>
-     * Note that the right side of the map does contain generic objects.
-     * Those objects are guaranteed to be client program descriptors.
-     * However, that class is not used here because that would create a dependency for all classes that use other
-     * client registries and need to access this class.
+     * Client programs are the counterpart to regular world programs that run on a server.
+     * They only have a GUI and don't implement any logic.
+     * That means that all logic is performed by the server-side world processes. The results are then sent to the client programs.
+     * In order to establish the client-server program connection, client programs create normal world processes on the server.
      */
-    public static final RegistryDefinition<MapRegistry<String, Object>> CLIENT_PROGRAMS;
+    public static final RegistryDefinition<SetRegistry<ClientProgram>> CLIENT_PROGRAMS;
 
     /**
      * The {@link Theme}s that should be loaded into the twl theme manager.
      * Note that only loaded themes can be used by graphical components.
      */
-    public static final RegistryDefinition<SetRegistry<Theme>>          THEMES;
+    public static final RegistryDefinition<SetRegistry<Theme>>         THEMES;
 
     static {
 
-        CLIENT_PROGRAMS = new RegistryDefinition<>("clientPrograms", new TypeLiteral<MapRegistry<String, Object>>() {});
+        CLIENT_PROGRAMS = new RegistryDefinition<>("clientPrograms", new TypeLiteral<SetRegistry<ClientProgram>>() {});
         THEMES = new RegistryDefinition<>("themes", new TypeLiteral<SetRegistry<Theme>>() {});
 
     }

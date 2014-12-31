@@ -18,26 +18,35 @@
 
 package com.quartercode.disconnected.client.graphics.desktop.prog.general;
 
+import static com.quartercode.disconnected.client.graphics.desktop.prog.util.ProgEventUtils.addEventHandler;
+import static com.quartercode.disconnected.client.graphics.desktop.prog.util.ProgEventUtils.launchWorldProcess;
+import static com.quartercode.disconnected.client.graphics.desktop.prog.util.ProgStateUtils.*;
 import static java.text.MessageFormat.format;
+import java.util.UUID;
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableObject;
 import com.quartercode.disconnected.client.graphics.GraphicsState;
 import com.quartercode.disconnected.client.graphics.component.TreeModel;
 import com.quartercode.disconnected.client.graphics.component.TreeNode;
-import com.quartercode.disconnected.client.graphics.desktop.ClientProgramContext;
-import com.quartercode.disconnected.client.graphics.desktop.ClientProgramDescriptor;
-import com.quartercode.disconnected.client.graphics.desktop.ClientProgramWindow;
-import com.quartercode.disconnected.client.graphics.desktop.ClientProgramWindowSkeleton;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowDefaultSizeMediator;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowSizeLimitsMediator;
 import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup;
 import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup.Option;
+import com.quartercode.disconnected.client.graphics.desktop.prog.ClientProgramExecutor;
+import com.quartercode.disconnected.client.graphics.desktop.prog.ClientProgramStateContext;
+import com.quartercode.disconnected.client.graphics.desktop.prog.ClientProgramWindow;
 import com.quartercode.disconnected.client.graphics.desktop.prog.util.GP_SBPWPU_ErrorEventPopupHandler;
-import com.quartercode.disconnected.client.util.ResourceBundles;
-import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchCommand;
+import com.quartercode.disconnected.client.util.LocalizationSupplier;
 import com.quartercode.disconnected.shared.event.comp.prog.general.PMP_SBPWPU_UpdateViewCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.general.PMP_WP_InterruptProcessCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.generic.GP_SBPWPU_ErrorEvent;
+import com.quartercode.disconnected.shared.util.ValueInjector.InjectValue;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
+import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserDetails;
+import com.quartercode.disconnected.shared.world.comp.prog.UUIDSBPWorldProcessUserDetails;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
 import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessPlaceholder;
+import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import de.matthiasmann.twl.Button;
 import de.matthiasmann.twl.DialogLayout;
@@ -49,55 +58,64 @@ import de.matthiasmann.twl.TreeTable;
 
 /**
  * The process manager client program is used to list and interrupt processes.
- * 
- * @see ProcessManagerClientProgramWindow
  */
-public class ProcessManagerClientProgram extends ClientProgramDescriptor {
+public class ProcessManagerClientProgram implements ClientProgramExecutor {
 
-    /**
-     * Creates a new process manager client program descriptor.
-     */
-    public ProcessManagerClientProgram() {
+    @InjectValue ("name")
+    private String                           name;
+    @InjectValue ("stateContext")
+    private ClientProgramStateContext        stateContext;
+    @InjectValue ("graphicsContext")
+    private GraphicsState                    graphicsContext;
+    @InjectValue ("l10nContext")
+    private LocalizationSupplier             l10n;
+    @InjectValue ("bridge")
+    private Bridge                           bridge;
 
-        super(ResourceBundles.forProgram("processManager"), "name");
-    }
+    private final SBPWorldProcessUserDetails clientProcessId = new UUIDSBPWorldProcessUserDetails(UUID.randomUUID());
+    private final Mutable<WorldProcessId>    worldProcessId  = new MutableObject<>();
 
     @Override
-    public ClientProgramWindow create(GraphicsState state, ClientProgramContext context) {
+    public void run() {
 
-        return new ProcessManagerClientProgramWindow(state, this, context);
+        interruptWorldProcessOnStop(bridge, stateContext, worldProcessId);
+        stopOnWorldProcessInterrupt(bridge, stateContext, clientProcessId);
+        nullFieldOnWorldProcessInterrupt(bridge, stateContext, clientProcessId, worldProcessId);
+
+        new ProcessManagerClientProgramWindow().setVisible(true);
+
+        launchWorldProcess(bridge, stateContext, clientProcessId, name, worldProcessId);
     }
 
-    /**
-     * The internal {@link ClientProgramWindow} used by the {@link ProcessManagerClientProgram}.
-     */
-    public static class ProcessManagerClientProgramWindow extends ClientProgramWindowSkeleton {
+    private class ProcessManagerClientProgramWindow extends ClientProgramWindow {
 
         private Button    interruptProcessButton;
         private TreeTable processListTable;
         private TreeModel processListModel;
 
-        private ProcessManagerClientProgramWindow(GraphicsState state, ClientProgramDescriptor descriptor, ClientProgramContext context) {
+        private ProcessManagerClientProgramWindow() {
 
-            super(state, descriptor, context);
+            super(graphicsContext, l10n.get("name"));
+
+            stopOnWindowClose(stateContext, this);
+
+            initializeWidgets();
+            initializeCallbacks();
+            registerEventHandlers();
         }
 
-        @Override
-        protected void initializeGraphics() {
+        private void initializeWidgets() {
 
             new DesktopWindowSizeLimitsMediator(this, new Dimension(500, 150), null);
             new DesktopWindowDefaultSizeMediator(this, new Dimension(700, 300));
 
-            interruptProcessButton = new Button(getString("interruptProcess.text"));
+            interruptProcessButton = new Button(l10n.get("interruptProcess.text"));
             interruptProcessButton.setTheme("/button");
 
-            Button btn = new Button("TestBTN");
-            btn.setTheme("/button");
-
-            String headerFileName = getString("processList.header.fileName");
-            String headerUser = getString("processList.header.user");
-            String headerPid = getString("processList.header.pid");
-            String headerState = getString("processList.header.state");
+            String headerFileName = l10n.get("processList.header.fileName");
+            String headerUser = l10n.get("processList.header.user");
+            String headerPid = l10n.get("processList.header.pid");
+            String headerState = l10n.get("processList.header.state");
             processListModel = new TreeModel(headerFileName, headerUser, headerPid, headerState);
 
             processListTable = new TreeTable(processListModel);
@@ -128,10 +146,7 @@ public class ProcessManagerClientProgram extends ClientProgramDescriptor {
             table.setColumnWidth(column, (int) (table.getWidth() * width));
         }
 
-        @Override
-        protected void initializeInteractions() {
-
-            super.initializeInteractions();
+        private void initializeCallbacks() {
 
             interruptProcessButton.addCallback(new Runnable() {
 
@@ -146,7 +161,7 @@ public class ProcessManagerClientProgram extends ClientProgramDescriptor {
                         final int pid = (int) node.getData(2);
 
                         // Ask for confirmation
-                        String confirmMessage = format(getString("interruptProcess.confirmPopup.message"), name, pid);
+                        String confirmMessage = format(l10n.get("interruptProcess.confirmPopup.message"), name, pid);
                         openPopup(new ConfirmPopup(getState(), confirmMessage, new Option[] { Option.NO, Option.YES }, new ConfirmPopup.Callback() {
 
                             @Override
@@ -154,7 +169,7 @@ public class ProcessManagerClientProgram extends ClientProgramDescriptor {
 
                                 if (selected == Option.YES) {
                                     // Interrupt the process
-                                    bridge.send(new PMP_WP_InterruptProcessCommand(worldProcessId, pid));
+                                    bridge.send(new PMP_WP_InterruptProcessCommand(worldProcessId.getValue(), pid));
                                 }
                             }
 
@@ -165,25 +180,15 @@ public class ProcessManagerClientProgram extends ClientProgramDescriptor {
             });
         }
 
-        @Override
-        protected void registerEventHandlers() {
+        private void registerEventHandlers() {
 
-            super.registerEventHandlers();
-
-            registerEventHandler(PMP_SBPWPU_UpdateViewCommand.class, new UpdateViewCommandHandler());
-            registerEventHandler(GP_SBPWPU_ErrorEvent.class, new GP_SBPWPU_ErrorEventPopupHandler(this, "", "Popup.message", true));
-        }
-
-        @Override
-        protected void doLaunchWorldProcess() {
-
-            // Launch process
-            bridge.send(new WorldProcessLaunchCommand(clientProcessDetails, "processManager"));
+            addEventHandler(bridge, stateContext, new UpdateViewCommandHandler(), PMP_SBPWPU_UpdateViewCommand.class, clientProcessId);
+            addEventHandler(bridge, stateContext, new GP_SBPWPU_ErrorEventPopupHandler(this, l10n, "", "Popup.message", true), GP_SBPWPU_ErrorEvent.class, clientProcessId);
         }
 
         private void updateView(WorldProcessPlaceholder rootProcess) {
 
-            // Add empty root process node if it doesn't exist
+            // Add empty root process node if it doesn't exist yet
             if (processListModel.getNumChildren() == 0) {
                 processListModel.addChild();
             }
@@ -197,7 +202,7 @@ public class ProcessManagerClientProgram extends ClientProgramDescriptor {
             node.setData(0, PathUtils.splitBeforeName(process.getSourcePath())[1]);
             node.setData(1, process.getUser());
             node.setData(2, process.getId().getPid());
-            node.setData(3, getString("processList.processState." + process.getState().name().toLowerCase()));
+            node.setData(3, l10n.get("processList.processState." + process.getState().name().toLowerCase()));
 
             // Remove nodes that are no longer children of the given process
             for (TreeNode childNode : node.getChildren()) {
@@ -216,21 +221,24 @@ public class ProcessManagerClientProgram extends ClientProgramDescriptor {
                 }
             }
 
-            // Add nodes to represent the new children of the given process
+            // Add nodes to represent the new children of the given process and update all existing nodes
             for (WorldProcessPlaceholder childProcess : process.getChildren()) {
-                boolean contains = false;
-                for (TreeNode childNode : node.getChildren()) {
-                    int childNodePid = (int) childNode.getData(2);
+                TreeNode childNode = null;
+                for (TreeNode testChildNode : node.getChildren()) {
+                    int childNodePid = (int) testChildNode.getData(2);
                     if (childNodePid == childProcess.getId().getPid()) {
-                        contains = true;
+                        childNode = testChildNode;
                         break;
                     }
                 }
 
-                if (!contains) {
-                    TreeNode newChildNode = node.addChild();
-                    updateNode(childProcess, newChildNode);
+                // Add the node if it is new
+                if (childNode == null) {
+                    childNode = node.addChild();
                 }
+
+                // Update the (possibly new) node
+                updateNode(childProcess, childNode);
             }
         }
 

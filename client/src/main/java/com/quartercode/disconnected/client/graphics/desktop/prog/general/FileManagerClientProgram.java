@@ -18,29 +18,38 @@
 
 package com.quartercode.disconnected.client.graphics.desktop.prog.general;
 
+import static com.quartercode.disconnected.client.graphics.desktop.prog.util.ProgEventUtils.addEventHandler;
+import static com.quartercode.disconnected.client.graphics.desktop.prog.util.ProgEventUtils.launchWorldProcess;
+import static com.quartercode.disconnected.client.graphics.desktop.prog.util.ProgStateUtils.*;
 import static java.text.MessageFormat.format;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableObject;
 import com.quartercode.disconnected.client.graphics.GraphicsState;
-import com.quartercode.disconnected.client.graphics.desktop.ClientProgramContext;
-import com.quartercode.disconnected.client.graphics.desktop.ClientProgramDescriptor;
-import com.quartercode.disconnected.client.graphics.desktop.ClientProgramWindow;
-import com.quartercode.disconnected.client.graphics.desktop.ClientProgramWindowSkeleton;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowDefaultSizeMediator;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowSizeLimitsMediator;
 import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup;
 import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup.Option;
 import com.quartercode.disconnected.client.graphics.desktop.popup.TextInputPopup;
+import com.quartercode.disconnected.client.graphics.desktop.prog.ClientProgramExecutor;
+import com.quartercode.disconnected.client.graphics.desktop.prog.ClientProgramStateContext;
+import com.quartercode.disconnected.client.graphics.desktop.prog.ClientProgramWindow;
 import com.quartercode.disconnected.client.graphics.desktop.prog.util.GP_SBPWPU_ErrorEventPopupHandler;
 import com.quartercode.disconnected.client.util.ByteCountFormatter;
-import com.quartercode.disconnected.client.util.ResourceBundles;
-import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchCommand;
+import com.quartercode.disconnected.client.util.LocalizationSupplier;
 import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_SBPWPU_UpdateViewCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_WP_AddFileCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_WP_ChangeDirCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_WP_RemoveFileCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.generic.GP_SBPWPU_ErrorEvent;
+import com.quartercode.disconnected.shared.util.ValueInjector.InjectValue;
 import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
+import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserDetails;
+import com.quartercode.disconnected.shared.world.comp.prog.UUIDSBPWorldProcessUserDetails;
+import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
+import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import de.matthiasmann.twl.Button;
 import de.matthiasmann.twl.DialogLayout;
@@ -55,29 +64,45 @@ import de.matthiasmann.twl.model.SimpleTableModel;
 
 /**
  * The file manager client program is used to list, create, and remove files.
- * 
- * @see FileManagerClientProgramWindow
  */
-public class FileManagerClientProgram extends ClientProgramDescriptor {
+public class FileManagerClientProgram implements ClientProgramExecutor {
 
-    /**
-     * Creates a new file manager client program descriptor.
-     */
-    public FileManagerClientProgram() {
+    @InjectValue ("name")
+    private String                           name;
+    @InjectValue ("stateContext")
+    private ClientProgramStateContext        stateContext;
+    @InjectValue ("graphicsContext")
+    private GraphicsState                    graphicsContext;
+    @InjectValue ("l10nContext")
+    private LocalizationSupplier             l10n;
+    @InjectValue ("bridge")
+    private Bridge                           bridge;
 
-        super(ResourceBundles.forProgram("fileManager"), "name");
-    }
+    private final SBPWorldProcessUserDetails clientProcessId = new UUIDSBPWorldProcessUserDetails(UUID.randomUUID());
+    private final Mutable<WorldProcessId>    worldProcessId  = new MutableObject<>();
 
     @Override
-    public ClientProgramWindow create(GraphicsState state, ClientProgramContext context) {
+    public void run() {
 
-        return new FileManagerClientProgramWindow(state, this, context);
+        interruptWorldProcessOnStop(bridge, stateContext, worldProcessId);
+        stopOnWorldProcessInterrupt(bridge, stateContext, clientProcessId);
+        nullFieldOnWorldProcessInterrupt(bridge, stateContext, clientProcessId, worldProcessId);
+
+        final FileManagerClientProgramWindow window = new FileManagerClientProgramWindow();
+        window.setVisible(true);
+
+        launchWorldProcess(bridge, stateContext, clientProcessId, name, worldProcessId, new Runnable() {
+
+            @Override
+            public void run() {
+
+                window.afterLaunch();
+            }
+
+        });
     }
 
-    /**
-     * The internal {@link ClientProgramWindow} used by the {@link FileManagerClientProgram}.
-     */
-    public static class FileManagerClientProgramWindow extends ClientProgramWindowSkeleton {
+    private class FileManagerClientProgramWindow extends ClientProgramWindow {
 
         private Label            currentDirectoryLabel;
         private Button           createFileButton;
@@ -86,13 +111,18 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
         private Table            fileListTable;
         private SimpleTableModel fileListModel;
 
-        private FileManagerClientProgramWindow(GraphicsState state, ClientProgramDescriptor descriptor, ClientProgramContext context) {
+        private FileManagerClientProgramWindow() {
 
-            super(state, descriptor, context);
+            super(graphicsContext, l10n.get("name"));
+
+            stopOnWindowClose(stateContext, this);
+
+            initializeWidgets();
+            initializeCallbacks();
+            registerEventHandlers();
         }
 
-        @Override
-        protected void initializeGraphics() {
+        private void initializeWidgets() {
 
             new DesktopWindowSizeLimitsMediator(this, new Dimension(500, 150), null);
             new DesktopWindowDefaultSizeMediator(this, new Dimension(700, 300));
@@ -100,21 +130,21 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
             currentDirectoryLabel = new Label();
             currentDirectoryLabel.setTheme("/label");
 
-            createFileButton = new Button(getString("createFile.text"));
+            createFileButton = new Button(l10n.get("createFile.text"));
             createFileButton.setTheme("/button");
 
-            createDirectoryButton = new Button(getString("createDirectory.text"));
+            createDirectoryButton = new Button(l10n.get("createDirectory.text"));
             createDirectoryButton.setTheme("/button");
 
-            removeFileButton = new Button(getString("removeFile.text"));
+            removeFileButton = new Button(l10n.get("removeFile.text"));
             removeFileButton.setTheme("/button");
 
-            String headerName = getString("fileList.header.name");
-            String headerType = getString("fileList.header.type");
-            String headerOwner = getString("fileList.header.owner");
-            String headerGroup = getString("fileList.header.group");
-            String headerRights = getString("fileList.header.rights");
-            String headerSize = getString("fileList.header.size");
+            String headerName = l10n.get("fileList.header.name");
+            String headerType = l10n.get("fileList.header.type");
+            String headerOwner = l10n.get("fileList.header.owner");
+            String headerGroup = l10n.get("fileList.header.group");
+            String headerRights = l10n.get("fileList.header.rights");
+            String headerSize = l10n.get("fileList.header.size");
             fileListModel = new SimpleTableModel(new String[] { headerName, headerType, headerOwner, headerGroup, headerRights, headerSize });
 
             fileListTable = new Table(fileListModel);
@@ -148,10 +178,7 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
             table.setColumnWidth(column, (int) (table.getWidth() * width));
         }
 
-        @Override
-        protected void initializeInteractions() {
-
-            super.initializeInteractions();
+        private void initializeCallbacks() {
 
             fileListTable.addCallback(new Callback() {
 
@@ -199,7 +226,7 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
                         // If the selected file is not a reference to the parent dir
                         if (!fileName.equals("..")) {
                             // Ask for confirmation
-                            String confirmMessage = format(getString("removeFile.confirmPopup.message"), fileName);
+                            String confirmMessage = format(l10n.get("removeFile.confirmPopup.message"), fileName);
                             openPopup(new ConfirmPopup(getState(), confirmMessage, new Option[] { Option.NO, Option.YES }, new ConfirmPopup.Callback() {
 
                                 @Override
@@ -207,7 +234,7 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
 
                                     if (selected == Option.YES) {
                                         // Remove the file
-                                        bridge.send(new FMP_WP_RemoveFileCommand(worldProcessId, fileName));
+                                        bridge.send(new FMP_WP_RemoveFileCommand(worldProcessId.getValue(), fileName));
                                     }
                                 }
 
@@ -219,24 +246,13 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
             });
         }
 
-        @Override
-        protected void registerEventHandlers() {
+        private void registerEventHandlers() {
 
-            super.registerEventHandlers();
-
-            registerEventHandler(FMP_SBPWPU_UpdateViewCommand.class, new UpdateViewCommandHandler());
-            registerEventHandler(GP_SBPWPU_ErrorEvent.class, new GP_SBPWPU_ErrorEventPopupHandler(this, "", "Popup.message", true));
+            addEventHandler(bridge, stateContext, new UpdateViewCommandHandler(), FMP_SBPWPU_UpdateViewCommand.class, clientProcessId);
+            addEventHandler(bridge, stateContext, new GP_SBPWPU_ErrorEventPopupHandler(this, l10n, "", "Popup.message", true), GP_SBPWPU_ErrorEvent.class, clientProcessId);
         }
 
-        @Override
-        protected void doLaunchWorldProcess() {
-
-            // Launch process
-            bridge.send(new WorldProcessLaunchCommand(clientProcessDetails, "fileManager"));
-        }
-
-        @Override
-        protected void executeActionsRequiringWorldProcessId() {
+        private void afterLaunch() {
 
             // Set initial directory in order to receive an update view command
             changeDirectory(PathUtils.SEPARATOR);
@@ -245,13 +261,13 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
         private void changeDirectory(final String change) {
 
             // Send a request to set the new path
-            bridge.send(new FMP_WP_ChangeDirCommand(worldProcessId, change));
+            bridge.send(new FMP_WP_ChangeDirCommand(worldProcessId.getValue(), change));
         }
 
         private void updateView(String currentDir, FilePlaceholder[] files) {
 
             // Change path label
-            currentDirectoryLabel.setText(format(getString("currentDirectoryLabel.text"), currentDir));
+            currentDirectoryLabel.setText(format(l10n.get("currentDirectoryLabel.text"), currentDir));
 
             // Set whether the file modification buttons are enabled
             boolean absoluteRoot = currentDir.equals(PathUtils.SEPARATOR);
@@ -266,12 +282,12 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
 
             // Add reference to parent file
             if (!absoluteRoot) {
-                fileListModel.addRow("..", getString("fileList.fileType.parentFile"));
+                fileListModel.addRow("..", l10n.get("fileList.fileType.parentFile"));
             }
 
             // Add new entries to file list
             for (FilePlaceholder file : files) {
-                String type = getString("fileList.fileType." + file.getType());
+                String type = l10n.get("fileList.fileType." + file.getType());
 
                 String size = ByteCountFormatter.format(file.getSize());
                 String rights = file.getRights().toString();
@@ -288,7 +304,7 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
             @Override
             public void run() {
 
-                String inputMessage = getString(keyBase + ".fileNameInputPopup.message");
+                String inputMessage = l10n.get(keyBase + ".fileNameInputPopup.message");
                 openPopup(new TextInputPopup(getState(), inputMessage, null, true, new TextInputPopup.Callback() {
 
                     @Override
@@ -296,7 +312,7 @@ public class FileManagerClientProgram extends ClientProgramDescriptor {
 
                         if (!cancelled && text != null) {
                             // Add the new file
-                            bridge.send(new FMP_WP_AddFileCommand(worldProcessId, text, fileType));
+                            bridge.send(new FMP_WP_AddFileCommand(worldProcessId.getValue(), text, fileType));
                         }
                     }
 

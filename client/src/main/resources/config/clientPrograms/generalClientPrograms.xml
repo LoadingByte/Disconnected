@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <configureClientProgram name="fileManager">
+        <category>management</category>
         <class>com.quartercode.disconnected.client.graphics.desktop.prog.general.FileManagerClientProgram</class>
+    </configureClientProgram>
+
+    <configureClientProgram name="processManager">
+        <category>management</category>
+        <class>com.quartercode.disconnected.client.graphics.desktop.prog.general.ProcessManagerClientProgram</class>
     </configureClientProgram>
 </config>

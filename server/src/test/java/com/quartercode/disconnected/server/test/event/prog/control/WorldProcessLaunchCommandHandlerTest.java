@@ -47,9 +47,9 @@ import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.util.registry.extra.MultipleValueRegistry;
 import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
-import com.quartercode.disconnected.shared.world.comp.prog.ClientProcessDetails;
 import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserDetails;
 import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.world.comp.prog.UUIDSBPWorldProcessUserDetails;
 import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
 import com.quartercode.eventbridge.bridge.Bridge;
 
@@ -120,7 +120,7 @@ public class WorldProcessLaunchCommandHandlerTest {
 
         handler.currentLaunchedProcessId = expectedPid;
 
-        final SBPWorldProcessUserDetails wpuDetails = new ClientProcessDetails(UUID.randomUUID());
+        final SBPWorldProcessUserDetails wpuDetails = new UUIDSBPWorldProcessUserDetails(UUID.randomUUID());
 
         // @formatter:off
         context.checking(new Expectations() {{

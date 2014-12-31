@@ -16,55 +16,49 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.client.graphics.desktop;
+package com.quartercode.disconnected.client.graphics.desktop.prog;
 
 import java.util.ArrayList;
 import java.util.List;
 import com.quartercode.disconnected.client.graphics.GraphicsState;
 import com.quartercode.disconnected.client.graphics.component.MultiactionButton;
-import com.quartercode.disconnected.client.util.ResourceBundleGroup;
+import com.quartercode.disconnected.client.graphics.desktop.DesktopWindow;
+import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowCenteringMediator;
 import de.matthiasmann.twl.Event;
 import de.matthiasmann.twl.Widget;
 
 /**
- * A client program window is the core component of a client program.
- * It extends the {@link DesktopWindow} class and adds some extra functionality that is exclusive to program guis.<br>
+ * A client program window can be used by a {@link ClientProgramExecutor} to display a GUI window.
+ * It extends the {@link DesktopWindow} class and adds some extra functionality that is exclusive to program windows.
+ * That means that it comes with the ability to {@link #openPopup(DesktopWindow, boolean) open popup windows} and has a taskbar button for hiding it.<br>
  * <br>
- * Implementations inherit from this class and add their components and communication logic.
- * They are declared and created by {@link ClientProgramDescriptor}s that also store common data.
+ * Window implementations inherit from this class and add their components and communication logic.
+ * They are then managed by the {@link ClientProgramExecutor}s that use them.
  * 
- * @see ClientProgramDescriptor
+ * @see ClientProgramExecutor
  */
 public class ClientProgramWindow extends DesktopWindow {
 
-    private final ClientProgramDescriptor descriptor;
-    private final ClientProgramContext    context;
-    private final MultiactionButton       taskbarButton;
-
-    private final List<DesktopWindow>     openPopups = new ArrayList<>();
+    private final MultiactionButton   taskbarButton;
+    private final List<DesktopWindow> openPopups = new ArrayList<>();
 
     /**
      * Creates a new client program window in the given desktop {@link GraphicsState}.
-     * The constructor was called by the given {@link ClientProgramDescriptor}.
      * The new window is <b>not</b> added to the desktop automatically.
      * 
-     * @param state The desktop state the new program will be running in.
-     * @param descriptor The program descriptor that created the object.
-     * @param context The {@link ClientProgramContext} that contains information about the environment of the program.
+     * @param state The desktop state the window is part of.
+     * @param title The title that should be used for the window's title bar and the taskbar button.
      */
-    public ClientProgramWindow(GraphicsState state, ClientProgramDescriptor descriptor, ClientProgramContext context) {
+    public ClientProgramWindow(GraphicsState state, String title) {
 
         super(state);
 
-        this.descriptor = descriptor;
-        this.context = context;
-
         new DesktopWindowCenteringMediator(this);
-        setTitle(descriptor.getName());
+        setTitle(title);
 
         taskbarButton = new MultiactionButton();
         taskbarButton.setTheme("/desktop-taskbarButton-active");
-        taskbarButton.setText(descriptor.getName());
+        taskbarButton.setText(title);
 
         // Left click on the taskbar button minimizes/maximizes the window
         taskbarButton.addCallback(Event.MOUSE_LBUTTON, new Runnable() {
@@ -87,27 +81,6 @@ public class ClientProgramWindow extends DesktopWindow {
             }
 
         });
-    }
-
-    /**
-     * Returns the {@link ClientProgramDescriptor} that created the window.
-     * It defines all the properties of the window.
-     * 
-     * @return The client program descriptor that defines the window.
-     */
-    public ClientProgramDescriptor getDescriptor() {
-
-        return descriptor;
-    }
-
-    /**
-     * Returns a {@link ClientProgramContext} which contains information about the environment of the program.
-     * 
-     * @return The {@link ClientProgramContext} which is assigned to the program.
-     */
-    public ClientProgramContext getContext() {
-
-        return context;
     }
 
     @Override
@@ -145,19 +118,6 @@ public class ClientProgramWindow extends DesktopWindow {
                 popup.close();
             }
         }
-    }
-
-    // ----- Utility -----
-
-    /**
-     * Returns the localization string that is associated with the given key in the {@link ResourceBundleGroup} of the descriptor.
-     * 
-     * @param key The key the returned value is associated with.
-     * @return The localization string which is associated with the given key.
-     */
-    public String getString(String key) {
-
-        return descriptor.getResourceBundle().getString(key);
     }
 
     /**

@@ -19,14 +19,12 @@
 package com.quartercode.disconnected.client.graphics.desktop;
 
 import com.quartercode.disconnected.client.graphics.AbstractGraphicsModule;
-import com.quartercode.disconnected.client.graphics.GraphicsService;
 import com.quartercode.disconnected.client.graphics.GraphicsState;
+import com.quartercode.disconnected.client.graphics.desktop.prog.ClientProgramLauncher;
+import com.quartercode.disconnected.client.registry.ClientProgram;
 import com.quartercode.disconnected.client.registry.ClientRegistries;
 import com.quartercode.disconnected.client.util.ResourceBundles;
-import com.quartercode.disconnected.shared.util.ServiceRegistry;
-import com.quartercode.disconnected.shared.util.ValueInjector;
 import com.quartercode.disconnected.shared.util.registry.Registries;
-import com.quartercode.disconnected.shared.util.registry.extra.MappedValueRegistry.Mapping;
 import de.matthiasmann.twl.Alignment;
 import de.matthiasmann.twl.BoxLayout;
 import de.matthiasmann.twl.BoxLayout.Direction;
@@ -50,7 +48,7 @@ public class DesktopLaunchButtonModule extends AbstractGraphicsModule {
 
         button = new Button();
         button.setTheme("/desktop-launchButton");
-        button.setText(ResourceBundles.DESKTOP.getString("launchButton.text"));
+        button.setText(ResourceBundles.DESKTOP.get("launchButton.text"));
         button.addCallback(new Runnable() {
 
             @Override
@@ -78,25 +76,17 @@ public class DesktopLaunchButtonModule extends AbstractGraphicsModule {
         if (menuVisible) {
             // Add new menu buttons
             // TODO: Add client program categories
-            for (Mapping<String, Object> programMapping : Registries.get(ClientRegistries.CLIENT_PROGRAMS)) {
-                final ClientProgramDescriptor program = (ClientProgramDescriptor) programMapping.getRight();
-
+            for (final ClientProgram program : Registries.get(ClientRegistries.CLIENT_PROGRAMS)) {
                 Button menuButton = new Button();
                 menuButton.setTheme("/desktop-launchMenuButton");
-                menuButton.setText(program.getName());
+                menuButton.setText(ResourceBundles.forProgram(program.getName()).get("name"));
 
                 menuButton.addCallback(new Runnable() {
 
                     @Override
                     public void run() {
 
-                        // Create the context object
-                        ValueInjector valueInjector = new ValueInjector();
-                        valueInjector.put("bridge", ServiceRegistry.lookup(GraphicsService.class).getBridge());
-                        ClientProgramContext context = new ClientProgramContext(valueInjector);
-
-                        // Launch the client program
-                        program.create(state, context).setVisible(true);
+                        ClientProgramLauncher.launch(program, state);
                     }
 
                 });

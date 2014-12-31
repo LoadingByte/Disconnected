@@ -21,53 +21,45 @@ package com.quartercode.disconnected.client.registry.config;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.quartercode.disconnected.client.graphics.desktop.ClientProgramDescriptor;
+import com.quartercode.disconnected.client.graphics.desktop.prog.ClientProgramExecutor;
+import com.quartercode.disconnected.client.registry.ClientProgram;
 import com.quartercode.disconnected.shared.util.VariableReferenceResolver;
 import com.quartercode.disconnected.shared.util.config.extra.ConfigureNamedValueCommand;
 import com.quartercode.disconnected.shared.util.config.extra.ParserUtils;
-import com.quartercode.disconnected.shared.util.registry.extra.MapRegistry;
-import com.quartercode.disconnected.shared.util.registry.extra.MapRegistry.DefaultMapping;
-import com.quartercode.disconnected.shared.util.registry.extra.MappedValueRegistry.Mapping;
+import com.quartercode.disconnected.shared.util.registry.extra.SetRegistry;
 
-public class ConfigureClientProgramCommand extends ConfigureNamedValueCommand<Mapping<String, Object>> {
+public class ConfigureClientProgramCommand extends ConfigureNamedValueCommand<ClientProgram> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigureClientProgramCommand.class);
-
-    public ConfigureClientProgramCommand(MapRegistry<String, Object> registry) {
+    public ConfigureClientProgramCommand(SetRegistry<ClientProgram> registry) {
 
         super("client program", registry);
     }
 
     @Override
-    protected Mapping<String, Object> supplyDefaultValue(String name) {
+    protected ClientProgram supplyDefaultValue(String name) {
 
-        return new DefaultMapping<>(name, null);
+        return new ClientProgram(name, null, null);
     }
 
     @Override
-    protected Mapping<String, Object> changeValue(Document config, Element commandElement, Mapping<String, Object> oldValue) throws JDOMException {
+    protected ClientProgram changeValue(Document config, Element commandElement, ClientProgram oldValue) throws JDOMException {
 
-        String name = oldValue.getLeft();
-        Object descriptor = oldValue.getRight();
+        String name = oldValue.getName();
+        String category = oldValue.getCategory();
+        Class<?> type = oldValue.getType();
 
         Element typeElement = commandElement.getChild("class");
         if (typeElement != null) {
             String typeString = VariableReferenceResolver.process(typeElement.getText(), null);
-            Class<?> oldType = descriptor == null ? null : descriptor.getClass();
-            Class<?> type = ParserUtils.parseClass(config, "client program class for '" + name + "'", ClientProgramDescriptor.class, typeString, oldType);
-
-            if (type != null) {
-                try {
-                    descriptor = type.newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
-                    LOGGER.warn("Config: Unable to create instance of client program class '{}' for '{}' (in '{}')", type.getName(), name, config.getBaseURI(), e);
-                }
-            }
+            type = ParserUtils.parseClass(config, "client program executor class for '" + name + "'", ClientProgramExecutor.class, typeString, type);
         }
 
-        return new DefaultMapping<>(name, descriptor);
+        Element categoryElement = commandElement.getChild("category");
+        if (categoryElement != null) {
+            category = VariableReferenceResolver.process(categoryElement.getText(), null);
+        }
+
+        return new ClientProgram(name, category, type);
     }
 
 }
