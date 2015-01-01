@@ -18,6 +18,12 @@
 
 package com.quartercode.disconnected.client.graphics.desktop;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import lombok.RequiredArgsConstructor;
 import com.quartercode.disconnected.client.graphics.AbstractGraphicsModule;
 import com.quartercode.disconnected.client.graphics.GraphicsState;
 import com.quartercode.disconnected.client.graphics.desktop.prog.ClientProgramLauncher;
@@ -43,6 +49,9 @@ public class DesktopLaunchButtonModule extends AbstractGraphicsModule {
     private boolean   menuVisible;
     private BoxLayout menuLayout;
 
+    private Button    activeCategoryButton;
+    private BoxLayout categorySubmenuLayout;
+
     @Override
     public void add(final GraphicsState state) {
 
@@ -61,41 +70,61 @@ public class DesktopLaunchButtonModule extends AbstractGraphicsModule {
         ((Widget) state.getModule("desktopWidget").getValue("widget")).add(button);
         setValue("button", button);
 
-        menuLayout = new BoxLayout(Direction.VERTICAL);
-        menuLayout.setTheme("");
-        menuLayout.setSpacing(0);
-        menuLayout.setAlignment(Alignment.FILL);
+        menuLayout = createMenuBoxLayout();
         state.add(menuLayout);
         setValue("menuLayout", menuLayout);
+
+        categorySubmenuLayout = createMenuBoxLayout();
+        state.add(categorySubmenuLayout);
+        setValue("categorySubmenuLayout", categorySubmenuLayout);
     }
 
-    private void toggleLaunchMenu(final GraphicsState state) {
+    private BoxLayout createMenuBoxLayout() {
+
+        BoxLayout layout = new BoxLayout(Direction.VERTICAL);
+
+        layout.setTheme("");
+        layout.setSpacing(0);
+        layout.setAlignment(Alignment.FILL);
+
+        return layout;
+    }
+
+    private void toggleLaunchMenu(GraphicsState state) {
 
         menuVisible = !menuVisible;
 
         if (menuVisible) {
-            // Add new menu buttons
-            // TODO: Add client program categories
-            for (final ClientProgram program : Registries.get(ClientRegistries.CLIENT_PROGRAMS)) {
+            // Build a map of [category -> programs] (sorted by categories)
+            // Note that localized category names are used instead of keys in order to sort by the visible category names
+            SortedMap<String, List<ClientProgram>> categoriesToPrograms = new TreeMap<>();
+            for (ClientProgram program : Registries.get(ClientRegistries.CLIENT_PROGRAMS)) {
+                String category = ResourceBundles.DESKTOP.get("launchMenu.categories." + program.getCategory());
+
+                if (!categoriesToPrograms.containsKey(category)) {
+                    categoriesToPrograms.put(category, new ArrayList<ClientProgram>());
+                }
+
+                categoriesToPrograms.get(category).add(program);
+            }
+
+            // Add new menu buttons for all categories
+            for (Entry<String, List<ClientProgram>> entry : categoriesToPrograms.entrySet()) {
                 Button menuButton = new Button();
                 menuButton.setTheme("/desktop-launchMenuButton");
-                menuButton.setText(ResourceBundles.forProgram(program.getName()).get("name"));
+                menuButton.setText(entry.getKey());
 
-                menuButton.addCallback(new Runnable() {
-
-                    @Override
-                    public void run() {
-
-                        ClientProgramLauncher.launch(program, state);
-                    }
-
-                });
+                // Add a button callback to open the category submenu on hovering
+                menuButton.getModel().addStateCallback(new CategoryButtonHoverCallback(state, menuButton, entry.getValue()));
 
                 menuLayout.add(menuButton);
             }
         } else {
-            // Clear the menu buttons
+            // Clear the menu
             menuLayout.removeAllChildren();
+            // Clear any active category submenu
+            activeCategoryButton = null;
+            categorySubmenuLayout.removeAllChildren();
         }
     }
 
@@ -107,6 +136,56 @@ public class DesktopLaunchButtonModule extends AbstractGraphicsModule {
 
         menuLayout.adjustSize();
         menuLayout.setPosition(button.getX() + 1, button.getY() - menuLayout.getHeight() - 1);
+
+        categorySubmenuLayout.adjustSize();
+        if (activeCategoryButton != null) {
+            int x = activeCategoryButton.getX() + activeCategoryButton.getWidth();
+            int y = activeCategoryButton.getY() + activeCategoryButton.getHeight() - categorySubmenuLayout.getHeight();
+            categorySubmenuLayout.setPosition(x, y);
+        }
+    }
+
+    @RequiredArgsConstructor
+    private class CategoryButtonHoverCallback implements Runnable {
+
+        private final GraphicsState       state;
+        private final Button              button;
+        private final List<ClientProgram> categoryPrograms;
+
+        @Override
+        public void run() {
+
+            // Only open a new category submenu if the category is marked as active (hover)
+            if (!button.getModel().isHover()) {
+                return;
+            }
+
+            // Set the current category button as active in order to properly layout the category submenu
+            activeCategoryButton = button;
+
+            // Clear any submenu that has been previously opened
+            categorySubmenuLayout.removeAllChildren();
+
+            // Add new menu buttons for all programs of the active category
+            for (final ClientProgram program : categoryPrograms) {
+                Button submenuButton = new Button();
+                submenuButton.setTheme("/desktop-launchMenuButton");
+                submenuButton.setText(ResourceBundles.forProgram(program.getName()).get("name"));
+
+                // Add a button callback to launch the program
+                submenuButton.addCallback(new Runnable() {
+
+                    @Override
+                    public void run() {
+
+                        ClientProgramLauncher.launch(program, state);
+                    }
+
+                });
+
+                categorySubmenuLayout.add(submenuButton);
+            }
+        }
     }
 
 }
