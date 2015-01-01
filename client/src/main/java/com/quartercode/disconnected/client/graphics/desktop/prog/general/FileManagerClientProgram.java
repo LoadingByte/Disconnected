@@ -18,6 +18,8 @@
 
 package com.quartercode.disconnected.client.graphics.desktop.prog.general;
 
+import static com.quartercode.disconnected.client.graphics.desktop.DesktopWindowUtils.setDefaultSize;
+import static com.quartercode.disconnected.client.graphics.desktop.DesktopWindowUtils.setMinimumSize;
 import static com.quartercode.disconnected.client.graphics.desktop.prog.util.ProgEventUtils.addEventHandler;
 import static com.quartercode.disconnected.client.graphics.desktop.prog.util.ProgEventUtils.launchWorldProcess;
 import static com.quartercode.disconnected.client.graphics.desktop.prog.util.ProgStateUtils.*;
@@ -27,8 +29,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import com.quartercode.disconnected.client.graphics.GraphicsState;
-import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowDefaultSizeMediator;
-import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowSizeLimitsMediator;
 import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup;
 import com.quartercode.disconnected.client.graphics.desktop.popup.ConfirmPopup.Option;
 import com.quartercode.disconnected.client.graphics.desktop.popup.TextInputPopup;
@@ -117,15 +117,15 @@ public class FileManagerClientProgram implements ClientProgramExecutor {
 
             stopOnWindowClose(stateContext, this);
 
+            setDefaultSize(this, new Dimension(700, 300));
+            setMinimumSize(this, new Dimension(500, 150));
+
             initializeWidgets();
             initializeCallbacks();
             registerEventHandlers();
         }
 
         private void initializeWidgets() {
-
-            new DesktopWindowSizeLimitsMediator(this, new Dimension(500, 150), null);
-            new DesktopWindowDefaultSizeMediator(this, new Dimension(700, 300));
 
             currentDirectoryLabel = new Label();
             currentDirectoryLabel.setTheme("/label");

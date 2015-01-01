@@ -18,10 +18,10 @@
 
 package com.quartercode.disconnected.client.graphics.desktop.popup;
 
+import static com.quartercode.disconnected.client.graphics.desktop.DesktopWindowUtils.setDefaultSize;
 import com.quartercode.disconnected.client.graphics.GraphicsState;
 import com.quartercode.disconnected.client.graphics.component.NoPopupEditField;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopWindow;
-import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowDefaultSizeMediator;
 import com.quartercode.disconnected.client.util.ResourceBundles;
 import de.matthiasmann.twl.Button;
 import de.matthiasmann.twl.DialogLayout;
@@ -51,7 +51,7 @@ public class TextInputPopup extends DesktopWindow {
 
         super(state);
 
-        new DesktopWindowDefaultSizeMediator(this, new Dimension(300, 0));
+        setDefaultSize(this, new Dimension(300, 0));
 
         Label messageLabel = new Label(message);
         messageLabel.setTheme("/label");

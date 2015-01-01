@@ -23,7 +23,7 @@ import java.util.List;
 import com.quartercode.disconnected.client.graphics.GraphicsState;
 import com.quartercode.disconnected.client.graphics.component.MultiactionButton;
 import com.quartercode.disconnected.client.graphics.desktop.DesktopWindow;
-import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowCenteringMediator;
+import com.quartercode.disconnected.client.graphics.desktop.DesktopWindowUtils;
 import de.matthiasmann.twl.Event;
 import de.matthiasmann.twl.Widget;
 
@@ -53,7 +53,7 @@ public class ClientProgramWindow extends DesktopWindow {
 
         super(state);
 
-        new DesktopWindowCenteringMediator(this);
+        DesktopWindowUtils.center(this);
         setTitle(title);
 
         taskbarButton = new MultiactionButton();
@@ -150,7 +150,7 @@ public class ClientProgramWindow extends DesktopWindow {
         });
 
         // Center the popup relative to the parent window
-        new DesktopWindowCenteringMediator(popup, this);
+        DesktopWindowUtils.center(popup, this);
 
         if (modal) {
             // Disable the main program window if the popup is modal
