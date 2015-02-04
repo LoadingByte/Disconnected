@@ -118,6 +118,10 @@ public class ProgEventUtils {
         executor.getParent().addToColl(Process.STATE_LISTENERS, removalListener);
     }
 
+    private ProgEventUtils() {
+
+    }
+
     /**
      * An internal {@link ProcStateListener} that removes a given {@link EventHandler} or {@link SBPAwareEventHandler} once the program is stopped.
      * It doesn't need to be persistent because all event handlers are removed anyway when the server stops. That would make it useless junk.
@@ -183,10 +187,6 @@ public class ProgEventUtils {
             });
 
         }
-
-    }
-
-    private ProgEventUtils() {
 
     }
 

@@ -73,7 +73,7 @@ public class FileSystem extends WorldChildFeatureHolder<FileSystemHolder> implem
 
     /**
      * Returns the {@link File} which is stored under the given path.
-     * A path is a collection of {@link File}s seperated by a separator.
+     * A path is a collection of {@link File}s separated by a separator.
      * This will look up the {@link File} using a local file system path.
      * 
      * <table>

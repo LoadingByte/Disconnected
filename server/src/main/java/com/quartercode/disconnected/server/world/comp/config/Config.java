@@ -41,7 +41,7 @@ import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
  * </pre>
  * 
  * A configuration uses {@link ConfigEntry config entries} which contain different columns.
- * Every column contains a value or a list. If it contains a list, the list entries are seperated by commas.
+ * Every column contains a value or a list. If it contains a list, the list entries are separated by commas.
  * 
  * @see ConfigEntry
  */

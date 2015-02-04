@@ -36,6 +36,7 @@ import com.quartercode.disconnected.shared.util.registry.extra.NamedValue;
  * 
  * @see Action
  * @see VulnSourceRegistry
+ * @see ServerRegistries#VULN_SOURCES
  */
 public class VulnSource implements NamedValue {
 

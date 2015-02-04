@@ -4,9 +4,9 @@
     <images>
         <select name="desktop.launchButton.background">
             <alias ref="desktop_taskbarButton_active.background" if="disabled" tint="#0093BD"/>
-            <alias ref="desktop_taskbarButton_active.background" if="pressed" tint="#00C800"/>
-            <alias ref="desktop_taskbarButton_active.background" if="hover" tint="#00FF00"/>
-            <alias ref="desktop_taskbarButton_active.background" tint="#00C7FF"/>
+            <alias ref="desktop_taskbarButton_active.background" if="pressed" tint="#00A600"/>
+            <alias ref="desktop_taskbarButton_active.background" if="hover" tint="#00D100"/>
+            <alias ref="desktop_taskbarButton_active.background" tint="#09D3ED"/>
         </select>
     </images>
 

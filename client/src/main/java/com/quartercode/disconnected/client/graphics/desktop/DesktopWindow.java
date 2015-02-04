@@ -26,7 +26,7 @@ import de.matthiasmann.twl.Widget;
 
 /**
  * A desktop window represents a window on a desktop area.
- * Bascially, it is extending the {@link ResizableFrame} widget.
+ * Basically, it is extending the {@link ResizableFrame} widget.
  */
 public class DesktopWindow extends ResizableFrame {
 
@@ -42,7 +42,7 @@ public class DesktopWindow extends ResizableFrame {
      * Creates a new desktop window in the given desktop {@link GraphicsState}.
      * The new window is <b>not</b> added to the desktop automatically.
      * 
-     * @param state The desktop state the new program will be running in.
+     * @param state The desktop state the window is part of.
      */
     public DesktopWindow(GraphicsState state) {
 
@@ -63,7 +63,7 @@ public class DesktopWindow extends ResizableFrame {
     }
 
     /**
-     * Returns the desktop {@link GraphicsState} the window is running in.
+     * Returns the desktop {@link GraphicsState} the window is part of.
      * 
      * @return The graphics state that uses the program.
      */
@@ -96,7 +96,7 @@ public class DesktopWindow extends ResizableFrame {
 
     /**
      * Adds the window widget to the desktop {@link GraphicsState} window area.
-     * This method is typically called by the {@link #setVisible(boolean)} method and should not be used from outside.
+     * This method is typically called by the {@link #setVisible(boolean)} method and should not be used from the outside.
      */
     protected void open() {
 

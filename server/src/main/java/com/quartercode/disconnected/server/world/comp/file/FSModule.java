@@ -142,8 +142,8 @@ public class FSModule extends OSModule {
 
     /**
      * Returns the {@link File} which is stored on a mounted {@link FileSystem} under the given path.
-     * A path is a collection of {@link File}s seperated by a separator.
-     * This will look up the {@link File} using a global os path.
+     * A path is a collection of {@link File}s separated by a separator.
+     * This will look up the {@link File} using a global OS path.
      * 
      * <table>
      * <tr>

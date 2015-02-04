@@ -260,7 +260,9 @@ public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHo
                 // Normally, the root file terminates the recursion by returning an empty string
                 if (file.getParent() != null) {
                     String parentPath = file.getParent().invoke(GET_PATH);
-                    path = parentPath + (parentPath.isEmpty() ? "" : PathUtils.SEPARATOR) + file.getObj(NAME);
+                    if (parentPath != null) {
+                        path = parentPath + (parentPath.isEmpty() ? "" : PathUtils.SEPARATOR) + file.getObj(NAME);
+                    }
                 }
 
                 invocation.next(arguments);

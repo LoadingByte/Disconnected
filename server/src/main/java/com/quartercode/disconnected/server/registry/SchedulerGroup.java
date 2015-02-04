@@ -26,7 +26,8 @@ import com.quartercode.disconnected.shared.util.registry.extra.NamedValue;
 
 /**
  * A data object that represents a scheduler group.
- * See {@link ServerRegistries#SCHEDULER_GROUPS} for more details.
+ * 
+ * @see ServerRegistries#SCHEDULER_GROUPS
  */
 public class SchedulerGroup implements NamedValue {
 

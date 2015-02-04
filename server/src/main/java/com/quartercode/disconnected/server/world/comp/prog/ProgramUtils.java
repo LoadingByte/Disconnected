@@ -103,11 +103,16 @@ public class ProgramUtils {
             children = childrenList.toArray(new WorldProcessPlaceholder[childrenList.size()]);
         }
 
+        String sourcePath = "<unknown>";
         ContentFile sourceFile = process.getObj(Process.SOURCE);
-        FSModule fsModule = process.invoke(Process.GET_OS).getObj(OS.FS_MODULE);
-        String localSourcePath = sourceFile.invoke(File.GET_PATH);
-        String mountpoint = fsModule.invoke(FSModule.GET_KNOWN_BY_FS, sourceFile.invoke(File.GET_FS)).getObj(KnownFS.MOUNTPOINT);
-        String sourcePath = PathUtils.resolve(PathUtils.SEPARATOR + mountpoint, localSourcePath);
+        FileSystem sourceFileFs = sourceFile.invoke(File.GET_FS);
+        // Check to avoid exceptions if the source file has been removed from its file system
+        if (sourceFileFs != null) {
+            FSModule fsModule = process.invoke(Process.GET_OS).getObj(OS.FS_MODULE);
+            String localSourcePath = sourceFile.invoke(File.GET_PATH);
+            String mountpoint = fsModule.invoke(FSModule.GET_KNOWN_BY_FS, sourceFileFs).getObj(KnownFS.MOUNTPOINT);
+            sourcePath = PathUtils.resolve(PathUtils.SEPARATOR + mountpoint, localSourcePath);
+        }
 
         String programName = getProgramName(process.getObj(Process.EXECUTOR).getClass());
 

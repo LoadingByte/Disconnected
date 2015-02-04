@@ -27,6 +27,8 @@ import com.quartercode.disconnected.shared.world.comp.file.SeparatedPath;
 
 /**
  * A data object that represents a world program by storing its program executor class, size, and common file location.
+ * 
+ * @see ServerRegistries#WORLD_PROGRAMS
  */
 public class WorldProgram implements NamedValue {
 
@@ -57,7 +59,7 @@ public class WorldProgram implements NamedValue {
 
     /**
      * Returns the key (name) of the world program.
-     * It is used to reference the program without the program executor class.
+     * It is used to reference the program without the {@link #getType() program executor class}.
      * 
      * @return The program key.
      */

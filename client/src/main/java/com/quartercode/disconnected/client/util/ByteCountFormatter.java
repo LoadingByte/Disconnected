@@ -45,7 +45,7 @@ public class ByteCountFormatter {
     public static String format(long byteCount) {
 
         if (byteCount <= 0) {
-            return "0";
+            return "0 " + UNITS[0];
         } else {
             int digitGroups = (int) (Math.log10(byteCount) / Math.log10(1024));
             return new DecimalFormat("###0.#").format(byteCount / Math.pow(1024, digitGroups)) + " " + (digitGroups < UNITS.length ? UNITS[digitGroups] : "?B");

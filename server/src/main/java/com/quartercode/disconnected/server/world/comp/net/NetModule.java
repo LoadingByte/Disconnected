@@ -78,6 +78,7 @@ public class NetModule extends OSModule {
     /**
      * Creates a new {@link Socket} that can send packets from the parent computer.
      * After creation, the new socket must be configured and then started up with {@link Socket#CONNECT}.
+     * The most important fields are: {@link Socket#LOCAL_PORT} (often {@code 0}), {@link Socket#DESTINATION} and {@link Socket#PACKET_HANDLERS}.
      */
     public static final FunctionDefinition<Socket>                                                             CREATE_SOCKET;
 

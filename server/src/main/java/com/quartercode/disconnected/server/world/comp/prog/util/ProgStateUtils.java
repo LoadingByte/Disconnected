@@ -59,6 +59,10 @@ public class ProgStateUtils {
         }, LEVEL_3);
     }
 
+    private ProgStateUtils() {
+
+    }
+
     /**
      * A {@link ProcStateListener} that stops the {@link Process} it is attached to as soon as that process is interrupted.
      * 
@@ -85,10 +89,6 @@ public class ProgStateUtils {
             });
 
         }
-
-    }
-
-    private ProgStateUtils() {
 
     }
 

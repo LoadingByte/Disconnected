@@ -111,7 +111,7 @@ public abstract class AbstractGraphicsModule implements GraphicsModule {
         values.put(key, value);
     }
 
-    // Empty implementations (can be overriden)
+    // Empty implementations (can be overridden)
 
     @Override
     public void add(GraphicsState state) {
