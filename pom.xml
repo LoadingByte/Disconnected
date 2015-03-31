@@ -7,7 +7,7 @@
     <packaging>pom</packaging>
 
     <name>Disconnected</name>
-    <url>http://www.quartercode.com</url>
+    <url>http://quartercode.com/wiki/Disconnected</url>
     <description>Disconnected is a large sandbox-type hacking game which simulates the entire world for giving realistic reactions of the society.</description>
     <inceptionYear>2013</inceptionYear>
 
@@ -45,7 +45,7 @@
 
     <organization>
         <name>QuarterCode</name>
-        <url>http://www.quartercode.com</url>
+        <url>http://quartercode.com</url>
     </organization>
 
     <developers>
