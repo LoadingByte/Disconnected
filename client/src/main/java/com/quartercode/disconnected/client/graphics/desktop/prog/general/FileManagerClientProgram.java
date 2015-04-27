@@ -290,7 +290,7 @@ public class FileManagerClientProgram implements ClientProgramExecutor {
                 String type = l10n.get("fileList.fileType." + file.getType());
 
                 String size = ByteCountFormatter.format(file.getSize());
-                String rights = file.getRights().toString();
+                String rights = file.getRights().exportRightsAsString();
                 fileListModel.addRow(file.getName(), type, file.getOwner(), file.getGroup(), rights, size);
             }
         }

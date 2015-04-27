@@ -116,7 +116,7 @@ public class FileRights implements Serializable {
         Validate.isTrue(c != ',', "Character used for file rights cannot be ','");
     }
 
-    private static SortedMap<Character, SortedSet<Character>> fromString(String string) {
+    private static SortedMap<Character, SortedSet<Character>> convertStringToRightMap(String string) {
 
         SortedMap<Character, SortedSet<Character>> rights = new TreeMap<>();
 
@@ -137,7 +137,7 @@ public class FileRights implements Serializable {
         return rights;
     }
 
-    private static String toString(SortedMap<Character, SortedSet<Character>> rights) {
+    private static String convertRightMapToString(SortedMap<Character, SortedSet<Character>> rights) {
 
         StringBuilder string = new StringBuilder();
 
@@ -153,7 +153,7 @@ public class FileRights implements Serializable {
     }
 
     @XmlJavaTypeAdapter (FileRightsAdapter.class)
-    private final SortedMap<Character, SortedSet<Character>> rights;
+    private SortedMap<Character, SortedSet<Character>> rights;
 
     /**
      * Creates a new empty file rights object with no rights being set.
@@ -166,27 +166,25 @@ public class FileRights implements Serializable {
     /**
      * Creates a new file rights object and fills it with the rights stored in the given file rights object.
      * Modifications on one of the two objects won't change the other object.
+     * Internally, this method just calls {@link #importRights(FileRights)}.
      * 
      * @param original The file rights object whose rights should be copied into the new object.
      */
     public FileRights(FileRights original) {
 
-        rights = new TreeMap<>();
-
-        for (Entry<Character, SortedSet<Character>> entry : original.rights.entrySet()) {
-            rights.put(entry.getKey(), new TreeSet<>(entry.getValue()));
-        }
+        importRights(original);
     }
 
     /**
      * Creates a new file rights object and fills it with the rights stored by the given string representation.
-     * The format is the same one used by {@link #toString()}. Check that method for more documentation.
+     * The format is the same one used by {@link #exportRightsAsString()}. Check that method for more documentation.
+     * Internally, this method just calls {@link #importRights(String)}.
      * 
      * @param string The string representation that contains the file rights for the new object.
      */
     public FileRights(String string) {
 
-        rights = fromString(string);
+        importRights(string);
     }
 
     /**
@@ -256,16 +254,39 @@ public class FileRights implements Serializable {
         }
     }
 
-    @Override
-    public int hashCode() {
+    /**
+     * Removes all previously set or imported rights.
+     * The {@link #exportRightsAsString()} method will return an empty string after this method has been called.
+     */
+    public void clearRights() {
 
-        return HashCodeBuilder.reflectionHashCode(this);
+        rights.clear();
     }
 
-    @Override
-    public boolean equals(Object obj) {
+    /**
+     * Changes the rights stored by this file rights objects to the ones stored in the given other file rights object.
+     * Modifications on one of the two objects won't change the other object.
+     * 
+     * @param other The file rights object whose rights should be copied.
+     */
+    public void importRights(FileRights other) {
 
-        return EqualsBuilder.reflectionEquals(this, obj);
+        rights = new TreeMap<>();
+
+        for (Entry<Character, SortedSet<Character>> entry : other.rights.entrySet()) {
+            rights.put(entry.getKey(), new TreeSet<>(entry.getValue()));
+        }
+    }
+
+    /**
+     * Changes the rights stored by this file rights objects to the ones defined by the given string representation.
+     * The format is the same as the one used by {@link #exportRightsAsString()}. Check that method for more documentation.
+     * 
+     * @param string The string representation that contains the file rights which should be imported.
+     */
+    public void importRights(String string) {
+
+        rights = convertStringToRightMap(string);
     }
 
     /**
@@ -284,10 +305,27 @@ public class FileRights implements Serializable {
      * 
      * @return A string representation of the file rights.
      */
+    public String exportRightsAsString() {
+
+        return convertRightMapToString(rights);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        return EqualsBuilder.reflectionEquals(this, obj);
+    }
+
     @Override
     public String toString() {
 
-        return toString(rights);
+        return exportRightsAsString();
     }
 
     static class FileRightsAdapter extends XmlAdapter<String, SortedMap<Character, SortedSet<Character>>> {
@@ -295,13 +333,13 @@ public class FileRights implements Serializable {
         @Override
         public String marshal(SortedMap<Character, SortedSet<Character>> v) {
 
-            return FileRights.toString(v);
+            return FileRights.convertRightMapToString(v);
         }
 
         @Override
         public SortedMap<Character, SortedSet<Character>> unmarshal(String v) {
 
-            return FileRights.fromString(v);
+            return FileRights.convertStringToRightMap(v);
         }
 
     }

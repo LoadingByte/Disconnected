@@ -26,20 +26,31 @@ import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
 public class FileRightsTest {
 
-    @Test
-    public void testSetAndGet() {
-
-        FileRights rights = new FileRights();
+    private void setTestRights(FileRights rights) {
 
         // Set: "o:r,u:dw"
         rights.setRight(FileRights.OWNER, FileRights.WRITE, true);
         rights.setRight(FileRights.OWNER, FileRights.DELETE, true);
         rights.setRight(FileRights.OTHERS, FileRights.READ, true);
+    }
 
+    private void assertTestRights(FileRights rights) {
+
+        // Assert: "o:r,u:dw"
         assertTrue("Owner write right isn't set", rights.isRightSet(FileRights.OWNER, FileRights.WRITE));
         assertTrue("Owner delete right isn't set", rights.isRightSet(FileRights.OWNER, FileRights.DELETE));
         assertFalse("Group delete right is set", rights.isRightSet(FileRights.GROUP, FileRights.DELETE));
         assertTrue("Others read right isn't set", rights.isRightSet(FileRights.OTHERS, FileRights.READ));
+    }
+
+    @Test
+    public void testSetAndGet() {
+
+        FileRights rights = new FileRights();
+
+        // Set and assert: "o:r,u:dw"
+        setTestRights(rights);
+        assertTestRights(rights);
     }
 
     @Test
@@ -48,9 +59,7 @@ public class FileRightsTest {
         FileRights rights = new FileRights();
 
         // Set: "o:r,u:dw"
-        rights.setRight(FileRights.OWNER, FileRights.WRITE, true);
-        rights.setRight(FileRights.OWNER, FileRights.DELETE, true);
-        rights.setRight(FileRights.OTHERS, FileRights.READ, true);
+        setTestRights(rights);
 
         assertEquals("Owner rights", new TreeSet<>(Arrays.asList(FileRights.WRITE, FileRights.DELETE)), rights.getAllSetRights(FileRights.OWNER));
         assertEquals("Group rights", new TreeSet<>(), rights.getAllSetRights(FileRights.GROUP));
@@ -63,9 +72,7 @@ public class FileRightsTest {
         FileRights rights = new FileRights();
 
         // Set: "o:r,u:w" (note that owner->delete is unset again)
-        rights.setRight(FileRights.OWNER, FileRights.WRITE, true);
-        rights.setRight(FileRights.OWNER, FileRights.DELETE, true);
-        rights.setRight(FileRights.OTHERS, FileRights.READ, true);
+        setTestRights(rights);
         rights.setRight(FileRights.OWNER, FileRights.DELETE, false);
 
         assertTrue("Owner write right isn't set", rights.isRightSet(FileRights.OWNER, FileRights.WRITE));
@@ -75,8 +82,40 @@ public class FileRightsTest {
     }
 
     @Test
-    public void testFromString() {
+    public void testClearRights() {
 
+        FileRights rights = new FileRights();
+
+        // Set: "o:r,u:dw"
+        setTestRights(rights);
+
+        // Clear the rights
+        rights.clearRights();
+
+        // No rights are allowed to be left
+        assertEquals("Owner rights", new TreeSet<>(), rights.getAllSetRights(FileRights.OWNER));
+        assertEquals("Group rights", new TreeSet<>(), rights.getAllSetRights(FileRights.GROUP));
+        assertEquals("Others rights", new TreeSet<>(), rights.getAllSetRights(FileRights.OTHERS));
+        assertEquals("Generated file right string", "", rights.exportRightsAsString());
+    }
+
+    @Test
+    public void testImportRightsFromOther() {
+
+        FileRights other = new FileRights();
+        // Set: "o:r,u:dw"
+        setTestRights(other);
+
+        // This also tests the import method
+        FileRights rights = new FileRights(other);
+        // Assert: "o:r,u:dw"
+        assertTestRights(rights);
+    }
+
+    @Test
+    public void testImportRightsFromString() {
+
+        // This also tests the import method
         FileRights rights = new FileRights("g:d,o:rx,u:rwx");
 
         assertTrue("Owner read right isn't set", rights.isRightSet(FileRights.OWNER, FileRights.READ));
@@ -96,7 +135,7 @@ public class FileRightsTest {
     }
 
     @Test
-    public void testToString() {
+    public void testExportRightsAsString() {
 
         FileRights rights = new FileRights();
 
@@ -115,7 +154,7 @@ public class FileRightsTest {
         rights.setRight(FileRights.OTHERS, FileRights.DELETE, false);
         rights.setRight(FileRights.OTHERS, FileRights.EXECUTE, true);
 
-        assertEquals("Generated file right string", "g:d,o:rx,u:rwx", rights.toString());
+        assertEquals("Generated file right string", "g:d,o:rx,u:rwx", rights.exportRightsAsString());
     }
 
 }
