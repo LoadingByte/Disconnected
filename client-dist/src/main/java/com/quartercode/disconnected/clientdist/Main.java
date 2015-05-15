@@ -26,11 +26,11 @@ import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Random;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -113,7 +113,9 @@ public class Main {
         initializeTempFileManager();
 
         // Process the command line arguments
-        processCommandLineArguments(args);
+        if (!processCommandLineArguments(args)) {
+            return;
+        }
 
         // Bootstrap modules (shared, server, client)
         LOGGER.info("Executing bootstrap");
@@ -231,38 +233,40 @@ public class Main {
         }
     }
 
-    private static void processCommandLineArguments(String[] arguments) {
+    // The return value expresses whether the main method should be executed further (true) or aborted (false)
+    private static boolean processCommandLineArguments(String[] arguments) {
 
         // Parse command line arguments
         Options options = createCommandLineOptions();
         CommandLine line = null;
         try {
-            line = new PosixParser().parse(options, arguments, true);
+            line = new DefaultParser().parse(options, arguments, true);
         } catch (ParseException e) {
             LOGGER.warn(e.getMessage());
             new HelpFormatter().printHelp("java -jar " + JAR_NAME, options, true);
-            return;
+            return false;
         }
 
         // Print help if necessary
         if (line.hasOption("help")) {
             LOGGER.info("Printing help and returning");
             new HelpFormatter().printHelp("java -jar " + JAR_NAME, options, true);
-            return;
+            return false;
         }
 
         // Set locale if necessary
         if (line.hasOption("locale")) {
             Locale.setDefault(LocaleUtils.toLocale(line.getOptionValue("locale")));
         }
+
+        return true;
     }
 
-    @SuppressWarnings ("static-access")
     private static Options createCommandLineOptions() {
 
         Options options = new Options();
-        options.addOption(OptionBuilder.withLongOpt("help").withDescription("Prints a help page").create("h"));
-        options.addOption(OptionBuilder.withLongOpt("locale").hasArg().withArgName("locale").withDescription("Sets the locale code to use (e.g. en or de_DE)").create("l"));
+        options.addOption(Option.builder("h").longOpt("help").desc("Prints a help page").build());
+        options.addOption(Option.builder("l").longOpt("locale").hasArg().argName("locale").desc("Sets the locale code to use (e.g. en or de_DE)").build());
         return options;
     }
 
