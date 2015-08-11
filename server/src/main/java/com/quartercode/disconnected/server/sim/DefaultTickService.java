@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This is the default implementation of the {@link TickService}.
- * 
+ *
  * @see TickService
  */
 public class DefaultTickService implements TickService {

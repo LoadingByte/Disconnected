@@ -18,13 +18,11 @@
 
 package com.quartercode.disconnected.server.sim.scheduler;
 
-import com.quartercode.classmod.base.FeatureHolder;
-
 /**
  * A scheduler registry provider is able to provide a {@link SchedulerRegistry} when the {@link #getSchedulerRegistry()} method is called.
- * Note that {@link Scheduler}s expect their {@link FeatureHolder holders} to be such a provider in order to retrieve their scheduler registry.
+ * Note that {@link Scheduler}s expect the objects that use them to be such providers in order to get access to a scheduler registry.
  * See the {@link Scheduler} class for more information on that.
- * 
+ *
  * @see SchedulerRegistry
  */
 public interface SchedulerRegistryProvider {
@@ -32,7 +30,7 @@ public interface SchedulerRegistryProvider {
     /**
      * Returns the {@link SchedulerRegistry} that is provided by the scheduler registry provider.
      * Note that it may be {@code null}.
-     * 
+     *
      * @return The provided scheduler registry.
      */
     public SchedulerRegistry getSchedulerRegistry();

@@ -24,19 +24,18 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import com.quartercode.classmod.base.FeatureHolder;
 import com.quartercode.disconnected.server.registry.SchedulerGroup;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerRegistry;
 import com.quartercode.disconnected.server.world.World;
-import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
 import com.quartercode.disconnected.shared.util.registry.Registries;
+import com.quartercode.jtimber.api.node.util.ParentUtils;
 
 /**
  * This class updates the {@link World} it stores.
  * It does that by updating all available {@link Scheduler}s which are registered inside the world's {@link SchedulerRegistry}.
- * 
+ *
  * @see Scheduler
  */
 public class TickWorldUpdater implements TickAction {
@@ -46,7 +45,7 @@ public class TickWorldUpdater implements TickAction {
 
     /**
      * Returns the {@link World} that is currently updated by the tick world updater.
-     * 
+     *
      * @return The currently updated world.
      */
     public World getWorld() {
@@ -57,7 +56,7 @@ public class TickWorldUpdater implements TickAction {
     /**
      * Changes the {@link World} that is currently updated by the tick world updater.
      * The change will take place in the next tick.
-     * 
+     *
      * @param world The new world to updated.
      */
     public void setWorld(World world) {
@@ -74,19 +73,19 @@ public class TickWorldUpdater implements TickAction {
 
         if (world != null) {
             // Remove the schedulers that are no longer part of the world tree
-            // That is determined by checking whether they are able to retrieve the world root object
-            Iterator<Scheduler> schedulerIterator = world.getSchedulerRegistry().getNewModifiableSchedulersIterator();
+            // That is determined by checking whether they are able to reach the world root object by recursively looking at all parents
+            Iterator<Scheduler<?>> schedulerIterator = world.getSchedulerRegistry().getNewModifiableSchedulersIterator();
             while (schedulerIterator.hasNext()) {
-                FeatureHolder schedulerHolder = schedulerIterator.next().getHolder();
-                if (schedulerHolder instanceof WorldChildFeatureHolder && ((WorldChildFeatureHolder<?>) schedulerHolder).getWorld() == null) {
+                Scheduler<?> scheduler = schedulerIterator.next();
+                if (ParentUtils.getFirstParentOfType(World.class, scheduler) == null) {
                     schedulerIterator.remove();
                 }
             }
 
             // Update each scheduler with each group in the correct order
-            Collection<Scheduler> schedulers = world.getSchedulerRegistry().getSchedulers();
+            Collection<Scheduler<?>> schedulers = world.getSchedulerRegistry().getSchedulers();
             for (String group : getSortedGroups()) {
-                for (Scheduler scheduler : schedulers) {
+                for (Scheduler<?> scheduler : schedulers) {
                     scheduler.update(group);
                 }
             }

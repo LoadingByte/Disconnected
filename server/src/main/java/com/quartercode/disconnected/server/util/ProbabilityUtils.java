@@ -32,7 +32,7 @@ public class ProbabilityUtils {
     /**
      * Calculates a valid probability value out of a pseudo one.
      * For example, if your pseudo value is 1.5, you will get 1, in the case of -2 you will get 0.
-     * 
+     *
      * @param pseudoProbability The pseudo probability (may be smaller than 0 or larger than 1).
      * @return The calculated valid probability.
      */
@@ -50,7 +50,7 @@ public class ProbabilityUtils {
     /**
      * Generates a random boolean result which is true if the probability is hit using the given random number generator.
      * The distribution of the results is equal to the probability.
-     * 
+     *
      * @param probability The probability to use for generation.
      * @param random The random number generator to use for generating a random float.
      * @return The generated random boolean result.
@@ -64,7 +64,7 @@ public class ProbabilityUtils {
      * Generates a random boolean result which is true if the probability is hit using the given random number generator.
      * The probability will get prepared before calculation.
      * The distribution of the results is equal to the probability.
-     * 
+     *
      * @param pseudoProbability The pseudo probability to use for generation. It will get prepared before calculation.
      * @param random The random number generator to use for generating a random float.
      * @return The generated random boolean result.

@@ -26,7 +26,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 /**
  * A generic {@link SBPWorldProcessUserDetails} implementation that identifies a world process user using a set {@link UUID}.
  * That UUID might be {@link UUID#randomUUID() randomly generated}.
- * 
+ *
  * @see SBPWorldProcessUserDetails
  */
 public class UUIDSBPWorldProcessUserDetails implements SBPWorldProcessUserDetails {
@@ -37,7 +37,7 @@ public class UUIDSBPWorldProcessUserDetails implements SBPWorldProcessUserDetail
 
     /**
      * Creates a new UUID SBP world process user details object.
-     * 
+     *
      * @param uuid The {@link UUID} that uniquely identifies the world process user.
      */
     public UUIDSBPWorldProcessUserDetails(UUID uuid) {
@@ -47,7 +47,7 @@ public class UUIDSBPWorldProcessUserDetails implements SBPWorldProcessUserDetail
 
     /**
      * Returns the {@link UUID} that uniquely identifies the world process user.
-     * 
+     *
      * @return The unique id.
      */
     public UUID getUUID() {

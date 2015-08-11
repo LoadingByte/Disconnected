@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.server.test.world.comp.file;
 
+import static com.quartercode.disconnected.server.test.world.comp.file.FileAssert.assertInvalidPath;
 import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,13 +30,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import com.quartercode.disconnected.server.world.comp.file.Directory;
 import com.quartercode.disconnected.server.world.comp.file.File;
-import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileMoveAction;
-import com.quartercode.disconnected.server.world.comp.file.FileRemoveAction;
-import com.quartercode.disconnected.server.world.comp.file.FileSystem;
-import com.quartercode.disconnected.server.world.comp.file.ParentFile;
+import com.quartercode.disconnected.server.world.comp.file.InvalidPathException;
+import com.quartercode.disconnected.server.world.comp.file.OccupiedPathException;
+import com.quartercode.disconnected.server.world.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
 @RunWith (Parameterized.class)
@@ -68,136 +67,121 @@ public class FileMoveActionTest extends AbstractFileActionTest {
     }
 
     @Before
-    public void setUp2() {
+    public void setUp2() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, oldPath).invoke(FileAddAction.EXECUTE);
-    }
-
-    private FileMoveAction createAction(File<ParentFile<?>> file, String newPath) {
-
-        FileMoveAction action = new FileMoveAction();
-        action.setObj(FileMoveAction.FILE_SYSTEM, fileSystem);
-        action.setObj(FileMoveAction.PATH, newPath);
-        action.setObj(FileMoveAction.FILE, file);
-        return action;
+        fileSystem.prepareAddFile(cfile, oldPath).execute();
     }
 
     @Test
-    public void testExecute() {
+    public void testExecute() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        FileMoveAction action = createAction(file, newPath);
+        FileMoveAction action = new FileMoveAction(cfile, newPath);
         actuallyTestExecute(action);
     }
 
     @Test
-    public void testFileExecute() {
+    public void testFileExecute() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        FileMoveAction action = file.invoke(File.CREATE_MOVE, newPath);
+        FileMoveAction action = cfile.prepareMove(newPath);
         actuallyTestExecute(action);
     }
 
-    private void actuallyTestExecute(FileMoveAction action) {
+    private void actuallyTestExecute(FileMoveAction action) throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        action.invoke(FileMoveAction.EXECUTE);
+        action.execute();
 
-        assertEquals("Resolved file for new path", file, fileSystem.invoke(FileSystem.GET_FILE, newPath));
-        assertEquals("Resolved file for old path", null, fileSystem.invoke(FileSystem.GET_FILE, oldPath));
-        assertEquals("Path of moved file", newPath, file.invoke(File.GET_PATH));
+        assertEquals("Resolved file for new path", cfile, fileSystem.getFile(newPath));
+        assertInvalidPath("Old file hasn't been removed", fileSystem, oldPath);
+        assertEquals("Path of moved file", newPath, cfile.getPath());
     }
 
     @Test
-    public void testIsExecutableBy() {
+    public void testIsExecutableBy() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
         if (testRights) {
-            FileMoveAction action = createAction(file, newPath);
+            FileMoveAction action = new FileMoveAction(cfile, newPath);
             actuallyTestIsExecutableBy(action);
         }
     }
 
     @Test
-    public void testFileIsExecutableBy() {
+    public void testFileIsExecutableBy() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
         if (testRights) {
-            FileMoveAction action = file.invoke(File.CREATE_MOVE, newPath);
+            FileMoveAction action = cfile.prepareMove(newPath);
             actuallyTestIsExecutableBy(action);
         }
     }
 
-    private void actuallyTestIsExecutableBy(FileMoveAction action) {
+    private void actuallyTestIsExecutableBy(FileMoveAction action) throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
         // Add the directory that would hold the actual file (we need to modify its rights later on)
-        Directory newParentFile = new Directory();
-        newParentFile.setObj(File.OWNER, user);
-        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, newParentFile, newParentPath).invoke(FileMoveAction.EXECUTE);
+        fileSystem.prepareAddFile(dir, newParentPath).execute();
 
-        actuallyTestIsExecutableBy(action, newParentFile, "", "", false);
-        actuallyTestIsExecutableBy(action, newParentFile, "u:d", "", false);
-        actuallyTestIsExecutableBy(action, newParentFile, "", "u:w", false);
-        actuallyTestIsExecutableBy(action, newParentFile, "u:d", "u:w", true);
+        actuallyTestIsExecutableBy(action, "", "", false);
+        actuallyTestIsExecutableBy(action, "u:d", "", false);
+        actuallyTestIsExecutableBy(action, "", "u:w", false);
+        actuallyTestIsExecutableBy(action, "u:d", "u:w", true);
     }
 
-    private void actuallyTestIsExecutableBy(FileMoveAction action, File<?> newParentFile, String fileRights, String newParentFileRights, boolean expectedResult) {
+    private void actuallyTestIsExecutableBy(FileMoveAction action, String fileRights, String newParentFileRights, boolean expectedResult) {
 
-        file.setObj(File.RIGHTS, new FileRights(fileRights));
-        newParentFile.setObj(File.RIGHTS, new FileRights(newParentFileRights));
+        cfile.getRights().importRights(fileRights);
+        dir.getRights().importRights(newParentFileRights);
 
-        boolean result = action.invoke(FileRemoveAction.IS_EXECUTABLE_BY, user);
-
+        boolean result = action.isExecutableBy(user);
         assertEquals("IS_EXECUTABLE_BY result", expectedResult, result);
     }
 
     @Test
-    public void testGetMissingRights() {
+    public void testGetMissingRights() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
         if (testRights) {
-            FileMoveAction action = createAction(file, newPath);
+            FileMoveAction action = new FileMoveAction(cfile, newPath);
             actuallyTestGetMissingRights(action);
         }
     }
 
     @Test
-    public void testFileGetMissingRights() {
+    public void testFileGetMissingRights() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
         if (testRights) {
-            FileMoveAction action = file.invoke(File.CREATE_MOVE, newPath);
+            FileMoveAction action = cfile.prepareMove(newPath);
             actuallyTestGetMissingRights(action);
         }
     }
 
-    private void actuallyTestGetMissingRights(FileMoveAction action) {
+    private void actuallyTestGetMissingRights(FileMoveAction action) throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
         // Add the directory that would hold the actual file (we need to modify its rights later on)
-        Directory newParentFile = new Directory();
-        newParentFile.setObj(File.OWNER, user);
-        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, newParentFile, newParentPath).invoke(FileMoveAction.EXECUTE);
+        fileSystem.prepareAddFile(dir, newParentPath).execute();
 
         // Test 1
         Map<File<?>, Character[]> test1Result = new HashMap<>();
-        test1Result.put(file, new Character[] { FileRights.DELETE });
-        test1Result.put(newParentFile, new Character[] { FileRights.WRITE });
-        actuallyTestGetMissingRights(action, newParentFile, "", "", test1Result);
+        test1Result.put(cfile, new Character[] { FileRights.DELETE });
+        test1Result.put(dir, new Character[] { FileRights.WRITE });
+        actuallyTestGetMissingRights(action, "", "", test1Result);
 
         // Test 2
         Map<File<?>, Character[]> test2Result = new HashMap<>();
-        test2Result.put(newParentFile, new Character[] { FileRights.WRITE });
-        actuallyTestGetMissingRights(action, newParentFile, "u:d", "", test2Result);
+        test2Result.put(dir, new Character[] { FileRights.WRITE });
+        actuallyTestGetMissingRights(action, "u:d", "", test2Result);
 
         // Test 3
         Map<File<?>, Character[]> test3Result = new HashMap<>();
-        test3Result.put(file, new Character[] { FileRights.DELETE });
-        actuallyTestGetMissingRights(action, newParentFile, "", "u:w", test3Result);
+        test3Result.put(cfile, new Character[] { FileRights.DELETE });
+        actuallyTestGetMissingRights(action, "", "u:w", test3Result);
 
         // Test 4
-        actuallyTestGetMissingRights(action, newParentFile, "u:d", "u:w", new HashMap<File<?>, Character[]>());
+        actuallyTestGetMissingRights(action, "u:d", "u:w", new HashMap<File<?>, Character[]>());
     }
 
-    private void actuallyTestGetMissingRights(FileMoveAction action, File<?> newParentFile, String fileRights, String newParentFileRights, Map<File<?>, Character[]> expectedResult) {
+    private void actuallyTestGetMissingRights(FileMoveAction action, String fileRights, String newParentFileRights, Map<File<?>, Character[]> expectedResult) {
 
-        file.setObj(File.RIGHTS, new FileRights(fileRights));
-        newParentFile.setObj(File.RIGHTS, new FileRights(newParentFileRights));
+        cfile.getRights().importRights(fileRights);
+        dir.getRights().importRights(newParentFileRights);
 
-        Map<File<?>, Character[]> result = action.invoke(FileRemoveAction.GET_MISSING_RIGHTS, user);
-
+        Map<File<?>, Character[]> result = action.getMissingRights(user);
         assertEquals("Missing file rights map", prepareMissingRightsMap(expectedResult), prepareMissingRightsMap(result));
     }
 

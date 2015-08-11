@@ -30,7 +30,7 @@ import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension;
 import com.quartercode.disconnected.server.test.world.comp.AbstractComplexComputerTest;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.Directory;
-import com.quartercode.disconnected.server.world.comp.file.FSModule;
+import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
@@ -66,7 +66,7 @@ public class FileManagerProgramAddFileTest extends AbstractComplexComputerTest {
     @Before
     public void setUp() {
 
-        mainFsModule().invoke(FSModule.CREATE_ADD_FILE, parentFile, DIR_PATH).invoke(FileAddAction.EXECUTE);
+        mainFsModule().invoke(FileSystemModule.CREATE_ADD_FILE, parentFile, DIR_PATH).invoke(FileAddAction.EXECUTE);
     }
 
     private void executeProgramAndSendChangeDirCommand(Process<?> parentProcess, String change) {
@@ -206,7 +206,7 @@ public class FileManagerProgramAddFileTest extends AbstractComplexComputerTest {
     public void testOccupiedPath() {
 
         // Add content file that makes the path occupied
-        mainFsModule().invoke(FSModule.CREATE_ADD_FILE, new ContentFile(), DIR_PATH + "/test.txt").invoke(FileAddAction.EXECUTE);
+        mainFsModule().invoke(FileSystemModule.CREATE_ADD_FILE, new ContentFile(), DIR_PATH + "/test.txt").invoke(FileAddAction.EXECUTE);
 
         executeProgramAndSendChangeDirCommand(mainRootProcess(), DIR_PATH);
 

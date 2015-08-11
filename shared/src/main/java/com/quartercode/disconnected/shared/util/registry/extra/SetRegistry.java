@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * A {@link MultipleValueRegistry} that uses a {@link Set} as internal data structure.
  * This implementation uses a {@link HashSet}.
- * 
+ *
  * @param <V> The type of the values that can be stored inside the set registry.
  * @see MultipleValueRegistry
  */

@@ -25,7 +25,7 @@ import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.registry.WorldProgram;
 import com.quartercode.disconnected.server.test.world.comp.AbstractComplexComputerTest;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
-import com.quartercode.disconnected.server.world.comp.file.FSModule;
+import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.prog.Program;
 import com.quartercode.disconnected.shared.event.comp.prog.general.PMP_SBPWPU_UpdateViewCommand;
@@ -67,7 +67,7 @@ public class ProcessManagerProgramAbstractTest extends AbstractComplexComputerTe
         // Create a test program file
         testProgramSourceFile = new ContentFile();
         testProgramSourceFile.setObj(ContentFile.CONTENT, testProgram);
-        mainFsModule().invoke(FSModule.CREATE_ADD_FILE, testProgramSourceFile, TEST_PROGRAM_PATH).invoke(FileAddAction.EXECUTE);
+        mainFsModule().invoke(FileSystemModule.CREATE_ADD_FILE, testProgramSourceFile, TEST_PROGRAM_PATH).invoke(FileAddAction.EXECUTE);
     }
 
 }

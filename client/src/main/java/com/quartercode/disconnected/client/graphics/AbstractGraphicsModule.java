@@ -28,7 +28,7 @@ import de.matthiasmann.twl.Widget;
  * They also provide empty implementations for all callback methods, as well as some useful utility methods.<br>
  * <br>
  * See {@link GraphicsModule} for further documentation on graphics modules.
- * 
+ *
  * @see GraphicsModule
  */
 public abstract class AbstractGraphicsModule implements GraphicsModule {
@@ -39,7 +39,7 @@ public abstract class AbstractGraphicsModule implements GraphicsModule {
      * Calculates the x value that is described by the given relative percent amount between {@code 0} and {@code 1}.
      * That means that the current width that is available to the given {@link GraphicsState} is just multiplied with the given percent value.
      * For example, calling the method on a {@link GraphicsState} that has {@code 200} available width pixels with {@code 0.5} percent would return {@code 100}.
-     * 
+     *
      * @param state The {@link GraphicsState} whose available width should be used for the calculation.
      * @param percent The relative "amount of pixels" in percent. Must be between {@code 0} and {@code 1}.
      * @return The absolute amount of pixels calculated with the relative amount.
@@ -52,7 +52,7 @@ public abstract class AbstractGraphicsModule implements GraphicsModule {
     /**
      * Calculates the x location the given {@link Widget} must be positioned in order to make its position match with the given percent value.
      * For more details, see {@link #getRelativeX(GraphicsState, float)}.
-     * 
+     *
      * @param state The {@link GraphicsState} whose available width should be used for the calculation.
      * @param component The {@link Widget} that can be positioned with the result of the calculation.
      * @param percent The relative "amount of pixels" in percent. Must be between {@code 0} and {@code 1}.
@@ -67,7 +67,7 @@ public abstract class AbstractGraphicsModule implements GraphicsModule {
      * Calculates the y value that is described by the given relative percent amount between {@code 0} and {@code 1}.
      * That means that the current height that is available to the given {@link GraphicsState} is just multiplied with the given percent value.
      * For example, calling the method on a {@link GraphicsState} that has {@code 200} available height pixels with {@code 0.5} percent would return {@code 100}.
-     * 
+     *
      * @param state The {@link GraphicsState} whose available height should be used for the calculation.
      * @param percent The relative "amount of pixels" in percent. Must be between {@code 0} and {@code 1}.
      * @return The absolute amount of pixels calculated with the relative amount.
@@ -80,7 +80,7 @@ public abstract class AbstractGraphicsModule implements GraphicsModule {
     /**
      * Calculates the y location the given {@link Widget} must be positioned in order to make its position match with the given percent value.
      * For more details, see {@link #getRelativeY(GraphicsState, float)}.
-     * 
+     *
      * @param state The {@link GraphicsState} whose available height should be used for the calculation.
      * @param component The {@link Widget} that can be positioned with the result of the calculation.
      * @param percent The relative "amount of pixels" in percent. Must be between {@code 0} and {@code 1}.
@@ -102,7 +102,7 @@ public abstract class AbstractGraphicsModule implements GraphicsModule {
      * The method overrides an existing value objects with the same key. <br>
      * <br>
      * See {@link #getValue(String)} for further documentation on the value system.
-     * 
+     *
      * @param key The key to assign the given value object to.
      * @param value The value object to assign to the given key.
      */

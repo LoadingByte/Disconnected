@@ -29,11 +29,9 @@ import com.quartercode.disconnected.server.sim.TickWorldUpdater;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
-import com.quartercode.disconnected.server.world.comp.file.FSModule;
-import com.quartercode.disconnected.server.world.comp.os.OS;
-import com.quartercode.disconnected.server.world.comp.prog.ProcModule;
+import com.quartercode.disconnected.server.world.comp.file.InvalidPathException;
+import com.quartercode.disconnected.server.world.comp.file.UnknownMountpointException;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
-import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchAcknowledgmentEvent;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
@@ -46,7 +44,7 @@ import com.quartercode.eventbridge.bridge.Bridge;
 
 /**
  * The world process launch command handler executes incoming {@link WorldProcessLaunchCommand} events.
- * 
+ *
  * @see WorldProcessLaunchCommand
  */
 public class WorldProcessLaunchCommandHandler implements SBPAwareEventHandler<WorldProcessLaunchCommand> {
@@ -59,52 +57,30 @@ public class WorldProcessLaunchCommandHandler implements SBPAwareEventHandler<Wo
         Computer playerComputer = getSBPComputer(sender);
 
         // Get the source file
-        ContentFile source = getSourceFile(playerComputer, event.getProgramName());
-        // Cancel if the program cannot be found
-        if (source == null) {
+        ContentFile source;
+        try {
+            source = getSourceFile(playerComputer, event.getProgramName());
+        } catch (UnknownMountpointException | InvalidPathException e) {
+            // Cancel if the program cannot be found
             LOGGER.warn("Cannot find program '{}' for launching it (commanded by SBP '{}')", event.getProgramName(), sender);
             return;
         }
 
-        // Create a new process
         Process<?> sessionProcess = getSessionProcess(playerComputer);
-        Process<?> process = sessionProcess.invoke(Process.CREATE_CHILD);
+        SBPWorldProcessUserId worldProcessUser = new SBPWorldProcessUserId(sender, event.getWorldProcessUserDetails());
 
-        // Set the world process user
-        SBPWorldProcessUserId worldProcessUserId = new SBPWorldProcessUserId(sender, event.getWorldProcessUserDetails());
-        process.setObj(Process.WORLD_PROCESS_USER, worldProcessUserId);
-
-        // Set the source file
-        process.setObj(Process.SOURCE, source);
-
-        // Retrieve a new pid
-        int pid = getProcModule(playerComputer).invoke(ProcModule.NEXT_PID);
-
-        // Initialize the process
+        // Create a new process
+        Process<?> process;
         try {
-            process.invoke(Process.INITIALIZE, pid);
+            process = sessionProcess.launchChild(source, worldProcessUser);
         } catch (Exception e) {
-            LOGGER.warn("Error while initializing process with pid {} (commanded by SBP '{}')", pid, sender, e);
-            abort(sessionProcess, process);
+            // Cancel if the process cannot be launched
+            LOGGER.warn("Error while initializing process for program '{}' (commanded by SBP '{}')", event.getProgramName(), sender, e);
             return;
         }
 
-        // Run the program
-        ProgramExecutor executor = process.getObj(Process.EXECUTOR);
-        try {
-            executor.invoke(ProgramExecutor.RUN);
-        } catch (Exception e) {
-            LOGGER.warn("Program executor '{}' threw unexpected exception on start (commanded by SBP '{}')", executor, sender, e);
-            abort(sessionProcess, process);
-        }
-
         // Send an acknowledgment event
-        getBridge().send(new WorldProcessLaunchAcknowledgmentEvent(worldProcessUserId, getProcessId(executor)));
-    }
-
-    private void abort(Process<?> parent, Process<?> process) {
-
-        parent.removeFromColl(Process.CHILDREN, process);
+        getBridge().send(new WorldProcessLaunchAcknowledgmentEvent(worldProcessUser, getProcessId(process)));
     }
 
     protected Bridge getBridge() {
@@ -116,34 +92,29 @@ public class WorldProcessLaunchCommandHandler implements SBPAwareEventHandler<Wo
 
         World world = ServiceRegistry.lookup(TickService.class).getAction(TickWorldUpdater.class).getWorld();
         // Just use first available computer as the player's one
-        return world.getColl(World.COMPUTERS).get(0);
-    }
-
-    protected ProcModule getProcModule(Computer computer) {
-
-        return computer.getObj(Computer.OS).getObj(OS.PROC_MODULE);
+        return world.getComputers().get(0);
     }
 
     protected Process<?> getSessionProcess(Computer computer) {
 
         // Just use the root process as the player's session
-        return getProcModule(computer).getObj(ProcModule.ROOT_PROCESS);
+        return computer.getOs().getProcModule().getRootProcess();
     }
 
-    protected ContentFile getSourceFile(Computer computer, String programName) {
+    protected ContentFile getSourceFile(Computer computer, String programName) throws UnknownMountpointException, InvalidPathException {
 
         WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS), programName);
+
         if (programData == null) {
             return null;
+        } else {
+            return (ContentFile) computer.getOs().getFsModule().getFile(programData.getCommonLocation().toString());
         }
-
-        FSModule fsModule = computer.getObj(Computer.OS).getObj(OS.FS_MODULE);
-        return (ContentFile) fsModule.invoke(FSModule.GET_FILE, programData.getCommonLocation().toString());
     }
 
-    protected WorldProcessId getProcessId(ProgramExecutor executor) {
+    protected WorldProcessId getProcessId(Process<?> process) {
 
-        return executor.getParent().invoke(Process.GET_WORLD_PROCESS_ID);
+        return process.getWorldProcessId();
     }
 
 }

@@ -34,7 +34,7 @@ import com.quartercode.disconnected.shared.util.config.ConfigService;
 
 /**
  * A utility for loading xml configuration files from the classpath using a {@link ConfigService}.
- * 
+ *
  * @see ConfigService
  */
 public class ClasspathConfigLoader {
@@ -44,7 +44,7 @@ public class ClasspathConfigLoader {
     /**
      * Loads xml configuration files recursively from the given path.
      * The path should be located in the classpath.
-     * 
+     *
      * @param configService The {@link ConfigService} that is responsible for parsing the found files.
      * @param path The path to load the config files from.
      */

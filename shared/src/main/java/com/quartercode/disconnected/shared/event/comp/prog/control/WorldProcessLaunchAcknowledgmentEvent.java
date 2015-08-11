@@ -25,7 +25,7 @@ import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
 /**
  * This event is sent when a program is launched using a {@link WorldProcessLaunchCommand} on the computer of the receiving world process user.
  * It contains the {@link WorldProcessId} of the newly launched process, which is required for further communication.
- * 
+ *
  * @see WorldProcessLaunchCommand
  */
 public class WorldProcessLaunchAcknowledgmentEvent extends SBPWorldProcessUserCommand {
@@ -37,7 +37,7 @@ public class WorldProcessLaunchAcknowledgmentEvent extends SBPWorldProcessUserCo
 
     /**
      * Creates a new world process launch acknowledgment event.
-     * 
+     *
      * @param worldProcessUserId The {@link SBPWorldProcessUserId} that should receive the event.
      *        That world process user must have launched the new world process.
      * @param worldProcessId The {@link WorldProcessId} of the newly launched world process.
@@ -57,7 +57,7 @@ public class WorldProcessLaunchAcknowledgmentEvent extends SBPWorldProcessUserCo
     /**
      * Returns the {@link WorldProcessId} of the newly launched world process.
      * This event was sent because that new process has been launched.
-     * 
+     *
      * @return The process id of the new process.
      */
     public WorldProcessId getWorldProcessId() {

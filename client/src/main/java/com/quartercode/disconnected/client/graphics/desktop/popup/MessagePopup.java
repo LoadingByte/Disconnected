@@ -30,7 +30,7 @@ import de.matthiasmann.twl.Label;
 
 /**
  * The message popup is a {@link DesktopWindow} which just shows a message and a close button which closes the popup.
- * 
+ *
  * @see DesktopWindow
  */
 public class MessagePopup extends DesktopWindow {
@@ -38,7 +38,7 @@ public class MessagePopup extends DesktopWindow {
     /**
      * Creates a new message popup with the given message.
      * The new popup is <b>not</b> added to the desktop automatically.
-     * 
+     *
      * @param state The desktop state the new popup will be showed on.
      * @param message The message that is showed by the popup.
      */
@@ -50,7 +50,7 @@ public class MessagePopup extends DesktopWindow {
     /**
      * Creates a new message popup with the given message and close callback.
      * The new popup is <b>not</b> added to the desktop automatically.
-     * 
+     *
      * @param state The desktop state the new popup will be showed on.
      * @param message The message that is showed by the popup.
      * @param callback A {@link Callback} that is called when the close button is pressed and the popup is closed.
@@ -92,7 +92,7 @@ public class MessagePopup extends DesktopWindow {
     /**
      * The message popup callback is used by the {@link MessagePopup} class.
      * It is called when certain events happen.
-     * 
+     *
      * @see #onClose()
      */
     public static interface Callback {

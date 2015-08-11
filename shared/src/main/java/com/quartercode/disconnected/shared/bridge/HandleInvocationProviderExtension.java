@@ -28,15 +28,15 @@ import com.quartercode.eventbridge.bridge.module.HandlerModule;
  * The handle invocation provider extension redirects all {@link HandlerModule#handle(Event, BridgeConnector)} calls through a {@link RunnableInvocationProvider}.<br>
  * <br>
  * Since the handle invocation provider extension is a {@link BridgeModule}, it can be added to a bridge as follows:
- * 
+ *
  * <pre>
  * Bridge bridge = ...
  * HandleInvocationProviderExtension extension = ...
  * bridge.addModule(extension);
  * </pre>
- * 
+ *
  * Please note that the extension also can be removed from a bridge:
- * 
+ *
  * <pre>
  * Bridge bridge = ...
  * HandleInvocationProviderExtension extension = ...
@@ -44,7 +44,7 @@ import com.quartercode.eventbridge.bridge.module.HandlerModule;
  * ...
  * bridge.removeModule(bridge.getModule(HandleInvocationProviderExtension.class));
  * </pre>
- * 
+ *
  * @see HandlerModule
  * @see RunnableInvocationProvider
  */
@@ -52,7 +52,7 @@ public interface HandleInvocationProviderExtension extends BridgeModule {
 
     /**
      * Returns the {@link RunnableInvocationProvider} all {@link HandlerModule#handle(Event, BridgeConnector)} calls are redirected through.
-     * 
+     *
      * @return The runnable invocation provider which is used to redirect all event handle calls.
      */
     public RunnableInvocationProvider getInvocationProvider();
@@ -60,7 +60,7 @@ public interface HandleInvocationProviderExtension extends BridgeModule {
     /**
      * Sets the {@link RunnableInvocationProvider} all {@link HandlerModule#handle(Event, BridgeConnector)} calls are redirected through.
      * If the invocation provider is set to {@code null}, event handle calls are not redirected.
-     * 
+     *
      * @param invocationProvider The new runnable invocation provider which is used to redirect all event handle calls.
      */
     public void setInvocationProvider(RunnableInvocationProvider invocationProvider);

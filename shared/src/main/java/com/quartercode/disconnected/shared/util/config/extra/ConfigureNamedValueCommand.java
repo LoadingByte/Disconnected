@@ -33,17 +33,17 @@ import com.quartercode.disconnected.shared.util.registry.extra.NamedValue;
  * An abstract command parser that adds {@link NamedValue}s to a {@link MultipleValueRegistry} or changes ones that already exist.
  * For example, if a value had a property {@code X} and a property {@code Y}, a command that only sets {@code X} would only change that property,
  * leaving {@code Y} untouched from the previous command call:
- * 
+ *
  * <pre>
  * Command: Y=5
  * =&gt; X=0 Y=5
- * 
+ *
  * Command: X=3
  * =&gt; X=3 Y=5
  * </pre>
- * 
+ *
  * This class provides a basic structure for such a command parser.
- * 
+ *
  * @param <V> The type of the named value that can be configured using the command.
  * @see NamedValue
  * @see MultipleValueRegistry
@@ -57,7 +57,7 @@ public abstract class ConfigureNamedValueCommand<V extends NamedValue> implement
 
     /**
      * Creates a new configure named value command.
-     * 
+     *
      * @param valueType A human-readable string that describes the value type (e.g. "scheduler task").
      * @param registry The {@link MultipleValueRegistry} all configured values should be written to.
      */
@@ -70,7 +70,7 @@ public abstract class ConfigureNamedValueCommand<V extends NamedValue> implement
     /**
      * Returns the {@link MultipleValueRegistry} all configured values should be written to.
      * Note that previous values are also taken from this registry for being modified.
-     * 
+     *
      * @return The registry the command manipulates.
      */
     protected MultipleValueRegistry<V> getRegistry() {
@@ -111,7 +111,7 @@ public abstract class ConfigureNamedValueCommand<V extends NamedValue> implement
 
     /**
      * Creates a new empty "default" instance of the supported value type with the given name.
-     * 
+     *
      * @param name The name of the new {@link NamedValue} instance.
      * @return A new empty instance of the value type.
      */
@@ -119,7 +119,7 @@ public abstract class ConfigureNamedValueCommand<V extends NamedValue> implement
 
     /**
      * Modifies the given old value with the changes provided by the given XML command {@link Element}.
-     * 
+     *
      * @param config The complete configuration document the given command is a part of.
      * @param commandElement The element that contains the modifying command.
      * @param oldValue The old value that should be modified.

@@ -34,7 +34,7 @@ import com.quartercode.eventbridge.factory.Factory;
 
 /**
  * The default default implementation of the {@link SBPIdentityExtension} interface.
- * 
+ *
  * @see SBPIdentityExtension
  */
 public class DefaultSBPIdentityExtension extends AbstractBridgeModule implements SBPIdentityExtension {

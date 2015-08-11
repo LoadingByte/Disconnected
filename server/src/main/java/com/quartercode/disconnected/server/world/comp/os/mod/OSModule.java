@@ -18,50 +18,24 @@
 
 package com.quartercode.disconnected.server.world.comp.os.mod;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import com.quartercode.classmod.extra.func.FunctionDefinition;
-import com.quartercode.classmod.factory.FunctionDefinitionFactory;
-import com.quartercode.disconnected.server.world.comp.os.OS;
-import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
+import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 
 /**
- * The base class for all {@link OS operating system} modules.
+ * The base interface for all {@link OperatingSystem} modules.
  * Such OS modules are an essential part of the operating system.
  * They define methods which are required by the operating system to interact with these modules.
- * 
- * @see OSModule#SET_RUNNING
- * @see OS
+ *
+ * @see #setRunning(boolean)
+ * @see OperatingSystem
  */
-public abstract class OSModule extends WorldChildFeatureHolder<OS> {
-
-    // ----- Functions -----
+public interface OSModule {
 
     /**
-     * Called on the bootstrap ({@code true}) or shutdown ({@code false}) of the {@link OS operating system} which uses the module.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Boolean}</td>
-     * <td>running</td>
-     * <td>{@code True} if the operating system is booting up, {@code false} if it's shutting down.</td>
-     * </tr>
-     * </table>
+     * Called on the bootstrap ({@code running = true}) or shutdown ({@code running = false}) of the {@link OperatingSystem} which uses the module.
+     * <b>Directly after the construction of a new OS module, it is not running!</b>
+     *
+     * @param running Whether the OS is bootstrapping ({@code true}) or shutting down ({@code false}).
      */
-    public static final FunctionDefinition<Void> SET_RUNNING = factory(FunctionDefinitionFactory.class).create("setRunning", new Class[] { Boolean.class });
-
-    /**
-     * Creates a new generic {@link OS operating system} module.
-     */
-    public OSModule() {
-
-        setParentType(OS.class);
-    }
+    public void setRunning(boolean running);
 
 }

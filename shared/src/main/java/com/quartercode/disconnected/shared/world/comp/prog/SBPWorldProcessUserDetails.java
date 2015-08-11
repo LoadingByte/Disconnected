@@ -29,7 +29,7 @@ import java.util.UUID;
  * <br>
  * For example, if an SBP would identify local world-process-using routines with {@link UUID}s, an implementation of this interface would contain that UUID in order to identify the routines.
  * Using that, the SBP can then pass incoming world process events to the correct routine.
- * 
+ *
  * @see SBPWorldProcessUserId
  */
 public interface SBPWorldProcessUserDetails extends Serializable {

@@ -18,38 +18,25 @@
 
 package com.quartercode.disconnected.server.world.comp.prog;
 
-import static com.quartercode.classmod.extra.func.Priorities.*;
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlIDREF;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.classmod.extra.func.FunctionDefinition;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.ReferenceStorage;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
-import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
-import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
-import com.quartercode.classmod.factory.FunctionDefinitionFactory;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.registry.WorldProgram;
+import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
-import com.quartercode.disconnected.server.world.comp.file.File;
-import com.quartercode.disconnected.server.world.comp.os.OS;
+import com.quartercode.disconnected.server.world.comp.file.MissingFileRightsException;
+import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.user.User;
-import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
+import com.quartercode.disconnected.server.world.util.WorldNode;
 import com.quartercode.disconnected.shared.event.comp.prog.control.SBPWorldProcessUserInterruptCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchCommand;
 import com.quartercode.disconnected.shared.util.registry.Registries;
@@ -59,725 +46,502 @@ import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId
 import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
 import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
 import com.quartercode.eventbridge.bridge.Bridge;
+import com.quartercode.jtimber.api.node.Node;
+import com.quartercode.jtimber.api.node.Weak;
+import com.quartercode.jtimber.api.node.wrapper.SubstituteWithWrapper;
+import com.quartercode.jtimber.api.node.wrapper.collection.ListWrapper;
 
 /**
  * This class represents a process which is basically a running instance of a program.
  * On the creation, the program object will be backed up, as well as a new program executor instance.
- * 
+ *
  * @param <P> The type of the parent {@link CFeatureHolder} which houses the process somehow.
  * @see Program
  * @see ProgramExecutor
  */
-public abstract class Process<P extends CFeatureHolder> extends WorldChildFeatureHolder<P> {
+public class Process<P extends Node<?>> extends WorldNode<P> {
 
-    private static final Logger                                                                  LOGGER = LoggerFactory.getLogger(Process.class);
+    private static final Logger              LOGGER         = LoggerFactory.getLogger(Process.class);
 
-    // ----- Properties -----
+    @XmlAttribute
+    private int                              pid;
+    @Weak
+    @XmlAttribute
+    @XmlIDREF
+    private ContentFile                      source;
+    // Transient
+    private SBPWorldProcessUserId            worldProcessUser;
 
-    /**
-     * The unique id the process has.
-     * It is used to identify the process.
-     */
-    public static final PropertyDefinition<Integer>                                              PID;
+    @XmlAttribute
+    private WorldProcessState                state          = WorldProcessState.RUNNING;
+    @XmlElement
+    private ProgramExecutor                  executor;
+    @XmlElement (name = "child")
+    @SubstituteWithWrapper (ListWrapper.class)
+    private final List<Process<?>>           childProcesses = new ArrayList<>();
+    @XmlElement (name = "stateListener")
+    @SubstituteWithWrapper (ListWrapper.class)
+    private final List<ProcessStateListener> stateListeners = new ArrayList<>();
 
-    /**
-     * The {@link File} which contains the {@link Program} the process runs.<br>
-     * <br>
-     * Exceptions that can occur when setting:
-     * 
-     * <table>
-     * <tr>
-     * <th>Exception</th>
-     * <th>When?</th>
-     * </tr>
-     * <tr>
-     * <td>{@link IllegalArgumentException}</td>
-     * <td>The provided source file does not contain a program object.</td>
-     * </tr>
-     * </table>
-     */
-    public static final PropertyDefinition<ContentFile>                                          SOURCE;
-
-    /**
-     * The environment variables that are assigned to the process.
-     * See {@link EnvVariable} for more information.
-     */
-    public static final PropertyDefinition<Map<String, String>>                                  ENVIRONMENT;
-
-    /**
-     * The {@link WorldProcessState} which defines the global state of the process as seen by the OS.
-     * It stores whether the process is running, interrupted etc.<br>
-     * Note that using the {@link #SUSPEND}/{@link #RESUME}/{@link #INTERRUPT}/{@link #STOP} methods is preferred over directly accessing the property.
-     */
-    public static final PropertyDefinition<WorldProcessState>                                    STATE;
-
-    /**
-     * The {@link ProgramExecutor} which contains the logic of the process.
-     * This value is only available after an {@link #INITIALIZE} call.<br>
-     * Argument properties should be passed to this object.<br>
-     * The {@link ProgramExecutor#RUN} method on the stored value finally starts the process.
-     */
-    public static final PropertyDefinition<ProgramExecutor>                                      EXECUTOR;
-
-    /**
-     * The child processes the process launched.<br>
-     * Note that using the {@link #CREATE_CHILD} method is preferred over directly accessing the property.
-     */
-    public static final CollectionPropertyDefinition<Process<?>, List<Process<?>>>               CHILDREN;
-
-    /**
-     * The {@link ProcStateListener process state listeners} which are called after the process {@link #STATE} has changed.
-     * Listeners can be directly added to this list and must not be removed after the program execution has finished.
-     */
-    public static final CollectionPropertyDefinition<ProcStateListener, List<ProcStateListener>> STATE_LISTENERS;
-
-    /**
-     * If the process was launched by an SBP, this property stores the {@link SBPWorldProcessUserId} that identifies the SBP and the world process user.
-     * Such a remote launch is done using the {@link WorldProcessLaunchCommand} event.
-     */
-    public static final PropertyDefinition<SBPWorldProcessUserId>                                WORLD_PROCESS_USER;
-
-    static {
-
-        PID = factory(PropertyDefinitionFactory.class).create("pid", new StandardStorage<>());
-
-        SOURCE = factory(PropertyDefinitionFactory.class).create("source", new ReferenceStorage<>());
-        SOURCE.addSetterExecutor("checkFileContent", Process.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                Validate.isInstanceOf(Program.class, ((ContentFile) arguments[0]).getObj(ContentFile.CONTENT), "Source must contain a program");
-                return invocation.next(arguments);
-            }
-
-        }, LEVEL_6);
-
-        ENVIRONMENT = factory(PropertyDefinitionFactory.class).create("environment", new StandardStorage<>(), new CloneValueFactory<>(new HashMap<>()));
-
-        STATE = factory(PropertyDefinitionFactory.class).create("state", new StandardStorage<>(), new ConstantValueFactory<>(WorldProcessState.RUNNING));
-        STATE.addSetterExecutor("callStateListeners", Process.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                CFeatureHolder process = invocation.getCHolder();
-                WorldProcessState oldState = process.getObj(STATE);
-
-                invocation.next(arguments);
-
-                WorldProcessState newState = (WorldProcessState) arguments[0];
-                for (ProcStateListener stateListener : process.getColl(STATE_LISTENERS)) {
-                    stateListener.invoke(ProcStateListener.ON_STATE_CHANGE, process, oldState, newState);
-                }
-
-                return null;
-            }
-
-        }, LEVEL_7);
-        STATE.addSetterExecutor("setExecutorSchedulerActive", Process.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                ProgramExecutor executor = invocation.getCHolder().getObj(EXECUTOR);
-
-                if (executor instanceof SchedulerUsing) {
-                    boolean active = ((WorldProcessState) arguments[0]).isTickState();
-                    executor.get(SchedulerUsing.SCHEDULER).setActive(active);
-                }
-
-                return invocation.next(arguments);
-            }
-
-        }, LEVEL_6);
-
-        EXECUTOR = factory(PropertyDefinitionFactory.class).create("executor", new StandardStorage<>());
-        CHILDREN = factory(CollectionPropertyDefinitionFactory.class).create("children", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
-        STATE_LISTENERS = factory(CollectionPropertyDefinitionFactory.class).create("stateListeners", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
-        WORLD_PROCESS_USER = factory(PropertyDefinitionFactory.class).create("worldProcessUser", new StandardStorage<>());
+    // JAXB constructor
+    protected Process() {
 
     }
 
-    // ----- Functions -----
-
     /**
-     * Returns true if the given {@link WorldProcessState} is applied to this process and all child processes (recursively).
-     * It stores if the process is running, interrupted etc.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link WorldProcessState}</td>
-     * <td>state</td>
-     * <td>The process state to check all children for recursively.</td>
-     * </tr>
-     * </table>
+     * Creates a new process.
+     * Note that you will probably not use this constructor by yourself.
+     * Instead, you should use {@link #createChild()}.
+     *
+     * @param pid The unique process id for the new process. Its uniqueness is validated by the constructor.
+     *        If you need a unique PID, you can generate one using {@link ProcModule#nextPid()}.
+     * @param source The {@link ContentFile} which contains the {@link Program} the new process should run.
+     * @param worldProcessUser If the process was launched by an SBP, this parameter takes the {@link SBPWorldProcessUserId} that identifies the SBP and the world process user.
+     *        Note that this property may be {@code null} (e.g. for internal processes like the {@link RootProcess}).
+     * @throws IllegalArgumentException If the given PID is invalid or already used by another process.
+     *         Alternatively, if the provided source file does not contain a program object.
      */
-    public static final FunctionDefinition<Boolean>                                              IS_STATE_APPLIED_RECURSIVELY;
+    protected Process(int pid, ContentFile source, SBPWorldProcessUserId worldProcessUser) {
+
+        Validate.isTrue(pid >= 0, "Process PID ('%d') must be >= 0", pid);
+        Validate.notNull(source, "Process source file cannot be null");
+        Validate.isInstanceOf(Program.class, source.getContent(), "Process source file must contain a program");
+
+        // Check whether the PID is already in use
+        Set<Integer> existingPids = new HashSet<>();
+        Process<?> root = getRoot();
+        existingPids.add(root.getPid());
+        for (Process<?> otherProcess : root.getAllChildProcesses()) {
+            existingPids.add(otherProcess.getPid());
+        }
+        Validate.isTrue(!existingPids.contains(pid), "PID '%d' is already used by another process", pid);
+
+        this.pid = pid;
+        this.source = source;
+        this.worldProcessUser = worldProcessUser;
+    }
 
     /**
-     * Suspends the execution temporarily, tick updates will be ignored.
-     * Suspension only works when the execution is running. During an interruption, an execution can't be suspended.
-     * The state change can also apply to every child process using the recursive parameter.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Boolean}</td>
-     * <td>recursive</td>
-     * <td>True if the state change should affect all child processes.</td>
-     * </tr>
-     * </table>
+     * Returns the unique id the process has.
+     * It is used to identify the process.
+     *
+     * @return The unique process id.
      */
-    public static final FunctionDefinition<Void>                                                 SUSPEND;
+    public int getPid() {
+
+        return pid;
+    }
 
     /**
-     * Resumes a suspended process.
-     * Resuming only works if the execution is suspended. An interrupted process can't be resumed.
-     * The state change can also apply to every child process using the recursive parameter.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Boolean}</td>
-     * <td>recursive</td>
-     * <td>True if the state change should affect all child processes.</td>
-     * </tr>
-     * </table>
+     * Returns the {@link ContentFile} which contains the {@link Program} the process runs.
+     *
+     * @return The program file the process executes.
      */
-    public static final FunctionDefinition<Void>                                                 RESUME;
+    public ContentFile getSource() {
+
+        return source;
+    }
 
     /**
-     * Interrupts the execution friendly and expresses that it should be stopped as soon as possible.
-     * If the process notes the interruption, it should try to execute last activities and then the stop the execution.
+     * Returns the {@link Program} which is or will be ran by the process.
+     * It is stored inside the processe's {@link #getSource() source program file}.
+     */
+    public Program getProgram() {
+
+        return (Program) source.getContent();
+    }
+
+    /**
+     * Returns the {@link WorldProcessState} which defines the global state of the process as seen by the OS.
+     * It stores whether the process is running, interrupted etc.<br>
+     * Note that the state can be changed with the state methods: {@link #suspend(boolean)}, {@link #resume(boolean)}, {@link #interrupt(boolean)}, and {@link #stop(boolean)}.
+     *
+     * @return The current state of the process.
+     */
+    public WorldProcessState getState() {
+
+        return state;
+    }
+
+    /**
+     * Returns the {@link ProgramExecutor} which contains the logic of the process.
+     * This value is only available after process {@link #initialize() initialization} since that method derives it from the {@link #getSource() source file.}
+     *
+     * @return The program executor which runs the process by executing the program's functionalities.
+     */
+    public ProgramExecutor getExecutor() {
+
+        return executor;
+    }
+
+    /**
+     * Returns the child processes the process launched through the {@link #createChild()} method.
+     * If you want to launch a new process from the {@link #getExecutor() program executor} of this process, you can use that method as well.
+     * In order to remove processes from this list, they need to be {@link #stop(boolean) stopped}.
+     *
+     * @return The child processes which have been launched by this process.
+     */
+    public List<Process<?>> getChildProcesses() {
+
+        return Collections.unmodifiableList(childProcesses);
+    }
+
+    /**
+     * Returns the {@link ProcessStateListener}s that are called whenever the {@link #getState() state} of this process changes.
+     * New listeners can be added by using the {@link #addStateListener(ProcessStateListener)} method.
+     * In contrast, old listeners can be removed with the {@link #removeStateListener(ProcessStateListener)} method.
+     * Note that listeners don't have to be manually removed after the program execution has finished.
+     * Since the whole process object is disposed, they are disposed as well.
+     *
+     * @return The process state listeners that are currently registered.
+     */
+    public List<ProcessStateListener> getStateListeners() {
+
+        return Collections.unmodifiableList(stateListeners);
+    }
+
+    /**
+     * Adds a new {@link ProcessStateListener} that is called whenever the {@link #getState() state} of this process changes.
+     * If you want to remove any listener, you can use the {@link #removeStateListener(ProcessStateListener)} method instead.
+     * Note that listeners don't have to be manually removed after the program execution has finished.
+     * Since the whole process object is disposed, they are disposed as well.
+     *
+     * @param stateListener The new process state listener which should listen for state changes.
+     */
+    public void addStateListener(ProcessStateListener stateListener) {
+
+        stateListeners.add(stateListener);
+    }
+
+    /**
+     * Removes the given {@link ProcessStateListener} so it is no longer called whenever the {@link #getState() state} of this process changes.
+     * If you want to add a new listener, you can use the {@link #addStateListener(ProcessStateListener)} method instead.
+     * Note that listeners don't have to be manually removed after the program execution has finished.
+     * Since the whole process object is disposed, they are disposed as well.
+     *
+     * @param stateListener The process state listener which should no longer listen for state changes.
+     */
+    public void removeStateListener(ProcessStateListener stateListener) {
+
+        stateListeners.remove(stateListener);
+    }
+
+    /**
+     * If the process was launched by an SBP, this method returns the {@link SBPWorldProcessUserId} that identifies the SBP and the world process user.
+     * Such a remote launch is done using the {@link WorldProcessLaunchCommand} event.
+     *
+     * @return An object that defines the SBP which is communicating with the world process, as well as some information specifying the exact part of the SBP.
+     */
+    public SBPWorldProcessUserId getWorldProcessUser() {
+
+        return worldProcessUser;
+    }
+
+    /**
+     * Returns whether the given {@link WorldProcessState} is applied to this process, all its {@link #getChildProcesses() child processes}, all their child processes etc.
+     *
+     * @param state The process state to check all children for recursively.
+     * @return Whether the given state is applied to this process recursively.
+     */
+    public boolean isStateAppliedRecursively(WorldProcessState state) {
+
+        if (this.state != state) {
+            return false;
+        } else {
+            for (Process<?> childProcess : childProcesses) {
+                if (!childProcess.isStateAppliedRecursively(state)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private void applyState(WorldProcessState state, boolean recursive) {
+
+        // Conserve the old state of the process for now; the state change listener caller needs this state later on
+        WorldProcessState oldState = this.state;
+
+        // Actually change the process state
+        this.state = state;
+
+        // Change the states of all child processes if the state change is recursive
+        if (recursive) {
+            for (Process<?> childProcess : childProcesses) {
+                childProcess.applyState(state, recursive);
+            }
+        }
+
+        // Call any state listeners
+        for (ProcessStateListener stateListener : stateListeners) {
+            stateListener.onStateChange(this, oldState, state);
+        }
+
+        // Enable or disable the program executor's scheduler according to the new state (e.g. SUSPENDED -> inactive, RUNNING -> active)
+        if (executor instanceof SchedulerUsing) {
+            ((SchedulerUsing) executor).getScheduler().setActive(state.isTickState());
+        }
+    }
+
+    /**
+     * Suspends the execution temporarily. A possibly {@link SchedulerUsing used scheduler} won't run until the process is {@link #resume(boolean) resumed}.
+     * Suspension only works when the execution is running. An {@link #interrupt(boolean) interrupted} or {@link #stop(boolean) stopped} process can't be suspended.
+     * The state change can additionally be applied to every {@link #getChildProcesses() child process} (and their child processes ...) using the recursive parameter.
+     *
+     * @param recursive Whether the state change should affect all child processes (and their child processes ...).
+     */
+    public void suspend(boolean recursive) {
+
+        if (state != WorldProcessState.RUNNING) {
+            LOGGER.warn("Cannot suspend non-running process '{}' (current state '{}, program executor '{}')", getWorldProcessId(), state, getExecutor().getClass());
+        } else {
+            applyState(WorldProcessState.SUSPENDED, recursive);
+        }
+    }
+
+    /**
+     * Resumes a {@link #suspend(boolean) suspended} process. A possibly {@link SchedulerUsing used scheduler} will run again.
+     * Resuming only works if the execution is suspended. An {@link #interrupt(boolean) interrupted} or {@link #stop(boolean) stopped} process can't be resumed.
+     * The state change can additionally be applied to every {@link #getChildProcesses() child process} (and their child processes ...) using the recursive parameter.
+     *
+     * @param recursive Whether the state change should affect all child processes (and their child processes ...).
+     */
+    public void resume(boolean recursive) {
+
+        if (state != WorldProcessState.SUSPENDED) {
+            LOGGER.warn("Cannot resume non-suspended process '{}' (current state '{}, program executor '{}')", getWorldProcessId(), state, getExecutor().getClass());
+        } else {
+            applyState(WorldProcessState.RUNNING, recursive);
+        }
+    }
+
+    /**
+     * Interrupts the execution friendly and asks the process to {@link #stop(boolean) stop} itself as soon as possible.
+     * If the {@link #getExecutor() program executor} notices the interruption, it should try to execute all necessary last activities before stopping the execution.
+     * For example, if a program executor notices an interruption, it might finish writing some data into files before stopping itself.
      * Interruption only works if the execution is running.
-     * The state change can also apply to every child process using the recursive parameter.
-     * Note that an {@link SBPWorldProcessUserInterruptCommand} is sent if the {@link Process#WORLD_PROCESS_USER} property is not {@code null}.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Boolean}</td>
-     * <td>recursive</td>
-     * <td>True if the state change should affect the child processes.</td>
-     * </tr>
-     * </table>
+     * Note that an {@link SBPWorldProcessUserInterruptCommand} is sent if the {@link Process#getWorldProcessUser() world process user} of the process is not {@code null}.<br>
+     * <br>
+     * The state change can additionally be applied to every {@link #getChildProcesses() child process} (and their child processes ...) using the recursive parameter.
+     *
+     * @param recursive Whether the state change should affect all child processes (and their child processes ...).
      */
-    public static final FunctionDefinition<Void>                                                 INTERRUPT;
+    public void interrupt(boolean recursive) {
+
+        if (state != WorldProcessState.RUNNING) {
+            LOGGER.warn("Cannot interrupt non-running process '{}' (current state '{}, program executor '{}')", getWorldProcessId(), state, getExecutor().getClass());
+        } else {
+            // Send SBPWorldProcessUserInterruptCommand if the process is being interrupted in order to shut down any user of the world process
+            if (state == WorldProcessState.INTERRUPTED) {
+                SBPWorldProcessUserId wpuId = getWorldProcessUser();
+                Bridge bridge = getBridge();
+                if (wpuId != null && bridge != null) {
+                    bridge.send(new SBPWorldProcessUserInterruptCommand(wpuId));
+                }
+            }
+
+            // Actually change the state
+            applyState(WorldProcessState.INTERRUPTED, recursive);
+        }
+    }
 
     /**
-     * Forces the process to stop the execution.
-     * This will act like {@link #SUSPEND}, apart from the fact that a stopped process won't ever be able to resume/restart.
-     * The forced stopping action should only be used if the further execution of the process must be stopped or when the interruption finished.
-     * Calling this method on an uninterrupted process might cause internal conflicts and is therefore disallowed.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Boolean}</td>
-     * <td>recursive</td>
-     * <td>True if the state change should affect the child processes.</td>
-     * </tr>
-     * </table>
+     * Forces the process to stop its execution immediately and gives the {@link #getExecutor() program executor} no chance to execute any more activites.
+     * This will act like {@link #suspend(boolean) suspension}, apart from the fact that a stopped process won't ever be able to {@link #resume(boolean) resume}.
+     * The forced stopping action should only be used by the program executor itself when it has finished the interruption activities.
+     * For example, if a program executor notices an {@link #interrupt(boolean) interruption}, it might finish writing some data into files before stopping itself.
+     * Calling this method on an uninterrupted process might cause internal conflicts and is therefore not possible.<br>
+     * <br>
+     * Note that there is no way of applying the state change recursively to other processes because this change should only be executed by the program executor.
      */
-    public static final FunctionDefinition<Void>                                                 STOP;
+    public void stop() {
+
+        if (state != WorldProcessState.INTERRUPTED) {
+            LOGGER.warn("Cannot suspend non-interrupted process '{}' (current state '{}, program executor '{}')", getWorldProcessId(), state, getExecutor().getClass());
+        } else if (state == WorldProcessState.STOPPED) {
+            LOGGER.warn("Cannot stop already stopped process '{}' again (current state '{}, program executor '{}')", getWorldProcessId(), state, getExecutor().getClass());
+        } else {
+            // Actually change the state
+            applyState(WorldProcessState.STOPPED, false);
+
+            // Unregister the stopped process from parent
+            if (getSingleParent() instanceof Process) {
+                ((Process<?>) getSingleParent()).childProcesses.remove(this);
+            }
+
+            // Promote the old child processes of this process to child processes of the parent process
+            for (Process<?> childProcess : new ArrayList<>(childProcesses)) {
+                childProcesses.remove(childProcess);
+                ((Process<?>) getSingleParent()).childProcesses.add(childProcess);
+            }
+        }
+    }
 
     /**
-     * Returns all child processes of this process, and all child processes of those processes etc.
-     * That means that all processes this process launched directly or indirectly (that means that a child process launched a child process) are returned by this method.
+     * Returns all {@link #getChildProcesses() child processes} of this process, and all child processes of those processes etc. recursively.
+     * That means that all processes this process launched directly or indirectly (that means that a child process launched another child process) are returned by this method.
      * Essentially, it just traverses the process tree recursively from this process onwards and returns the collected processes.
+     *
+     * @return All processes that originated from this process directly or indirectly.
      */
-    public static final FunctionDefinition<List<Process<?>>>                                     GET_ALL_CHILDREN;
+    public List<Process<?>> getAllChildProcesses() {
 
-    /**
-     * Creates a new empty {@link ChildProcess} which uses the same environment variables as this one.
-     * You can run the returned process after creation using {@link #INITIALIZE} and then {@link ProgramExecutor#RUN} on {@link #EXECUTOR}.
-     */
-    public static final FunctionDefinition<ChildProcess>                                         CREATE_CHILD;
+        List<Process<?>> allChildProcesses = new ArrayList<>();
+        for (Process<?> directChildProcess : childProcesses) {
+            allChildProcesses.add(directChildProcess);
+            allChildProcesses.addAll(directChildProcess.getAllChildProcesses());
+        }
+
+        return allChildProcesses;
+    }
 
     /**
      * Returns the root {@link RootProcess} which is the parent of every other process somewhere in the tree.
+     * It is the topmost process and probably has the {@link #getPid() PID} {@code 0}.
+     *
+     * @return The process all other processes originates from directly or indirectly.
      */
-    public static final FunctionDefinition<RootProcess>                                          GET_ROOT;
+    public RootProcess getRoot() {
+
+        return ((Process<?>) getSingleParent()).getRoot();
+    }
 
     /**
-     * Returns the {@link OS operating system} which is hosting the {@link RootProcess} that is the direct or indirect parent of every other process.
+     * Returns the {@link ProcessModule} which is hosting the {@link #getRoot() root process} that is the direct or indirect parent of every other process.
+     *
+     * @return The process module the process belongs to.
      */
-    public static final FunctionDefinition<OS>                                                   GET_OS;
+    public ProcessModule getProcModule() {
+
+        return getRoot().getSingleParent();
+    }
 
     /**
-     * Resolves the {@link Session} process this process is running under.
-     * This process is running with the rights of that session.
+     * Returns the {@link OperatingSystem} which is hosting the {@link #getRoot() root process} that is the direct or indirect parent of every other process.
+     * Note that the OS is not directly holding the process. Instead, the {@link ProcessModule} has that responsibility.
+     *
+     * @return The operating system the process belongs to.
      */
-    public static final FunctionDefinition<Process<?>>                                           GET_SESSION_PROCESS;
+    public OperatingSystem getOs() {
+
+        return getProcModule().getSingleParent();
+    }
 
     /**
-     * Resolves the actual {@link Session} executor this process is running under.
-     * This process is running with the rights of that session.
+     * Resolves the process that runs the {@link Session} this process is part of.
+     * Effectively, this process is running under the {@link User} which is set inside that session.
+     * Note that the session process is internally retrieved by returning the first parent (or parent of a parent ...) process that runs a session.
+     *
+     * @return The session process this process is running under.
      */
-    public static final FunctionDefinition<Session>                                              GET_SESSION;
+    public Process<?> getSessionProcess() {
+
+        if (executor instanceof Session) {
+            return this;
+        } else {
+            // Check parent process
+            if (getSingleParent() instanceof Process) {
+                return ((Process<?>) getSingleParent()).getSessionProcess();
+            } else {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Resolves the {@link Session} this process is part of.
+     * Effectively, this process is running under the {@link User} which is set inside that session.
+     * Note that the session's process is internally retrieved using the {@link #getSessionProcess()} method.
+     *
+     * @return The session process this process is running under.
+     */
+    public Session getSession() {
+
+        Process<?> sessionProcess = getSessionProcess();
+        return sessionProcess == null ? null : (Session) sessionProcess.getExecutor();
+    }
 
     /**
      * Resolves the {@link User} this process is running under.
-     * This uses the {@link #GET_SESSION} function for resolving the {@link Session} object.
+     * When the process tries to access files etc., the returned user must be allowed to do so.
+     * Note that this method internally uses the {@link #getSession()} function for resolving the {@link Session} that stores the user.
      */
-    public static final FunctionDefinition<User>                                                 GET_USER;
+    public User getUser() {
+
+        Session session = getSession();
+        return session == null ? null : session.getUser();
+    }
 
     /**
-     * Returns the {@link Program} which is ran by the process.
-     * It is stored inside the {@link #SOURCE} file.
+     * Returns a {@link WorldProcessId} object that identifies this process uniquely in the whole world.
+     * It can be used to communicate with the process from the outside (e.g. from a graphical client).
+     * Internally, the process is identified using the {@link #getUUID() UUID} of the {@link Computer} it is running on, as well as the processes's {@link #getPid() process id (pid)}.
+     *
+     * @return A world-wide unique identifier for this specific process.
      */
-    public static final FunctionDefinition<Program>                                              GET_PROGRAM;
+    public WorldProcessId getWorldProcessId() {
+
+        return new WorldProcessId(getUUID(), pid);
+    }
 
     /**
-     * Returns a {@link WorldProcessId} object that identifies this process.
-     * The process is identified using the id of the computer it is running on, as well as the actual {@link #PID process id (pid)}.
+     * Initializes the process by creating a new {@link ProgramExecutor} instance of the {@link Program} that is stored in the set {@link #getSource() source file}.
+     * Moreover, the newly set {@link #getExecutor() executor} is directly {@link ProgramExecutor#run() started} by the method.
+     * Please note that this method should not be used publicly. Instead, it is automatically called by {@link #createChild(int, ContentFile, SBPWorldProcessUserId)}.
+     * However, there are internal situations where calling this method manually is necessary (e.g. when a new {@link RootProcess} is created).
+     *
+     * @throws IllegalStateException If the {@link Program#getName() name} of the set {@link #getProgram() program} is unknown and no executor can therefore be retrieved.
+     * @throws MissingFileRightsException If the {@link User} the process runs under hasn't got the read and execute rights on the {@link #getSource() source file}.
      */
-    public static final FunctionDefinition<WorldProcessId>                                       GET_WORLD_PROCESS_ID;
+    protected void initialize() throws MissingFileRightsException {
+
+        // Check the read and execution rights on the source file
+        source.checkRights("initialize process using source file", getUser(), FileRights.READ, FileRights.EXECUTE);
+
+        // Retrieve the program data object
+        String programName = getProgram().getName();
+        WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS), programName);
+        Validate.validState(programData != null, "Cannot find world program with name '%s' for launching a process", programName);
+
+        // Create and set a new executor
+        try {
+            executor = (ProgramExecutor) programData.getType().newInstance();
+            executor.run();
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected exception during initialization of new program executor (class '" + programData.getType().getName() + "'", e);
+        }
+    }
 
     /**
-     * Initializes the process using the {@link Program} that is stored in the set source {@link ContentFile}.
-     * Initialization means setting the {@link #PID} and creating a {@link ProgramExecutor} instance.
-     * Please note that the process needs to be launched using the {@link ProgramExecutor#RUN} method on the {@link #EXECUTOR} after intialization.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Integer}</td>
-     * <td>pid</td>
-     * <td>The {@link #PID} of the new process (can be generated using {@link ProcModule#NEXT_PID}). Its uniqueness is validated by the function.</td>
-     * </tr>
-     * </table>
-     * 
-     * <table>
-     * <tr>
-     * <th>Exception</th>
-     * <th>When?</th>
-     * </tr>
-     * <tr>
-     * <td>{@link IllegalArgumentException}</td>
-     * <td>The given pid is already used by another process.</td>
-     * </tr>
-     * <tr>
-     * <td>{@link IllegalStateException}</td>
-     * <td>The {@link User} the process runs under hasn't got the read and execute rights on the {@link #SOURCE} file.</td>
-     * </tr>
-     * </table>
+     * Creates <b>and launches</b> a new {@link #getChildProcesses() child process} of this process.
+     * The {@link #getPid() PID} of the new process will be obtained through a call to {@link ProcessModule#nextPid()}.
+     * Note that the {@link ProgramExecutor#run()} method is automatically called by this method.
+     * The new process will immediately start running.
+     *
+     * @param source The {@link ContentFile} which contains the {@link Program} the new process should run.
+     * @param worldProcessUser If the process was launched by an SBP, this parameter takes the {@link SBPWorldProcessUserId} that identifies the SBP and the world process user.
+     *        Note that this property may be {@code null} (e.g. for internal processes like the {@link RootProcess}).
+     * @return The newly created and launched child process.
+     * @throws IllegalArgumentException If the given PID is invalid or already used by another process.
+     *         Alternatively, if the provided source file does not contain a program object.
+     * @throws IllegalStateException If the {@link Program#getName() name} of the program stored in the given source file is unknown and no executor can therefore be retrieved.
+     * @throws MissingFileRightsException If the {@link User} the new process runs under hasn't got the read and execute rights on the source file.
+     *         If you are not starting a new {@link Session}, the user of the new process will be the same one as the {@link #getUser() user of this process}.
      */
-    public static final FunctionDefinition<Void>                                                 INITIALIZE;
-
-    static {
-
-        IS_STATE_APPLIED_RECURSIVELY = factory(FunctionDefinitionFactory.class).create("isStateApplied", new Class[] { WorldProcessState.class });
-        IS_STATE_APPLIED_RECURSIVELY.addExecutor("default", Process.class, new FunctionExecutor<Boolean>() {
-
-            @Override
-            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
-
-                CFeatureHolder process = invocation.getCHolder();
-                boolean stateApplied = true;
-
-                if (process.getObj(STATE) != arguments[0]) {
-                    stateApplied = false;
-                } else {
-                    for (Process<?> child : process.getColl(CHILDREN)) {
-                        if (!child.invoke(IS_STATE_APPLIED_RECURSIVELY)) {
-                            stateApplied = false;
-                            break;
-                        }
-                    }
-                }
-
-                invocation.next(arguments);
-                return stateApplied;
-            }
-
-        });
-        SUSPEND = factory(FunctionDefinitionFactory.class).create("suspend", new Class[] { Boolean.class });
-        SUSPEND.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                CFeatureHolder process = invocation.getCHolder();
-
-                if (process.getObj(STATE) != WorldProcessState.RUNNING) {
-                    LOGGER.warn("Cannot suspend non-running process '{}' (current state '{}, program executor '{}')", process.invoke(GET_WORLD_PROCESS_ID), process.getObj(STATE), process.getObj(EXECUTOR).getClass());
-                } else {
-                    process.setObj(STATE, WorldProcessState.SUSPENDED);
-
-                    if ((Boolean) arguments[0]) {
-                        for (Process<?> child : process.getColl(CHILDREN)) {
-                            child.invoke(SUSPEND, true);
-                        }
-                    }
-                }
-
-                return invocation.next(arguments);
-            }
-
-        });
-        RESUME = factory(FunctionDefinitionFactory.class).create("resume", new Class[] { Boolean.class });
-        RESUME.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                CFeatureHolder process = invocation.getCHolder();
-
-                if (process.getObj(STATE) != WorldProcessState.SUSPENDED) {
-                    LOGGER.warn("Cannot resume non-suspended process '{}' (current state '{}, program executor '{}')", process.invoke(GET_WORLD_PROCESS_ID), process.getObj(STATE), process.getObj(EXECUTOR).getClass());
-                } else {
-                    process.setObj(STATE, WorldProcessState.RUNNING);
-
-                    if ((Boolean) arguments[0]) {
-                        for (Process<?> child : process.getColl(CHILDREN)) {
-                            child.invoke(RESUME, true);
-                        }
-                    }
-                }
-
-                return invocation.next(arguments);
-            }
-
-        });
-        INTERRUPT = factory(FunctionDefinitionFactory.class).create("interrupt", new Class[] { Boolean.class });
-        INTERRUPT.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                Process<?> process = (Process<?>) invocation.getCHolder();
-
-                if (process.getObj(STATE) != WorldProcessState.RUNNING) {
-                    LOGGER.warn("Cannot interrupt non-running process '{}' (current state '{}, program executor '{}')", process.invoke(GET_WORLD_PROCESS_ID), process.getObj(STATE), process.getObj(EXECUTOR).getClass());
-                } else {
-                    // Send SBPWorldProcessUserInterruptCommand
-                    SBPWorldProcessUserId wpuId = process.getObj(WORLD_PROCESS_USER);
-                    Bridge bridge = process.getBridge();
-                    if (wpuId != null && bridge != null) {
-                        bridge.send(new SBPWorldProcessUserInterruptCommand(wpuId));
-                    }
-
-                    // Actually interrupt the process
-                    process.setObj(STATE, WorldProcessState.INTERRUPTED);
-
-                    if ((Boolean) arguments[0]) {
-                        for (Process<?> child : process.getColl(CHILDREN)) {
-                            child.invoke(INTERRUPT, true);
-                        }
-                    }
-                }
-
-                return invocation.next(arguments);
-            }
-
-        });
-        STOP = factory(FunctionDefinitionFactory.class).create("stop", new Class[] { Boolean.class });
-        STOP.addExecutor("default", Process.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                Process<?> process = (Process<?>) invocation.getCHolder();
-
-                if (process.getObj(STATE) != WorldProcessState.INTERRUPTED) {
-                    LOGGER.warn("Cannot suspend non-interrupted process '{}' (current state '{}, program executor '{}')", process.invoke(GET_WORLD_PROCESS_ID), process.getObj(STATE), process.getObj(EXECUTOR).getClass());
-                } else if (process.getObj(STATE) == WorldProcessState.STOPPED) {
-                    LOGGER.warn("Cannot stop already stopped process '{}' again (current state '{}, program executor '{}')", process.invoke(GET_WORLD_PROCESS_ID), process.getObj(STATE), process.getObj(EXECUTOR).getClass());
-                } else {
-                    process.setObj(STATE, WorldProcessState.STOPPED);
-
-                    // Unregister stopped process from parent
-                    if (process.getParent() != null) {
-                        process.getParent().removeFromColl(CHILDREN, process);
-                    }
-
-                    // Promote the old child processes of this process to child processes of the parent process
-                    for (Process<?> child : new ArrayList<>(process.getColl(CHILDREN))) {
-                        process.removeFromColl(CHILDREN, child);
-                        process.getParent().addToColl(CHILDREN, child);
-                    }
-
-                    if ((Boolean) arguments[0]) {
-                        for (Process<?> child : process.getColl(CHILDREN)) {
-                            child.invoke(SUSPEND, true);
-                        }
-                    }
-                }
-
-                return invocation.next(arguments);
-            }
-
-        });
-
-        GET_ALL_CHILDREN = factory(FunctionDefinitionFactory.class).create("getAllChildren", new Class[0]);
-        GET_ALL_CHILDREN.addExecutor("default", Process.class, new FunctionExecutor<List<Process<?>>>() {
-
-            @Override
-            public List<Process<?>> invoke(FunctionInvocation<List<Process<?>>> invocation, Object... arguments) {
-
-                List<Process<?>> children = getAllChildren((Process<?>) invocation.getCHolder());
-                invocation.next(arguments);
-                return children;
-            }
-
-            private List<Process<?>> getAllChildren(Process<?> parent) {
-
-                List<Process<?>> allChildren = new ArrayList<>();
-                for (Process<?> directChild : parent.getColl(CHILDREN)) {
-                    allChildren.add(directChild);
-                    allChildren.addAll(getAllChildren(directChild));
-                }
-
-                return allChildren;
-            }
-
-        });
-
-        CREATE_CHILD = factory(FunctionDefinitionFactory.class).create("createChild", new Class[0]);
-        CREATE_CHILD.addExecutor("default", Process.class, new FunctionExecutor<ChildProcess>() {
-
-            @Override
-            public ChildProcess invoke(FunctionInvocation<ChildProcess> invocation, Object... arguments) {
-
-                CFeatureHolder process = invocation.getCHolder();
-
-                ChildProcess newChildProcess = new ChildProcess();
-                newChildProcess.setParent((Process<?>) process);
-                newChildProcess.setObj(ENVIRONMENT, new HashMap<>(process.getObj(ENVIRONMENT)));
-                process.addToColl(CHILDREN, newChildProcess);
-
-                invocation.next(arguments);
-                return newChildProcess;
-            }
-
-        });
-
-        GET_ROOT = factory(FunctionDefinitionFactory.class).create("getRoot", new Class[0]);
-        GET_ROOT.addExecutor("default", Process.class, new FunctionExecutor<RootProcess>() {
-
-            @Override
-            public RootProcess invoke(FunctionInvocation<RootProcess> invocation, Object... arguments) {
-
-                CFeatureHolder process = invocation.getCHolder();
-                RootProcess root = null;
-
-                if (process instanceof RootProcess) {
-                    root = (RootProcess) process;
-                } else {
-                    root = ((Process<?>) process).getParent().invoke(GET_ROOT);
-                }
-
-                invocation.next(arguments);
-                return root;
-            }
-
-        });
-
-        GET_OS = factory(FunctionDefinitionFactory.class).create("getOS", new Class[0]);
-        GET_OS.addExecutor("default", Process.class, new FunctionExecutor<OS>() {
-
-            @Override
-            public OS invoke(FunctionInvocation<OS> invocation, Object... arguments) {
-
-                OS os = invocation.getCHolder().invoke(GET_ROOT).getParent().getParent();
-                invocation.next(arguments);
-                return os;
-            }
-
-        });
-
-        GET_SESSION_PROCESS = factory(FunctionDefinitionFactory.class).create("getSessionProcess", new Class[0]);
-        GET_SESSION_PROCESS.addExecutor("default", Process.class, new FunctionExecutor<Process<?>>() {
-
-            @Override
-            public Process<?> invoke(FunctionInvocation<Process<?>> invocation, Object... arguments) {
-
-                CFeatureHolder process = invocation.getCHolder();
-                Process<?> sessionProcess = null;
-
-                if (process.getObj(EXECUTOR) instanceof Session) {
-                    sessionProcess = (Process<?>) process;
-                } else {
-                    // Check parent process
-                    CFeatureHolder parentProcess = ((Process<?>) process).getParent();
-                    if (parentProcess != null) {
-                        sessionProcess = parentProcess.invoke(GET_SESSION_PROCESS);
-                    }
-                }
-
-                invocation.next(arguments);
-                return sessionProcess;
-            }
-
-        });
-
-        GET_SESSION = factory(FunctionDefinitionFactory.class).create("getSession", new Class[0]);
-        GET_SESSION.addExecutor("default", Process.class, new FunctionExecutor<Session>() {
-
-            @Override
-            public Session invoke(FunctionInvocation<Session> invocation, Object... arguments) {
-
-                Process<?> sessionProcess = invocation.getCHolder().invoke(GET_SESSION_PROCESS);
-                if (sessionProcess == null) {
-                    return null;
-                } else {
-                    Session session = (Session) sessionProcess.getObj(EXECUTOR);
-                    invocation.next(arguments);
-                    return session;
-                }
-            }
-
-        });
-
-        GET_USER = factory(FunctionDefinitionFactory.class).create("getUser", new Class[0]);
-        GET_USER.addExecutor("default", Process.class, new FunctionExecutor<User>() {
-
-            @Override
-            public User invoke(FunctionInvocation<User> invocation, Object... arguments) {
-
-                Session session = invocation.getCHolder().invoke(GET_SESSION);
-                if (session == null) {
-                    return null;
-                } else {
-                    User user = session.getObj(Session.USER);
-                    invocation.next(arguments);
-                    return user;
-                }
-            }
-
-        });
-
-        GET_PROGRAM = factory(FunctionDefinitionFactory.class).create("getProgram", new Class[0]);
-        GET_PROGRAM.addExecutor("default", Process.class, new FunctionExecutor<Program>() {
-
-            @Override
-            public Program invoke(FunctionInvocation<Program> invocation, Object... arguments) {
-
-                CFeatureHolder process = invocation.getCHolder();
-                Program program = (Program) process.getObj(SOURCE).getObj(ContentFile.CONTENT);
-
-                invocation.next(arguments);
-                return program;
-            }
-
-        });
-
-        GET_WORLD_PROCESS_ID = factory(FunctionDefinitionFactory.class).create("getWorldProcessId", new Class[0]);
-        GET_WORLD_PROCESS_ID.addExecutor("default", Process.class, new FunctionExecutor<WorldProcessId>() {
-
-            @Override
-            public WorldProcessId invoke(FunctionInvocation<WorldProcessId> invocation, Object... arguments) {
-
-                CFeatureHolder process = invocation.getCHolder();
-
-                int pid = process.getObj(Process.PID);
-                UUID computerId = process.invoke(Process.GET_OS).getParent().getUUID();
-                WorldProcessId worldProcessId = new WorldProcessId(computerId, pid);
-
-                invocation.next(arguments);
-                return worldProcessId;
-            }
-
-        });
-
-        INITIALIZE = factory(FunctionDefinitionFactory.class).create("initialize", new Class[] { Integer.class });
-        INITIALIZE.addExecutor("setPid", Process.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                CFeatureHolder process = invocation.getCHolder();
-
-                int pid = (int) arguments[0];
-
-                // Check given pid
-                Set<Integer> existingPids = new HashSet<>();
-                Process<?> root = process.invoke(GET_ROOT);
-                existingPids.add(root.getObj(PID));
-                for (Process<?> otherProcess : root.invoke(GET_ALL_CHILDREN)) {
-                    existingPids.add(otherProcess.getObj(PID));
-                }
-                Validate.isTrue(!existingPids.contains(pid), "Pid {} is already used by another process", pid);
-
-                process.setObj(PID, pid);
-                return invocation.next(arguments);
-            }
-
-        }, DEFAULT + SUBLEVEL_7);
-        INITIALIZE.addExecutor("setExecutor", Process.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                CFeatureHolder process = invocation.getCHolder();
-
-                // Check read and execution right on source file
-                ContentFile source = process.getObj(SOURCE);
-                User user = process.invoke(GET_USER);
-                if (!source.invoke(File.HAS_RIGHT, user, FileRights.READ) || !source.invoke(File.HAS_RIGHT, user, FileRights.EXECUTE)) {
-                    throw new IllegalStateException("Cannot initialize process: No read right and execute right on source file");
-                }
-
-                // Retrieve the program data object
-                String programName = ((Program) source.getObj(ContentFile.CONTENT)).getObj(Program.NAME);
-                WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS), programName);
-                Validate.validState(programData != null, "Cannot find world program with name '%s' for launching a process", programName);
-
-                // Create new executor
-                ProgramExecutor executor;
-                try {
-                    executor = (ProgramExecutor) programData.getType().newInstance();
-                } catch (Exception e) {
-                    throw new RuntimeException("Unexpected exception during initialization of new program executor (class '" + programData.getType().getName() + "'", e);
-                }
-
-                // Set new executor
-                process.setObj(EXECUTOR, executor);
-
-                return invocation.next(arguments);
-            }
-
-        }, DEFAULT + SUBLEVEL_5);
-
+    public Process<Process<?>> launchChild(ContentFile source, SBPWorldProcessUserId worldProcessUser) throws MissingFileRightsException {
+
+        Process<Process<?>> childProcess = new Process<>(getProcModule().nextPid(), source, worldProcessUser);
+        childProcesses.add(childProcess);
+
+        try {
+            childProcess.initialize();
+        } catch (IllegalStateException | MissingFileRightsException e) {
+            childProcesses.remove(childProcess);
+            throw e;
+        }
+
+        return childProcess;
     }
 
 }

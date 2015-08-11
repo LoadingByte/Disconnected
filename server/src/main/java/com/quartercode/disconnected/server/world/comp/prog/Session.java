@@ -18,98 +18,80 @@
 
 package com.quartercode.disconnected.server.world.comp.prog;
 
-import static com.quartercode.classmod.extra.func.Priorities.*;
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import org.apache.commons.lang3.Validate;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.ReferenceStorage;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
-import com.quartercode.disconnected.server.util.HashUtils;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlIDREF;
+import org.apache.commons.lang3.StringUtils;
 import com.quartercode.disconnected.server.world.comp.user.User;
 
 /**
- * This class represents a program which opens a session.
+ * This class represents a program which opens a session with a certain {@link User}; other programs can run under that user by being a child of the session process.
  * For opening an actual session, you just have to create a process using this with these arguments:
- * 
+ *
  * <ul>
- * <li>user: The name of the {@link User} the session should be running under.</li>
- * <li>password: The password of the given {@link User}. Can be null if the parent session is null or a root session.</li>
+ * <li>user: The name of the user the session should be running under.</li>
+ * <li>password: The password of the given user. Can be {@code null} if the parent session is null or a root session.</li>
  * </ul>
  */
 public class Session extends ProgramExecutor {
 
-    // ----- Properties -----
+    // TODO: There needs to be a way of constructing sessions
+
+    @XmlAttribute
+    @XmlIDREF
+    private User   user;
+    @XmlAttribute
+    private String password;
 
     /**
-     * The {@link User} the session is running under.
-     * Every {@link ChildProcess} of the session can use the rights provided by the session.
+     * Returns the {@link User} the session is running under.
+     * Every child {@link Process} of the session can use the rights provided by the session.
+     *
+     * @return The user who "uses" this session.
      */
-    public static final PropertyDefinition<User>   USER;
+    public User getUser() {
 
-    /**
-     * The password of the set {@link #USER}.
-     * It is used to verify that opening the new session is authorized and can be null if the parent session is null or a root session.
-     * This password must be supplied in <b>raw form</b> and may not be hashed!
-     */
-    public static final PropertyDefinition<String> PASSWORD;
-
-    static {
-
-        USER = factory(PropertyDefinitionFactory.class).create("user", new ReferenceStorage<>());
-        PASSWORD = factory(PropertyDefinitionFactory.class).create("password", new StandardStorage<>());
-
+        return user;
     }
 
-    // ----- Functions -----
+    /**
+     * Returns the password which has been input by the creator of the session for the set {@link #getUser() user}.
+     * It is used to verify that opening the new session is authorized.
+     * Note that it can be {@code null} if the parent session is {@code null} or if the parent session's user is the {@link User#isSuperuser() superuser}.
+     * That makes sense because the superuser is allowed to do everything, including opening new sessions.<br>
+     * <br>
+     * Important: This password is supplied in <b>hashed form</b>!
+     *
+     * @return The presumed password of the session user.
+     */
+    public String getPassword() {
 
-    static {
+        return password;
+    }
 
-        RUN.addExecutor("checkUser", Session.class, new FunctionExecutor<Void>() {
+    @Override
+    public void run() {
 
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+        Process<?> process = getSingleParent();
 
-                Validate.notNull(invocation.getCHolder().getObj(USER), "Session user cannot be null");
+        if (!checkPassword()) {
+            process.interrupt(true);
+            process.stop();
+        }
+    }
 
-                return invocation.next(arguments);
-            }
+    private boolean checkPassword() {
 
-        }, LEVEL_7 + SUBLEVEL_7);
+        // Determine whether a check is required (parentSession != null and parentSession.user != superuser)
+        Session parentSession = getSingleParent().getSession();
+        boolean checkRequired = parentSession != null && !parentSession.getUser().isSuperuser();
 
-        RUN.addExecutor("checkPassword", Session.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                Session session = (Session) invocation.getCHolder();
-
-                // Determine whether a check is required (parent session != null or parent session user != root)
-                Session parentSession = session.getParent().invoke(Process.GET_SESSION);
-                boolean checkRequired = parentSession != null && !parentSession.getObj(USER).invoke(User.IS_SUPERUSER);
-
-                if (checkRequired && session.getObj(USER).getObj(User.PASSWORD) != null) {
-                    String password = session.getObj(PASSWORD);
-                    if (password == null) {
-                        // Wrong password
-                        return null;
-                    }
-                    String hashedPassword = HashUtils.sha256(password);
-
-                    String correctPassword = session.getObj(USER).getObj(User.PASSWORD);
-                    if (!correctPassword.equals(hashedPassword)) {
-                        // Wrong password
-                        return null;
-                    }
-                }
-
-                return invocation.next(arguments);
-            }
-
-        }, LEVEL_7 + SUBLEVEL_5);
-
+        // If a check is required, verify the password
+        if (checkRequired && (StringUtils.isBlank(password) || !password.equals(user.getPassword()))) {
+            // Wrong password
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }

@@ -27,7 +27,7 @@ public interface RunnableInvocationProvider {
     /**
      * Invokes the given {@link Runnable} in the context of the implementing class.
      * For example, the runnable could be invoked in a certain thread.
-     * 
+     *
      * @param runnable The runnable to invoke.
      */
     public void invoke(Runnable runnable);

@@ -19,24 +19,24 @@
 package com.quartercode.disconnected.server.world.comp.file;
 
 /**
- * This runtime exception occures if no file system is mounted under a certain mountpoint that the user input.
- * 
- * @see FSModule
+ * This exception occurs if no file system is mounted under a certain mountpoint that the user input.
+ *
+ * @see FileSystemModule
  */
-public class UnknownMountpointException extends RuntimeException {
+public class UnknownMountpointException extends Exception {
 
-    private static final long serialVersionUID = 6564332145013501014L;
+    private static final long      serialVersionUID = 6564332145013501014L;
 
-    private final FSModule    fsModule;
-    private final String      mountpoint;
+    private final FileSystemModule fsModule;
+    private final String           mountpoint;
 
     /**
      * Creates a new unknown mountpoint exception.
-     * 
-     * @param fsModule The {@link FSModule file system module} that doesn't contain a mounted file system under the given mountpoint.
+     *
+     * @param fsModule The {@link FileSystemModule file system module} that doesn't contain a mounted file system under the given mountpoint.
      * @param mountpoint The mountpoint no file system is mounted under.
      */
-    public UnknownMountpointException(FSModule fsModule, String mountpoint) {
+    public UnknownMountpointException(FileSystemModule fsModule, String mountpoint) {
 
         super("Unknown mountpoint: " + mountpoint);
 
@@ -45,18 +45,18 @@ public class UnknownMountpointException extends RuntimeException {
     }
 
     /**
-     * Returns the {@link FSModule file system module} that doesn't contain a mounted file system under the set mountpoint ({@link #getMountpoint()}).
-     * 
+     * Returns the {@link FileSystemModule file system module} that doesn't contain a mounted file system under the set mountpoint ({@link #getMountpoint()}).
+     *
      * @return The file system module on which the required mountpoint cannot be found.
      */
-    public FSModule getFsModule() {
+    public FileSystemModule getFsModule() {
 
         return fsModule;
     }
 
     /**
      * Returns the required mountpoint no file system is mounted under.
-     * 
+     *
      * @return The required mountpoint.
      */
     public String getMountpoint() {

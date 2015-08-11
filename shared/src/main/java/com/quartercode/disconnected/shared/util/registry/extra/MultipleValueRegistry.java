@@ -25,7 +25,7 @@ import com.quartercode.disconnected.shared.util.registry.Registry;
  * A multiple value registry is a {@link Registry} that stores multiple values, probably in a {@link Collection}.
  * These values are accessible through {@link #getValues()}.
  * New values can be added using {@link #addValue(Object)}, old ones can be removed with {@link #removeValue(Object)}.
- * 
+ *
  * @param <V> The type of the values that can be stored inside the multiple value registry.
  * @see Registry
  */
@@ -33,7 +33,7 @@ public interface MultipleValueRegistry<V> extends Registry<V> {
 
     /**
      * Returns a (possibly unmodifiable) view of all values that are stored in the multiple value registry.
-     * 
+     *
      * @return All stored values.
      */
     @Override
@@ -41,14 +41,14 @@ public interface MultipleValueRegistry<V> extends Registry<V> {
 
     /**
      * Adds the given value object to the multiple value registry.
-     * 
+     *
      * @param value The value that should be added.
      */
     public void addValue(V value);
 
     /**
      * Removes the given value object from the multiple value registry.
-     * 
+     *
      * @param value The value that should be removed.
      */
     public void removeValue(V value);

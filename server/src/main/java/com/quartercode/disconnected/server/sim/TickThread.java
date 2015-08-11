@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This thread calls the tick update on several {@link TickAction}s.
  * It's an independent utility.
- * 
+ *
  * @see TickService
  */
 public class TickThread extends Thread {
@@ -35,7 +35,7 @@ public class TickThread extends Thread {
 
     /**
      * Creates a new tick thread that will use the given {@link TickService}.
-     * 
+     *
      * @param service The tick service to retrieve the tick data from.
      */
     public TickThread(TickService service) {
@@ -47,7 +47,7 @@ public class TickThread extends Thread {
 
     /**
      * Returns the {@link TickService} that is used to retrieve tick data from.
-     * 
+     *
      * @return The assigned tick service.
      */
     public TickService getService() {

@@ -18,38 +18,66 @@
 
 package com.quartercode.disconnected.server.world.comp.hardware;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
+import javax.xml.bind.annotation.XmlAttribute;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.server.world.comp.hardware.Mainboard.NeedsMainboardSlot;
 
 /**
- * This class represents a cpu of a computer.
- * A cpu has a count of possible threads running at the same time and a frequency (given in hertz).
- * 
+ * This class represents the CPU of a computer.
+ * A CPU has a count of possible threads running at the same time and a clock rate.
+ *
  * @see Hardware
  */
 @NeedsMainboardSlot
 public class CPU extends Hardware {
 
-    // ----- Properties -----
+    @XmlAttribute
+    private int  threads;
+    @XmlAttribute
+    private long clockRate;
+
+    // JAXB constructor
+    protected CPU() {
+
+    }
 
     /**
-     * The amount of possible threads running at the same time (virtual cores).
+     * Creates a new CPU.
+     *
+     * @param name The "model" name of the new CPU.
+     *        See {@link #getName()} for more details.
+     * @param threads The amount of possible threads running at the same time (virtual cores).
+     * @param clockRate The clock rate (tick frequency) of the CPU in hertz.
      */
-    public static final PropertyDefinition<Integer> THREADS;
+    public CPU(String name, int threads, long clockRate) {
+
+        super(name);
+
+        Validate.isTrue(threads > 0, "Max CPU threads must be > 0");
+        Validate.isTrue(clockRate > 0, "CPU clock rate must be > 0");
+
+        this.threads = threads;
+        this.clockRate = clockRate;
+    }
 
     /**
-     * The tick frequency of the cpu, given in hertz.
+     * Returns the amount of possible threads running at the same time (virtual cores).
+     *
+     * @return The amount of threads the CPU can handle.
      */
-    public static final PropertyDefinition<Long>    FREQUENCY;
+    public int getThreads() {
 
-    static {
+        return threads;
+    }
 
-        THREADS = factory(PropertyDefinitionFactory.class).create("threads", new StandardStorage<>());
-        FREQUENCY = factory(PropertyDefinitionFactory.class).create("frequency", new StandardStorage<>());
+    /**
+     * Returns the clock rate (tick frequency) of the CPU in hertz.
+     *
+     * @return The tick frequency of the CPU in hertz.
+     */
+    public long getClockRate() {
 
+        return clockRate;
     }
 
 }

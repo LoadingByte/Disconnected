@@ -25,8 +25,13 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -34,30 +39,44 @@ import java.util.zip.ZipOutputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import org.eclipse.persistence.jaxb.JAXBContextProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.quartercode.classmod.base.FeatureDefinition;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.util.TreeInitializer;
 import com.quartercode.disconnected.server.registry.PersistentClassScanDirective;
 import com.quartercode.disconnected.server.registry.PersistentClassScanDirective.ScanMethod;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.shared.util.ClasspathScanningUtils;
+import com.quartercode.disconnected.shared.util.TempFileManager;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
-import com.quartercode.disconnected.shared.util.registry.Registries;
-import com.quartercode.disconnected.shared.util.registry.extra.MappedValueRegistry.Mapping;
 
 /**
  * This is the default implementation of the {@link ProfileSerializationService}.
- * 
+ *
  * @see ProfileSerializationService
  */
 public class DefaultProfileSerializationService implements ProfileSerializationService {
 
-    private static final Logger         LOGGER            = LoggerFactory.getLogger(DefaultProfileSerializationService.class);
+    private static final Logger         LOGGER                 = LoggerFactory.getLogger(DefaultProfileSerializationService.class);
 
-    private static Collection<Class<?>> persistentClasses = new HashSet<>();
+    /**
+     * The temporary directory the {@link JAXBContext} will look for extra OXM binding files in.
+     * All discovered OXM files will actually be used.
+     */
+    public static final Path            EXTRA_JAXB_BINDING_DIR = TempFileManager.getTempDir().resolve("extraJaxbBindings");
+
+    private static Collection<Class<?>> persistentClasses      = new HashSet<>();
+
+    /**
+     * Returns all {@link XmlPersistent persistent} {@link Class}es which are present on the classpath.
+     * In order to scan for more such classes, try using the {@link #scanForPersistentClasses(PersistentClassScanDirective)} method.
+     *
+     * @return All persistent classes.
+     */
+    public static Collection<Class<?>> getPersistentClasses() {
+
+        return Collections.unmodifiableCollection(persistentClasses);
+    }
 
     /**
      * Scans the classpath for persistent {@link Class}es as defined by the given {@link PersistentClassScanDirective}.
@@ -66,7 +85,7 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
      * Note that all exceptions, which occur during the scanning process, are only logged as errors.
      * That way, small exceptions like inaccessible <i>unimportant</i> directories, do not cause the whole game to halt.
      * If an exception doesn't cause any damage, it is just "ignored" and only logged.
-     * 
+     *
      * @param scanDirective The scanning directive which defines the exact scanning process.
      */
     public void scanForPersistentClasses(PersistentClassScanDirective scanDirective) {
@@ -147,7 +166,7 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
             ZipEntry zipEntry = null;
             while ( (zipEntry = zipInputStream.getNextEntry()) != null) {
                 if (zipEntry.getName().equals("world.xml")) {
-                    world = deserializeWorld(zipInputStream, true);
+                    world = deserializeWorld(zipInputStream);
                 } else if (zipEntry.getName().equals("random.ser")) {
                     random = deserializeRandom(zipInputStream);
                 }
@@ -170,7 +189,7 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
     /**
      * Creates a new {@link JAXBContext} which can be used for the {@link World} XML model.
      * The new context uses the classes whose retrieval is defined by the {@link ServerRegistries#PERSISTENT_CLASS_SCAN_DIRECTIVES persistent class scan directives}.
-     * 
+     *
      * @return A JAXB context for the world XML model.
      * @throws ProfileSerializationException Thrown if the world JAXB context cannot be created for some reason.
      */
@@ -178,7 +197,11 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
 
         try {
             Class<?>[] classArray = persistentClasses.toArray(new Class[persistentClasses.size()]);
-            return JAXBContext.newInstance(classArray);
+
+            Map<String, Object> properties = new HashMap<>();
+            properties.put(JAXBContextProperties.OXM_METADATA_SOURCE, Arrays.asList(EXTRA_JAXB_BINDING_DIR.toFile().listFiles()));
+
+            return JAXBContext.newInstance(classArray, properties);
         } catch (JAXBException e) {
             throw new ProfileSerializationException("Cannot create new JAXB context with dynamically resolved bound classes", e);
         }
@@ -189,8 +212,6 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
 
         try {
             Marshaller marshaller = createWorldContext().createMarshaller();
-            // Turn this option on for debugging:
-            // marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             marshaller.marshal(world, new NoCloseOutputStream(outputStream));
         } catch (JAXBException e) {
             throw new ProfileSerializationException("Cannot marshal input world object as XML", e);
@@ -198,26 +219,13 @@ public class DefaultProfileSerializationService implements ProfileSerializationS
     }
 
     @Override
-    public World deserializeWorld(InputStream inputStream, boolean initialize) throws ProfileSerializationException {
+    public World deserializeWorld(InputStream inputStream) throws ProfileSerializationException {
 
-        // Unmarshal world
-        World world;
         try {
-            world = (World) createWorldContext().createUnmarshaller().unmarshal(new NoCloseInputStream(inputStream));
+            return (World) createWorldContext().createUnmarshaller().unmarshal(new NoCloseInputStream(inputStream));
         } catch (JAXBException e) {
             throw new ProfileSerializationException("Cannot unmarshal world object from input XML", e);
         }
-
-        if (initialize) {
-            // Initialize world
-            TreeInitializer worldInitializer = new TreeInitializer();
-            for (Mapping<Class<? extends FeatureHolder>, FeatureDefinition<?>> mapping : Registries.get(ServerRegistries.WORLD_INITIALIZER_MAPPINGS)) {
-                worldInitializer.addInitializationDefinition(mapping.getLeft(), mapping.getRight());
-            }
-            worldInitializer.apply(world);
-        }
-
-        return world;
     }
 
     // ----- Random -----

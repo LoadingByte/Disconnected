@@ -30,7 +30,7 @@ public interface LimitedSBPEvent extends Event {
     /**
      * Returns the {@link SBPIdentity} objects that identify the server bridge partners who are allowed to receive the event.
      * It is permitted to provide only one SBP.
-     * 
+     *
      * @return The SBPs who are allowed to receive the event.
      */
     public SBPIdentity[] getSBPs();

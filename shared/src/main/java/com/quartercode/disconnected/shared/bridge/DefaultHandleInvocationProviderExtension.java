@@ -30,7 +30,7 @@ import com.quartercode.eventbridge.factory.Factory;
 
 /**
  * The default default implementation of the {@link HandleInvocationProviderExtension} interface.
- * 
+ *
  * @see HandleInvocationProviderExtension
  */
 public class DefaultHandleInvocationProviderExtension extends AbstractBridgeModule implements HandleInvocationProviderExtension {

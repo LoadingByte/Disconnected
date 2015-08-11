@@ -18,51 +18,151 @@
 
 package com.quartercode.disconnected.server.world.comp;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
-import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import org.apache.commons.lang3.Validate;
+import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.hardware.Hardware;
-import com.quartercode.disconnected.server.world.comp.os.OS;
-import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
+import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.server.world.util.WorldNode;
 import com.quartercode.disconnected.shared.world.general.Location;
+import com.quartercode.jtimber.api.node.wrapper.SubstituteWithWrapper;
+import com.quartercode.jtimber.api.node.wrapper.collection.ListWrapper;
 
 /**
  * This class stores information about a computer, like the {@link Location} or the {@link Hardware} parts.
- * 
+ *
  * @see Location
  * @see Hardware
  */
-public class Computer extends WorldFeatureHolder {
+public class Computer extends WorldNode<World> {
 
-    // ----- Properties -----
+    @XmlAttribute
+    private Location             location;
+    @XmlElementWrapper
+    @XmlElementRef
+    @SubstituteWithWrapper (ListWrapper.class)
+    private final List<Hardware> hardware = new ArrayList<>();
+    @XmlElement
+    private OperatingSystem      os;
+
+    // JAXB constructor
+    protected Computer() {
+
+    }
 
     /**
-     * The {@link Location} of the computer.
+     * Creates a new computer.
+     *
+     * @param location The geographical {@link Location} of the computer.
+     * @param os The {@link OperatingSystem} instance which runs the computer.
      */
-    public static final PropertyDefinition<Location>                           LOCATION;
+    public Computer(Location location, OperatingSystem os) {
+
+        Validate.notNull(location, "Computer location cannot be null");
+        Validate.notNull(os, "Computer operating system cannot be null");
+
+        this.location = location;
+        this.os = os;
+    }
 
     /**
-     * The {@link Hardware} parts the computer contains.
+     * Returns the geographical {@link Location} of the computer.
+     *
+     * @return The location of the computer.
      */
-    public static final CollectionPropertyDefinition<Hardware, List<Hardware>> HARDWARE;
+    public Location getLocation() {
+
+        return location;
+    }
 
     /**
-     * The active {@link OS operating system} instance which is currently running the computer.
+     * Returns the {@link Hardware} parts the computer contains.
+     *
+     * @return The hardware of the computer.
      */
-    public static final PropertyDefinition<OS>                                 OS;
+    public List<Hardware> getHardware() {
 
-    static {
+        return Collections.unmodifiableList(hardware);
+    }
 
-        LOCATION = factory(PropertyDefinitionFactory.class).create("location", new StandardStorage<>());
-        HARDWARE = factory(CollectionPropertyDefinitionFactory.class).create("hardware", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
-        OS = factory(PropertyDefinitionFactory.class).create("os", new StandardStorage<>());
+    /**
+     * Returns all the {@link Hardware} which are an instance of the given class and used by this computer.
+     * If no matching hardware part is found, this method returns an empty list.<br>
+     * If you want to retrieve <b>exactly</b> one hardware part of a given type, try {@link #getSingleHardwareByType(Class)}.
+     *
+     * @param type The type the returned hardware parts must be instances of.
+     * @return All hardware parts which are an instance of the given type. May be empty.
+     */
+    @SuppressWarnings ("unchecked")
+    public <T extends Hardware> List<T> getHardwareByType(Class<T> type) {
 
+        List<T> hardwareByType = new ArrayList<>();
+
+        for (Hardware hardwarePart : hardware) {
+            if (type.isInstance(hardwarePart)) {
+                hardwareByType.add((T) hardwarePart);
+            }
+        }
+
+        return hardwareByType;
+    }
+
+    /**
+     * If this computer contains <b>exactly</b> one {@link Hardware} part of the given type, returns that part. Otherwise, throws an {@link IllegalStateException}.
+     * Note that such exceptions are also thrown if no matching hardware part can be found.
+     *
+     * @param type The type the returned hardware part must be an instance of.
+     * @return The hardware part which is an instance of the given type. May not be {@code null}.
+     * @throws IllegalStateException If there are 0 or multiple hardware parts that match the given type.
+     */
+    public <T extends Hardware> T getSingleHardwareByType(Class<T> type) {
+
+        List<T> hardwareByType = getHardwareByType(type);
+
+        Validate.validState(hardwareByType.size() != 0, "This computer contains no '%s'", type.getName());
+        Validate.validState(hardwareByType.size() <= 1, "This computer contains more than one '%s'", type.getName());
+
+        return hardwareByType.get(0);
+    }
+
+    /**
+     * Adds a {@link Hardware} part to the computer.
+     *
+     * @param hardware The hardware part to add to the computer.
+     */
+    public void addHardware(Hardware hardware) {
+
+        Validate.notNull(hardware, "Cannot add null hardware to computer");
+
+        this.hardware.add(hardware);
+    }
+
+    /**
+     * Removes a {@link Hardware} part from the computer.
+     *
+     * @param hardware The hardware part to remove from the computer.
+     */
+    public void removeHardware(Hardware hardware) {
+
+        this.hardware.remove(hardware);
+    }
+
+    /**
+     * Returns the {@link OperatingSystem} instance which runs the computer.
+     * Note that it is <b>not</b> {@code null} if the computer is turned of.
+     * Instead, {@link OperatingSystem#isRunning()} returns {@code false};
+     *
+     * @return The operating system which runs the computer.
+     */
+    public OperatingSystem getOs() {
+
+        return os;
     }
 
 }

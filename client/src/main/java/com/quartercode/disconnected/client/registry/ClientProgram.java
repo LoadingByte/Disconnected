@@ -26,7 +26,7 @@ import com.quartercode.disconnected.shared.util.registry.extra.NamedValue;
 
 /**
  * A data object that represents a client program by storing its name, category, and class.
- * 
+ *
  * @see ClientRegistries#CLIENT_PROGRAMS
  */
 public class ClientProgram implements NamedValue {
@@ -37,7 +37,7 @@ public class ClientProgram implements NamedValue {
 
     /**
      * Creates a new client program data object.
-     * 
+     *
      * @param name The internal name of the client program.
      * @param category The internal category the client program is associated to.
      * @param type The client program executor class which runs the client program.
@@ -55,7 +55,7 @@ public class ClientProgram implements NamedValue {
      * Returns the internal name of the client program.
      * It is used to reference the program without the {@link #getType() client program executor class}.
      * Note that it should not be directly displayed in the GUI because it's an internal key.
-     * 
+     *
      * @return The client program's name.
      */
     @Override
@@ -67,7 +67,7 @@ public class ClientProgram implements NamedValue {
     /**
      * Returns the internal category the client program is associated to.
      * Note that it should not be directly displayed in the GUI because it's an internal key.
-     * 
+     *
      * @return The client program's category.
      */
     public String getCategory() {
@@ -77,7 +77,7 @@ public class ClientProgram implements NamedValue {
 
     /**
      * Returns the class of the client program executor which runs the client program.
-     * 
+     *
      * @return The client program executor class.
      */
     public Class<?> getType() {

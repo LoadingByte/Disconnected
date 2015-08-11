@@ -51,7 +51,7 @@ public class ValueInjector {
     /**
      * Adds a new value to the value injector.
      * The value can then be injected into fields.
-     * 
+     *
      * @param name The name of the value. It is used by {@link InjectValue#value()}.
      * @param value The actual object that is injected into requesting fields.
      */
@@ -63,7 +63,7 @@ public class ValueInjector {
     /**
      * Runs the injector on the given object by injecting values into fields that have the {@link InjectValue} annotation.
      * Every object that somehow requests values must run this method on itself before the values can be used.
-     * 
+     *
      * @param object The object whose injectable fields should be filled with values.
      */
     public void inject(Object object) {

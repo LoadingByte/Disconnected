@@ -32,7 +32,7 @@ import de.matthiasmann.twl.Label;
 
 /**
  * The text input popup is a {@link DesktopWindow} which shows a message and prompts the user for inputting a text.
- * 
+ *
  * @see DesktopWindow
  */
 public class TextInputPopup extends DesktopWindow {
@@ -40,7 +40,7 @@ public class TextInputPopup extends DesktopWindow {
     /**
      * Creates a new text input popup with the given parameters.
      * The new popup is <b>not</b> added to the desktop automatically.
-     * 
+     *
      * @param state The desktop state the new popup will be showed on.
      * @param message The message that is showed by the popup when the user is prompted.
      * @param defaultText The default text that is placed in the text input field before the user inputs anything. May be {@code null}.
@@ -111,14 +111,14 @@ public class TextInputPopup extends DesktopWindow {
     /**
      * The text input popup callback is used by the {@link TextInputPopup} class.
      * It is called when certain events happen.
-     * 
+     *
      * @see #onClose(boolean, String)
      */
     public static interface Callback {
 
         /**
          * This method is called when the text input popup is closed.
-         * 
+         *
          * @param cancelled {@code True} if the cancel button was pressed, {@code false} if the confirm button was pressed.
          * @param text The text that was input by the user.
          *        May be {@code null} if the text field was left empty.

@@ -29,7 +29,7 @@ public class NamedValueUtils {
 
     /**
      * Iterates over the given {@link Iterable} object, which contains {@link NamedValue}s, and returns the value which has the given name.
-     * 
+     *
      * @param values The iterable object that contains the named values.
      * @param name The name the returned named value must have.
      * @return The named value with the given name.
@@ -47,7 +47,7 @@ public class NamedValueUtils {
 
     /**
      * Iterates over the given {@link Iterable} object, which contains {@link NamedValue}s, and returns all the values which have the given names.
-     * 
+     *
      * @param values The iterable object that contains the named values.
      * @param names The names from whose each returned named value must have one of.
      * @return All the named value with the given names.

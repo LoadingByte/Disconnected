@@ -23,13 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
-import com.quartercode.disconnected.server.world.comp.file.Directory;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
-import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.InvalidPathException;
 import com.quartercode.disconnected.server.world.comp.file.OccupiedPathException;
-import com.quartercode.disconnected.server.world.comp.file.ParentFile;
+import com.quartercode.disconnected.server.world.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
 public class FileAddActionTest extends AbstractFileActionTest {
@@ -37,135 +35,124 @@ public class FileAddActionTest extends AbstractFileActionTest {
     private static final String ADD_FILE_PARENT_PATH = "test1/test2";
     private static final String ADD_FILE_PATH        = ADD_FILE_PARENT_PATH + "/test.txt";
 
-    private FileAddAction createAction(File<ParentFile<?>> file, String path) {
-
-        FileAddAction action = new FileAddAction();
-        action.setObj(FileAddAction.FILE_SYSTEM, fileSystem);
-        action.setObj(FileAddAction.PATH, path);
-        action.setObj(FileAddAction.FILE, file);
-        return action;
-    }
-
     @Test
-    public void testExecute() {
+    public void testExecute() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        FileAddAction action = createAction(file, ADD_FILE_PATH);
+        FileAddAction action = new FileAddAction(fileSystem, cfile, ADD_FILE_PATH);
         actuallyTestExecute(action);
     }
 
     @Test
-    public void testFileSystemExecute() {
+    public void testFileSystemExecute() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        FileAddAction action = fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, ADD_FILE_PATH);
+        FileAddAction action = fileSystem.prepareAddFile(cfile, ADD_FILE_PATH);
         actuallyTestExecute(action);
     }
 
-    private void actuallyTestExecute(FileAddAction action) {
+    private void actuallyTestExecute(FileAddAction action) throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        action.invoke(FileAddAction.EXECUTE);
-        assertEquals("Resolved file", file, fileSystem.invoke(FileSystem.GET_FILE, ADD_FILE_PATH));
+        action.execute();
+
+        assertEquals("File path", ADD_FILE_PATH, cfile.getPath());
+        assertEquals("Resolved file", cfile, fileSystem.getFile(ADD_FILE_PATH));
     }
 
     @Test (expected = InvalidPathException.class)
-    public void testExecuteInvalidPath() {
+    public void testExecuteInvalidPath() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        FileAddAction action = createAction(file, ADD_FILE_PATH);
+        FileAddAction action = new FileAddAction(fileSystem, cfile, ADD_FILE_PATH);
         actuallyTestExecuteInvalidPath(action);
     }
 
     @Test (expected = InvalidPathException.class)
-    public void testFileSystemExecuteInvalidPath() {
+    public void testFileSystemExecuteInvalidPath() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        FileAddAction action = fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, ADD_FILE_PATH);
+        FileAddAction action = fileSystem.prepareAddFile(cfile, ADD_FILE_PATH);
         actuallyTestExecuteInvalidPath(action);
     }
 
-    private void actuallyTestExecuteInvalidPath(FileAddAction action) {
+    private void actuallyTestExecuteInvalidPath(FileAddAction action) throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, new ContentFile(), ADD_FILE_PARENT_PATH).invoke(FileAddAction.EXECUTE);
-        action.invoke(FileAddAction.EXECUTE);
+        fileSystem.prepareAddFile(new ContentFile(user), ADD_FILE_PARENT_PATH).execute();
+        action.execute();
     }
 
     @Test (expected = OccupiedPathException.class)
-    public void testExecutePathAlreadyOccupied() {
+    public void testExecutePathAlreadyOccupied() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        FileAddAction action = createAction(file, ADD_FILE_PATH);
+        FileAddAction action = new FileAddAction(fileSystem, cfile, ADD_FILE_PATH);
         actuallyTestExecutePathAlreadyOccupied(action);
     }
 
     @Test (expected = OccupiedPathException.class)
-    public void testFileSystemExecutePathAlreadyOccupied() {
+    public void testFileSystemExecutePathAlreadyOccupied() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        FileAddAction action = fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, ADD_FILE_PATH);
+        FileAddAction action = fileSystem.prepareAddFile(cfile, ADD_FILE_PATH);
         actuallyTestExecutePathAlreadyOccupied(action);
     }
 
-    private void actuallyTestExecutePathAlreadyOccupied(FileAddAction action) {
+    private void actuallyTestExecutePathAlreadyOccupied(FileAddAction action) throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, new ContentFile(), ADD_FILE_PATH).invoke(FileAddAction.EXECUTE);
-        action.invoke(FileAddAction.EXECUTE);
+        fileSystem.prepareAddFile(new ContentFile(user), ADD_FILE_PATH).execute();
+        action.execute();
     }
 
     @Test
-    public void testIsExecutableBy() {
+    public void testIsExecutableBy() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        FileAddAction action = createAction(file, ADD_FILE_PATH);
+        FileAddAction action = new FileAddAction(fileSystem, cfile, ADD_FILE_PATH);
         actuallyTestIsExecutableBy(action);
     }
 
     @Test
-    public void testFileSystemIsExecutableBy() {
+    public void testFileSystemIsExecutableBy() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        FileAddAction action = fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, ADD_FILE_PATH);
+        FileAddAction action = fileSystem.prepareAddFile(cfile, ADD_FILE_PATH);
         actuallyTestIsExecutableBy(action);
     }
 
-    private void actuallyTestIsExecutableBy(FileAddAction action) {
+    private void actuallyTestIsExecutableBy(FileAddAction action) throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
         // Add the directory that would hold the actual file (we need to modify its rights later on)
-        Directory parentFile = new Directory();
-        parentFile.setObj(File.OWNER, user);
-        createAction(parentFile, ADD_FILE_PARENT_PATH).invoke(FileAddAction.EXECUTE);
+        new FileAddAction(fileSystem, dir, ADD_FILE_PARENT_PATH).execute();
 
         // Test 1
-        parentFile.setObj(File.RIGHTS, new FileRights("u:w"));
-        assertTrue("File add action is not executable although the write right is set on the parent directory", action.invoke(FileAddAction.IS_EXECUTABLE_BY, user));
+        dir.getRights().importRights("u:w");
+        assertTrue("File add action is not executable although the write right is set on the parent directory", action.isExecutableBy(user));
 
         // Test 2
-        parentFile.setObj(File.RIGHTS, new FileRights());
-        assertFalse("File add action is executable although the write right is not set on the parent directory", action.invoke(FileAddAction.IS_EXECUTABLE_BY, user));
+        dir.getRights().clearRights();
+        assertFalse("File add action is executable although the write right is not set on the parent directory", action.isExecutableBy(user));
     }
 
     @Test
-    public void testGetMissingRights() {
+    public void testGetMissingRights() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        FileAddAction action = createAction(file, ADD_FILE_PATH);
+        FileAddAction action = new FileAddAction(fileSystem, cfile, ADD_FILE_PATH);
         actuallyTestGetMissingRights(action);
     }
 
     @Test
-    public void testFileSystemGetMissingRights() {
+    public void testFileSystemGetMissingRights() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        FileAddAction action = fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, ADD_FILE_PATH);
+        FileAddAction action = fileSystem.prepareAddFile(cfile, ADD_FILE_PATH);
         actuallyTestGetMissingRights(action);
     }
 
-    private void actuallyTestGetMissingRights(FileAddAction action) {
+    private void actuallyTestGetMissingRights(FileAddAction action) throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
         // Add the directory that would hold the actual file (we need to modify its rights later on)
-        Directory parentFile = new Directory();
-        parentFile.setObj(File.OWNER, user);
-        createAction(parentFile, ADD_FILE_PARENT_PATH).invoke(FileAddAction.EXECUTE);
+        new FileAddAction(fileSystem, dir, ADD_FILE_PARENT_PATH).execute();
 
         // Test 1
-        parentFile.setObj(File.RIGHTS, new FileRights("u:w"));
-        assertEquals("Missing file rights map with write right on parent dir", new HashMap<>(), prepareMissingRightsMap(action.invoke(FileAddAction.GET_MISSING_RIGHTS, user)));
+        dir.getRights().importRights("u:w");
+        assertEquals("Missing file rights map with write right on parent dir", new HashMap<>(), prepareMissingRightsMap(action.getMissingRights(user)));
 
         // Test 2
-        parentFile.setObj(File.RIGHTS, new FileRights());
+        dir.getRights().clearRights();
         Map<File<?>, Character[]> test2Result = new HashMap<>();
-        test2Result.put(parentFile, new Character[] { FileRights.WRITE });
-        assertEquals("Missing file rights map without write right on parent dir", prepareMissingRightsMap(test2Result), prepareMissingRightsMap(action.invoke(FileAddAction.GET_MISSING_RIGHTS, user)));
+        test2Result.put(dir, new Character[] { FileRights.WRITE });
+        assertEquals("Missing file rights map without write right on parent dir", prepareMissingRightsMap(test2Result), prepareMissingRightsMap(action.getMissingRights(user)));
     }
 
 }

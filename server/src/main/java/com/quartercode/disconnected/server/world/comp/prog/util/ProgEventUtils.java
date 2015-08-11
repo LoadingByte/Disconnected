@@ -29,7 +29,7 @@ import com.quartercode.classmod.extra.storage.StandardStorage;
 import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
 import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension;
-import com.quartercode.disconnected.server.world.comp.prog.ProcStateListener;
+import com.quartercode.disconnected.server.world.comp.prog.ProcessStateListener;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
@@ -123,14 +123,14 @@ public class ProgEventUtils {
     }
 
     /**
-     * An internal {@link ProcStateListener} that removes a given {@link EventHandler} or {@link SBPAwareEventHandler} once the program is stopped.
+     * An internal {@link ProcessStateListener} that removes a given {@link EventHandler} or {@link SBPAwareEventHandler} once the program is stopped.
      * It doesn't need to be persistent because all event handlers are removed anyway when the server stops. That would make it useless junk.
      * 
      * @see ProgEventUtils#registerEventHandler(ProgramExecutor, Class, EventHandler)
      * @see ProgEventUtils#registerSBPAwareEventHandler(ProgramExecutor, Class, SBPAwareEventHandler, boolean)
      */
     @NonPersistent
-    public static class RemoveEventHandlerOnStopPSListener extends WorldFeatureHolder implements ProcStateListener {
+    public static class RemoveEventHandlerOnStopPSListener extends WorldFeatureHolder implements ProcessStateListener {
 
         // ----- Properties -----
 

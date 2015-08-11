@@ -28,7 +28,7 @@ import com.quartercode.disconnected.shared.util.registry.Registry;
  * A single value registry is a {@link Registry} that only stores one value.
  * That value is accessible and changeable through {@link #getValue()} and {@link #setValue(Object)}.
  * The interface method {@link #getValues()} returns a list that contains the single stored value.
- * 
+ *
  * @param <V> The type of value that can be stored inside the single value registry.
  * @see Registry
  */
@@ -39,7 +39,7 @@ public class SingleValueRegistry<V> implements Registry<V> {
 
     /**
      * Returns the value which is stored inside the single value registry.
-     * 
+     *
      * @return The stored value.
      */
     public V getValue() {
@@ -49,7 +49,7 @@ public class SingleValueRegistry<V> implements Registry<V> {
 
     /**
      * Changes the value which is stored inside the single value registry.
-     * 
+     *
      * @param value The new value to be stored.
      */
     public void setValue(V value) {

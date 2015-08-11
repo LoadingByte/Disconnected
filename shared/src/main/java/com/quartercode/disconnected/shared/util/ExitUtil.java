@@ -35,7 +35,7 @@ public class ExitUtil {
     /**
      * Injects the given {@link ExitProcessor} into the exit utility.
      * This might override existing processors.
-     * 
+     *
      * @param processor The exit processor to inject.
      */
     public static void injectProcessor(ExitProcessor processor) {

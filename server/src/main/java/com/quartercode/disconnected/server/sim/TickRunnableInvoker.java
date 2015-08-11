@@ -31,7 +31,7 @@ public class TickRunnableInvoker implements TickAction, RunnableInvocationProvid
 
     /**
      * Invokes the given {@link Runnable} in the tick update thread.
-     * 
+     *
      * @param runnable The runnable to invoke in the tick update thread.
      */
     @Override

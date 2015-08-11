@@ -18,108 +18,81 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import static com.quartercode.classmod.extra.func.Priorities.LEVEL_6;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.disconnected.server.util.NullPreventer;
+import com.quartercode.disconnected.server.world.comp.user.User;
+import com.quartercode.disconnected.server.world.util.SizeUtils;
 
 /**
  * This class represents the root file of a {@link FileSystem}.
- * Every {@link File} branches of a root file somehow.
- * 
+ * Every {@link File} branches off a root file somehow.
+ *
  * @see FileSystem
  * @see File
  */
 public class RootFile extends ParentFile<FileSystem> {
 
-    // ----- Properties -----
-
-    static {
-
-        NAME.addGetterExecutor("returnStatic", RootFile.class, new FunctionExecutor<String>() {
-
-            @Override
-            public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
-
-                return "root";
-            }
-
-        }, LEVEL_6);
-        NAME.addSetterExecutor("cancel", RootFile.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                return null;
-            }
-
-        }, LEVEL_6);
-
-    }
-
-    // ----- Functions -----
-
-    static {
-
-        GET_PATH.addExecutor("returnStatic", RootFile.class, new FunctionExecutor<String>() {
-
-            @Override
-            public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
-
-                return "";
-            }
-
-        }, LEVEL_6);
-
-        CREATE_MOVE.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileMoveAction>() {
-
-            @Override
-            public FileMoveAction invoke(FunctionInvocation<FileMoveAction> invocation, Object... arguments) {
-
-                return null;
-            }
-
-        }, LEVEL_6);
-
-        CREATE_MOVE_TO_OTHER_FS.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileMoveAction>() {
-
-            @Override
-            public FileMoveAction invoke(FunctionInvocation<FileMoveAction> invocation, Object... arguments) {
-
-                return null;
-            }
-
-        }, LEVEL_6);
-
-        CREATE_REMOVE.addExecutor("returnNull", RootFile.class, new FunctionExecutor<FileRemoveAction>() {
-
-            @Override
-            public FileRemoveAction invoke(FunctionInvocation<FileRemoveAction> invocation, Object... arguments) {
-
-                return null;
-            }
-
-        }, LEVEL_6);
-
-        // The root file has no name size
-        GET_SIZE.addExecutor("name", RootFile.class, new FunctionExecutor<Long>() {
-
-            @Override
-            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
-
-                return 0L + NullPreventer.prevent(invocation.next(arguments));
-            }
-
-        });
-
-    }
-
     /**
      * Creates a new root file.
+     * This constructor should only be used by a {@link FileSystem}.
      */
-    public RootFile() {
+    protected RootFile() {
 
-        setParentType(FileSystem.class);
+    }
+
+    @Override
+    public String getName() {
+
+        return "root";
+    }
+
+    @Override
+    public void setName(String name) {
+
+        throw new UnsupportedOperationException("Cannot change the name of a root file");
+    }
+
+    @Override
+    public String getPath() {
+
+        return "";
+    }
+
+    @Override
+    public FileSystem getFileSystem() {
+
+        // A root file should only be stored by one file system
+        return getSingleParent();
+    }
+
+    @Override
+    public boolean hasRight(User user, char right) {
+
+        // Only superusers are allowed to manipulate files on the root level
+        return user == null || user.isSuperuser();
+    }
+
+    @Override
+    public long getSize() {
+
+        // The root file only has the size of its children; its metadata (name etc.) doesn't count because the file is only virtual
+        return SizeUtils.getSize(getChildFiles());
+    }
+
+    @Override
+    public FileMoveAction prepareMove(String path) {
+
+        throw new UnsupportedOperationException("Cannot move the root file");
+    }
+
+    @Override
+    public FileMoveAction prepareMove(String path, FileSystem fileSystem) {
+
+        throw new UnsupportedOperationException("Cannot move the root file");
+    }
+
+    @Override
+    public FileRemoveAction prepareRemove() {
+
+        throw new UnsupportedOperationException("Cannot remove the root file");
     }
 
 }

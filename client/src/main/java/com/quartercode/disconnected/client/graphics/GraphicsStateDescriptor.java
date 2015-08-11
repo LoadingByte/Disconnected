@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Graphics state descriptors define the properties of {@link GraphicsState}s which can be created out of them with {@link #create()}.
  * That way there can be multiple fresh copies of the same {@link GraphicsState}.
- * 
+ *
  * @see GraphicsState
  */
 public class GraphicsStateDescriptor {
@@ -44,7 +44,7 @@ public class GraphicsStateDescriptor {
 
     /**
      * Creates a new graphics state descriptor that produces {@link GraphicsState} with the given name.
-     * 
+     *
      * @param name The name of the {@link GraphicsState}s produces by the descriptor.
      */
     public GraphicsStateDescriptor(String name) {
@@ -55,7 +55,7 @@ public class GraphicsStateDescriptor {
     /**
      * Returns the name new {@link GraphicsState}s will use.
      * Such names can be used for debugging purposes.
-     * 
+     *
      * @return The name for new {@link GraphicsState}s.
      */
     public String getName() {
@@ -67,7 +67,7 @@ public class GraphicsStateDescriptor {
      * Returns a {@link Set} containing all {@link GraphicsModule}s that are added to the descriptor.
      * The {@link Set} only contains their {@link Class}es because {@link #create()} instantiates fresh copies every time it is called.
      * You can add new {@link GraphicsModule} using {@link #addModule(Class, String, int)} and remove them with {@link #removeModule(Class)}.
-     * 
+     *
      * @return A {@link Set} containg the {@link Class}es of all registered {@link GraphicsModule}.
      */
     public Set<Class<? extends GraphicsModule>> getModules() {
@@ -79,7 +79,7 @@ public class GraphicsStateDescriptor {
      * Adds a new {@link GraphicsModule} to the descriptor.
      * The method only requires the module's {@link Class} because {@link #create()} instantiates a fresh copy every time it is called.
      * The name of the {@link GraphicsModule} and its priority (higher priorities are invoked first) are also set.
-     * 
+     *
      * @param module The {@link Class} of the {@link GraphicsModule} to add to the descriptor.
      * @param name The name of the {@link GraphicsModule}. This name can be used later on for {@link GraphicsState#getModule(String)}.
      * @param priority The priority of the {@link GraphicsModule}. Modules with higher priorities are invoked first.
@@ -92,7 +92,7 @@ public class GraphicsStateDescriptor {
     /**
      * Removess the given {@link GraphicsModule} from the descriptor.
      * The method only requires the module's {@link Class} because {@link #create()} instantiates a fresh copy every time it is called.
-     * 
+     *
      * @param module The {@link Class} of the {@link GraphicsModule} to remove from the descriptor.
      */
     public void removeModule(Class<? extends GraphicsModule> module) {
@@ -103,7 +103,7 @@ public class GraphicsStateDescriptor {
     /**
      * Creates a new {@link GraphicsState} using the data stored in the descriptor.
      * A new instance of every added {@link GraphicsModule} is created on every call of this method.
-     * 
+     *
      * @return The created {@link GraphicsState}.
      */
     public GraphicsState create() {

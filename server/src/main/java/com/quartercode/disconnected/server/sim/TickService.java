@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * This service implements the controls for the tick system which then calls several actions.
  * It's like a central hub for controlling the activity of the tick thread.
- * 
+ *
  * @see TickAction
  */
 public interface TickService {
@@ -40,14 +40,14 @@ public interface TickService {
 
     /**
      * Returns a list of {@link TickAction}s which are called on every tick.
-     * 
+     *
      * @return The registered tick actions.
      */
     public List<TickAction> getActions();
 
     /**
      * Returns the {@link TickAction} which has the given type as a superclass.
-     * 
+     *
      * @param type The type to use for the check.
      * @return The tick action which has the given type as a superclass.
      */
@@ -56,7 +56,7 @@ public interface TickService {
     /**
      * Adds a {@link TickAction} which is called on every tick.
      * You can only add actions if there is no other action of the same type already registered.
-     * 
+     *
      * @param action The tick action to add.
      * @throws IllegalStateException If there is another action of the same type already registered.
      */
@@ -64,28 +64,28 @@ public interface TickService {
 
     /**
      * Removes a {@link TickAction} from the tick service.
-     * 
+     *
      * @param action The tick action to remove.
      */
     public void removeAction(TickAction action);
 
     /**
      * Returns the delay the tick service should wait between two ticks.
-     * 
+     *
      * @return The tick delay.
      */
     public int getDelay();
 
     /**
      * Sets the delay the thread should wait between two ticks.
-     * 
+     *
      * @param delay The new tick delay.
      */
     public void setDelay(int delay);
 
     /**
      * Returns whether the tick service is currently running.
-     * 
+     *
      * @return The current running state of the tick service.
      */
     public boolean isRunning();
@@ -93,7 +93,7 @@ public interface TickService {
     /**
      * Changes the running state of the tick service.
      * This method starts and stops the tick update.
-     * 
+     *
      * @param running Whether the tick service should run.
      */
     public void setRunning(boolean running);

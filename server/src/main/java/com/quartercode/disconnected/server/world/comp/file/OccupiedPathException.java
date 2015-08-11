@@ -19,13 +19,13 @@
 package com.quartercode.disconnected.server.world.comp.file;
 
 /**
- * This runtime exception occures if a path on a {@link FileSystem}, under which a new file should be added, is already occupied by another file.
+ * This exception occurs if a path on a {@link FileSystem}, under which a new file should be added, is already occupied by another file.
  * That just means that two files with the same path cannot exist.
- * 
+ *
  * @see FileSystem
  * @see File
  */
-public class OccupiedPathException extends RuntimeException {
+public class OccupiedPathException extends Exception {
 
     private static final long serialVersionUID = -796351484036279039L;
 
@@ -34,7 +34,7 @@ public class OccupiedPathException extends RuntimeException {
 
     /**
      * Creates a new occupied path exception.
-     * 
+     *
      * @param fileSystem The {@link FileSystem} on which the given path is already occupied.
      * @param path The occupied path.
      */
@@ -48,7 +48,7 @@ public class OccupiedPathException extends RuntimeException {
 
     /**
      * Returns the {@link FileSystem} on which the set path ({@link #getPath()}) is already occupied.
-     * 
+     *
      * @return The file system that already holds a file on the given path.
      */
     public FileSystem getFileSystem() {
@@ -58,7 +58,7 @@ public class OccupiedPathException extends RuntimeException {
 
     /**
      * Returns the path that is already occupied by another file.
-     * 
+     *
      * @return The occupied path.
      */
     public String getPath() {

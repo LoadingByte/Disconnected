@@ -49,7 +49,6 @@ import com.quartercode.disconnected.server.sim.gen.WorldGenerator;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerRegistry;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
-import com.quartercode.disconnected.server.world.comp.os.OS;
 import com.quartercode.disconnected.shared.CommonBootstrap;
 import com.quartercode.disconnected.shared.util.ApplicationInfo;
 import com.quartercode.disconnected.shared.util.ExitUtil;
@@ -94,7 +93,7 @@ public class Main {
 
     /**
      * The main method which initializes the whole game.
-     * 
+     *
      * @param args The command line arguments.
      */
     public static void main(String[] args) {
@@ -108,9 +107,6 @@ public class Main {
         // Initialize settings and process default ones
         initializeSettings();
         processDefaultSettings();
-
-        // Initialize temp file manager
-        initializeTempFileManager();
 
         // Process the command line arguments
         if (!processCommandLineArguments(args)) {
@@ -164,8 +160,8 @@ public class Main {
             @Override
             public void run() {
 
-                for (Computer computer : world.get(World.COMPUTERS).get()) {
-                    computer.get(Computer.OS).get().invoke(OS.SET_RUNNING, true);
+                for (Computer computer : world.getComputers()) {
+                    computer.getOs().setRunning(true);
                 }
             }
 
@@ -218,18 +214,6 @@ public class Main {
                 // Retrieve the root logger for the current package and set its level to debug
                 ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(loggerPackage)).setLevel(Level.DEBUG);
             }
-        }
-    }
-
-    private static void initializeTempFileManager() {
-
-        Path parentTempDir = Paths.get("tmp");
-
-        LOGGER.debug("Initializing temp file manager under '{}'", parentTempDir);
-        try {
-            TempFileManager.initialize(parentTempDir);
-        } catch (IOException e) {
-            throw new RuntimeException("Error while initializing temp file manager under '" + parentTempDir + "'", e);
         }
     }
 

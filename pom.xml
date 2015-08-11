@@ -37,7 +37,8 @@
         <!-- Child dependencies -->
         <commons-cli.version>1.3</commons-cli.version>
         <logback.version>1.1.3</logback.version>
-        <classmod.version>0.3.0-SNAPSHOT</classmod.version>
+        <jtimber.version>0.2.0-SNAPSHOT</jtimber.version>
+        <moxy.version>2.6.0</moxy.version>
         <lwjgl.version>2.9.3</lwjgl.version>
         <twl.version>1.0</twl.version>
         <gdx.version>1.6.0</gdx.version>

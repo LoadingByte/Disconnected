@@ -27,7 +27,7 @@ import com.quartercode.eventbridge.bridge.module.EventHandler;
 
 /**
  * A simple {@link EventHandler} for {@link GP_SBPWPU_ErrorEvent}s that just opens a {@link MessagePopup} window when an error event arrives.
- * 
+ *
  * @see GP_SBPWPU_ErrorEvent
  */
 public class GP_SBPWPU_ErrorEventPopupHandler implements EventHandler<GP_SBPWPU_ErrorEvent> {
@@ -40,7 +40,7 @@ public class GP_SBPWPU_ErrorEventPopupHandler implements EventHandler<GP_SBPWPU_
 
     /**
      * Creates a new {@link GP_SBPWPU_ErrorEvent} popup handler.
-     * 
+     *
      * @param programWindow The {@link ClientProgramWindow} of the client program whose {@link GP_SBPWPU_ErrorEvent}s should be processed.
      * @param l10nContext The {@link LocalizationSupplier} which should be used to resolve the error messages.
      * @param keyPrefix A prefix that is put in front of the error type before it is used as a localization key.

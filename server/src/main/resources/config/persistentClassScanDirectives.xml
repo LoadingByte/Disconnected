@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <!-- Classmod -->
-    <addPersistentClassScanDirective method="jaxbIndexLookup">$C{com.quartercode.classmod.Classmod.CONTEXT_PATH}</addPersistentClassScanDirective>
+    <!-- Possible library indices; not required at the moment -->
+    <!-- <addPersistentClassScanDirective method="jaxbIndexLookup">$C{some.path.to.contant.Class.CONSTANT}</addPersistentClassScanDirective> -->
 
     <!-- Game -->
     <addPersistentClassScanDirective method="recursiveAnnotationSearch">com.quartercode.disconnected.shared.world</addPersistentClassScanDirective>

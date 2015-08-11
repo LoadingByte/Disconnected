@@ -18,112 +18,86 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.classmod.extra.func.FunctionDefinition;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.ReferenceStorage;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
+import com.quartercode.jtimber.api.node.Weak;
 
 /**
  * The file remove action is a simple file action that defines the process of removing a {@link File} from its file system.
  * For doing that, the action only takes the file to remove and resolves the rest of the required data automatically.<br>
  * <br>
  * See {@link FileAction} for more detail on what file actions actually are.
- * 
+ *
  * @see FileAction
  * @see File
  */
 public class FileRemoveAction extends FileAction {
 
-    // ----- Properties -----
+    @Weak
+    private final File<ParentFile<?>> file;
 
     /**
-     * The {@link File} that should be removed from the file system it's currently stored on.
+     * Creates a new file remove action.
+     *
+     * @param file The {@link File} that should be removed from the {@link FileSystem} it's currently stored on.
      */
-    public static final PropertyDefinition<File<ParentFile<?>>> FILE;
+    public FileRemoveAction(File<ParentFile<?>> file) {
 
-    static {
+        Validate.notNull(file, "Cannot use null file for file remove action");
 
-        FILE = factory(PropertyDefinitionFactory.class).create("file", new ReferenceStorage<>());
-
+        this.file = file;
     }
 
-    // ----- Functions -----
+    /**
+     * Returns the {@link File} that should be removed from the {@link FileSystem} it's currently stored on.
+     *
+     * @return The file that should be removed.
+     */
+    public File<ParentFile<?>> getFile() {
+
+        return file;
+    }
 
     /**
-     * Removes the set {@link #FILE} from the file system it's currently located on.
-     * If the file for removal is a {@link ParentFile}, all child files are also going to be removed.
-     * 
-     * <table>
-     * <tr>
-     * <th>Exception</th>
-     * <th>When?</th>
-     * </tr>
-     * <tr>
-     * <td>{@link IllegalStateException}</td>
-     * <td>The file for removal is not stored on any file system (it has no parent file).</td>
-     * </tr>
-     * </table>
+     *
+     * Removes the set {@link #getFile()} from the file system it's currently stored on.
+     * If the file for removal is a {@link ParentFile}, all child files are also going to be removed.<br>
+     * <br>
+     * Note that no right checks or anything like that are done by this method.
+     * If you need such permission checks, use {@link #isExecutableBy(User)} or {@link #getMissingRights(User)}.
+     *
+     * @throws IllegalStateException If the file for removal is not stored on any file system (true if it has no parent file).
      */
-    public static final FunctionDefinition<Void>                EXECUTE = FileAction.EXECUTE;
+    @Override
+    public void execute() {
 
-    static {
+        Validate.validState(file.getSingleParent() != null, "File for removal is not stored on any file system (parent file is null)");
+        file.getSingleParent().removeChildFile(file);
+    }
 
-        EXECUTE.addExecutor("removeFile", FileRemoveAction.class, new FunctionExecutor<Void>() {
+    @Override
+    public Map<File<?>, Character[]> getMissingRights(User user) {
 
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+        Map<File<?>, Character[]> missingRights = new HashMap<>();
+        checkFile(user, file, missingRights);
 
-                CFeatureHolder fileRemoveAction = invocation.getCHolder();
-                File<ParentFile<?>> removeFile = fileRemoveAction.getObj(FILE);
+        return missingRights;
+    }
 
-                Validate.validState(removeFile.getParent() != null, "File for removal is not stored on any file system (parent file == null)");
+    private void checkFile(User user, File<?> file, Map<File<?>, Character[]> target) {
 
-                removeFile.getParent().removeFromColl(ParentFile.CHILDREN, removeFile);
+        if (!file.hasRight(user, FileRights.DELETE)) {
+            target.put(file, new Character[] { FileRights.DELETE });
+        }
 
-                return invocation.next(arguments);
+        if (file instanceof ParentFile) {
+            for (File<?> childFile : ((ParentFile<?>) file).getChildFiles()) {
+                checkFile(user, childFile, target);
             }
-
-        });
-
-        GET_MISSING_RIGHTS.addExecutor("checkForDeleteRight", FileRemoveAction.class, new FunctionExecutor<Map<File<?>, Character[]>>() {
-
-            @Override
-            public Map<File<?>, Character[]> invoke(FunctionInvocation<Map<File<?>, Character[]>> invocation, Object... arguments) {
-
-                User executor = (User) arguments[0];
-                File<ParentFile<?>> removeFile = invocation.getCHolder().getObj(FILE);
-
-                Map<File<?>, Character[]> missingRights = new HashMap<>();
-                checkFile(executor, removeFile, missingRights);
-
-                invocation.next(arguments);
-                return missingRights;
-            }
-
-            private void checkFile(User executor, File<?> file, Map<File<?>, Character[]> target) {
-
-                if (!file.invoke(File.HAS_RIGHT, executor, FileRights.DELETE)) {
-                    target.put(file, new Character[] { FileRights.DELETE });
-                }
-
-                if (file instanceof ParentFile) {
-                    for (File<?> childFile : file.getColl(ParentFile.CHILDREN)) {
-                        checkFile(executor, childFile, target);
-                    }
-                }
-            }
-
-        });
-
+        }
     }
 
 }

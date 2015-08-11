@@ -18,113 +18,111 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import static com.quartercode.classmod.extra.func.Priorities.LEVEL_6;
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.classmod.extra.func.FunctionDefinition;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
-import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
-import com.quartercode.classmod.factory.FunctionDefinitionFactory;
-import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
-import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
+import javax.xml.bind.annotation.XmlElementRef;
+import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.server.world.util.SizeUtils;
+import com.quartercode.jtimber.api.node.Node;
+import com.quartercode.jtimber.api.node.wrapper.SubstituteWithWrapper;
+import com.quartercode.jtimber.api.node.wrapper.collection.ListWrapper;
 
 /**
- * This class represents a parent file.
- * Parent files contain and hold other {@link File}s.
- * 
- * @param <P> The type of the parent {@link CFeatureHolder} which houses the parent file somehow.
+ * This class represents a parent file that is able to contain and hold other {@link File}s.
+ * An example of an actual parent file is the {@link Directory}.
+ *
+ * @param <P> The type of {@link Node}s that are able to be the parent of this parent file.
+ *        Apart from the special case {@link RootFile}, this parameter should always reference another file class.
  * @see File
  * @see FileSystem
  */
-public class ParentFile<P extends CFeatureHolder> extends File<P> {
+public abstract class ParentFile<P extends Node<?>> extends File<P> {
 
-    // ----- Properties -----
+    @XmlElementRef
+    @SubstituteWithWrapper (ListWrapper.class)
+    private final List<File<ParentFile<?>>> childFiles = new ArrayList<>();
 
-    /**
-     * The child {@link File}s the parent file contains.<br>
-     * <br>
-     * Exceptions that can occur when adding:
-     * 
-     * <table>
-     * <tr>
-     * <th>Exception</th>
-     * <th>When?</th>
-     * </tr>
-     * <tr>
-     * <td>{@link OutOfSpaceException}</td>
-     * <td>There is not enough space for the new child {@link File}s.</td>
-     * </tr>
-     * </table>
-     */
-    public static final CollectionPropertyDefinition<File<ParentFile<?>>, List<File<ParentFile<?>>>> CHILDREN;
-
-    static {
-
-        CHILDREN = factory(CollectionPropertyDefinitionFactory.class).create("children", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
-        CHILDREN.addAdderExecutor("checkSize", ParentFile.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                FileSystem fileSystem = invocation.getCHolder().invoke(GET_FS);
-                if (fileSystem != null) {
-                    long fileSize = ((File<?>) arguments[0]).invoke(File.GET_SIZE);
-                    if (fileSize > fileSystem.invoke(FileSystem.GET_FREE)) {
-                        throw new OutOfSpaceException(fileSystem, fileSize);
-                    }
-                }
-
-                return invocation.next(arguments);
-            }
-
-        }, LEVEL_6);
+    // JAXB constructor
+    protected ParentFile() {
 
     }
 
-    // ----- Functions -----
+    /**
+     * Creates a new parent file.
+     * Note that the file's {@link #getName() name} will be set as soon as the file is added to a {@link FileSystem}.
+     *
+     * @param owner The owning user of the parent file. Note that it may not be {@code null}.
+     *        See {@link #getOwner()} for more details.
+     */
+    protected ParentFile(User owner) {
+
+        super(owner);
+    }
 
     /**
-     * Returns the child {@link File} which has the given name.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link String}</td>
-     * <td>name</td>
-     * <td>The name of the {@link File} to return.</td>
-     * </tr>
-     * </table>
+     * Returns the child {@link File}s the parent file contains.
+     * For example, a {@link Directory} would store the files it holds in this list.
+     *
+     * @return The child files of the directory.
      */
-    public static final FunctionDefinition<File<ParentFile<?>>>                                      GET_CHILD_BY_NAME;
+    public List<File<ParentFile<?>>> getChildFiles() {
 
-    static {
+        return Collections.unmodifiableList(childFiles);
+    }
 
-        GET_CHILD_BY_NAME = factory(FunctionDefinitionFactory.class).create("getChildByName", new Class[] { String.class });
-        GET_CHILD_BY_NAME.addExecutor("default", ParentFile.class, CollectionPropertyAccessorFactory.createGetSingle(CHILDREN, new CriteriumMatcher<File<ParentFile<?>>>() {
+    /**
+     * Returns the {@link #getChildFiles() child file} which has the given name.
+     *
+     * @param name The name of the child {@link File} to return.
+     * @return The child file with the given name.
+     */
+    public File<ParentFile<?>> getChildFileByName(String name) {
 
-            @Override
-            public boolean matches(File<ParentFile<?>> element, Object... arguments) {
-
-                return element.getObj(NAME).equals(arguments[0]);
+        for (File<ParentFile<?>> child : childFiles) {
+            if (child.getName().equals(name)) {
+                return child;
             }
+        }
 
-        }));
+        return null;
+    }
 
-        GET_SIZE.addExecutor("children", ParentFile.class, SizeUtils.createGetSize(CHILDREN));
+    /**
+     * Adds the given {@link #getChildFiles() child file} to the parent file.
+     * This operation can be compared with adding a {@link File} to a {@link Directory}.
+     *
+     * @param childFile The new child file which should be added to the parent file.
+     * @throws OutOfSpaceException If there is not enough space for the new child files on the {@link FileSystem}.
+     */
+    public void addChildFile(File<ParentFile<?>> childFile) throws OutOfSpaceException {
 
+        FileSystem fileSystem = getFileSystem();
+        if (fileSystem != null) {
+            long childFileSize = childFile.getSize();
+            if (childFileSize > fileSystem.getFreeSpace()) {
+                throw new OutOfSpaceException(fileSystem, childFileSize);
+            }
+        }
+
+        childFiles.add(childFile);
+    }
+
+    /**
+     * Removes the given {@link #getChildFiles() child file} from the parent file.
+     * This operation can be compared with removing a {@link File} from a {@link Directory}.
+     *
+     * @param childFile The child file which should be removed from the parent file.
+     */
+    public void removeChildFile(File<ParentFile<?>> childFile) {
+
+        childFiles.remove(childFile);
+    }
+
+    @Override
+    public long getSize() {
+
+        return super.getSize() + SizeUtils.getSize(childFiles);
     }
 
 }

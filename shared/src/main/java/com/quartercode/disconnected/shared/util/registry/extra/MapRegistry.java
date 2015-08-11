@@ -31,7 +31,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * A {@link MappedValueRegistry} that uses two {@link HashMap}s as internal data structures.
- * 
+ *
  * @param <L> The type of the left values, which are mapped to the right values.
  * @param <R> The type of the right values, which are mapped to the left values.
  * @see MappedValueRegistry

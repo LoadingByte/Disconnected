@@ -31,7 +31,7 @@ public class ServiceRegistry {
 
     /**
      * Looks up the registered service implementation for the given service specification.
-     * 
+     *
      * @param service The service specification which defines the service.
      * @return The service implementation for the given specification.
      */
@@ -43,7 +43,7 @@ public class ServiceRegistry {
 
     /**
      * Registers the given service implementation instance to the service registry and makes it available.
-     * 
+     *
      * @param service The service specification interface which defines the service.
      * @param implementation The actual implementation of the service that can be retrieved through {@link #lookup(Class)}.
      */

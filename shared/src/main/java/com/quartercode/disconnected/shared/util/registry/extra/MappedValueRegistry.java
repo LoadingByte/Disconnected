@@ -30,7 +30,7 @@ import com.quartercode.disconnected.shared.util.registry.extra.MappedValueRegist
  * <br>
  * If one of the two value types is or should be handled as a {@link NamedValue}, it should be used as the left one.
  * Mappings implement the named value interface and redirect the named value call to the left object.
- * 
+ *
  * @param <L> The type of the left values, which are mapped to the right values.
  * @param <R> The type of the right values, which are mapped to the left values.
  * @see MultipleValueRegistry
@@ -40,7 +40,7 @@ public interface MappedValueRegistry<L, R> extends MultipleValueRegistry<Mapping
 
     /**
      * Returns the left mapping for the given right object.
-     * 
+     *
      * @param right The right object whose left partner should be returned.
      * @return The assigned left partner of the given right object.
      */
@@ -48,7 +48,7 @@ public interface MappedValueRegistry<L, R> extends MultipleValueRegistry<Mapping
 
     /**
      * Returns the right mapping for the given left object.
-     * 
+     *
      * @param left The left object whose right partner should be returned.
      * @return The assigned right partner of the given left object.
      */
@@ -57,7 +57,7 @@ public interface MappedValueRegistry<L, R> extends MultipleValueRegistry<Mapping
     /**
      * Adds the given mapping in order to make it available through the accessor methods.
      * Note that all mappings with the same left <b>or</b> right object are removed.
-     * 
+     *
      * @param left The left object that should be mapped to the given right object.
      * @param right The right object that should be mapped to the given left object.
      */
@@ -65,14 +65,14 @@ public interface MappedValueRegistry<L, R> extends MultipleValueRegistry<Mapping
 
     /**
      * Removes the mapping that maps the given left object to some right object.
-     * 
+     *
      * @param left The left object whose mapping should be removed.
      */
     public void removeLeft(L left);
 
     /**
      * Removes the mapping that maps the given right object to some left object.
-     * 
+     *
      * @param right The right object whose mapping should be removed.
      */
     public void removeRight(R right);
@@ -82,7 +82,7 @@ public interface MappedValueRegistry<L, R> extends MultipleValueRegistry<Mapping
      * The custom object type of the multiple value registry is replaced with such a mapping type.
      * Note that the all {@link #getName()} calls on a mapping object are redirected to the left object.
      * See the main mapped value registry class for more details.
-     * 
+     *
      * @param <L> The type of the left value, which is mapped to the right value.
      * @param <R> The type of the right value, which is mapped to the left value.
      * @see MappedValueRegistry
@@ -91,14 +91,14 @@ public interface MappedValueRegistry<L, R> extends MultipleValueRegistry<Mapping
 
         /**
          * Returns the left value, which is mapped to the right value.
-         * 
+         *
          * @return The left value.
          */
         public L getLeft();
 
         /**
          * Returns the right value, which is mapped to the left value.
-         * 
+         *
          * @return The right value.
          */
         public R getRight();

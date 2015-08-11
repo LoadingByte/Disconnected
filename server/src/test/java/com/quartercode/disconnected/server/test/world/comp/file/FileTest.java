@@ -18,14 +18,15 @@
 
 package com.quartercode.disconnected.server.test.world.comp.file;
 
+import static com.quartercode.disconnected.server.test.world.comp.file.FileAssert.assertInvalidPath;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
-import com.quartercode.disconnected.server.world.comp.file.File;
-import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
-import com.quartercode.disconnected.server.world.comp.user.Group;
+import com.quartercode.disconnected.server.world.comp.file.InvalidPathException;
+import com.quartercode.disconnected.server.world.comp.file.OccupiedPathException;
+import com.quartercode.disconnected.server.world.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.shared.world.comp.ByteUnit;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
@@ -36,19 +37,18 @@ public class FileTest {
     private ContentFile testFile;
 
     @Before
-    public void setUp() {
+    public void setUp() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        fileSystem = new FileSystem();
-        fileSystem.setObj(FileSystem.SIZE, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
+        fileSystem = new FileSystem(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
 
-        testFile = new ContentFile();
-        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, testFile, "test1/test2/test.txt").invoke(FileAddAction.EXECUTE);
+        testFile = new ContentFile(new User("user"));
+        fileSystem.prepareAddFile(testFile, "test1/test2/test.txt").execute();
     }
 
     @Test
     public void testGetPath() {
 
-        assertEquals("File path", "test1/test2/test.txt", testFile.invoke(File.GET_PATH));
+        assertEquals("File path", "test1/test2/test.txt", testFile.getPath());
     }
 
     /*
@@ -56,65 +56,51 @@ public class FileTest {
      * In production, a FileMoveAction should be used instead of the direct name setting.
      */
     @Test
-    public void testSetName() {
+    public void testSetName() throws InvalidPathException {
 
-        testFile.setObj(File.NAME, "test3.txt");
+        testFile.setName("test3.txt");
 
-        assertTrue("Renamed file doesn't exist", testFile.equals(fileSystem.invoke(FileSystem.GET_FILE, "test1/test2/test3.txt")));
-        assertTrue("Removed file does exist", fileSystem.invoke(FileSystem.GET_FILE, "test1/test2/test.txt") == null);
-        assertEquals("Path of renamed file", "test1/test2/test3.txt", testFile.invoke(File.GET_PATH));
+        assertTrue("Renamed file doesn't exist", testFile.equals(fileSystem.getFile("test1/test2/test3.txt")));
+        assertInvalidPath("Removed file does exist", fileSystem, "test1/test2/test.txt");
+        assertEquals("Path of renamed file", "test1/test2/test3.txt", testFile.getPath());
     }
 
     @Test
     public void testHasRight() {
 
-        User owner = createUser("owner");
-        User groupuser = createUser("groupusers");
+        User owner = new User("owner");
+        User groupuser = new User("groupusers");
 
-        Group group = createGroup("group");
-        owner.addToColl(User.GROUPS, group);
-        groupuser.addToColl(User.GROUPS, group);
+        String group = "group";
+        owner.addGroup(group);
+        groupuser.addGroup(group);
 
-        testFile.setObj(File.OWNER, owner);
-        testFile.setObj(File.GROUP, group);
+        testFile.setOwner(owner);
+        testFile.setGroup(group);
 
-        testFile.setObj(File.RIGHTS, new FileRights());
-        assertTrue("Owner has read right although it is not set for owner", !testFile.invoke(File.HAS_RIGHT, owner, FileRights.READ));
+        testFile.getRights().clearRights();
+        assertTrue("Owner has read right although it is not set for owner", !testFile.hasRight(owner, FileRights.READ));
 
-        testFile.setObj(File.RIGHTS, new FileRights("u:r"));
-        assertTrue("Owner hasn't read right although it is set for owner", testFile.invoke(File.HAS_RIGHT, owner, FileRights.READ));
-        assertTrue("Group user has read right although it is not set for group", !testFile.invoke(File.HAS_RIGHT, groupuser, FileRights.READ));
+        testFile.getRights().importRights("u:r");
+        assertTrue("Owner hasn't read right although it is set for owner", testFile.hasRight(owner, FileRights.READ));
+        assertTrue("Group user has read right although it is not set for group", !testFile.hasRight(groupuser, FileRights.READ));
 
-        testFile.setObj(File.RIGHTS, new FileRights("g:r,u:w"));
-        assertTrue("Owner hasn't write right although it is set for owner", testFile.invoke(File.HAS_RIGHT, owner, FileRights.WRITE));
-        assertTrue("Owner hasn't read right although it is set for group", testFile.invoke(File.HAS_RIGHT, owner, FileRights.READ));
-        assertTrue("Group user has write right although it is not set for group", !testFile.invoke(File.HAS_RIGHT, groupuser, FileRights.WRITE));
-        assertTrue("Group user hasn't read right although it is set for group", testFile.invoke(File.HAS_RIGHT, groupuser, FileRights.READ));
+        testFile.getRights().importRights("g:r,u:w");
+        assertTrue("Owner hasn't write right although it is set for owner", testFile.hasRight(owner, FileRights.WRITE));
+        assertTrue("Owner hasn't read right although it is set for group", testFile.hasRight(owner, FileRights.READ));
+        assertTrue("Group user has write right although it is not set for group", !testFile.hasRight(groupuser, FileRights.WRITE));
+        assertTrue("Group user hasn't read right although it is set for group", testFile.hasRight(groupuser, FileRights.READ));
     }
 
     @Test
     public void testCanChangeRights() {
 
-        User owner = createUser("owner");
-        User other = createUser("other");
-        testFile.setObj(File.OWNER, owner);
+        User owner = new User("owner");
+        User other = new User("other");
+        testFile.setOwner(owner);
 
-        assertTrue("Owner can't change rights", testFile.invoke(File.CAN_CHANGE_RIGHTS, owner));
-        assertFalse("Other user can change rights", testFile.invoke(File.CAN_CHANGE_RIGHTS, other));
-    }
-
-    private User createUser(String name) {
-
-        User user = new User();
-        user.setObj(User.NAME, name);
-        return user;
-    }
-
-    private Group createGroup(String name) {
-
-        Group group = new Group();
-        group.setObj(Group.NAME, name);
-        return group;
+        assertTrue("Owner can't change rights", testFile.canChangeRights(owner));
+        assertFalse("Other user can change rights", testFile.canChangeRights(other));
     }
 
 }

@@ -56,7 +56,7 @@ import de.matthiasmann.twl.utils.PNGDecoder;
 
 /**
  * This thread executes the OpenGL update which keeps the lwjgl display alive.
- * 
+ *
  * @see GraphicsService
  */
 public class GraphicsThread extends Thread {
@@ -83,7 +83,7 @@ public class GraphicsThread extends Thread {
     /**
      * Changes the current {@link GraphicsState} to the given one.
      * The change is applied on the next tick.
-     * 
+     *
      * @param newState The new {@link GraphicsState} to use.
      */
     protected void changeState(GraphicsState newState) {
@@ -93,7 +93,7 @@ public class GraphicsThread extends Thread {
 
     /**
      * Invokes the given {@link Runnable} in the graphics update thread.
-     * 
+     *
      * @param runnable The runnable to invoke in the graphics update thread.
      */
     protected void invoke(Runnable runnable) {
@@ -187,7 +187,7 @@ public class GraphicsThread extends Thread {
 
         Path themeFile = TempFileManager.getTempDir().resolve("twlConfigFinal.xml");
 
-        try (Writer themeFileWriter = Files.newBufferedWriter(themeFile, Charset.forName("UTF-8"))) {
+        try (Writer themeFileWriter = Files.newBufferedWriter(themeFile, Charset.defaultCharset())) {
             themeFileWriter.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             themeFileWriter.write("<!DOCTYPE themes PUBLIC \"-//www.matthiasmann.de//TWL-Theme//EN\" ");
             themeFileWriter.write("\"http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd\">");

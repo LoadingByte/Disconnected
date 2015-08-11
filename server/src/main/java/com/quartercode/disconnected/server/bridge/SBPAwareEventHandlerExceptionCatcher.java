@@ -23,14 +23,14 @@ import com.quartercode.eventbridge.bridge.Event;
 
 /**
  * SBP-aware event handler exception catchers are called when an {@link SBPAwareEventHandler} throws a {@link RuntimeException}.
- * 
+ *
  * @see SBPAwareEventHandler
  */
 public interface SBPAwareEventHandlerExceptionCatcher {
 
     /**
      * Processes the given {@link RuntimeException}, which was thrown by the given {@link SBPAwareEventHandler} while handling the given {@link Event}.
-     * 
+     *
      * @param exception The runtime exception the given SBP-aware event handler threw while handling the given event.
      *        It should be processed by the exception catcher.
      * @param handler The SBP-aware event handler which threw the exception.

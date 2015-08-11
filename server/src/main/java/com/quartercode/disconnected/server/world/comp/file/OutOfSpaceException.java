@@ -19,11 +19,11 @@
 package com.quartercode.disconnected.server.world.comp.file;
 
 /**
- * This runtime exception occures if there is not enough space on a {@link FileSystem} for storing some new data (e.g. from a {@link File}).
- * 
+ * This exception occurs if there is not enough space on a {@link FileSystem} for storing some new data (e.g. from a {@link File}).
+ *
  * @see FileSystem
  */
-public class OutOfSpaceException extends RuntimeException {
+public class OutOfSpaceException extends Exception {
 
     private static final long serialVersionUID = 3277220106399425382L;
 
@@ -32,7 +32,7 @@ public class OutOfSpaceException extends RuntimeException {
 
     /**
      * Creates a new out of space exception.
-     * 
+     *
      * @param fileSystem The {@link FileSystem} which should have stored the new bytes.
      * @param size The amount of new bytes.
      */
@@ -46,7 +46,7 @@ public class OutOfSpaceException extends RuntimeException {
 
     /**
      * Returns the {@link FileSystem} which should have stored the new bytes.
-     * 
+     *
      * @return The file system which should have stored the new bytes.
      */
     public FileSystem getFileSystem() {
@@ -56,7 +56,7 @@ public class OutOfSpaceException extends RuntimeException {
 
     /**
      * Returns the amount of new bytes.
-     * 
+     *
      * @return The amount of new bytes.
      */
     public long getSize() {

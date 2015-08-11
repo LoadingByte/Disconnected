@@ -44,7 +44,7 @@ public class ClasspathScanningUtils {
     /**
      * Returns all subpackages of the given package.
      * For example, imagine the following packages exist:
-     * 
+     *
      * <pre>
      * a.b
      * a.b.c
@@ -52,16 +52,16 @@ public class ClasspathScanningUtils {
      * a.b.d.e
      * a.f
      * </pre>
-     * 
+     *
      * A call of this method with the root package {@code a.b} and {@code returnItself} on {@code true} would yield the following packages:
-     * 
+     *
      * <pre>
      * a.b
      * a.b.c
      * a.b.d
      * a.b.d.e
      * </pre>
-     * 
+     *
      * @param rootPackage The root package whose subpackages should be returned.
      * @param returnRoot Whether this method should also return the initial root package ({@code rootPackage} parameter).
      * @param throwAll Whether {@link IOException}s, which are thrown during the search process and would therefore interrupt it, should be thrown.
@@ -115,7 +115,7 @@ public class ClasspathScanningUtils {
      * Returns all {@link Class}es which are located inside the given package.
      * Note that all classes from a package are loaded when this method is called on that package.
      * That is required because all classes from the package are returned by this method.
-     * 
+     *
      * @param packageName The name of the package whose classes should be returned.
      * @param throwAll Whether {@link IOException}s, which are thrown during the search process and would therefore interrupt it, should be thrown.
      *        If this is {@code false}, the regarding exceptions are logged as errors.
@@ -158,7 +158,7 @@ public class ClasspathScanningUtils {
      * Each (non-empty) line from the file should reference one class from the package, which contains the index file, by its name.
      * Note that it is also possible to reference classes from subpackages by prepending the relative subpackage path.
      * Also note that only the classes listed in the index file are loaded.
-     * 
+     *
      * @param indexResource The classpath resource path to the index file, which should be evaluated.
      *        All mentioned classes must also lie in the directory of this resource.
      * @param allowRemoval If {@code true}, lines prefixed with a {@code -} mark classes which should not be added to the resulting class list.
@@ -183,7 +183,7 @@ public class ClasspathScanningUtils {
      * Each (non-empty) line from the file should reference one class from the package by its name.
      * Note that it is also possible to reference classes from subpackages by prepending the relative subpackage path.
      * Also note that only the classes listed in the index file are loaded.
-     * 
+     *
      * @param packageName The name of the package whose index file should be evaluated.
      * @param indexFileName The name of the index file, which should be evaluated.
      * @param allowRemoval If {@code true}, lines prefixed with a {@code -} mark classes which should not be added to the resulting class list.
@@ -238,7 +238,7 @@ public class ClasspathScanningUtils {
             for (Path indexFile : resourceLister.getResourcePaths()) {
                 try {
                     // Iterate over the index and try to add each class which is mentioned there
-                    for (String line : Files.readAllLines(indexFile, Charset.forName("UTF-8"))) {
+                    for (String line : Files.readAllLines(indexFile, Charset.defaultCharset())) {
                         // Remove comment part
                         line = StringUtils.substringBefore(line, "#");
 

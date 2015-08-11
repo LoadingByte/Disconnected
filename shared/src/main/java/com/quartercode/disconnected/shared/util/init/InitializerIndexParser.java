@@ -28,7 +28,7 @@ import com.quartercode.disconnected.shared.util.ClasspathScanningUtils;
 /**
  * A utility class which reads class index files from the classpath and constructs instances of the mentioned {@link Initializer}s.
  * That way, initializers can be dynamically resolved without coupling them inside the code.
- * 
+ *
  * @see Initializer
  */
 public class InitializerIndexParser {
@@ -41,7 +41,7 @@ public class InitializerIndexParser {
      * The mentioned classes are then instantiated to the returned {@link Initializer} objects.<br>
      * <br>
      * See {@link ClasspathScanningUtils#getIndexedPackageClasses(String, boolean, boolean)} for information on the index file format.
-     * 
+     *
      * @param indexResource The classpath resource path under which the class index files are located.
      * @return The parsed initializer list.
      * @throws IOException Thrown if the available class index file directories cannot be listed.

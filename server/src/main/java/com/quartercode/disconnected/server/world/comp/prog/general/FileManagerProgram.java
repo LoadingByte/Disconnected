@@ -33,8 +33,8 @@ import com.quartercode.classmod.extra.valuefactory.ConstantValueFactory;
 import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.bridge.SBPAwareEventHandler;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
-import com.quartercode.disconnected.server.world.comp.file.FSModule;
-import com.quartercode.disconnected.server.world.comp.file.FSModule.KnownFS;
+import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
+import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileRemoveAction;
@@ -43,7 +43,7 @@ import com.quartercode.disconnected.server.world.comp.file.OccupiedPathException
 import com.quartercode.disconnected.server.world.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.server.world.comp.file.ParentFile;
 import com.quartercode.disconnected.server.world.comp.file.UnknownMountpointException;
-import com.quartercode.disconnected.server.world.comp.os.OS;
+import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.user.User;
@@ -217,8 +217,8 @@ public class FileManagerProgram extends ProgramExecutor {
             if (!path.equals(PathUtils.SEPARATOR)) {
                 try {
                     Process<?> process = program.getParent();
-                    FSModule fsModule = process.invoke(Process.GET_OS).getObj(OS.FS_MODULE);
-                    File<?> dir = fsModule.invoke(FSModule.GET_FILE, path);
+                    FileSystemModule fsModule = process.invoke(Process.GET_OS).getObj(OperatingSystem.FS_MODULE);
+                    File<?> dir = fsModule.invoke(FileSystemModule.GET_FILE, path);
 
                     if (! (dir instanceof ParentFile)) {
                         // File does not exist or is not a directory
@@ -276,7 +276,7 @@ public class FileManagerProgram extends ProgramExecutor {
 
             SBPWorldProcessUserId wpuId = program.getParent().getObj(Process.WORLD_PROCESS_USER);
             Process<?> process = program.getParent();
-            FSModule fsModule = process.invoke(Process.GET_OS).getObj(OS.FS_MODULE);
+            FileSystemModule fsModule = process.invoke(Process.GET_OS).getObj(OperatingSystem.FS_MODULE);
 
             String currentDir = program.getObj(CURRENT_DIR);
             String filePath = PathUtils.resolve(currentDir, fileName);
@@ -295,7 +295,7 @@ public class FileManagerProgram extends ProgramExecutor {
                 throw new RuntimeException("Error while creating new instance of file type '" + fileType + "'", e);
             }
 
-            FileAddAction addAction = fsModule.invoke(FSModule.CREATE_ADD_FILE, file, filePath);
+            FileAddAction addAction = fsModule.invoke(FileSystemModule.CREATE_ADD_FILE, file, filePath);
             User sessionUser = process.invoke(Process.GET_USER);
 
             if (addAction.invoke(FileAddAction.IS_EXECUTABLE_BY, sessionUser)) {
@@ -345,7 +345,7 @@ public class FileManagerProgram extends ProgramExecutor {
 
             SBPWorldProcessUserId wpuId = program.getParent().getObj(Process.WORLD_PROCESS_USER);
             Process<?> process = program.getParent();
-            FSModule fsModule = process.invoke(Process.GET_OS).getObj(OS.FS_MODULE);
+            FileSystemModule fsModule = process.invoke(Process.GET_OS).getObj(OperatingSystem.FS_MODULE);
 
             String currentDir = program.getObj(CURRENT_DIR);
             String filePath = PathUtils.resolve(currentDir, fileName);
@@ -357,7 +357,7 @@ public class FileManagerProgram extends ProgramExecutor {
 
             File<?> file;
             try {
-                file = fsModule.invoke(FSModule.GET_FILE, filePath);
+                file = fsModule.invoke(FileSystemModule.GET_FILE, filePath);
             } catch (UnknownMountpointException e) {
                 return;
             }
@@ -386,13 +386,13 @@ public class FileManagerProgram extends ProgramExecutor {
 
         Bridge bridge = programProcess.getBridge();
         SBPWorldProcessUserId wpuId = programProcess.getObj(Process.WORLD_PROCESS_USER);
-        FSModule fsModule = programProcess.invoke(Process.GET_OS).getObj(OS.FS_MODULE);
+        FileSystemModule fsModule = programProcess.invoke(Process.GET_OS).getObj(OperatingSystem.FS_MODULE);
 
         // Current dir is absolute root
         if (currentDir.equals(PathUtils.SEPARATOR)) {
             List<FilePlaceholder> files = new ArrayList<>();
 
-            for (KnownFS knownFs : fsModule.invoke(FSModule.GET_MOUNTED)) {
+            for (KnownFileSystem knownFs : fsModule.invoke(FileSystemModule.GET_MOUNTED)) {
                 files.add(FileUtils.createFilePlaceholder(knownFs));
             }
 
@@ -404,7 +404,7 @@ public class FileManagerProgram extends ProgramExecutor {
             String pathMountpoint = PathUtils.splitAfterMountpoint(currentDir)[0];
             List<FilePlaceholder> files = new ArrayList<>();
 
-            ParentFile<?> dir = (ParentFile<?>) fsModule.invoke(FSModule.GET_FILE, currentDir);
+            ParentFile<?> dir = (ParentFile<?>) fsModule.invoke(FileSystemModule.GET_FILE, currentDir);
             for (File<?> file : dir.getColl(ParentFile.CHILDREN)) {
                 files.add(FileUtils.createFilePlaceholder(pathMountpoint, file));
             }

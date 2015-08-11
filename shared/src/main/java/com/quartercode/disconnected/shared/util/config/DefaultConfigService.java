@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This is the default implementation of the {@link ConfigService}.
- * 
+ *
  * @see ConfigService
  */
 public class DefaultConfigService implements ConfigService {

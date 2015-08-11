@@ -30,7 +30,7 @@ public class HashUtils {
 
     /**
      * Hashes the given string using the {@code SHA-256} algorithm and returns the result as a string.
-     * 
+     *
      * @param value The string which should be hashed.
      * @return The resulting hash as a string.
      */

@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A resource bundle group is a simple {@link LocalizationSupplier} that stores the bundle name and creates new {@link ResourceBundle}s on every request.
  * That way resource bundles don't need to be cached.
- * 
+ *
  * @see ResourceBundle
  * @see LocalizationSupplier
  */
@@ -38,7 +38,7 @@ public class ResourceBundleGroup implements LocalizationSupplier {
 
     /**
      * Creates a new resource bundle group that accesses the {@link ResourceBundle} with the given name.
-     * 
+     *
      * @param name The resource bundle the new group retrieves.
      */
     public ResourceBundleGroup(String name) {
@@ -48,7 +48,7 @@ public class ResourceBundleGroup implements LocalizationSupplier {
 
     /**
      * Retrieves the {@link ResourceBundle} that has the set name. No caching is going on here.
-     * 
+     *
      * @return The resource bundle with the set name.
      */
     public ResourceBundle get() {

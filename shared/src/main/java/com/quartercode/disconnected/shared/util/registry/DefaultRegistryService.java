@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * This is the default implementation of the {@link RegistryService}.
- * 
+ *
  * @see RegistryService
  */
 public class DefaultRegistryService implements RegistryService {

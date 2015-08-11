@@ -18,277 +18,242 @@
 
 package com.quartercode.disconnected.server.world.comp.user;
 
-import static com.quartercode.classmod.extra.func.Priorities.LEVEL_6;
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.security.acl.Group;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlList;
+import javax.xml.bind.annotation.XmlType;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.classmod.extra.func.FunctionDefinition;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.prop.ValueSupplierDefinition;
-import com.quartercode.classmod.extra.storage.ReferenceCollectionStorage;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
-import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
-import com.quartercode.classmod.factory.FunctionDefinitionFactory;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
-import com.quartercode.disconnected.server.util.NullPreventer;
 import com.quartercode.disconnected.server.world.comp.config.ConfigEntry;
+import com.quartercode.disconnected.server.world.comp.config.UnknownColumnException;
+import com.quartercode.jtimber.api.node.wrapper.SubstituteWithWrapper;
+import com.quartercode.jtimber.api.node.wrapper.collection.CollectionWrapper;
 
 /**
  * A user represents a system user (basically someone who can use a system).
- * The user object represents a user and all its properties. It can be used as {@link ConfigEntry}.
- * 
+ * The user object represents a user and his name, his (hashed) password and the groups he is part of.
+ * However, everything related to rights (apart from the {@link #isSuperuser() superuser} property) is done through the file system.<br>
+ * <br>
+ * The user object can be used as a {@link ConfigEntry}.
+ *
  * @see Group
  */
-public class User extends ConfigEntry {
+// "primaryGroup" must be unmarshalled after "groups"
+@XmlType (propOrder = { "name", "password", "groups", "primaryGroup" })
+public class User extends ConfigEntry<User> {
 
     /**
      * This is the name of the superuser on a system.
      * The superuser of a system can do everything without having the rights applied for doing it.
-     * You can check if a user is the superuser by using {@link #IS_SUPERUSER}.
+     * You can check whether a user is the superuser by using {@link #isSuperuser()}.
      */
-    public static final String                                           SUPERUSER_NAME = "root";
+    public static final String       SUPERUSER_NAME = "root";
 
-    // ----- Properties -----
+    @XmlAttribute
+    private String                   name;
+    @XmlAttribute
+    private String                   password;
+    @XmlAttribute
+    @XmlList
+    @SubstituteWithWrapper (CollectionWrapper.class)
+    private final Collection<String> groups         = new LinkedHashSet<>();
+    @XmlAttribute
+    private String                   primaryGroup;
 
-    /**
-     * The name of the user.
-     * The name is used for recognizing a user on the os-level.
-     */
-    public static final PropertyDefinition<String>                       NAME;
+    // JAXB constructor
+    protected User() {
 
-    /**
-     * The hashed password of the user.
-     * It is hashed using the SHA-256 algorithm and can be used to authenticate as the user.
-     */
-    public static final PropertyDefinition<String>                       PASSWORD;
-
-    /**
-     * All {@link Group}s the user is a member in.
-     * Such groups are used to set rights for multiple users.<br>
-     * <br>
-     * Exceptions that can occur when adding:
-     * 
-     * <table>
-     * <tr>
-     * <th>Exception</th>
-     * <th>When?</th>
-     * </tr>
-     * <tr>
-     * <td>{@link IllegalArgumentException}</td>
-     * <td>The user the function is invoked on is a superuser.</td>
-     * </tr>
-     * </table>
-     * 
-     * <br>
-     * Exceptions that can occur when removing:
-     * 
-     * <table>
-     * <tr>
-     * <th>Exception</th>
-     * <th>When?</th>
-     * </tr>
-     * <tr>
-     * <td>{@link IllegalArgumentException}</td>
-     * <td>The user the function is invoked on is a superuser.</td>
-     * </tr>
-     * <tr>
-     * <td>{@link IllegalStateException}</td>
-     * <td>The group for removal is the primary group of the user.</td>
-     * </tr>
-     * </table>
-     */
-    public static final CollectionPropertyDefinition<Group, List<Group>> GROUPS;
-
-    static {
-
-        NAME = factory(PropertyDefinitionFactory.class).create("name", new StandardStorage<>());
-        NAME.addSetterExecutor("checkNotSuperuser", User.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                if (invocation.getCHolder().invoke(IS_SUPERUSER)) {
-                    // Cancel invocation
-                    return null;
-                }
-
-                return invocation.next(arguments);
-            }
-
-        }, LEVEL_6);
-
-        PASSWORD = factory(PropertyDefinitionFactory.class).create("password", new StandardStorage<>());
-
-        GROUPS = factory(CollectionPropertyDefinitionFactory.class).create("groups", new ReferenceCollectionStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
-        GROUPS.addAdderExecutor("checkNotSuperuser", User.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                Validate.isTrue(!invocation.getCHolder().invoke(IS_SUPERUSER), "The superuser can't be a member in any group");
-                return invocation.next(arguments);
-            }
-
-        }, LEVEL_6);
-        GROUPS.addRemoverExecutor("checkNotSuperuser", User.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                Validate.isTrue(!invocation.getCHolder().invoke(IS_SUPERUSER), "The superuser can't be a member in any group");
-                return invocation.next(arguments);
-            }
-
-        }, LEVEL_6);
-        GROUPS.addRemoverExecutor("checkNotPrimaryGroup", User.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                Validate.validState(!invocation.getCHolder().invoke(GET_PRIMARY_GROUP).equals(arguments[0]), "Can't remove user from its primary group");
-                return invocation.next(arguments);
-            }
-
-        }, LEVEL_6);
-
+        super(Arrays.asList("name", "password", "groups", "primaryGroup"));
     }
 
-    // ----- Functions -----
-
     /**
-     * Returns the name of the primary {@link Group} of the user.
-     * The primary group is the first group in the {@link #GROUPS} list and is used when new rights are applied.
+     * Creates a new user.
+     *
+     * @param name The name of the new user.
      */
-    public static final FunctionDefinition<Group>                        GET_PRIMARY_GROUP;
+    public User(String name) {
+
+        this();
+
+        setName(name);
+    }
 
     /**
-     * Changes the primary {@link Group} of the user to the one which has the given name.
-     * The user must already be a member of the group.
-     * The primary group is the first group in the {@link #GROUPS} list and is used when new rights are applied.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Group}</td>
-     * <td>primaryGroup</td>
-     * <td>The name of the new primary group of the user.</td>
-     * </tr>
-     * </table>
+     * Returns the name of the user.
+     * The name is used to recognize a user on the OS level.
+     * Note that the name of the {@link #isSuperuser() superuser} cannot be changed.
+     *
+     * @return The name of the user.
      */
-    public static final FunctionDefinition<Void>                         SET_PRIMARY_GROUP;
+    public String getName() {
+
+        return name;
+    }
 
     /**
-     * Returns true if the user is a superuser.
+     * Sets the name of the user.
+     * The name is used to recognize a user on the OS level.
+     *
+     * @param name The new name of the user.
+     */
+    public void setName(String name) {
+
+        Validate.notNull(name, "Cannot use null as user name");
+        Validate.validState(!isSuperuser(), "Cannot change the name of the superuser");
+
+        this.name = name;
+    }
+
+    /**
+     * Returns the hashed password of the user.
+     * It is hashed using the SHA-256 algorithm and can be used to login/authenticate as the user.
+     *
+     * @return The hashed password of the user.
+     */
+    public String getPassword() {
+
+        return password;
+    }
+
+    /**
+     * Sets the hashed password of the user.
+     * It <b>must be hashed using the SHA-256 algorithm before it is provided to this method</b> and can be used to login/authenticate as the user.
+     *
+     * @param password The new already hashed password of the user.
+     */
+    public void setPassword(String password) {
+
+        Validate.notNull(name, "Cannot use null as hashed user password");
+        this.password = password;
+    }
+
+    /**
+     * Returns all {@link Group}s the user is a member of.
+     * Such groups are used to set rights for multiple users.
+     *
+     * @return The groups the user is a member of.
+     */
+    public Collection<String> getGroups() {
+
+        return Collections.unmodifiableCollection(groups);
+    }
+
+    /**
+     * Makes the user member of the given {@link Group}.
+     * Such groups are used to set rights for multiple users.
+     * Note that the {@link #isSuperuser() superuser} cannot be a member of any group.
+     *
+     * @param group The group the user should be a member of.
+     */
+    public void addGroup(String group) {
+
+        Validate.notNull(name, "Cannot make a user member of a null group");
+        Validate.validState(!isSuperuser(), "Cannot make the superuser member of a group");
+
+        groups.add(group);
+    }
+
+    /**
+     * Removes the membership of the user from the given {@link Group}.
+     * Such groups are used to set rights for multiple users.
+     * Note that the user cannot be directly removed from his {@link #getPrimaryGroup() primary group} using this method.
+     * Instead, the {@link #setPrimaryGroup(String)} method must be called with another group (or {@code null)} before this method can be invoked.
+     *
+     * @param group The group the user should no longer be a member of.
+     */
+    public void removeGroup(String group) {
+
+        Validate.validState(!isSuperuser(), "Cannot remove the membership of the superuser from any group (the superuser cannot be member of any group)");
+        Validate.validState(!group.equals(getPrimaryGroup()), "Cannot remove a user from his primary group");
+
+        groups.remove(group);
+    }
+
+    /**
+     * Returns the primary {@link Group} of the user.
+     * The primary group is the group which is automatically applied to new files created by the user.
+     * Note that it must be part of the {@link #getGroups() regular group list}.
+     * Also note that it may be {@code null}, in which case no group is applied to new files.
+     *
+     * @return The primary group of the user. May be {@code null}.
+     */
+    public String getPrimaryGroup() {
+
+        return primaryGroup;
+    }
+
+    /**
+     * Sets the primary {@link Group} of the user.
+     * The primary group is the group which is automatically applied to new files created by the user.
+     * Note that it must be part of the {@link #getGroups() regular group list}.
+     * Also note that it may be {@code null}, in which case no group is applied to new files.
+     *
+     * @param primaryGroup The new primary group of the user.
+     *        The user must already be a member of this group. May be {@code null}.
+     */
+    public void setPrimaryGroup(String primaryGroup) {
+
+        Validate.notNull(name, "Cannot use null as the user primary group");
+        Validate.isTrue(groups.contains(primaryGroup), "Cannot set user primary group to a group the user isn't a member of");
+
+        this.primaryGroup = primaryGroup;
+    }
+
+    /**
+     * Returns {@code true} if the user is the superuser.
      * The superuser of a system can do everything without having the rights applied for doing it.
+     * Note that the superuser must have the {@link #SUPERUSER_NAME} as name.
+     *
+     * @return Whether the user is the superuser.
      */
-    public static final FunctionDefinition<Boolean>                      IS_SUPERUSER;
+    public boolean isSuperuser() {
 
-    static {
+        return name != null && name.equals(SUPERUSER_NAME);
+    }
 
-        GET_PRIMARY_GROUP = factory(FunctionDefinitionFactory.class).create("getPrimaryGroup", new Class[0]);
-        GET_PRIMARY_GROUP.addExecutor("default", User.class, new FunctionExecutor<Group>() {
+    @Override
+    public String getColumnValue(String columnName) {
 
-            @Override
-            public Group invoke(FunctionInvocation<Group> invocation, Object... arguments) {
-
-                CFeatureHolder user = invocation.getCHolder();
-                Group primaryGroup = null;
-                if (user.getColl(GROUPS).size() > 0) {
-                    primaryGroup = user.getColl(GROUPS).get(0);
-                }
-
-                invocation.next(arguments);
+        switch (columnName) {
+            case "name":
+                return getName();
+            case "password":
+                return getPassword();
+            case "groups":
+                return StringUtils.join(groups, ',');
+            case "primaryGroup":
                 return primaryGroup;
-            }
+            default:
+                throw new UnknownColumnException(columnName);
+        }
+    }
 
-        });
-        SET_PRIMARY_GROUP = factory(FunctionDefinitionFactory.class).create("setPrimaryGroup", new Class[] { Group.class });
-        SET_PRIMARY_GROUP.addExecutor("default", User.class, new FunctionExecutor<Void>() {
+    @Override
+    public void setColumnValue(String columnName, String columnValue) {
 
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                CFeatureHolder user = invocation.getCHolder();
-                Group primaryGroup = (Group) arguments[0];
-
-                if (user.getColl(GROUPS).contains(primaryGroup)) {
-                    // Put the new primary group at the front of the list
-                    List<Group> groups = user.getColl(GROUPS);
-                    groups.remove(primaryGroup);
-
-                    for (Group group : groups) {
-                        user.removeFromColl(GROUPS, group);
-                    }
-                    for (Group group : groups) {
-                        user.addToColl(GROUPS, group);
-                    }
+        switch (columnName) {
+            case "name":
+                setName(columnValue);
+                break;
+            case "password":
+                setPassword(columnValue);
+                break;
+            case "groups":
+                groups.clear();
+                for (String group : StringUtils.split(columnValue, ',')) {
+                    addGroup(group);
                 }
-
-                return invocation.next(arguments);
-            }
-
-        });
-
-        IS_SUPERUSER = factory(FunctionDefinitionFactory.class).create("isSuperuser", new Class[0]);
-        IS_SUPERUSER.addExecutor("default", User.class, new FunctionExecutor<Boolean>() {
-
-            @Override
-            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
-
-                String name = invocation.getCHolder().getObj(NAME);
-                boolean result = name != null && name.equals(SUPERUSER_NAME);
-                invocation.next(arguments);
-                return result;
-            }
-        });
-
-        GET_COLUMNS.addExecutor("name", User.class, new FunctionExecutor<Map<ValueSupplierDefinition<?, ?>, Class<?>>>() {
-
-            @Override
-            public Map<ValueSupplierDefinition<?, ?>, Class<?>> invoke(FunctionInvocation<Map<ValueSupplierDefinition<?, ?>, Class<?>>> invocation, Object... arguments) {
-
-                Map<ValueSupplierDefinition<?, ?>, Class<?>> columns = NullPreventer.prevent(invocation.next(arguments));
-                columns.put(NAME, String.class);
-                return columns;
-            }
-
-        });
-        GET_COLUMNS.addExecutor("password", User.class, new FunctionExecutor<Map<ValueSupplierDefinition<?, ?>, Class<?>>>() {
-
-            @Override
-            public Map<ValueSupplierDefinition<?, ?>, Class<?>> invoke(FunctionInvocation<Map<ValueSupplierDefinition<?, ?>, Class<?>>> invocation, Object... arguments) {
-
-                Map<ValueSupplierDefinition<?, ?>, Class<?>> columns = NullPreventer.prevent(invocation.next(arguments));
-                columns.put(PASSWORD, String.class);
-                return columns;
-            }
-
-        });
-        GET_COLUMNS.addExecutor("groups", User.class, new FunctionExecutor<Map<ValueSupplierDefinition<?, ?>, Class<?>>>() {
-
-            @Override
-            public Map<ValueSupplierDefinition<?, ?>, Class<?>> invoke(FunctionInvocation<Map<ValueSupplierDefinition<?, ?>, Class<?>>> invocation, Object... arguments) {
-
-                Map<ValueSupplierDefinition<?, ?>, Class<?>> columns = NullPreventer.prevent(invocation.next(arguments));
-                columns.put(GROUPS, Group.class);
-                return columns;
-            }
-
-        });
-
+                break;
+            case "primaryGroup":
+                setPrimaryGroup(columnValue);
+                break;
+            default:
+                throw new UnknownColumnException(columnName);
+        }
     }
 
 }

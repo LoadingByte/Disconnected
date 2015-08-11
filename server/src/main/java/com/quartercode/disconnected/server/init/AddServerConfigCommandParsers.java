@@ -20,13 +20,11 @@ package com.quartercode.disconnected.server.init;
 
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.registry.config.AddPersistentClassScanDirectiveCommand;
-import com.quartercode.disconnected.server.registry.config.AddWorldInitializerMappingCommand;
 import com.quartercode.disconnected.server.registry.config.ConfigureFileTypeCommand;
 import com.quartercode.disconnected.server.registry.config.ConfigureSchedulerGroupCommand;
 import com.quartercode.disconnected.server.registry.config.ConfigureVulnSourceCommand;
 import com.quartercode.disconnected.server.registry.config.ConfigureWorldProgramCommand;
 import com.quartercode.disconnected.server.registry.config.RemovePersistentClassScanDirectiveCommand;
-import com.quartercode.disconnected.server.registry.config.RemoveWorldInitializerMappingCommand;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 import com.quartercode.disconnected.shared.util.config.ConfigService;
 import com.quartercode.disconnected.shared.util.config.extra.RemoveNamedValueCommand;
@@ -45,10 +43,6 @@ public class AddServerConfigCommandParsers implements Initializer {
         // World context path
         service.addCommand("addPersistentClassScanDirective", new AddPersistentClassScanDirectiveCommand(Registries.get(ServerRegistries.PERSISTENT_CLASS_SCAN_DIRECTIVES)));
         service.addCommand("removePersistentClassScanDirective", new RemovePersistentClassScanDirectiveCommand(Registries.get(ServerRegistries.PERSISTENT_CLASS_SCAN_DIRECTIVES)));
-
-        // World initializer mappings
-        service.addCommand("addWorldInitializerMapping", new AddWorldInitializerMappingCommand(Registries.get(ServerRegistries.WORLD_INITIALIZER_MAPPINGS)));
-        service.addCommand("removeWorldInitializerMapping", new RemoveWorldInitializerMappingCommand(Registries.get(ServerRegistries.WORLD_INITIALIZER_MAPPINGS)));
 
         // Scheduler groups
         service.addCommand("configureSchedulerGroup", new ConfigureSchedulerGroupCommand(Registries.get(ServerRegistries.SCHEDULER_GROUPS)));

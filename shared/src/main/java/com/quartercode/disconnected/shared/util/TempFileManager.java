@@ -23,6 +23,7 @@ import java.lang.management.ManagementFactory;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -48,22 +49,25 @@ public class TempFileManager {
     private static Path         parentDir;
     private static Path         tempDir;
 
-    /**
+    static {
+
+        Path parentTempDir = Paths.get("tmp");
+
+        try {
+            initialize(parentTempDir);
+        } catch (IOException e) {
+            throw new RuntimeException("Error while initializing temp file manager under '" + parentTempDir + "'", e);
+        }
+
+    }
+
+    /*
      * Initializes the temp file manager inside the given parent directory.
      * All temporary directories, which can be used by a process, are stored inside that parent directory.
-     * It should be constant for each application process.<br>
-     * <br>
+     * It should be constant for each application process.
      * Note that this method also purges old temporary directories.
-     * See {@link TempFileManager} for more details on that.
-     * 
-     * @param parentDir The directory that holds all temporary directories.
-     * @throws IOException Something goes wrong during the initialization.
      */
-    public static void initialize(Path parentDir) throws IOException {
-
-        if (TempFileManager.parentDir != null) {
-            throw new IllegalStateException("Temp file manager cannot be initialized twice");
-        }
+    private static void initialize(Path parentDir) throws IOException {
 
         TempFileManager.parentDir = parentDir;
         Files.createDirectories(parentDir);
@@ -144,11 +148,11 @@ public class TempFileManager {
     /**
      * Returns the temporary directory which can be used by the current application process to store temporary files.
      * It is recommended to use the {@link Path#resolve(String)} method for resolving the path of a new temporary file:
-     * 
+     *
      * <pre>
      * TempFileManager.getTempDir().resolve(&quot;someNewTempFile&quot;);
      * </pre>
-     * 
+     *
      * @return The temporary directory where temporary files can be stored.
      */
     public static Path getTempDir() {

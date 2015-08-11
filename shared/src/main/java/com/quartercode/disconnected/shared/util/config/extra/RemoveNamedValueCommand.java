@@ -31,7 +31,7 @@ import com.quartercode.disconnected.shared.util.registry.extra.NamedValue;
 
 /**
  * A command parser that removes {@link NamedValue}s from a {@link MultipleValueRegistry} based on the names supplied in the XML command {@link Element}s.
- * 
+ *
  * @param <V> The type of the named value that can be removed using the command.
  * @see NamedValue
  * @see MultipleValueRegistry
@@ -45,7 +45,7 @@ public class RemoveNamedValueCommand<V extends NamedValue> implements ConfigComm
 
     /**
      * Creates a new remove named value command.
-     * 
+     *
      * @param valueType A human-readable string that describes the value type (e.g. "scheduler task").
      * @param registry The {@link MultipleValueRegistry} that contains the values for potential removal.
      */
@@ -57,7 +57,7 @@ public class RemoveNamedValueCommand<V extends NamedValue> implements ConfigComm
 
     /**
      * Returns the {@link MultipleValueRegistry} that contains the values for potential removal.
-     * 
+     *
      * @return The registry the command manipulates.
      */
     protected MultipleValueRegistry<V> getRegistry() {

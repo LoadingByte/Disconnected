@@ -29,7 +29,7 @@ import com.quartercode.eventbridge.bridge.Event;
  * <br>
  * The generic parameter {@code <T>} defines the type of SBP-aware event the handler can handle.
  * That allows event handlers to handle specific events without having to perform casts.
- * 
+ *
  * @param <T> The type of event that can be handled by the SBP-aware handler.
  * @see Event
  * @see SBPIdentity
@@ -40,7 +40,7 @@ public interface SBPAwareEventHandler<T extends Event> {
      * Processes the given {@link Event} and does something depending on the event.
      * Since events are immutable, this method may not modify the event.
      * The generic parameter {@code <T>} defines the type of event the SBP-aware handler can process.
-     * 
+     *
      * @param event The event that should be processed by the SBP-aware handler.
      * @param sender The {@link SBPIdentity} of the SBP who sent the event.
      *        May be {@code null} if the handled event was not sent from an SBP bridge.

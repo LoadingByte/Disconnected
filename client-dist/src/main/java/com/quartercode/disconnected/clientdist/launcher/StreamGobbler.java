@@ -39,7 +39,7 @@ public class StreamGobbler extends Thread {
 
     /**
      * Creates a new stream gobbler and setsthe prefix and the input and output streams.
-     * 
+     *
      * @param prefix The prefix to use on each line.
      * @param inputStream The input stream to listen on.
      * @param outputStream The output stream (must be a print stream) to write on.

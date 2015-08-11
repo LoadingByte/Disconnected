@@ -42,7 +42,7 @@ public enum WorldProcessState {
      * The execution is permanently stopped.
      * If a process is stopped, it won't be able to start again.
      */
-    STOPPED (true);
+    STOPPED (false);
 
     private final boolean tickState;
 
@@ -53,7 +53,7 @@ public enum WorldProcessState {
 
     /**
      * Returns true if the process state should allow execution of the process it is applied on.
-     * 
+     *
      * @return Whether the state should allow the active process execution.
      */
     public boolean isTickState() {

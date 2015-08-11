@@ -21,18 +21,11 @@ package com.quartercode.disconnected.server.world.util;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.classmod.extra.prop.CollectionProperty;
-import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.prop.Property;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.disconnected.server.util.NullPreventer;
+import com.quartercode.jtimber.api.node.Node;
 
 /**
  * This utility calculates the size of certain objects in bytes (of course, it's a fictional size).
- * 
+ *
  * @see DerivableSize
  */
 public class SizeUtils {
@@ -40,9 +33,10 @@ public class SizeUtils {
     /**
      * Returns the size of an object in bytes (of course, it's a fictional size).
      * If the object is {@code null}, {@code 0} is returned.
-     * If the object is a {@link CFeatureHolder}, the size can be derived using the {@link DerivableSize#GET_SIZE} function.
+     * If the object implements {@link DerivableSize}, the size can be derived using {@link DerivableSize#getSize()}.
+     * If the object is a {@link Node}, the size is the sum of the sizes of all {@link Node#getChildren() children}.
      * In other cases, the following methods are used to calculate the size:
-     * 
+     *
      * <ul>
      * <li>{@link #getSize(boolean)}</li>
      * <li>{@link #getSize(char)}</li>
@@ -51,20 +45,21 @@ public class SizeUtils {
      * <li>{@link #getSize(Iterable)}</li>
      * <li>{@link #getSize(Map)}</li>
      * </ul>
-     * 
+     *
      * If the object does not match any of the methods above, an {@link IllegalArgumentException} is thrown.
-     * 
+     *
      * @param value The object to calculate the size of.
      * @return The size of the object in bytes (of course, it's a fictitious size).
-     * @throws IllegalArgumentException Thrown if the size of the object cannot be derivded.
+     * @throws IllegalArgumentException Thrown if the size of the object cannot be derived.
      */
     public static long getSize(Object value) throws IllegalArgumentException {
 
         if (value == null) {
             return 0;
         } else if (value instanceof DerivableSize) {
-            // Feature holders which implement DerivableSize have the size provided by DerivableSize.GET_SIZE
-            return NullPreventer.prevent( ((DerivableSize) value).invoke(DerivableSize.GET_SIZE));
+            return ((DerivableSize) value).getSize();
+        } else if (value instanceof Node) {
+            return getSize( ((Node<?>) value).getChildren());
         } else if (value instanceof Boolean) {
             return getSize((boolean) value);
         } else if (value instanceof Character) {
@@ -86,7 +81,7 @@ public class SizeUtils {
     /**
      * Returns the size of the given {@link Boolean} value.
      * It is always {@code 1}.
-     * 
+     *
      * @param value The boolean value whose size should be derived.
      * @return The size of the given boolean value.
      */
@@ -100,7 +95,7 @@ public class SizeUtils {
     /**
      * Returns the size of the given {@link Character}.
      * It is always {@code 1}.
-     * 
+     *
      * @param value The character whose size should be derived.
      * @return The size of the given character.
      */
@@ -114,7 +109,7 @@ public class SizeUtils {
     /**
      * Returns the size of the given {@link String}.
      * It is just the length of the string.
-     * 
+     *
      * @param value The string whose size should be derived.
      * @return The size of the given string, or {@code 0} if the value is {@code null}.
      */
@@ -129,7 +124,7 @@ public class SizeUtils {
      * Returns the size of the given {@link Number} value.
      * Each digit uses one bit.
      * Because single bits are not supported, the result is rounded up to an amount of bytes.
-     * 
+     *
      * @param value The number value whose size should be derived.
      * @return The size of the given number value, or {@code 0} if the value is {@code null}.
      */
@@ -150,7 +145,7 @@ public class SizeUtils {
     /**
      * Returns the size of the given {@link Iterable} object (e.g. a {@link Collection}).
      * The size of the whole iterable object is derived by summing up the sizes of the items it iterates over.
-     * 
+     *
      * @param value The iterable object whose size should be derived.
      * @return The size of the given iterable object, or {@code 0} if the object is {@code null}.
      */
@@ -171,7 +166,7 @@ public class SizeUtils {
     /**
      * Returns the size of the given {@link Map} object.
      * The size of the whole map is derived by summing up the sizes of all the keys and values it contains.
-     * 
+     *
      * @param value The map whose size should be derived.
      * @return The size of the given map, or {@code 0} if the object is {@code null}.
      */
@@ -188,48 +183,6 @@ public class SizeUtils {
             size += getSize(entry.getValue());
         }
         return size;
-    }
-
-    /**
-     * Creates a new size getter {@link FunctionExecutor} for the given {@link PropertyDefinition}.
-     * It returns the size of the content of a {@link Property} using {@link #getSize(Object)}.
-     * Note that it also adds the size value returned by the function executor which is called after it.
-     * 
-     * @param propertyDefinition The property definition of the property to access.
-     * @return The created getter function executor.
-     */
-    public static FunctionExecutor<Long> createGetSize(final PropertyDefinition<?> propertyDefinition) {
-
-        return new FunctionExecutor<Long>() {
-
-            @Override
-            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
-
-                return SizeUtils.getSize(invocation.getCHolder().getObj(propertyDefinition)) + NullPreventer.prevent(invocation.next(arguments));
-            }
-
-        };
-    }
-
-    /**
-     * Creates a new size getter {@link FunctionExecutor} for the given {@link CollectionPropertyDefinition}.
-     * It returns the size of the contents of a {@link CollectionProperty} using {@link #getSize(Object)}.
-     * Note that it also adds the size value returned by the function executor which is called after it.
-     * 
-     * @param propertyDefinition The collection property definition of the collection property to access.
-     * @return The created getter function executor.
-     */
-    public static FunctionExecutor<Long> createGetSize(final CollectionPropertyDefinition<?, ?> propertyDefinition) {
-
-        return new FunctionExecutor<Long>() {
-
-            @Override
-            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
-
-                return SizeUtils.getSize(invocation.getCHolder().getColl(propertyDefinition)) + NullPreventer.prevent(invocation.next(arguments));
-            }
-
-        };
     }
 
     private SizeUtils() {

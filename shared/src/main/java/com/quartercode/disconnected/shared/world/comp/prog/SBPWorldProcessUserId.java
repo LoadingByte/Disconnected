@@ -33,7 +33,7 @@ import com.quartercode.disconnected.shared.identity.SBPIdentity;
  * That identification is used by the server to send the correct events to the world process user.
  * Secondly, an {@link SBPWorldProcessUserDetails} object identifies which module on the SBP-side uses the world process.
  * It is used by the SBP to pass incoming events to the correct module.
- * 
+ *
  * @see SBPIdentity
  * @see SBPWorldProcessUserDetails
  */
@@ -46,7 +46,7 @@ public class SBPWorldProcessUserId implements Serializable {
 
     /**
      * Creates a new server bridge partner world process user id.
-     * 
+     *
      * @param sbp The {@link SBPIdentity} of the server bridge partner who uses the world process.
      * @param details An {@link SBPWorldProcessUserDetails} object that identifies which part of the SBP uses the world process.
      */
@@ -59,7 +59,7 @@ public class SBPWorldProcessUserId implements Serializable {
     /**
      * Returns the {@link SBPIdentity} which identifies the server bridge partner who uses the world process.
      * That identification is used by the server to send the correct events to the world process user.
-     * 
+     *
      * @return The SBP who uses the world process.
      */
     public SBPIdentity getSBP() {
@@ -70,7 +70,7 @@ public class SBPWorldProcessUserId implements Serializable {
     /**
      * Returns an {@link SBPWorldProcessUserDetails} object which identifies which module on the SBP-side uses the world process.
      * It is used by the SBP to pass incoming events to the correct module.
-     * 
+     *
      * @return The SBP part which uses the world process.
      */
     public SBPWorldProcessUserDetails getDetails() {

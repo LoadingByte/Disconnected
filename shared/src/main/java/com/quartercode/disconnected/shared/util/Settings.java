@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A class that stores a global {@link Properties} object, which contains basic application settings, and makes its values available.
  * Note that all settings should be initialized using {@link #initializeSetting(String, String)}.
- * 
+ *
  * @see Properties
  */
 public class Settings {
@@ -44,7 +44,7 @@ public class Settings {
      * Sets the location of the file which contains the settings {@link Properties}.
      * Also loads that settings file into memory.
      * Note that this operation must be executed before any other operation.
-     * 
+     *
      * @param file The location of the settings file.
      */
     public static void setSettingsFile(Path file) {
@@ -69,7 +69,7 @@ public class Settings {
     /**
      * Initializes the provided setting by storing a default value if the setting is not yet set.
      * Also saves the settings file to the file system.
-     * 
+     *
      * @param name The name of the setting whose default value should be set.
      * @param defaultValue The default value for the given setting.
      */
@@ -89,7 +89,7 @@ public class Settings {
 
     /**
      * Returns the value which is stored under the given setting name.
-     * 
+     *
      * @param name The name of the setting whose value should be returned.
      * @return The value of the given setting.
      */

@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.server.test.world.comp.file;
 
+import static com.quartercode.disconnected.server.test.world.comp.file.FileAssert.assertInvalidPath;
 import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,12 +30,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.File;
-import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileRemoveAction;
-import com.quartercode.disconnected.server.world.comp.file.FileSystem;
-import com.quartercode.disconnected.server.world.comp.file.ParentFile;
+import com.quartercode.disconnected.server.world.comp.file.InvalidPathException;
+import com.quartercode.disconnected.server.world.comp.file.OccupiedPathException;
+import com.quartercode.disconnected.server.world.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 
@@ -52,10 +52,8 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
         return data;
     }
 
-    private final String        removeFilePath;
-    private final String        removeFileChildPath;
-
-    private File<ParentFile<?>> childFile;
+    private final String removeFilePath;
+    private final String removeFileChildPath;
 
     public FileRemoveActionTest(String removeFilePath) {
 
@@ -64,53 +62,45 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
     }
 
     @Before
-    public void setUp2() {
+    public void setUp2() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, removeFilePath).invoke(FileAddAction.EXECUTE);
-
-        childFile = new ContentFile();
-        childFile.setObj(File.OWNER, user);
-        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, childFile, removeFileChildPath).invoke(FileAddAction.EXECUTE);
-    }
-
-    private FileRemoveAction createAction(File<ParentFile<?>> file) {
-
-        FileRemoveAction action = new FileRemoveAction();
-        action.setObj(FileAddAction.FILE, file);
-        return action;
+        fileSystem.prepareAddFile(dir, removeFilePath).execute();
+        fileSystem.prepareAddFile(cfile, removeFileChildPath).execute();
     }
 
     @Test
     public void testExecute() {
 
-        FileRemoveAction action = createAction(file);
+        FileRemoveAction action = new FileRemoveAction(dir);
         actuallyTestExecute(action);
     }
 
     @Test
     public void testFileExecute() {
 
-        FileRemoveAction action = file.invoke(File.CREATE_REMOVE);
+        FileRemoveAction action = dir.prepareRemove();
         actuallyTestExecute(action);
     }
 
     private void actuallyTestExecute(FileRemoveAction action) {
 
-        action.invoke(FileRemoveAction.EXECUTE);
-        assertEquals("Resolved file for deleted file", null, fileSystem.invoke(FileSystem.GET_FILE, removeFilePath));
+        action.execute();
+
+        assertEquals("File path", null, dir.getPath());
+        assertInvalidPath("File has not been removed", fileSystem, removeFilePath);
     }
 
     @Test
     public void testIsExecutableBy() {
 
-        FileRemoveAction action = createAction(file);
+        FileRemoveAction action = new FileRemoveAction(dir);
         actuallyTestIsExecutableBy(action);
     }
 
     @Test
     public void testFileIsExecutableBy() {
 
-        FileRemoveAction action = file.invoke(File.CREATE_REMOVE);
+        FileRemoveAction action = dir.prepareRemove();
         actuallyTestIsExecutableBy(action);
     }
 
@@ -124,25 +114,24 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
 
     private void actuallyTestIsExecutableBy(FileRemoveAction action, String fileRights, String childFileRights, boolean expectedResult) {
 
-        file.setObj(File.RIGHTS, new FileRights(fileRights));
-        childFile.setObj(File.RIGHTS, new FileRights(childFileRights));
+        dir.getRights().importRights(fileRights);
+        cfile.getRights().importRights(childFileRights);
 
-        boolean result = action.invoke(FileRemoveAction.IS_EXECUTABLE_BY, user);
-
+        boolean result = action.isExecutableBy(user);
         assertEquals("IS_EXECUTABLE_BY result", expectedResult, result);
     }
 
     @Test
     public void testGetMissingRights() {
 
-        FileRemoveAction action = createAction(file);
+        FileRemoveAction action = new FileRemoveAction(dir);
         actuallyTestGetMissingRights(action);
     }
 
     @Test
     public void testFileGetMissingRights() {
 
-        FileRemoveAction action = file.invoke(File.CREATE_REMOVE);
+        FileRemoveAction action = dir.prepareRemove();
         actuallyTestGetMissingRights(action);
     }
 
@@ -150,18 +139,18 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
 
         // Test 1
         Map<File<?>, Character[]> test1Result = new HashMap<>();
-        test1Result.put(file, new Character[] { FileRights.DELETE });
-        test1Result.put(childFile, new Character[] { FileRights.DELETE });
+        test1Result.put(dir, new Character[] { FileRights.DELETE });
+        test1Result.put(cfile, new Character[] { FileRights.DELETE });
         actuallyTestGetMissingRights(action, "", "", test1Result);
 
         // Test 2
         Map<File<?>, Character[]> test2Result = new HashMap<>();
-        test2Result.put(childFile, new Character[] { FileRights.DELETE });
+        test2Result.put(cfile, new Character[] { FileRights.DELETE });
         actuallyTestGetMissingRights(action, "u:d", "", test2Result);
 
         // Test 3
         Map<File<?>, Character[]> test3Result = new HashMap<>();
-        test3Result.put(file, new Character[] { FileRights.DELETE });
+        test3Result.put(dir, new Character[] { FileRights.DELETE });
         actuallyTestGetMissingRights(action, "", "u:d", test3Result);
 
         // Test 4
@@ -170,11 +159,10 @@ public class FileRemoveActionTest extends AbstractFileActionTest {
 
     private void actuallyTestGetMissingRights(FileRemoveAction action, String fileRights, String childFileRights, Map<File<?>, Character[]> expectedResult) {
 
-        file.setObj(File.RIGHTS, new FileRights(fileRights));
-        childFile.setObj(File.RIGHTS, new FileRights(childFileRights));
+        dir.getRights().importRights(fileRights);
+        cfile.getRights().importRights(childFileRights);
 
-        Map<File<?>, Character[]> result = action.invoke(FileRemoveAction.GET_MISSING_RIGHTS, user);
-
+        Map<File<?>, Character[]> result = action.getMissingRights(user);
         assertEquals("Missing file rights map", prepareMissingRightsMap(expectedResult), prepareMissingRightsMap(result));
     }
 

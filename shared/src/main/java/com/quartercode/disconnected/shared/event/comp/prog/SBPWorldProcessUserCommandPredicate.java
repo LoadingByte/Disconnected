@@ -31,7 +31,7 @@ import com.quartercode.eventbridge.basic.EventPredicateBase;
  * Note that a check for a complete {@link SBPWorldProcessUserId}, which normally identifies world process users and includes
  * an {@link SBPIdentity}, is not needed because an SBP which uses this predicate can only receive events he should receive.
  * Therefore, an extra check for the SBP identity would be redundant.
- * 
+ *
  * @param <T> The type of world process user command that can be tested by the predicate.
  * @see SBPWorldProcessUserDetails
  */

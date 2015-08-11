@@ -28,8 +28,20 @@
         </dependency>
         <dependency>
             <groupId>com.quartercode</groupId>
-            <artifactId>classmod</artifactId>
-            <version>${classmod.version}</version>
+            <artifactId>jtimber-api</artifactId>
+            <version>${jtimber.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.quartercode</groupId>
+            <artifactId>jtimber-compiler-hook</artifactId>
+            <version>${jtimber.version}</version>
+        </dependency>
+
+        <!-- Persistence -->
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.moxy</artifactId>
+            <version>${moxy.version}</version>
         </dependency>
     </dependencies>
 </project>

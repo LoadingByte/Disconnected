@@ -18,38 +18,66 @@
 
 package com.quartercode.disconnected.server.world.comp.hardware;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
+import javax.xml.bind.annotation.XmlAttribute;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.server.world.comp.hardware.Mainboard.NeedsMainboardSlot;
 
 /**
- * This class represents a ram module of a computer.
- * A ram module has a size (given in bytes) and an access frequency (given in hertz).
- * 
+ * This class represents a RAM module of a computer.
+ * A RAM module has a size in bytes and an access frequency in hertz.
+ *
  * @see Hardware
  */
 @NeedsMainboardSlot
 public class RAM extends Hardware {
 
-    // ----- Properties -----
+    @XmlAttribute
+    private long size;
+    @XmlAttribute
+    private long accessFrequency;
+
+    // JAXB constructor
+    protected RAM() {
+
+    }
 
     /**
-     * The size of the ram module, given in bytes.
+     * Creates a new RAM module.
+     *
+     * @param name The "model" name of the new RAM module.
+     *        See {@link #getName()} for more details.
+     * @param size The size of the RAM module in bytes.
+     * @param accessFrequency The frequency at which the RAM module can be accessed in hertz.
      */
-    public static final PropertyDefinition<Long> SIZE;
+    public RAM(String name, long size, long accessFrequency) {
+
+        super(name);
+
+        Validate.isTrue(size > 0, "RAM module size must be > 0");
+        Validate.isTrue(accessFrequency > 0, "RAM module access frequency must be > 0");
+
+        this.size = size;
+        this.accessFrequency = accessFrequency;
+    }
 
     /**
-     * The access frequency of the ram module, given in hertz.
+     * Returns the size of the RAM module in bytes.
+     *
+     * @return The size of the RAM module in bytes.
      */
-    public static final PropertyDefinition<Long> FREQUENCY;
+    public long getSize() {
 
-    static {
+        return size;
+    }
 
-        SIZE = factory(PropertyDefinitionFactory.class).create("size", new StandardStorage<>());
-        FREQUENCY = factory(PropertyDefinitionFactory.class).create("frequency", new StandardStorage<>());
+    /**
+     * Returns the frequency at which the RAM module can be accessed in hertz.
+     *
+     * @return The access frequency of the RAM module in hertz.
+     */
+    public long getAccessFrequency() {
 
+        return accessFrequency;
     }
 
 }

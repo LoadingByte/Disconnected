@@ -36,7 +36,7 @@ public class WorldProcessInterruptCommand extends EventBase {
 
     /**
      * Creates a new world process interrupt command.
-     * 
+     *
      * @param worldPid The pid of the world process which should be interrupted.
      *        That world process must run on the computer of the server bridge partner that sends the command.
      * @param recursive Whether all child processes of the given process should also be interrupted.
@@ -51,7 +51,7 @@ public class WorldProcessInterruptCommand extends EventBase {
     /**
      * Returns the pid of the world process which should be interrupted.
      * That world process runs on the computer of the server bridge partner that sent the command.
-     * 
+     *
      * @return The pid of the world process for interruption.
      */
     public int getWorldPid() {
@@ -62,7 +62,7 @@ public class WorldProcessInterruptCommand extends EventBase {
     /**
      * Returns whether all child processes of the defined process should also be interrupted.
      * If this is not true, all direct child processes of the interrupted process will eventually be promoted to child processes of the parent process.
-     * 
+     *
      * @return Whether all child processes should also be interrupted.
      */
     public boolean isRecursive() {

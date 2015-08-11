@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * A {@link MultipleValueRegistry} that uses a {@link List} as internal data structure.
  * This implementation uses an {@link ArrayList}.
- * 
+ *
  * @param <V> The type of the values that can be stored inside the list registry.
  * @see MultipleValueRegistry
  */

@@ -18,98 +18,67 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.Map;
-import com.quartercode.classmod.extra.func.FunctionDefinition;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.classmod.factory.FunctionDefinitionFactory;
 import com.quartercode.disconnected.server.world.comp.user.User;
-import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 
 /**
  * File actions are predefined "plans" of activities that are related to {@link File}s, for example moving a file.
  * They are basically a usage of the command pattern.
  * However, all actions provide two methods related to the activities they are representing.<br>
  * <br>
- * The first method is called {@link #EXECUTE}.
+ * The first method is called {@link #execute()}.
  * It is just executing the defined action without doing anything else.
- * For example, a file movement action would actually move the file here.<br>
+ * For example, a file movement action would actually move the file when it is executed.
+ * Note that no right checks or anything like that are done by this method.<br>
  * <br>
- * The second method is called {@link #IS_EXECUTABLE_BY}.
+ * The second method is called {@link #isExecutableBy(User)}.
  * It takes a {@link User} as argument and checks whether the user is allowed to execute the action under the current circumstances.
- * Every program implementation is responsible for checking whether a file action can be actually executed.
- * The {@link #EXECUTE} method should only be called after the check passed.
- * 
+ * Every program implementation is responsible for checking whether a file action can be actually executed before actually executing it.
+ * The {@link #execute()} method should only be called after the check passed.<br>
+ * <br>
+ * The third method is called {@link #getMissingRights(User)}.
+ * If {@link #isExecutableBy(User)} is {@code false}, this method returns the files the user has insufficient access to.
+ * Moreover, a char array containing the missing rights is returned alongside each file.
+ * If {@link #isExecutableBy(User)} is {@code true}, this method just returns an empty map.
+ *
  * @see File
  */
-public abstract class FileAction extends WorldFeatureHolder {
+public abstract class FileAction {
 
     /**
      * Actually executes the defined action without doing anything else.
-     * For example, a file movement action would simply do the file movement here.
+     * For example, a file movement action would simply do the file movement when it is executed.<br>
+     * <br>
+     * Note that no right checks or anything like that are done by this method.
+     * If you need such permission checks, use {@link #isExecutableBy(User)} or {@link #getMissingRights(User)}.
+     *
+     * @throws Exception If some kind of exception occurs while executing the action.
      */
-    public static final FunctionDefinition<Void>                      EXECUTE            = factory(FunctionDefinitionFactory.class).create("execute", new Class[0]);
+    public abstract void execute() throws Exception;
 
     /**
-     * Takes a {@link User} and checks whether the user is allowed to execute the action under the current circumstances.<br>
-     * Every program implementation is responsible for checking whether a file action can be actually executed.
-     * The {@link #EXECUTE} method should only be called after the check passed.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link User}</td>
-     * <td>user</td>
-     * <td>The {@link User} whose permission to execute the action should be checked.</td>
-     * </tr>
-     * </table>
+     * Takes a {@link User} and checks whether he allowed to execute the action under the current circumstances.<br>
+     * <br>
+     * Every program implementation is responsible for checking whether a file action can be actually executed before actually executing it.
+     * The {@link #execute()} method should only be called after the check passed.
+     *
+     * @param user The user whose permission to execute the action should be checked.
+     * @return Whether the given user is allowed to execute the action.
      */
-    public static final FunctionDefinition<Boolean>                   IS_EXECUTABLE_BY   = factory(FunctionDefinitionFactory.class).create("isExecutableBy", new Class[] { User.class });
+    public boolean isExecutableBy(User user) {
 
-    /**
-     * If {@link #IS_EXECUTABLE_BY} is {@code false}, this method returns the files the user has insufficient access to.
-     * Moreover, a char array containing the missing rights is returned alongside each file.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link User}</td>
-     * <td>user</td>
-     * <td>The {@link User} whose missing rights for the action should be retrieved.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<Map<File<?>, Character[]>> GET_MISSING_RIGHTS = factory(FunctionDefinitionFactory.class).create("getMissingRights", new Class[] { User.class });
-
-    static {
-
-        // By default, IS_EXECUTABLE_BY just checks whether the GET_MISSING_RIGHTS map is empty
-        IS_EXECUTABLE_BY.addExecutor("default", FileAction.class, new FunctionExecutor<Boolean>() {
-
-            @Override
-            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
-
-                boolean result = invocation.getCHolder().invoke(GET_MISSING_RIGHTS, arguments[0]).isEmpty();
-
-                invocation.next(arguments);
-                return result;
-            }
-
-        });
-
+        // By default, this method just checks whether the map returned by getMissingRights is empty
+        return getMissingRights(user).isEmpty();
     }
+
+    /**
+     * If {@link #isExecutableBy(User)} is {@code false}, this method returns the files the user has insufficient access to.
+     * Moreover, a char array containing the missing rights is returned alongside each file.<br>
+     * If {@link #isExecutableBy(User)} is {@code true}, this method just returns an empty map.
+     *
+     * @param user The user whose missing rights for the action should be retrieved.
+     * @return The files the given user has insufficient access to.
+     */
+    public abstract Map<File<?>, Character[]> getMissingRights(User user);
 
 }

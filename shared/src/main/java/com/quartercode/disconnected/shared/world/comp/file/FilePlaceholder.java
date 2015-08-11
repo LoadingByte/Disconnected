@@ -43,7 +43,7 @@ public class FilePlaceholder implements Serializable {
 
     /**
      * Creates a new file placeholder using the provided data.
-     * 
+     *
      * @param path The path of the represented file.
      * @param type The string that describes the type of the represented file.
      *        By default, possible strings are {@code rootFile}, {@code directory}, and {@code contentFile}.
@@ -80,7 +80,7 @@ public class FilePlaceholder implements Serializable {
     /**
      * Returns whether the placeholder represents a file system.
      * This returns true if {@link #getPath()} only has one segment.
-     * 
+     *
      * @return Whether a file system is represented.
      */
     public boolean isFileSystem() {
@@ -90,7 +90,7 @@ public class FilePlaceholder implements Serializable {
 
     /**
      * Returns the path of the represented file.
-     * 
+     *
      * @return The file path.
      * @see #getFileSystemMountpoint()
      * @see #getName()
@@ -103,7 +103,7 @@ public class FilePlaceholder implements Serializable {
     /**
      * Returns the mountpoint of the file system the file file is stored on.
      * It is derived from the first segment of the path ({@link #getPath()}).
-     * 
+     *
      * @return The file system mountpoint.
      */
     public String getFileSystemMountpoint() {
@@ -114,7 +114,7 @@ public class FilePlaceholder implements Serializable {
     /**
      * Returns the name of the represented file.
      * It is derived from the last element of the path ({@link #getPath()}).
-     * 
+     *
      * @return The file name.
      */
     public String getName() {
@@ -125,13 +125,13 @@ public class FilePlaceholder implements Serializable {
     /**
      * Returns a string that describes the type of the represented file.
      * By default, possible types are:
-     * 
+     *
      * <ul>
      * <li>rootFile</li>
      * <li>directory</li>
      * <li>contentFile</li>
      * </ul>
-     * 
+     *
      * @return The file type.
      */
     public String getType() {
@@ -142,7 +142,7 @@ public class FilePlaceholder implements Serializable {
     /**
      * Returns the total size of the represented file.
      * If the placeholder represents a file system, the size of that file system is used.
-     * 
+     *
      * @return The file/file system size.
      */
     public long getSize() {
@@ -152,7 +152,7 @@ public class FilePlaceholder implements Serializable {
 
     /**
      * Returns a {@link FileRights} object that stores the file rights of the represented file.
-     * 
+     *
      * @return The file rights.
      */
     public FileRights getRights() {
@@ -162,7 +162,7 @@ public class FilePlaceholder implements Serializable {
 
     /**
      * Returns the name of the user which owns the represented file.
-     * 
+     *
      * @return The name of the file owner.
      */
     public String getOwner() {
@@ -172,7 +172,7 @@ public class FilePlaceholder implements Serializable {
 
     /**
      * Returns The name of the group which is assigned to the represented file.
-     * 
+     *
      * @return The name of the file group.
      */
     public String getGroup() {

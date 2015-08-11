@@ -22,7 +22,7 @@ package com.quartercode.disconnected.client.graphics.desktop.prog;
  * A client program state context object holds the state of a {@link ClientProgramExecutor} and allows to add listeners.
  * One such state context object is responsible for holding the state of one executor instance.
  * It is typically injected into the executor in order to allow it to view and manage its state.
- * 
+ *
  * @see ClientProgramExecutor
  */
 public interface ClientProgramStateContext {
@@ -35,7 +35,7 @@ public interface ClientProgramStateContext {
 
     /**
      * Adds the given {@link Runnable listener} which is guaranteed to be called when the program state changes to {@link #stop() stopped}.
-     * 
+     *
      * @param listener The listener which should be added.
      */
     public void addStoppingListener(Runnable listener);

@@ -29,7 +29,7 @@ public interface WorldProcessCommand extends Event {
 
     /**
      * Returns the {@link WorldProcessId} that points to the server simulation process that should receive the event.
-     * 
+     *
      * @return The world process the event is sent to.
      */
     public WorldProcessId getWorldProcessId();

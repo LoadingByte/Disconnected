@@ -18,20 +18,12 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import static com.quartercode.classmod.extra.func.Priorities.LEVEL_6;
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.HashMap;
 import java.util.Map;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.classmod.extra.func.FunctionDefinition;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.ReferenceStorage;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
+import com.quartercode.jtimber.api.node.Weak;
 
 /**
  * The file move action is a simple file action that defines the process of moving a {@link File} to a new location.
@@ -39,155 +31,124 @@ import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
  * For doing that, the action takes a path string that describes the location where the file to add should go, as well as the new file system. <br>
  * <br>
  * See {@link FileAction} for more detail on what file actions actually are.
- * 
+ *
  * @see FileAction
  * @see File
  */
 public class FileMoveAction extends FileAction {
 
-    // ----- Properties -----
+    @Weak
+    private final FileSystem          fileSystem;
+    @Weak
+    private final File<ParentFile<?>> file;
+    private final String              path;
 
     /**
-     * The {@link FileSystem} where the set {@link #FILE} should be moved to.
-     * The target {@link #PATH} is related to that file system.<br>
-     * Note that this property is automatically adjusted to the current file system when setting {@link #FILE}.
-     * However, the current value of the property must be {@code null} in order for that to happen.
+     * Creates a new file move action which moves the file to the given path on the file's current {@link FileSystem}.
+     *
+     * @param file The {@link File} that should be moved to the given path on its current file system.
+     *        Note that the name of this file is changed to the last entry of the given path on execution.
+     * @param path The local path on the given file system where the given file should be moved to.
+     *        Any {@link Directory}s in this path that do not yet exist are created on execution; their attributes are copied from the given file.
+     *        Note that the name of that given file is changed to the last entry of this path.
      */
-    public static final PropertyDefinition<FileSystem>          FILE_SYSTEM;
+    public FileMoveAction(File<ParentFile<?>> file, String path) {
 
-    /**
-     * The {@link File} that should be moved to the set {@link #PATH}.
-     * The name of the file is changed to the last entry of the path on execution.<br>
-     * Note that setting this property automatically adjusts the {@link #FILE_SYSTEM} to the current system of the new file.
-     * However, the current value of the file system property must be {@code null} in order for that to happen.
-     */
-    public static final PropertyDefinition<File<ParentFile<?>>> FILE;
-
-    /**
-     * The path on the {@link #FILE_SYSTEM} where the set {@link #FILE} should be moved to.
-     * Any directories in this path that do not yet exist are created on execution.
-     * The name of the set {@link #FILE} is also changed to the last entry of this path.
-     */
-    public static final PropertyDefinition<String>              PATH;
-
-    static {
-
-        FILE_SYSTEM = factory(PropertyDefinitionFactory.class).create("fileSystem", new ReferenceStorage<>());
-
-        FILE = factory(PropertyDefinitionFactory.class).create("file", new ReferenceStorage<>());
-        FILE.addSetterExecutor("adjustFileSystem", FileMoveAction.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                CFeatureHolder fileMoveAction = invocation.getCHolder();
-
-                if (fileMoveAction.getObj(FILE_SYSTEM) == null) {
-                    File<?> file = (File<?>) arguments[0];
-                    fileMoveAction.setObj(FILE_SYSTEM, file.invoke(File.GET_FS));
-                }
-
-                return invocation.next(arguments);
-            }
-
-        }, LEVEL_6);
-
-        PATH = factory(PropertyDefinitionFactory.class).create("path", new StandardStorage<>());
-        PATH.addSetterExecutor("normalize", FileMoveAction.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                String normalizedPath = PathUtils.normalize((String) arguments[0]);
-                if (!normalizedPath.isEmpty()) {
-                    normalizedPath = normalizedPath.substring(1);
-                }
-                return invocation.next(normalizedPath);
-            }
-
-        }, LEVEL_6);
-
+        this(file.getFileSystem(), file, path);
     }
 
-    // ----- Functions -----
+    /**
+     * Creates a new file move action which moves the file to the given {@link FileSystem}.
+     *
+     * @param fileSystem The file system on which the given should be moved to on execution.
+     * @param file The {@link File} that should be moved to the given path on the given file system.
+     *        Note that the name of this file is changed to the last entry of the set path on execution.
+     * @param path The local path on the given file system where the given file should be moved to.
+     *        Any {@link Directory}s in this path that do not yet exist are created on execution; their attributes are copied from the given file.
+     *        Note that the name of that given file is changed to the last entry of this path.
+     */
+    public FileMoveAction(FileSystem fileSystem, File<ParentFile<?>> file, String path) {
+
+        Validate.notNull(fileSystem, "Cannot use null file system for file move action");
+        Validate.notNull(file, "Cannot use null file for file move action");
+        Validate.notBlank(path, "Cannot use blank path for file move action");
+
+        this.fileSystem = fileSystem;
+        this.file = file;
+
+        String acutalPath = PathUtils.normalize(path);
+        this.path = acutalPath.isEmpty() ? "" : acutalPath.substring(1);
+    }
 
     /**
-     * Moves the set {@link #FILE} from the file system it's currently located on.
-     * If the file for removal is a {@link ParentFile}, all child files are also going to be removed.
-     * 
-     * <table>
-     * <tr>
-     * <th>Exception</th>
-     * <th>When?</th>
-     * </tr>
-     * <tr>
-     * <td>{@link InvalidPathException}</td>
-     * <td>The set file path isn't valid (for example, a file along the path is not a parent file).</td>
-     * </tr>
-     * <tr>
-     * <td>{@link OutOfSpaceException}</td>
-     * <td>There is not enough space for the file or a required directory on the new file system.</td>
-     * </tr>
-     * </table>
+     * Returns the {@link FileSystem} on which the set {@link #getFile() file} should be moved to on execution.
+     *
+     * @return The target file system.
      */
-    public static final FunctionDefinition<Void>                EXECUTE = FileAction.EXECUTE;
+    public FileSystem getFileSystem() {
 
-    static {
+        return fileSystem;
+    }
 
-        EXECUTE.addExecutor("moveFile", FileMoveAction.class, new FunctionExecutor<Void>() {
+    /**
+     * Returns the {@link File} that should be moved to the set {@link #getPath() path} on the set {@link #getFileSystem() file system}.
+     * Note that the name of this file is changed to the last entry of the set path on execution.
+     *
+     * @return The file that should be added.
+     */
+    public File<ParentFile<?>> getFile() {
 
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+        return file;
+    }
 
-                CFeatureHolder fileMoveAction = invocation.getCHolder();
-                FileSystem targetFileSystem = fileMoveAction.getObj(FILE_SYSTEM);
-                File<ParentFile<?>> moveFile = fileMoveAction.getObj(FILE);
-                String targetPath = fileMoveAction.getObj(PATH);
+    /**
+     * The local path on the set {@link #getFileSystem() file system} where the set {@link #getFile() file} should be moved to.
+     * Any {@link Directory}s in this path that do not yet exist are created on execution; their attributes are copied from the set file.
+     * Note that the name of that set file is changed to the last entry of this path.
+     *
+     * @return The target local path (without a mountpoint).
+     */
+    public String getPath() {
 
-                // Retrieve the old parent file before the movement
-                ParentFile<?> oldParent = moveFile.getParent();
+        return path;
+    }
 
-                // Add the file to the target file system under the target path
-                targetFileSystem.invoke(FileSystem.CREATE_ADD_FILE, moveFile, targetPath).invoke(FileAddAction.EXECUTE);
-                // Retrieve the new parent file after the file was added under the new location
-                ParentFile<?> newParent = moveFile.getParent();
+    /**
+     * Moves the set {@link #getFile() file} to the set {@link #getPath() path} on the set {@link #getFileSystem() file system}.
+     * If the new path does not exist, this method creates {@link Directory}s to match it.
+     * Note that the name of the added file is changed to the last entry of the set path.
+     * Furthermore, newly created directories have the same attributes and right settings as the file to add.<br>
+     * <br>
+     * Also note that no right checks or anything like that are done by this method.
+     * If you need such permission checks, use {@link #isExecutableBy(User)} or {@link #getMissingRights(User)}.
+     *
+     * @throws InvalidPathException If the set file path isn't valid (for example, if a file along the path is not a parent file).
+     * @throws OccupiedPathException If the set file path, to which the file should be moved to, is already used by another file.
+     * @throws OutOfSpaceException If there is not enough space for the file or a required directory on the target file system.
+     */
+    @Override
+    public void execute() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-                // Manually remove the file from its old parent file
-                oldParent.removeFromColl(ParentFile.CHILDREN, moveFile);
-                // Set the new parent file again because the removal automatically setthe parent object to null
-                moveFile.setParent(newParent);
+        // Retrieve the old parent file before the movement
+        ParentFile<?> oldParent = file.getSingleParent();
 
-                return invocation.next(arguments);
-            }
+        // Add the file to the target file system under the target path
+        fileSystem.prepareAddFile(file, path).execute();
 
-        });
+        // Manually remove the file from its old parent file
+        // The FileRemoveAction cannot be used here because it would remove the file from its new parent
+        oldParent.removeChildFile(file);
+    }
 
-        GET_MISSING_RIGHTS.addExecutor("checkSplitActions", FileMoveAction.class, new FunctionExecutor<Map<File<?>, Character[]>>() {
+    @Override
+    public Map<File<?>, Character[]> getMissingRights(User user) {
 
-            @Override
-            public Map<File<?>, Character[]> invoke(FunctionInvocation<Map<File<?>, Character[]>> invocation, Object... arguments) {
+        Map<File<?>, Character[]> missingRights = new HashMap<>();
 
-                User executor = (User) arguments[0];
-                CFeatureHolder fileMoveAction = invocation.getCHolder();
+        missingRights.putAll(new FileRemoveAction(file).getMissingRights(user));
+        missingRights.putAll(new FileAddAction(fileSystem, file, path).getMissingRights(user));
 
-                Map<File<?>, Character[]> missingRights = new HashMap<>();
-
-                FileRemoveAction action1 = new FileRemoveAction();
-                action1.setObj(FileRemoveAction.FILE, fileMoveAction.getObj(FILE));
-                missingRights.putAll(action1.invoke(GET_MISSING_RIGHTS, executor));
-
-                FileAddAction action2 = new FileAddAction();
-                action2.setObj(FileAddAction.FILE_SYSTEM, fileMoveAction.getObj(FILE_SYSTEM));
-                action2.setObj(FileAddAction.FILE, fileMoveAction.getObj(FILE));
-                action2.setObj(FileAddAction.PATH, fileMoveAction.getObj(PATH));
-                missingRights.putAll(action2.invoke(GET_MISSING_RIGHTS, executor));
-
-                invocation.next(arguments);
-                return missingRights;
-            }
-
-        });
-
+        return missingRights;
     }
 
 }

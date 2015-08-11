@@ -28,7 +28,7 @@ import com.quartercode.eventbridge.bridge.BridgeModule;
 /**
  * An internal bridge extension that adds hooks to a {@link Bridge} for implementing the functionality of an {@link SBPIdentityService}.
  * It adds the following actions:
- * 
+ *
  * <ul>
  * <li>It adds the correct {@link SBPIdentity} if a {@link BridgeConnector} is added and a new connection with a server bridge partner is established.</li>
  * <li>It removes an {@link SBPIdentity} if the associated {@link BridgeConnector} is removed.</li>
@@ -40,7 +40,7 @@ public interface SBPIdentityExtension extends BridgeModule {
     /**
      * Returns the {@link SBPIdentityService} the extension is linked with.
      * All actions are performed with that service.
-     * 
+     *
      * @return The linked SBP identity service.
      */
     public SBPIdentityService getIdentityService();
@@ -48,7 +48,7 @@ public interface SBPIdentityExtension extends BridgeModule {
     /**
      * Changes the {@link SBPIdentityService} the extension is linked with.
      * All actions will be performed with that service.
-     * 
+     *
      * @param identityService The new linked SBP identity service.
      */
     public void setIdentityService(SBPIdentityService identityService);

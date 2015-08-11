@@ -41,7 +41,7 @@ public abstract class SBPWorldProcessUserCommand extends EventBase implements Li
      * Returns the {@link SBPWorldProcessUserId} that should receive the event.
      * If this event is sent by a world process, that world process user has launched the world process.
      * Note that the SBP mentioned in that object is the one returned by {@link #getSBPs()}.
-     * 
+     *
      * @return The world process user the event is sent to.
      */
     public abstract SBPWorldProcessUserId getWorldProcessUserId();

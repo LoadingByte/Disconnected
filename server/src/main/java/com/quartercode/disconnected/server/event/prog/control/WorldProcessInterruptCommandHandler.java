@@ -25,8 +25,6 @@ import com.quartercode.disconnected.server.sim.TickService;
 import com.quartercode.disconnected.server.sim.TickWorldUpdater;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
-import com.quartercode.disconnected.server.world.comp.os.OS;
-import com.quartercode.disconnected.server.world.comp.prog.ProcModule;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessInterruptCommand;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
@@ -35,7 +33,7 @@ import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId
 
 /**
  * The world process interrupt command handler executes incoming {@link WorldProcessInterruptCommand} events.
- * 
+ *
  * @see WorldProcessInterruptCommand
  */
 public class WorldProcessInterruptCommandHandler implements SBPAwareEventHandler<WorldProcessInterruptCommand> {
@@ -50,24 +48,24 @@ public class WorldProcessInterruptCommandHandler implements SBPAwareEventHandler
 
         // Check the world process user
         // That check ensures that the SBP does not stop processes it shouldn't stop on its own computer (e.g. the root process)
-        SBPWorldProcessUserId processUser = process.getObj(Process.WORLD_PROCESS_USER);
+        SBPWorldProcessUserId processUser = process.getWorldProcessUser();
         if (processUser == null || !processUser.getSBP().equals(sender)) {
             LOGGER.warn("SBP '{}' tried to interrupt process with pid {} although he doesn't own it", sender, event.getWorldPid());
             return;
         }
 
         // Interrupt the process
-        process.invoke(Process.INTERRUPT, event.isRecursive());
+        process.interrupt(event.isRecursive());
     }
 
     protected Process<?> getSBPProcess(SBPIdentity sbp, int pid) {
 
         World world = ServiceRegistry.lookup(TickService.class).getAction(TickWorldUpdater.class).getWorld();
         // Just use first available computer as the player's one
-        Computer computer = world.getColl(World.COMPUTERS).get(0);
+        Computer computer = world.getComputers().get(0);
 
-        for (Process<?> process : computer.getObj(Computer.OS).getObj(OS.PROC_MODULE).invoke(ProcModule.GET_ALL)) {
-            if (process.getObj(Process.PID) == pid) {
+        for (Process<?> process : computer.getOs().getProcModule().getAllProcesses()) {
+            if (process.getPid() == pid) {
                 return process;
             }
         }

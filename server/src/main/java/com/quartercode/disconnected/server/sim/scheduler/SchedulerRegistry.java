@@ -24,31 +24,28 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.WeakHashMap;
-import com.quartercode.classmod.base.Feature;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.util.FeatureHolderVisitorAdapter;
-import com.quartercode.classmod.util.TreeWalker;
+import com.quartercode.jtimber.api.node.Node;
 
 /**
  * The scheduler registry is a simple class which stores a {@link WeakReference weak} set of {@link Scheduler}s.
  * It is used to quickly retrieve the active schedulers of a world in order to update them.
  * That world {@link SchedulerRegistryProvider provides} such a registry for allowing the schedulers to register themselves.
- * 
+ *
  * @see Scheduler
  * @see SchedulerRegistryProvider
  */
 public class SchedulerRegistry {
 
-    private final Set<Scheduler> schedulers = Collections.newSetFromMap(new WeakHashMap<Scheduler, Boolean>());
+    private final Set<Scheduler<?>> schedulers = Collections.newSetFromMap(new WeakHashMap<Scheduler<?>, Boolean>());
 
     /**
      * Returns an <b>unmodifiable</b> view of all registered {@link Scheduler}s.
      * In order to register or unregister a scheduler, the {@link #addScheduler(Scheduler)} or {@link #removeScheduler(Scheduler)} method must be called.
      * Note that a modifiable {@link Iterator} over this collection can be obtained using {@link #getNewModifiableSchedulersIterator()}.
-     * 
+     *
      * @return The registered schedulers.
      */
-    public Collection<Scheduler> getSchedulers() {
+    public Collection<Scheduler<?>> getSchedulers() {
 
         return schedulers;
     }
@@ -56,10 +53,10 @@ public class SchedulerRegistry {
     /**
      * Returns a new modifiable {@link Iterator} over the {@link #getSchedulers() scheduler collection}.
      * That means that the {@link Iterator#remove()} method is available.
-     * 
+     *
      * @return A new modifiable schedulers iterator.
      */
-    public Iterator<Scheduler> getNewModifiableSchedulersIterator() {
+    public Iterator<Scheduler<?>> getNewModifiableSchedulersIterator() {
 
         return schedulers.iterator();
     }
@@ -68,10 +65,10 @@ public class SchedulerRegistry {
      * Registers the given {@link Scheduler} in the registry.
      * If the scheduler has already been registered, nothing happens.
      * Note that this method should only be used by {@link Scheduler} implementations.
-     * 
+     *
      * @param scheduler The scheduler to register.
      */
-    public void addScheduler(Scheduler scheduler) {
+    public void addScheduler(Scheduler<?> scheduler) {
 
         schedulers.add(scheduler);
     }
@@ -80,38 +77,32 @@ public class SchedulerRegistry {
      * Unregisters the given {@link Scheduler} from the registry.
      * If the scheduler isn't actually registered, nothing happens.
      * Note that this method should only be used by {@link Scheduler} implementations.
-     * 
+     *
      * @param scheduler The scheduler to unregister.
      */
-    public void removeScheduler(Scheduler scheduler) {
+    public void removeScheduler(Scheduler<?> scheduler) {
 
         schedulers.remove(scheduler);
     }
 
     /**
-     * Recursively walks the {@link FeatureHolder} tree that starts at the given root holder and {@link #addScheduler(Scheduler) registers} all found {@link Scheduler}s.
+     * Recursively walks the {@link Node} tree that starts at the given root node and {@link #addScheduler(Scheduler) registers} all found {@link Scheduler}s.
      * This method should be used after a world has been deserialized in order to create a valid scheduler registry.
      * However, this method should only be called once because traversing the whole tree is rather expensive.
-     * 
-     * @param start The root feature holder to start at.
+     *
+     * @param start The root node to start at.
      */
-    public void addSchedulersFromTree(FeatureHolder start) {
+    public void addSchedulersFromTree(Node<?> start) {
 
-        TreeWalker.walk(start, new FeatureHolderVisitorAdapter() {
-
-            @Override
-            public VisitResult preVisit(FeatureHolder holder) {
-
-                for (Feature feature : holder) {
-                    if (feature instanceof Scheduler) {
-                        schedulers.add((Scheduler) feature);
-                    }
-                }
-
-                return VisitResult.CONTINUE;
+        for (Object child : start.getChildren()) {
+            if (child instanceof Scheduler) {
+                schedulers.add((Scheduler<?>) child);
             }
 
-        }, false);
+            if (child instanceof Node) {
+                addSchedulersFromTree((Node<?>) child);
+            }
+        }
     }
 
 }

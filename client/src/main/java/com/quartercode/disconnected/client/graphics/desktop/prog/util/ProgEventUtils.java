@@ -40,7 +40,7 @@ import com.quartercode.eventbridge.extra.predicate.TypePredicate;
 /**
  * This utility class provides some utility methods and classes regarding {@link Event}s and {@link EventHandler}s for {@link ClientProgramExecutor} implementations.
  * They should be used to remove the need for boilerplate code.
- * 
+ *
  * @see ClientProgramExecutor
  */
 public class ProgEventUtils {
@@ -48,7 +48,7 @@ public class ProgEventUtils {
     /**
      * Adds the given {@link EventHandler} to the given {@link Bridge} and makes it listen for incoming {@link Event}s that match the given {@link EventPredicate}.
      * Moreover, the handler is removed as soon as the client program executor, which is associated to the given {@link ClientProgramStateContext}, stops.
-     * 
+     *
      * @param bridge The bridge the event handler should be added to.
      * @param stateContext The state context of the {@link ClientProgramExecutor} that wants to register the event handler.
      *        It is used to remove the event handler when the program stops.
@@ -80,7 +80,7 @@ public class ProgEventUtils {
      * Adds the given {@link EventHandler} to the given {@link Bridge} and makes it listen for incoming {@link SBPWorldProcessUserCommand}s of the given type.
      * However, only events that are addressed at the given {@link SBPWorldProcessUserDetails world process user id} are accepted.
      * Moreover, the handler is removed as soon as the client program executor, which is associated to the given {@link ClientProgramStateContext}, stops.
-     * 
+     *
      * @param bridge The bridge the event handler should be added to.
      * @param stateContext The state context of the {@link ClientProgramExecutor} that wants to register the event handler.
      *        It is used to remove the event handler when the program stops.
@@ -100,7 +100,7 @@ public class ProgEventUtils {
 
     /**
      * Launches the given world program using the given communication parameters without calling a callback.
-     * 
+     *
      * @param bridge The bridge through which the server, which should launch the world program, can be reached.
      * @param stateContext The state context of the {@link ClientProgramExecutor} that wants to launch the world process.
      *        It is used to remove the added event handlers when the program stops.
@@ -119,7 +119,7 @@ public class ProgEventUtils {
 
     /**
      * Launches the given world program using the given communication parameters and calls the given {@link Runnable callback} once the program has been started.
-     * 
+     *
      * @param bridge The bridge through which the server, which should launch the world program, can be reached.
      * @param stateContext The state context of the {@link ClientProgramExecutor} that wants to launch the world process.
      *        It is used to remove the added event handlers when the program stops.

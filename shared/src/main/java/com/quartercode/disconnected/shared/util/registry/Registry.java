@@ -27,7 +27,7 @@ import com.quartercode.disconnected.shared.util.registry.extra.SingleValueRegist
  * All objects must be an instance of a certain generic type.
  * Different {@link MultipleValueRegistry} registry implementations are used for implementing different types of storages.
  * However, the {@link SingleValueRegistry} is used to only store a single value.
- * 
+ *
  * @param <V> The type of value that can be stored inside the registry.
  * @see RegistryDefinition
  * @see RegistryService
@@ -37,7 +37,7 @@ public interface Registry<V> extends Iterable<V> {
     /**
      * Returns a (possibly unmodifiable) view of all objects that are stored in the registry.
      * In case of a {@link SingleValueRegistry}, a collection with one object is returned.
-     * 
+     *
      * @return All stored objects.
      */
     public Collection<V> getValues();

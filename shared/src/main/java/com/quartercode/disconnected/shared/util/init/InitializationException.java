@@ -36,7 +36,7 @@ public class InitializationException extends Exception {
 
     /**
      * Creates a new initialization exception with the given message.
-     * 
+     *
      * @param message The detail message.
      */
     public InitializationException(String message) {
@@ -46,7 +46,7 @@ public class InitializationException extends Exception {
 
     /**
      * Creates a new initialization exception with the given cause.
-     * 
+     *
      * @param cause The child cause which caused the exception to be thrown.
      */
     public InitializationException(Throwable cause) {
@@ -56,7 +56,7 @@ public class InitializationException extends Exception {
 
     /**
      * Creates a new initialization exception with the given message and cause.
-     * 
+     *
      * @param message The detail message.
      * @param cause The child cause which caused the exception to be thrown.
      */

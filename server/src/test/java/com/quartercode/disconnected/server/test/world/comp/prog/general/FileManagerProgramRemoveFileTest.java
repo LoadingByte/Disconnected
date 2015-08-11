@@ -31,7 +31,7 @@ import com.quartercode.disconnected.server.bridge.SBPAwareEventHandlerExceptionC
 import com.quartercode.disconnected.server.bridge.SBPAwareHandlerExtension;
 import com.quartercode.disconnected.server.test.world.comp.AbstractComplexComputerTest;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
-import com.quartercode.disconnected.server.world.comp.file.FSModule;
+import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.prog.ChildProcess;
@@ -66,7 +66,7 @@ public class FileManagerProgramRemoveFileTest extends AbstractComplexComputerTes
     @Before
     public void setUp() {
 
-        mainFsModule().invoke(FSModule.CREATE_ADD_FILE, path1File, TEST_PATH).invoke(FileAddAction.EXECUTE);
+        mainFsModule().invoke(FileSystemModule.CREATE_ADD_FILE, path1File, TEST_PATH).invoke(FileAddAction.EXECUTE);
     }
 
     private void executeProgramAndSendChangeDirCommand(Process<?> parentProcess, String change) {

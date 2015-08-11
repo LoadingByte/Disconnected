@@ -33,7 +33,7 @@ import com.quartercode.eventbridge.extra.extension.ReturnEventExtensionReturner;
 
 /**
  * This is the default implementation of the {@link GraphicsService}.
- * 
+ *
  * @see GraphicsService
  */
 public class DefaultGraphicsService implements GraphicsService {

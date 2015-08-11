@@ -19,13 +19,13 @@
 package com.quartercode.disconnected.server.world.comp.file;
 
 /**
- * This runtime exception occures if a path on a {@link FileSystem} is invalid.
- * For example, the path {@code test1/test2/test.txt} could be invalid when {@code test2} is not a directory.
- * 
+ * This exception occurs if a path on a {@link FileSystem} does not exist or is invalid.
+ * For example, the path {@code test1/test2/test.txt} could be invalid if {@code test2} is not a directory.
+ *
  * @see FileSystem
  * @see File
  */
-public class InvalidPathException extends RuntimeException {
+public class InvalidPathException extends Exception {
 
     private static final long serialVersionUID = 4866038832089520912L;
 
@@ -34,7 +34,7 @@ public class InvalidPathException extends RuntimeException {
 
     /**
      * Creates a new invalid path exception.
-     * 
+     *
      * @param fileSystem The {@link FileSystem} on which the given path is invalid.
      * @param path The invalid path.
      */
@@ -48,7 +48,7 @@ public class InvalidPathException extends RuntimeException {
 
     /**
      * Returns the {@link FileSystem} on which the set path ({@link #getPath()}) is invalid.
-     * 
+     *
      * @return The file system that contains the invalidity.
      */
     public FileSystem getFileSystem() {
@@ -59,7 +59,7 @@ public class InvalidPathException extends RuntimeException {
     /**
      * Returns the invalid path.
      * For example, the path {@code test1/test2/test.txt} could be invalid when {@code test2} is not a directory.
-     * 
+     *
      * @return The invalid path.
      */
     public String getPath() {

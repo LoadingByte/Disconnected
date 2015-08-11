@@ -18,26 +18,24 @@
 
 package com.quartercode.disconnected.server.world.comp.prog;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import com.quartercode.classmod.base.FeatureDefinition;
 import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
-import com.quartercode.disconnected.server.sim.scheduler.SchedulerDefinitionFactory;
 
 /**
- * {@link ProgramExecutor}s can implement this interface to inherit the {@link #SCHEDULER} feature (which obviously is a {@link Scheduler}).
- * However, that scheduler can be (de)activated depending on the {@link Process#STATE state} of the {@link Process} that uses the program executor.
- * Note that program executors should not use "custom" schedulers apart from this one in order to be controllable by the process.
- * 
+ * {@link ProgramExecutor}s which use a {@link Scheduler} must implement this interface and provide their scheduler through the {@link #getScheduler()} method.
+ * That provided scheduler can then be (de)activated depending on the {@link Process#getState() state} of the {@link Process} that uses the program executor.
+ * Note that program executors should not use other "custom" schedulers apart from the provided one because those schedulers would not be controllable by the process.
+ *
  * @see Scheduler
  * @see ProgramExecutor
  */
 public interface SchedulerUsing {
 
-    // ----- Schedulers -----
-
     /**
-     * The {@link Scheduler} which is (de)activated depending on the {@link Process#STATE state} of the {@link Process} that uses the program executor.
+     * Returns the <b>one and only</b> {@link Scheduler} used by the program executor.
+     * It is (de)activated depending on the {@link Process#getState() state} of the {@link Process} that uses the program executor.
+     *
+     * @return The scheduler used by the program executor.
      */
-    public static final FeatureDefinition<Scheduler> SCHEDULER = factory(SchedulerDefinitionFactory.class).create("scheduler");
+    public Scheduler<?> getScheduler();
 
 }

@@ -38,7 +38,7 @@ public class ParserUtils {
     /**
      * Parses the given positive number string and returns the result (as a long).
      * This method outputs a logger warning and returns the given old number if the string does not represent a positive number.
-     * 
+     *
      * @param config The XML configuration {@link Document} that contains the string for parsing.
      * @param usage A string that is used to specify the logger warning.
      *        The context is "Cannot use ... as {}", where {} is the usage string.
@@ -62,7 +62,7 @@ public class ParserUtils {
     /**
      * Parses the given decimal number string and returns the result (as a double).
      * This method outputs a logger warning and returns the given old number if the string does not represent a positive or negative decimal number.
-     * 
+     *
      * @param config The XML configuration {@link Document} that contains the string for parsing.
      * @param usage A string that is used to specify the logger warning.
      *        The context is "Cannot use ... as {}", where {} is the usage string.
@@ -86,7 +86,7 @@ public class ParserUtils {
     /**
      * Parses the given fully qualified java {@link Class} name string and returns the result.
      * This method outputs a logger warning and returns the given old class if the string does not represent a valid class.
-     * 
+     *
      * @param config The XML configuration {@link Document} that contains the string for parsing.
      * @param usage A string that is used to specify the logger warning.
      *        The context is "Cannot use ... as {}", where {} is the usage string.
@@ -120,7 +120,7 @@ public class ParserUtils {
     /**
      * Parses the given fully qualified java {@link Class} name string and returns the result as a <b>class object with the correct generic parameter</b>.
      * This method outputs a logger warning and returns the given old class if the string does not represent a valid class.
-     * 
+     *
      * @param config The XML configuration {@link Document} that contains the string for parsing.
      * @param usage A string that is used to specify the logger warning.
      *        The context is "Cannot use ... as {}", where {} is the usage string.
@@ -144,7 +144,7 @@ public class ParserUtils {
     /**
      * Parses the given {@link URL} string and returns the result.
      * This method outputs a logger warning and returns the given old URL if the string does not represent a valid URL.
-     * 
+     *
      * @param config The XML configuration {@link Document} that contains the string for parsing.
      * @param usage A string that is used to specify the logger warning.
      *        The context is "Cannot use ... as {}", where {} is the usage string.
@@ -186,7 +186,7 @@ public class ParserUtils {
      * The format for the string is {@code class.field} (e.g. {@code com.quartercode.disconnected.Something.CONSTANT_3}).
      * Note that inner classes can also be accessed (e.g. {@code com.quartercode.disconnected.Outer$Inner.CONSTANT_15}).
      * This method outputs a logger warning and returns the given old constant value class if the string does not represent a valid static field.
-     * 
+     *
      * @param config The XML configuration {@link Document} that contains the string for parsing.
      * @param usage A string that is used to specify the logger warning.
      *        The context is "Cannot use ... as {}", where {} is the usage string.

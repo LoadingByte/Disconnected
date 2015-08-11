@@ -34,7 +34,7 @@ import de.matthiasmann.twl.Widget;
  * <br>
  * Window implementations inherit from this class and add their components and communication logic.
  * They are then managed by the {@link ClientProgramExecutor}s that use them.
- * 
+ *
  * @see ClientProgramExecutor
  */
 public class ClientProgramWindow extends DesktopWindow {
@@ -45,7 +45,7 @@ public class ClientProgramWindow extends DesktopWindow {
     /**
      * Creates a new client program window in the given desktop {@link GraphicsState}.
      * The new window is <b>not</b> added to the desktop automatically.
-     * 
+     *
      * @param state The desktop state the window is part of.
      * @param title The title that should be used for the window's title bar and the taskbar button.
      */
@@ -123,7 +123,7 @@ public class ClientProgramWindow extends DesktopWindow {
     /**
      * Opens the given popup {@link DesktopWindow} and registers it as owned by this window.
      * All owned open popups are closed when the window is closed.
-     * 
+     *
      * @param popup The popup window that should be opened.
      * @param modal Whether the popup should block any interaction on the main window.
      *        That block is removed when the popup is closed.

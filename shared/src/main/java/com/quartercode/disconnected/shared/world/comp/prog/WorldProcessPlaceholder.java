@@ -43,7 +43,7 @@ public class WorldProcessPlaceholder implements Serializable {
 
     /**
      * Creates a new process placeholder <b>without</b> the child processes of the represented process using the provided data.
-     * 
+     *
      * @param id The {@link WorldProcessId} which identifies the represented world process across the whole world.
      * @param state The {@link WorldProcessState} which defines the global state of the represented world process as seen by the OS.
      * @param user The resolved name of the user the represented world process is running under.
@@ -57,7 +57,7 @@ public class WorldProcessPlaceholder implements Serializable {
 
     /**
      * Creates a new process placeholder <b>with</b> the child processes of the represented process using the provided data.
-     * 
+     *
      * @param id The {@link WorldProcessId} which identifies the represented world process across the whole world.
      * @param state The {@link WorldProcessState} which defines the global state of the represented world process as seen by the OS.
      * @param user The resolved name of the user the represented world process is running under.
@@ -84,7 +84,7 @@ public class WorldProcessPlaceholder implements Serializable {
     /**
      * Returns a {@link WorldProcessId} which identifies the represented world process across the whole world.
      * It also contains the numerical local pid value ({@link WorldProcessId#getPid()}).
-     * 
+     *
      * @return The world process id.
      */
     public WorldProcessId getId() {
@@ -95,7 +95,7 @@ public class WorldProcessPlaceholder implements Serializable {
     /**
      * Returns the {@link WorldProcessState} which defines the global state of the represented world process as seen by the OS.
      * It stores whether the process is running, interrupted etc.
-     * 
+     *
      * @return The process state.
      */
     public WorldProcessState getState() {
@@ -106,7 +106,7 @@ public class WorldProcessPlaceholder implements Serializable {
     /**
      * Returns the resolved name of the user the represented world process is running under.
      * That user is retrieved by looking at the first session process that occurs when walking up the process tree from the represented process.
-     * 
+     *
      * @return The process user which defines the rights of the process.
      */
     public String getUser() {
@@ -120,7 +120,7 @@ public class WorldProcessPlaceholder implements Serializable {
      * <br>
      * Note that this child array may be {@code null} if the creator of the placeholder didn't want to add this information.
      * That might be the case if the information is not needed and would result in useless data being sent over the network.
-     * 
+     *
      * @return The child processes of the represented process.
      *         May be empty if the creator of the placeholder didn't want to add this information (e.g. by supplying {@code null}).
      */
@@ -132,7 +132,7 @@ public class WorldProcessPlaceholder implements Serializable {
     /**
      * Returns the file path to the file which contains the world program ran by the represented world process.
      * Note that a resolved program name can be retrieved using the {@link #getProgramName()} method.
-     * 
+     *
      * @return The program file path.
      * @see #getProgramName()
      */
@@ -144,7 +144,7 @@ public class WorldProcessPlaceholder implements Serializable {
     /**
      * Returns the name of the world program ran by the represented world process (e.g. {@code fileManager}).
      * It represents the program executor class as seen by this application.
-     * 
+     *
      * @return The program name.
      */
     public String getProgramName() {

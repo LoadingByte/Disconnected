@@ -28,12 +28,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.disconnected.server.util.NullPreventer;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
 import com.quartercode.disconnected.server.world.util.SizeUtils;
+import com.quartercode.jtimber.api.node.DefaultNode;
+import com.quartercode.jtimber.api.node.Node;
 
 @RunWith (Parameterized.class)
 public class SizeUtilsTest {
@@ -70,24 +68,11 @@ public class SizeUtilsTest {
         // Lists (as well as other iterables)
         data.add(new Object[] { Arrays.asList(new Object[] { "Test", true, 128 }), 4 + 1 + 2 });
 
-        // Feature holders
-        DerivableSize.GET_SIZE.addExecutor("test1", TestFeatureHolder.class, new FunctionExecutor<Long>() {
+        // Classes implementing DerivableSize
+        data.add(new Object[] { new TestDSObject(), 500 });
 
-            @Override
-            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
-
-                return 100L + NullPreventer.prevent(invocation.next(arguments));
-            }
-        });
-        DerivableSize.GET_SIZE.addExecutor("test2", TestFeatureHolder.class, new FunctionExecutor<Long>() {
-
-            @Override
-            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
-
-                return 500L + NullPreventer.prevent(invocation.next(arguments));
-            }
-        });
-        data.add(new Object[] { new TestFeatureHolder(), 100 + 500 });
+        // Nodes
+        data.add(new Object[] { new TestNode(), 1000 });
 
         // Null (should return 0)
         data.add(new Object[] { null, 0 });
@@ -118,7 +103,21 @@ public class SizeUtilsTest {
         }
     }
 
-    private static class TestFeatureHolder extends DefaultCFeatureHolder implements DerivableSize {
+    private static class TestDSObject implements DerivableSize {
+
+        @Override
+        public long getSize() {
+
+            return 500;
+        }
+
+    }
+
+    @SuppressWarnings ("unused")
+    private static class TestNode extends DefaultNode<Node<?>> {
+
+        private final TestDSObject object1 = new TestDSObject();
+        private final TestDSObject object2 = new TestDSObject();
 
     }
 

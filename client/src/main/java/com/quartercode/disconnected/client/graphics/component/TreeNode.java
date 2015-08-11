@@ -24,14 +24,14 @@ import de.matthiasmann.twl.model.TreeTableNode;
 /**
  * The tree node is a central access point for accessing a tree with one interface.
  * It describes common methods for tree modification.
- * 
+ *
  * @see TreeModel
  */
 public interface TreeNode extends TreeTableNode {
 
     /**
      * Returns the data object which is stored inside the given table column of the node (row).
-     * 
+     *
      * @param column The index of the column whose data object should be returned.
      *        Note that the column indices start at {@code 0}. For example, the third column has the index {@code 2}.
      * @return The data object which is stored inside the given column.
@@ -42,7 +42,7 @@ public interface TreeNode extends TreeTableNode {
 
     /**
      * Changes the data object which is stored inside the given table column of the node (row).
-     * 
+     *
      * @param column The index of the column whose data object should be returned.
      *        Note that the column indices start at {@code 0}. For example, the third column has the index {@code 2}.
      * @param data The new data object which should be stored inside the given column.
@@ -52,7 +52,7 @@ public interface TreeNode extends TreeTableNode {
 
     /**
      * Returns all direct child nodes this node holds.
-     * 
+     *
      * @return All direct child nodes.
      */
     public List<TreeNode> getChildren();
@@ -60,7 +60,7 @@ public interface TreeNode extends TreeTableNode {
     /**
      * Returns the direct child node this node holds at the given index.
      * A call to this method is equivalent to calling <code>{@link #getChildren()}[index]</code>.
-     * 
+     *
      * @param index The index of the direct child node for retrieval.
      */
     @Override
@@ -68,7 +68,7 @@ public interface TreeNode extends TreeTableNode {
 
     /**
      * Returns if the given node is a direct child of this node.
-     * 
+     *
      * @param child The node to check.
      * @return True if the given node is a direct child node.
      */
@@ -76,7 +76,7 @@ public interface TreeNode extends TreeTableNode {
 
     /**
      * Adds a new child node to this node using the given data array for the columns of the table.
-     * 
+     *
      * @param data The data to use for the columns of the table.
      * @return The created child node object.
      * @throws IllegalArgumentException Thrown if the amount of data objects does not match the amount of available columns.
@@ -85,7 +85,7 @@ public interface TreeNode extends TreeTableNode {
 
     /**
      * Removes a given child node from this node.
-     * 
+     *
      * @param child The child node for removal.
      */
     public void removeChild(TreeNode child);

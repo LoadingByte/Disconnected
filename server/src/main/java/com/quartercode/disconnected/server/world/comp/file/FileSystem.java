@@ -18,219 +18,159 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import com.quartercode.classmod.extra.func.FunctionDefinition;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.extra.valuefactory.ValueFactory;
-import com.quartercode.classmod.factory.FunctionDefinitionFactory;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
-import com.quartercode.classmod.util.PropertyAccessorFactory;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import org.apache.commons.lang3.Validate;
+import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
-import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
+import com.quartercode.disconnected.server.world.util.WorldNode;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
+import com.quartercode.jtimber.api.node.Node;
 
 /**
  * This class represents a file system.
  * The system stores {@link File}s which can be accessed like regular file objects.
  * A file system can be virtual or physical.
- * 
+ *
  * @see File
  */
-public class FileSystem extends WorldChildFeatureHolder<FileSystemHolder> implements DerivableSize {
+public class FileSystem extends WorldNode<Node<?>> implements DerivableSize {
 
-    // ----- Properties -----
+    @XmlAttribute
+    private long           size;
+    @XmlElement
+    private final RootFile rootFile = new RootFile();
 
-    /**
-     * The size of the file system, given in bytes.
-     */
-    public static final PropertyDefinition<Long>          SIZE;
-
-    /**
-     * The {@link RootFile} every other {@link File} branches of somehow.
-     */
-    public static final PropertyDefinition<RootFile>      ROOT;
-
-    static {
-
-        SIZE = factory(PropertyDefinitionFactory.class).create("size", new StandardStorage<>());
-
-        ROOT = factory(PropertyDefinitionFactory.class).create("root", new StandardStorage<>(), new ValueFactory<RootFile>() {
-
-            @Override
-            public RootFile get() {
-
-                return new RootFile();
-            }
-
-        });
-
-    }
-
-    // ----- Functions -----
-
-    /**
-     * Returns the {@link File} which is stored under the given path.
-     * A path is a collection of {@link File}s separated by a separator.
-     * This will look up the {@link File} using a local file system path.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link String}</td>
-     * <td>path</td>
-     * <td>The path to search under.</td>
-     * </tr>
-     * </table>
-     */
-    public static final FunctionDefinition<File<?>>       GET_FILE;
-
-    /**
-     * Returns a {@link FileAddAction} for adding a file with the given parameters.
-     * In order to actually add the file, the {@link FileAddAction#EXECUTE} method must be invoked.
-     * Note that that method might throw exceptions if the given file cannot be added.<br>
-     * <br>
-     * The returned action adds the given {@link File} to the file system under the given path.
-     * If the path does not exist, this method creates directories to match it.<br>
-     * <br>
-     * The name of the file to add is changed to match the path.
-     * Furthermore, newly created directories have the same right settings as the file to add.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link File}&lt;{@link ParentFile}&lt;?&gt;&gt;</td>
-     * <td>file</td>
-     * <td>The {@link File} to add to the file system.</td>
-     * </tr>
-     * <tr>
-     * <td>1</td>
-     * <td>{@link String}</td>
-     * <td>path</td>
-     * <td>The path for the new {@link File}. The name of the {@link File} will be changed to the last entry.</td>
-     * </tr>
-     * </table>
-     * 
-     * @see FileAddAction#EXECUTE
-     */
-    public static final FunctionDefinition<FileAddAction> CREATE_ADD_FILE;
-
-    /**
-     * Returns the total amount of bytes which are occupied by {@link File}s on the file system.
-     */
-    public static final FunctionDefinition<Long>          GET_FILLED;
-
-    /**
-     * Returns the total amount of bytes which are not occupied by {@link File}s on the file system.
-     */
-    public static final FunctionDefinition<Long>          GET_FREE;
-
-    static {
-
-        GET_FILE = factory(FunctionDefinitionFactory.class).create("getFile", new Class[] { String.class });
-        GET_FILE.addExecutor("default", FileSystem.class, new FunctionExecutor<File<?>>() {
-
-            @Override
-            public File<?> invoke(FunctionInvocation<File<?>> invocation, Object... arguments) {
-
-                String path = PathUtils.normalize((String) arguments[0]);
-
-                String[] parts = path.split(PathUtils.SEPARATOR);
-                File<?> current = invocation.getCHolder().getObj(ROOT);
-                for (int index = 0; index < parts.length; index++) {
-                    String part = parts[index];
-
-                    if (!part.isEmpty()) {
-                        if (current instanceof ParentFile) {
-                            current = current.invoke(ParentFile.GET_CHILD_BY_NAME, part);
-
-                            // Return null if the next file is not a parent file and not the last file (invalid path)
-                            if (! (current instanceof ParentFile) && index != parts.length - 1) {
-                                current = null;
-                                break;
-                            }
-                            // Return null if the next file doesn't exist
-                            else if (current == null) {
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                invocation.next(arguments);
-                return current;
-            }
-
-        });
-
-        CREATE_ADD_FILE = factory(FunctionDefinitionFactory.class).create("createAddFile", new Class[] { File.class, String.class });
-        CREATE_ADD_FILE.addExecutor("default", FileSystem.class, new FunctionExecutor<FileAddAction>() {
-
-            @Override
-            @SuppressWarnings ("unchecked")
-            public FileAddAction invoke(FunctionInvocation<FileAddAction> invocation, Object... arguments) {
-
-                FileAddAction action = new FileAddAction();
-                action.setObj(FileAddAction.FILE_SYSTEM, (FileSystem) invocation.getCHolder());
-                action.setObj(FileAddAction.FILE, (File<ParentFile<?>>) arguments[0]);
-                action.setObj(FileAddAction.PATH, (String) arguments[1]);
-
-                invocation.next(arguments);
-                return action;
-            }
-
-        });
-
-        GET_FILLED = factory(FunctionDefinitionFactory.class).create("getFilled", new Class[0]);
-        GET_FILLED.addExecutor("default", FileSystem.class, new FunctionExecutor<Long>() {
-
-            @Override
-            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
-
-                long filled = invocation.getCHolder().getObj(ROOT).invoke(RootFile.GET_SIZE);
-                invocation.next(arguments);
-                return filled;
-            }
-
-        });
-
-        GET_FREE = factory(FunctionDefinitionFactory.class).create("getFree", new Class[0]);
-        GET_FREE.addExecutor("default", FileSystem.class, new FunctionExecutor<Long>() {
-
-            @Override
-            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
-
-                long free = invocation.getCHolder().invoke(GET_SIZE) - invocation.getCHolder().invoke(GET_FILLED);
-                invocation.next(arguments);
-                return free;
-            }
-
-        });
-
-        GET_SIZE.addExecutor("fileSystemSize", FileSystem.class, PropertyAccessorFactory.createGet(SIZE));
+    // JAXB constructor
+    protected FileSystem() {
 
     }
 
     /**
      * Creates a new file system.
+     *
+     * @param size The maximum size of the file system in bytes.
+     *        See {@link #getSize()} for more details.
      */
-    public FileSystem() {
+    public FileSystem(long size) {
 
-        setParentType(FileSystemHolder.class);
+        Validate.isTrue(size > 0, "File system size must be > 0");
+
+        this.size = size;
+    }
+
+    /**
+     * Returns the maximum size of the file system in bytes.
+     * The {@link #getFilledSpace() filled space size} must always be smaller or equal to the size of the file system.
+     *
+     * @return The size of the file system in bytes.
+     */
+    // Note that this file system size is the DerivableSize.getSize() value as well
+    @Override
+    public long getSize() {
+
+        return size;
+    }
+
+    /**
+     * Changes the size of the file system to the given one.
+     * Since the {@link #getFilledSpace() filled space size} must always be smaller or equal to the size of the file system,
+     * an {@link IllegalArgumentException} is thrown if the new size doesn't pass that criteria.
+     *
+     * @param size The new size of the file system in bytes.
+     * @throws IllegalArgumentException If the new file system size is smaller that the size of the filled file system space.
+     */
+    public void setSize(long size) {
+
+        Validate.isTrue(getFilledSpace() <= size);
+        this.size = size;
+    }
+
+    /**
+     * Returns the {@link RootFile} every other {@link File} branches off somehow.
+     * It is like a virtual root directory.
+     *
+     * @return The root file of the file system.
+     */
+    public RootFile getRootFile() {
+
+        return rootFile;
+    }
+
+    /**
+     * Returns the total amount of bytes which are occupied by {@link File}s on the file system.
+     *
+     * @return The filled space on the file system in bytes.
+     */
+    public long getFilledSpace() {
+
+        return rootFile.getSize();
+    }
+
+    /**
+     * Returns the total amount of bytes which are not occupied by {@link File}s on the file system.
+     *
+     * @return The free space on the file system in bytes.
+     */
+    public long getFreeSpace() {
+
+        return size - getFilledSpace();
+    }
+
+    /**
+     * Returns the {@link File} which is stored under the given path.
+     * This will lookup the file using a {@link File#getPath() local file system path}.
+     * However, such a local path does <b>not</b> contain any kind of mountpoint information.<br>
+     * <br>
+     * If you invoke {@link File#getPath()} on the returned file, the original path which has been provided to this method will be the result.
+     *
+     * @param path The path to search under.
+     * @return The file which is stored under the given path.
+     * @throws InvalidPathException If the given path isn't valid (e.g. because the file does not exist or because a file along the path is not a parent file).
+     */
+    public File<?> getFile(String path) throws InvalidPathException {
+
+        String[] pathParts = PathUtils.normalize(path).split(PathUtils.SEPARATOR);
+
+        File<?> currentFile = rootFile;
+        for (int pathPartIndex = 0; pathPartIndex < pathParts.length; pathPartIndex++) {
+            String pathPart = pathParts[pathPartIndex];
+
+            if (!pathPart.isEmpty()) {
+                currentFile = ((ParentFile<?>) currentFile).getChildFileByName(pathPart);
+
+                // Throw an InvalidPathException
+                // - if the next file doesn't exist or
+                // - if the next file is not a parent file and the last path part is not yet reached (invalid path)
+                if (currentFile == null || ! (currentFile instanceof ParentFile) && pathPartIndex != pathParts.length - 1) {
+                    throw new InvalidPathException(this, path);
+                }
+            }
+        }
+
+        return currentFile;
+    }
+
+    /**
+     * Returns a {@link FileAddAction} for adding the given {@link File} to the given path on this file system.
+     * If the path does not exist, this method creates directories to match it.
+     * Those newly created directories have the same right settings as the file to add.
+     * Note that the name of the file to add is changed to match the path.<br>
+     * <br>
+     * In order to actually add the file, the {@link FileAddAction#execute()} method must be invoked.
+     * Note that that method might throw exceptions if the given file cannot be added.
+     * Also note that no right checks or anything like that are done by that execution method.
+     * If you need such permission checks, use {@link FileAddAction#isExecutableBy(User)} or {@link FileAddAction#getMissingRights(User)}.
+     *
+     * @param file The file to add to the file system.
+     * @param path The local file system path for the new file.
+     *        The name of the file will be changed to the last entry of this path.
+     * @return A file add action for actually adding the file.
+     * @see FileAddAction#execute()
+     */
+    public FileAddAction prepareAddFile(File<ParentFile<?>> file, String path) {
+
+        return new FileAddAction(this, file, path);
     }
 
 }

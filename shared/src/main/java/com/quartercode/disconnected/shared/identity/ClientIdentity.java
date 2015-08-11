@@ -25,7 +25,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * An {@link SBPIdentity} that represents an identified client which is connected to a server.
  * That identification is achieved using a client authentication system.
  * Currently, a client identity just stores a player name.
- * 
+ *
  * @see SBPIdentity
  */
 public class ClientIdentity implements SBPIdentity {
@@ -36,7 +36,7 @@ public class ClientIdentity implements SBPIdentity {
 
     /**
      * Creates a new client identity.
-     * 
+     *
      * @param name The player name of the identified client.
      */
     public ClientIdentity(String name) {
@@ -46,7 +46,7 @@ public class ClientIdentity implements SBPIdentity {
 
     /**
      * Returns the player name of the identified client.
-     * 
+     *
      * @return The player name.
      */
     public String getName() {

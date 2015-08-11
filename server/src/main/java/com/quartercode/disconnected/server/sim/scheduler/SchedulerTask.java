@@ -18,54 +18,33 @@
 
 package com.quartercode.disconnected.server.sim.scheduler;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.classmod.extra.func.FunctionDefinition;
-import com.quartercode.classmod.factory.FunctionDefinitionFactory;
-import com.quartercode.disconnected.shared.util.XmlPersistent;
+import com.quartercode.jtimber.api.node.Node;
 
 /**
  * A scheduler task is an action that can be scheduled to be executed using a {@link Scheduler}.
- * It contains the {@link #EXECUTE} function to call it when the right time has come.
+ * It contains the {@link #execute(Scheduler, Node)} method which runs it when the right time has come.
  * Setting the {@link #isCancelled() cancellation} flag to {@code true} cancels the task and removes it from its scheduler.
  * That means that the task will no longer be executed.<br>
  * <br>
  * Please note that the state of a scheduler task must be serializable using JAXB persistence.
- * 
+ *
  * @see Scheduler
  * @see SchedulerTaskAdapter
  */
-@XmlPersistent
-public interface SchedulerTask extends CFeatureHolder {
-
-    // ----- Functions -----
+public interface SchedulerTask<P extends Node<?>> {
 
     /**
      * Executes the scheduler task.
-     * This function should only be used by a {@link Scheduler} in order to execute a task.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link CFeatureHolder}</td>
-     * <td>schedulerHolder</td>
-     * <td>The feature holder that contains the scheduler which called the method.</td>
-     * </tr>
-     * </table>
+     * <b>This method should only be called by a {@link Scheduler} in order to execute a task.</b>
+     *
+     * @param scheduler The scheduler which called the method in order to execute the task.
+     * @param schedulerParent The single parent {@link Node} that references the scheduler which calls this execution method.
      */
-    public static final FunctionDefinition<Void> EXECUTE = factory(FunctionDefinitionFactory.class).create("execute", new Class[] { CFeatureHolder.class });
-
-    // ----- Regular Methods -----
+    public void execute(Scheduler<? extends P> scheduler, P schedulerParent);
 
     /**
      * Returns whether the task has been cancelled and should no longer be executed.
-     * 
+     *
      * @return Whether the scheduler task has been cancelled.
      */
     public boolean isCancelled();

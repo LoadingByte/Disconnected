@@ -34,7 +34,7 @@ import com.quartercode.disconnected.shared.util.ValueInjector;
  * The class executes all necessary steps in order to start the program.
  * That means that it also injects appropriate context values into the newly created executors.
  * Those values are taken from the public registries of the application (e.g. {@link ServiceRegistry}).
- * 
+ *
  * @see ClientProgram
  * @see ClientProgramExecutor
  * @see #launch(ClientProgram, GraphicsState)
@@ -49,7 +49,7 @@ public class ClientProgramLauncher {
      * That means that it also injects appropriate context values into the newly created executors.
      * Those values are taken from the public registries of the application (e.g. {@link ServiceRegistry}) and the provided desktop state.
      * Note that the {@link ClientProgramExecutor#run()} method <b>is</b> ran at the end of this method.
-     * 
+     *
      * @param program The client program descriptor which describes the program that should be launched.
      * @param graphicsContext The desktop graphics state which serves as a graphical context where the newly launched client program can run in.
      *        For example, it uses this state to open new windows.

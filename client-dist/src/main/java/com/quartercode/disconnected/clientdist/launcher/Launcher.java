@@ -51,7 +51,7 @@ public class Launcher {
 
     /**
      * Creates a new launcher and initializes the main class.
-     * 
+     *
      * @param mainClass The main class which get called on launch.
      */
     public Launcher(String mainClass) {
@@ -62,7 +62,7 @@ public class Launcher {
 
     /**
      * Creates a new launcher and initializes the main class and vm and program arguments.
-     * 
+     *
      * @param mainClass The main class which get called on launch.
      * @param vmArguments The vm arguments which are set on launch and read by the virtual machine.
      * @param programArguments The program arguments which are set on launch and read by the executed program.
@@ -78,7 +78,7 @@ public class Launcher {
 
     /**
      * Returns the main class which get called on launch.
-     * 
+     *
      * @return The main class which get called on launch.
      */
     public String getMainClass() {
@@ -88,7 +88,7 @@ public class Launcher {
 
     /**
      * Sets the main class which get called on launch.
-     * 
+     *
      * @param mainClass The main class which get called on launch.
      */
     public void setMainClass(String mainClass) {
@@ -99,7 +99,7 @@ public class Launcher {
     /**
      * Returns the vm arguments which are set on launch.
      * VM arguments are read by the virtual machine and set things like the max heap size etc.
-     * 
+     *
      * @return The vm arguments which are set on launch.
      */
     public String[] getVmArguments() {
@@ -110,7 +110,7 @@ public class Launcher {
     /**
      * Sets the vm arguments which are set on launch.
      * VM arguments are read by the virtual machine and set things like the max heap size etc.
-     * 
+     *
      * @param vmArguments The vm arguments which are set on launch.
      */
     public void setVmArguments(String[] vmArguments) {
@@ -121,7 +121,7 @@ public class Launcher {
     /**
      * Returns the program arguments which are set on launch.
      * Program arguments are read by the executed program. Every program handles them differently.
-     * 
+     *
      * @return The program arguments which are set on launch.
      */
     public String[] getProgramArguments() {
@@ -132,7 +132,7 @@ public class Launcher {
     /**
      * Sets the program arguments which are set on launch.
      * Program arguments are read by the executed program. Every program handles them differently.
-     * 
+     *
      * @param programArguments The program arguments which are set on launch.
      */
     public void setProgramArguments(String[] programArguments) {
@@ -142,7 +142,7 @@ public class Launcher {
 
     /**
      * Returns the directory the new process will be launched in.
-     * 
+     *
      * @return The working directory for the new process.
      */
     public Path getWorkingDirectory() {
@@ -152,7 +152,7 @@ public class Launcher {
 
     /**
      * Changes the directory the new process will be launched in.
-     * 
+     *
      * @param workingDirectory The new working directory for the new process.
      */
     public void setWorkingDirectory(Path workingDirectory) {

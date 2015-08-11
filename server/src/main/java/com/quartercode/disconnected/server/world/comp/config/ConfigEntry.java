@@ -18,71 +18,91 @@
 
 package com.quartercode.disconnected.server.world.comp.config;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import java.util.Map;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.classmod.extra.func.FunctionDefinition;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.classmod.extra.prop.ValueSupplierDefinition;
-import com.quartercode.classmod.factory.FunctionDefinitionFactory;
-import com.quartercode.disconnected.server.util.NullPreventer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
 import com.quartercode.disconnected.server.world.util.SizeUtils;
-import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
+import com.quartercode.disconnected.server.world.util.WorldNode;
 
 /**
  * A {@link Config} object uses configuration entries which represent the lines in a configuration string.
- * These entries have different columns. Every column contains a value or a list.
- * 
+ * These entries have different columns. Each column contains a single value or a list of values.
+ *
  * <pre>
  * value1 | value2 | listentry1,listentry2 | value3
  * </pre>
- * 
+ *
+ * @param <S> The type of the subclass which extends this class (self-bound).
  * @see Config
  */
-public class ConfigEntry extends WorldChildFeatureHolder<Config> implements DerivableSize {
+public abstract class ConfigEntry<S extends ConfigEntry<S>> extends WorldNode<Config<S>> implements DerivableSize {
 
-    // ----- Functions -----
-
-    /**
-     * Returns the definitions of the features which define the different columns of the entry, along with the types of the columns.
-     * Each definition needs to be a {@link ValueSupplierDefinition}, so the value of the defined feature can be retrieved.
-     * Moreover, each definition must define a property or a collection property because the column values must be changeable.
-     */
-    public static final FunctionDefinition<Map<ValueSupplierDefinition<?, ?>, Class<?>>> GET_COLUMNS;
-
-    static {
-
-        GET_COLUMNS = factory(FunctionDefinitionFactory.class).create("getColumns", new Class[0]);
-
-        GET_SIZE.addExecutor("columns", ConfigEntry.class, new FunctionExecutor<Long>() {
-
-            @Override
-            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
-
-                CFeatureHolder configEntry = invocation.getCHolder();
-
-                long size = 0;
-                for (ValueSupplierDefinition<?, ?> column : configEntry.invoke(GET_COLUMNS).keySet()) {
-                    // Cannot use the convenient method because the value supplier has generic wildcard parameters
-                    Object columnValue = configEntry.get(column).get();
-                    size += SizeUtils.getSize(columnValue);
-                }
-
-                return size + NullPreventer.prevent(invocation.next(arguments));
-            }
-
-        });
-
-    }
+    // This property doesn't need to be persistent since it is freshly set by subclasses each time a new instance is constructed
+    private final List<String> columnNames;
 
     /**
      * Creates a new configuration entry.
+     *
+     * @param columnNames The names of all columns the configuration entry should have.
+     *        See {@link #getColumnNames()} for more details.
      */
-    public ConfigEntry() {
+    protected ConfigEntry(List<String> columnNames) {
 
-        setParentType(Config.class);
+        Validate.notEmpty(columnNames, "Configuration entry column name list cannot be null or empty");
+        this.columnNames = new ArrayList<>(columnNames);
+    }
+
+    /**
+     * Returns the names of all columns the configuration entry has.
+     * Each column of an entry contains a single value or a list.
+     * For example, a column with the name {@code username} might contain some value like {@code myuser}.
+     * The methods {@link #getColumnValue(String)} or {@link #setColumnValue(String, Object)} must work with any column name returned by this method.
+     *
+     * @return The names of all columns of the configuration entry.
+     */
+    public List<String> getColumnNames() {
+
+        return Collections.unmodifiableList(columnNames);
+    }
+
+    /**
+     * Returns the value which is stored in the column with the given name.
+     * The underlying mechanism is similar to a key-value-pair.
+     * The column name is the "key", the returned column value is the "value".
+     * If the requested column contains a list, the returned string is a comma-separated list of the individual values.
+     *
+     * @param columnName The name of the column (the "key") whose current value should be returned.
+     * @return The value which is currently stored in the given column.
+     * @throws UnknownColumnException If the configuration entry doesn't have a column with the given name.
+     *         Note that you can check for column existence by verifying that the column name is part of the {@link #getColumnNames()} list.
+     */
+    public abstract String getColumnValue(String columnName);
+
+    /**
+     * Sets the value which is stored in the column with the given name.
+     * The underlying mechanism is similar to a key-value-pair.
+     * The column name is the "key", the given column value is the "value".
+     * If the new column value should be a list, the given value string must be a comma-separated list of the individual values.
+     *
+     * @param columnName The name of the column (the "key") whose value should be set to the given one.
+     * @param columnValue The new value which should be stored in the given column.
+     * @throws UnknownColumnException If the configuration entry doesn't have a column with the given name.
+     *         Note that you can check for column existence by verifying that the column name is part of the {@link #getColumnNames()} list.
+     */
+    public abstract void setColumnValue(String columnName, String columnValue);
+
+    @Override
+    public long getSize() {
+
+        long size = 0;
+
+        for (String columnName : getColumnNames()) {
+            size += SizeUtils.getSize(getColumnValue(columnName));
+        }
+
+        return size;
     }
 
 }

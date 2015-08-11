@@ -25,7 +25,7 @@ import com.quartercode.disconnected.shared.util.XmlPersistent;
  * A data object that describes a location which should be scanned for persistent world classes.
  * Such classes are marshalled or unmarshalled during the serialization or deserialization of a world object.
  * Therefore, they must be known to the operating {@link JAXBContext}.
- * 
+ *
  * @see ServerRegistries#PERSISTENT_CLASS_SCAN_DIRECTIVES
  */
 public class PersistentClassScanDirective {
@@ -42,7 +42,7 @@ public class PersistentClassScanDirective {
     /**
      * Returns the package which should be scanned for persistent world classes.
      * Depending on the {@link #getMethod() scanning method}, the subpackages of this package might also be scanned.
-     * 
+     *
      * @return The package for scanning, e.g. {@code com.quartercode.disconnected.world}.
      */
     public String getPackageName() {
@@ -52,7 +52,7 @@ public class PersistentClassScanDirective {
 
     /**
      * Returns the {@link ScanMethod} which defines how the given {@link #getPackageName() package} is scanned for persistent world classes.
-     * 
+     *
      * @return The scanning method.
      */
     public ScanMethod getMethod() {
@@ -63,7 +63,7 @@ public class PersistentClassScanDirective {
     /**
      * A scan method defines how the a certain package is scanned for persistent world classes.
      * Depending on the method, the subpackages of an input package might also be scanned.
-     * 
+     *
      * @see PersistentClassScanDirective
      */
     public static enum ScanMethod {
@@ -80,7 +80,7 @@ public class PersistentClassScanDirective {
 
         /**
          * Returns the scan method which has the given camel-cased name.
-         * 
+         *
          * @param name The camel-cased name the returned scan method must have.
          * @return The scan method with the given name, or {@code null} if no such scan method is found.
          * @see #getName()
@@ -106,7 +106,7 @@ public class PersistentClassScanDirective {
         /**
          * Returns the name of the scan method.
          * It is just the name of the constant in camel case.
-         * 
+         *
          * @return The scan method name.
          */
         public String getName() {

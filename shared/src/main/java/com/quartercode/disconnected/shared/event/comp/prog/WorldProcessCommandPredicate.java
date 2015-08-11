@@ -26,7 +26,7 @@ import com.quartercode.eventbridge.basic.EventPredicateBase;
 /**
  * An event predicate that filters out {@link WorldProcessCommand}s sent to a specific server-side world process.
  * The world process is identified with a {@link WorldProcessId}.
- * 
+ *
  * @param <T> The type of world process command that can be tested by the predicate.
  * @see WorldProcessId
  */

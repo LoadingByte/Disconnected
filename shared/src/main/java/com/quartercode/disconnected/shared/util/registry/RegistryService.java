@@ -21,7 +21,7 @@ package com.quartercode.disconnected.shared.util.registry;
 /**
  * A registry service stores {@link Registry}s and makes them accessible through a {@link RegistryDefinition}.
  * When a registry does not yet exist, it is created using the {@link RegistryDefinition#create()} method.
- * 
+ *
  * @see Registry
  * @see RegistryDefinition
  */
@@ -30,7 +30,7 @@ public interface RegistryService {
     /**
      * Returns the {@link Registry} which is defined by the given {@link RegistryDefinition}.
      * If the registry does not yet exist, it is created using the {@link RegistryDefinition#create()} method.
-     * 
+     *
      * @param definition The definition that defines the registry which should be returned.
      * @return The registry which is defined by the given definition.
      */

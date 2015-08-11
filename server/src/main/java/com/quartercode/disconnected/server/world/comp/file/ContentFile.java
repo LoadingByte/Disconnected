@@ -18,80 +18,77 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import static com.quartercode.classmod.extra.func.Priorities.LEVEL_6;
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
+import javax.xml.bind.annotation.XmlAnyElement;
+import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.server.world.util.SizeUtils;
 
 /**
- * This class represents a content file.
- * Content files can contain and store objects.
- * 
+ * This class represents a content file that is able contain and store any object.
+ * Note that the stored object must have a {@link SizeUtils derivable size}.
+ *
  * @see File
  * @see FileSystem
  */
 public class ContentFile extends File<ParentFile<?>> {
 
-    // ----- Properties -----
+    @XmlAnyElement (lax = true)
+    private Object content;
 
-    /**
-     * The content of the content file.<br>
-     * <br>
-     * Exceptions that can occur when setting:
-     * 
-     * <table>
-     * <tr>
-     * <th>Exception</th>
-     * <th>When?</th>
-     * </tr>
-     * <tr>
-     * <td>{@link OutOfSpaceException}</td>
-     * <td>There is not enough space on the current file system for the new file content.</td>
-     * </tr>
-     * </table>
-     */
-    public static final PropertyDefinition<Object> CONTENT;
-
-    static {
-
-        CONTENT = factory(PropertyDefinitionFactory.class).create("content", new StandardStorage<>());
-        CONTENT.addSetterExecutor("checkSize", ContentFile.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                long size = SizeUtils.getSize(arguments[0]);
-
-                FileSystem fileSystem = invocation.getCHolder().invoke(GET_FS);
-                if (fileSystem != null && size > fileSystem.invoke(FileSystem.GET_FREE)) {
-                    throw new OutOfSpaceException(fileSystem, size);
-                }
-
-                return invocation.next(arguments);
-            }
-
-        }, LEVEL_6);
-
-    }
-
-    // ----- Functions -----
-
-    static {
-
-        GET_SIZE.addExecutor("content", ContentFile.class, SizeUtils.createGetSize(CONTENT));
+    // JAXB constructor
+    protected ContentFile() {
 
     }
 
     /**
      * Creates a new content file.
+     * Note that the file's {@link #getName() name} will be set as soon as the file is added to a {@link FileSystem}.
+     *
+     * @param owner The owning user of the content file. Note that it may not be {@code null}.
+     *        See {@link #getOwner()} for more details.
      */
-    public ContentFile() {
+    public ContentFile(User owner) {
 
-        setParentType(ParentFile.class);
+        super(owner);
+    }
+
+    /**
+     * Returns the object contained by the content file.
+     * Note that the returned object must have a {@link SizeUtils derivable size}.
+     *
+     * @return The stored content object.
+     */
+    public Object getContent() {
+
+        return content;
+    }
+
+    /**
+     * Stores a new content object in the content file.
+     * Note that the new object must have a {@link SizeUtils derivable size}.
+     *
+     * @param content The new stored content object.
+     * @throws IllegalArgumentException If the size of the new file content object cannot be derived.
+     * @throws OutOfSpaceException If there is not enough space for the new file content object on the {@link FileSystem}.
+     */
+    public void setContent(Object content) throws OutOfSpaceException {
+
+        FileSystem fileSystem = getFileSystem();
+        if (fileSystem != null) {
+            long oldContentSize = SizeUtils.getSize(this.content);
+            long newContentSize = SizeUtils.getSize(content);
+
+            if (newContentSize > fileSystem.getFreeSpace() + oldContentSize) {
+                throw new OutOfSpaceException(fileSystem, newContentSize - oldContentSize);
+            }
+        }
+
+        this.content = content;
+    }
+
+    @Override
+    public long getSize() {
+
+        return super.getSize() + SizeUtils.getSize(content);
     }
 
 }

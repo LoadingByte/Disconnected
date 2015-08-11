@@ -39,7 +39,7 @@ import com.quartercode.eventbridge.factory.Factory;
 
 /**
  * The default default implementation of the {@link SBPAwareHandlerExtension} interface.
- * 
+ *
  * @see SBPAwareHandlerExtension
  */
 public class DefaultSBPAwareHandlerExtension extends AbstractBridgeModule implements SBPAwareHandlerExtension {

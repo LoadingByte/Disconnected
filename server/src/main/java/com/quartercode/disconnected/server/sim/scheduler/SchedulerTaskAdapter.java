@@ -19,15 +19,18 @@
 package com.quartercode.disconnected.server.sim.scheduler;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
+import com.quartercode.disconnected.shared.util.XmlPersistent;
+import com.quartercode.jtimber.api.node.DefaultNode;
+import com.quartercode.jtimber.api.node.Node;
 
 /**
  * An adapter class for {@link SchedulerTask} which implements the cancellation flag.
- * It extends {@link DefaultCFeatureHolder} for implementing the feature holder functionality.
- * 
+ * It extends {@link DefaultNode} for implementing the feature holder functionality.
+ *
  * @see SchedulerTask
  */
-public abstract class SchedulerTaskAdapter extends DefaultCFeatureHolder implements SchedulerTask {
+@XmlPersistent
+public abstract class SchedulerTaskAdapter<P extends Node<?>> extends DefaultNode<Node<?>> implements SchedulerTask<P> {
 
     @XmlAttribute
     private boolean cancelled;
@@ -61,7 +64,7 @@ public abstract class SchedulerTaskAdapter extends DefaultCFeatureHolder impleme
         } else if (obj == null || ! (obj instanceof SchedulerTaskAdapter) || !super.equals(obj)) {
             return false;
         } else {
-            SchedulerTaskAdapter other = (SchedulerTaskAdapter) obj;
+            SchedulerTaskAdapter<?> other = (SchedulerTaskAdapter<?>) obj;
             return cancelled == other.cancelled;
         }
     }

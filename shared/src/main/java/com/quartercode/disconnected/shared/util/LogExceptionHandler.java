@@ -31,7 +31,7 @@ public class LogExceptionHandler implements UncaughtExceptionHandler {
 
     /**
      * Returns the used logger for logging the exceptions.
-     * 
+     *
      * @return The used logger for logging the exceptions.
      */
     public static Logger getLogger() {

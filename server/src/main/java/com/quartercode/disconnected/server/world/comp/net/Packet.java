@@ -18,62 +18,42 @@
 
 package com.quartercode.disconnected.server.world.comp.net;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
+import com.quartercode.disconnected.server.world.comp.net.socket.Socket;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
-import com.quartercode.disconnected.server.world.util.SizeUtils;
-import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
 import com.quartercode.disconnected.shared.world.comp.net.Address;
 
 /**
- * This class represents a packet which can be sent to a network interface.
- * Every packet contains the source and destination {@link Address}es, the used protocol and the data payload {@link Object} which should be sent.
- * 
+ * This class represents a packet which can be sent from one to another network interface.
+ * Each packet contains the source and destination {@link Address}es, as well as the data payload {@link Object} which is sent using the packet.<br>
+ * <br>
+ * The most basic implementation of this interface is the {@link StandardPacket}.
+ * Other implementations, for example the {@link RoutedPacket}, wrap around a standard packet and add more routing information to the packet in order to deliver it properly.
+ * When the packet is delivered, it can then be unwrapped again, or its original information can be accessed through the interface methods.
+ *
  * @see Address
  */
-public class Packet extends WorldFeatureHolder implements DerivableSize {
-
-    // ----- Properties -----
+public interface Packet extends DerivableSize {
 
     /**
-     * The network {@link Address} of the {@link Socket} which sent the packet.
+     * Returns the network {@link Address} of the {@link Socket} which sent the packet.
+     *
+     * @return The sender address.
      */
-    public static final PropertyDefinition<Address> SOURCE;
+    public Address getSource();
 
     /**
-     * The network {@link Address} of the {@link Socket} the packet is sent to.
+     * Returns the network {@link Address} of the {@link Socket} the packet is sent to.
+     *
+     * @return The receiver address.
      */
-    public static final PropertyDefinition<Address> DESTINATION;
+    public Address getDestination();
 
     /**
-     * A string that identifies the protocol the packet was sent with.
-     * By default, {@code TCP} and {@code UDP} are allowed.
+     * Returns the data payload {@link Object} which is sent using the packet.
+     * If the payload object is mutable for some reason, it shouldn't be modified after the packet has been constructed.
+     *
+     * @return The actual data payload sent from the sender to the receiver.
      */
-    public static final PropertyDefinition<String>  PROTOCOL;
-
-    /**
-     * The data payload {@link Object} which is sent.
-     * The payload shouldn't be modified after construction.
-     */
-    public static final PropertyDefinition<Object>  DATA;
-
-    static {
-
-        SOURCE = factory(PropertyDefinitionFactory.class).create("source", new StandardStorage<>());
-        DESTINATION = factory(PropertyDefinitionFactory.class).create("destination", new StandardStorage<>());
-        PROTOCOL = factory(PropertyDefinitionFactory.class).create("protocol", new StandardStorage<>());
-        DATA = factory(PropertyDefinitionFactory.class).create("data", new StandardStorage<>());
-
-    }
-
-    // ----- Functions -----
-
-    static {
-
-        GET_SIZE.addExecutor("data", Packet.class, SizeUtils.createGetSize(DATA));
-
-    }
+    public Object getData();
 
 }

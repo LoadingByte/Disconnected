@@ -18,88 +18,98 @@
 
 package com.quartercode.disconnected.server.world.comp.prog;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.extra.valuefactory.ValueFactory;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.server.registry.ServerRegistries;
 import com.quartercode.disconnected.server.registry.WorldProgram;
-import com.quartercode.disconnected.server.util.NullPreventer;
-import com.quartercode.disconnected.server.world.comp.vuln.Vuln;
-import com.quartercode.disconnected.server.world.comp.vuln.VulnContainer;
+import com.quartercode.disconnected.server.world.comp.file.ContentFile;
+import com.quartercode.disconnected.server.world.comp.vuln.Vulnerability;
+import com.quartercode.disconnected.server.world.comp.vuln.VulnerabilityContainer;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
-import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
+import com.quartercode.disconnected.server.world.util.WorldNode;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
 import com.quartercode.disconnected.shared.world.comp.Version;
 
 /**
- * This class stores information about a program.
- * A program object can be stored in a file. The execution is done by a {@link ProgramExecutor}. To run an executor, you need to create a new {@link Process}.
- * This also contains a {@link VulnContainer vulnerability container} that manages the {@link Vuln vulnerabilities} of the program.
- * 
+ * This class stores minimal information about a program and is typically used as the content of a file.
+ * In order to retrieve more information, you need to query the {@link WorldProgram} object with the same name as the program.
+ * The execution is done by a {@link ProgramExecutor} stored in the {@link WorldProgram} object. To run an executor, you need to create a new {@link Process}.<br>
+ * <br>
+ * Since {@link WorldProgram} objects define global properties of programs, this class specifies properties of a single {@link Version} of the program.
+ * Currently, the only such "property" is a {@link VulnerabilityContainer} that manages the {@link Vulnerability}s of the specific program version.
+ *
  * @see ProgramExecutor
  * @see Process
- * @see VulnContainer
+ * @see VulnerabilityContainer
  */
-public class Program extends WorldFeatureHolder implements DerivableSize {
+public class Program extends WorldNode<ContentFile> implements DerivableSize {
 
-    // ----- Properties -----
+    @XmlAttribute
+    private String                 name;
+    @XmlAttribute
+    private Version                version;
+    @XmlElement
+    private VulnerabilityContainer vulnContainer;
 
-    /**
-     * The name of the program.
-     * It is used to retrieve the {@link WorldProgram} object which defines the actual {@link ProgramExecutor}.
-     */
-    public static final PropertyDefinition<String>        NAME;
-
-    /**
-     * The {@link Version} of the program.
-     */
-    public static final PropertyDefinition<Version>       VERSION;
-
-    /**
-     * A {@link VulnContainer vulnerability container} that manages the {@link Vuln vulnerabilities} of the program.
-     */
-    public static final PropertyDefinition<VulnContainer> VULN_CONTAINER;
-
-    static {
-
-        NAME = factory(PropertyDefinitionFactory.class).create("name", new StandardStorage<>());
-        VERSION = factory(PropertyDefinitionFactory.class).create("version", new StandardStorage<>());
-
-        VULN_CONTAINER = factory(PropertyDefinitionFactory.class).create("vulnContainer", new StandardStorage<>(), new ValueFactory<VulnContainer>() {
-
-            @Override
-            public VulnContainer get() {
-
-                return new VulnContainer();
-            }
-
-        });
+    // JAXB constructor
+    protected Program() {
 
     }
 
-    // ----- Functions -----
+    /**
+     * Creates a new program.
+     *
+     * @param name The internal name of the program.
+     *        There must exist a {@link WorldProgram} with the same name.
+     * @param version The {@link Version} of the program.
+     */
+    public Program(String name, Version version) {
 
-    static {
+        Validate.notBlank(name, "Internal program name cannot be blank");
+        Validate.notNull(version, "Program version cannot be null");
 
-        GET_SIZE.addExecutor("executor", Program.class, new FunctionExecutor<Long>() {
+        this.name = name;
+        this.version = version;
+        vulnContainer = new VulnerabilityContainer();
+    }
 
-            @Override
-            public Long invoke(FunctionInvocation<Long> invocation, Object... arguments) {
+    /**
+     * Returns the internal name of the program.
+     * It is used to retrieve the {@link WorldProgram} object which defines the actual {@link ProgramExecutor}.
+     *
+     * @return The internal program name.
+     */
+    public String getName() {
 
-                CFeatureHolder program = invocation.getCHolder();
+        return name;
+    }
 
-                long size = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS), program.getObj(NAME)).getSize();
-                return size + NullPreventer.prevent(invocation.next(arguments));
-            }
+    /**
+     * Returns the {@link Version} of the program.
+     *
+     * @return The program version.
+     */
+    public Version getVersion() {
 
-        });
+        return version;
+    }
 
+    /**
+     * Returns the {@link VulnerabilityContainer} that manages the {@link Vulnerability}s of the program.
+     *
+     * @return The program's vulnerability container.
+     */
+    public VulnerabilityContainer getVulnContainer() {
+
+        return vulnContainer;
+    }
+
+    @Override
+    public long getSize() {
+
+        return NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS), name).getSize();
     }
 
 }

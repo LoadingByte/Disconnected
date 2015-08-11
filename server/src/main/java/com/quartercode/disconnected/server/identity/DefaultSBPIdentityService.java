@@ -27,7 +27,7 @@ import com.quartercode.eventbridge.bridge.BridgeConnector;
 
 /**
  * This is the default implementation of the {@link SBPIdentityService}.
- * 
+ *
  * @see SBPIdentityService
  */
 public class DefaultSBPIdentityService implements SBPIdentityService {

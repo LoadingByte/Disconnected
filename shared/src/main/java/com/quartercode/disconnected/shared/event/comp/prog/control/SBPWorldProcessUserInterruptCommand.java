@@ -37,7 +37,7 @@ public class SBPWorldProcessUserInterruptCommand extends SBPWorldProcessUserComm
 
     /**
      * Creates a new world process user interrupt command.
-     * 
+     *
      * @param worldProcessUserId The {@link SBPWorldProcessUserId} that should receive the event and is therefore commanded to shut down.
      */
     public SBPWorldProcessUserInterruptCommand(SBPWorldProcessUserId worldProcessUserId) {

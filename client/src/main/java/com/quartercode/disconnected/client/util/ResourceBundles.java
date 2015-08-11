@@ -21,7 +21,7 @@ package com.quartercode.disconnected.client.util;
 /**
  * This is a simple class which enumerates some important {@link ResourceBundleGroup}s as constants.
  * It also enables quick access to typical bundle groups like client program resources.
- * 
+ *
  * @see ResourceBundleGroup
  */
 public class ResourceBundles {
@@ -34,7 +34,7 @@ public class ResourceBundles {
 
     /**
      * Returns the {@link ResourceBundleGroup} of the client program with the given name.
-     * 
+     *
      * @param name The name of the client program the returned bundle group belongs to.
      * @return The {@link ResourceBundleGroup} of the client program which has the given name.
      */

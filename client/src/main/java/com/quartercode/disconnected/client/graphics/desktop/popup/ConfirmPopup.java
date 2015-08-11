@@ -32,7 +32,7 @@ import de.matthiasmann.twl.Label;
 
 /**
  * The confirm popup is a {@link DesktopWindow} which shows a message and some defined buttons to close the popup.
- * 
+ *
  * @see DesktopWindow
  */
 public class ConfirmPopup extends DesktopWindow {
@@ -74,7 +74,7 @@ public class ConfirmPopup extends DesktopWindow {
         /**
          * Returns the resource bundle key of the option.
          * Note that the key must be used on the {@link ResourceBundles#DESKTOP} resource bundle.
-         * 
+         *
          * @return The resource key of the option.
          */
         public String getKey() {
@@ -87,7 +87,7 @@ public class ConfirmPopup extends DesktopWindow {
     /**
      * Creates a new confirm popup with the given message, option array, and close callback.
      * The new popup is <b>not</b> added to the desktop automatically.
-     * 
+     *
      * @param state The desktop state the new popup will be showed on.
      * @param message The message that is showed by the popup.
      * @param options The {@link Option}s that should be showed to the user.
@@ -145,14 +145,14 @@ public class ConfirmPopup extends DesktopWindow {
     /**
      * The confirm popup callback is used by the {@link ConfirmPopup} class.
      * It is called when certain events happen.
-     * 
+     *
      * @see #onClose(ConfirmPopup.Option)
      */
     public static interface Callback {
 
         /**
          * This method is called when the user selected an option and closed the popup.
-         * 
+         *
          * @param selected The {@link Option} that was selected by the user.
          */
         public void onClose(Option selected);

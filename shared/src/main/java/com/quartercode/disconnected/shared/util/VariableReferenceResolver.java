@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * A utility that takes an input string and replaces certain "variables".
  * Those variables must have the format <code>$S{...}</code>, where {@code S} specifies the type of the variable and {@code ...} is the content.
  * Currently, the following variable types are available:
- * 
+ *
  * <table>
  * <tr>
  * <th>Specifier</th>
@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * Note that a $-sign should still be used for inner classes; e.g. (with short names) {@code com.qc.dc.SomeClass$SomeInnerClass.VERSION}.</td>
  * </tr>
  * </table>
- * 
+ *
  * Variable strings can be escaped by putting a backslash in front of the dollar sign (e.g. <code>\$S{...}</code>).
  * Each first backslash before any dollar sign is removed by the utility.<br>
  * <br>
@@ -70,7 +70,7 @@ public class VariableReferenceResolver {
     /**
      * Replaces all variables inside the given string and returns the result.
      * See {@link VariableReferenceResolver} for more information on the format.
-     * 
+     *
      * @param input The input string that should be processed.
      * @param variables The map used for resolving {@code $V} variables.
      * @return The processed output string.

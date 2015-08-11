@@ -24,7 +24,7 @@ import com.quartercode.eventbridge.bridge.BridgeConnector;
 /**
  * This service assigns {@link SBPIdentity} objects (server bridge partners, e.g. clients) to {@link BridgeConnector}s and makes both accessible.
  * For this to work properly, an SBP identity bridge extension must be added to exactly one bridge.
- * 
+ *
  * @see SBPIdentity
  */
 public interface SBPIdentityService {
@@ -32,7 +32,7 @@ public interface SBPIdentityService {
     /**
      * Returns the {@link SBPIdentity} of the given {@link BridgeConnector}.
      * That means that the returned SBP uses the given connector.
-     * 
+     *
      * @param connector The bridge connector whose identity should be returned.
      * @return The SBP identity of the given connector.
      */
@@ -40,7 +40,7 @@ public interface SBPIdentityService {
 
     /**
      * Returns the {@link BridgeConnector} the given {@link SBPIdentity} uses to communicate with the server.
-     * 
+     *
      * @param identity The SBP identity whose bridge connector should be returned.
      * @return The bridge connector that uses the given identity.
      */
@@ -49,7 +49,7 @@ public interface SBPIdentityService {
     /**
      * Assigns the given {@link SBPIdentity} to the given {@link BridgeConnector}.
      * Any previous entry with that connector will be removed.
-     * 
+     *
      * @param connector The bridge connector that is used by the given SBP.
      * @param identity The identity of the SBP that uses the given bridge connector.
      */
@@ -58,7 +58,7 @@ public interface SBPIdentityService {
     /**
      * Removes the mapping between the given {@link BridgeConnector} and some {@link SBPIdentity}.
      * That means that the connector will no longer be identifiable.
-     * 
+     *
      * @param connector The bridge connector whose mapping should be removed.
      */
     public void removeIdentity(BridgeConnector connector);
@@ -66,7 +66,7 @@ public interface SBPIdentityService {
     /**
      * Removes the mapping between the given {@link SBPIdentity} and some {@link BridgeConnector}.
      * That means that the bridge connector the identity was assigned to will no longer be identifiable.
-     * 
+     *
      * @param identity The SBP identity whose mapping should be removed.
      */
     public void removeIdentity(SBPIdentity identity);

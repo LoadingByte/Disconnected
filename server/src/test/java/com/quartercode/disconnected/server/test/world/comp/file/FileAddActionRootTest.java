@@ -21,63 +21,55 @@ package com.quartercode.disconnected.server.test.world.comp.file;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
-import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
-import com.quartercode.disconnected.server.world.comp.file.FileSystem;
+import com.quartercode.disconnected.server.world.comp.file.InvalidPathException;
 import com.quartercode.disconnected.server.world.comp.file.OccupiedPathException;
-import com.quartercode.disconnected.server.world.comp.file.ParentFile;
+import com.quartercode.disconnected.server.world.comp.file.OutOfSpaceException;
 
 public class FileAddActionRootTest extends AbstractFileActionTest {
 
     private static final String ADD_FILE_PATH = "test.txt";
 
-    private FileAddAction createAction(File<ParentFile<?>> file, String path) {
-
-        FileAddAction action = new FileAddAction();
-        action.setObj(FileAddAction.FILE_SYSTEM, fileSystem);
-        action.setObj(FileAddAction.PATH, path);
-        action.setObj(FileAddAction.FILE, file);
-        return action;
-    }
-
     @Test
-    public void testExecute() {
+    public void testExecute() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        FileAddAction action = createAction(file, ADD_FILE_PATH);
+        FileAddAction action = new FileAddAction(fileSystem, cfile, ADD_FILE_PATH);
         actuallyTestExecute(action);
     }
 
     @Test
-    public void testFileSystemExecute() {
+    public void testFileSystemExecute() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        FileAddAction action = fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, ADD_FILE_PATH);
+        FileAddAction action = fileSystem.prepareAddFile(cfile, ADD_FILE_PATH);
         actuallyTestExecute(action);
     }
 
-    private void actuallyTestExecute(FileAddAction action) {
+    private void actuallyTestExecute(FileAddAction action) throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        action.invoke(FileAddAction.EXECUTE);
-        assertEquals("Resolved file", file, fileSystem.invoke(FileSystem.GET_FILE, ADD_FILE_PATH));
+        action.execute();
+
+        assertEquals("File path", ADD_FILE_PATH, cfile.getPath());
+        assertEquals("Resolved file", cfile, fileSystem.getFile(ADD_FILE_PATH));
     }
 
     @Test (expected = OccupiedPathException.class)
-    public void testExecutePathAlreadyOccupied() {
+    public void testExecutePathAlreadyOccupied() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        FileAddAction action = createAction(file, ADD_FILE_PATH);
+        FileAddAction action = new FileAddAction(fileSystem, cfile, ADD_FILE_PATH);
         actuallyTestExecutePathAlreadyOccupied(action);
     }
 
     @Test (expected = OccupiedPathException.class)
-    public void testFileSystemExecutePathAlreadyOccupied() {
+    public void testFileSystemExecutePathAlreadyOccupied() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        FileAddAction action = fileSystem.invoke(FileSystem.CREATE_ADD_FILE, file, ADD_FILE_PATH);
+        FileAddAction action = fileSystem.prepareAddFile(cfile, ADD_FILE_PATH);
         actuallyTestExecutePathAlreadyOccupied(action);
     }
 
-    private void actuallyTestExecutePathAlreadyOccupied(FileAddAction action) {
+    private void actuallyTestExecutePathAlreadyOccupied(FileAddAction action) throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, new ContentFile(), ADD_FILE_PATH).invoke(FileAddAction.EXECUTE);
-        action.invoke(FileAddAction.EXECUTE);
+        fileSystem.prepareAddFile(new ContentFile(user), ADD_FILE_PATH).execute();
+        action.execute();
     }
 
 }

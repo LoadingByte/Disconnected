@@ -33,7 +33,7 @@ package com.quartercode.disconnected.client.graphics;
  * For example, the {@link #add(GraphicsState)} method is called when a new module is instantiated and added to a {@link GraphicsState}.
  * Furthermore, graphics modules provide and integrated value storage.
  * That way modules can depend on other modules and retrieve their values, like layouts etc.
- * 
+ *
  * @see AbstractGraphicsModule
  * @see GraphicsStateDescriptor
  */
@@ -42,7 +42,7 @@ public interface GraphicsModule {
     /**
      * Callback that is invoked when a new object of the module is instantiated and added to the given {@link GraphicsState}.
      * This method usually adds the gui components the modules requires to work.
-     * 
+     *
      * @param state The {@link GraphicsState} that uses the module.
      */
     public void add(GraphicsState state);
@@ -50,7 +50,7 @@ public interface GraphicsModule {
     /**
      * Callback that is invoked when the layout() method is called on the given {@link GraphicsState}.
      * This method usually layouts the components added in {@link #add(GraphicsState)} if that's not done by a layout manager.
-     * 
+     *
      * @param state The {@link GraphicsState} that uses the module. The original layout() call was done there.
      */
     public void layout(GraphicsState state);
@@ -58,7 +58,7 @@ public interface GraphicsModule {
     /**
      * Callback that is invoked when the given {@link GraphicsState} is disabled.
      * Actually, the callback is called when the given {@link GraphicsState} is removed from the root container.
-     * 
+     *
      * @param state The {@link GraphicsState} that uses the module.
      */
     public void remove(GraphicsState state);
@@ -67,7 +67,7 @@ public interface GraphicsModule {
      * Returns the value that is stored and associated with the given key.
      * The value is probably set by the implementing module.
      * This method should be used by other modules which want to access the module's data.
-     * 
+     *
      * @param key The key the value for return is associated with.
      * @return The value that is associated with the given key.
      */

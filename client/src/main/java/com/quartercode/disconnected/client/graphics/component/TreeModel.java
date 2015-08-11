@@ -31,7 +31,7 @@ import de.matthiasmann.twl.model.TreeTableNode;
  * The tree allows adding and removing child nodes.
  * Although the tree model class implements the {@link TreeNode} interface, it isn't able to store data since it is only a 'virtual' root node.
  * The visible root nodes are added to this 'virtual' one.
- * 
+ *
  * @see TreeNode
  * @see TreeNodeImpl
  */
@@ -41,7 +41,7 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
 
     /**
      * Creates a new tree model with the given columns.
-     * 
+     *
      * @param columns The column names to use for the table.
      */
     public TreeModel(String... columns) {
@@ -51,7 +51,7 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
 
     /**
      * Returns the column names which are used for the table.
-     * 
+     *
      * @return The column names which are used for the table.
      */
     public String[] getColumns() {
@@ -128,7 +128,7 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
     /**
      * Tree nodes are used by the tree model to store the tree structure.
      * Every node can hold a data array to use for the columns of the table.
-     * 
+     *
      * @see TreeNode
      * @see TreeModel
      */
@@ -138,7 +138,7 @@ public class TreeModel extends AbstractTreeTableModel implements TreeNode {
 
         /**
          * Creates a new node for a tree with the given parent node and data array to use for the columns of the table.
-         * 
+         *
          * @param parent The parent node which holds the new node.
          * @param data The data to use for the columns of the table.
          */

@@ -19,13 +19,14 @@
 package com.quartercode.disconnected.server.test.world.comp.file;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
-import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
-import com.quartercode.disconnected.server.world.util.DerivableSize;
+import com.quartercode.disconnected.server.world.comp.file.InvalidPathException;
+import com.quartercode.disconnected.server.world.comp.file.OccupiedPathException;
+import com.quartercode.disconnected.server.world.comp.file.OutOfSpaceException;
+import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.shared.world.comp.ByteUnit;
 
 public class FileSystemTest {
@@ -34,44 +35,44 @@ public class FileSystemTest {
     private ContentFile testFile;
 
     @Before
-    public void setUp() {
+    public void setUp() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-        fileSystem = new FileSystem();
-        fileSystem.setObj(FileSystem.SIZE, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
+        fileSystem = new FileSystem(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
 
-        testFile = new ContentFile();
-        testFile.setObj(ContentFile.CONTENT, "Test-Content");
-        fileSystem.invoke(FileSystem.CREATE_ADD_FILE, testFile, "test1/test2/test.txt").invoke(FileAddAction.EXECUTE);
+        testFile = new ContentFile(new User("user"));
+        testFile.setContent("Test-Content");
+        fileSystem.prepareAddFile(testFile, "test1/test2/test.txt").execute();
     }
 
     @Test
-    public void testGetFile() {
+    public void testGetFile() throws InvalidPathException {
 
-        assertEquals("Resolved file", testFile, fileSystem.invoke(FileSystem.GET_FILE, "test1/test2/test.txt"));
+        assertEquals("Resolved file", testFile, fileSystem.getFile("test1/test2/test.txt"));
+    }
+
+    @Test (expected = InvalidPathException.class)
+    public void testGetFileNotExisting() throws InvalidPathException {
+
+        fileSystem.getFile("test1/test2/test2.txt");
+    }
+
+    @Test (expected = InvalidPathException.class)
+    public void testGetFileWithInvalidPath() throws InvalidPathException {
+
+        fileSystem.getFile("test1/test2/test.txt/test2.txt");
     }
 
     @Test
-    public void testGetFileNotExisting() {
+    public void testCalcSpace() throws InvalidPathException {
 
-        assertNull("GET_FILE didn't return null for a not existing path", fileSystem.invoke(FileSystem.GET_FILE, "test1/test2/test2.txt"));
-    }
-
-    @Test
-    public void testGetFileWithInvalidPath() {
-
-        assertNull("GET_FILE didn't return null for an invalid path (one dir is a content file)", fileSystem.invoke(FileSystem.GET_FILE, "test1/test2/test.txt/test2.txt"));
-    }
-
-    @Test
-    public void testCalcSpace() {
-
-        long contentSize = 30;
-        long filled = fileSystem.invoke(FileSystem.GET_FILLED);
-        long free = fileSystem.invoke(FileSystem.GET_FREE);
+        // The size of the only top-level directory must be equal to the filled file system space
+        long contentSize = fileSystem.getFile("test1").getSize();
+        long filled = fileSystem.getFilledSpace();
+        long free = fileSystem.getFreeSpace();
 
         assertEquals("Filled bytes", contentSize, filled);
-        assertEquals("Free bytes", fileSystem.invoke(DerivableSize.GET_SIZE) - contentSize, free);
-        assertEquals("Size (Filled + free)", (long) fileSystem.invoke(DerivableSize.GET_SIZE), free + filled);
+        assertEquals("Free bytes", fileSystem.getSize() - contentSize, free);
+        assertEquals("Size (Filled + free)", fileSystem.getSize(), free + filled);
     }
 
 }

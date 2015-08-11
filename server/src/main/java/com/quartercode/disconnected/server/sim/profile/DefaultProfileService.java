@@ -38,7 +38,7 @@ import com.quartercode.disconnected.shared.util.ServiceRegistry;
 
 /**
  * This is the default implementation of the {@link ProfileService}.
- * 
+ *
  * @see ProfileService
  */
 public class DefaultProfileService implements ProfileService {
@@ -54,7 +54,7 @@ public class DefaultProfileService implements ProfileService {
     /**
      * Creates a new default profile service which stores its profiles in the given directory.
      * If the profile directory doesn't exist yet, it is created.
-     * 
+     *
      * @param directory The directory the new service will store its profiles in.
      */
     public DefaultProfileService(Path directory) {

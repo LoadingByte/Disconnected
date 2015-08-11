@@ -24,7 +24,7 @@ import de.matthiasmann.twl.Widget;
 
 /**
  * Some utility methods that are related to {@link DesktopWindow}s and should be used to remove boilerplate code.
- * 
+ *
  * @see DesktopWindow
  */
 public class DesktopWindowUtils {
@@ -32,7 +32,7 @@ public class DesktopWindowUtils {
     /**
      * Defaults the size of the given {@link DesktopWindow}.
      * The actual size setting operation is executed when the window is opened.
-     * 
+     *
      * @param window The window whose size should be defaulted.
      * @param defaultSize The default size for the given window.
      */
@@ -56,7 +56,7 @@ public class DesktopWindowUtils {
      * Sets the minimum size of the given {@link DesktopWindow}.
      * The actual minimum size setting operation is executed when the window is opened.
      * That is necessary because any calls prior to that moment are ignored.
-     * 
+     *
      * @param window The window whose minimum size limit should be set.
      * @param minSize The minimum size limit for the given window.
      */
@@ -80,7 +80,7 @@ public class DesktopWindowUtils {
      * Sets the maximum size of the given {@link DesktopWindow}.
      * The actual maximum size setting operation is executed when the window is opened.
      * That is necessary because any calls prior to that moment are ignored.
-     * 
+     *
      * @param window The window whose maximum size limit should be set.
      * @param maxSize The maximum size limit for the given window.
      */
@@ -104,7 +104,7 @@ public class DesktopWindowUtils {
      * Centers the given {@link DesktopWindow} on the desktop it is added to.
      * The actual centering operation is executed after the first {@link DesktopWindow#layout()} has been made.
      * That is necessary because the required sizes are only available after that moment.
-     * 
+     *
      * @param window The window that should be absolutely centered on its desktop.
      */
     public static void center(final DesktopWindow window) {
@@ -128,7 +128,7 @@ public class DesktopWindowUtils {
      * That means that the middle/center of the first window will be exactly positioned over the middle/center of the second window.
      * The actual centering operation is executed after the first {@link DesktopWindow#layout()} has been made.
      * That is necessary because the required sizes are only available after that moment.
-     * 
+     *
      * @param window The window that should be relatively centered to the given second window.
      * @param relativeCenter The window the first window is centered relative to.
      */

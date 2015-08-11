@@ -18,22 +18,22 @@
 
 package com.quartercode.disconnected.server.test.sim.scheduler;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import static org.junit.Assert.assertEquals;
 import java.io.StringReader;
 import java.io.StringWriter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.junit.Test;
-import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
-import com.quartercode.classmod.def.extra.prop.DefaultProperty;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
 import com.quartercode.disconnected.server.sim.scheduler.DefaultScheduler;
+import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
+import com.quartercode.jtimber.api.node.Node;
 
 public class SchedulerPersistenceTest {
 
@@ -42,16 +42,16 @@ public class SchedulerPersistenceTest {
     @Test
     public void testScheduleWithPersistence() throws JAXBException {
 
-        DefaultScheduler scheduler = new DefaultScheduler("scheduler", new DefaultCFeatureHolder());
+        DefaultScheduler<?> scheduler = new DefaultScheduler<>();
 
         TestSchedulerTask task = new TestSchedulerTask();
-        task.setObj(TestSchedulerTask.PROP, 5);
+        task.setProp(5);
         scheduler.schedule("testName", "testGroup", 5, 2, task);
 
-        JAXBContext context = JAXBContext.newInstance(TestSchedulerTask.class, DefaultScheduler.class, DefaultProperty.class, StandardStorage.class);
+        JAXBContext context = JAXBContext.newInstance(RootElement.class, TestSchedulerTask.class, DefaultScheduler.class);
         StringWriter serialized = new StringWriter();
-        context.createMarshaller().marshal(scheduler, serialized);
-        DefaultScheduler copy = (DefaultScheduler) context.createUnmarshaller().unmarshal(new StringReader(serialized.toString()));
+        context.createMarshaller().marshal(new RootElement(scheduler), serialized);
+        DefaultScheduler<?> copy = ((RootElement) context.createUnmarshaller().unmarshal(new StringReader(serialized.toString()))).getScheduler();
 
         for (int update = 0; update < 11; update++) {
             copy.update("testGroup");
@@ -60,35 +60,28 @@ public class SchedulerPersistenceTest {
         assertEquals("Scheduler task executions after 11 updates", 4 * 5, schedulerTaskExecutions);
     }
 
-    private static class TestSchedulerTask extends SchedulerTaskAdapter {
+    @Setter
+    private static class TestSchedulerTask extends SchedulerTaskAdapter<Node<?>> {
 
-        // ----- Properties -----
+        @XmlElement
+        private int prop;
 
-        public static final PropertyDefinition<Integer> PROP;
+        @Override
+        public void execute(Scheduler<? extends Node<?>> scheduler, Node<?> schedulerParent) {
 
-        static {
-
-            PROP = factory(PropertyDefinitionFactory.class).create("prop", new StandardStorage<>());
-
+            schedulerTaskExecutions += prop;
         }
 
-        // ----- Functions -----
+    }
 
-        static {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Getter
+    @XmlRootElement
+    private static class RootElement {
 
-            EXECUTE.addExecutor("default", TestSchedulerTask.class, new FunctionExecutor<Void>() {
-
-                @Override
-                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                    schedulerTaskExecutions += invocation.getCHolder().getObj(PROP);
-
-                    return invocation.next(arguments);
-                }
-
-            });
-
-        }
+        @XmlElement
+        private DefaultScheduler<?> scheduler;
 
     }
 

@@ -30,7 +30,7 @@ import de.matthiasmann.twl.Widget;
  * Graphics state widgets are like categories for deciding what should be drawn.
  * They contain {@link GraphicsModule}s which access the graphics state widgets for managing TWL {@link Widget}s.
  * The objects are used as top level child widgets for the root {@link Container} by the {@link GraphicsThread}.
- * 
+ *
  * @see GraphicsStateDescriptor
  * @see GraphicsModule
  */
@@ -43,7 +43,7 @@ public class GraphicsState extends Widget {
 
     /**
      * Creates a new graphics state that is using the given {@link GraphicsModule}s.
-     * 
+     *
      * @param name The name of the new graphics state.
      * @param modules The {@link GraphicsModule}s the new state uses for managing {@link Widget}s.
      */
@@ -58,7 +58,7 @@ public class GraphicsState extends Widget {
     /**
      * Returns the name of the graphics state.
      * It can be used for debugging purposes.
-     * 
+     *
      * @return The name of the graphics state.
      */
     public String getName() {
@@ -70,7 +70,7 @@ public class GraphicsState extends Widget {
      * Returns the {@link GraphicsModule} that is assigned to the given name.
      * This method is usually used for accessing the value storage of other {@link GraphicsModule}s.
      * That way modules can share data without knowing each other's class name.
-     * 
+     *
      * @param name The name the {@link GraphicsModule} for return is assigned to.
      * @return The {@link GraphicsModule} that is assigned to the given name.
      */

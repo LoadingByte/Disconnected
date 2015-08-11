@@ -18,55 +18,80 @@
 
 package com.quartercode.disconnected.server.world.comp.config;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
-import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
+import javax.xml.bind.annotation.XmlAnyElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
 import com.quartercode.disconnected.server.world.util.SizeUtils;
-import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
+import com.quartercode.disconnected.server.world.util.WorldNode;
+import com.quartercode.jtimber.api.node.Node;
+import com.quartercode.jtimber.api.node.wrapper.SubstituteWithWrapper;
+import com.quartercode.jtimber.api.node.wrapper.collection.ListWrapper;
 
 /**
- * A configuration is used as content of a configuration file.
- * The configuration object could be represented as a string like
- * 
+ * A configuration object represents the content of a configuration file.
+ * Any configuration object could be represented as a string like:
+ *
  * <pre>
- *           Column 1  Column 2  Column 3               Column 4
- * (Entry 1) value1    value2    listentry1,listentry2  value3
- * (Entry 2) value4    value5    listentry1             col4
+ *           (Column 1)  (Column 2)  (Column 3)               (Column 4)
+ * (Entry 1)  value1      value2      listentry1,listentry2    value3
+ * (Entry 2)  value4      value5      listentry1               col4
  * (Entry 3) ...
  * </pre>
- * 
- * A configuration uses {@link ConfigEntry config entries} which contain different columns.
- * Every column contains a value or a list. If it contains a list, the list entries are separated by commas.
- * 
+ *
+ * A configuration uses multiple {@link ConfigEntry configuration entries} <b>of the same type</b> which represent the lines.
+ * Each entry represents one line and contains contains different columns.
+ * Each column contains a single value or a list of values. If it contains a list, the individual values are separated by commas.
+ *
+ * @param <E> The type of the configuration entries that can be part of this configuration.
  * @see ConfigEntry
  */
-public class Config extends WorldFeatureHolder implements DerivableSize {
+public class Config<E extends ConfigEntry<E>> extends WorldNode<Node<?>> implements DerivableSize {
 
-    // ----- Properties -----
+    @XmlElementWrapper
+    @XmlAnyElement (lax = true)
+    @SubstituteWithWrapper (ListWrapper.class)
+    private final List<E> entries = new ArrayList<>();
 
     /**
-     * The {@link ConfigEntry config entries} the configuration object contains.
-     * Such configuration entries represents the lines in a configuration file.
+     * Returns the {@link ConfigEntry configuration entries} the configuration object contains.
+     * Such configuration entries represent the lines in a configuration file.
+     *
+     * @return The configuration the configuration contains.
      */
-    public static final CollectionPropertyDefinition<ConfigEntry, List<ConfigEntry>> ENTRIES;
+    public List<E> getEntries() {
 
-    static {
-
-        ENTRIES = factory(CollectionPropertyDefinitionFactory.class).create("entries", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
-
+        return Collections.unmodifiableList(entries);
     }
 
-    // ----- Functions -----
+    /**
+     * Adds the given {@link ConfigEntry} to the configuration object.
+     *
+     * @param entry The configuration entry to add to the configuration.
+     */
+    public void addEntry(E entry) {
 
-    static {
+        Validate.notNull(entry, "Cannot add null entry to config");
+        entries.add(entry);
+    }
 
-        GET_SIZE.addExecutor("entries", Config.class, SizeUtils.createGetSize(ENTRIES));
+    /**
+     * Removes the given {@link ConfigEntry} from the configuration object.
+     *
+     * @param entry The configuration entry to remove from the configuration.
+     */
+    public void removeEntry(E entry) {
 
+        entries.remove(entry);
+    }
+
+    @Override
+    public long getSize() {
+
+        return SizeUtils.getSize(entries);
     }
 
 }

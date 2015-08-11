@@ -24,7 +24,7 @@ import com.quartercode.disconnected.shared.world.comp.ByteUnit;
  * A speed unit represents a unit for the speed of a connection in bytes per second. There are several stages like "kilo-", "mega-", "giga-" etc.
  * The speed unit uses powers of the base 1000.
  * The speed unit class is manly used to convert between the units.
- * 
+ *
  * @see ByteUnit
  */
 public enum SpeedUnit {
@@ -56,7 +56,7 @@ public enum SpeedUnit {
 
     /**
      * Converts the given source amount which is set in the given source unit into this unit.
-     * 
+     *
      * @param source The source amount of "speed" (set in the source unit).
      * @param sourceUnit The source unit which the source amount uses.
      * @return The converted amount of "speed".

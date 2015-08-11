@@ -29,14 +29,14 @@ import com.quartercode.disconnected.shared.world.general.Location;
 
 /**
  * This utility class generates random locations on an earth map.
- * 
+ *
  * @see Location
  */
 public class LocationGenerator {
 
     /**
      * Generates the given amount of locations on an earth map.
-     * 
+     *
      * @param amount The amount of locations to generate.
      * @param random The random object to use for generating the random locations.
      * @return The generated locations.
@@ -48,7 +48,7 @@ public class LocationGenerator {
 
     /**
      * Generates the given amount of locations on an earth map, ignoring the given ignore locations.
-     * 
+     *
      * @param amount The amount of locations to generate.
      * @param ignore The method will definiteley not return any of these locations.
      * @param random The random object to use for generating the random locations.

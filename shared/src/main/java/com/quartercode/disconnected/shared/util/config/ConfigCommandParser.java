@@ -26,7 +26,7 @@ import org.jdom2.JDOMException;
  * A config command parser takes one XML configuration command {@link Element} and executes the defined action.
  * It is used by the {@link ConfigService} for parsing whole config files.
  * See that class for more information on the purpose.
- * 
+ *
  * @see ConfigService
  */
 public interface ConfigCommandParser {
@@ -34,7 +34,7 @@ public interface ConfigCommandParser {
     /**
      * Parses the given XML configuration command {@link Element}, which is located inside the given JDOM2 {@link Document}.
      * That includes executing the defined action.
-     * 
+     *
      * @param config The complete configuration document the given command is a part of.
      * @param commandElement The element that contains the command.
      * @throws JDOMException Should be thrown when something related to JDOM2 happens.

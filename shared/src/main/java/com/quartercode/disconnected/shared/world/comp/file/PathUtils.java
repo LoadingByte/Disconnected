@@ -41,15 +41,15 @@ public class PathUtils {
     /**
      * Normalizes the given path.
      * Here are some examples:
-     * 
+     *
      * <pre>
      * /user/bin/../homes/test/
      * =&gt; /user/homes/test/
-     * 
+     *
      * /user/./homes/test/
      * =&gt; /user/homes/test/
      * </pre>
-     * 
+     *
      * @param path The path that should be normalized.
      * @return The normalized path.
      */
@@ -64,21 +64,21 @@ public class PathUtils {
      * The "change" path also can be absolute. This will ignore the start path.<br>
      * <br>
      * Here's an example:
-     * 
+     *
      * <pre>
      * Start:  /user/homes/test/
      * Change: ../test2/docs
      * Result: /user/home/test2/docs
      * </pre>
-     * 
+     *
      * Note that going further up than the root node (/) will just result in the root node:
-     * 
+     *
      * <pre>
      * Start:  /user/
      * Change: ../../
      * Result: /
      * </pre>
-     * 
+     *
      * @param start The absolute path the algorithm starts at.
      * @param path The "change" path which defines where the start path should change (see above).
      * @return The resolved absolute path.
@@ -125,18 +125,18 @@ public class PathUtils {
     /**
      * Splits the path into an array that contains the different path segments which were separated by path separators ({@link #SEPARATOR}).
      * Examples:
-     * 
+     *
      * <pre>
      * Path: /system/etc/test
      * =&gt; [system, etc, test]
-     * 
+     *
      * Path: /system/etc/../test
      * =&gt; [system, etc, .., test]
      * </pre>
-     * 
+     *
      * Note that double separators are ignored and separators at the start or end of the path do not matter.
      * Moreover, any relative segments (e.g. "..") are not resolved.
-     * 
+     *
      * @param path The path that should be split into an array.
      * @return The split path array.
      */
@@ -150,17 +150,17 @@ public class PathUtils {
      * All segments are separated by the {@link #SEPARATOR} character.
      * Also, a leading separator is placed at the beginning.
      * Examples:
-     * 
+     *
      * <pre>
      * Path: [system, etc, test]
      * =&gt; /system/etc/test
-     * 
+     *
      * Path: [system, etc, .., test]
      * =&gt; /system/etc/../test
      * </pre>
-     * 
+     *
      * Any relative segments (e.g. "..") are not resolved.
-     * 
+     *
      * @param path The path segment array that should be joined into a path string.
      * @return The joined path.
      */
@@ -174,20 +174,20 @@ public class PathUtils {
      * All segments are separated by the {@link #SEPARATOR} character.
      * Also, a leading separator might be placed at the beginning depending on the second argument.
      * Examples:
-     * 
+     *
      * <pre>
      * Path: [system, etc, test], Leading Separator: true
      * =&gt; /system/etc/test
-     * 
+     *
      * Path: [system, etc, test], Leading Separator: false
      * =&gt; system/etc/test
-     * 
+     *
      * Path: [system, etc, .., test], Leading Separator: true
      * =&gt; /system/etc/../test
      * </pre>
-     * 
+     *
      * Any relative segments (e.g. "..") are not resolved.
-     * 
+     *
      * @param path The path segment array that should be joined into a path string.
      * @param leadingSeparator Whether a leading path separator should be placed at the beginning of the path.
      * @return The joined path.
@@ -202,21 +202,21 @@ public class PathUtils {
      * The returned array always has two entries. [0] is the mountpoint and [1] is the local file system path.
      * The mountpoint of a path is the first path element.
      * Examples:
-     * 
+     *
      * <pre>
      * Path: /system/etc/test
      * =&gt; [system, etc/test]
-     * 
+     *
      * Path: /user
      * =&gt; [user, null]
-     * 
+     *
      * Path: home/user1/file
      * =&gt; [null, home/user1/file]
-     * 
+     *
      * Path: /
      * =&gt; [null, null]
      * </pre>
-     * 
+     *
      * @param path The path which should be split into a mountpoint and a local path.
      * @return The mountpoint and the local path of the given global path.
      *         May be {@code null} if an empty path (e.g. "" or "/") is provided.
@@ -238,23 +238,23 @@ public class PathUtils {
      * The returned array always has two entries. [0] is the directory path and [1] is the file name.
      * The file name of a path is the last path element.
      * Examples:
-     * 
+     *
      * <pre>
      * Path: /system/etc/test
      * =&gt; [/system/etc, test]
-     * 
+     *
      * Path: /user
      * =&gt; [null, user]
-     * 
+     *
      * Path: home/user1/file
      * =&gt; [home/user1, file]
-     * 
+     *
      * Path: /
      * =&gt; [null, null]
      * </pre>
-     * 
+     *
      * Note that the file name will never contain a separator.
-     * 
+     *
      * @param path The path which should be split into a directory path and a file name.
      * @return The directory path and the file name of the given path.
      *         May be {@code null} if an empty path (e.g. "" or "/") is provided.

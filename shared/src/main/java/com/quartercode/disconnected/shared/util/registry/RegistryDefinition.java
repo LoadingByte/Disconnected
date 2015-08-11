@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 /**
  * An object that defines a {@link Registry} by mapping a registry name to an exact type literal.
  * Such a definition object can be used to retrieve a registry instance with {@link RegistryService#getRegistry(RegistryDefinition)}.
- * 
+ *
  * @param <R> The type of the defined registry.
  *        This defined registry type should also contain all possible generic parameters; no wildcards (?) should be used.
  *        For example, {@code ListRegistry<String>} should be used instead of {@code ListRegistry<?>}.
@@ -45,7 +45,7 @@ public class RegistryDefinition<R extends Registry<?>> {
 
     /**
      * Creates a new registry definition for a {@link Registry} of the given type.
-     * 
+     *
      * @param name The name of the defined registry.
      * @param type The exact type of the defined registry.
      *        This type should also contain all possible generic parameters; no wildcards (?) should be used.
@@ -60,7 +60,7 @@ public class RegistryDefinition<R extends Registry<?>> {
     /**
      * Returns the name of the defined {@link Registry}.
      * Note that the name is not stored in the final registry object.
-     * 
+     *
      * @return The registry name.
      */
     public String getName() {
@@ -72,7 +72,7 @@ public class RegistryDefinition<R extends Registry<?>> {
      * Returns the exact type of the defined {@link Registry}.
      * This type should also contain all possible generic parameters; no wildcards (?) should be used.
      * For example, {@code ListRegistry<String>} should be used instead of {@code ListRegistry<?>}.
-     * 
+     *
      * @return The registry type.
      */
     public Typed<R> getType() {
@@ -86,7 +86,7 @@ public class RegistryDefinition<R extends Registry<?>> {
      * <br>
      * By default, this method creates a new instance of the registry type defined in {@link #getType()}.
      * It can be overridden to change the default behavior.
-     * 
+     *
      * @return A new registry instance.
      */
     public R create() {

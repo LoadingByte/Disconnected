@@ -52,7 +52,7 @@ public enum ByteUnit {
 
     /**
      * Converts the given source amount which is set in the given source unit into this unit.
-     * 
+     *
      * @param source The source amount of bytes (set in the source unit).
      * @param sourceUnit The source unit which the source amount uses.
      * @return The converted amount of bytes.

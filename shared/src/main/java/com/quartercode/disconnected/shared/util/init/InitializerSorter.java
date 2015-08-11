@@ -28,7 +28,7 @@ import org.apache.commons.lang3.Validate;
  * A utility class which uses a topological sorting algorithm to sort a {@link Collection} of {@link Initializer} according to their dependencies.
  * That means that all initializers which depend on other initializers are put after those dependencies.
  * The resulting {@link List} could be executed iteratively since the initializers are in a valid order.
- * 
+ *
  * @see Initializer
  */
 public class InitializerSorter {
@@ -39,7 +39,7 @@ public class InitializerSorter {
      * The resulting {@link List} could be executed iteratively since the initializers are in a valid order.<br>
      * <br>
      * Internally, this method uses a topological sorting algorithm.
-     * 
+     *
      * @param initializers The initializers which should be brought into a valid order.
      * @return The topologically sorted initializer list.
      */

@@ -25,7 +25,7 @@ import com.quartercode.disconnected.shared.util.registry.extra.SetRegistry;
 
 /**
  * A class that stores the default {@link RegistryDefinition}s which define the default {@link Registry}s used by the client.
- * 
+ *
  * @see RegistryDefinition
  * @see Registry
  */

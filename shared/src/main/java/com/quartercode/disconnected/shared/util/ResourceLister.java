@@ -55,7 +55,7 @@ public class ResourceLister implements Closeable {
      * Note that this class uses a workaround to create path objects for files which are located inside a jar.
      * Because of that, each instance of this class should be closed after the paths have been used.
      * However, the paths might no longer be accessible after the lister has been closed.
-     * 
+     *
      * @param resourcePath The path that defines the classpath resource whose occurrences should be listed.
      * @param throwAll Whether {@link IOException}s, which are thrown during the retrieval of one specific resource and would therefore also interrupt
      *        the retrieval of other resources, should be thrown.
@@ -102,7 +102,7 @@ public class ResourceLister implements Closeable {
 
     /**
      * Returns all listed occurrences of the classpath resource.
-     * 
+     *
      * @return All resource occurrences.
      */
     public List<Path> getResourcePaths() {

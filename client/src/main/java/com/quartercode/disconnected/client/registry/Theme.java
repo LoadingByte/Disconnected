@@ -36,7 +36,7 @@ public class Theme implements NamedValue {
 
     /**
      * Creates a new theme data object.
-     * 
+     *
      * @param name The name of the theme.
      *        It only marks the theme and is not used to locate its file.
      * @param url The {@link URL} which locates the theme file that is represented by the new data object.
@@ -54,7 +54,7 @@ public class Theme implements NamedValue {
     /**
      * Returns the name of the theme.
      * It only marks the theme and is not used to locate its file.
-     * 
+     *
      * @return The theme's name.
      */
     @Override
@@ -65,7 +65,7 @@ public class Theme implements NamedValue {
 
     /**
      * Returns the {@link URL} which locates the theme file that is represented by the data object.
-     * 
+     *
      * @return The theme's location.
      */
     public URL getURL() {
@@ -77,7 +77,7 @@ public class Theme implements NamedValue {
      * Returns the loading priority of the theme.
      * Themes with higher priorities are loaded before themes with lower ones.
      * If a theme depends on another theme, it must have a lower loading priority.
-     * 
+     *
      * @return The theme's priority.
      */
     public int getPriority() {

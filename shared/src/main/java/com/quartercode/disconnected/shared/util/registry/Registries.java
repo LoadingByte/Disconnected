@@ -22,7 +22,7 @@ import com.quartercode.disconnected.shared.util.ServiceRegistry;
 
 /**
  * A utility class for working with {@link Registry}s and the {@link RegistryService}.
- * 
+ *
  * @see Registry
  * @see RegistryService
  */
@@ -32,7 +32,7 @@ public class Registries {
      * Looks up the {@link Registry} which is defined by the given {@link RegistryDefinition} using the default {@link RegistryService}.
      * That default service is retrieved using {@link ServiceRegistry#lookup(Class)}.
      * Effectively, this is just a shortcut.
-     * 
+     *
      * @param definition The definition that defines the registry which should be returned.
      * @return The registry which is defined by the given definition.
      * @see RegistryService#getRegistry(RegistryDefinition)

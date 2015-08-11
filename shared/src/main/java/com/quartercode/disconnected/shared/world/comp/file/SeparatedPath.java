@@ -34,7 +34,7 @@ public class SeparatedPath implements Serializable {
 
     /**
      * Creates a new separated path that represents a file with the given file name inside the given directory.
-     * 
+     *
      * @param dir The path of the directory that contains the represented file.
      *        When possible, a {@link CommonFiles} constant should be used here.
      * @param file The name of the represented file.
@@ -48,7 +48,7 @@ public class SeparatedPath implements Serializable {
     /**
      * Creates a new separated path by using the two path components stored in the given array.
      * The directory path must be located at index 0 while the file name must be located at index 1.
-     * 
+     *
      * @param pathComponents The array whose two elements should be used.
      */
     public SeparatedPath(String[] pathComponents) {
@@ -58,7 +58,7 @@ public class SeparatedPath implements Serializable {
 
     /**
      * Creates a new separated path by splitting the given path to a file.
-     * 
+     *
      * @param path The path that points to the represented file.
      *        It is split into two components.
      */
@@ -72,7 +72,7 @@ public class SeparatedPath implements Serializable {
     /**
      * Returns the stored directory path that represents the first component of the path (e.g. {@code /system/bin}).
      * When possible, a {@link CommonFiles} constant should be used here.
-     * 
+     *
      * @return The directory path.
      */
     public String getDir() {
@@ -82,7 +82,7 @@ public class SeparatedPath implements Serializable {
 
     /**
      * Returns the stored file name that represents the second component of the path (e.g. {@code session.exe}).
-     * 
+     *
      * @return The file name.
      */
     public String getFile() {
@@ -93,7 +93,7 @@ public class SeparatedPath implements Serializable {
     /**
      * Combines the stored directory path and file name to an array.
      * The directory path is located at index 0 while the file name is located at index 1.
-     * 
+     *
      * @return The stored components as an array.
      */
     public String[] toArray() {
@@ -115,7 +115,7 @@ public class SeparatedPath implements Serializable {
 
     /**
      * Combines the stored directory path and file name to a full file path.
-     * 
+     *
      * @return The full file path to the file.
      */
     @Override

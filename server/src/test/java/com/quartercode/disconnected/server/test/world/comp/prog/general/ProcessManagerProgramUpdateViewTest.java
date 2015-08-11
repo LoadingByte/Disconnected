@@ -96,7 +96,7 @@ public class ProcessManagerProgramUpdateViewTest extends ProcessManagerProgramAb
 
         // Update the scheduler in order to send one event
         for (int counter = 0; counter < 1 + ProcessManagerProgram.UPDATE_VIEW_SENDING_PERIOD * 2; counter++) {
-            process.getObj(Process.EXECUTOR).get(ProcessManagerProgram.SCHEDULER).update("computerProgramUpdate");
+            process.getObj(Process.EXECUTOR).get(ProcessManagerProgram.SCHEDULER).update("computer.programUpdate");
         }
 
         assertEquals("Update view handler invocation count", 3, invocationCounter.intValue());

@@ -43,7 +43,7 @@ public class ResourceStore {
 
     /**
      * Returns all resource objects which are currently loaded into the resource store.
-     * 
+     *
      * @return All resource objects which are currently loaded into the resource store.
      */
     public static Map<String, Object> getAll() {
@@ -53,7 +53,7 @@ public class ResourceStore {
 
     /**
      * Returns the loaded resource object which was stored under the given path.
-     * 
+     *
      * @param path The path to use for the selection.
      * @return The loaded resource object which was stored under the given path.
      */
@@ -69,7 +69,7 @@ public class ResourceStore {
      * Example:
      * If you load resources from /data, a file located under /data/test.png will be assigned to the path test.png.
      * A file located under /data/test/test.png will be assigned to the path test/test.png.
-     * 
+     *
      * @param path The path to load the resources from.
      * @throws IOException Something goes wrong while reading from a jar file or resource.
      */
@@ -95,7 +95,7 @@ public class ResourceStore {
 
         Object resourceObject = null;
         if (name.endsWith(".txt")) {
-            try (Scanner scanner = new Scanner(Files.newBufferedReader(file, Charset.forName("UTF-8")))) {
+            try (Scanner scanner = new Scanner(Files.newBufferedReader(file, Charset.defaultCharset()))) {
                 resourceObject = scanner.useDelimiter("\\Z").next();
             }
         } else if (name.endsWith(".png")) {

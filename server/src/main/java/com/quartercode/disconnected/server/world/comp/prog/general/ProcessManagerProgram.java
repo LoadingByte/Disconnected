@@ -30,8 +30,8 @@ import com.quartercode.disconnected.server.sim.TickService;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTask;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
 import com.quartercode.disconnected.server.world.comp.file.File;
-import com.quartercode.disconnected.server.world.comp.os.OS;
-import com.quartercode.disconnected.server.world.comp.prog.ProcModule;
+import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.server.world.comp.prog.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.prog.ProgramUtils;
@@ -69,7 +69,7 @@ public class ProcessManagerProgram extends ProgramExecutor implements SchedulerU
             public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
 
                 CFeatureHolder program = invocation.getCHolder();
-                program.get(SCHEDULER).schedule("sendUpdateView", "computerProgramUpdate", 1, UPDATE_VIEW_SENDING_PERIOD, new SendUpdateViewTask());
+                program.get(SCHEDULER).schedule("sendUpdateView", "computer.programUpdate", 1, UPDATE_VIEW_SENDING_PERIOD, new SendUpdateViewTask());
 
                 return invocation.next(arguments);
             }
@@ -136,18 +136,18 @@ public class ProcessManagerProgram extends ProgramExecutor implements SchedulerU
 
             SBPWorldProcessUserId wpuId = program.getParent().getObj(Process.WORLD_PROCESS_USER);
             Process<?> process = program.getParent();
-            ProcModule procModule = process.invoke(Process.GET_OS).getObj(OS.PROC_MODULE);
+            ProcessModule procModule = process.invoke(Process.GET_OS).getObj(OperatingSystem.PROC_MODULE);
 
             // Interrupting the root process is disallowed (in order to not mess up the OS)
             if (pid == 0) {
-                String rootProcessName = getName(procModule.getObj(ProcModule.ROOT_PROCESS));
+                String rootProcessName = getName(procModule.getObj(ProcessModule.ROOT_PROCESS));
                 program.getBridge().send(new GP_SBPWPU_ErrorEvent(wpuId, "interruptProcess.missingRights", rootProcessName, String.valueOf(pid)));
                 return;
             }
 
             // Retrieve the process that should be interrupted
             Process<?> targetProcess = null;
-            for (Process<?> otherProcess : procModule.invoke(ProcModule.GET_ALL)) {
+            for (Process<?> otherProcess : procModule.invoke(ProcessModule.GET_ALL)) {
                 if (otherProcess.getObj(Process.PID) == pid) {
                     targetProcess = otherProcess;
                     break;

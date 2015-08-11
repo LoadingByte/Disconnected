@@ -36,7 +36,7 @@ import com.quartercode.eventbridge.bridge.Bridge;
  * <br>
  * Before the {@link #run()} method is called, a {@link ValueInjector} is used on the executor to provide the necessary context values.
  * The following values are available by default:
- * 
+ *
  * <table>
  * <tr>
  * <td>{@code name} ({@link String})</td>
@@ -63,7 +63,7 @@ import com.quartercode.eventbridge.bridge.Bridge;
  * <td>The bridge that should be used for sending and receiving world process events.</td>
  * </tr>
  * </table>
- * 
+ *
  * @see ClientRegistries#CLIENT_PROGRAMS
  * @see ClientProgramWindow
  */

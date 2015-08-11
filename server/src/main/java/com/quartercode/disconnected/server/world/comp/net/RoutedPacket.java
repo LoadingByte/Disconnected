@@ -18,100 +18,196 @@
 
 package com.quartercode.disconnected.server.world.comp.net;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import java.util.ArrayList;
-import java.util.List;
-import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
-import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
-import com.quartercode.disconnected.server.world.util.DerivableSize;
-import com.quartercode.disconnected.server.world.util.SizeUtils;
-import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
+import java.util.LinkedList;
+import java.util.Queue;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlList;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.apache.commons.lang3.Validate;
+import com.quartercode.disconnected.server.world.comp.net.nodes.DownlinkRouterNode;
+import com.quartercode.disconnected.server.world.comp.net.nodes.UplinkRouterNode;
+import com.quartercode.disconnected.server.world.util.InterfaceAdapter;
+import com.quartercode.disconnected.server.world.util.WorldNode;
+import com.quartercode.disconnected.shared.world.comp.net.Address;
+import com.quartercode.disconnected.shared.world.comp.net.NetId;
+import com.quartercode.jtimber.api.node.Node;
+import com.quartercode.jtimber.api.node.wrapper.SubstituteWithWrapper;
+import com.quartercode.jtimber.api.node.wrapper.collection.QueueWrapper;
 
 /**
- * This class represents a packet which is routed between routers.
- * It wraps a real {@link Packet} and stores some important routing information.
- * 
- * @see #PATH
+ * This class represents a {@link Packet} whose route <b>between {@link NetNode}s inside one {@link Network}</b> has already been calculated.
+ * It therefore contains some routing information, while wrapping around a real packet (e.g. the {@link StandardPacket}).<br>
+ * Note, however, that routes through multiple network tiers (see {@link NetId}) are not precomputed.
+ * Instead, a routed packet might just contain the path to an uplink or downlink router, which in turn transports the packet to another tier.
+ * Then, a new route can be computed inside that other upper/lower-tier network.
+ *
+ * @see #getPath()
  */
-public class RoutedPacket extends WorldFeatureHolder implements DerivableSize {
+public class RoutedPacket extends WorldNode<Node<?>> implements Packet {
 
-    // ----- Properties -----
+    @XmlElement
+    @XmlJavaTypeAdapter (InterfaceAdapter.class)
+    private Packet               wrappedPacket;
+    @XmlAttribute
+    @XmlList
+    @SubstituteWithWrapper (QueueWrapper.class)
+    private final Queue<Integer> path;
+
+    // JAXB constructor
+    protected RoutedPacket() {
+
+        path = new LinkedList<>();
+    }
 
     /**
-     * The network {@link Packet} that is wrapped by the routed packet.
-     * It should be extracted when the routed packet reaches its destination.
+     * Creates a new routed packet.
+     *
+     * @param packet The network {@link Packet} that should be wrapped by the new routed packet.
+     * @param path A queue that contains the {@link NetId#getNodeIdsAtTiers() node ids} (not {@link NetId}s!) of the {@link NetNode}s which should transport the new routed packet.
+     *        See {@link #getPath()} for a very detailed description of this queue, its function, and some special values.
      */
-    public static final PropertyDefinition<Packet>                           PACKET;
+    public RoutedPacket(Packet packet, Queue<Integer> path) {
+
+        Validate.notNull(packet, "Cannot route a null packet by putting it in a RoutedPacket");
+        Validate.notEmpty(path, "Routed packet path cannot be null or empty");
+
+        wrappedPacket = packet;
+        this.path = path;
+    }
 
     /**
-     * An integer queue that contains the subnet ids that belong to the routers which should transport the routed packet.
-     * When a router receives the packet, it should apply the following algorithm:
-     * 
+     * Returns the network {@link Packet} that is wrapped by the routed packet.
+     * It should be extracted when the routed packet reaches its destination.
+     *
+     * @return The wrapped packet which is actually sent.
+     */
+    public Packet getWrappedPacket() {
+
+        return wrappedPacket;
+    }
+
+    @Override
+    public Address getSource() {
+
+        return wrappedPacket.getSource();
+    }
+
+    @Override
+    public Address getDestination() {
+
+        return wrappedPacket.getDestination();
+    }
+
+    @Override
+    public Object getData() {
+
+        return wrappedPacket.getData();
+    }
+
+    @Override
+    public long getSize() {
+
+        return wrappedPacket.getSize();
+    }
+
+    /**
+     * Returns the queue that contains the {@link NetId#getNodeIdsAtTiers() node ids} (not {@link NetId}s!) of the {@link NetNode}s which should transport the routed packet.
+     * The node ids are related to the {@link Network} the packet is currently in and are provided in the correct order of transportation.
+     * For example, if this queue contains the ids {@code 5}, {@code 7} and {@code 10}, the net node the packet originated from (the first one) will send it to node {@code 5}.
+     * That node will then send it to node {@code 7}, which in turn sends it even further to the receiving node {@code 10} that might forward the packet to its computer.<br>
+     * <br>
+     * However, there often occur cases where the destination node isn't actually a part of the same (sub)network the sending node is part of.
+     * In such a case, the packet is send to a router (uplink or downlink) which in turn delivers it to another network.
+     * Sometimes, multiple of the network hops are necessary in order to reach the network that contains the destination node.<br>
+     * <br>
+     * When any node (including routers) receives any {@link Packet}, it should apply the following routing algorithm:
+     *
      * <table border="1">
      * <tr>
-     * <td colspan="6">Is the path queue empty?</td>
+     * <td colspan="4">Is the packet a routed packet and is it's path queue <b>not</b> empty?</td>
      * </tr>
      * <tr>
-     * <td colspan="2">Yes</td>
-     * <td colspan="4">No</td>
-     * </tr>
-     * <tr>
-     * <td colspan="2">Is the packet destination a node in my subnet?</td>
-     * <td colspan="4">Poll the next entry from the queue.</td>
-     * </tr>
-     * <tr>
-     * <td>Yes</td>
-     * <td>No</td>
-     * <td colspan="4">Is the next entry a negative integer?</td>
-     * </tr>
-     * <tr>
-     * <td>Extract the packet and hand it over to the destination node.</td>
-     * <td>Calculate a new route to the destination of the packet.</td>
      * <td colspan="2">Yes</td>
      * <td colspan="2">No</td>
      * </tr>
      * <tr>
-     * <td colspan="2"></td>
-     * <td colspan="2">Am I connected to the backbone?</td>
-     * <td colspan="2">Is the entry equal to the subnet of a neighbour router?</td>
+     * <td colspan="2">Am I connected to the next node in the path queue?</td>
+     * <td colspan="2">Calculate a new route for the packet (algorithm below).</td>
      * </tr>
      * <tr>
-     * <td colspan="2"></td>
      * <td>Yes</td>
      * <td>No</td>
-     * <td>Yes</td>
-     * <td>No</td>
+     * <td rowspan="2"></td>
      * </tr>
      * <tr>
-     * <td colspan="2"></td>
-     * <td>Extract the packet and hand it over to the backbone.</td>
-     * <td>Calculate a new route to the destination of the packet.</td>
-     * <td>Hand the routed packet over to the determined neighbour router.</td>
-     * <td>Calculate a new route to the destination of the packet.</td>
+     * <td>Send the packet to the next node in the path queue.</td>
+     * <td>Calculate a new route for the packet (algorithm below).</td>
      * </tr>
      * </table>
-     * 
-     * Note that this cannot be an actual queue since Classmod cannot handle queues in collection properties.
+     * <br>
+     * A new route for a packet is calculated by firstly determinating the next target of the packet inside the current network using the following algorithm.
+     * It essentially compares the net id of the net node that handles the packet ("me") with the destination net id of the packet.
+     *
+     * <table border="1">
+     * <tr>
+     * <td colspan="5">Am I the receiver of the packet?<br>
+     * <i>Does my net id match the packet's destination net id?<br>
+     * (e.g. my net id = {@code 1.2.3}, dest. net id = {@code 1.2.3} =&gt; net ids match)</i></td>
+     * </tr>
+     * <tr>
+     * <td>Yes</td>
+     * <td colspan="4">No</td>
+     * </tr>
+     * <tr>
+     * <td>Hand over the packet's data payload to my computer without calculating a new route</td>.
+     * <td colspan="4">Is the destination located in an upper-tier network compared to the network I am located in?<br>
+     * <i>Is my net id longer than the packet's destination net id?<br>
+     * (e.g. my net id = {@code 1.2.3.4}, dest. net id = {@code 5.6} =&gt; my net id is longer)</i></td>
+     * </tr>
+     * <td rowspan="6"></td>
+     * <td>Yes</td>
+     * <td colspan="3">No</td>
+     * </tr>
+     * <tr>
+     * <td>Use the network's {@link UplinkRouterNode} as next target.</td>
+     * <td colspan="3">Is the destination located in my network or a lower-tier network that is reachable from my network?<br>
+     * <i>Does the beginning of my net id (apart from the last element) match the beginning of the destination net id?<br>
+     * (e.g. my net id = {@code 1.2.3}, dest. net id = {@code 1.4.5.6} =&gt; my beginning last node id ({@code 1.2}) doesn't match the dest's beginning ({@code 1.4})</i></td>
+     * </tr>
+     * <tr>
+     * <td rowspan="4"></td>
+     * <td colspan="2">Yes</td>
+     * <td>No</td>
+     * </tr>
+     * <tr>
+     * <td colspan="2">Is the destination located in a lower-tier network?<br>
+     * <i>Is my net id shorter that the packet's destination net id?<br>
+     * (e.g. my net id = {@code 1.2.3}, dest. net id = {@code 1.2.4.5} =&gt; my net id is shorter)</i></td>
+     * <td>Use the network's {@link UplinkRouterNode} as next target.</td>
+     * </tr>
+     * <tr>
+     * <td>Yes</td>
+     * <td>No</td>
+     * <td rowspan="2"></td>
+     * </tr>
+     * <tr>
+     * <td>Use the correct {@link DownlinkRouterNode}, which leads into the next lower-tier network on the path to the destination's network, as next target.<br>
+     * <i>Cut off the packet's destination net id after the tier of my net id and use the downlink router with that net id as next target.<br>
+     * (e.g. my net id = {@code 1.2.3}, dest. net id = {@code 1.2.4.5.6} =&gt; net id of target = {@code 1.2.4})</i></td>
+     * <td>Use the packet's destination net id as next target (the destination is in my network).</td>
+     * </tr>
+     * </table>
+     * <br>
+     * Note that the returned queue is modifiable; therefore, you can {@link Queue#poll() poll} from it.
+     * Sadly, there are no built-in unmodifiable queues available.
+     * Just make sure that you do not execute any other modifying operation apart from poll (e.g. {@link Queue#offer(Object)}) on it.
+     *
+     * @return A queue that contains the node ids of the nodes which should transport the routed packet.
      */
-    public static final CollectionPropertyDefinition<Integer, List<Integer>> PATH;
+    public Queue<Integer> getPath() {
 
-    static {
-
-        PACKET = factory(PropertyDefinitionFactory.class).create("packet", new StandardStorage<>());
-        PATH = factory(CollectionPropertyDefinitionFactory.class).create("path", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
-
-    }
-
-    // ----- Functions -----
-
-    static {
-
-        GET_SIZE.addExecutor("data", RoutedPacket.class, SizeUtils.createGetSize(PACKET));
-
+        return path;
     }
 
 }

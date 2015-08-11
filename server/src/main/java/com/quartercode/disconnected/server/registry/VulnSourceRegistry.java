@@ -28,7 +28,7 @@ import com.quartercode.disconnected.shared.util.registry.extra.SetRegistry;
 
 /**
  * A {@link SetRegistry} that stores {@link VulnSource vulnerability source} objects and makes them accessible through some special methods.
- * 
+ *
  * @see VulnSource
  * @see SetRegistry
  */
@@ -42,7 +42,7 @@ public class VulnSourceRegistry extends SetRegistry<VulnSource> {
      * The method concatenates the provided usage nodes with a {@code .} as separator and then checks which source objects
      * have usage strings that start with that joined string.
      * See {@link VulnSource#getUsage()} for more information about the purpose of the usage string.
-     * 
+     *
      * @param usageNodes The usage strings of all returned sources must start with these nodes.
      *        They are concatenated with the {@code .} separator.
      * @return All vulnerability sources that start with the given usage string nodes.

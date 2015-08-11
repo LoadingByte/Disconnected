@@ -34,13 +34,13 @@ import com.quartercode.disconnected.server.sim.scheduler.SchedulerRegistry;
 import com.quartercode.disconnected.server.world.World;
 import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
-import com.quartercode.disconnected.server.world.comp.file.FSModule;
-import com.quartercode.disconnected.server.world.comp.file.FSModule.KnownFS;
+import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
+import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.KnownFileSystem;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
-import com.quartercode.disconnected.server.world.comp.net.NetModule;
-import com.quartercode.disconnected.server.world.comp.os.OS;
+import com.quartercode.disconnected.server.world.comp.net.NetworkModule;
+import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
 import com.quartercode.disconnected.server.world.comp.prog.ChildProcess;
-import com.quartercode.disconnected.server.world.comp.prog.ProcModule;
+import com.quartercode.disconnected.server.world.comp.prog.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.prog.RootProcess;
@@ -116,10 +116,10 @@ public abstract class AbstractComplexComputerTest {
     protected Computer newComputer(boolean start) {
 
         mainComputer = WorldGenerator.generateComputer(false);
-        world.addToColl(World.COMPUTERS, mainComputer);
+        world.addComputer( mainComputer);
 
         if (start) {
-            mainComputer.getObj(Computer.OS).invoke(OS.SET_RUNNING, true);
+            mainComputer.getOs().invoke(OperatingSystem.SET_RUNNING, true);
         }
 
         return mainComputer;
@@ -145,7 +145,7 @@ public abstract class AbstractComplexComputerTest {
         ChildProcess process = parentProcess.invoke(Process.CREATE_CHILD);
         process.setObj(Process.SOURCE, programFile);
         process.setObj(Process.WORLD_PROCESS_USER, new SBPWorldProcessUserId(SBP, null));
-        process.invoke(Process.INITIALIZE, procModule(computer).invoke(ProcModule.NEXT_PID));
+        process.invoke(Process.INITIALIZE, procModule(computer).invoke(ProcessModule.NEXT_PID));
 
         ProgramExecutor program = process.getObj(Process.EXECUTOR);
         program.invoke(ProgramExecutor.RUN);
@@ -169,9 +169,9 @@ public abstract class AbstractComplexComputerTest {
         Computer computer = parentProcess.invoke(Process.GET_OS).getParent();
 
         ChildProcess process = parentProcess.invoke(Process.CREATE_CHILD);
-        ContentFile programFile = (ContentFile) fsModule(computer).invoke(FSModule.GET_FILE, getCommonLocation(Session.class).toString());
+        ContentFile programFile = (ContentFile) fsModule(computer).invoke(FileSystemModule.GET_FILE, getCommonLocation(Session.class).toString());
         process.setObj(Process.SOURCE, programFile);
-        process.invoke(Process.INITIALIZE, procModule(computer).invoke(ProcModule.NEXT_PID));
+        process.invoke(Process.INITIALIZE, procModule(computer).invoke(ProcessModule.NEXT_PID));
 
         ProgramExecutor session = process.getObj(Process.EXECUTOR);
         session.setObj(Session.USER, user);
@@ -183,29 +183,29 @@ public abstract class AbstractComplexComputerTest {
 
     // Computer getter shortcuts
 
-    protected OS os(Computer computer) {
+    protected OperatingSystem os(Computer computer) {
 
-        return computer.getObj(Computer.OS);
+        return computer.getOs();
     }
 
-    protected OS mainOs() {
+    protected OperatingSystem mainOs() {
 
         return os(mainComputer);
     }
 
-    protected FSModule fsModule(Computer computer) {
+    protected FileSystemModule fsModule(Computer computer) {
 
-        return computer.getObj(Computer.OS).getObj(OS.FS_MODULE);
+        return os(computer).getObj(OperatingSystem.FS_MODULE);
     }
 
-    protected FSModule mainFsModule() {
+    protected FileSystemModule mainFsModule() {
 
         return fsModule(mainComputer);
     }
 
     protected FileSystem fs(Computer computer, String mountpoint) {
 
-        return fsModule(computer).invoke(FSModule.GET_MOUNTED_BY_MOUNTPOINT, mountpoint).getObj(KnownFS.FILE_SYSTEM);
+        return fsModule(computer).invoke(FileSystemModule.GET_MOUNTED_BY_MOUNTPOINT, mountpoint).getObj(KnownFileSystem.FILE_SYSTEM);
     }
 
     protected FileSystem mainFs(String mountpoint) {
@@ -213,19 +213,19 @@ public abstract class AbstractComplexComputerTest {
         return fs(mainComputer, mountpoint);
     }
 
-    protected ProcModule procModule(Computer computer) {
+    protected ProcessModule procModule(Computer computer) {
 
-        return computer.getObj(Computer.OS).getObj(OS.PROC_MODULE);
+        return computer.getOs().getObj(OperatingSystem.PROC_MODULE);
     }
 
-    protected ProcModule mainProcModule() {
+    protected ProcessModule mainProcModule() {
 
         return procModule(mainComputer);
     }
 
     protected RootProcess rootProcess(Computer computer) {
 
-        return procModule(computer).getObj(ProcModule.ROOT_PROCESS);
+        return procModule(computer).getObj(ProcessModule.ROOT_PROCESS);
     }
 
     protected RootProcess mainRootProcess() {
@@ -233,12 +233,12 @@ public abstract class AbstractComplexComputerTest {
         return rootProcess(mainComputer);
     }
 
-    protected NetModule netModule(Computer computer) {
+    protected NetworkModule netModule(Computer computer) {
 
-        return computer.getObj(Computer.OS).getObj(OS.NET_MODULE);
+        return computer.getOs().getObj(OperatingSystem.NET_MODULE);
     }
 
-    protected NetModule mainNetModule() {
+    protected NetworkModule mainNetModule() {
 
         return netModule(mainComputer);
     }

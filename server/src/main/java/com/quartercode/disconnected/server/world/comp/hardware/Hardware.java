@@ -18,40 +18,49 @@
 
 package com.quartercode.disconnected.server.world.comp.hardware;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
+import javax.xml.bind.annotation.XmlAttribute;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.server.world.comp.Computer;
-import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
+import com.quartercode.disconnected.server.world.util.WorldNode;
 
 /**
- * This class stores information about a part of hardware, like a mainboard, a cpu or a ram module.
- * This also contains a list of all vulnerabilities this hardware part has.
- * 
+ * This class is the base class for classes which store information about a part of hardware, like a {@link Mainboard}, a {@link CPU}, or a {@link RAM} module.
+ *
  * @see Computer
  */
-public class Hardware extends WorldChildFeatureHolder<Computer> {
+public class Hardware extends WorldNode<Computer> {
 
-    // ----- Properties -----
+    @XmlAttribute
+    private String name;
 
-    /**
-     * The name of the hardware part.
-     */
-    public static final PropertyDefinition<String> NAME;
-
-    static {
-
-        NAME = factory(PropertyDefinitionFactory.class).create("name", new StandardStorage<>());
+    // JAXB constructor
+    protected Hardware() {
 
     }
 
     /**
      * Creates a new hardware part.
+     *
+     * @param name The "model" name of the new hardware part.
+     *        See {@link #getName()} for more details.
      */
-    public Hardware() {
+    public Hardware(String name) {
 
-        setParentType(Computer.class);
+        Validate.notNull(name, "Cannot use null as hardware name");
+
+        this.name = name;
+    }
+
+    /**
+     * Returns the "model" name of the hardware part.
+     * This name identifies a certain "model" of a hardware part type (e.g. a specific mainbord).
+     * Therefore, all hardware parts of the same type (e.g. mainborads) and with the same specs should have the same name.
+     *
+     * @return The "model" name of the hardware part.
+     */
+    public String getName() {
+
+        return name;
     }
 
 }

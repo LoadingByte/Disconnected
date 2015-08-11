@@ -32,6 +32,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
+import com.quartercode.disconnected.shared.world.comp.file.FileRights.FileRightsAdapter;
 
 /**
  * A storage object for file rights which control the access to files by users.
@@ -40,15 +41,15 @@ import com.quartercode.disconnected.shared.util.XmlPersistent;
  * <br>
  * Note that accessor types and right types are represented by single characters.
  * By default, the following file accessors can be used:
- * 
+ *
  * <ul>
  * <li>{@link #OWNER} -&gt; {@value #OWNER}</li>
  * <li>{@link #GROUP} -&gt; {@value #GROUP}</li>
  * <li>{@link #OTHERS} -&gt; {@value #OTHERS}</li>
  * </ul>
- * 
+ *
  * Moreover, the following default file rights are provided:
- * 
+ *
  * <ul>
  * <li>{@link #READ} -&gt; {@value #READ}</li>
  * <li>{@link #WRITE} -&gt; {@value #WRITE}</li>
@@ -57,9 +58,10 @@ import com.quartercode.disconnected.shared.util.XmlPersistent;
  * </ul>
  */
 @XmlPersistent
+@XmlJavaTypeAdapter (FileRightsAdapter.class)
 public class FileRights implements Serializable {
 
-    private static final long                 serialVersionUID = -6352156428846716007L;
+    private static final long                 serialVersionUID = 3161069598919941420L;
 
     // ----- Default file accessors -----
 
@@ -116,43 +118,6 @@ public class FileRights implements Serializable {
         Validate.isTrue(c != ',', "Character used for file rights cannot be ','");
     }
 
-    private static SortedMap<Character, SortedSet<Character>> convertStringToRightMap(String string) {
-
-        SortedMap<Character, SortedSet<Character>> rights = new TreeMap<>();
-
-        for (String accessorGroup : StringUtils.split(string, ',')) {
-            boolean isValid = accessorGroup.indexOf(':') == 1 && StringUtils.countMatches(accessorGroup, ":") == 1;
-            Validate.isTrue(isValid, "Each accessor group separated by a ',' must contain exactly one ':' at the second position; wrong format: '%s'", string);
-
-            char accessor = accessorGroup.charAt(0);
-            validateCharacter(accessor);
-            rights.put(accessor, new TreeSet<Character>());
-
-            for (char right : accessorGroup.substring(2).toCharArray()) {
-                validateCharacter(right);
-                rights.get(accessor).add(right);
-            }
-        }
-
-        return rights;
-    }
-
-    private static String convertRightMapToString(SortedMap<Character, SortedSet<Character>> rights) {
-
-        StringBuilder string = new StringBuilder();
-
-        for (Entry<Character, SortedSet<Character>> entry : rights.entrySet()) {
-            string.append(",").append(entry.getKey()).append(":");
-
-            for (char right : entry.getValue()) {
-                string.append(right);
-            }
-        }
-
-        return string.length() == 0 ? "" : string.substring(1);
-    }
-
-    @XmlJavaTypeAdapter (FileRightsAdapter.class)
     private SortedMap<Character, SortedSet<Character>> rights;
 
     /**
@@ -167,7 +132,7 @@ public class FileRights implements Serializable {
      * Creates a new file rights object and fills it with the rights stored in the given file rights object.
      * Modifications on one of the two objects won't change the other object.
      * Internally, this method just calls {@link #importRights(FileRights)}.
-     * 
+     *
      * @param original The file rights object whose rights should be copied into the new object.
      */
     public FileRights(FileRights original) {
@@ -179,7 +144,7 @@ public class FileRights implements Serializable {
      * Creates a new file rights object and fills it with the rights stored by the given string representation.
      * The format is the same one used by {@link #exportRightsAsString()}. Check that method for more documentation.
      * Internally, this method just calls {@link #importRights(String)}.
-     * 
+     *
      * @param string The string representation that contains the file rights for the new object.
      */
     public FileRights(String string) {
@@ -190,7 +155,7 @@ public class FileRights implements Serializable {
     /**
      * Returns whether the given file right (second character) is granted to the given file accessor type (first character).
      * If the file right is set, the given accessor is allowed to use functions related to the right.
-     * 
+     *
      * @param accessor A character that describes the type of user that wants to access a file.
      *        Default accessors are {@link #OWNER}, {@link #GROUP} and {@link #OTHERS}.
      * @param right A character that describes the right required for certain operations on a file.
@@ -208,7 +173,7 @@ public class FileRights implements Serializable {
     /**
      * Returns an unmodifiable set that contains all rights granted to the given file accessor type.
      * If a file right is set, the given accessor is allowed to use functions related to that right.
-     * 
+     *
      * @param accessor A character that describes the type of user that wants to access a file.
      *        Default accessors are {@link #OWNER}, {@link #GROUP} and {@link #OTHERS}.
      * @return All rights that are granted to the given file accessor type.
@@ -227,7 +192,7 @@ public class FileRights implements Serializable {
     /**
      * Sets whether the given file right (second character) is granted to the given file accessor type (first character).
      * If the file right is set, the given accessor is allowed to use functions related to the right.
-     * 
+     *
      * @param accessor A character that describes the type of file-accessing user the right is granted or not granted to.
      *        Default accessors are {@link #OWNER}, {@link #GROUP} and {@link #OTHERS}.
      * @param right A character that describes the right, which is required for certain operations on a file, that should be granted or not granted.
@@ -266,7 +231,7 @@ public class FileRights implements Serializable {
     /**
      * Changes the rights stored by this file rights objects to the ones stored in the given other file rights object.
      * Modifications on one of the two objects won't change the other object.
-     * 
+     *
      * @param other The file rights object whose rights should be copied.
      */
     public void importRights(FileRights other) {
@@ -281,33 +246,57 @@ public class FileRights implements Serializable {
     /**
      * Changes the rights stored by this file rights objects to the ones defined by the given string representation.
      * The format is the same as the one used by {@link #exportRightsAsString()}. Check that method for more documentation.
-     * 
+     *
      * @param string The string representation that contains the file rights which should be imported.
      */
     public void importRights(String string) {
 
-        rights = convertStringToRightMap(string);
+        rights = new TreeMap<>();
+
+        for (String accessorGroup : StringUtils.split(string, ',')) {
+            boolean isValid = accessorGroup.indexOf(':') == 1 && StringUtils.countMatches(accessorGroup, ":") == 1;
+            Validate.isTrue(isValid, "Each accessor group separated by a ',' must contain exactly one ':' at the second position; wrong format: '%s'", string);
+
+            char accessor = accessorGroup.charAt(0);
+            validateCharacter(accessor);
+            rights.put(accessor, new TreeSet<Character>());
+
+            for (char right : accessorGroup.substring(2).toCharArray()) {
+                validateCharacter(right);
+                rights.get(accessor).add(right);
+            }
+        }
     }
 
     /**
      * Returns a string representation of the stored file rights.
      * Examples:
-     * 
+     *
      * <pre>
      * o:rx,u:dw
      * =&gt; File accessor 'o' (everyone) has the rights 'r' and 'x'.
      * =&gt; File accessor 'u' (owner) has the explicit rights 'd' and 'w'.
      *    Note that 'u' also has the implicit rights 'r' and 'x' because those two rights are granted to everyone.
-     * 
+     *
      * g:drwx,u:drwx
      * =&gt; File accessors 'g' (group) and 'u' (owner) have the rights 'd', 'r', 'w', and 'x'.
      * </pre>
-     * 
+     *
      * @return A string representation of the file rights.
      */
     public String exportRightsAsString() {
 
-        return convertRightMapToString(rights);
+        StringBuilder string = new StringBuilder();
+
+        for (Entry<Character, SortedSet<Character>> entry : rights.entrySet()) {
+            string.append(",").append(entry.getKey()).append(":");
+
+            for (char right : entry.getValue()) {
+                string.append(right);
+            }
+        }
+
+        return string.length() == 0 ? "" : string.substring(1);
     }
 
     @Override
@@ -328,18 +317,24 @@ public class FileRights implements Serializable {
         return exportRightsAsString();
     }
 
-    static class FileRightsAdapter extends XmlAdapter<String, SortedMap<Character, SortedSet<Character>>> {
+    /**
+     * An {@link XmlAdapter} that binds {@link FileRights} objects using their {@link FileRights#exportRightsAsString() string representation}.
+     * If a JAXB property references a file rights object and doesn't specify a custom XML adapter, this adapter is used by default.
+     *
+     * @see FileRights
+     */
+    public static class FileRightsAdapter extends XmlAdapter<String, FileRights> {
 
         @Override
-        public String marshal(SortedMap<Character, SortedSet<Character>> v) {
+        public String marshal(FileRights v) {
 
-            return FileRights.convertRightMapToString(v);
+            return v.toString();
         }
 
         @Override
-        public SortedMap<Character, SortedSet<Character>> unmarshal(String v) {
+        public FileRights unmarshal(String v) {
 
-            return FileRights.convertStringToRightMap(v);
+            return new FileRights(v);
         }
 
     }

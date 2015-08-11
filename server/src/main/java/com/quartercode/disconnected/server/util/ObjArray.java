@@ -25,14 +25,17 @@ import java.util.Arrays;
  * That is useful when a method or constructor takes a vararg argument and an object array should be passed into the method/constructor
  * without being used as a vararg.
  * Example:
- * 
+ *
  * <pre>
- * Method:                  do(Object...)
- * Call:                    do(new Object[] { "test1", "test2" })
- * Compiler Interpretation: do("test1", "test2")
- * Fix using ObjArray:      do(new ObjArray("test1", "test2"))
+ * Method:                    do(Object...)
+ *
+ * Call:                      do(new Object[] { "test1", "test2" })
+ * Compiler Interpretation:   do("test1", "test2")                  [2 String arguments]
+ *
+ * Fixed call using ObjArray: do(new ObjArray("test1", "test2"))
+ * Compiler Interpretation:   do(<b>ObjArray{</b>"test1", "test2"<b>}</b>)        [1 ObjArray argument]
  * </pre>
- * 
+ *
  * However, because ObjArray does not act as an array, any consumers must know how to handle ObjArray objects.
  */
 public class ObjArray {
@@ -41,7 +44,7 @@ public class ObjArray {
 
     /**
      * Creates a new ObjArray object which wraps around the given object array.
-     * 
+     *
      * @param array The object array (or vararg) the new object should wrap around.
      */
     public ObjArray(Object... array) {
@@ -51,7 +54,7 @@ public class ObjArray {
 
     /**
      * Returns the object array the ObjArray object wraps around.
-     * 
+     *
      * @return The wrapped object array.
      */
     public Object[] getArray() {

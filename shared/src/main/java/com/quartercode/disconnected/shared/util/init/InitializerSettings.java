@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 
 /**
  * An annotation that provides information about an {@link Initializer} and specifies its requirements.
- * 
+ *
  * @see Initializer
  */
 @Target (ElementType.TYPE)
@@ -37,7 +37,7 @@ public @interface InitializerSettings {
      * In case of a single group, all initializers of that group must be executed before any initializer that depends on that group.
      * Note that it is possible for an initializer to be part of multiple groups.
      * In that case, the initializer must be executed before any initializer that depends on one of its groups.
-     * 
+     *
      * @return The group(s) the initializer is part of.
      */
     String[] groups ();
@@ -45,7 +45,7 @@ public @interface InitializerSettings {
     /**
      * Returns the group(s) the annotated {@link Initializer} depends on.
      * All initializers of all these groups must be executed before the annotated initializer is executed.
-     * 
+     *
      * @return The group(s) the initializer depends on.
      */
     String[] dependencies () default {};

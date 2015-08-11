@@ -28,15 +28,17 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.junit.Before;
 import org.junit.Test;
-import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
 import com.quartercode.disconnected.server.sim.scheduler.DefaultScheduler;
+import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerRegistry;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerRegistryProvider;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
+import com.quartercode.jtimber.api.node.DefaultNode;
+import com.quartercode.jtimber.api.node.Node;
 
 public class DefaultSchedulerTest {
 
-    private DefaultScheduler        scheduler;
+    private DefaultScheduler<?>     scheduler;
     private final SchedulerRegistry schedulerRegistry = new SchedulerRegistry();
 
     private final TestSchedulerTask task1             = new TestSchedulerTask(1);
@@ -46,7 +48,9 @@ public class DefaultSchedulerTest {
     @Before
     public void setUp() {
 
-        scheduler = new DefaultScheduler("scheduler", new TestSchedulerHolder(schedulerRegistry));
+        scheduler = new DefaultScheduler<>();
+        // Add the one and only parent
+        scheduler.addParent(new TestSchedulerHolder(schedulerRegistry));
 
         scheduler.schedule("testTask1", "testGroup1", 1, 1, task1);
         scheduler.schedule("testTask2", "testGroup2", 1, 1, task2);
@@ -96,7 +100,7 @@ public class DefaultSchedulerTest {
 
     @RequiredArgsConstructor
     @Getter
-    private static class TestSchedulerHolder extends DefaultCFeatureHolder implements SchedulerRegistryProvider {
+    private static class TestSchedulerHolder extends DefaultNode<Node<?>> implements SchedulerRegistryProvider {
 
         private final SchedulerRegistry schedulerRegistry;
 
@@ -104,9 +108,15 @@ public class DefaultSchedulerTest {
 
     @RequiredArgsConstructor
     @Getter
-    private static class TestSchedulerTask extends SchedulerTaskAdapter {
+    private static class TestSchedulerTask extends SchedulerTaskAdapter<Node<?>> {
 
         private final int id;
+
+        @Override
+        public void execute(Scheduler<? extends Node<?>> scheduler, Node<?> schedulerParent) {
+
+            // Empty
+        }
 
     }
 

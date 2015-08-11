@@ -36,7 +36,7 @@ public class WorldProcessId implements Serializable {
 
     /**
      * Creates a new world process id.
-     * 
+     *
      * @param computerUUID The {@link UUID} of the computer which runs the identifiable process.
      * @param pid The process id of the identifiable process.
      */
@@ -48,7 +48,7 @@ public class WorldProcessId implements Serializable {
 
     /**
      * Returns the {@link UUID} of the computer which runs the identifiable process.
-     * 
+     *
      * @return The computer UUID.
      */
     public UUID getComputerUUID() {
@@ -58,7 +58,7 @@ public class WorldProcessId implements Serializable {
 
     /**
      * Returns the process id of the identifiable process.
-     * 
+     *
      * @return The process id.
      */
     public int getPid() {

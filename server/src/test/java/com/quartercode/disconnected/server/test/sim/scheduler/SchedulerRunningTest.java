@@ -29,11 +29,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import com.quartercode.classmod.def.extra.conv.DefaultCFeatureHolder;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.disconnected.server.sim.scheduler.DefaultScheduler;
+import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
+import com.quartercode.jtimber.api.node.Node;
 
 @RunWith (Parameterized.class)
 public class SchedulerRunningTest {
@@ -56,12 +55,12 @@ public class SchedulerRunningTest {
         return data;
     }
 
-    private final int        initialDelay;
-    private final int        periodicDelay;
+    private final int           initialDelay;
+    private final int           periodicDelay;
 
-    private final boolean    periodic;
+    private final boolean       periodic;
 
-    private DefaultScheduler scheduler;
+    private DefaultScheduler<?> scheduler;
 
     public SchedulerRunningTest(int initialDelay, int periodicDelay) {
 
@@ -76,7 +75,7 @@ public class SchedulerRunningTest {
 
         schedulerTaskExecutions = new int[2];
 
-        scheduler = new DefaultScheduler("scheduler", new DefaultCFeatureHolder());
+        scheduler = new DefaultScheduler<>();
     }
 
     @Test
@@ -137,26 +136,15 @@ public class SchedulerRunningTest {
     }
 
     @RequiredArgsConstructor
-    private static class TestSchedulerTask extends SchedulerTaskAdapter {
-
-        static {
-
-            EXECUTE.addExecutor("default", TestSchedulerTask.class, new FunctionExecutor<Void>() {
-
-                @Override
-                public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                    int trackingIndex = ((TestSchedulerTask) invocation.getCHolder()).trackingIndex;
-                    schedulerTaskExecutions[trackingIndex]++;
-
-                    return invocation.next(arguments);
-                }
-
-            });
-
-        }
+    private static class TestSchedulerTask extends SchedulerTaskAdapter<Node<?>> {
 
         private final int trackingIndex;
+
+        @Override
+        public void execute(Scheduler<? extends Node<?>> scheduler, Node<?> schedulerParent) {
+
+            schedulerTaskExecutions[trackingIndex]++;
+        }
 
     }
 

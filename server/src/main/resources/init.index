@@ -1,6 +1,3 @@
-# Add Classmod factory providers
-com.quartercode.disconnected.server.init.AddServerClassmodFactoryProviders
-
 # Add EventBridge factory mappings
 com.quartercode.disconnected.server.init.AddServerEventBridgeFactoryMappings
 
@@ -17,6 +14,7 @@ com.quartercode.disconnected.server.init.InitializeTickService
 
 # Initialize resources
 com.quartercode.disconnected.server.init.LoadResourceStore
+com.quartercode.disconnected.server.init.GenerateExtraJAXBBindingFiles
 
 # Add config commands
 com.quartercode.disconnected.server.init.AddServerConfigCommandParsers

@@ -20,7 +20,7 @@ package com.quartercode.disconnected.client.graphics;
 
 /**
  * This constant class holds the {@link GraphicsStateDescriptor}s for the {@link GraphicsState}s used by Disconnected.
- * 
+ *
  * @see GraphicsStateDescriptor
  */
 public class DefaultStates {

@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.server.test.world.comp.AbstractComplexComputerTest;
 import com.quartercode.disconnected.server.world.comp.file.Directory;
-import com.quartercode.disconnected.server.world.comp.file.FSModule;
+import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.file.FileRemoveAction;
@@ -161,7 +161,7 @@ public class FileManagerProgramChangeDirTest extends AbstractComplexComputerTest
         sendChangeDirCommand(resolve(ROOT, "test1/test2/test5"));
 
         // Delete /test1/test2
-        mainFsModule().invoke(FSModule.GET_FILE, resolve(ROOT, "test1/test2")).invoke(File.CREATE_REMOVE).invoke(FileRemoveAction.EXECUTE);
+        mainFsModule().invoke(FileSystemModule.GET_FILE, resolve(ROOT, "test1/test2")).invoke(File.CREATE_REMOVE).invoke(FileRemoveAction.EXECUTE);
 
         // /test1/test2/test6 (should result in /test1 because /test1/test2 does no longer exist)
         bridge.getModule(StandardHandlerModule.class).addHandler(new FMP_SBPWPU_UpdateViewCommandTestHandler(resolve(ROOT, "test1"), invoked2), UPDATE_VIEW_PREDICATE);

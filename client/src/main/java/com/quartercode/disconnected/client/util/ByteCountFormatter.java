@@ -23,7 +23,7 @@ import java.text.DecimalFormat;
 /**
  * A simple formatter that converts byte counts (e.g. file sizes) into a human-readable format.
  * For example, {@code 1024} would be converted to {@code 1 kB}, while {@code 1024 * 1024 * 2 = 2097152} would be converted to {@code 2 MB}.
- * 
+ *
  * @see #format(long)
  */
 public class ByteCountFormatter {
@@ -38,7 +38,7 @@ public class ByteCountFormatter {
      * Note that the maximum byte count is somewhere between {@code 1023 PB} and {@code 1024 PB}.
      * The exact maximum would be {@code 10 ^ (6 * log(1024))}; however, the real value is often lower because of inaccuracies.
      * If the maximum is exceeded, {@code ?B} is used as unit.
-     * 
+     *
      * @param byteCount The byte count that should be converted into the human-readable format.
      * @return The human-readable string that represents the given byte count.
      */

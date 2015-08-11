@@ -18,19 +18,14 @@
 
 package com.quartercode.disconnected.server.world.util;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.classmod.extra.func.FunctionDefinition;
-import com.quartercode.classmod.factory.FunctionDefinitionFactory;
-
 /**
- * The derivable size interface declares the {@link #GET_SIZE} function for getting the size of an object.
+ * The derivable size interface declares the {@link #getSize()} method for retrieving the size of an object.
  */
-public interface DerivableSize extends CFeatureHolder {
+public interface DerivableSize {
 
     /**
-     * Derives the size of the implementing {@link CFeatureHolder} in bytes.
+     * Returns the size of this object in bytes.
      */
-    public static final FunctionDefinition<Long> GET_SIZE = factory(FunctionDefinitionFactory.class).create("getSize", new Class[0]);
+    public long getSize();
 
 }

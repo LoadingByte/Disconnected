@@ -18,46 +18,32 @@
 
 package com.quartercode.disconnected.server.world.comp.prog;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import com.quartercode.classmod.extra.func.FunctionDefinition;
-import com.quartercode.classmod.factory.FunctionDefinitionFactory;
-import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
+import com.quartercode.disconnected.server.world.util.WorldNode;
 import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
 
 /**
  * This abstract class defines a program executor which takes care of actually running a program.
- * The executor class is set in the {@link Program}.
- * 
+ * A running program executor is generally managed by a {@link Process}.
+ * On the file system, program executors are stored in {@link Program} objects which in turn are stored in content files.
+ *
  * @see Program
  * @see Process
  */
-public abstract class ProgramExecutor extends WorldChildFeatureHolder<Process<?>> {
-
-    // ----- Functions -----
+public abstract class ProgramExecutor extends WorldNode<Process<?>> {
 
     /**
-     * This callback is executed once when the program executor should start running.
-     * For example, this method could schedule tasks using the scheduler.<br>
+     * This callback is executed exactly one time when the program executor should start running its program.
+     * For example, this method could schedule new tasks or add some event handlers.<br>
      * <br>
      * <b>Important note:</b>
-     * If this method registers some kind of hooks apart from scheduler tasks (e.g. event handlers), they must be removed when the program stops.
-     * For doing that, {@link ProcStateListener process state listeners} should be added to the {@link Process#STATE_LISTENERS} callback list of the parent process.
-     * Those listeners can then execute all clearance activities as soon as the process state is changed to {@link WorldProcessState#STOPPED}.
+     * If this method registers some kind of hooks apart from scheduler tasks (for example, if it registers event handlers), they must be removed when the program stops.
+     * For doing that, {@link ProcessStateListener}s should be added to the executor's {@link Process} using {@link Process#addStateListener(ProcessStateListener)}.
+     * Those listeners can then execute all cleanup activities as soon as the process state is changed to {@link WorldProcessState#STOPPED}.<br>
+     * <br>
+     * Note that you do not have to implement those listeners yourself.
+     * The {@code com.quartercode.disconnected.server.world.comp.prog.util} package contains a lot of utility methods that register hooks and take care of the cleanup.
+     * That way, most hook registrations are reduced to one-liners.
      */
-    public static final FunctionDefinition<Void> RUN;
-
-    static {
-
-        RUN = factory(FunctionDefinitionFactory.class).create("run", new Class[0]);
-
-    }
-
-    /**
-     * Creates a new program executor.
-     */
-    public ProgramExecutor() {
-
-        setParentType(Process.class);
-    }
+    public abstract void run();
 
 }

@@ -27,7 +27,7 @@ public interface LocalizationSupplier {
 
     /**
      * Returns the localized string that is associated with the given key.
-     * 
+     *
      * @param key The key the returned localized string is associated with.
      * @return The localized string that is associated with the given key.
      */

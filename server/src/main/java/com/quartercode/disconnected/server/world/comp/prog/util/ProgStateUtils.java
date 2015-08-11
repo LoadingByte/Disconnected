@@ -22,7 +22,7 @@ import static com.quartercode.classmod.extra.func.Priorities.LEVEL_3;
 import com.quartercode.classmod.extra.func.FunctionExecutor;
 import com.quartercode.classmod.extra.func.FunctionInvocation;
 import com.quartercode.classmod.extra.func.Priorities;
-import com.quartercode.disconnected.server.world.comp.prog.ProcStateListener;
+import com.quartercode.disconnected.server.world.comp.prog.ProcessStateListener;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
@@ -64,11 +64,11 @@ public class ProgStateUtils {
     }
 
     /**
-     * A {@link ProcStateListener} that stops the {@link Process} it is attached to as soon as that process is interrupted.
+     * A {@link ProcessStateListener} that stops the {@link Process} it is attached to as soon as that process is interrupted.
      * 
      * @see ProgStateUtils#addInterruptionStopperRegisteringExecutor(Class)
      */
-    public static class StopOnInterruptPSListener extends WorldFeatureHolder implements ProcStateListener {
+    public static class StopOnInterruptPSListener extends WorldFeatureHolder implements ProcessStateListener {
 
         static {
 

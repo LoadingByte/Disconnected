@@ -18,48 +18,77 @@
 
 package com.quartercode.disconnected.server.world.comp.vuln;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.ReferenceStorage;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
-import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlIDREF;
+import org.apache.commons.lang3.Validate;
+import com.quartercode.disconnected.server.world.util.WorldNode;
+import com.quartercode.jtimber.api.node.Node;
+import com.quartercode.jtimber.api.node.Weak;
 
 /**
- * An attack is targeted at a specific {@link Vuln vulnerability} of a computer part (e.g. a program).
- * It tries to execute a defined {@link #PREFERRED_ACTION}.
+ * An attack is targeted at a specific {@link Vulnerability vulnerability} of a computer part (e.g. a program).
+ * It tries to execute a defined {@link #getPreferredAction() preferred action}.
  * That action describes what the attacked computer part should do when the attack arrives.
  * For example, there could be {@code "crash"} and {@code "executePayload"} actions for a buffer overflow vulnerability.<br>
  * <br>
  * Note that the preferred action is really "preferred" and might not always be executed.
  * Depending on the environment, something else might happen.
  * For example, the action might be unsafe and sometimes causes the attacked program to crash instead of executing the payload.
- * 
- * @see Vuln
- * @see VulnAction
- * @see VulnAction#ATTACK_WEIGHT
+ *
+ * @see Vulnerability
+ * @see VulnerabilityAction
+ * @see VulnerabilityAction#getAttackWeight()
  */
-public class Attack extends WorldFeatureHolder {
+public class Attack extends WorldNode<Node<?>> {
 
-    // ----- Properties -----
+    @Weak
+    @XmlAttribute
+    @XmlIDREF
+    private Vulnerability vulnerability;
+    @XmlAttribute
+    private String        preferredAction;
+
+    // JAXB constructor
+    protected Attack() {
+
+    }
 
     /**
-     * The {@link Vuln vulnerability} the attack is using to attack a computer part.
+     * Creates a new attack.
+     *
+     * @param vulnerability The {@link Vulnerability} the attack is using to attack a computer part.
+     * @param preferredAction The name of the action which <i>should</i> be executed once the attack arrives at the target.
+     *        See {@link Attack} for more information on the purpose of actions and why the field starts with "preferred".
+     */
+    public Attack(Vulnerability vulnerability, String preferredAction) {
+
+        Validate.notNull(vulnerability, "Attack vulnerability cannot be null");
+        Validate.notBlank(preferredAction, "Preferred attack action cannot be blank");
+
+        this.vulnerability = vulnerability;
+        this.preferredAction = preferredAction;
+    }
+
+    /**
+     * Returns the {@link Vulnerability} the attack is using to attack a computer part.
      * This is only used to check that the attacked computer part actually has the assumed vulnerability.
+     *
+     * @return The vulnerability used by the attack.
      */
-    public static final PropertyDefinition<Vuln>   VULN;
+    public Vulnerability getVulnerability() {
+
+        return vulnerability;
+    }
 
     /**
-     * Returns the action which should be executed once the attack arrives at the target.
+     * Returns the name of the action which <i>should</i> be executed once the attack arrives at the target.
      * See {@link Attack} for more information on the purpose of actions and why the field starts with "preferred".
+     *
+     * @return The name of the vulnerability action which <i>should</i> be executed as a consequence of the attack.
      */
-    public static final PropertyDefinition<String> PREFERRED_ACTION;
+    public String getPreferredAction() {
 
-    static {
-
-        VULN = factory(PropertyDefinitionFactory.class).create("vuln", new ReferenceStorage<>());
-        PREFERRED_ACTION = factory(PropertyDefinitionFactory.class).create("preferredAction", new StandardStorage<>());
-
+        return preferredAction;
     }
 
 }

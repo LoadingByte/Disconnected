@@ -18,210 +18,187 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import static com.quartercode.classmod.extra.func.Priorities.LEVEL_5;
-import static com.quartercode.classmod.extra.func.Priorities.LEVEL_6;
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.util.HashMap;
 import java.util.Map;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.classmod.extra.func.FunctionDefinition;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.ReferenceStorage;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
+import com.quartercode.jtimber.api.node.Weak;
 
 /**
  * The file add action is a simple file action that defines the process of adding a {@link File} to a {@link FileSystem}.
  * For doing that, the action takes a path string that describes the location where the file to add should go.<br>
  * <br>
  * See {@link FileAction} for more detail on what file actions actually are.
- * 
+ *
  * @see FileAction
  * @see File
  * @see FileSystem
  */
 public class FileAddAction extends FileAction {
 
-    // ----- Properties -----
+    @Weak
+    private final FileSystem          fileSystem;
+    @Weak
+    private final File<ParentFile<?>> file;
+    private final String              path;
 
     /**
-     * The {@link FileSystem} where the set {@link #FILE} should be added to on execution.
+     * Creates a new file add action.
+     *
+     * @param fileSystem The {@link FileSystem} on which the given file should be stored on execution.
+     * @param file The {@link File} that should be added to the given file system under the given path.
+     *        Note that the name of this file is changed to the last entry of the given path on execution.
+     * @param path The local path on the given file system where the given file should be located.
+     *        Any {@link Directory}s in this path that do not yet exist are created on execution; their attributes are copied from the given file.
+     *        Note that the name of that given file is changed to the last entry of this path.
      */
-    public static final PropertyDefinition<FileSystem>          FILE_SYSTEM;
+    public FileAddAction(FileSystem fileSystem, File<ParentFile<?>> file, String path) {
 
-    /**
-     * The {@link File} that should be added to the set {@link #FILE_SYSTEM} under the set {@link #PATH}.
-     * The name of the file is changed to the last entry of the path on execution.
-     */
-    public static final PropertyDefinition<File<ParentFile<?>>> FILE;
+        Validate.notNull(fileSystem, "Cannot use null file system for file add action");
+        Validate.notNull(file, "Cannot use null file for file add action");
+        Validate.notBlank(path, "Cannot use blank path for file add action");
 
-    /**
-     * The path on the set {@link #FILE_SYSTEM} where the set {@link #FILE} should be located.
-     * Any directories in this path that do not yet exist are created on execution.
-     * The name of the set {@link #FILE} is also changed to the last entry of this path.
-     */
-    public static final PropertyDefinition<String>              PATH;
+        this.fileSystem = fileSystem;
+        this.file = file;
 
-    static {
-
-        FILE_SYSTEM = factory(PropertyDefinitionFactory.class).create("fileSystem", new ReferenceStorage<>());
-        FILE = factory(PropertyDefinitionFactory.class).create("file", new StandardStorage<>());
-
-        PATH = factory(PropertyDefinitionFactory.class).create("path", new StandardStorage<>());
-        PATH.addSetterExecutor("normalize", FileAddAction.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                String normalizedPath = PathUtils.normalize((String) arguments[0]);
-                if (!normalizedPath.isEmpty()) {
-                    normalizedPath = normalizedPath.substring(1);
-                }
-                return invocation.next(normalizedPath);
-            }
-
-        }, LEVEL_6);
-
+        String acutalPath = PathUtils.normalize(path);
+        this.path = acutalPath.isEmpty() ? "" : acutalPath.substring(1);
     }
 
-    // ----- Functions -----
+    /**
+     * Returns the {@link FileSystem} on which the set {@link #getFile() file} should be stored on execution.
+     *
+     * @return The target file system.
+     */
+    public FileSystem getFileSystem() {
+
+        return fileSystem;
+    }
 
     /**
-     * Adds the set {@link #FILE} to the set {@link #FILE_SYSTEM} under the set {@link #PATH}.
-     * If the path does not exist, this method creates directories to match it.<br>
-     * <br>
-     * The name of the file to add is changed to match the path.
-     * Furthermore, newly created directories have the same right settings as the file to add.
-     * 
-     * <table>
-     * <tr>
-     * <th>Exception</th>
-     * <th>When?</th>
-     * </tr>
-     * <tr>
-     * <td>{@link InvalidPathException}</td>
-     * <td>The set file path isn't valid (for example, a file along the path is not a parent file).</td>
-     * </tr>
-     * <tr>
-     * <td>{@link OccupiedPathException}</td>
-     * <td>The file path, under which the new file should be added, is already used by another file.</td>
-     * </tr>
-     * <tr>
-     * <td>{@link OutOfSpaceException}</td>
-     * <td>There is not enough space for the new file or a required directory.</td>
-     * </tr>
-     * </table>
+     * Returns the {@link File} that should be added to the set {@link #getFileSystem() file system} under the set {@link #getPath() path}.
+     * Note that the name of this file is changed to the last entry of the set path on execution.
+     *
+     * @return The file that should be added.
      */
-    public static final FunctionDefinition<Void>                EXECUTE = FileAction.EXECUTE;
+    public File<ParentFile<?>> getFile() {
 
-    static {
+        return file;
+    }
 
-        EXECUTE.addExecutor("addPathDirectories", FileAddAction.class, new FunctionExecutor<Void>() {
+    /**
+     * Returns the local path on the set {@link #getFileSystem() file system} where the set {@link #getFile() file} should be located.
+     * Any {@link Directory}s in this path that do not yet exist are created on execution; their attributes are copied from the set file.
+     * Note that the name of that set file is changed to the last entry of this path.
+     *
+     * @return The target local path (without a mountpoint).
+     */
+    public String getPath() {
 
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
+        return path;
+    }
 
-                CFeatureHolder fileAddAction = invocation.getCHolder();
-                File<ParentFile<?>> addFile = fileAddAction.getObj(FILE);
+    /**
+     * Adds the set {@link #getFile() file} to the set {@link #getPath() path} on the set {@link #getFileSystem() file system}.
+     * If the path does not exist, this method creates {@link Directory}s to match it.
+     * Note that the name of the added file is changed to the last entry of the set path.
+     * Furthermore, newly created directories have the same attributes and right settings as the file to add.<br>
+     * <br>
+     * Also note that no right checks or anything like that are done by this method.
+     * If you need such permission checks, use {@link #isExecutableBy(User)} or {@link #getMissingRights(User)}.
+     *
+     * @throws InvalidPathException If the set file path isn't valid (for example, if a file along the path is not a parent file).
+     * @throws OccupiedPathException If the set file path, under which the new file should be added, is already used by another file.
+     * @throws OutOfSpaceException If there is not enough space for the new file or a required directory on the target file system.
+     */
+    @Override
+    public void execute() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
 
-                String path = fileAddAction.getObj(PATH);
-                String pathToParent = path.contains(PathUtils.SEPARATOR) ? path.substring(0, path.lastIndexOf(PathUtils.SEPARATOR)) : "";
-                String[] pathParts = pathToParent.split(PathUtils.SEPARATOR);
+        addPathDirectories();
+        addFile();
+    }
 
-                File<?> current = fileAddAction.getObj(FILE_SYSTEM).getObj(FileSystem.ROOT);
-                for (String pathPart : pathParts) {
-                    if (!pathPart.isEmpty()) {
-                        File<?> nextCurrent = current.invoke(ParentFile.GET_CHILD_BY_NAME, pathPart);
+    private String getParentFilePath() {
 
-                        if (nextCurrent == null) {
-                            Directory directory = new Directory();
-                            directory.setObj(File.NAME, pathPart);
-                            directory.setObj(File.OWNER, addFile.getObj(File.OWNER));
-                            directory.setObj(File.GROUP, addFile.getObj(File.GROUP));
-                            directory.setObj(File.RIGHTS, new FileRights(addFile.getObj(File.RIGHTS)));
-                            current.addToColl(ParentFile.CHILDREN, directory);
-                            nextCurrent = directory;
-                        } else if (! (nextCurrent instanceof ParentFile)) {
-                            throw new InvalidPathException(fileAddAction.getObj(FILE_SYSTEM), path);
-                        }
+        return path.contains(PathUtils.SEPARATOR) ? path.substring(0, path.lastIndexOf(PathUtils.SEPARATOR)) : "";
+    }
 
-                        current = nextCurrent;
+    private void addPathDirectories() throws InvalidPathException, OutOfSpaceException {
+
+        String[] parentPathParts = getParentFilePath().split(PathUtils.SEPARATOR);
+
+        ParentFile<?> current = fileSystem.getRootFile();
+        for (String parentPathPart : parentPathParts) {
+            if (!parentPathPart.isEmpty()) {
+                File<?> nextCurrent = current.getChildFileByName(parentPathPart);
+
+                if (nextCurrent == null) {
+                    Directory directory = new Directory(file.getOwner());
+                    directory.setName(parentPathPart);
+                    directory.setGroup(file.getGroup());
+                    directory.getRights().importRights(file.getRights());
+                    current.addChildFile(directory);
+                    nextCurrent = directory;
+                } else if (! (nextCurrent instanceof ParentFile)) {
+                    throw new InvalidPathException(fileSystem, path);
+                }
+
+                current = (ParentFile<?>) nextCurrent;
+            }
+        }
+    }
+
+    private void addFile() throws InvalidPathException, OccupiedPathException, OutOfSpaceException {
+
+        // Should not throw an exception because the parent has already been added by the addPathDirectories() method
+        ParentFile<?> parent = (ParentFile<?>) fileSystem.getFile(getParentFilePath());
+
+        String fileName = path.substring(path.lastIndexOf(PathUtils.SEPARATOR) + 1);
+        if (parent.getChildFileByName(fileName) != null) {
+            throw new OccupiedPathException(fileSystem, path);
+        }
+
+        file.setName(fileName);
+        parent.addChildFile(file);
+    }
+
+    @Override
+    public Map<File<?>, Character[]> getMissingRights(User user) {
+
+        String[] pathParts = path.split(PathUtils.SEPARATOR);
+
+        File<?> missingRightsFile = null;
+        ParentFile<?> current = fileSystem.getRootFile();
+        for (String pathPart : pathParts) {
+            if (!pathPart.isEmpty()) {
+                File<?> nextCurrent = current.getChildFileByName(pathPart);
+
+                // Check whether the current file exists
+                if (nextCurrent == null) {
+                    // Executor user hasn't rights to create the new file
+                    if (!current.hasRight(user, FileRights.WRITE)) {
+                        missingRightsFile = current;
                     }
+                    break;
+                } else if (! (nextCurrent instanceof ParentFile)) {
+                    // Break; checking whether the operation is executable at all is not the responsibility of this method
+                    break;
+                } else {
+                    // Continue on
+                    current = (ParentFile<?>) nextCurrent;
                 }
-
-                return invocation.next(arguments);
             }
+        }
 
-        }, LEVEL_5);
-        EXECUTE.addExecutor("addFile", FileAddAction.class, new FunctionExecutor<Void>() {
+        // Create the missing rights map
+        Map<File<?>, Character[]> missingRights = new HashMap<>();
+        if (missingRightsFile != null) {
+            missingRights.put(missingRightsFile, new Character[] { FileRights.WRITE });
+        }
 
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                CFeatureHolder fileAddAction = invocation.getCHolder();
-
-                String path = fileAddAction.getObj(PATH);
-                String pathToParent = path.contains(PathUtils.SEPARATOR) ? path.substring(0, path.lastIndexOf(PathUtils.SEPARATOR)) : "";
-                File<?> parent = fileAddAction.getObj(FILE_SYSTEM).invoke(FileSystem.GET_FILE, pathToParent);
-
-                String addFileName = path.substring(path.lastIndexOf(PathUtils.SEPARATOR) + 1);
-                if (parent.invoke(ParentFile.GET_CHILD_BY_NAME, addFileName) != null) {
-                    throw new OccupiedPathException(fileAddAction.getObj(FILE_SYSTEM), path);
-                }
-
-                File<ParentFile<?>> addFile = fileAddAction.getObj(FILE);
-                addFile.setObj(File.NAME, addFileName);
-                parent.addToColl(ParentFile.CHILDREN, addFile);
-
-                return invocation.next(arguments);
-            }
-
-        });
-
-        GET_MISSING_RIGHTS.addExecutor("checkFirstUnexisting", FileAddAction.class, new FunctionExecutor<Map<File<?>, Character[]>>() {
-
-            @Override
-            public Map<File<?>, Character[]> invoke(FunctionInvocation<Map<File<?>, Character[]>> invocation, Object... arguments) {
-
-                User executor = (User) arguments[0];
-                File<?> missingRightsFile = null;
-
-                CFeatureHolder fileAddAction = invocation.getCHolder();
-                String[] parts = fileAddAction.getObj(PATH).split(PathUtils.SEPARATOR);
-                File<?> current = fileAddAction.getObj(FILE_SYSTEM).getObj(FileSystem.ROOT);
-                for (String part : parts) {
-                    File<?> newCurrent = current.invoke(ParentFile.GET_CHILD_BY_NAME, part);
-
-                    // Check whether the current file exists
-                    if (newCurrent == null) {
-                        // Executor user hasn't rights to create the new file
-                        if (!current.invoke(File.HAS_RIGHT, executor, FileRights.WRITE)) {
-                            missingRightsFile = current;
-                        }
-                        break;
-                    } else {
-                        // Continue on
-                        current = newCurrent;
-                    }
-                }
-
-                // Create the missing rights map
-                Map<File<?>, Character[]> missingRights = new HashMap<>();
-                if (missingRightsFile != null) {
-                    missingRights.put(missingRightsFile, new Character[] { FileRights.WRITE });
-                }
-
-                invocation.next(arguments);
-                return missingRights;
-            }
-
-        });
-
+        return missingRights;
     }
 
 }

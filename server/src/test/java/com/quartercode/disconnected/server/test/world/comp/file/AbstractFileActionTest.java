@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.junit.Before;
+import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.Directory;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
@@ -33,20 +34,20 @@ import com.quartercode.disconnected.shared.world.comp.ByteUnit;
 
 public abstract class AbstractFileActionTest {
 
-    protected FileSystem fileSystem;
-    protected Directory  file;
-    protected User       user;
+    protected FileSystem  fileSystem;
+    protected Directory   dir;
+    protected ContentFile cfile;
+    protected User        user;
 
     @Before
     public void setUp() {
 
-        fileSystem = new FileSystem();
-        fileSystem.setObj(FileSystem.SIZE, ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
+        fileSystem = new FileSystem(ByteUnit.BYTE.convert(1, ByteUnit.TERABYTE));
 
-        user = new User();
+        user = new User("user");
 
-        file = new Directory();
-        file.setObj(File.OWNER, user);
+        dir = new Directory(user);
+        cfile = new ContentFile(user);
     }
 
     protected Map<File<?>, List<Character>> prepareMissingRightsMap(Map<File<?>, Character[]> map) {

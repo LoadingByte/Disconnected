@@ -33,14 +33,14 @@ import com.quartercode.eventbridge.bridge.module.EventHandler;
 /**
  * This utility class provides some utility methods and classes regarding the {@link ClientProgramStateContext} of {@link ClientProgramExecutor}s.
  * They should be used to remove the need for boilerplate code.
- * 
+ *
  * @see ClientProgramExecutor
  */
 public class ProgStateUtils {
 
     /**
      * Calls {@link ClientProgramStateContext#stop()} as soon as the world process, which addresses its events at the given {@link SBPWorldProcessUserDetails world process user id}, is interrupted.
-     * 
+     *
      * @param bridge The {@link Bridge} through which the server running the world process can be reached.
      * @param stateContext The state context that should be stopped.
      *        It is also used to remove the added event handlers when it stops for another reason.
@@ -65,7 +65,7 @@ public class ProgStateUtils {
 
     /**
      * Sets the given {@link Mutable} to {@code null} as soon as the world process, which addresses its events at the given {@link SBPWorldProcessUserDetails world process user id}, is interrupted.
-     * 
+     *
      * @param bridge The {@link Bridge} through which the server running the world process can be reached.
      * @param stateContext The state context of the {@link ClientProgramExecutor} that called the method.
      *        It is used to remove the added event handlers when the program stops.
@@ -93,7 +93,7 @@ public class ProgStateUtils {
     /**
      * Calls {@link ClientProgramStateContext#stop()} as soon as the given {@link DesktopWindow} is closed.
      * For doing that, a closing listener is added using {@link DesktopWindow#addCloseListener(Runnable)}.
-     * 
+     *
      * @param stateContext The state context that should be stopped.
      * @param window The desktop window that should be observed for closing.
      */
@@ -116,7 +116,7 @@ public class ProgStateUtils {
     /**
      * Interrupts a certain world process as soon as the given {@link ClientProgramStateContext} is stopped.
      * That is done by sending a {@link WorldProcessInterruptCommand}.
-     * 
+     *
      * @param bridge The {@link Bridge} through which the server running the world process can be reached.
      * @param stateContext The state context that should be observed for stopping.
      * @param worldProcessIdField A {@link Mutable} {@link WorldProcessId} field the world process for interruption is taken from.

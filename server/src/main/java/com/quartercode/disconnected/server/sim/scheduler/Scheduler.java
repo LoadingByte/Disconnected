@@ -19,32 +19,31 @@
 package com.quartercode.disconnected.server.sim.scheduler;
 
 import java.util.List;
-import com.quartercode.classmod.base.Feature;
-import com.quartercode.classmod.base.FeatureHolder;
-import com.quartercode.classmod.base.Persistable;
 import com.quartercode.disconnected.server.sim.scheduler.DefaultScheduler.ScheduledTask;
+import com.quartercode.jtimber.api.node.Node;
 
 /**
- * A scheduler is a {@link Feature} that allows executing actions (in the form of {@link ScheduledTask}s) after a set delay and/or periodically.
+ * A scheduler is a {@link Node} that allows executing actions (in the form of {@link ScheduledTask}s) after a set delay and/or periodically.
  * Such tasks are registered and started through the two {@code schedule()} methods
  * ({@link #schedule(String, String, int, SchedulerTask)} and {@link #schedule(String, String, int, int, SchedulerTask)}).
  * For actually counting down any delay and finally executing the tasks, the {@link #update(String)} method needs to be called
  * once per tick for each group.
  * Note that the update method can be temporarily disabled using the {@link #setActive(boolean)} method.<br>
  * <br>
- * It is important to note that a scheduler expects its {@link FeatureHolder holder} to implement the {@link SchedulerRegistryProvider} interface.
+ * It is important to note that a scheduler expects to have a {@link Node#getSingleParent() single parent} node.
+ * Moreover, that single parent must implement the {@link SchedulerRegistryProvider} interface.
  * The scheduler needs such a {@link SchedulerRegistry} in order to register itself for updating if it has any tasks.
- * If its holder doesn't implement the interface, no exception is thrown; however, the scheduler also isn't able to register itself.
- * Therefore, such a holder should only be used for testing (when a scheduler index isn't needed for updating all schedulers).
- * 
+ * If its single parent doesn't implement the interface, no exception is thrown; however, the scheduler also isn't able to register itself.
+ * Therefore, such a single parent should only be used for testing (when a scheduler index isn't needed for updating all schedulers).
+ *
  * @see SchedulerTask
  */
-public interface Scheduler extends Feature, Persistable {
+public interface Scheduler<P extends Node<?>> extends Node<P> {
 
     /**
      * Returns whether the scheduler is active and processes {@link #update(String)} invocations.
      * If this is set to {@code false}, any update calls do nothing.
-     * 
+     *
      * @return Whether the scheduler is active.
      */
     public boolean isActive();
@@ -52,7 +51,7 @@ public interface Scheduler extends Feature, Persistable {
     /**
      * Sets whether the scheduler is active and processes {@link #update(String)} invocations.
      * If this is set to {@code false}, any update calls do nothing.
-     * 
+     *
      * @param active Whether the scheduler should be active.
      */
     public void setActive(boolean active);
@@ -61,30 +60,30 @@ public interface Scheduler extends Feature, Persistable {
      * Returns all {@link SchedulerTask}s that are currently scheduled.
      * Such tasks must have been added using {@link #schedule(String, String, int, SchedulerTask)} or {@link #schedule(String, String, int, int, SchedulerTask)} before.
      * The order of the returned tasks matches the order in which they were scheduled.
-     * 
+     *
      * @return All currently scheduled tasks.
      */
-    public List<SchedulerTask> getTasks();
+    public List<SchedulerTask<? super P>> getTasks();
 
     /**
      * Retrieves the scheduled {@link SchedulerTask} that has the given name.
      * If multiple tasks have the same name, the task that was scheduled first is returned.
      * For example, this method could be used to {@link SchedulerTask#cancel() cancel} the retrieved task.
-     * 
+     *
      * @param name The name of the task that should be returned.
      * @return The first task with the given name, or {@code null} if no one exists.
      */
-    public SchedulerTask getTaskByName(String name);
+    public SchedulerTask<? super P> getTaskByName(String name);
 
     /**
      * Retrieves the {@link SchedulerTask}s that are scheduled for the given group.
      * If no tasks are assigned to the given group, an empty list is returned.
      * The order of the returned tasks matches the order in which they were scheduled.
-     * 
+     *
      * @param group The group of the tasks that should be returned.
      * @return The tasks with the given group.
      */
-    public List<SchedulerTask> getTasksByGroup(String group);
+    public List<SchedulerTask<? super P>> getTasksByGroup(String group);
 
     /**
      * Schedules the given non-repeating {@link SchedulerTask}.
@@ -104,14 +103,14 @@ public interface Scheduler extends Feature, Persistable {
      * The {@code group} field defines at which point during a tick the task should be executed.
      * A map of groups to priorities is used by the caller of the {@link #update(String)} method.
      * For example, all tasks with a group which has the priority 2 are executed before all tasks of a priority 1 group.
-     * 
+     *
      * @param name The name that can be used to identify the task from inside the scheduler.
      *        This field may be {@code null}, in which case the task is anonymous.
      * @param group The group which defines at which point during a tick the task should be executed.
      * @param initialDelay The amount of ticks that must elapse before the task is executed once.
      * @param task The scheduler task that should be scheduled for execution.
      */
-    public void schedule(String name, String group, int initialDelay, SchedulerTask task);
+    public void schedule(String name, String group, int initialDelay, SchedulerTask<? super P> task);
 
     /**
      * Schedules the given repeating {@link SchedulerTask}.
@@ -132,7 +131,7 @@ public interface Scheduler extends Feature, Persistable {
      * The {@code group} field defines at which point during a tick the task should be executed.
      * A map of groups to priorities is used by the caller of the {@link #update(String)} method.
      * For example, all tasks with a group which has the priority 2 are executed before all tasks of a priority 1 group.
-     * 
+     *
      * @param name The name that can be used to identify the task from inside the scheduler.
      *        This field may be {@code null}, in which case the task is anonymous.
      * @param group The group which defines at which point during a tick the task should be executed.
@@ -140,7 +139,7 @@ public interface Scheduler extends Feature, Persistable {
      * @param periodicDelay The amount of ticks that must elapse before the task is executed for any subsequent time.
      * @param task The scheduler task that should be scheduled for execution.
      */
-    public void schedule(String name, String group, int initialDelay, int periodicDelay, SchedulerTask task);
+    public void schedule(String name, String group, int initialDelay, int periodicDelay, SchedulerTask<? super P> task);
 
     /**
      * Lets <b>one</b> tick pass and executes all scheduled {@link SchedulerTask}s which are assigned to the given group
@@ -150,7 +149,7 @@ public interface Scheduler extends Feature, Persistable {
      * <br>
      * If a scheduler task throws a {@link RuntimeException}, it is thrown up the stack to the update caller.
      * Since it is not the responsibility of the update caller to handle exceptions, they should be handled by the tasks themselves.
-     * 
+     *
      * @param group The group whose scheduler tasks should be updated.
      *        Note that this method should be invoked once per tick for <b>each</b> group.
      */

@@ -34,7 +34,7 @@ public class WorldProcessLaunchCommand extends EventBase {
 
     /**
      * Creates a new process launch command.
-     * 
+     *
      * @param worldProcessUserDetails A {@link SBPWorldProcessUserDetails} object that is used by the SBP to identify the correct world process user.
      * @param programName The name of the program which should be launched for the new world process (e.g. {@code fileManager}).
      */
@@ -46,7 +46,7 @@ public class WorldProcessLaunchCommand extends EventBase {
 
     /**
      * Returns a {@link SBPWorldProcessUserDetails} object that is used by the SBP to identify the correct world process user.
-     * 
+     *
      * @return The world process user identity details.
      */
     public SBPWorldProcessUserDetails getWorldProcessUserDetails() {
@@ -57,7 +57,7 @@ public class WorldProcessLaunchCommand extends EventBase {
     /**
      * Returns the name of the program which should be launched for the new world process (e.g. {@code fileManager}).
      * If the defined program doesn't exist, the launch command is ignored by the server.
-     * 
+     *
      * @return The program name.
      */
     public String getProgramName() {

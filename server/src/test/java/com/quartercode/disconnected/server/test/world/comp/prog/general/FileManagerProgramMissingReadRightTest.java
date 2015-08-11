@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import com.quartercode.disconnected.server.test.world.comp.AbstractComplexComputerTest;
 import com.quartercode.disconnected.server.world.comp.file.Directory;
-import com.quartercode.disconnected.server.world.comp.file.FSModule;
+import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
 import com.quartercode.disconnected.server.world.comp.file.File;
 import com.quartercode.disconnected.server.world.comp.file.FileAddAction;
 import com.quartercode.disconnected.server.world.comp.prog.ChildProcess;
@@ -52,7 +52,7 @@ public class FileManagerProgramMissingReadRightTest extends AbstractComplexCompu
     public void setUp() {
 
         // Create the test directory
-        mainFsModule().invoke(FSModule.CREATE_ADD_FILE, dir, PATH).invoke(FileAddAction.EXECUTE);
+        mainFsModule().invoke(FileSystemModule.CREATE_ADD_FILE, dir, PATH).invoke(FileAddAction.EXECUTE);
     }
 
     private void executeProgramAndSendChangeDirCommand(Process<?> parentProcess, String change) {

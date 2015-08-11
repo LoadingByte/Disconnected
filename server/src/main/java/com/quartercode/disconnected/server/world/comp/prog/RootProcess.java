@@ -18,40 +18,45 @@
 
 package com.quartercode.disconnected.server.world.comp.prog;
 
-import static com.quartercode.classmod.extra.func.Priorities.LEVEL_6;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
+import com.quartercode.disconnected.server.world.comp.file.ContentFile;
+import com.quartercode.disconnected.server.world.comp.file.MissingFileRightsException;
+import com.quartercode.disconnected.server.world.comp.user.User;
 
 /**
  * The root process is a simple {@link Process} which can be only used as root for the process tree.
- * 
+ *
  * @see Process
  */
-public class RootProcess extends Process<ProcModule> {
+public class RootProcess extends Process<ProcessModule> {
 
-    // ----- Functions -----
-
-    static {
-
-        GET_ROOT.addExecutor("returnThis", RootProcess.class, new FunctionExecutor<RootProcess>() {
-
-            @Override
-            public RootProcess invoke(FunctionInvocation<RootProcess> invocation, Object... arguments) {
-
-                invocation.next(arguments);
-                return (RootProcess) invocation.getCHolder();
-            }
-
-        }, LEVEL_6);
+    // JAXB constructor
+    protected RootProcess() {
 
     }
 
     /**
-     * Creates a new empty root process.
+     * Creates a new root process and immediately launches it.
+     * This constructor should only be used by a {@link ProcessModule}.
+     *
+     * @param pid The unique process id for the new process. This is probably {@code 0}.
+     * @param source The {@link ContentFile} which contains the {@link Program} the new process should run. This is probably the session program.
+     * @throws IllegalArgumentException If the given PID is invalid or already used by another process.
+     *         Alternatively, if the provided source file does not contain a program object.
+     * @throws IllegalStateException If the {@link Program#getName() name} of the program stored in the given source file is unknown and no executor can therefore be retrieved.
+     * @throws MissingFileRightsException If the {@link User} the new process runs under hasn't got the read and execute rights on the source file.
+     *         If you are not starting a new {@link Session}, the user of the new process will be the same one as the {@link #getUser() user of this process}.
      */
-    public RootProcess() {
+    protected RootProcess(int pid, ContentFile source) throws MissingFileRightsException {
 
-        setParentType(ProcModule.class);
+        super(pid, source, null);
+
+        initialize();
+    }
+
+    @Override
+    public RootProcess getRoot() {
+
+        return this;
     }
 
 }

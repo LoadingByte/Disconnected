@@ -19,12 +19,15 @@
 package com.quartercode.disconnected.shared.world.comp;
 
 import java.io.Serializable;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
+import com.quartercode.disconnected.shared.world.comp.Version.VersionAdapter;
 
 /**
  * This class represents a simple version.
@@ -32,15 +35,16 @@ import com.quartercode.disconnected.shared.util.XmlPersistent;
  * An example version string could be {@code 2.5.1} (using the format {@code major.minor.revision}).
  */
 @XmlPersistent
+@XmlJavaTypeAdapter (VersionAdapter.class)
 public class Version implements Serializable {
 
     private static final long serialVersionUID = -1562702953794851906L;
 
-    @XmlElement
+    @XmlAttribute
     private final int         major;
-    @XmlElement
+    @XmlAttribute
     private final int         minor;
-    @XmlElement
+    @XmlAttribute
     private final int         revision;
 
     /**
@@ -56,7 +60,7 @@ public class Version implements Serializable {
     /**
      * Creates a new version object with the given three version components.
      * Note that all components must be {@code >= 0}.
-     * 
+     *
      * @param major The major version component which is changed after very large changes.
      * @param minor The minor version component which is changed after the addition of a new big features.
      * @param revision The revision version component which is changed after fixes.
@@ -76,7 +80,7 @@ public class Version implements Serializable {
      * Creates a new version object using the version that is stored in the given version string.
      * The string must be using the format {@code major.minor.revision} (e.g. {@code 2.5.1}).
      * Note that all parts must be {@code >= 0}.
-     * 
+     *
      * @param string The version string to parse.
      */
     public Version(String string) {
@@ -97,7 +101,7 @@ public class Version implements Serializable {
      * Returns the major version component which is changed after very large changes.
      * It is the first version string component ({@code X.x.x}).
      * Note that the major version must always be {@code >= 0}.
-     * 
+     *
      * @return The major version number.
      */
     public int getMajor() {
@@ -109,7 +113,7 @@ public class Version implements Serializable {
      * Creates a new version that is based of this version and has the given major version component.
      * That component is the one which is changed after very large changes.
      * Note that the new major version must be {@code >= 0}.
-     * 
+     *
      * @param major The new major version number.
      * @return The new version object with the given major version number.
      */
@@ -124,7 +128,7 @@ public class Version implements Serializable {
      * Returns the minor version component which is changed after the addition of a new big features.
      * It is the second version string component ({@code x.X.x}).
      * Note that the minor version must always be {@code >= 0}.
-     * 
+     *
      * @return The minor version number.
      */
     public int getMinor() {
@@ -136,7 +140,7 @@ public class Version implements Serializable {
      * Creates a new version that is based of this version and has the given minor version component.
      * That component is the one which is changed after the addition of a new big features.
      * Note that the new minor version must be {@code >= 0}.
-     * 
+     *
      * @param minor The new minor version number.
      * @return The new version object with the given minor version number.
      */
@@ -151,7 +155,7 @@ public class Version implements Serializable {
      * Returns the revision version component which is changed after fixes.
      * It is the third version string component ({@code x.x.X}).
      * Note that the revision version must always be {@code >= 0}.
-     * 
+     *
      * @return The revision version number.
      */
     public int getRevision() {
@@ -163,7 +167,7 @@ public class Version implements Serializable {
      * Creates a new version that is based of this version and has the given revision version component.
      * That component is the one which is changed after fixes.
      * Note that the new revision version must be {@code >= 0}.
-     * 
+     *
      * @param revision The new revision version number.
      * @return The new version object with the given revision version number.
      */
@@ -189,13 +193,35 @@ public class Version implements Serializable {
     /**
      * Returns the stored version as a string.
      * The string is using the format {@code major.minor.revision} (e.g. {@code 2.5.1}).
-     * 
+     *
      * @return A string representation of the version.
      */
     @Override
     public String toString() {
 
         return new StringBuilder().append(major).append(".").append(minor).append(".").append(revision).toString();
+    }
+
+    /**
+     * An {@link XmlAdapter} that binds {@link Version} objects using their {@link Version#toString() string representation}.
+     * If a JAXB property references a version object and doesn't specify a custom XML adapter, this adapter is used by default.
+     *
+     * @see Version
+     */
+    public static class VersionAdapter extends XmlAdapter<String, Version> {
+
+        @Override
+        public String marshal(Version v) {
+
+            return v.toString();
+        }
+
+        @Override
+        public Version unmarshal(String v) {
+
+            return new Version(v);
+        }
+
     }
 
 }

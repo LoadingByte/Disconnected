@@ -18,126 +18,161 @@
 
 package com.quartercode.disconnected.server.world.comp.hardware;
 
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import com.quartercode.classmod.extra.func.FunctionDefinition;
-import com.quartercode.classmod.extra.prop.CollectionPropertyDefinition;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.ReferenceStorage;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.extra.valuefactory.CloneValueFactory;
-import com.quartercode.classmod.factory.CollectionPropertyDefinitionFactory;
-import com.quartercode.classmod.factory.FunctionDefinitionFactory;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
-import com.quartercode.classmod.util.CollectionPropertyAccessorFactory;
-import com.quartercode.classmod.util.CollectionPropertyAccessorFactory.CriteriumMatcher;
-import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlIDREF;
+import org.apache.commons.lang3.Validate;
+import com.quartercode.disconnected.server.world.util.WorldNode;
+import com.quartercode.jtimber.api.node.Weak;
+import com.quartercode.jtimber.api.node.wrapper.SubstituteWithWrapper;
+import com.quartercode.jtimber.api.node.wrapper.collection.ListWrapper;
 
 /**
  * This class stores information about a mainboard.
  * A mainboard has {@link MainboardSlot}s that house different pieces of {@link Hardware}.
- * 
+ *
  * @see Hardware
  */
 public class Mainboard extends Hardware {
 
-    // ----- Properties -----
+    @XmlElement (name = "slot")
+    @XmlElementWrapper
+    @SubstituteWithWrapper (ListWrapper.class)
+    private final List<MainboardSlot<?>> slots;
 
-    /**
-     * The {@link MainboardSlot}s the mainboard offers.
-     * The slots could have a content on them, you have to check before you set the content to a new one.
-     */
-    public static final CollectionPropertyDefinition<MainboardSlot, List<MainboardSlot>> SLOTS;
+    // JAXB constructor
+    protected Mainboard() {
 
-    static {
-
-        SLOTS = factory(CollectionPropertyDefinitionFactory.class).create("slots", new StandardStorage<>(), new CloneValueFactory<>(new ArrayList<>()));
-
+        slots = new ArrayList<>();
     }
 
-    // ----- Functions -----
+    /**
+     * Creates a new mainboard.
+     *
+     * @param name The "model" name of the new mainboard.
+     *        See {@link #getName()} for more details.
+     * @param slots The {@link MainboardSlot}s the mainboard should offer.
+     */
+    public Mainboard(String name, List<MainboardSlot<?>> slots) {
+
+        super(name);
+
+        Validate.notEmpty(slots, "Mainboard slot list cannot be null or empty");
+        this.slots = new ArrayList<>(slots);
+    }
 
     /**
-     * Returns the {@link MainboardSlot}s the mainboard offers which have the given content type.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link Class}&lt;? extends {@link Hardware}&gt;</td>
-     * <td>type</td>
-     * <td>The content type to use for the selection.</td>
-     * </tr>
-     * </table>
+     * Returns the {@link MainboardSlot}s the mainboard offers.
+     * The slots could have a content on them, you have to check before you set the content to a new one.
+     *
+     * @return The slots of the mainboard.
      */
-    public static final FunctionDefinition<List<MainboardSlot>>                          GET_SLOTS_BY_CONTENT_TYPE;
+    public List<MainboardSlot<?>> getSlots() {
 
-    static {
+        return Collections.unmodifiableList(slots);
+    }
 
-        GET_SLOTS_BY_CONTENT_TYPE = factory(FunctionDefinitionFactory.class).create("getSlotsByContentType", new Class[] { Class.class });
-        GET_SLOTS_BY_CONTENT_TYPE.addExecutor("default", Mainboard.class, CollectionPropertyAccessorFactory.createGet(SLOTS, new CriteriumMatcher<MainboardSlot>() {
+    /**
+     * Returns the {@link MainboardSlot}s of the mainboard which have the given {@link MainboardSlot#getContentType() content type}.
+     *
+     * @param contentType The slot content type to look for.
+     * @return All slots of the mainboard which have the given content type.
+     */
+    @SuppressWarnings ("unchecked")
+    public <T extends Hardware> List<MainboardSlot<T>> getSlotsByContentType(Class<T> contentType) {
 
-            @Override
-            public boolean matches(MainboardSlot element, Object... arguments) {
+        List<MainboardSlot<T>> result = new ArrayList<>();
 
-                return ((Class<?>) arguments[0]).isAssignableFrom(element.getObj(MainboardSlot.TYPE));
+        for (MainboardSlot<?> slot : slots) {
+            if (contentType.isAssignableFrom(slot.getContentType())) {
+                result.add((MainboardSlot<T>) slot);
             }
+        }
 
-        }));
-
+        return result;
     }
 
     /**
      * This class represents a mainboard slot which can have a {@link Hardware} part as content.
      * The {@link Hardware} type a slot can accept is defined using the type class.
      * A mainboard slot is only used by the mainboard class.
-     * 
+     *
+     * @param <T> The type of hardware the mainboard slot can hold (similar to the {@link #getContentType() content type}).
      * @see Mainboard
      * @see Hardware
      */
-    public static class MainboardSlot extends WorldChildFeatureHolder<Mainboard> {
+    public static class MainboardSlot<T extends Hardware> extends WorldNode<Mainboard> {
 
-        // ----- Properties -----
+        @XmlAttribute
+        private Class<T> contentType;
+        @Weak
+        @XmlAttribute
+        @XmlIDREF
+        private T        content;
 
-        /**
-         * The {@link Hardware} type the mainboard slot accepts.
-         */
-        public static final PropertyDefinition<Class<? extends Hardware>> TYPE;
-
-        /**
-         * The {@link Hardware} part which currently uses the mainboard slot.
-         */
-        public static final PropertyDefinition<Hardware>                  CONTENT;
-
-        static {
-
-            TYPE = factory(PropertyDefinitionFactory.class).create("name", new StandardStorage<>());
-            CONTENT = factory(PropertyDefinitionFactory.class).create("content", new ReferenceStorage<>());
+        // JAXB constructor
+        protected MainboardSlot() {
 
         }
 
         /**
          * Creates a new mainboard slot.
+         *
+         * @param contentType The type of the {@link Hardware} part the mainboard slot accepts.
+         *        See {@link #getContentType()} for more details.
          */
-        public MainboardSlot() {
+        public MainboardSlot(Class<T> contentType) {
 
-            setParentType(Mainboard.class);
+            Validate.notNull(contentType, "Mainboard slot content type cannot be null");
+            this.contentType = contentType;
+        }
+
+        /**
+         * Returns the type of the {@link Hardware} part the mainboard slot accepts.
+         * The slot can only have a hardware part of this type as {@link #getContent() content}.
+         *
+         * @return The allowed content type of the mainboard slot.
+         */
+        public Class<T> getContentType() {
+
+            return contentType;
+        }
+
+        /**
+         * Returns the {@link Hardware} part which currently uses the mainboard slot.
+         * It must be of the allowed {@link #getContentType() content type}.
+         *
+         * @return The content of the mainboard slot.
+         */
+        public T getContent() {
+
+            return content;
+        }
+
+        /**
+         * Sets the {@link Hardware} part which uses the mainboard slot.
+         * It must be of the allowed {@link #getContentType() content type}.
+         *
+         * @param content The new content of the mainboard slot.
+         */
+        public void setContent(T content) {
+
+            Validate.notNull(content, "Mainboard slot content cannot be null");
+            this.content = content;
         }
 
     }
 
     /**
-     * This annotation marks {@link Hardware} types which are compatible with a {@link MainboardSlot} and need a {@link MainboardSlot} to function.
+     * This annotation marks {@link Hardware} parts which <b>need</b> a {@link MainboardSlot} to function.
      */
     @Target (ElementType.TYPE)
     @Retention (RetentionPolicy.RUNTIME)

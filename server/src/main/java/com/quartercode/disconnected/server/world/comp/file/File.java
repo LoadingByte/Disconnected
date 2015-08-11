@@ -18,388 +18,350 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import static com.quartercode.classmod.extra.func.Priorities.LEVEL_7;
-import static com.quartercode.classmod.factory.ClassmodFactory.factory;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
-import com.quartercode.classmod.extra.func.FunctionDefinition;
-import com.quartercode.classmod.extra.func.FunctionExecutor;
-import com.quartercode.classmod.extra.func.FunctionInvocation;
-import com.quartercode.classmod.extra.prop.PropertyDefinition;
-import com.quartercode.classmod.extra.storage.ReferenceStorage;
-import com.quartercode.classmod.extra.storage.StandardStorage;
-import com.quartercode.classmod.extra.valuefactory.ValueFactory;
-import com.quartercode.classmod.factory.FunctionDefinitionFactory;
-import com.quartercode.classmod.factory.PropertyDefinitionFactory;
-import com.quartercode.disconnected.server.world.comp.user.Group;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlIDREF;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.server.world.util.DerivableSize;
 import com.quartercode.disconnected.server.world.util.SizeUtils;
-import com.quartercode.disconnected.server.world.util.WorldChildFeatureHolder;
+import com.quartercode.disconnected.server.world.util.WorldNode;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
+import com.quartercode.jtimber.api.node.Node;
+import com.quartercode.jtimber.api.node.Weak;
 
 /**
  * This class represents a file on a {@link FileSystem}.
  * Every file knows its name and can resolve its path.
- * There are different variants of a file: A {@link ContentFile} holds content, a {@link ParentFile} holds other files.
- * 
- * @param <P> The type of the parent {@link CFeatureHolder} which houses the file somehow.
+ * There are different variants of a file: A {@link ContentFile} holds content, a {@link ParentFile} holds other files.<br>
+ * <br>
+ * Note that any file expects to have only <b>one</b> parent.
+ * Please use {@link Weak} references if you need to reference a file in an attribute.
+ *
+ * @param <P> The type of {@link Node}s that are able to be the parent of this file.
+ *        Apart from the special case {@link RootFile}, this parameter should always reference another file class.
  * @see ContentFile
  * @see ParentFile
  * @see FileSystem
  */
-public abstract class File<P extends CFeatureHolder> extends WorldChildFeatureHolder<P> implements DerivableSize {
+public abstract class File<P extends Node<?>> extends WorldNode<P> implements DerivableSize {
 
     /**
      * The default {@link FileRights} string for every new file.
-     * Note that this object is not allowed to be modified.
-     * If you wish to obtain an instance of the default file rights, please use the {@link FileRights#FileRights(FileRights)} copy constructor.
+     * If you wish to obtain an instance of the default file rights, please use the {@link FileRights#FileRights(String)} constructor with this string.
      */
-    // TODO: Make the default FileRights dynamic
-    public static final FileRights                           DEFAULT_FILE_RIGHTS = new FileRights("o:r,u:dw");
+    // TODO: Make the default file rights dynamic
+    public static final String DEFAULT_FILE_RIGHTS = "o:r,u:dw";
 
-    // ----- Properties -----
+    @XmlAttribute
+    private String             name;
+    @Weak
+    @XmlAttribute
+    @XmlIDREF
+    private User               owner;
+    @XmlAttribute
+    private String             group;
+    @XmlAttribute
+    private final FileRights   rights              = new FileRights(DEFAULT_FILE_RIGHTS);
 
-    /**
-     * The name of the file.
-     */
-    public static final PropertyDefinition<String>           NAME;
-
-    /**
-     * The {@link FileRights} object that stores which user groups are allowed to do which operations on the file.
-     * See the {@link FileRights} class for more documentation on how it works.
-     */
-    public static final PropertyDefinition<FileRights>       RIGHTS;
-
-    /**
-     * The {@link User} who owns the file.
-     * This is important for the {@link FileRights} system.
-     */
-    public static final PropertyDefinition<User>             OWNER;
-
-    /**
-     * The {@link Group} which partly owns the file.
-     * This is important for the {@link FileRights} system.
-     */
-    public static final PropertyDefinition<Group>            GROUP;
-
-    static {
-
-        NAME = factory(PropertyDefinitionFactory.class).create("name", new StandardStorage<>());
-        NAME.addSetterExecutor("trim", File.class, new FunctionExecutor<Void>() {
-
-            @Override
-            public Void invoke(FunctionInvocation<Void> invocation, Object... arguments) {
-
-                String name = (String) arguments[0];
-                name = name.trim();
-
-                return invocation.next(name);
-            }
-
-        }, LEVEL_7);
-
-        RIGHTS = factory(PropertyDefinitionFactory.class).create("rights", new StandardStorage<>(), new ValueFactory<FileRights>() {
-
-            @Override
-            public FileRights get() {
-
-                return new FileRights(DEFAULT_FILE_RIGHTS);
-            }
-
-        });
-
-        OWNER = factory(PropertyDefinitionFactory.class).create("owner", new ReferenceStorage<>());
-        GROUP = factory(PropertyDefinitionFactory.class).create("group", new ReferenceStorage<>());
+    // JAXB constructor
+    protected File() {
 
     }
 
-    // ----- Functions -----
-
     /**
-     * Returns the local the path of the file.
-     * The local path can be used to look up the file a on its {@link FileSystem}.<br>
-     * A path is a collection of files separated by a separator.
+     * Creates a new file.
+     * Note that the file's {@link #getName() name} will be set as soon as the file is added to a {@link FileSystem}.
+     *
+     * @param owner The owning user of the file. Note that it may not be {@code null}.
+     *        See {@link #getOwner()} for more details.
      */
-    public static final FunctionDefinition<String>           GET_PATH;
+    protected File(User owner) {
+
+        setOwner(owner);
+    }
 
     /**
-     * Returns a {@link FileMoveAction} that moves the file to a new path on the same {@link FileSystem}.
-     * In order to actually move the file, the {@link FileMoveAction#EXECUTE} method must be invoked.
-     * Note that that method might throw exceptions if the file cannot be moved.<br>
+     * Returns the name of the file.
+     * It is the last entry of the file's {@link #getPath() path}.
+     * Note that it probably ends with an extension (e.g. {@code .exe} or {@code .txt}).
+     * An example file name might be {@code filemanager.exe}.
+     *
+     * @return The file name.
+     *         It may be {@code null} if the file has not yet been added to a {@link FileSystem}.
+     */
+    public String getName() {
+
+        return name;
+    }
+
+    /**
+     * Changes the name of the file.
+     * This operation represents renaming the file (or moving it while staying in the same directory).
+     * See {@link #getName()} for more information on the file name.
+     *
+     * @param name The new file name.
+     */
+    public void setName(String name) {
+
+        this.name = name.trim();
+    }
+
+    /**
+     * Returns the {@link User} who "owns" the file.
+     * By default, the owner of a certain file is the user who created that file.
+     * However, the owner can be {@link #setOwner(User) changed}.<br>
      * <br>
-     * If the new path does not exist, this method creates directories to match it.
-     * Newly created directories have the same right settings as the file to move.
-     * Furthermore, the name of the file to move is changed to match the new path.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link String}</td>
-     * <td>path</td>
-     * <td>The path the file will be moved to.</td>
-     * </tr>
-     * </table>
-     * 
-     * @see FileMoveAction#EXECUTE
+     * This attribute is important for the {@link #getRights() file rights} system.
+     * The user who owns a certain file has extra privileges on that file.
+     * Also see {@link FileRights} for more details.
+     *
+     * @return The owning user of the file.
+     *         Note that it may not be {@code null}.
      */
-    public static final FunctionDefinition<FileMoveAction>   CREATE_MOVE;
+    public User getOwner() {
+
+        return owner;
+    }
 
     /**
-     * Returns a {@link FileMoveAction} that moves the file to a new path on the given {@link FileSystem}.
-     * In order to actually move the file, the {@link FileMoveAction#EXECUTE} method must be invoked.
-     * Note that that method might throw exceptions if the file cannot be moved.<br>
+     * Changes the {@link User} who "owns" the file.
+     * See {@link #getOwner()} for more information on file owners.
+     *
+     * @param owner The new owning user of the file.
+     */
+    public void setOwner(User owner) {
+
+        Validate.notNull(owner, "Cannot use null as file owner");
+        this.owner = owner;
+    }
+
+    /**
+     * Returns the name of the group which is assigned to the file.
+     * By default, the group of a certain file is the {@link User#getPrimaryGroup() primary group} of the {@link User} who created that file.
+     * However, the group can be {@link #setGroup(String) changed}.
+     * It is even possible to set the file group to {@code null}, in which case the file has no group at all.<br>
      * <br>
-     * If the new path does not exist, this method creates directories to match it.
-     * Newly created directories have the same right settings as the file to move.
-     * Furthermore, the name of the file to move is changed to match the new path.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link String}</td>
-     * <td>path</td>
-     * <td>The path the file will be moved to.</td>
-     * </tr>
-     * <tr>
-     * <td>1</td>
-     * <td>{@link FileSystem}</td>
-     * <td>fileSystem</td>
-     * <td>The new file system the file will be moved to. The path is located on this file system.</td>
-     * </tr>
-     * </table>
-     * 
-     * @see FileMoveAction#EXECUTE
+     * This attribute is important for the {@link #getRights() file rights} system.
+     * Every user in the group "partially owns" the file and has certain privileges on it (compared to everyone else).
+     * However, the {@link #getOwner() owner} of the file often has even more rights.
+     * Also see {@link FileRights} for more details.
+     *
+     * @return The group of the file.
+     *         Note that it may be {@code null}.
      */
-    public static final FunctionDefinition<FileMoveAction>   CREATE_MOVE_TO_OTHER_FS;
+    public String getGroup() {
+
+        return group;
+    }
 
     /**
-     * Returns an {@link FileRemoveAction} for removing the file.
-     * If the file is a {@link ParentFile}, all child files are also going to be removed.
-     * In order to actually remove the file from its current file system, the {@link FileRemoveAction#EXECUTE} method must be invoked.
-     * Note that that method might throw exceptions if the given file cannot be added.
-     * 
-     * @see FileRemoveAction#EXECUTE
+     * Changes the name of the group which is assigned to the file.
+     * See {@link #getGroup()} for more information on file groups.
+     *
+     * @param group The new group of the file.
+     *        Note that it may be {@code null}.
      */
-    public static final FunctionDefinition<FileRemoveAction> CREATE_REMOVE;
+    public void setGroup(String group) {
+
+        Validate.isTrue(group == null || !group.isEmpty(), "Cannot use an empty string as file group; use null or an actual group instead");
+        this.group = group;
+    }
 
     /**
-     * Returns the {@link FileSystem} which is hosting the file.
+     * Returns the {@link FileRights} object that defines who (users) is allowed to execute which operations on the file.
+     * See the {@link FileRights} class for more documentation on how it works in detail.<br>
+     * <br>
+     * Note that the file rights objects of a file cannot be replaced by another object.
+     * Instead, you should use the {@link FileRights#setRight(char, char, boolean)} method to change file rights.
+     *
+     * @return The file rights object that defines who is allowed to do what with the file.
      */
-    public static final FunctionDefinition<FileSystem>       GET_FS;
+    public FileRights getRights() {
+
+        return rights;
+    }
 
     /**
      * Returns whether the given {@link User} has access to the given file right on the file.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link User}</td>
-     * <td>user</td>
-     * <td>The user whose access to the given file right should be checked.</td>
-     * </tr>
-     * <tr>
-     * <td>1</td>
-     * <td>{@link Character}</td>
-     * <td>right</td>
-     * <td>The file right character that describes the right which should be checked.</td>
-     * </tr>
-     * </table>
+     * That means that he is allowed to execute operations related to the given file right on this file.
+     * Note that the {@link User#isSuperuser() superuser} (or {@code null}) as user) has all rights; the method always returns {@code true}.
+     * Otherwise, the set {@link #getRights() file rights} are checked.
+     *
+     * @param user The user whose access to the given file right should be checked.
+     * @param right The file right character that describes the right which should be checked.
+     * @return Whether the given user is allowed to execute operations related to the given file right.
      */
-    public static final FunctionDefinition<Boolean>          HAS_RIGHT;
+    public boolean hasRight(User user, char right) {
+
+        if (user == null || user.isSuperuser()) {
+            return true;
+        } else if (rights.isRightSet(FileRights.OWNER, right) && owner.equals(user)) {
+            return true;
+        } else if (group != null && rights.isRightSet(FileRights.GROUP, right) && user.getGroups().contains(group)) {
+            return true;
+        } else if (rights.isRightSet(FileRights.OTHERS, right)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
-     * Returns whether the given {@link User} is allowed to change the {@link FileRights} attributes of the file.
-     * 
-     * <table>
-     * <tr>
-     * <th>Index</th>
-     * <th>Type</th>
-     * <th>Parameter</th>
-     * <th>Description</th>
-     * </tr>
-     * <tr>
-     * <td>0</td>
-     * <td>{@link User}</td>
-     * <td>user</td>
-     * <td>The user whose ability to change the file rights should be checked.</td>
-     * </tr>
-     * </table>
+     * Throws a {@link MissingFileRightsException} if the given {@link User} hasn't got access to at least one of the given file rights on the file.
+     * If an exception is thrown, it contains all missing rights and not just the first one.
+     * If no rights are missing, no exception is thrown.
+     * For more information on file rights, see {@link #hasRight(User, char)}.
+     *
+     * @param action A short string that describes what the missing rights are needed for. It is used in the exception message.
+     *        The context is "Cannot &lt;action&gt; '&lt;file path&gt;' because the following rights are missing: ..."
+     *        For example, this string could be {@code remove file}.
+     * @param user The user whose access to the given file rights should be checked.
+     * @param rights The file right character that describes the right which should be checked.
+     * @throws MissingFileRightsException If the given user isn't granted at least one of the given file rights.
      */
-    public static final FunctionDefinition<Boolean>          CAN_CHANGE_RIGHTS;
+    public void checkRights(String action, User user, char... rights) throws MissingFileRightsException {
 
-    static {
-
-        GET_PATH = factory(FunctionDefinitionFactory.class).create("getPath", new Class[0]);
-        GET_PATH.addExecutor("default", File.class, new FunctionExecutor<String>() {
-
-            @Override
-            public String invoke(FunctionInvocation<String> invocation, Object... arguments) {
-
-                File<?> file = (File<?>) invocation.getCHolder();
-                String path = null;
-                // Check to avoid errors when this method is called on removed/unlinked files
-                // Normally, the root file terminates the recursion by returning an empty string
-                if (file.getParent() != null) {
-                    String parentPath = file.getParent().invoke(GET_PATH);
-                    if (parentPath != null) {
-                        path = parentPath + (parentPath.isEmpty() ? "" : PathUtils.SEPARATOR) + file.getObj(NAME);
-                    }
-                }
-
-                invocation.next(arguments);
-                return path;
+        List<Character> missingRights = new ArrayList<>();
+        for (char right : rights) {
+            if (!hasRight(user, right)) {
+                missingRights.add(right);
             }
+        }
 
-        });
+        if (!missingRights.isEmpty()) {
+            throw new MissingFileRightsException(this, user, missingRights, action);
+        }
+    }
 
-        CREATE_MOVE = factory(FunctionDefinitionFactory.class).create("createMove", new Class[] { String.class });
-        CREATE_MOVE.addExecutor("default", File.class, new FunctionExecutor<FileMoveAction>() {
+    /**
+     * Returns whether the given {@link User} is allowed to change the {@link #getRights() file rights} attributes of the file.
+     *
+     * @param user The user whose ability to change the file rights should be checked.
+     * @return Whether the given user is allowed to change the file rights of this file.
+     */
+    public boolean canChangeRights(User user) {
 
-            @Override
-            public FileMoveAction invoke(FunctionInvocation<FileMoveAction> invocation, Object... arguments) {
+        return user == null || owner.equals(user) || user.isSuperuser();
+    }
 
-                CFeatureHolder file = invocation.getCHolder();
+    /**
+     * Returns the <b>local</b> the path of the file (e.g {@code bin/sys/filemanager.exe}.
+     * The local path can be used to lookup the file a on its {@link FileSystem}.
+     * However, it does <b>not</b> contain any kind of mountpoint information because that would be specific to a computer which mounted the file system.
+     * Therefore, the local path cannot be used to lookup the file on a computer/OS level.
+     *
+     * @return The <b>local</b> path of the file.
+     *         May be {@code null} if no path can be resolved because the file is no longer stored on any file system.
+     */
+    public String getPath() {
 
-                String path = (String) arguments[0];
-                FileSystem fileSystem = file.invoke(GET_FS);
-                FileMoveAction action = file.invoke(CREATE_MOVE_TO_OTHER_FS, path, fileSystem);
+        // A file should only have one parent
+        Node<?> parent = getSingleParent();
 
-                invocation.next(arguments);
-                return action;
+        // Check to avoid errors when this method is called on removed/unlinked files
+        // Normally, the root file terminates the recursion by returning an empty string
+        if (parent instanceof File) {
+            String parentPath = ((File<?>) parent).getPath();
+
+            if (parentPath != null) {
+                return parentPath + (parentPath.isEmpty() ? "" : PathUtils.SEPARATOR) + name;
             }
+        }
 
-        });
+        return null;
+    }
 
-        CREATE_MOVE_TO_OTHER_FS = factory(FunctionDefinitionFactory.class).create("createMoveToOtherFs", new Class[] { String.class, FileSystem.class });
-        CREATE_MOVE_TO_OTHER_FS.addExecutor("default", File.class, new FunctionExecutor<FileMoveAction>() {
+    /**
+     * Returns the {@link FileSystem} which is hosting the file.
+     * If you call {@link FileSystem#GET_FILE} using the path returned by {@link #getPath()}, this exact file must be returned.
+     *
+     * @return The file system which stores the file.
+     */
+    public FileSystem getFileSystem() {
 
-            @SuppressWarnings ("unchecked")
-            @Override
-            public FileMoveAction invoke(FunctionInvocation<FileMoveAction> invocation, Object... arguments) {
+        // A file should only have one parent
+        Node<?> parent = getSingleParent();
 
-                FileMoveAction action = new FileMoveAction();
-                action.setObj(FileMoveAction.FILE_SYSTEM, (FileSystem) arguments[1]);
-                action.setObj(FileMoveAction.FILE, (File<ParentFile<?>>) invocation.getCHolder());
-                action.setObj(FileMoveAction.PATH, (String) arguments[0]);
+        // Check to avoid errors when this method is called on removed/unlinked files
+        // Normally, the root file terminates the recursion by returning its parent file system
+        if (parent instanceof File) {
+            return ((File<?>) parent).getFileSystem();
+        } else {
+            return null;
+        }
+    }
 
-                invocation.next(arguments);
-                return action;
-            }
+    @Override
+    public long getSize() {
 
-        });
+        return SizeUtils.getSize(name) + SizeUtils.getSize(owner.getName()) + SizeUtils.getSize(group) + SizeUtils.getSize(rights.exportRightsAsString());
+    }
 
-        CREATE_REMOVE = factory(FunctionDefinitionFactory.class).create("createRemove", new Class[0]);
-        CREATE_REMOVE.addExecutor("default", File.class, new FunctionExecutor<FileRemoveAction>() {
+    /**
+     * Returns a {@link FileMoveAction} for moving the file to a new local path on the {@link FileSystem} it's currently located on.
+     * If the new file path does not exist, this method creates directories to match it.
+     * Those newly created directories have the same right settings as the file to add.
+     * Note that the name of the file to add is changed to match the path.<br>
+     * <br>
+     * In order to actually move the file, the {@link FileMoveAction#execute()} method must be invoked.
+     * Note that that method might throw exceptions if the file cannot be moved.
+     * Also note that no right checks or anything like that are done by that execution method.
+     * If you need such permission checks, use {@link FileMoveAction#isExecutableBy(User)} or {@link FileMoveAction#getMissingRights(User)}.
+     *
+     * @param path The new local file system path the file should be moved to
+     *        The name of the file will be changed to the last entry of this path.
+     * @return A file move action for actually moving the file.
+     * @see FileMoveAction#execute()
+     */
+    @SuppressWarnings ("unchecked")
+    public FileMoveAction prepareMove(String path) {
 
-            @Override
-            @SuppressWarnings ("unchecked")
-            public FileRemoveAction invoke(FunctionInvocation<FileRemoveAction> invocation, Object... arguments) {
+        return new FileMoveAction((File<ParentFile<?>>) this, path);
+    }
 
-                FileRemoveAction action = new FileRemoveAction();
-                action.setObj(FileAddAction.FILE, (File<ParentFile<?>>) invocation.getCHolder());
+    /**
+     * Returns a {@link FileMoveAction} for moving the file to a new local path on the given {@link FileSystem}.
+     * If the new file path does not exist, this method creates directories to match it.
+     * Those newly created directories have the same right settings as the file to add.
+     * Note that the name of the file to add is changed to match the path.<br>
+     * <br>
+     * In order to actually move the file, the {@link FileMoveAction#execute()} method must be invoked.
+     * Note that that method might throw exceptions if the file cannot be moved.
+     * Also note that no right checks or anything like that are done by that execution method.
+     * If you need such permission checks, use {@link FileMoveAction#isExecutableBy(User)} or {@link FileMoveAction#getMissingRights(User)}.
+     *
+     * @param path The new local file system path the file should be moved to
+     *        The name of the file will be changed to the last entry of this path.
+     * @param fileSystem The new file system the file will be moved to.
+     *        The given local path relates to this file system.
+     * @return A file move action for actually moving the file.
+     * @see FileMoveAction#execute()
+     */
+    @SuppressWarnings ("unchecked")
+    public FileMoveAction prepareMove(String path, FileSystem fileSystem) {
 
-                invocation.next(arguments);
-                return action;
-            }
+        return new FileMoveAction(fileSystem, (File<ParentFile<?>>) this, path);
+    }
 
-        });
+    /**
+     * Returns a {@link FileRemoveAction} for removing the file from the file system it's currently stored on.
+     * If the file is a {@link ParentFile}, all child files are also going to be removed.<br>
+     * <br>
+     * In order to actually remove the file, the {@link FileRemoveAction#execute()} method must be invoked.
+     * Note that that method might throw exceptions if the file cannot be removed.
+     * Also note that no right checks or anything like that are done by that execution method.
+     * If you need such permission checks, use {@link FileRemoveAction#isExecutableBy(User)} or {@link FileRemoveAction#getMissingRights(User)}.
+     *
+     * @return A file remove action for actually removing the file.
+     * @see FileRemoveAction#execute()
+     */
+    @SuppressWarnings ("unchecked")
+    public FileRemoveAction prepareRemove() {
 
-        GET_FS = factory(FunctionDefinitionFactory.class).create("getFs", new Class[0]);
-        GET_FS.addExecutor("default", File.class, new FunctionExecutor<FileSystem>() {
-
-            @Override
-            public FileSystem invoke(FunctionInvocation<FileSystem> invocation, Object... arguments) {
-
-                CFeatureHolder file = invocation.getCHolder();
-
-                FileSystem fileSystem = null;
-                if (file instanceof RootFile) {
-                    fileSystem = ((RootFile) file).getParent();
-                } else if (file instanceof File && ((File<?>) file).getParent() != null) {
-                    fileSystem = ((File<?>) file).getParent().invoke(GET_FS);
-                }
-
-                invocation.next(arguments);
-                return fileSystem;
-            }
-
-        });
-
-        HAS_RIGHT = factory(FunctionDefinitionFactory.class).create("hasRight", new Class[] { User.class, Character.class });
-        HAS_RIGHT.addExecutor("default", File.class, new FunctionExecutor<Boolean>() {
-
-            @Override
-            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
-
-                CFeatureHolder file = invocation.getCHolder();
-                User user = (User) arguments[0];
-                char right = (char) arguments[1];
-
-                boolean result;
-                if (user == null || user.invoke(User.IS_SUPERUSER)) {
-                    result = true;
-                } else if (file instanceof RootFile) {
-                    // Only superusers (filtered out by the previous check) can add files to the root file
-                    result = false;
-                } else if (checkRight(file, FileRights.OWNER, right) && file.getObj(File.OWNER).equals(user)) {
-                    result = true;
-                } else if (checkRight(file, FileRights.GROUP, right) && user.getColl(User.GROUPS).contains(file.getObj(File.GROUP))) {
-                    result = true;
-                } else if (checkRight(file, FileRights.OTHERS, right)) {
-                    result = true;
-                } else {
-                    result = false;
-                }
-
-                invocation.next(arguments);
-                return result;
-            }
-
-            private boolean checkRight(CFeatureHolder file, char accessor, char right) {
-
-                return file.getObj(File.RIGHTS).isRightSet(accessor, right);
-            }
-
-        });
-
-        CAN_CHANGE_RIGHTS = factory(FunctionDefinitionFactory.class).create("canChangeRights", new Class[] { User.class });
-        CAN_CHANGE_RIGHTS.addExecutor("default", File.class, new FunctionExecutor<Boolean>() {
-
-            @Override
-            public Boolean invoke(FunctionInvocation<Boolean> invocation, Object... arguments) {
-
-                CFeatureHolder file = invocation.getCHolder();
-                User user = (User) arguments[0];
-
-                boolean result = file.getObj(File.OWNER).equals(user) || user.invoke(User.IS_SUPERUSER);
-
-                invocation.next(arguments);
-                return result;
-            }
-
-        });
-
-        GET_SIZE.addExecutor("name", File.class, SizeUtils.createGetSize(NAME));
-
+        return new FileRemoveAction((File<ParentFile<?>>) this);
     }
 
 }

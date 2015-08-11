@@ -23,7 +23,7 @@ package com.quartercode.disconnected.shared.util.init;
  * That initialization process is executed by the {@link #initialize()} method.
  * Each initializer must also be annotated with an {@link InitializerSettings} annotation.
  * That annotation provides more information about the initializer.
- * 
+ *
  * @see InitializerSettings
  */
 public interface Initializer {
@@ -31,7 +31,7 @@ public interface Initializer {
     /**
      * Initializes the part of the application the initializer is responsible for.
      * Note that this method should only be invoked once during the lifecycle of the application.
-     * 
+     *
      * @throws InitializationException Thrown by the initializer if the whole initialization process should be interrupted.
      *         That causes the whole application to halt.
      *         Because of that, it should only be thrown when an unrecoverable error occurs.

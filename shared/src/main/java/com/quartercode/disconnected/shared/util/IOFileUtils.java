@@ -34,7 +34,7 @@ public class IOFileUtils {
 
     /**
      * Copies the given source directory and all its content to the given target directory recursively.
-     * 
+     *
      * @param sourceDir The directory that contains the files which should be copied.
      * @param targetDir The directory into which the source files should be copied.
      * @throws IOException Something goes wrong while copying a file or directory.
@@ -57,7 +57,7 @@ public class IOFileUtils {
 
     /**
      * Deletes the given directory and all its content recursively.
-     * 
+     *
      * @param dir The directory that should be deleted.
      * @throws IOException Something goes wrong while deleting a file or directory.
      */

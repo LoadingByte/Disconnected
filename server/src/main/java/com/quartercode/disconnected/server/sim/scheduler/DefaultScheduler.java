@@ -20,56 +20,34 @@ package com.quartercode.disconnected.server.sim.scheduler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import lombok.Getter;
 import org.apache.commons.lang3.Validate;
-import com.quartercode.classmod.def.base.AbstractFeature;
-import com.quartercode.classmod.extra.conv.CFeatureHolder;
+import com.quartercode.disconnected.server.world.util.InterfaceAdapter;
 import com.quartercode.disconnected.shared.util.XmlPersistent;
+import com.quartercode.jtimber.api.node.DefaultNode;
+import com.quartercode.jtimber.api.node.Node;
+import com.quartercode.jtimber.api.node.wrapper.SubstituteWithWrapper;
+import com.quartercode.jtimber.api.node.wrapper.collection.ListWrapper;
 
 /**
  * The default {@link Scheduler} implementation.
- * 
+ *
  * @see Scheduler
  */
 @XmlPersistent
-@XmlRootElement
-public class DefaultScheduler extends AbstractFeature implements Scheduler {
+@XmlAccessorType (XmlAccessType.NONE)
+public class DefaultScheduler<P extends Node<?>> extends DefaultNode<P> implements Scheduler<P> {
 
-    private boolean             active;
+    @XmlAttribute
+    private boolean                              active         = true;
     @XmlElement (name = "scheduledTask")
-    private List<ScheduledTask> scheduledTasks;
-
-    /**
-     * Creates a new empty default scheduler.
-     * This is only recommended for direct field access (e.g. for serialization).
-     */
-    protected DefaultScheduler() {
-
-    }
-
-    /**
-     * Creates a new default scheduler with the given name and {@link CFeatureHolder}.
-     * 
-     * @param name The name of the default scheduler.
-     * @param holder The feature holder which has and uses the new default scheduler.
-     */
-    public DefaultScheduler(String name, CFeatureHolder holder) {
-
-        super(name, holder);
-
-        active = true;
-        scheduledTasks = new CopyOnWriteArrayList<>();
-    }
-
-    @Override
-    public boolean isPersistent() {
-
-        return !scheduledTasks.isEmpty();
-    }
+    @SubstituteWithWrapper (ListWrapper.class)
+    private final List<ScheduledTask<? super P>> scheduledTasks = new ArrayList<>();
 
     @Override
     public boolean isActive() {
@@ -84,11 +62,11 @@ public class DefaultScheduler extends AbstractFeature implements Scheduler {
     }
 
     @Override
-    public List<SchedulerTask> getTasks() {
+    public List<SchedulerTask<? super P>> getTasks() {
 
-        List<SchedulerTask> tasks = new ArrayList<>();
+        List<SchedulerTask<? super P>> tasks = new ArrayList<>();
 
-        for (ScheduledTask scheduledTask : scheduledTasks) {
+        for (ScheduledTask<? super P> scheduledTask : scheduledTasks) {
             tasks.add(scheduledTask.getTask());
         }
 
@@ -96,11 +74,11 @@ public class DefaultScheduler extends AbstractFeature implements Scheduler {
     }
 
     @Override
-    public SchedulerTask getTaskByName(String name) {
+    public SchedulerTask<? super P> getTaskByName(String name) {
 
         Validate.notBlank(name, "Can't search for scheduler task with blank name");
 
-        for (ScheduledTask task : scheduledTasks) {
+        for (ScheduledTask<? super P> task : scheduledTasks) {
             String taskName = task.getName();
 
             if (taskName != null && taskName.equals(name)) {
@@ -112,13 +90,13 @@ public class DefaultScheduler extends AbstractFeature implements Scheduler {
     }
 
     @Override
-    public List<SchedulerTask> getTasksByGroup(String group) {
+    public List<SchedulerTask<? super P>> getTasksByGroup(String group) {
 
         Validate.notBlank(group, "Can't search for scheduler tasks with blank group");
 
-        List<SchedulerTask> tasks = new ArrayList<>();
+        List<SchedulerTask<? super P>> tasks = new ArrayList<>();
 
-        for (ScheduledTask scheduledTask : scheduledTasks) {
+        for (ScheduledTask<? super P> scheduledTask : scheduledTasks) {
             if (scheduledTask.getGroup().equals(group)) {
                 tasks.add(scheduledTask.getTask());
             }
@@ -128,17 +106,18 @@ public class DefaultScheduler extends AbstractFeature implements Scheduler {
     }
 
     @Override
-    public void schedule(String name, String group, int initialDelay, SchedulerTask task) {
+    public void schedule(String name, String group, int initialDelay, SchedulerTask<? super P> task) {
 
         schedule(name, group, initialDelay, -1, task);
     }
 
     @Override
-    public void schedule(String name, String group, int initialDelay, int periodicDelay, SchedulerTask task) {
+    public void schedule(String name, String group, int initialDelay, int periodicDelay, SchedulerTask<? super P> task) {
 
-        ScheduledTask scheduledTask = new ScheduledTask(name, group, initialDelay, periodicDelay, task);
+        ScheduledTask<? super P> scheduledTask = new ScheduledTask<>(name, group, initialDelay, periodicDelay, task);
 
         // Update task list
+        // The new task will be added at the end of the task list; therefore, if an update loop is currently iterating the list, the new task will be processed
         scheduledTasks.add(scheduledTask);
 
         // If the first task has just been scheduled, add the scheduler to the registry
@@ -155,34 +134,37 @@ public class DefaultScheduler extends AbstractFeature implements Scheduler {
             return;
         }
 
-        CFeatureHolder holder = (CFeatureHolder) getHolder();
+        P schedulerParent = getSingleParent();
 
-        for (ScheduledTask scheduledTask : scheduledTasks) {
+        for (int index = 0; index < scheduledTasks.size(); index++) {
+            ScheduledTask<? super P> scheduledTask = scheduledTasks.get(index);
+
             if (scheduledTask.getGroup().endsWith(group)) {
+                // Remove the task if it has been cancelled
                 if (scheduledTask.getTask().isCancelled()) {
-                    removeTask(scheduledTask, group);
-                } else {
-                    scheduledTask.update(holder);
+                    scheduledTasks.remove(index);
+                    // Decrement the index so that no task will be skipped (we just removed one task; therefore, the next task has moved up by one)
+                    index--;
+
+                    // If the scheduler has no more tasks, remove it from the registry
+                    if (scheduledTasks.isEmpty() && getSchedulerRegistry() != null) {
+                        getSchedulerRegistry().removeScheduler(this);
+                    }
+                }
+                // Otherwise, update the task
+                else {
+                    scheduledTask.update(schedulerParent);
                 }
             }
         }
     }
 
-    private void removeTask(ScheduledTask task, String group) {
-
-        // Update task list
-        scheduledTasks.remove(task);
-
-        // If the scheduler has no more tasks, remove it from the registry
-        if (scheduledTasks.isEmpty() && getSchedulerRegistry() != null) {
-            getSchedulerRegistry().removeScheduler(this);
-        }
-    }
-
     private SchedulerRegistry getSchedulerRegistry() {
 
-        if (getHolder() instanceof SchedulerRegistryProvider) {
-            return ((SchedulerRegistryProvider) getHolder()).getSchedulerRegistry();
+        P schedulerParent = getSingleParent();
+
+        if (schedulerParent instanceof SchedulerRegistryProvider) {
+            return ((SchedulerRegistryProvider) schedulerParent).getSchedulerRegistry();
         } else {
             return null;
         }
@@ -203,33 +185,35 @@ public class DefaultScheduler extends AbstractFeature implements Scheduler {
     }
 
     @XmlPersistent
-    protected static class ScheduledTask {
+    protected static class ScheduledTask<P extends Node<?>> extends DefaultNode<Scheduler<? extends P>> {
 
         @Getter
         @XmlAttribute
-        private String        name;
+        private String           name;
         @Getter
         @XmlAttribute
-        private String        group;
+        private String           group;
         @XmlAttribute
-        private int           initialDelay;
+        private int              initialDelay;
         @XmlAttribute
-        private int           periodicDelay;
+        private int              periodicDelay;
 
         @Getter
-        private SchedulerTask task;
+        @XmlElement
+        @XmlJavaTypeAdapter (InterfaceAdapter.class)
+        private SchedulerTask<P> task;
 
         @XmlAttribute
-        private boolean       executedInitially;
+        private boolean          executedInitially;
         @XmlAttribute
-        private int           ticksSinceLastExecution;
+        private int              ticksSinceLastExecution;
 
         // JAXB constructor
         protected ScheduledTask() {
 
         }
 
-        private ScheduledTask(String name, String group, int initialDelay, int periodicDelay, SchedulerTask task) {
+        private ScheduledTask(String name, String group, int initialDelay, int periodicDelay, SchedulerTask<P> task) {
 
             Validate.notBlank(group, "Scheduler task group cannot be blank");
             Validate.isTrue(initialDelay > 0, "Scheduler task initial delay (%d) must be > 0", initialDelay);
@@ -244,22 +228,9 @@ public class DefaultScheduler extends AbstractFeature implements Scheduler {
             this.task = task;
         }
 
-        // Use an object reference because JAXB doesn't support interfaces and SchedulerTask is an interface
-
-        @XmlElement (name = "task")
-        protected Object getTaskAsObject() {
-
-            return task;
-        }
-
-        protected void setTaskAsObject(Object task) {
-
-            this.task = (SchedulerTask) task;
-        }
-
         // ----- Updating -----
 
-        private void update(CFeatureHolder schedulerHolder) {
+        private void update(P schedulerParent) {
 
             ticksSinceLastExecution++;
 
@@ -270,9 +241,9 @@ public class DefaultScheduler extends AbstractFeature implements Scheduler {
                     task.cancel();
                 }
 
-                execute(schedulerHolder);
+                execute(schedulerParent);
             } else if (executedInitially && reachedDelay(periodicDelay)) {
-                execute(schedulerHolder);
+                execute(schedulerParent);
             }
         }
 
@@ -281,10 +252,10 @@ public class DefaultScheduler extends AbstractFeature implements Scheduler {
             return ticksSinceLastExecution >= delay;
         }
 
-        private void execute(CFeatureHolder schedulerHolder) {
+        private void execute(P schedulerParent) {
 
             ticksSinceLastExecution = 0;
-            task.invoke(SchedulerTask.EXECUTE, schedulerHolder);
+            task.execute(getSingleParent(), schedulerParent);
         }
 
     }

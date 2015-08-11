@@ -36,7 +36,7 @@ public class NullPreventer {
 
     /**
      * Returns 0 if the input {@link Byte} wrapper is null, otherwise the method returns the input again.
-     * 
+     *
      * @param value The wrapped {@link Byte} object to prevent from null.
      * @return 0 or the input {@link Byte}, depending on the value.
      */
@@ -47,7 +47,7 @@ public class NullPreventer {
 
     /**
      * Returns 0 if the input {@link Short} wrapper is null, otherwise the method returns the input again.
-     * 
+     *
      * @param value The wrapped {@link Short} object to prevent from null.
      * @return 0 or the input {@link Short}, depending on the value.
      */
@@ -58,7 +58,7 @@ public class NullPreventer {
 
     /**
      * Returns 0 if the input {@link Integer} wrapper is null, otherwise the method returns the input again.
-     * 
+     *
      * @param value The wrapped {@link Integer} object to prevent from null.
      * @return 0 or the input {@link Integer}, depending on the value.
      */
@@ -69,7 +69,7 @@ public class NullPreventer {
 
     /**
      * Returns 0 if the input {@link Long} wrapper is null, otherwise the method returns the input again.
-     * 
+     *
      * @param value The wrapped {@link Long} object to prevent from null.
      * @return 0 or the input {@link Long}, depending on the value.
      */
@@ -80,7 +80,7 @@ public class NullPreventer {
 
     /**
      * Returns false if the input {@link Boolean} wrapper is null, otherwise the method returns the input again.
-     * 
+     *
      * @param value The wrapped {@link Boolean} object to prevent from null.
      * @return false or the input {@link Boolean}, depending on the value.
      */
@@ -91,7 +91,7 @@ public class NullPreventer {
 
     /**
      * Returns an empty {@link String} if the input {@link String} is null, otherwise the method returns the input again.
-     * 
+     *
      * @param value The {@link String} to prevent from null.
      * @return An empty {@link String} or the input {@link String}, depending on the value.
      */
@@ -102,7 +102,7 @@ public class NullPreventer {
 
     /**
      * Returns an empty {@link ArrayList} if the input {@link List} is null, otherwise the method returns the input again.
-     * 
+     *
      * @param value The {@link List} to prevent from null.
      * @return An empty {@link ArrayList} or the input {@link List}, depending on the value.
      */
@@ -113,7 +113,7 @@ public class NullPreventer {
 
     /**
      * Returns an empty {@link HashSet} if the input {@link Set} is null, otherwise the method returns the input again.
-     * 
+     *
      * @param value The {@link Set} to prevent from null.
      * @return An empty {@link HashSet} or the input {@link Set}, depending on the value.
      */
@@ -124,7 +124,7 @@ public class NullPreventer {
 
     /**
      * Returns an empty {@link LinkedList} if the input {@link Queue} is null, otherwise the method returns the input again.
-     * 
+     *
      * @param value The {@link Queue} to prevent from null.
      * @return An empty {@link LinkedList} or the input {@link Queue}, depending on the value.
      */
@@ -135,7 +135,7 @@ public class NullPreventer {
 
     /**
      * Returns an empty {@link HashMap} if the input {@link Map} is null, otherwise the method returns the input again.
-     * 
+     *
      * @param value The {@link Map} to prevent from null.
      * @return An empty {@link HashMap} or the input {@link Map}, depending on the value.
      */

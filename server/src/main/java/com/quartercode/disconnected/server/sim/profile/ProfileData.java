@@ -24,7 +24,7 @@ import com.quartercode.disconnected.server.world.World;
 
 /**
  * A data class which stores the persistent {@link World} and {@link Random} objects of a profile.
- * 
+ *
  * @see ProfileService
  */
 public class ProfileData {
@@ -34,7 +34,7 @@ public class ProfileData {
 
     /**
      * Creates a new profile data object.
-     * 
+     *
      * @param world The {@link World} of the profile.
      * @param random The {@link Random} object that is used by the given world.
      */
@@ -49,7 +49,7 @@ public class ProfileData {
 
     /**
      * Returns the {@link World} of the profile.
-     * 
+     *
      * @return The profile world.
      */
     public World getWorld() {
@@ -59,7 +59,7 @@ public class ProfileData {
 
     /**
      * Returns the {@link Random} object that is used by the stored {@link World} (see {@link #getWorld()}).
-     * 
+     *
      * @return The profile random object.
      */
     public Random getRandom() {

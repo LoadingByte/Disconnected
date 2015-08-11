@@ -33,7 +33,7 @@ public class LauncherMain {
     /**
      * The main method which creates and calls a new launcher.
      * This is not part of the launcher utility.
-     * 
+     *
      * @param args The command line arguments.
      */
     public static void main(String[] args) {

@@ -86,44 +86,44 @@ public class TWLSpritesheetGenerator {
      * <br>
      * A config file with the name {@code sprites.xml} can be used inside each (sub)directory to configure the sprites.
      * Here are some example for such a config file:
-     * 
+     *
      * <pre>
      * &lt;sprites&gt;
      *     &lt;!-- Sets the attributes <i>splitx</i> and <i>splity</i> for the sprite "button.background" --&gt;
      *     &lt;!-- They will be added to the area definition --&gt;
      *     <b>&lt;sprite name="button.background" splitx="L1,R1" splity="T1,B1" /&gt;</b>
-     * 
+     *
      *     &lt;!-- Creates 32-pixel-wide sprites by iterating over the set image horizontally --&gt;
      *     &lt;!-- Each times 32 pixels have passed on the x-axis, a new sprite is started --&gt;
      *     &lt;!-- The resulting sprites have the names button2.background$0, button2.background$1, ... --&gt;
      *     <b>&lt;spriteArray name="button2.background" itemLength="32" /&gt;</b>
-     * 
+     *
      *     &lt;!-- Creates a new animation with the given name --&gt;
      *     &lt;!-- It adds all sprites from the array <i>button2.background</i> to the animation --&gt;
      *     <b>&lt;animation name="button2.background.anim" timeSource="hover"&gt;
      *         &lt;frameArray spriteArray="button2.background" duration="100" /&gt;
      *     &lt;/animation&gt;</b>
-     * 
+     *
      *     &lt;!-- Creates a new animation and adds all array sprites from index 3 to 12 (indices start at 0) --&gt;
      *     &lt;!-- Note that a non-existing start or end attribute will default the values to the start/end of the sprite array --&gt;
      *     &lt;animation name="button2.background.anim" timeSource="hover"&gt;
      *         &lt;frameArray spriteArray="button2.background" <b>start="3" end="12</b> duration="100" /&gt;
      *     &lt;/animation&gt;
-     * 
+     *
      *     &lt;!-- Animation that first displays <i>button.background</i> for 1 second --&gt;
      *     &lt;!-- and then plays the whole sprite array <i>button2.background</i> --&gt;
      *     &lt;animation name="button2.background.anim" timeSource="hover"&gt;
      *         <b>&lt;frame sprite="button.background" duration="1000" /&gt;</b>
      *         &lt;frameArray spriteArray="button2.background" duration="100" /&gt;
      *     &lt;/animation&gt;
-     * 
+     *
      *     &lt;!-- Animation that first displays <i>button.background</i> for 1 second --&gt;
      *     &lt;!-- and then plays the whole sprite array <i>button2.background</i> 3 times --&gt;
      *     &lt;animation name="button2.background.anim" timeSource="hover"&gt;
      *         &lt;frame sprite="button.background" duration="1000" /&gt;
      *         &lt;frameArray spriteArray="button2.background" <b>reps="3"</b> duration="100" /&gt;
      *     &lt;/animation&gt;
-     * 
+     *
      *     &lt;!-- Animation that first plays the whole sprite array <i>button2.background</i> --&gt;
      *     &lt;!-- and then displays a <i>button.background</i> which flashes red 5 times --&gt;
      *     &lt;animation name="button2.background.anim" timeSource="hover"&gt;
@@ -135,10 +135,10 @@ public class TWLSpritesheetGenerator {
      *     &lt;/animation&gt;
      * &lt;/sprites&gt;
      * </pre>
-     * 
+     *
      * Note that not all normal sprites have to be defined in the sprites config.
      * The sprites which are not mentioned are plain twl areas that have no special attributes.
-     * 
+     *
      * @param spritesDir The directory which contains the sprites for packing.
      *        Note that this {@link Path} should point to a plain directory and not to a zip/jar file.
      * @param outputDir The directory where the method writes the resulting spritesheets and the twl config.
@@ -173,7 +173,7 @@ public class TWLSpritesheetGenerator {
         // Write a twl theme config file that defines the sprites using the writers
         Path twlConfigFile = outputDir.resolve("twlConfig.xml");
         LOGGER.debug("Writing twl config to '{}'", twlConfigFile);
-        writeTWLConfig(smallSprites, largeSprites, twlWriters, Files.newBufferedWriter(twlConfigFile, Charset.forName("UTF-8")));
+        writeTWLConfig(smallSprites, largeSprites, twlWriters, Files.newBufferedWriter(twlConfigFile, Charset.defaultCharset()));
 
         return twlConfigFile;
     }
@@ -182,7 +182,7 @@ public class TWLSpritesheetGenerator {
      * This method walks over the sprites dir tree and determines which sprites are small and which ones are large.
      * Large sprites are directly converted into Sprite objects while only the path of small sprites is returned.
      * The method also reads all sprites.xml configuration files and creates TWLWriter objects.
-     * 
+     *
      * Return triple: [smallSpriteFiles, largeSprites, twlWriters]
      */
     private static Triple<List<Path>, Map<Path, Sprite>, List<TWLWriter>> indexSprites(final Path spritesDir, final int thresholdWidth, final int thresholdHeight) throws IOException {
@@ -333,7 +333,7 @@ public class TWLSpritesheetGenerator {
     private static void writeTWLConfig(Map<Path, List<Sprite>> smallSprites, Map<Path, Sprite> largeSprites, List<TWLWriter> writers, Writer output) throws IOException {
 
         // Write header
-        output.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        output.write("<?xml version=\"1.0\"?>");
         output.write("<!DOCTYPE themes PUBLIC \"-//www.matthiasmann.de//TWL-Theme//EN\" ");
         output.write("\"http://hg.l33tlabs.org/twl/raw-file/tip/src/de/matthiasmann/twl/theme/theme.dtd\">");
         output.write("<themes>");

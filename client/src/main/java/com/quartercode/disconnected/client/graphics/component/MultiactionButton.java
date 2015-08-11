@@ -70,7 +70,7 @@ public class MultiactionButton extends Button {
 
     /**
      * Adds a new button callback using a button code and a callback runnable.
-     * 
+     *
      * @param button The mouse button code to listen on; if the button gets pressed using this mouse button, the callback will get executed.
      * @param callback The callback listener.
      */

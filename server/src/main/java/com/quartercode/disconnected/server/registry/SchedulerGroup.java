@@ -26,7 +26,7 @@ import com.quartercode.disconnected.shared.util.registry.extra.NamedValue;
 
 /**
  * A data object that represents a scheduler group.
- * 
+ *
  * @see ServerRegistries#SCHEDULER_GROUPS
  */
 public class SchedulerGroup implements NamedValue {
@@ -36,7 +36,7 @@ public class SchedulerGroup implements NamedValue {
 
     /**
      * Creates a new scheduler group data object.
-     * 
+     *
      * @param name The name of the group.
      * @param priority The priority of the group.
      */
@@ -51,7 +51,7 @@ public class SchedulerGroup implements NamedValue {
     /**
      * Returns the name of the group.
      * See {@link ServerRegistries#SCHEDULER_GROUPS} for more details.
-     * 
+     *
      * @return The group name.
      */
     @Override
@@ -63,7 +63,7 @@ public class SchedulerGroup implements NamedValue {
     /**
      * Returns the priority of the group.
      * See {@link ServerRegistries#SCHEDULER_GROUPS} for more details.
-     * 
+     *
      * @return The group priority.
      */
     public int getPriority() {

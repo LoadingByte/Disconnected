@@ -41,7 +41,7 @@ public class DesktopWindow extends ResizableFrame {
     /**
      * Creates a new desktop window in the given desktop {@link GraphicsState}.
      * The new window is <b>not</b> added to the desktop automatically.
-     * 
+     *
      * @param state The desktop state the window is part of.
      */
     public DesktopWindow(GraphicsState state) {
@@ -64,7 +64,7 @@ public class DesktopWindow extends ResizableFrame {
 
     /**
      * Returns the desktop {@link GraphicsState} the window is part of.
-     * 
+     *
      * @return The graphics state that uses the program.
      */
     public GraphicsState getState() {
@@ -75,7 +75,7 @@ public class DesktopWindow extends ResizableFrame {
     /**
      * Changes the visibility of the window.
      * If the window is not added to the desktop yet, the {@link #open()} method is called in order to do so.
-     * 
+     *
      * @param visible Whether the window should be visibility on the desktop.
      */
     @Override
@@ -110,7 +110,7 @@ public class DesktopWindow extends ResizableFrame {
     /**
      * Registers a new open listener that is called after the window was added to the parent desktop.
      * Open listeners can be added twice.
-     * 
+     *
      * @param listener The open listener to register to the window.
      */
     public void addOpenListener(Runnable listener) {
@@ -133,7 +133,7 @@ public class DesktopWindow extends ResizableFrame {
     /**
      * Registers a new close listener that is called before the window is removed from the parent desktop.
      * Close listeners can be added twice.
-     * 
+     *
      * @param listener The close listener to register to the window.
      */
     public void addCloseListener(Runnable listener) {
@@ -158,7 +158,7 @@ public class DesktopWindow extends ResizableFrame {
     /**
      * Registers a new first layout listener that is called after the first time the {@link #layout()} method was invoked.
      * First layout listeners can be added twice.
-     * 
+     *
      * @param listener The first layout listener to register to the window.
      */
     public void addFirstLayoutListener(Runnable listener) {
