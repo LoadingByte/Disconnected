@@ -77,7 +77,7 @@ public class DefaultProfileSerializationServiceTest {
         String serializedAgain = serializeWorldToString(service, world);
         assertEquals("Serialized-deserialized-serialized XML of world does not equal the original serialized XML", serialized, serializedAgain);
 
-        // Test 1: Manually check that the content of all persistent fields and getter methods has stayed the same
+        // Test 2: Manually check that the content of all persistent fields and getter methods has stayed the same
         assertTrue("Serialized-deserialized copy of world does not equal original", nodesEqualPersistent(world, copy));
 
     }

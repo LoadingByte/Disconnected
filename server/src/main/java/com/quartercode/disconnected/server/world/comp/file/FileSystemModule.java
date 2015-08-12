@@ -150,6 +150,7 @@ public class FileSystemModule extends WorldNode<OperatingSystem> implements OSMo
      *
      * @param path The path to search under.
      * @return The file which is located under the given global OS path.
+     *         <b>Note that this file will never be {@code null}!</b> Instead, an {@link InvalidPathException} is thrown if the file doesn't exist.
      * @throws IllegalArgumentException If the given path is not absolute (it does not start with {@link PathUtils#SEPARATOR}).
      * @throws UnknownMountpointException If the file system the given path refers (first path component, e.g {@code /system}) cannot be found or is not mounted.
      * @throws InvalidPathException If the given path isn't valid (e.g. because the file does not exist or because a file along the path is not a parent file).

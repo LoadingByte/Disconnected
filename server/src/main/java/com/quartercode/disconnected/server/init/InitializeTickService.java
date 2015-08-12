@@ -33,6 +33,8 @@ public class InitializeTickService implements Initializer {
 
         TickService service = ServiceRegistry.lookup(TickService.class);
 
+        // It is important that the TickBridgeProvider is executed before the TickWorldUpdater
+        // Otherwise, command events sent by the clients would take one extra tick to really affect the world
         service.addAction(new TickBridgeProvider());
         service.addAction(new TickWorldUpdater());
     }

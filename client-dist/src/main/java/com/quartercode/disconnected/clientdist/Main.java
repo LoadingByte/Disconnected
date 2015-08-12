@@ -18,10 +18,8 @@
 
 package com.quartercode.disconnected.clientdist;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Random;
@@ -56,7 +54,6 @@ import com.quartercode.disconnected.shared.util.ExitUtil.ExitProcessor;
 import com.quartercode.disconnected.shared.util.LogExceptionHandler;
 import com.quartercode.disconnected.shared.util.ServiceRegistry;
 import com.quartercode.disconnected.shared.util.Settings;
-import com.quartercode.disconnected.shared.util.TempFileManager;
 import com.quartercode.disconnected.shared.util.ValueInjector;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.BridgeConnectorException;

@@ -65,11 +65,6 @@ public class CommonFiles {
     public static final String USER_CONFIG        = CONFIG_DIR + SEPARATOR + "users.cfg";
 
     /**
-     * The path of the config file which stores the groups of a system.
-     */
-    public static final String GROUP_CONFIG       = CONFIG_DIR + SEPARATOR + "groups.cfg";
-
-    /**
      * The config file which stores the default environment variables that are assigned to every new process.
      */
     public static final String ENVIRONMENT_CONFIG = CONFIG_DIR + SEPARATOR + "environment.cfg";

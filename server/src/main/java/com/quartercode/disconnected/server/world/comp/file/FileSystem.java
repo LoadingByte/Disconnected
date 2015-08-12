@@ -126,6 +126,7 @@ public class FileSystem extends WorldNode<Node<?>> implements DerivableSize {
      *
      * @param path The path to search under.
      * @return The file which is stored under the given path.
+     *         <b>Note that this file will never be {@code null}!</b> Instead, an {@link InvalidPathException} is thrown if the file doesn't exist.
      * @throws InvalidPathException If the given path isn't valid (e.g. because the file does not exist or because a file along the path is not a parent file).
      */
     public File<?> getFile(String path) throws InvalidPathException {

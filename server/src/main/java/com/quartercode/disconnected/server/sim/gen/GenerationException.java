@@ -24,7 +24,7 @@ import com.quartercode.disconnected.server.world.World;
  * The generation exception can occur while trying to generate a {@link World} or a part of it and indicates a severe bug the generator can not recover from.
  * It is generally thrown by one of the generators in this package.
  */
-public class GenerationException extends Exception {
+public class GenerationException extends RuntimeException {
 
     private static final long serialVersionUID = 1851129437269233199L;
 

@@ -339,7 +339,7 @@ public class WorldGenerator {
         addProgramFile(fileSystem, superuser, "processManager", new Version(1, 0, 0));
     }
 
-    // Temporary method for generating some unnecessary programs and personal files
+    // Temporary method for generating some unessential programs and personal files
     private static void addUserFiles(FileSystem fileSystem, User superuser) throws GenerationException {
 
         // Generate basic user config

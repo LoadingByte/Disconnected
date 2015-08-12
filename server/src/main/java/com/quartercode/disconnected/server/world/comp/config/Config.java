@@ -37,7 +37,7 @@ import com.quartercode.jtimber.api.node.wrapper.collection.ListWrapper;
  *
  * <pre>
  *           (Column 1)  (Column 2)  (Column 3)               (Column 4)
- * (Entry 1)  value1      value2      listentry1,listentry2    value3
+ * (Entry 1)  value1      value2      listentry1;listentry2    value3
  * (Entry 2)  value4      value5      listentry1               col4
  * (Entry 3) ...
  * </pre>

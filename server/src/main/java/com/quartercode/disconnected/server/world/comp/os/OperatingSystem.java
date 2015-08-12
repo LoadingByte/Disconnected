@@ -155,7 +155,16 @@ public class OperatingSystem extends WorldNode<Computer> {
 
         for (Object child : getChildren()) {
             if (child instanceof OSModule) {
-                ((OSModule) child).setRunning(running);
+                try {
+                    ((OSModule) child).setRunning(running);
+                } catch (RuntimeException e) {
+                    if (running == true) {
+                        // An unrecoverable error happened while trying to boot up the OS -> shut down the whole computer
+                        setRunning(false);
+                        return;
+                    }
+                    // Else: If the OS is currently shutting down and an exception is thrown by one module, ignore that error and continue with the next module
+                }
             }
         }
     }
