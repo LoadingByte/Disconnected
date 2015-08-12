@@ -29,9 +29,9 @@ import com.quartercode.disconnected.shared.world.comp.file.FileRights;
  *
  * @see FileRights
  */
-public class MissingFileRightsException extends Exception {
+public class MissingFileRightsException extends FileException {
 
-    private static final long     serialVersionUID = 5736795886562705130L;
+    private static final long     serialVersionUID = -4363670639073352728L;
 
     private final File<?>         file;
     private final User            user;

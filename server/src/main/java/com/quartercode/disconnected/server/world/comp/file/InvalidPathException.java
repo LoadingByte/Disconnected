@@ -25,7 +25,7 @@ package com.quartercode.disconnected.server.world.comp.file;
  * @see FileSystem
  * @see File
  */
-public class InvalidPathException extends Exception {
+public class InvalidPathException extends FileException {
 
     private static final long serialVersionUID = 4866038832089520912L;
 

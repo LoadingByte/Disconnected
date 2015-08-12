@@ -23,7 +23,7 @@ package com.quartercode.disconnected.server.world.comp.file;
  *
  * @see FileSystemModule
  */
-public class UnknownMountpointException extends Exception {
+public class UnknownMountpointException extends FileException {
 
     private static final long      serialVersionUID = 6564332145013501014L;
 

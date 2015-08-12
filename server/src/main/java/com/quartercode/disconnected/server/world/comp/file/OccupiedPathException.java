@@ -25,7 +25,7 @@ package com.quartercode.disconnected.server.world.comp.file;
  * @see FileSystem
  * @see File
  */
-public class OccupiedPathException extends Exception {
+public class OccupiedPathException extends FileException {
 
     private static final long serialVersionUID = -796351484036279039L;
 
