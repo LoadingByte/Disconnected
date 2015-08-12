@@ -196,7 +196,7 @@ public class ProcessModule extends WorldNode<OperatingSystem> implements OSModul
     private void killRootProcess() {
 
         rootProcess.interrupt(true);
-        scheduler.schedule("killRootProcess", "computer.programUpdate", TickService.DEFAULT_TICKS_PER_SECOND * 5, new KillRootProcessTask());
+        scheduler.schedule("killRootProcess", "computer.processUpdate", TickService.DEFAULT_TICKS_PER_SECOND * 5, new KillRootProcessTask());
     }
 
     /**

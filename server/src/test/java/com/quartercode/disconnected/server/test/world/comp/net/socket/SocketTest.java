@@ -80,7 +80,7 @@ public class SocketTest {
         socket.getIncomingPacketBuffer().add("testdata2");
         socket.getIncomingPacketBuffer().add("testdata3");
         socket.getIncomingPacketBuffer().add("testdata4");
-        socket.getScheduler().update("computer.programUpdate");
+        socket.getScheduler().update("computer.processUpdate");
     }
 
     @Test
@@ -110,7 +110,7 @@ public class SocketTest {
         // Add test packets to the packet buffer and trigger the packet handling
         socket.getIncomingPacketBuffer().add("testdata1");
         socket.getIncomingPacketBuffer().add("testdata2");
-        socket.getScheduler().update("computer.programUpdate");
+        socket.getScheduler().update("computer.processUpdate");
     }
 
 }

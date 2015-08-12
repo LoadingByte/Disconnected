@@ -106,7 +106,7 @@ public class ProcessManagerProgramInterruptProcessTest extends ProcessManagerPro
         }, UPDATE_VIEW_PREDICATE);
 
         // Update the scheduler once in order to send one UpdateView event
-        process.getObj(Process.EXECUTOR).get(ProcessManagerProgram.SCHEDULER).update("computer.programUpdate");
+        process.getObj(Process.EXECUTOR).get(ProcessManagerProgram.SCHEDULER).update("computer.processUpdate");
 
         assertTrue("Update view handler hasn't been invoked", invoked.booleanValue());
     }

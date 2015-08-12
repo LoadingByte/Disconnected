@@ -84,7 +84,7 @@ public class Socket extends WorldNode<SocketRegistry> {
     /*
      * A buffer with all received packet data payloads that need to be processed by the user of the socket.
      * All incoming packet payloads are added to the this buffer.
-     * When the scheduler calls the group "computer.programUpdate", all these payloads are polled and handed over to the socket's packet handlers.
+     * When the scheduler calls the group "computer.processUpdate", all these payloads are polled and handed over to the socket's packet handlers.
      */
     @XmlElementWrapper
     @XmlElement (name = "packet")
@@ -181,7 +181,7 @@ public class Socket extends WorldNode<SocketRegistry> {
     /**
      * Returns a collection of {@link PacketHandler}s that are called every time a new {@link Packet} arrives.<br>
      * <br>
-     * Internally, these handlers are called when scheduler invokes the group {@code computer.programUpdate}.
+     * Internally, these handlers are called when scheduler invokes the group {@code computer.processUpdate}.
      * When that happens, all buffered packets are polled from the internal incoming packet buffer and are handed over to these handlers.
      *
      * @return The packet handlers that are called whenever a packet arrives.
@@ -246,7 +246,7 @@ public class Socket extends WorldNode<SocketRegistry> {
         if (state == SocketState.CONNECTED && oldState != SocketState.CONNECTED) {
             // Note that these tasks do not need to be cancelled explicitly since the scheduler object is automatically unlinked once the socket is disconnected
             scheduler.schedule("scheduleKeepalive", "networkUpdate", KEEPALIVE_PERIOD, KEEPALIVE_PERIOD, new ScheduleKeepaliveTask());
-            scheduler.schedule("handleIncomingBufferedPackets", "computer.programUpdate", 1, 1, new HandleBufferedPacketsTask());
+            scheduler.schedule("handleIncomingBufferedPackets", "computer.processUpdate", 1, 1, new HandleBufferedPacketsTask());
 
             // Inform all socket connection listeners about the successfully established connection
             SocketRegistry socketRegistry = getSingleParent();
@@ -310,7 +310,7 @@ public class Socket extends WorldNode<SocketRegistry> {
     }
 
     /**
-     * Sends the given data payload object to the set {@link #getDestination() destination} socket <b>as soon as scheduler calls the group {@code computer.programUpdate}</b>.
+     * Sends the given data payload object to the set {@link #getDestination() destination} socket <b>as soon as scheduler calls the group {@code computer.processUpdate}</b>.
      * For doing that, this method wraps the data object inside a {@link Packet}.
      * Note that a program which receives a packet cannot handle it during the same tick it was sent.
      * Instead, the received packet will be handled during the next tick.
