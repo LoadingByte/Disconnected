@@ -63,6 +63,22 @@ public class ContentFile extends File<ParentFile<?>> {
     }
 
     /**
+     * Returns the {@link #getContent() object contained by the content file} as an instance of the given class by casting it.
+     * If the content is {@code null} or the cast cannot be performed, {@code null} is returned.
+     *
+     * @param type The type the file content should be casted to.
+     * @return The casted file content object.
+     */
+    public <T> T getContentAs(Class<T> type) {
+
+        if (content != null && type.isInstance(content)) {
+            return type.cast(content);
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Stores a new content object in the content file.
      * Note that the new object must have a {@link SizeUtils derivable size}.
      *

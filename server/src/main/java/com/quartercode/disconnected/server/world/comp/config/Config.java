@@ -68,6 +68,60 @@ public class Config<E extends ConfigEntry<E>> extends WorldNode<Node<?>> impleme
     }
 
     /**
+     * Returns the {@link #getEntries() configuration entries} which provide the given {@link ConfigEntry#getColumnValue(String) value} in the column with the given name.
+     * Of course, the column names are dependent on the different types of config entries.
+     * For example, you are able to retrieve all users with the primary group {@code "myGroup"} from a user config with the given call:
+     *
+     * <pre>
+     * userConfig.getEntriesByColumn("primaryGroup", "myGroup");
+     * </pre>
+     *
+     * If you only want to retrieve one entry (e.g. the user with a specific name) instead of a list with multiple entries, try {@link #getEntryByColumn(String, String)}.
+     * Of course, this method is just a convenience method for very simple cases.
+     * If your query is more complex (e.g. all users which are part of a specific group), you still have to loop through all entries and check each one individually.
+     *
+     * @param column The name of the {@link ConfigEntry#getColumnNames() column} which should be checked.
+     * @param value The {@link ConfigEntry#getColumnValue(String) column value} all returned entries must have in the given column.
+     * @return All config entries which provide the given value in the column with the given name.
+     */
+    public List<E> getEntriesByColumn(String column, String value) {
+
+        List<E> result = new ArrayList<>();
+
+        for (E entry : entries) {
+            if (entry.getColumnNames().contains(column) && entry.getColumnValue(column).endsWith(value)) {
+                result.add(entry);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns the first {@link #getEntries() configuration entry} which provides the given {@link ConfigEntry#getColumnValue(String) value} in the column with the given name.
+     * Of course, the column names are dependent on the different types of config entries.
+     * For example, you are able to retrieve the user with the name {@code "root"} from a user config with the given call:
+     *
+     * <pre>
+     * userConfig.getEntryByColumn("name", "root");
+     * </pre>
+     *
+     * If you want to retrieve multiple entries (e.g. all users with a specific primary group) instead of just one, try {@link #getEntriesByColumn(String, String)}.
+     * Of course, this method is just a convenience method for very simple cases.
+     * If your query is more complex (e.g. all users which are part of a specific group), you still have to loop through all entries and check each one individually.
+     *
+     * @param column The name of the {@link ConfigEntry#getColumnNames() column} which should be checked.
+     * @param value The {@link ConfigEntry#getColumnValue(String) column value} the returned entry must have in the given column.
+     * @return The first config entries which provides the given value in the column with the given name.
+     *         If no config entry can be found, {@code null} is returned.
+     */
+    public E getEntryByColumn(String column, String value) {
+
+        List<E> entriesByColumn = getEntriesByColumn(column, value);
+        return entriesByColumn.isEmpty() ? null : entriesByColumn.get(0);
+    }
+
+    /**
      * Adds the given {@link ConfigEntry} to the configuration object.
      *
      * @param entry The configuration entry to add to the configuration.
