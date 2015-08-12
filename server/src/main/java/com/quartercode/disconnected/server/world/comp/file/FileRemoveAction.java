@@ -21,7 +21,7 @@ package com.quartercode.disconnected.server.world.comp.file;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
-import com.quartercode.disconnected.server.world.comp.user.User;
+import com.quartercode.disconnected.server.world.comp.os.config.User;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 import com.quartercode.jtimber.api.node.Weak;
 

@@ -39,13 +39,13 @@ import com.quartercode.disconnected.server.world.comp.file.FileSystemModule.Know
 import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.net.NetworkModule;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.server.world.comp.os.config.User;
 import com.quartercode.disconnected.server.world.comp.prog.ChildProcess;
 import com.quartercode.disconnected.server.world.comp.prog.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
 import com.quartercode.disconnected.server.world.comp.prog.RootProcess;
 import com.quartercode.disconnected.server.world.comp.prog.Session;
-import com.quartercode.disconnected.server.world.comp.user.User;
 import com.quartercode.disconnected.shared.CommonBootstrap;
 import com.quartercode.disconnected.shared.identity.ClientIdentity;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;

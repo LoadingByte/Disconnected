@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.server.world.comp.file;
 
 import java.util.Map;
-import com.quartercode.disconnected.server.world.comp.user.User;
+import com.quartercode.disconnected.server.world.comp.os.config.User;
 
 /**
  * File actions are predefined "plans" of activities that are related to {@link File}s, for example moving a file.

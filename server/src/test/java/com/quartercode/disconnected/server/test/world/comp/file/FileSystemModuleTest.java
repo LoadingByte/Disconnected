@@ -34,7 +34,7 @@ import com.quartercode.disconnected.server.world.comp.file.OccupiedPathException
 import com.quartercode.disconnected.server.world.comp.file.OutOfSpaceException;
 import com.quartercode.disconnected.server.world.comp.file.ParentFile;
 import com.quartercode.disconnected.server.world.comp.file.UnknownMountpointException;
-import com.quartercode.disconnected.server.world.comp.user.User;
+import com.quartercode.disconnected.server.world.comp.os.config.User;
 import com.quartercode.disconnected.shared.world.comp.ByteUnit;
 
 public class FileSystemModuleTest {

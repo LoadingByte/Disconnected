@@ -35,7 +35,7 @@ import com.quartercode.disconnected.server.world.comp.Computer;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.MissingFileRightsException;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
-import com.quartercode.disconnected.server.world.comp.user.User;
+import com.quartercode.disconnected.server.world.comp.os.config.User;
 import com.quartercode.disconnected.server.world.util.WorldNode;
 import com.quartercode.disconnected.shared.event.comp.prog.control.SBPWorldProcessUserInterruptCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchCommand;

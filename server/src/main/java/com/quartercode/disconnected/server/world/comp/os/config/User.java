@@ -16,7 +16,7 @@
  * along with Disconnected. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.quartercode.disconnected.server.world.comp.user;
+package com.quartercode.disconnected.server.world.comp.os.config;
 
 import java.security.acl.Group;
 import java.util.Arrays;
@@ -73,7 +73,8 @@ public class User extends ConfigEntry<User> {
     /**
      * Creates a new user.
      *
-     * @param name The name of the new user.
+     * @param name The {@link #getName() name} of the new user.
+     *        It cannot be {@code null}.
      */
     public User(String name) {
 
@@ -85,7 +86,6 @@ public class User extends ConfigEntry<User> {
     /**
      * Returns the name of the user.
      * The name is used to recognize a user on the OS level.
-     * Note that the name of the {@link #isSuperuser() superuser} cannot be changed.
      *
      * @return The name of the user.
      */
@@ -97,8 +97,10 @@ public class User extends ConfigEntry<User> {
     /**
      * Sets the name of the user.
      * The name is used to recognize a user on the OS level.
+     * Note that the name of the {@link #isSuperuser() superuser} cannot be changed; instead, an exception will be thrown if such a change is attempted.
      *
      * @param name The new name of the user.
+     *        It cannot be {@code null}.
      */
     public void setName(String name) {
 

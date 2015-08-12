@@ -27,7 +27,7 @@ import com.quartercode.disconnected.server.world.comp.file.FileSystem;
 import com.quartercode.disconnected.server.world.comp.file.InvalidPathException;
 import com.quartercode.disconnected.server.world.comp.file.OccupiedPathException;
 import com.quartercode.disconnected.server.world.comp.file.OutOfSpaceException;
-import com.quartercode.disconnected.server.world.comp.user.User;
+import com.quartercode.disconnected.server.world.comp.os.config.User;
 import com.quartercode.disconnected.shared.world.comp.ByteUnit;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 

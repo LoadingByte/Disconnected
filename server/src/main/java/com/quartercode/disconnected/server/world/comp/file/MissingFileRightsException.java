@@ -21,7 +21,7 @@ package com.quartercode.disconnected.server.world.comp.file;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import com.quartercode.disconnected.server.world.comp.user.User;
+import com.quartercode.disconnected.server.world.comp.os.config.User;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
 
 /**

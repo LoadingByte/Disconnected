@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElementRef;
-import com.quartercode.disconnected.server.world.comp.user.User;
+import com.quartercode.disconnected.server.world.comp.os.config.User;
 import com.quartercode.disconnected.server.world.util.SizeUtils;
 import com.quartercode.jtimber.api.node.Node;
 import com.quartercode.jtimber.api.node.wrapper.SubstituteWithWrapper;

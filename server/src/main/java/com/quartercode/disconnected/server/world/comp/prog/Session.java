@@ -21,7 +21,7 @@ package com.quartercode.disconnected.server.world.comp.prog;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlIDREF;
 import org.apache.commons.lang3.StringUtils;
-import com.quartercode.disconnected.server.world.comp.user.User;
+import com.quartercode.disconnected.server.world.comp.os.config.User;
 
 /**
  * This class represents a program which opens a session with a certain {@link User}; other programs can run under that user by being a child of the session process.

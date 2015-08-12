@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import com.quartercode.disconnected.server.world.comp.user.User;
+import com.quartercode.disconnected.server.world.comp.os.config.User;
 
 /**
  * This class represents a directory that is able to contain and hold other {@link File}s.

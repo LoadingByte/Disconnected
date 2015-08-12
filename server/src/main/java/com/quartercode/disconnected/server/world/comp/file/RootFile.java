@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.server.world.comp.file;
 
-import com.quartercode.disconnected.server.world.comp.user.User;
+import com.quartercode.disconnected.server.world.comp.os.config.User;
 import com.quartercode.disconnected.server.world.util.SizeUtils;
 
 /**

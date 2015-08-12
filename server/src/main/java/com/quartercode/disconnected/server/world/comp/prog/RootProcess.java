@@ -20,7 +20,7 @@ package com.quartercode.disconnected.server.world.comp.prog;
 
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
 import com.quartercode.disconnected.server.world.comp.file.MissingFileRightsException;
-import com.quartercode.disconnected.server.world.comp.user.User;
+import com.quartercode.disconnected.server.world.comp.os.config.User;
 
 /**
  * The root process is a simple {@link Process} which can be only used as root for the process tree.
