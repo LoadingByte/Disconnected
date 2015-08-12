@@ -29,6 +29,7 @@ import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTask;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
 import com.quartercode.disconnected.server.world.comp.hardware.NetInterface;
+import com.quartercode.disconnected.server.world.comp.net.socket.PortAlreadyBoundException;
 import com.quartercode.disconnected.server.world.comp.net.socket.Socket;
 import com.quartercode.disconnected.server.world.comp.net.socket.SocketConnectionListener;
 import com.quartercode.disconnected.server.world.comp.net.socket.SocketRegistry;
@@ -160,16 +161,14 @@ public class NetworkModule extends WorldNode<OperatingSystem> implements OSModul
     }
 
     @Override
-    public void addConnectionListener(SocketConnectionListener connectionListener) {
+    public void addConnectionListener(SocketConnectionListener connectionListener) throws PortAlreadyBoundException {
 
-        Validate.notNull(connectionListener, "Cannot add a null socket connection listener to network module");
         socketRegistry.addConnectionListener(connectionListener);
     }
 
     @Override
     public void removeConnectionListener(SocketConnectionListener connectionListener) {
 
-        Validate.notNull(connectionListener, "Cannot remove a null socket connection listener from network module");
         socketRegistry.removeConnectionListener(connectionListener);
     }
 

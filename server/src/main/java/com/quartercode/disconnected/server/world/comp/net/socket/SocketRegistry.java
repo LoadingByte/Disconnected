@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
+import org.apache.commons.lang3.Validate;
 import com.quartercode.disconnected.server.world.comp.net.NetworkModule;
 import com.quartercode.disconnected.server.world.comp.net.Packet;
 import com.quartercode.disconnected.server.world.comp.net.StandardPacket;
@@ -74,7 +75,20 @@ public class SocketRegistry extends WorldNode<NetworkModule> implements SocketRe
     }
 
     @Override
-    public void addConnectionListener(SocketConnectionListener connectionListener) {
+    public void addConnectionListener(SocketConnectionListener connectionListener) throws PortAlreadyBoundException {
+
+        Validate.notNull(connectionListener, "Cannot add a null socket connection listener to socket registry");
+
+        // Ensure that only one port-bound listener is able to bind a specific port
+        if (connectionListener instanceof PortBoundSocketConnectionListener) {
+            int localPort = ((PortBoundSocketConnectionListener) connectionListener).getLocalPort();
+
+            for (SocketConnectionListener existingConnectionListener : connectionListeners) {
+                if (existingConnectionListener instanceof PortBoundSocketConnectionListener && ((PortBoundSocketConnectionListener) existingConnectionListener).getLocalPort() == localPort) {
+                    throw new PortAlreadyBoundException(localPort);
+                }
+            }
+        }
 
         connectionListeners.add(connectionListener);
     }
@@ -82,6 +96,7 @@ public class SocketRegistry extends WorldNode<NetworkModule> implements SocketRe
     @Override
     public void removeConnectionListener(SocketConnectionListener connectionListener) {
 
+        Validate.notNull(connectionListener, "Cannot remove a null socket connection listener from socket registry");
         connectionListeners.remove(connectionListener);
     }
 

@@ -28,23 +28,23 @@ import com.quartercode.disconnected.shared.world.comp.net.Address;
  * It is useful for service programs that only listen to one specific port.
  * For example, a webserver would only listen to the port {@code 80}.
  */
-public abstract class PortSocketConnectionListener extends WorldNode<NetworkModule> implements SocketConnectionListener {
+public abstract class PortBoundSocketConnectionListener extends WorldNode<NetworkModule> implements SocketConnectionListener {
 
     @XmlAttribute
     private int localPort;
 
     // JAXB constructor
-    protected PortSocketConnectionListener() {
+    protected PortBoundSocketConnectionListener() {
 
     }
 
     /**
-     * Creates a new port socket connection listener.
+     * Creates a new port bound socket connection listener.
      *
      * @param localPort The {@link Socket#getLocalPort() local port} all socket requests/connections must be "assigned" to for being forwarded to the listener methods of this class.
      *        Effectively, the listener only listens for calls on this local port.
      */
-    public PortSocketConnectionListener(int localPort) {
+    public PortBoundSocketConnectionListener(int localPort) {
 
         this.localPort = localPort;
     }

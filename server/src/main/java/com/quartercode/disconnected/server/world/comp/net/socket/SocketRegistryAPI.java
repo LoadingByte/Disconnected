@@ -47,8 +47,9 @@ public interface SocketRegistryAPI {
      * See {@link #getConnectionListeners()} for more information on connection listeners.
      *
      * @param connectionListener The socket connection listener which should be registered.
+     * @throws PortAlreadyBoundException If the new connection listener is a {@link PortBoundSocketConnectionListener} and the wanted local port has already been bound by another one.
      */
-    public void addConnectionListener(SocketConnectionListener connectionListener);
+    public void addConnectionListener(SocketConnectionListener connectionListener) throws PortAlreadyBoundException;
 
     /**
      * Unregisters the given {@link SocketConnectionListener}, so that it will no longer be notified when another computer tries to establish a {@link Socket} connection.
