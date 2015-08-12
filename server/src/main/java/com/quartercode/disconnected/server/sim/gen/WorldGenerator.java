@@ -19,6 +19,7 @@
 package com.quartercode.disconnected.server.sim.gen;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +57,7 @@ import com.quartercode.disconnected.server.world.comp.net.nodes.DeviceNode;
 import com.quartercode.disconnected.server.world.comp.net.nodes.DownlinkRouterNode;
 import com.quartercode.disconnected.server.world.comp.net.nodes.UplinkRouterNode;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.server.world.comp.os.config.EnvVariable;
 import com.quartercode.disconnected.server.world.comp.os.config.User;
 import com.quartercode.disconnected.server.world.comp.prog.Program;
 import com.quartercode.disconnected.shared.util.registry.Registries;
@@ -344,6 +346,11 @@ public class WorldGenerator {
         Config<User> userConfig = new Config<>();
         userConfig.addEntry(superuser);
         addContentFile(fileSystem, PathUtils.splitAfterMountpoint(CommonFiles.USER_CONFIG)[1], superuser, "o:r", userConfig);
+
+        // Generate basic environment config
+        Config<EnvVariable> envConfig = new Config<>();
+        envConfig.addEntry(new EnvVariable("BIN_PATHS", Arrays.asList(CommonFiles.SYS_BIN_DIR, CommonFiles.USER_BIN_DIR)));
+        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(CommonFiles.ENVIRONMENT_CONFIG)[1], superuser, "o:r", envConfig);
     }
 
     private static ContentFile createContentFile(User owner, String rights, Object content) {

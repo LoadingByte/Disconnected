@@ -21,7 +21,6 @@ package com.quartercode.disconnected.server.world.comp.prog;
 import static com.quartercode.disconnected.server.world.comp.prog.ProgramUtils.getProgramFileFromPaths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -33,14 +32,12 @@ import com.quartercode.disconnected.server.sim.scheduler.Scheduler;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTask;
 import com.quartercode.disconnected.server.sim.scheduler.SchedulerTaskAdapter;
 import com.quartercode.disconnected.server.world.comp.config.Config;
-import com.quartercode.disconnected.server.world.comp.config.ConfigEntry;
 import com.quartercode.disconnected.server.world.comp.file.ContentFile;
-import com.quartercode.disconnected.server.world.comp.file.File;
+import com.quartercode.disconnected.server.world.comp.file.FileException;
 import com.quartercode.disconnected.server.world.comp.file.FileSystemModule;
-import com.quartercode.disconnected.server.world.comp.file.InvalidPathException;
 import com.quartercode.disconnected.server.world.comp.file.MissingFileRightsException;
-import com.quartercode.disconnected.server.world.comp.file.UnknownMountpointException;
 import com.quartercode.disconnected.server.world.comp.os.OperatingSystem;
+import com.quartercode.disconnected.server.world.comp.os.config.EnvVariable;
 import com.quartercode.disconnected.server.world.comp.os.config.User;
 import com.quartercode.disconnected.server.world.comp.os.mod.OSModule;
 import com.quartercode.disconnected.server.world.util.WorldNode;
@@ -56,9 +53,6 @@ import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
  * @see OSModule
  */
 public class ProcessModule extends WorldNode<OperatingSystem> implements OSModule {
-
-    // TODO: Create a ConfigModule for this
-    public static final List<String>       BIN_PATHS = Collections.unmodifiableList(Arrays.asList(CommonFiles.SYS_BIN_DIR, CommonFiles.USER_BIN_DIR));
 
     @XmlElement (type = DefaultScheduler.class)
     private final Scheduler<ProcessModule> scheduler = new DefaultScheduler<>();
@@ -137,9 +131,12 @@ public class ProcessModule extends WorldNode<OperatingSystem> implements OSModul
 
         FileSystemModule fsModule = getSingleParent().getFsModule();
 
+        // Get BIN_PATHS
+        List<String> binPaths = getBinPaths();
+
         // Get session program
         String sessionProgramFileName = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS), "session").getCommonLocation().toString();
-        ContentFile sessionProgramFile = getProgramFileFromPaths(fsModule, BIN_PATHS, sessionProgramFileName);
+        ContentFile sessionProgramFile = getProgramFileFromPaths(fsModule, binPaths, sessionProgramFileName);
         Validate.validState(sessionProgramFile != null, "Cannot start process module: Session program not found");
 
         try {
@@ -149,29 +146,48 @@ public class ProcessModule extends WorldNode<OperatingSystem> implements OSModul
         }
 
         // Get superuser
-        User superuser = null;
-
-        try {
-            File<?> userConfigFile = fsModule.getFile(CommonFiles.USER_CONFIG);
-            Config<?> userConfig = (Config<?>) ((ContentFile) userConfigFile).getContent();
-            for (ConfigEntry<?> user : userConfig.getEntries()) {
-                if (user instanceof User && ((User) user).isSuperuser()) {
-                    superuser = (User) user;
-                    break;
-                }
-            }
-        } catch (UnknownMountpointException | InvalidPathException e) {
-            // If no user config file is available, the next if-block will create a temporary superuser
-        }
-
-        // If no superuser is set, use a temporary superuser with no password
-        if (superuser == null) {
-            superuser = new User(User.SUPERUSER_NAME);
-        }
+        User superuser = getSuperuser();
 
         // TODO: Set the superuser as the root session user
         // Session rootSession = (Session) rootProcess.getExecutor();
         // rootSession.setUser(superuser);
+    }
+
+    private List<String> getBinPaths() {
+
+        FileSystemModule fsModule = getSingleParent().getFsModule();
+
+        try {
+            @SuppressWarnings ("unchecked")
+            Config<EnvVariable> envConfig = ((ContentFile) fsModule.getFile(CommonFiles.ENVIRONMENT_CONFIG)).getContentAs(Config.class);
+            EnvVariable binPathsEnvVar = envConfig.getEntryByColumn("name", "BIN_PATHS");
+            if (binPathsEnvVar != null) {
+                return binPathsEnvVar.getValueList();
+            }
+            // No BIN_PATHS variable -> code down below recovers
+        } catch (FileException e) {
+            // No environment config file -> code down below recovers
+        }
+
+        // If BIN_PATHS cannot be resolved, try to guess the directory which contains the session program
+        return Arrays.asList(CommonFiles.SYS_BIN_DIR);
+    }
+
+    private User getSuperuser() {
+
+        FileSystemModule fsModule = getSingleParent().getFsModule();
+
+        try {
+            @SuppressWarnings ("unchecked")
+            Config<User> userConfig = ((ContentFile) fsModule.getFile(CommonFiles.USER_CONFIG)).getContentAs(Config.class);
+            return userConfig.getEntryByColumn("name", User.SUPERUSER_NAME);
+            // No superuser entry -> code down below recovers
+        } catch (FileException e) {
+            // No user config file -> code down below recovers
+        }
+
+        // If no superuser is set, use a temporary superuser with no password
+        return new User(User.SUPERUSER_NAME);
     }
 
     /*

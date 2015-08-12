@@ -45,7 +45,7 @@ public class ProgramUtils {
     /**
      * Tries to resolve a {@link Program} file (a {@link ContentFile} which contains a program) with the given name from one of the provided directory paths.
      * That means that the algorithm iterates over all of the directories and uses the first one which contains a program file with the given name.
-     * This method is used to resolve program files from the (not editable) {@code PATH}/{@code BIN_PATHS} "environment variable".
+     * This method is used to resolve program files from the {@code PATH}/{@code BIN_PATHS} environment variable.
      * Note that this method suppresses all exceptions that might occur.
      *
      * @param fsModule The {@link FileSystemModule file system module} which manages the file systems that should be searched.
