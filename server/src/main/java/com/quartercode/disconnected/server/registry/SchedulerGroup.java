@@ -19,9 +19,6 @@
 package com.quartercode.disconnected.server.registry;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import com.quartercode.disconnected.shared.util.registry.extra.NamedValue;
 
 /**
@@ -29,7 +26,7 @@ import com.quartercode.disconnected.shared.util.registry.extra.NamedValue;
  *
  * @see ServerRegistries#SCHEDULER_GROUPS
  */
-public class SchedulerGroup implements NamedValue {
+public class SchedulerGroup extends RegistryObject implements NamedValue {
 
     private final String name;
     private final int    priority;
@@ -69,24 +66,6 @@ public class SchedulerGroup implements NamedValue {
     public int getPriority() {
 
         return priority;
-    }
-
-    @Override
-    public int hashCode() {
-
-        return HashCodeBuilder.reflectionHashCode(this);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        return EqualsBuilder.reflectionEquals(this, obj);
-    }
-
-    @Override
-    public String toString() {
-
-        return ToStringBuilder.reflectionToString(this);
     }
 
 }

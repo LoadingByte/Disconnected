@@ -19,9 +19,6 @@
 package com.quartercode.disconnected.server.registry;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import com.quartercode.disconnected.shared.util.registry.extra.NamedValue;
 import com.quartercode.disconnected.shared.world.comp.file.SeparatedPath;
 
@@ -30,7 +27,7 @@ import com.quartercode.disconnected.shared.world.comp.file.SeparatedPath;
  *
  * @see ServerRegistries#WORLD_PROGRAMS
  */
-public class WorldProgram implements NamedValue {
+public class WorldProgram extends RegistryObject implements NamedValue {
 
     private final String        name;
     private final Class<?>      type;
@@ -99,24 +96,6 @@ public class WorldProgram implements NamedValue {
     public SeparatedPath getCommonLocation() {
 
         return commonLocation;
-    }
-
-    @Override
-    public int hashCode() {
-
-        return HashCodeBuilder.reflectionHashCode(this);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        return EqualsBuilder.reflectionEquals(this, obj);
-    }
-
-    @Override
-    public String toString() {
-
-        return ToStringBuilder.reflectionToString(this);
     }
 
 }

@@ -21,9 +21,6 @@ package com.quartercode.disconnected.server.registry;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import com.quartercode.disconnected.shared.util.registry.extra.NamedValue;
 
 /**
@@ -38,7 +35,7 @@ import com.quartercode.disconnected.shared.util.registry.extra.NamedValue;
  * @see VulnSourceRegistry
  * @see ServerRegistries#VULN_SOURCES
  */
-public class VulnSource implements NamedValue {
+public class VulnSource extends RegistryObject implements NamedValue {
 
     private final String       name;
     private final String       usage;
@@ -134,24 +131,6 @@ public class VulnSource implements NamedValue {
         return actions;
     }
 
-    @Override
-    public int hashCode() {
-
-        return HashCodeBuilder.reflectionHashCode(this);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        return EqualsBuilder.reflectionEquals(this, obj);
-    }
-
-    @Override
-    public String toString() {
-
-        return ToStringBuilder.reflectionToString(this);
-    }
-
     /**
      * Vulnerability actions describe what an attacked computer part (e.g. a program) should do.
      * For example, a buffer overflow vulnerability could provide actions to crash a program or to execute a payload (e.g. for opening a remote session).
@@ -170,7 +149,7 @@ public class VulnSource implements NamedValue {
      *
      * @see VulnSource
      */
-    public static class Action implements NamedValue {
+    public static class Action extends RegistryObject implements NamedValue {
 
         private final String name;
         private final float  vulnProbability;
@@ -233,24 +212,6 @@ public class VulnSource implements NamedValue {
         public int getAttackWeight() {
 
             return attackWeight;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return HashCodeBuilder.reflectionHashCode(this);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-
-            return EqualsBuilder.reflectionEquals(this, obj);
-        }
-
-        @Override
-        public String toString() {
-
-            return ToStringBuilder.reflectionToString(this);
         }
 
     }

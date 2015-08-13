@@ -28,7 +28,7 @@ import com.quartercode.disconnected.shared.util.XmlPersistent;
  *
  * @see ServerRegistries#PERSISTENT_CLASS_SCAN_DIRECTIVES
  */
-public class PersistentClassScanDirective {
+public class PersistentClassScanDirective extends RegistryObject {
 
     private final String     packageName;
     private final ScanMethod method;
