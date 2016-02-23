@@ -28,9 +28,9 @@ import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.Session;
 import com.quartercode.disconnected.server.world.comp.prog.general.ProcessManagerProgram;
 import com.quartercode.disconnected.shared.event.comp.prog.general.PMP_SBPWPU_UpdateViewCommand;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessPlaceholder;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessId;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessPlaceholder;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessState;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 

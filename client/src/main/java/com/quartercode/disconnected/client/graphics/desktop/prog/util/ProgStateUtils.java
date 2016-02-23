@@ -25,8 +25,8 @@ import com.quartercode.disconnected.client.graphics.desktop.prog.ClientProgramEx
 import com.quartercode.disconnected.client.graphics.desktop.prog.ClientProgramStateContext;
 import com.quartercode.disconnected.shared.event.comp.prog.control.SBPWorldProcessUserInterruptCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessInterruptCommand;
-import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserDetails;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
+import com.quartercode.disconnected.shared.world.comp.proc.SBPWorldProcessUserDetails;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessId;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 

@@ -34,6 +34,12 @@ import com.quartercode.disconnected.shared.util.registry.extra.SetRegistry;
 public class ServerRegistries {
 
     /**
+     * A map that maps string shortcuts to real classes.
+     * For example, the string {@code "user"} is mapped to the {@code User} class which represents users in the world.
+     */
+    public static final RegistryDefinition<MapRegistry<String, Class<?>>>             NAMED_TYPES;
+
+    /**
      * The {@link PersistentClassScanDirective}s which define what should be scanned for persistent world classes.
      * The results of such scans are fed into new {@link JAXBContext}s for making the found classes visible to the contexts.
      */
@@ -68,6 +74,7 @@ public class ServerRegistries {
 
     static {
 
+        NAMED_TYPES = new RegistryDefinition<>("namedTypes", new TypeLiteral<MapRegistry<String, Class<?>>>() {});
         PERSISTENT_CLASS_SCAN_DIRECTIVES = new RegistryDefinition<>("persistentClassScanDirectives", new TypeLiteral<SetRegistry<PersistentClassScanDirective>>() {});
         SCHEDULER_GROUPS = new RegistryDefinition<>("schedulerGroups", new TypeLiteral<SetRegistry<SchedulerGroup>>() {});
         FILE_TYPES = new RegistryDefinition<>("fileTypes", new TypeLiteral<MapRegistry<String, Class<?>>>() {});

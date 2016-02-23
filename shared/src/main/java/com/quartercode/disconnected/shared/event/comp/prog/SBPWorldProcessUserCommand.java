@@ -20,7 +20,7 @@ package com.quartercode.disconnected.shared.event.comp.prog;
 
 import com.quartercode.disconnected.shared.event.LimitedSBPEvent;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
-import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.world.comp.proc.SBPWorldProcessUserId;
 import com.quartercode.eventbridge.basic.EventBase;
 
 /**

@@ -42,10 +42,10 @@ import com.quartercode.disconnected.shared.event.comp.prog.general.PMP_WP_Interr
 import com.quartercode.disconnected.shared.event.comp.prog.generic.GP_SBPWPU_ErrorEvent;
 import com.quartercode.disconnected.shared.util.ValueInjector.InjectValue;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
-import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserDetails;
-import com.quartercode.disconnected.shared.world.comp.prog.UUIDSBPWorldProcessUserDetails;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessPlaceholder;
+import com.quartercode.disconnected.shared.world.comp.proc.SBPWorldProcessUserDetails;
+import com.quartercode.disconnected.shared.world.comp.proc.UUIDSBPWorldProcessUserDetails;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessId;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessPlaceholder;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import de.matthiasmann.twl.Button;

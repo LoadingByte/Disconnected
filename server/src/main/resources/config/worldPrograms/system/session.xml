@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <configureWorldProgram name="session">
+        <size>1024</size>
+        <configureTask name="session" class="com.quartercode.disconnected.server.world.comp.prog.Session" />
+    </configureWorldProgram>
+</config>

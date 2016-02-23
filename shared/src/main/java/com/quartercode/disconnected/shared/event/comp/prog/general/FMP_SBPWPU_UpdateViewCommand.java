@@ -22,7 +22,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import com.quartercode.disconnected.shared.event.comp.prog.SBPWorldProcessUserCommand;
 import com.quartercode.disconnected.shared.world.comp.file.FilePlaceholder;
-import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.world.comp.proc.SBPWorldProcessUserId;
 
 @RequiredArgsConstructor
 @Getter

@@ -36,7 +36,7 @@ import com.quartercode.disconnected.shared.event.comp.prog.general.FMP_WP_Change
 import com.quartercode.disconnected.shared.event.comp.prog.generic.GP_SBPWPU_ErrorEvent;
 import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.world.comp.file.FileRights;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessId;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 import com.quartercode.eventbridge.extra.predicate.TypePredicate;

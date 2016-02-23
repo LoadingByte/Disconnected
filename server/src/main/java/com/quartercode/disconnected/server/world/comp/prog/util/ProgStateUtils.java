@@ -26,7 +26,7 @@ import com.quartercode.disconnected.server.world.comp.prog.ProcessStateListener;
 import com.quartercode.disconnected.server.world.comp.prog.Process;
 import com.quartercode.disconnected.server.world.comp.prog.ProgramExecutor;
 import com.quartercode.disconnected.server.world.util.WorldFeatureHolder;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessState;
 
 /**
  * This utility class provides some utility methods and classes regarding {@link WorldProcessState}s for {@link ProgramExecutor} implementations.

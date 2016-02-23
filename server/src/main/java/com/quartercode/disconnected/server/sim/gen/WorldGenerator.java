@@ -18,6 +18,7 @@
 
 package com.quartercode.disconnected.server.sim.gen;
 
+import static com.quartercode.disconnected.shared.world.comp.file.CommonFiles.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -64,7 +65,6 @@ import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
 import com.quartercode.disconnected.shared.world.comp.ByteUnit;
 import com.quartercode.disconnected.shared.world.comp.Version;
-import com.quartercode.disconnected.shared.world.comp.file.CommonFiles;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
 import com.quartercode.disconnected.shared.world.comp.net.NetId;
 import com.quartercode.disconnected.shared.world.general.Location;
@@ -294,8 +294,8 @@ public class WorldGenerator {
 
         // Add debug known file systems
         FileSystemModule fsModule = os.getFsModule();
-        addKnownFs(fsModule, systemFs, CommonFiles.SYSTEM_MOUNTPOINT);
-        addKnownFs(fsModule, userFs, CommonFiles.USER_MOUNTPOINT);
+        addKnownFs(fsModule, systemFs, SYSTEM_MOUNTPOINT);
+        addKnownFs(fsModule, userFs, USER_MOUNTPOINT);
 
         return computer;
     }
@@ -332,11 +332,12 @@ public class WorldGenerator {
     private static void addSystemFiles(FileSystem fileSystem, User superuser) throws GenerationException {
 
         // Add system programs
-        addProgramFile(fileSystem, superuser, "session", new Version(1, 0, 0));
+        addProgramFile(fileSystem, SYSTEM_PROGRAM_DIR, superuser, "session", new Version(1, 0, 0));
 
         // Add general programs
-        addProgramFile(fileSystem, superuser, "fileManager", new Version(1, 0, 0));
-        addProgramFile(fileSystem, superuser, "processManager", new Version(1, 0, 0));
+        // TODO: Uncomment these
+        // addProgramFile(fileSystem, SYSTEM_PROGRAM_DIR, superuser, "fileManager", new Version(1, 0, 0));
+        // addProgramFile(fileSystem, SYSTEM_PROGRAM_DIR, superuser, "processManager", new Version(1, 0, 0));
     }
 
     // Temporary method for generating some unessential programs and personal files
@@ -345,12 +346,12 @@ public class WorldGenerator {
         // Generate basic user config
         Config<User> userConfig = new Config<>();
         userConfig.addEntry(superuser);
-        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(CommonFiles.USER_CONFIG)[1], superuser, "o:r", userConfig);
+        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(USER_CONFIG)[1], superuser, "o:r", userConfig);
 
         // Generate basic environment config
         Config<EnvVariable> envConfig = new Config<>();
-        envConfig.addEntry(new EnvVariable("BIN_PATHS", Arrays.asList(CommonFiles.SYS_BIN_DIR, CommonFiles.USER_BIN_DIR)));
-        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(CommonFiles.ENVIRONMENT_CONFIG)[1], superuser, "o:r", envConfig);
+        envConfig.addEntry(new EnvVariable("PROGRAM_DIRS", Arrays.asList(SYSTEM_PROGRAM_DIR, USER_PROGRAM_DIR)));
+        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(ENVIRONMENT_CONFIG)[1], superuser, "o:r", envConfig);
     }
 
     private static ContentFile createContentFile(User owner, String rights, Object content) {
@@ -382,7 +383,7 @@ public class WorldGenerator {
         return file;
     }
 
-    private static void addProgramFile(FileSystem fileSystem, User superuser, String programName, Version version) throws GenerationException {
+    private static void addProgramFile(FileSystem fileSystem, String dir, User owner, String programName, Version version) throws GenerationException {
 
         WorldProgram programData = NamedValueUtils.getByName(Registries.get(ServerRegistries.WORLD_PROGRAMS), programName);
         Program program = new Program(programName, version);
@@ -393,8 +394,8 @@ public class WorldGenerator {
             program.getVulnContainer().generateVulnerabilities(vulnSources, 3);
         }
 
-        String programPath = programData.getCommonLocation().toString();
-        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(programPath)[1], superuser, "o:rx", program);
+        String programPath = PathUtils.resolve(dir, programData + ".exe");
+        addContentFile(fileSystem, PathUtils.splitAfterMountpoint(programPath)[1], owner, "o:rx", program);
     }
 
     private WorldGenerator() {

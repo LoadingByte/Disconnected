@@ -47,10 +47,10 @@ import com.quartercode.disconnected.shared.identity.SBPIdentity;
 import com.quartercode.disconnected.shared.util.registry.Registries;
 import com.quartercode.disconnected.shared.util.registry.extra.MultipleValueRegistry;
 import com.quartercode.disconnected.shared.util.registry.extra.NamedValueUtils;
-import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserDetails;
-import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId;
-import com.quartercode.disconnected.shared.world.comp.prog.UUIDSBPWorldProcessUserDetails;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
+import com.quartercode.disconnected.shared.world.comp.proc.SBPWorldProcessUserDetails;
+import com.quartercode.disconnected.shared.world.comp.proc.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.world.comp.proc.UUIDSBPWorldProcessUserDetails;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessId;
 import com.quartercode.eventbridge.bridge.Bridge;
 
 public class WorldProcessLaunchCommandHandlerTest {

@@ -33,7 +33,7 @@ import com.quartercode.disconnected.server.world.comp.prog.ProcessModule;
 import com.quartercode.disconnected.server.world.comp.prog.RootProcess;
 import com.quartercode.disconnected.server.world.util.WorldNode;
 import com.quartercode.disconnected.shared.world.comp.Version;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessState;
 
 /**
  * This class stores information about an operating system.

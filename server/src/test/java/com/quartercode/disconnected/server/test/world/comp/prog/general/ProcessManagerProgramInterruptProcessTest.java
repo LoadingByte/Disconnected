@@ -32,9 +32,9 @@ import com.quartercode.disconnected.shared.event.comp.prog.general.PMP_SBPWPU_Up
 import com.quartercode.disconnected.shared.event.comp.prog.general.PMP_WP_InterruptProcessCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.generic.GP_SBPWPU_ErrorEvent;
 import com.quartercode.disconnected.shared.world.comp.file.PathUtils;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessPlaceholder;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessId;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessPlaceholder;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessState;
 import com.quartercode.eventbridge.bridge.module.EventHandler;
 import com.quartercode.eventbridge.bridge.module.StandardHandlerModule;
 import com.quartercode.eventbridge.extra.predicate.TypePredicate;

@@ -34,8 +34,8 @@ import com.quartercode.disconnected.server.world.comp.prog.RootProcess;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessInterruptCommand;
 import com.quartercode.disconnected.shared.identity.ClientIdentity;
 import com.quartercode.disconnected.shared.identity.SBPIdentity;
-import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessState;
+import com.quartercode.disconnected.shared.world.comp.proc.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessState;
 
 @RunWith (Parameterized.class)
 public class WorldProcessInterruptCommandHandlerTest {

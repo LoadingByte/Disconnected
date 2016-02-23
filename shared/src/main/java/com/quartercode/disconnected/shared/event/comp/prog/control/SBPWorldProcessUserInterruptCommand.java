@@ -19,7 +19,7 @@
 package com.quartercode.disconnected.shared.event.comp.prog.control;
 
 import com.quartercode.disconnected.shared.event.comp.prog.SBPWorldProcessUserCommand;
-import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.world.comp.proc.SBPWorldProcessUserId;
 
 /**
  * This event interrupts the user (server bridge partner) of a world process.

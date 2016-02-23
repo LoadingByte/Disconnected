@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
 public @interface InitializerSettings {
 
     /**
-     * Returns the group(s) the annotated {@link Initializer} is part of.
+     * The group(s) the annotated {@link Initializer} is part of.
      * In case of a single group, all initializers of that group must be executed before any initializer that depends on that group.
      * Note that it is possible for an initializer to be part of multiple groups.
      * In that case, the initializer must be executed before any initializer that depends on one of its groups.
@@ -43,7 +43,7 @@ public @interface InitializerSettings {
     String[] groups ();
 
     /**
-     * Returns the group(s) the annotated {@link Initializer} depends on.
+     * The group(s) the annotated {@link Initializer} depends on.
      * All initializers of all these groups must be executed before the annotated initializer is executed.
      *
      * @return The group(s) the initializer depends on.

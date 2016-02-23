@@ -27,8 +27,8 @@ import com.quartercode.disconnected.shared.event.comp.prog.SBPWorldProcessUserCo
 import com.quartercode.disconnected.shared.event.comp.prog.WorldProcessCommand;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchAcknowledgmentEvent;
 import com.quartercode.disconnected.shared.event.comp.prog.control.WorldProcessLaunchCommand;
-import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserDetails;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
+import com.quartercode.disconnected.shared.world.comp.proc.SBPWorldProcessUserDetails;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessId;
 import com.quartercode.eventbridge.bridge.Bridge;
 import com.quartercode.eventbridge.bridge.Event;
 import com.quartercode.eventbridge.bridge.EventPredicate;

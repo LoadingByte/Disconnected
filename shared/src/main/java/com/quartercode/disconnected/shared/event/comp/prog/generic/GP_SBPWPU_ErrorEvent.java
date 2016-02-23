@@ -20,7 +20,7 @@ package com.quartercode.disconnected.shared.event.comp.prog.generic;
 
 import java.text.MessageFormat;
 import com.quartercode.disconnected.shared.event.comp.prog.SBPWorldProcessUserCommand;
-import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.world.comp.proc.SBPWorldProcessUserId;
 
 /**
  * A generic error event sent by world programs to world process users.

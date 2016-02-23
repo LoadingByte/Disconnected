@@ -21,7 +21,7 @@ package com.quartercode.disconnected.shared.event.comp.prog.general;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import com.quartercode.disconnected.shared.event.comp.prog.WorldProcessCommand;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessId;
 import com.quartercode.eventbridge.basic.EventBase;
 
 @RequiredArgsConstructor

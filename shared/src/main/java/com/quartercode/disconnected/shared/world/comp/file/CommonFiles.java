@@ -43,16 +43,16 @@ public class CommonFiles {
     // ----- System Paths -----
 
     /**
-     * The path of the binary directory which stores all programs that come with a system.
+     * The path of the directory which stores all programs that come with a system.
      */
-    public static final String SYS_BIN_DIR        = SEPARATOR + SYSTEM_MOUNTPOINT + SEPARATOR + "bin";
+    public static final String SYSTEM_PROGRAM_DIR = SEPARATOR + SYSTEM_MOUNTPOINT + SEPARATOR + "bin";
 
     // ----- User Paths -----
 
     /**
-     * The path of the binary directory which stores all custom programs that are added by the users.
+     * The path of the directory which stores all custom programs that are added by the users.
      */
-    public static final String USER_BIN_DIR       = SEPARATOR + USER_MOUNTPOINT + SEPARATOR + "bin";
+    public static final String USER_PROGRAM_DIR   = SEPARATOR + USER_MOUNTPOINT + SEPARATOR + "bin";
 
     /**
      * The path of the config directory which contains all global configuration files for system and user programs.

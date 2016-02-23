@@ -19,8 +19,8 @@
 package com.quartercode.disconnected.shared.event.comp.prog.control;
 
 import com.quartercode.disconnected.shared.event.comp.prog.SBPWorldProcessUserCommand;
-import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserId;
-import com.quartercode.disconnected.shared.world.comp.prog.WorldProcessId;
+import com.quartercode.disconnected.shared.world.comp.proc.SBPWorldProcessUserId;
+import com.quartercode.disconnected.shared.world.comp.proc.WorldProcessId;
 
 /**
  * This event is sent when a program is launched using a {@link WorldProcessLaunchCommand} on the computer of the receiving world process user.

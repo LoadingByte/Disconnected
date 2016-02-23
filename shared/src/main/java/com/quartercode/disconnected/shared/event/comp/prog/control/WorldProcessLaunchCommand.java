@@ -18,7 +18,7 @@
 
 package com.quartercode.disconnected.shared.event.comp.prog.control;
 
-import com.quartercode.disconnected.shared.world.comp.prog.SBPWorldProcessUserDetails;
+import com.quartercode.disconnected.shared.world.comp.proc.SBPWorldProcessUserDetails;
 import com.quartercode.eventbridge.basic.EventBase;
 
 /**

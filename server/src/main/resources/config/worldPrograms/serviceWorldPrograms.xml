@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+<!--     <configureWorldProgram name="webServer"> -->
+<!--         <class>com.quartercode.disconnected.server.world.comp.prog.service.WebServerProgram</class> -->
+<!--         <size>1024</size> -->
+<!--         <commonFileDir>$C{com.quartercode.disconnected.shared.world.comp.file.CommonFiles.USER_BIN_DIR}</commonFileDir> -->
+<!--         <commonFileName>webserver.exe</commonFileName> -->
+<!--     </configureWorldProgram> -->
+<!--     <configureVulnSource name="worldProgram.webServer.httpRequestBufferOverflow"> -->
+<!--         <usage>worldProgram.webServer</usage> -->
+<!--         <weight>1</weight> -->
+<!--         <configureAction name="crash" vulnChance="1" attackWeight="5" /> -->
+<!--         <configureAction name="executePayload" vulnChance="0.3" attackWeight="1" /> -->
+<!--     </configureVulnSource> -->
+</config>
